@@ -4,103 +4,126 @@ import delay from 'pdelay';
 
 import rateLimitQueuer from './rate-limit-queuer';
 
-// This test is disabled because it depends on timing, and the test doesn't
-// handle running on overloaded CI test instances very well. Make sure to
-// manually re-enable this (xdescribe -> describe) if you make any changed to
-// rateLimitQueuer!
-xdescribe('rateLimitQueuer', () => {
-  test('single call works', async () => {
-    const fn = rateLimitQueuer(async () => 5, 15, 2);
-    expect(await fn()).toBe(5);
-  });
-  test('multiple calls under limit work', async () => {
-    let x = 5;
-    const fn = rateLimitQueuer(async () => x++, 15, 2);
-    const t1 = Date.now();
-    expect(await fn()).toBe(5);
-    const t2 = Date.now();
-    expect(t2 - t1).toBeLessThan(15);
-    expect(await fn()).toBe(6);
-    const t3 = Date.now();
-    expect(t3 - t2).toBeLessThan(15);
-  });
-  test('going over rate limit sequentially queues', async () => {
-    let x = 5;
-    const fn = rateLimitQueuer(async () => x++, 30, 2);
-    const t1 = Date.now();
-    expect(await fn()).toBe(5);
-    const t2 = Date.now();
-    expect(t2 - t1).toBeLessThan(10);
-    expect(await fn()).toBe(6);
-    const t3 = Date.now();
-    expect(t3 - t2).toBeLessThan(10);
+jest.useFakeTimers();
 
-    expect(await fn()).toBe(7);
-    const t4 = Date.now();
-    expect(t4 - t3).toBeGreaterThanOrEqual(10);
-    expect(await fn()).toBe(8);
-    const t5 = Date.now();
-    expect(t5 - t4).toBeLessThan(10);
+const _originalDateNow = Date.now;
 
-    expect(await fn()).toBe(9);
-    const t6 = Date.now();
-    expect(t6 - t5).toBeGreaterThanOrEqual(10);
-    expect(await fn()).toBe(10);
-    const t7 = Date.now();
-    expect(t7 - t6).toBeLessThan(10);
-  });
-  test('going over rate limit simultaneously queues', async () => {
-    let x = 5;
-    const fn = rateLimitQueuer(async () => x++, 100, 2);
+beforeEach(() => {
+  const start = _originalDateNow.call(Date);
+  (Date: any).now = () => start;
+});
 
-    const start = Date.now();
-    await Promise.all([
-      fn().then(r => {
-        expect(r).toBe(5);
-        expect(Date.now() - start).toBeLessThan(80);
-      }),
-      fn().then(r => {
-        expect(r).toBe(6);
-        expect(Date.now() - start).toBeLessThan(80);
-      }),
+function advancePromises(): Promise<void> {
+  return Promise.resolve().then(() => Promise.resolve());
+}
 
-      fn().then(r => {
-        expect(r).toBe(7);
-        expect(Date.now() - start).toBeGreaterThanOrEqual(80);
-        expect(Date.now() - start).toBeLessThan(200);
-      }),
-      fn().then(r => {
-        expect(r).toBe(8);
-        expect(Date.now() - start).toBeGreaterThanOrEqual(80);
-        expect(Date.now() - start).toBeLessThan(200);
-      }),
+function advanceTimers(time: number) {
+  const newTime = Date.now() + time;
+  (Date: any).now = () => newTime;
+  jest.advanceTimersByTime(time);
+}
 
-      fn().then(r => {
-        expect(r).toBe(9);
+test('single call works', async () => {
+  const fn = rateLimitQueuer(async () => 5, 15, 2);
+  expect(await fn()).toBe(5);
+});
+test('multiple calls under limit work', async () => {
+  let x = 5;
+  const fn = rateLimitQueuer(async () => x++, 15, 2);
+  expect(await fn()).toBe(5);
+  expect(await fn()).toBe(6);
+});
+test('going over rate limit sequentially queues', async () => {
+  let x = 5;
+  const fn = rateLimitQueuer(async () => x++, 30, 2);
+  expect(await fn()).toBe(5);
+  expect(await fn()).toBe(6);
+
+  const callSeven = fn();
+  const callSevenCb = jest.fn();
+  callSeven.then(callSevenCb, callSevenCb);
+  await advancePromises();
+  expect(callSevenCb).not.toBeCalled();
+
+  advanceTimers(30);
+
+  expect(await callSeven).toBe(7);
+  expect(await fn()).toBe(8);
+
+  const callNine = fn();
+  const callNineCb = jest.fn();
+  callNine.then(callNineCb, callNineCb);
+  await advancePromises();
+  expect(callNineCb).not.toBeCalled();
+
+  advanceTimers(30);
+
+  expect(await callNine).toBe(9);
+  expect(await fn()).toBe(10);
+});
+test('going over rate limit simultaneously queues', async () => {
+  let x = 5;
+  const fn = rateLimitQueuer(async () => x++, 100, 2);
+
+  const start = Date.now();
+  const p = Promise.all([
+    fn().then(r => {
+      expect(r).toBe(5);
+      expect(Date.now() - start).toBeLessThan(80);
+    }),
+    fn().then(r => {
+      expect(r).toBe(6);
+      expect(Date.now() - start).toBeLessThan(80);
+    }),
+
+    fn().then(r => {
+      expect(r).toBe(7);
+      expect(Date.now() - start).toBeGreaterThanOrEqual(80);
+      expect(Date.now() - start).toBeLessThan(200);
+    }),
+    fn().then(r => {
+      expect(r).toBe(8);
+      expect(Date.now() - start).toBeGreaterThanOrEqual(80);
+      expect(Date.now() - start).toBeLessThan(200);
+    }),
+
+    fn().then(r => {
+      expect(r).toBe(9);
+      expect(Date.now() - start).toBeGreaterThanOrEqual(200);
+    }),
+    delay(15)
+      .then(() => fn())
+      .then(r => {
+        expect(r).toBe(10);
         expect(Date.now() - start).toBeGreaterThanOrEqual(200);
-      }),
-      delay(15)
-        .then(() => fn())
-        .then(r => {
-          expect(r).toBe(10);
-          expect(Date.now() - start).toBeGreaterThanOrEqual(200);
-        })
-    ]);
-  });
-  test('recursive rate limited functions work', async () => {
-    let x = 0;
-    const fn = rateLimitQueuer(
-      async expectedX => {
-        expect(expectedX).toBe(x);
-        x++;
-        if (expectedX === 0) {
-          await Promise.all([fn(1), fn(2)]);
-        }
-      },
-      15,
-      2
-    );
-    await fn(0);
-    await delay(30);
-  });
+      })
+  ]);
+  for (let i=0; i<20; i++) {
+    advanceTimers(50);
+    await advancePromises();
+  }
+  await p;
+});
+test('recursive rate limited functions work', async () => {
+  let x = 0;
+  const fn = rateLimitQueuer(
+    async expectedX => {
+      expect(expectedX).toBe(x);
+      x++;
+      if (expectedX === 0) {
+        await Promise.all([fn(1), fn(2)]);
+      }
+    },
+    15,
+    2
+  );
+  const zeroCall = fn(0);
+  const zeroCallCb = jest.fn();
+  zeroCall.then(zeroCallCb, zeroCallCb);
+  await advancePromises();
+  expect(zeroCallCb).not.toBeCalled();
+
+  advanceTimers(50);
+  await zeroCall;
+  expect(zeroCallCb).toBeCalled();
 });
