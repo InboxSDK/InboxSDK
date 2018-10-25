@@ -13,7 +13,7 @@ global.MutationObserver = MockMutationObserver;
 </div>
 <div id="canvas"></div>
 </body>`;
-Object.defineProperty(document.location, 'origin', {value:'https://mail.google.com'});
+global.__test_origin = 'https://mail.google.com';
 const originalWindowProperties = Object.keys(window);
 
 const _ = require('lodash');

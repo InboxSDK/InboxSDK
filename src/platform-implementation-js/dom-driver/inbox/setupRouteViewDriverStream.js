@@ -26,7 +26,7 @@ export default function setupRouteViewDriverStream(driver: InboxDriver): Kefir.O
       Kefir.fromEvents(window, 'popstate')
     ])
       .map(e =>
-        (process.env.NODE_ENV === 'test' && e.detail.__test_url) || document.location.href
+        (process.env.NODE_ENV === 'test' && e.detail && e.detail.__test_url) || document.location.href
       ),
     Kefir.fromEvents(window, 'hashchange').map(e => e.newURL)
       // When the user hits back and leaves a hash URL, a hashchange *and*

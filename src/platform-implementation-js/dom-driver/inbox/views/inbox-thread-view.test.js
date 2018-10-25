@@ -16,7 +16,7 @@ function makeDriver(): Object {
     getAppId: ()=>'foo',
     getOpts: _.constant({
       appName: 'driver appName',
-      appIconUrl: '/driver/appIconUrl.png'
+      appIconUrl: 'http://localhost/driver/appIconUrl.png'
     }),
     getThreadViewElementsMap: _.constant(new Map()),
     getAppSidebarView: _.constant({
@@ -62,12 +62,12 @@ describe('addSidebarContentPanel', () => {
     const {el, parsed} = makeElement();
     const threadView = new InboxThreadView(el, driver, parsed);
     threadView.addSidebarContentPanel(Kefir.constant({
-      title: 'foo', iconUrl: '/bar.png', el: document.createElement('div')
+      title: 'foo', iconUrl: 'http://localhost/driver/bar.png', el: document.createElement('div')
     }));
     const {stickyHeading} = parsed.elements;
     expect(stickyHeading.querySelectorAll('button').length).toBe(1);
     expect(stickyHeading.querySelector('button').title).toBe('driver appName');
-    expect(stickyHeading.querySelector('button img').src).toBe('/driver/appIconUrl.png');
+    expect(stickyHeading.querySelector('button img').src).toBe('http://localhost/driver/appIconUrl.png');
     expect(stickyHeading.querySelector('button').parentElement.getAttribute('data-count')).toBe(null);
     const appSidebarView = driver.getAppSidebarView();
     expect(appSidebarView._addedPanels.length).toBe(1);
@@ -81,7 +81,7 @@ describe('addSidebarContentPanel', () => {
     const {el, parsed} = makeElement();
     const threadView = new InboxThreadView(el, driver, parsed);
     threadView.addSidebarContentPanel(Kefir.constant({
-      title: 'foo', iconUrl: '/bar.png', el: document.createElement('div')
+      title: 'foo', iconUrl: 'http://localhost/driver/bar.png', el: document.createElement('div')
     }));
     const appSidebarView = driver.getAppSidebarView();
     expect(appSidebarView._addedPanels.length).toBe(1);
@@ -98,7 +98,7 @@ describe('addSidebarContentPanel', () => {
     const {el, parsed} = makeElement();
     const threadView = new InboxThreadView(el, driver, parsed);
     threadView.addSidebarContentPanel(Kefir.constant({
-      title: 'foo', iconUrl: '/bar.png', el: document.createElement('div')
+      title: 'foo', iconUrl: 'http://localhost/driver/bar.png', el: document.createElement('div')
     }));
     threadView.addSidebarContentPanel(Kefir.constant({
       title: 'foo2', iconUrl: '/bar2.png', el: document.createElement('div')
@@ -106,7 +106,7 @@ describe('addSidebarContentPanel', () => {
     const {stickyHeading} = parsed.elements;
     expect(stickyHeading.querySelectorAll('button').length).toBe(1);
     expect(stickyHeading.querySelector('button').title).toBe('driver appName');
-    expect(stickyHeading.querySelector('button img').src).toBe('/driver/appIconUrl.png');
+    expect(stickyHeading.querySelector('button img').src).toBe('http://localhost/driver/appIconUrl.png');
     expect(stickyHeading.querySelector('button').parentElement.getAttribute('data-count')).toBe('2');
     const appSidebarView = driver.getAppSidebarView();
     expect(appSidebarView._addedPanels.length).toBe(2);
@@ -123,7 +123,7 @@ describe('addSidebarContentPanel', () => {
     const {el, parsed} = makeElement();
     const threadView = new InboxThreadView(el, driver, parsed);
     threadView.addSidebarContentPanel(Kefir.constant({
-      title: 'foo', iconUrl: '/bar.png', el: document.createElement('div')
+      title: 'foo', iconUrl: 'http://localhost/driver/bar.png', el: document.createElement('div')
     }));
     threadView.addSidebarContentPanel(Kefir.constant({
       title: 'foo2', iconUrl: '/bar2.png', el: document.createElement('div')
