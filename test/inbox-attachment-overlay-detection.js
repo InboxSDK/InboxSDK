@@ -25,7 +25,7 @@ import {
   page20160817,
   page20160830,
   page20170209,
-} from './lib/pages';
+} from './lib/pages-old';
 
 describe('Inbox Attachment Overlay Detection', function() {
   this.slow(5000);

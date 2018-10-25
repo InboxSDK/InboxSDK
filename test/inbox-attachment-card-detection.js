@@ -25,7 +25,7 @@ import {
   page20160812,
   page20160816,
   page20160908,
-} from './lib/pages';
+} from './lib/pages-old';
 
 describe('Inbox Attachment Card Detection', function() {
   this.slow(5000);

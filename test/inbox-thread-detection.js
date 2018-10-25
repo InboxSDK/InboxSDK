@@ -25,7 +25,7 @@ import {
   page20160727,
   page20160823,
   page20170317,
-} from './lib/pages';
+} from './lib/pages-old';
 
 describe('Inbox Thread Detection', function() {
   this.slow(5000);

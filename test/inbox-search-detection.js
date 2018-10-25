@@ -25,7 +25,7 @@ import {
   pageWithSidebar20160614,
   pageWithNav20170303,
   pageWithAutocomplete20170306
-} from './lib/pages';
+} from './lib/pages-old';
 
 describe('Inbox Search Detection', function() {
   this.slow(5000);

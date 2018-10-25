@@ -27,7 +27,7 @@ import {
   page20160810_2,
   page20160818_2,
   page20160819,
-} from './lib/pages';
+} from './lib/pages-old';
 
 describe('Inbox Message Detection', function() {
   this.slow(5000);

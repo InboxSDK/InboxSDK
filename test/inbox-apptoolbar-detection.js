@@ -13,7 +13,7 @@ function locFinder(document) {
 import {
   page20160614,
   pageWithSidebar20160614
-} from './lib/pages';
+} from './lib/pages-old';
 
 describe('Inbox AppToolbar Support Detection', function() {
   this.slow(5000);

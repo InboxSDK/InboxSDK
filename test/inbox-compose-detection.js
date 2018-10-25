@@ -46,7 +46,7 @@ import {
   page20160818,
   page20161102,
   page20170302,
-} from './lib/pages';
+} from './lib/pages-old';
 
 describe('Inbox Compose Detection', function() {
   this.slow(5000);
