@@ -1,10 +1,13 @@
 /* @flow */
 
+import lsMap from 'live-set/map';
 import querySelector from '../../src/platform-implementation-js/lib/dom/querySelectorOrFail';
+import MockMutationObserver from '../lib/mock-mutation-observer';
+global.MutationObserver = MockMutationObserver;
+
+import makePageParserTree from '../lib/makePageParserTree';
 import pageParserOptions from '../../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
 import parser from '../../src/platform-implementation-js/dom-driver/inbox/detection/searchBar/parser';
-import makePageParserTree from '../lib/makePageParserTree';
-import lsMap from 'live-set/map';
 
 function searchBarFinder(documentElement: HTMLHtmlElement) {
   return Array.from(pageParserOptions.finders.searchBar.fn(documentElement));
