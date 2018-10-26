@@ -102,6 +102,12 @@ export const page20160817 = once(() => {
       'utf8'
     )
   );
+
+  // Needed for iframe's contentDocument property to be accessible
+  const div = document.createElement('div');
+  div.appendChild(page);
+  (document.body: any).appendChild(div);
+
   const ifrContent = createElementWithHtml(
     fs.readFileSync(
       __dirname + '/../data/inbox-2016-08-17 with preview overlay iframe.html',

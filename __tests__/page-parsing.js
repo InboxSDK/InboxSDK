@@ -4,6 +4,7 @@
 
 import '../test/page-parsing/inbox-apptoolbar-detection';
 import '../test/page-parsing/inbox-attachment-card-detection';
+import '../test/page-parsing/inbox-attachment-overlay-detection';
 import '../test/page-parsing/inbox-compose-detection';
 import '../test/page-parsing/inbox-message-detection';
 import '../test/page-parsing/inbox-search-detection';
