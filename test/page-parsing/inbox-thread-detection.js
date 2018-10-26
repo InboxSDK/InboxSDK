@@ -4,13 +4,13 @@ import _ from 'lodash';
 import fs from 'fs';
 import Kefir from 'kefir';
 import lsMap from 'live-set/map';
-import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
-import MockMutationObserver from '../test/lib/mock-mutation-observer';
+import querySelector from '../../src/platform-implementation-js/lib/dom/querySelectorOrFail';
+import MockMutationObserver from '../lib/mock-mutation-observer';
 global.MutationObserver = MockMutationObserver;
 
-import makePageParserTree from '../test/lib/makePageParserTree';
-import pageParserOptions from '../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
-import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/thread/parser';
+import makePageParserTree from '../lib/makePageParserTree';
+import pageParserOptions from '../../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
+import parser from '../../src/platform-implementation-js/dom-driver/inbox/detection/thread/parser';
 
 function finder(documentElement: HTMLHtmlElement) {
   return pageParserOptions.finders.thread.fn(documentElement);
@@ -22,7 +22,7 @@ import {
   page20160727,
   page20160823,
   page20170317,
-} from '../test/lib/pages';
+} from '../lib/pages';
 
 describe('Inbox Thread Detection', () => {
   describe('finder', () => {

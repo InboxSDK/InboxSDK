@@ -5,14 +5,14 @@ import fs from 'fs';
 import sinon from 'sinon';
 import Kefir from 'kefir';
 import lsMap from 'live-set/map';
-import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
-import MockMutationObserver from '../test/lib/mock-mutation-observer';
+import querySelector from '../../src/platform-implementation-js/lib/dom/querySelectorOrFail';
+import MockMutationObserver from '../lib/mock-mutation-observer';
 global.MutationObserver = MockMutationObserver;
 
-import makePageParserTree from '../test/lib/makePageParserTree';
-import pageParserOptions from '../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
+import makePageParserTree from '../lib/makePageParserTree';
+import pageParserOptions from '../../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
 
-import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/compose/parser';
+import parser from '../../src/platform-implementation-js/dom-driver/inbox/detection/compose/parser';
 
 function inlineFinder(documentElement: HTMLHtmlElement) {
   return Array.from(pageParserOptions.finders.inlineCompose.fn(documentElement));
@@ -43,7 +43,7 @@ import {
   page20160818,
   page20161102,
   page20170302,
-} from '../test/lib/pages';
+} from '../lib/pages';
 
 describe('Inbox Compose Detection', () => {
   describe('finder', () => {

@@ -47,7 +47,7 @@ module.exports = {
       },
     },
     {
-      "files": ["__tests__/**", "**/*.test.js"],
+      "files": ["__tests__/**", "**/*.test.js", "test/page-parsing/**"],
       "env": {
         "jest": true
       },

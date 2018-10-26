@@ -6,13 +6,13 @@ import assert from 'assert';
 import sinon from 'sinon';
 import Kefir from 'kefir';
 import lsMap from 'live-set/map';
-import querySelector from '../src/platform-implementation-js/lib/dom/querySelectorOrFail';
-import MockMutationObserver from '../test/lib/mock-mutation-observer';
+import querySelector from '../../src/platform-implementation-js/lib/dom/querySelectorOrFail';
+import MockMutationObserver from '../lib/mock-mutation-observer';
 global.MutationObserver = MockMutationObserver;
 
-import makePageParserTree from '../test/lib/makePageParserTree';
-import pageParserOptions from '../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
-import parser from '../src/platform-implementation-js/dom-driver/inbox/detection/message/parser';
+import makePageParserTree from '../lib/makePageParserTree';
+import pageParserOptions from '../../src/platform-implementation-js/dom-driver/inbox/pageParserOptions';
+import parser from '../../src/platform-implementation-js/dom-driver/inbox/detection/message/parser';
 
 function finder(documentElement) {
   return pageParserOptions.finders.message.fn(documentElement);
@@ -25,7 +25,7 @@ import {
   page20160810_2,
   page20160818_2,
   page20160819,
-} from '../test/lib/pages';
+} from '../lib/pages';
 
 describe('Inbox Message Detection', () => {
   describe('finder', () => {
