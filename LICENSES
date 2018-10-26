@@ -17,7 +17,6 @@ gulp-streamify - MIT
 gulp-uglify - MIT
 gulp-util - MIT
 jsdom - MIT
-mocha - MIT
 mold-source-map - MIT
 node-dir - MIT
 rimraf - MIT
