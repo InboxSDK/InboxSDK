@@ -222,7 +222,7 @@ const pageParserOptions: PageParserTreeOptions = {
     {sources: [null], tag: 'attachmentOverlay', selectors: [
       'body',
       'iframe[id][frameborder]:not([src])',
-      {$map: el => (el:any).contentDocument.body},
+      {$map: el => (el:any).contentDocument && (el:any).contentDocument.body},
       'div[aria-label][role=dialog]',
       {$watch: {attributeFilter: ['aria-hidden'], cond: ':not([aria-hidden=true])'}}
     ]},

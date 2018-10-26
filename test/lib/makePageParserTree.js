@@ -5,12 +5,12 @@ import _makePageParserTree from '../../src/platform-implementation-js/dom-driver
 import type PageParserTree from 'page-parser-tree';
 
 const activePageParserTrees = [];
-beforeEach(function() {
+beforeEach(() => {
   if (activePageParserTrees.length) {
     throw new Error(`activePageParserTrees.length ${activePageParserTrees.length}`);
   }
 });
-afterEach(function() {
+afterEach(() => {
   activePageParserTrees.forEach(page => {
     page.dump();
   });
