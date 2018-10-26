@@ -6,3 +6,4 @@ import '../test/page-parsing/inbox-apptoolbar-detection';
 import '../test/page-parsing/inbox-compose-detection';
 import '../test/page-parsing/inbox-message-detection';
 import '../test/page-parsing/inbox-thread-detection';
+import '../test/page-parsing/inbox-search-detection';

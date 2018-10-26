@@ -3,6 +3,9 @@
 import fs from 'fs';
 import once from 'lodash/once';
 
+// For efficiency, this module should only be imported by tests that are
+// imported from __tests__/page-parsing.js.
+
 function createElementWithHtml(html: string): HTMLHtmlElement {
   const el = document.createElement('html');
   el.innerHTML = html;
