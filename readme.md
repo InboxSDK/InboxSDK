@@ -47,9 +47,6 @@ This project has different kinds of unit tests and integration tests.
 All .js files under `__tests__` and all `*.test.js` files are tests executed by
 Jest. All new (non-integration) tests should be Jest tests.
 
-There are many unit tests which run under a single Javascript environment in
-`test/*.js` files. These are executed by Mocha.
-
 There are Selenium-based browser integration tests in `test/chrome/*.js` files.
 These are the only tests which test the InboxSDK against the live Gmail and
 Inbox sites. These tests are primarily about checking whether Gmail or Inbox
