@@ -569,11 +569,12 @@ class GmailAppSidebarPrimary {
     }
 
     {
-      const activeAddOnIcon = companionSidebarIconContainerEl.querySelector(
+      // If a gmail addon is active, close it.
+      const nativeActiveAddOnIcon = companionSidebarIconContainerEl.querySelector(
         ACTIVE_ADD_ON_ICON_SELECTOR
       );
-      if (activeAddOnIcon) {
-        simulateClick(activeAddOnIcon);
+      if (nativeActiveAddOnIcon) {
+        simulateClick(nativeActiveAddOnIcon);
       }
     }
 
