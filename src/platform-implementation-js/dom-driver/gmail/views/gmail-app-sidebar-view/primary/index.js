@@ -918,7 +918,7 @@ class GmailAppSidebarPrimary {
 
           const activeButtonContainer = this._getActiveButtonContainer();
           if (activeButtonContainer === buttonContainer) {
-            simulateClick(querySelector(buttonContainer, 'button'));
+            querySelector(buttonContainer, 'button').click();
           }
         });
 
@@ -1007,10 +1007,9 @@ class GmailAppSidebarPrimary {
       .onValue(() => {
         // TODO What is this block for? It closes the current section whenever
         // one of the Gmail addons bar elements changes?
-        console.error('Unknown section hit TODO');
         const activeButtonContainer = this._getActiveButtonContainer();
         if (activeButtonContainer) {
-          simulateClick(querySelector(activeButtonContainer, 'button'));
+          querySelector(activeButtonContainer, 'button').click();
         }
       });
   }
