@@ -434,7 +434,9 @@ class GmailAppSidebarPrimary {
             this._closeButton = (userClick: boolean) => {
               this._closeButton = null;
 
-              this._closeSidebarAndDeactivateButton(buttonContainer);
+              const activeButtonContainer = this._getActiveButtonContainer();
+              if (!activeButtonContainer) throw new Error('Expected activeButtonContainer');
+              this._closeSidebarAndDeactivateButton(activeButtonContainer);
 
               if (isGlobal) {
                 if (userClick) this._setShouldGlobalAppSidebarOpen(false);
