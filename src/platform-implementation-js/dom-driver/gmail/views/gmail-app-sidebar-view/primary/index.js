@@ -328,7 +328,7 @@ class GmailAppSidebarPrimary {
     return activeButtonContainer;
   }
 
-  _closeButton: ?() => void = null;
+  _closeButton: ?(userClick: boolean) => void = null;
 
   _addButton(iconArea: HTMLElement, event: Object, isGlobal: boolean) {
     // we put adding the content panel icon in the iconArea in an asap so that we
@@ -396,12 +396,12 @@ class GmailAppSidebarPrimary {
             if (activeButtonContainer === buttonContainer) {
               // button was clicked while its panel was open, so close it.
               if (!this._closeButton) throw new Error();
-              this._closeButton();
+              this._closeButton(true);
             } else {
               // button was clicked while its own panel wasn't open, so open it.
 
               if (this._closeButton) {
-                this._closeButton();
+                this._closeButton(true);
               }
 
               if (isGlobal) this._setShouldGlobalAppSidebarOpen(true);
@@ -433,18 +433,13 @@ class GmailAppSidebarPrimary {
                 threadSidebarComponent.scrollPanelIntoView(instanceId, true);
               }
 
-              this._closeButton = () => {
+              this._closeButton = (userClick: boolean) => {
                 this._closeButton = null;
 
-                const activeButtonContainer = this._getActiveButtonContainer();
-                if (!activeButtonContainer) {
-                  throw new Error('Expected activeButtonContainer');
-                }
-
-                this._closeSidebarAndDeactivateButton(activeButtonContainer);
+                this._closeSidebarAndDeactivateButton(buttonContainer);
 
                 if (isGlobal) {
-                  this._setShouldGlobalAppSidebarOpen(false);
+                  if (userClick) this._setShouldGlobalAppSidebarOpen(false);
 
                   const contentEl = this._contentContainers.get(appName);
                   if (contentEl) {
@@ -461,7 +456,7 @@ class GmailAppSidebarPrimary {
                     })
                   );
                 } else {
-                  this._setShouldThreadAppSidebarOpen(false);
+                  if (userClick) this._setShouldThreadAppSidebarOpen(false);
                 }
               };
             }
@@ -515,7 +510,7 @@ class GmailAppSidebarPrimary {
       buttonContainers.delete(appName);
       if (container === activeButtonContainer) {
         if (!this._closeButton) throw new Error();
-        this._closeButton();
+        this._closeButton(false);
 
         this._companionSidebarOuterWrapper.classList.remove(
           'companion_app_sidebar_wrapper_visible'
@@ -918,7 +913,8 @@ class GmailAppSidebarPrimary {
 
           const activeButtonContainer = this._getActiveButtonContainer();
           if (activeButtonContainer === buttonContainer) {
-            querySelector(buttonContainer, 'button').click();
+            if (!this._closeButton) throw new Error('Expected this._closeButton');
+            this._closeButton(true);
           }
         });
 
