@@ -386,7 +386,7 @@ class GmailAppSidebarPrimary {
           this._threadButtonContainers.set(appName, buttonContainer);
         }
 
-        const activate = (dontScrollIntoView=false) => {
+        const activate = (dontScrollIntoView = false) => {
           const activeButtonContainer = this._getActiveButtonContainer();
 
           if (activeButtonContainer === buttonContainer) {
@@ -435,7 +435,9 @@ class GmailAppSidebarPrimary {
               this._closeButton = null;
 
               const activeButtonContainer = this._getActiveButtonContainer();
-              if (!activeButtonContainer) throw new Error('Expected activeButtonContainer');
+              if (!activeButtonContainer) {
+                throw new Error('Expected activeButtonContainer');
+              }
               this._closeSidebarAndDeactivateButton(activeButtonContainer);
 
               if (isGlobal) {
@@ -445,7 +447,9 @@ class GmailAppSidebarPrimary {
                 if (contentEl) {
                   contentEl.style.display = 'none';
                 } else {
-                  this._driver.getLogger().error(new Error('Unexpected: contentEl not set'));
+                  this._driver
+                    .getLogger()
+                    .error(new Error('Unexpected: contentEl not set'));
                 }
 
                 ((document.body: any): HTMLElement).dispatchEvent(
@@ -482,11 +486,25 @@ class GmailAppSidebarPrimary {
         // panel gets added
         {
           const activeButtonContainer = this._getActiveButtonContainer();
-          if (!activeButtonContainer) {
-            if (isGlobal && this._getShouldGlobalAppSidebarOpen()) {
-              activate(true);
-            } else if (!isGlobal && this._getShouldThreadAppSidebarOpen()) {
-              activate(true);
+          if (isGlobal) {
+            if (this._getShouldGlobalAppSidebarOpen()) {
+              const activeButtonContainerPresentAndIsForGlobal =
+                this._globalIconArea &&
+                activeButtonContainer &&
+                this._globalIconArea.contains(activeButtonContainer);
+              if (!activeButtonContainerPresentAndIsForGlobal) {
+                activate(true);
+              }
+            }
+          } else {
+            if (this._getShouldThreadAppSidebarOpen()) {
+              const activeButtonContainerPresentAndIsForThread =
+                this._threadIconArea &&
+                activeButtonContainer &&
+                this._threadIconArea.contains(activeButtonContainer);
+              if (!activeButtonContainerPresentAndIsForThread) {
+                activate(true);
+              }
             }
           }
         }
@@ -920,7 +938,9 @@ class GmailAppSidebarPrimary {
 
           const activeButtonContainer = this._getActiveButtonContainer();
           if (activeButtonContainer === buttonContainer) {
-            if (!this._closeButton) throw new Error('Expected this._closeButton');
+            if (!this._closeButton) {
+              throw new Error('Expected this._closeButton');
+            }
             this._closeButton(true);
           }
         });
