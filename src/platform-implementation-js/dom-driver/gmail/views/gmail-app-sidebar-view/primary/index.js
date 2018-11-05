@@ -513,8 +513,6 @@ class GmailAppSidebarPrimary {
       const activeButtonContainer = iconArea.querySelector(
         '.sidebar_button_container_active'
       );
-      container.remove();
-      buttonContainers.delete(appName);
       if (container === activeButtonContainer) {
         if (!this._closeButton) throw new Error();
         this._closeButton(false);
@@ -532,6 +530,8 @@ class GmailAppSidebarPrimary {
             'companion_container_app_sidebar_visible'
           );
       }
+      container.remove();
+      buttonContainers.delete(appName);
     } else if (currentCount === 2) {
       container.removeAttribute('data-count');
     } else {
