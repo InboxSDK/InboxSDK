@@ -313,6 +313,23 @@ class GmailAppSidebarPrimary {
     });
   }
 
+  _getActiveButtonContainer(): ?HTMLElement {
+    let activeButtonContainer;
+    if (this._globalIconArea) {
+      activeButtonContainer = this._globalIconArea.querySelector(
+        '.sidebar_button_container_active'
+      );
+    }
+    if (!activeButtonContainer && this._threadIconArea) {
+      activeButtonContainer = this._threadIconArea.querySelector(
+        '.sidebar_button_container_active'
+      );
+    }
+    return activeButtonContainer;
+  }
+
+  _closeButton: ?(userClick: boolean) => void = null;
+
   _addButton(iconArea: HTMLElement, event: Object, isGlobal: boolean) {
     // we put adding the content panel icon in the iconArea in an asap so that we
     // get consistent ordering. The ordering of the icons is based on the position of the FIRST
@@ -369,33 +386,71 @@ class GmailAppSidebarPrimary {
           this._threadButtonContainers.set(appName, buttonContainer);
         }
 
-        querySelector(buttonContainer, 'button').addEventListener(
-          'click',
-          (event: MouseEvent) => {
-            event.stopPropagation();
+        const activate = (dontScrollIntoView = false) => {
+          const activeButtonContainer = this._getActiveButtonContainer();
 
-            let activeButtonContainer;
-            if (this._globalIconArea)
-              activeButtonContainer = this._globalIconArea.querySelector(
-                '.sidebar_button_container_active'
+          if (activeButtonContainer === buttonContainer) {
+            // button was clicked while its panel was open, so close it.
+            if (!this._closeButton) throw new Error();
+            this._closeButton(true);
+          } else {
+            // button was clicked while its own panel wasn't open, so open it.
+
+            if (this._closeButton) {
+              this._closeButton(true);
+            }
+
+            if (isGlobal) this._setShouldGlobalAppSidebarOpen(true);
+            else this._setShouldThreadAppSidebarOpen(true);
+
+            this._openSidebarAndActivateButton(buttonContainer, isGlobal);
+
+            if (isGlobal) {
+              const contentEl = this._contentContainers.get(appName);
+              if (contentEl) contentEl.style.display = '';
+              this._companionSidebarContentContainerEl.classList.add(
+                'companion_global_app_sidebar_visible'
               );
-            if (!activeButtonContainer && this._threadIconArea)
-              activeButtonContainer = this._threadIconArea.querySelector(
-                '.sidebar_button_container_active'
+
+              // let app listen for activate event
+              ((document.body: any): HTMLElement).dispatchEvent(
+                new CustomEvent('inboxsdkSidebarPanelActivated', {
+                  bubbles: true,
+                  cancelable: false,
+                  detail: { instanceId }
+                })
               );
+            } else {
+              const threadSidebarComponent = this._threadSidebarComponent;
+              if (!threadSidebarComponent) {
+                throw new Error('sidebar not mounted');
+              }
+              if (!dontScrollIntoView) {
+                threadSidebarComponent.openPanel(instanceId);
+                threadSidebarComponent.scrollPanelIntoView(instanceId, true);
+              }
+            }
 
-            if (activeButtonContainer === buttonContainer) {
-              // button was clicked while its panel was open, so close it.
+            this._closeButton = (userClick: boolean) => {
+              this._closeButton = null;
 
-              if (!activeButtonContainer) throw new Error(); // for flow
-
+              const activeButtonContainer = this._getActiveButtonContainer();
+              if (!activeButtonContainer) {
+                throw new Error('Expected activeButtonContainer');
+              }
               this._closeSidebarAndDeactivateButton(activeButtonContainer);
 
               if (isGlobal) {
-                this._setShouldGlobalAppSidebarOpen(false);
+                if (userClick) this._setShouldGlobalAppSidebarOpen(false);
 
                 const contentEl = this._contentContainers.get(appName);
-                if (contentEl) contentEl.style.display = 'none';
+                if (contentEl) {
+                  contentEl.style.display = 'none';
+                } else {
+                  this._driver
+                    .getLogger()
+                    .error(new Error('Unexpected: contentEl not set'));
+                }
 
                 ((document.body: any): HTMLElement).dispatchEvent(
                   new CustomEvent('inboxsdkSidebarPanelDeactivated', {
@@ -405,43 +460,20 @@ class GmailAppSidebarPrimary {
                   })
                 );
               } else {
-                this._setShouldThreadAppSidebarOpen(false);
+                if (userClick) this._setShouldThreadAppSidebarOpen(false);
               }
-            } else {
-              // button was clicked while its panel wasn't open, so open it.
+            };
+          }
 
-              if (isGlobal) this._setShouldGlobalAppSidebarOpen(true);
-              else this._setShouldThreadAppSidebarOpen(true);
+          //fake resize to get gmail to fix any heights that are messed up
+          fakeWindowResize();
+        };
 
-              this._openSidebarAndActivateButton(buttonContainer, isGlobal);
-
-              if (isGlobal) {
-                const contentEl = this._contentContainers.get(appName);
-                if (contentEl) contentEl.style.display = '';
-                this._companionSidebarContentContainerEl.classList.add(
-                  'companion_global_app_sidebar_visible'
-                );
-
-                // let app listen for activate event
-                ((document.body: any): HTMLElement).dispatchEvent(
-                  new CustomEvent('inboxsdkSidebarPanelActivated', {
-                    bubbles: true,
-                    cancelable: false,
-                    detail: { instanceId }
-                  })
-                );
-              } else {
-                const threadSidebarComponent = this._threadSidebarComponent;
-                if (!threadSidebarComponent) {
-                  throw new Error('sidebar not mounted');
-                }
-                threadSidebarComponent.openPanel(instanceId);
-                threadSidebarComponent.scrollPanelIntoView(instanceId, true);
-              }
-            }
-
-            //fake resize to get gmail to fix any heights that are messed up
-            fakeWindowResize();
+        querySelector(buttonContainer, 'button').addEventListener(
+          'click',
+          (event: MouseEvent) => {
+            event.stopPropagation();
+            activate();
           },
           true
         );
@@ -453,25 +485,26 @@ class GmailAppSidebarPrimary {
         // if we last had an SDK sidebar open then bring up the SDK sidebar when the first
         // panel gets added
         {
-          let activeButtonContainer;
-          if (isGlobal && this._getShouldGlobalAppSidebarOpen()) {
-            if (this._threadIconArea)
-              activeButtonContainer = this._threadIconArea.querySelector(
-                '.sidebar_button_container_active'
-              );
-            if (!activeButtonContainer && this._globalIconArea)
-              activeButtonContainer = this._globalIconArea.querySelector(
-                '.sidebar_button_container_active'
-              );
-            if (!activeButtonContainer)
-              simulateClick(querySelector(buttonContainer, 'button'));
-          } else if (!isGlobal && this._getShouldThreadAppSidebarOpen()) {
-            if (this._threadIconArea)
-              activeButtonContainer = this._threadIconArea.querySelector(
-                '.sidebar_button_container_active'
-              );
-            if (!activeButtonContainer) {
-              this._openSidebarAndActivateButton(buttonContainer, isGlobal);
+          const activeButtonContainer = this._getActiveButtonContainer();
+          if (isGlobal) {
+            if (this._getShouldGlobalAppSidebarOpen()) {
+              const activeButtonContainerPresentAndIsForGlobal =
+                this._globalIconArea &&
+                activeButtonContainer &&
+                this._globalIconArea.contains(activeButtonContainer);
+              if (!activeButtonContainerPresentAndIsForGlobal) {
+                activate(true);
+              }
+            }
+          } else {
+            if (this._getShouldThreadAppSidebarOpen()) {
+              const activeButtonContainerPresentAndIsForThread =
+                this._threadIconArea &&
+                activeButtonContainer &&
+                this._threadIconArea.contains(activeButtonContainer);
+              if (!activeButtonContainerPresentAndIsForThread) {
+                activate(true);
+              }
             }
           }
         }
@@ -498,9 +531,10 @@ class GmailAppSidebarPrimary {
       const activeButtonContainer = iconArea.querySelector(
         '.sidebar_button_container_active'
       );
-      container.remove();
-      buttonContainers.delete(appName);
       if (container === activeButtonContainer) {
+        if (!this._closeButton) throw new Error();
+        this._closeButton(false);
+
         this._companionSidebarOuterWrapper.classList.remove(
           'companion_app_sidebar_wrapper_visible'
         );
@@ -514,6 +548,8 @@ class GmailAppSidebarPrimary {
             'companion_container_app_sidebar_visible'
           );
       }
+      container.remove();
+      buttonContainers.delete(appName);
     } else if (currentCount === 2) {
       container.removeAttribute('data-count');
     } else {
@@ -552,28 +588,19 @@ class GmailAppSidebarPrimary {
         'Could not find companion sidebar icon container element'
       );
 
-    let activeButtonContainer;
-    if (this._globalIconArea) {
-      activeButtonContainer = this._globalIconArea.querySelector(
-        '.sidebar_button_container_active'
-      );
-    }
-    if (!activeButtonContainer && this._threadIconArea) {
-      activeButtonContainer = this._threadIconArea.querySelector(
-        '.sidebar_button_container_active'
-      );
-    }
-
+    const activeButtonContainer = this._getActiveButtonContainer();
     if (activeButtonContainer) {
-      this._closeSidebarAndDeactivateButton(activeButtonContainer);
+      throw new Error('activeButtonContainer should not be true');
+      // this._closeSidebarAndDeactivateButton(activeButtonContainer);
     }
 
     {
-      const activeAddOnIcon = companionSidebarIconContainerEl.querySelector(
+      // If a gmail addon is active, close it.
+      const nativeActiveAddOnIcon = companionSidebarIconContainerEl.querySelector(
         ACTIVE_ADD_ON_ICON_SELECTOR
       );
-      if (activeAddOnIcon) {
-        simulateClick(activeAddOnIcon);
+      if (nativeActiveAddOnIcon) {
+        simulateClick(nativeActiveAddOnIcon);
       }
     }
 
@@ -794,24 +821,16 @@ class GmailAppSidebarPrimary {
             );
             if (!descriptor) return;
 
-            this._setShouldThreadAppSidebarOpen(true);
-
             const buttonContainer = this._threadButtonContainers.get(
               descriptor.appName
             );
             if (!buttonContainer) {
               throw new Error('missing button container');
             }
-            this._openSidebarAndActivateButton(
-              buttonContainer,
-              e.detail.isGlobal
-            );
-
-            threadSidebarComponent.openPanel(e.detail.instanceId);
-            threadSidebarComponent.scrollPanelIntoView(
-              e.detail.instanceId,
-              true
-            );
+            const activeButtonContainer = this._getActiveButtonContainer();
+            if (activeButtonContainer !== buttonContainer) {
+              querySelector(buttonContainer, 'button').click();
+            }
           });
         });
     }
@@ -917,15 +936,12 @@ class GmailAppSidebarPrimary {
           );
           if (!buttonContainer) return;
 
-          let activeButtonContainer;
-          if (this._globalIconArea) {
-            activeButtonContainer = this._globalIconArea.querySelector(
-              '.sidebar_button_container_active'
-            );
-          }
-
+          const activeButtonContainer = this._getActiveButtonContainer();
           if (activeButtonContainer === buttonContainer) {
-            simulateClick(querySelector(buttonContainer, 'button'));
+            if (!this._closeButton) {
+              throw new Error('Expected this._closeButton');
+            }
+            this._closeButton(true);
           }
         });
 
@@ -945,15 +961,9 @@ class GmailAppSidebarPrimary {
           );
           if (!buttonContainer) return;
 
-          let activeButtonContainer;
-          if (this._globalIconArea) {
-            activeButtonContainer = this._globalIconArea.querySelector(
-              '.sidebar_button_container_active'
-            );
-          }
-
+          const activeButtonContainer = this._getActiveButtonContainer();
           if (activeButtonContainer !== buttonContainer) {
-            simulateClick(querySelector(buttonContainer, 'button'));
+            querySelector(buttonContainer, 'button').click();
           }
         });
     }
@@ -1018,18 +1028,11 @@ class GmailAppSidebarPrimary {
       )
       .takeUntilBy(this._stopper)
       .onValue(() => {
-        let activeButtonContainer;
-        if (this._threadIconArea)
-          activeButtonContainer = this._threadIconArea.querySelector(
-            '.sidebar_button_container_active'
-          );
-        if (!activeButtonContainer && this._globalIconArea)
-          activeButtonContainer = this._globalIconArea.querySelector(
-            '.sidebar_button_container_active'
-          );
-
+        // TODO What is this block for? It closes the current section whenever
+        // one of the Gmail addons bar elements changes?
+        const activeButtonContainer = this._getActiveButtonContainer();
         if (activeButtonContainer) {
-          simulateClick(querySelector(activeButtonContainer, 'button'));
+          querySelector(activeButtonContainer, 'button').click();
         }
       });
   }
