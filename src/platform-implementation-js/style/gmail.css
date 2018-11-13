@@ -124,6 +124,11 @@ body:not(.inboxsdk__gmailv1css) .f4.J-N-JX.inboxsdk__message_more_icon {
 
 /* compose buttons */
 
+/* fix compose mole position when sidebar is open */
+body:not(.inboxsdk__gmailv1css) .dw .nH > .no .nH.nn:last-child[style="width: 320px;"] {
+  width: 376px !important;
+}
+
 /* fix native button wrapping */
 body:not(.inboxsdk__gmailv1css) .inboxsdk__compose .a8X {
   overflow: visible;
