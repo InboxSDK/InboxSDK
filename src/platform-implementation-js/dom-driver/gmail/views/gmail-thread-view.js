@@ -332,14 +332,15 @@ class GmailThreadView {
 			if (isNaN(numberNativeHiddenMessages)) {
 				throw new Error('Couldn\'t find number of native hidden messages in dom structure');
 			}
-		} 
+		}
 
 		const appNoticeElement = noticeProvider(numberCustomHiddenMessages, numberNativeHiddenMessages);
 		appNoticeContainerElement.appendChild(appNoticeElement);
 
 		if(nativeHiddenNoticePresent){
 			const nativeHiddenNoticeElement = querySelector(hiddenNoticeMessageElement, '.adx');
-			nativeHiddenNoticeElement.insertAdjacentElement('afterend', appNoticeContainerElement);
+			nativeHiddenNoticeElement.classList.add("inboxsdk__custom_message_view_app_notice_wrapper");
+			nativeHiddenNoticeElement.appendChild(appNoticeContainerElement);
 		}
 		else {
 			appNoticeContainerElement.classList.add('inboxsdk__custom_message_view_app_notice_noNative');
