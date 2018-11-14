@@ -320,8 +320,8 @@ class GmailThreadView {
 		const noticeProvider = this._hiddenCustomMessageNoticeProvider;
 		if(!noticeProvider) return;
 
-		const appNoticeContainerElement = this._hiddenCustomMessageNoticeElement = document.createElement('div');
-		appNoticeContainerElement.classList.add('inboxsdk__custom_message_view_app_notice');
+		const appNoticeContainerElement = this._hiddenCustomMessageNoticeElement = document.createElement('span');
+		appNoticeContainerElement.classList.add('inboxsdk__custom_message_view_app_notice_content');
 
 		const numberCustomHiddenMessages = this._hiddenCustomMessageViews.size;
 
@@ -337,16 +337,17 @@ class GmailThreadView {
 		const appNoticeElement = noticeProvider(numberCustomHiddenMessages, numberNativeHiddenMessages);
 		appNoticeContainerElement.appendChild(appNoticeElement);
 
-		if(nativeHiddenNoticePresent){
-			const nativeHiddenNoticeElement = querySelector(hiddenNoticeMessageElement, '.adx');
-			nativeHiddenNoticeElement.classList.add("inboxsdk__custom_message_view_app_notice_wrapper");
-			nativeHiddenNoticeElement.appendChild(appNoticeContainerElement);
-		}
-		else {
-			appNoticeContainerElement.classList.add('inboxsdk__custom_message_view_app_notice_noNative');
+		if(!nativeHiddenNoticePresent) {
+			const fakeAppNoticeElement = document.createElement('span');
+			fakeAppNoticeElement.classList.add('adx');
+
 			const insertionPoint = querySelector(hiddenNoticeMessageElement, '.G3');
-			insertionPoint.appendChild(appNoticeContainerElement);
+			insertionPoint.appendChild(fakeAppNoticeElement);
 		}
+
+		const hiddenNoticeElement = querySelector(hiddenNoticeMessageElement, '.adx');
+		hiddenNoticeElement.classList.add('inboxsdk__custom_message_view_app_notice_container');
+		hiddenNoticeElement.appendChild(appNoticeContainerElement);
 	}
 
 	getSubject(): string {

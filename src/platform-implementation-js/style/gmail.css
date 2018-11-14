@@ -611,7 +611,7 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
 
 /* .zA td.apU.xy refers to the <td/> element that houses the favorite star in thread row view.
  The <span> element is what inboxSDK will render threadRowButtons as when Gmail hover actions are disabled.
- The following rules fix the issue where threadRowButtons were spilling over into the thread row email text. 
+ The following rules fix the issue where threadRowButtons were spilling over into the thread row email text.
  */
 body:not(.inboxsdk__gmailv1css) .zA td.apU.xY {
     width: initial;
@@ -2341,18 +2341,25 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   cursor: pointer;
 }
 
-.inboxsdk__custom_message_view_app_notice {
+.inboxsdk__custom_message_view_app_notice_content {
   position: relative;
-  top: -8px;
   display: flex;
   justify-content: center;
   z-index: 1;
 }
 
-.inboxsdk__custom_message_view_app_notice > * {
-  background-color: white;
-  padding: 0px 8px;
-  font-size: 80%;
+.adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container {
+  position: relative;
+  width: auto;
+  min-width: 32px;
+  padding: 0px 10px;
+}
+
+.inboxsdk__custom_message_view_app_notice_container::before{
+  position: absolute;
+}
+
+.inboxsdk__custom_message_view_app_notice_content > * {
   color: #555;
 }
 
@@ -2365,10 +2372,8 @@ table[role=presentation].inboxsdk__thread_view_with_custom_view {
   }
 
 /* hidden message notice beside native notice */
-.adv .inboxsdk__custom_message_view_app_notice {
+.adv .inboxsdk__custom_message_view_app_notice_content {
   display: inline-flex;
-  margin-left: 10px;
-  top: -7px;
 }
 
 /* compact density setting */
@@ -2405,7 +2410,7 @@ body.inboxsdk__gmailv1css .inboxsdk__custom_message_view {
 
 /* gmail v1 specific ui */
 
-body.inboxsdk__gmailv1css .inboxsdk__custom_message_view_app_notice > *,
+body.inboxsdk__gmailv1css .inboxsdk__custom_message_view_app_notice_content > *,
 body.inboxsdk__gmailv1css .inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
   background-color: rgb(245, 245, 245);
 }
