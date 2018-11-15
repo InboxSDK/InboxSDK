@@ -2355,6 +2355,24 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   padding: 0px 10px;
 }
 
+.inboxsdk__custom_message_view_app_notice_content {
+  align-items: center;
+  display: flex;
+  justify-content: flex-start;
+  left: -26px;
+  margin-left: 0;
+  padding: 0px;
+  top: 0;
+}
+
+.adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container:hover::before {
+  content: none !important;
+}
+
+.adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container span:first-child {
+  display: none;
+}
+
 .inboxsdk__custom_message_view_app_notice_container::before{
   position: absolute;
 }
