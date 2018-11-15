@@ -125,7 +125,7 @@ body:not(.inboxsdk__gmailv1css) .f4.J-N-JX.inboxsdk__message_more_icon {
 /* compose buttons */
 
 /* fix compose mole position when sidebar is open */
-/* 
+/*
 steps to repro:
 1. open compose mole
 2. open non-native sidebar
@@ -622,7 +622,7 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
 
 /* .zA td.apU.xy refers to the <td/> element that houses the favorite star in thread row view.
  The <span> element is what inboxSDK will render threadRowButtons as when Gmail hover actions are disabled.
- The following rules fix the issue where threadRowButtons were spilling over into the thread row email text. 
+ The following rules fix the issue where threadRowButtons were spilling over into the thread row email text.
  */
 body:not(.inboxsdk__gmailv1css) .zA td.apU.xY {
     width: initial;
@@ -2352,18 +2352,42 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   cursor: pointer;
 }
 
-.inboxsdk__custom_message_view_app_notice {
+.inboxsdk__custom_message_view_app_notice_content {
   position: relative;
-  top: -8px;
   display: flex;
   justify-content: center;
   z-index: 1;
 }
 
-.inboxsdk__custom_message_view_app_notice > * {
-  background-color: white;
-  padding: 0px 8px;
-  font-size: 80%;
+.adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container {
+  position: relative;
+  width: auto !important;
+  min-width: 32px;
+}
+
+.inboxsdk__custom_message_view_app_notice_content {
+  align-items: center;
+  display: flex;
+  font-size: .75rem !important;
+  justify-content: flex-start;
+  margin-left: 0;
+  padding: 0px;
+  top: 0;
+}
+
+.adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container:hover::before {
+  content: none !important;
+}
+
+.adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container > span:first-child {
+  display: none;
+}
+
+.inboxsdk__custom_message_view_app_notice_container::before{
+  position: absolute;
+}
+
+.inboxsdk__custom_message_view_app_notice_content > * {
   color: #555;
 }
 
@@ -2371,15 +2395,8 @@ table[role=presentation].inboxsdk__thread_view_with_custom_view {
   table-layout: fixed;
 }
 
-  table[role=presentation].inboxsdk__thread_view_with_custom_view > tr {
-    display: block;
-  }
-
-/* hidden message notice beside native notice */
-.adv .inboxsdk__custom_message_view_app_notice {
-  display: inline-flex;
-  margin-left: 10px;
-  top: -7px;
+table[role=presentation].inboxsdk__thread_view_with_custom_view > tr {
+  display: block;
 }
 
 /* compact density setting */
@@ -2416,7 +2433,7 @@ body.inboxsdk__gmailv1css .inboxsdk__custom_message_view {
 
 /* gmail v1 specific ui */
 
-body.inboxsdk__gmailv1css .inboxsdk__custom_message_view_app_notice > *,
+body.inboxsdk__gmailv1css .inboxsdk__custom_message_view_app_notice_content > *,
 body.inboxsdk__gmailv1css .inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
   background-color: rgb(245, 245, 245);
 }

@@ -7,7 +7,7 @@ function addCustomMessage(sortDate){
 	headerEl.innerHTML = 'header element';
 	bodyEl.innerHTML = 'body element';
 
-	window._lastThreadView.addCustomMessage({
+	return window._lastThreadView.addCustomMessage({
 		iconUrl: 'http://www.pvhc.net/img152/gohqnjgtktwlztooxcbj.jpg',
 		collapsedEl, bodyEl, headerEl, sortDate
 	});
@@ -31,10 +31,10 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 				console.log('threadView destroy');
 			});
 
-			threadView.registerHiddenCustomMessageNoticeProvider(number => {
+			threadView.registerHiddenCustomMessageNoticeProvider((customHiddenCount, nativeHiddenCount) => {
 				const span = document.createElement('span');
-				span.innerText = 'There are ' + (number) + ' lights.';
-
+				span.textContent = `${nativeHiddenCount != null ? nativeHiddenCount+', ' : ''}${customHiddenCount} custom hides`;
+				console.log('args', customHiddenCount, nativeHiddenCount);
 				return span;
 			});
 

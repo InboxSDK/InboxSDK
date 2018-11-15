@@ -49,7 +49,7 @@ class GmailThreadView {
 	_syncThreadID: ?string;
 	_customMessageViews: Set<CustomMessageView> = new Set();
 	_hiddenCustomMessageViews: Set<CustomMessageView> = new Set();
-	_hiddenCustomMessageNoticeProvider: ?(numHidden: number) => HTMLElement;
+	_hiddenCustomMessageNoticeProvider: ?(numberCustomMessagesHidden: number, numberNativeMessagesHidden: ?number) => ?HTMLElement;
 	_hiddenCustomMessageNoticeElement: ?HTMLElement;
 
 	constructor(element: HTMLElement, routeViewDriver: any, driver: GmailDriver, isPreviewedThread:boolean=false) {
@@ -188,7 +188,7 @@ class GmailThreadView {
 		return view;
 	}
 
-	registerHiddenCustomMessageNoticeProvider(provider: (numHidden: number) => HTMLElement) {
+	registerHiddenCustomMessageNoticeProvider(provider: (numberCustomMessagesHidden: number, numberNativeMessagesHidden: ?number) => HTMLElement) {
 		this._hiddenCustomMessageNoticeProvider = provider;
 	}
 
@@ -316,21 +316,37 @@ class GmailThreadView {
 		const noticeProvider = this._hiddenCustomMessageNoticeProvider;
 		if(!noticeProvider) return;
 
-		const appNoticeContainerElement = this._hiddenCustomMessageNoticeElement = document.createElement('div');
-		appNoticeContainerElement.classList.add('inboxsdk__custom_message_view_app_notice');
+		const appNoticeContainerElement = this._hiddenCustomMessageNoticeElement = document.createElement('span');
+		appNoticeContainerElement.classList.add('inboxsdk__custom_message_view_app_notice_content');
 
-		const appNoticeElement = noticeProvider(this._hiddenCustomMessageViews.size);
+		const numberCustomHiddenMessages = this._hiddenCustomMessageViews.size;
+
+		let numberNativeHiddenMessages = null;
+		if (nativeHiddenNoticePresent) {
+			const nativeHiddenNoticeCountSpan = querySelector(hiddenNoticeMessageElement, '.adx span');
+			numberNativeHiddenMessages = Number(nativeHiddenNoticeCountSpan.innerHTML);
+			if (isNaN(numberNativeHiddenMessages)) {
+				throw new Error('Couldn\'t find number of native hidden messages in dom structure');
+			}
+		}
+
+		const appNoticeElement = noticeProvider(numberCustomHiddenMessages, numberNativeHiddenMessages);
+		if (!appNoticeElement) {
+			return;
+		}
 		appNoticeContainerElement.appendChild(appNoticeElement);
 
-		if(nativeHiddenNoticePresent){
-			const nativeHiddenNoticeElement = querySelector(hiddenNoticeMessageElement, '.adx');
-			nativeHiddenNoticeElement.insertAdjacentElement('afterend', appNoticeContainerElement);
-		}
-		else {
-			appNoticeContainerElement.classList.add('inboxsdk__custom_message_view_app_notice_noNative');
+		if(!nativeHiddenNoticePresent) {
+			const fakeAppNoticeElement = document.createElement('span');
+			fakeAppNoticeElement.classList.add('adx');
+
 			const insertionPoint = querySelector(hiddenNoticeMessageElement, '.G3');
-			insertionPoint.appendChild(appNoticeContainerElement);
+			insertionPoint.appendChild(fakeAppNoticeElement);
 		}
+
+		const hiddenNoticeElement = querySelector(hiddenNoticeMessageElement, '.adx');
+		hiddenNoticeElement.classList.add('inboxsdk__custom_message_view_app_notice_container');
+		hiddenNoticeElement.appendChild(appNoticeContainerElement);
 	}
 
 	getSubject(): string {
