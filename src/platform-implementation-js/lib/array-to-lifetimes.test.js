@@ -2,6 +2,7 @@
 
 import asap from 'asap';
 import Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
 import sinon from 'sinon';
 
 import arrayToLifetimes from './array-to-lifetimes';
@@ -73,12 +74,14 @@ it('keyFn works', cb => {
 
 it('unsubscription triggers removal', cb => {
   const events = [];
+  const stopper = kefirStopper();
   arrayToLifetimes(Kefir.sequentially(50, [['a', 'b'], ['a'], ['a', 'b', 'c']]))
-    .takeUntilBy(Kefir.later(120))
+    .takeUntilBy(stopper)
     .onValue(({ el, removalStream }) => {
       events.push(['add', el]);
       removalStream.take(1).onValue(() => {
         events.push(['remove', el]);
+        stopper.destroy();
       });
     })
     .onEnd(() => {
