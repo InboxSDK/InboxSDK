@@ -103,7 +103,7 @@ export default function logError(err: Error, details: any, context: LogErrorCont
       implementationVersion: implVersion,
       isUsingSyncAPI,
       isUsingMaterialGmailUI,
-      origin: (document.location: any).origin,
+      origin: document.location.origin,
       timestamp: Date.now()*1000
     };
 

@@ -1,15 +1,11 @@
 /* @flow */
 
-import RSVP from '../test/lib/rsvp';
 import fs from 'fs';
 
 import PageCommunicator from '../src/platform-implementation-js/dom-driver/gmail/gmail-page-communicator';
 import * as threadIdentifier from '../src/injected-js/gmail/thread-identifier';
 
 (document.documentElement:any).innerHTML = fs.readFileSync(__dirname+'/injected-thread-identifier.html', 'utf8');
-
-// Work around https://github.com/tmpvar/jsdom/issues/1703
-window.open = window.open;
 
 test('threadIdentifier works', () => {
   const pageCommunicator = new PageCommunicator();

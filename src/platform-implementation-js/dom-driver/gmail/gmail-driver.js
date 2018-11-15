@@ -60,6 +60,7 @@ import createLink from './gmail-driver/create-link';
 import registerSearchQueryRewriter from './gmail-driver/register-search-query-rewriter';
 import openComposeWindow from './gmail-driver/open-compose-window';
 import GmailAppSidebarView from './views/gmail-app-sidebar-view';
+import suppressAddon from './gmail-driver/suppressAddon';
 
 import getSyncThreadFromSyncThreadId from './gmail-driver/getSyncThreadFromSyncThreadId';
 import getSyncThreadForOldGmailThreadId from './gmail-driver/getSyncThreadForOldGmailThreadId';
@@ -206,12 +207,14 @@ class GmailDriver {
 
     this.onready
       .then(() => {
-        this._timestampOnready = Date.now();
         trackEvents(this);
         gmailLoadEvent(this);
         overrideGmailBackButton(this, this._gmailRouteProcessor);
         trackGmailStyles();
         temporaryTrackDownloadUrlValidity(this);
+        if (opts.suppressAddonTitle != null && this.isUsingMaterialUI()) {
+          suppressAddon(this, opts.suppressAddonTitle);
+        }
       })
       .catch(err => {
         this._logger.error(err);
@@ -732,6 +735,8 @@ class GmailDriver {
         this._setupComposeViewDriverStream();
 
         this._threadRowIdentifier = new ThreadRowIdentifier(this);
+
+        this._timestampOnready = Date.now();
       });
   }
 
