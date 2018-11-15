@@ -339,7 +339,7 @@ const setupSearchReplacing = (
         setTimeout(() => {
           const errorBar = document.querySelector('.vY .vX.UC');
           if (errorBar && errorBar.style.display !== 'none' && /#\d+/.test(errorBar.textContent)) {
-            const isStreak = true||isStreakAppId(driver.getAppId());
+            const isStreak = isStreakAppId(driver.getAppId());
             driver.getLogger().error(new Error('Gmail error with custom thread list'), {
               message: errorBar.textContent,
               idPairsLength: idPairs.length,
