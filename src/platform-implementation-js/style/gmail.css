@@ -125,7 +125,7 @@ body:not(.inboxsdk__gmailv1css) .f4.J-N-JX.inboxsdk__message_more_icon {
 /* compose buttons */
 
 /* fix compose mole position when sidebar is open */
-/* 
+/*
 steps to repro:
 1. open compose mole
 2. open non-native sidebar
@@ -2361,7 +2361,7 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 .adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container {
   position: relative;
-  width: auto;
+  width: auto !important;
   min-width: 32px;
   padding: 0px 10px;
 }
@@ -2369,8 +2369,8 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 .inboxsdk__custom_message_view_app_notice_content {
   align-items: center;
   display: flex;
+  font-size: .75rem !important;
   justify-content: flex-start;
-  left: -26px;
   margin-left: 0;
   padding: 0px;
   top: 0;
@@ -2380,7 +2380,7 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   content: none !important;
 }
 
-.adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container span:first-child {
+.adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container > span:first-child {
   display: none;
 }
 
@@ -2396,13 +2396,8 @@ table[role=presentation].inboxsdk__thread_view_with_custom_view {
   table-layout: fixed;
 }
 
-  table[role=presentation].inboxsdk__thread_view_with_custom_view > tr {
-    display: block;
-  }
-
-/* hidden message notice beside native notice */
-.adv .inboxsdk__custom_message_view_app_notice_content {
-  display: inline-flex;
+table[role=presentation].inboxsdk__thread_view_with_custom_view > tr {
+  display: block;
 }
 
 /* compact density setting */
