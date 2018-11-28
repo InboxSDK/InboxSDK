@@ -3,8 +3,13 @@
 import Logger from '../../../../lib/logger';
 import extractContactFromEmailContactString from '../../../../lib/extract-contact-from-email-contact-string';
 
+import censorHTMLstring from '../../../../../common/censor-html-string.js';
+
+import type GmailComposeView from '../gmail-compose-view';
+
 export default function getAddressInformationExtractor(
-  addressType: string
+  addressType: string,
+  composeView: GmailComposeView
 ): (node: HTMLElement) => ?Contact {
 	return function(node: HTMLElement): ?Contact {
 		const contactNode = node.querySelector(`input[name='${addressType}']`);
@@ -23,7 +28,8 @@ export default function getAddressInformationExtractor(
 			}
 		} else {
 			Logger.error(new Error(`contactNode can't be found`), {
-				addressType
+        addressType,
+        composeViewHtml: censorHTMLstring(composeView.getElement().outerHTML)
 			});
 
 			return null;
