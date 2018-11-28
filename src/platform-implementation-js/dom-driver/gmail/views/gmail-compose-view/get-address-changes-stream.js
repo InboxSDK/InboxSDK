@@ -16,9 +16,9 @@ export default function(gmailComposeView: GmailComposeView): Kefir.Observable<Ob
 	}
 
 	const mergedStream = Kefir.merge([
-		_makeSubAddressStream('to', recipientRowElements, 0),
-		_makeSubAddressStream('cc', recipientRowElements, 1),
-		_makeSubAddressStream('bcc', recipientRowElements, 2)
+		_makeSubAddressStream('to', recipientRowElements, 0, gmailComposeView),
+		_makeSubAddressStream('cc', recipientRowElements, 1, gmailComposeView),
+		_makeSubAddressStream('bcc', recipientRowElements, 2, gmailComposeView)
 	]);
 
 	const umbrellaStream = mergedStream.map(_groupChangeEvents);
@@ -26,7 +26,7 @@ export default function(gmailComposeView: GmailComposeView): Kefir.Observable<Ob
 	return Kefir.merge([mergedStream, umbrellaStream, getFromAddressChangeStream(gmailComposeView)]);
 }
 
-function _makeSubAddressStream(addressType, rowElements, rowIndex){
+function _makeSubAddressStream(addressType, rowElements, rowIndex, gmailComposeView) {
 	if(!rowElements[rowIndex]){
 		return Kefir.never();
 	}
@@ -50,7 +50,7 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 				.transduce(t.compose(
 					t.mapcat(e => Array.from(e.addedNodes)),
 					t.filter(_isRecipientNode),
-					t.map(getAddressInformationExtractor(addressType)),
+					t.map(getAddressInformationExtractor(addressType, gmailComposeView)),
 					t.keep(),
 					t.map(_convertToEvent.bind(null, addressType + 'ContactAdded'))
 				)),
@@ -59,7 +59,7 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex){
 				.transduce(t.compose(
 					t.mapcat(e => Array.from(e.removedNodes)),
 					t.filter(_isRecipientNode),
-					t.map(getAddressInformationExtractor(addressType)),
+					t.map(getAddressInformationExtractor(addressType, gmailComposeView)),
 					t.keep(),
 					t.map(_convertToEvent.bind(null, addressType + 'ContactRemoved'))
 				))
