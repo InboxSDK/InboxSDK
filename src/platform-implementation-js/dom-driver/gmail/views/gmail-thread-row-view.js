@@ -461,7 +461,7 @@ class GmailThreadRowView {
             }
             else {
               buttonSpan = document.createElement('span');
-              // T-KT is one of the class names on the star button. 
+              // T-KT is one of the class names on the star button.
               buttonSpan.classList.add('T-KT');
             }
 
