@@ -210,7 +210,7 @@ class GmailThreadRowView {
   // make sure you take until by on the gmailThreadRowView.getStopper() because waitForReady
   // must not be called after the gmailThreadRowView is destroyed
   waitForReady(): Kefir.Observable<GmailThreadRowView> {
-    const time = [0,10,100,1000,10000];
+    const time = [0,10,100,1000,15000];
     const step = () => {
       if (this._threadIdReady()) {
         asap(() => {
@@ -461,7 +461,7 @@ class GmailThreadRowView {
             }
             else {
               buttonSpan = document.createElement('span');
-              // T-KT is one of the class names on the star button. 
+              // T-KT is one of the class names on the star button.
               buttonSpan.classList.add('T-KT');
             }
 
