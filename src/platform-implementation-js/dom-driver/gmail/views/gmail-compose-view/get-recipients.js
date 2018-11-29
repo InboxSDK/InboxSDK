@@ -17,7 +17,7 @@ export default function getRecipients(gmailComposeView: GmailComposeView, contac
 	}
 
 	const contacts = [];
-	const candidateContacts = _extractPeopleContacts(contactRows[contactRowIndex], addressType);
+	const candidateContacts = _extractPeopleContacts(contactRows[contactRowIndex], addressType, gmailComposeView);
 	candidateContacts.forEach(contact => {
 		if(contact != null){
 			contacts.push(contact);
@@ -32,7 +32,7 @@ function _getContactRows(gmailComposeView){
 	return gmailComposeView.getElement().querySelectorAll('.GS tr');
 }
 
-function _extractPeopleContacts(container, addressType){
+function _extractPeopleContacts(container, addressType, gmailComposeView) {
 	var peopleSpans = container.querySelectorAll('.vR');
-	return Array.prototype.map.call(peopleSpans, getAddressInformationExtractor(addressType));
+	return Array.prototype.map.call(peopleSpans, getAddressInformationExtractor(addressType, gmailComposeView));
 }
