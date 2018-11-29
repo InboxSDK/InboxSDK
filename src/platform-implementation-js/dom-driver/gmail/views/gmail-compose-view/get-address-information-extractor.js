@@ -29,7 +29,7 @@ export default function getAddressInformationExtractor(
 		} else {
 			Logger.error(new Error(`contactNode can't be found`), {
         addressType,
-        composeViewHtml: censorHTMLstring(composeView.getElement().outerHTML)
+        composeViewHtml: censorHTMLstring(composeView.getElement().querySelectorAll('form')[1].outerHTML)
 			});
 
 			return null;
