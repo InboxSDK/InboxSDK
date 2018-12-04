@@ -1,7 +1,6 @@
 /* @flow */
 
 import Logger from '../../../../lib/logger';
-import Kefir from 'kefir';
 import extractContactFromEmailContactString from '../../../../lib/extract-contact-from-email-contact-string';
 
 import censorHTMLstring from '../../../../../common/censor-html-string.js';
@@ -32,19 +31,6 @@ export default function getAddressInformationExtractor(
         addressType,
         composeViewHtml: censorHTMLstring(composeView.getElement().outerHTML)
       });
-
-      // Maybe the issue is Gmail is doing lazy loading? Let's test for that.
-      Kefir.later(5000)
-        .takeUntilBy(composeView.getStopper())
-        .onValue(() => {
-          const contactNode = node.querySelector(
-            `input[name='${addressType}']`
-          );
-          Logger.error(new Error(`contactNode re-check status`), {
-            addressType,
-            contactNodePresent: contactNode != null
-          });
-        });
 
       return null;
     }
