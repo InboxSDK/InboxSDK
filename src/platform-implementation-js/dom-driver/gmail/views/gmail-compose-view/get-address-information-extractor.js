@@ -11,28 +11,28 @@ export default function getAddressInformationExtractor(
   addressType: string,
   composeView: GmailComposeView
 ): (node: HTMLElement) => ?Contact {
-	return function(node: HTMLElement): ?Contact {
-		const contactNode = node.querySelector(`input[name='${addressType}']`);
+  return function(node: HTMLElement): ?Contact {
+    const contactNode = node.querySelector(`input[name='${addressType}']`);
 
-		var emailAddress = null;
-		var name = null;
+    var emailAddress = null;
+    var name = null;
 
-		if (contactNode) {
-			var contactInfoString = (contactNode: any).value;
+    if (contactNode) {
+      var contactInfoString = (contactNode: any).value;
 
-			try {
-				return extractContactFromEmailContactString(contactInfoString);
-			} catch(err) {
-				// The user might have typed in a partial address. We can just ignore that.
-				return null;
-			}
-		} else {
-			Logger.error(new Error(`contactNode can't be found`), {
+      try {
+        return extractContactFromEmailContactString(contactInfoString);
+      } catch (err) {
+        // The user might have typed in a partial address. We can just ignore that.
+        return null;
+      }
+    } else {
+      Logger.error(new Error(`contactNode can't be found`), {
         addressType,
         composeViewHtml: censorHTMLstring(composeView.getElement().outerHTML)
-			});
+      });
 
-			return null;
-		}
-	};
+      return null;
+    }
+  };
 }

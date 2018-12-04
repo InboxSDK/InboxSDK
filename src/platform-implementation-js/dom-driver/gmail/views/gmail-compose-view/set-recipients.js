@@ -1,6 +1,7 @@
 /* @flow */
 
 import type GmailComposeView from '../gmail-compose-view';
+import Logger from '../../../../lib/logger';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import getRecipients from './get-recipients';
 import {simulateClick} from '../../../../lib/dom/simulate-mouse-event';
@@ -8,19 +9,19 @@ import simulateKey from '../../../../lib/dom/simulate-key';
 
 const ADDRESS_TYPES = ['to', 'cc', 'bcc'];
 
-// contactRowIndex values: 0:to, 1:cc, 2:bcc
-export default function(gmailComposeView: GmailComposeView, contactRowIndex: number, emailAddresses: string[]) {
-	if(_areContactsEqual(gmailComposeView, contactRowIndex, emailAddresses)){
+export default function setRecipients(gmailComposeView: GmailComposeView, addressType: ReceiverType, emailAddresses: string[]) {
+	if(_areContactsEqual(gmailComposeView, addressType, emailAddresses)){
 		return;
 	}
 
-	const contactRows = gmailComposeView.getRecipientRowElements();
-
-	if(!contactRows || contactRows.length === 0 || !contactRows[contactRowIndex]){
+	let contactRow;
+	try {
+		contactRow = gmailComposeView.getRecipientRowForType(addressType);
+	} catch (err) {
+		Logger.error(err, {addressType});
 		return;
 	}
 
-	const contactRow = contactRows[contactRowIndex];
 	const emailAddressEntry = contactRow.querySelector('textarea.vO');
 
 	if(!emailAddressEntry || !(emailAddressEntry instanceof HTMLTextAreaElement)){
@@ -43,10 +44,10 @@ export default function(gmailComposeView: GmailComposeView, contactRowIndex: num
 	const cover = querySelector(gmailComposeView.getElement(), 'div.aoD.hl');
 	cover.dispatchEvent(new FocusEvent('focus'));
 
-	if (contactRowIndex == 1) {
+	if (addressType === 'cc') {
 		const ccButton = querySelector(gmailComposeView.getElement(), 'span.aB.gQ.pE');
 		simulateClick(ccButton);
-	} else if (contactRowIndex == 2) {
+	} else if (addressType === 'bcc') {
 		const bccButton = querySelector(gmailComposeView.getElement(), 'span.aB.gQ.pB');
 		simulateClick(bccButton);
 	}
@@ -63,8 +64,8 @@ export default function(gmailComposeView: GmailComposeView, contactRowIndex: num
 	}
 }
 
-function _areContactsEqual(gmailComposeView, contactRowIndex, emailAddresses){
-	let existingEmailAddresses = getRecipients(gmailComposeView, contactRowIndex, ADDRESS_TYPES[contactRowIndex]).map(c => c.emailAddress);
+function _areContactsEqual(gmailComposeView, addressType: ReceiverType, emailAddresses){
+	let existingEmailAddresses = getRecipients(gmailComposeView, addressType).map(c => c.emailAddress);
 
 	if(!emailAddresses){
 		return !!existingEmailAddresses;

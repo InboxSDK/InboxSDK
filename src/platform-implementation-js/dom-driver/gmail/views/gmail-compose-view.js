@@ -612,19 +612,19 @@ class GmailComposeView {
   }
 
   setToRecipients(emails: string[]) {
-    setRecipients(this, 0, emails);
+    setRecipients(this, 'to', emails);
 
     this._triggerDraftSave();
   }
 
   setCcRecipients(emails: string[]) {
-    setRecipients(this, 1, emails);
+    setRecipients(this, 'cc', emails);
 
     this._triggerDraftSave();
   }
 
   setBccRecipients(emails: string[]) {
-    setRecipients(this, 2, emails);
+    setRecipients(this, 'bcc', emails);
 
     this._triggerDraftSave();
   }
@@ -986,15 +986,15 @@ class GmailComposeView {
   }
 
   getToRecipients(): Contact[] {
-    return getRecipients(this, 0, "to");
+    return getRecipients(this, "to");
   }
 
   getCcRecipients(): Contact[] {
-    return getRecipients(this, 1, "cc");
+    return getRecipients(this, "cc");
   }
 
   getBccRecipients(): Contact[] {
-    return getRecipients(this, 2, "bcc");
+    return getRecipients(this, "bcc");
   }
 
   getAdditionalActionToolbar(): HTMLElement {
@@ -1298,8 +1298,16 @@ class GmailComposeView {
     }
   }
 
+  // getRecipientRowForType is recommended over this
   getRecipientRowElements(): HTMLElement[] {
     return Array.prototype.filter.call(this._element.querySelectorAll('.GS tr'), (tr) => !tr.classList.contains('inboxsdk__recipient_row'));
+  }
+
+  getRecipientRowForType(addressType: 'to'|'cc'|'bcc'): HTMLElement {
+    const input = querySelector(this._element, `.GS tr textarea.vO[name="${addressType}"], .GS tr input[name="${addressType}"]`);
+    const row = closest(input, 'tr');
+    if (!row) throw new Error();
+    return row;
   }
 
   addManagedViewController(viewController: {destroy(): void}) {
