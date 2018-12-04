@@ -52,7 +52,7 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex, gmailComposeV
 					t.filter(_isRecipientNode),
 					t.map(getAddressInformationExtractor(addressType, gmailComposeView)),
 					t.keep(),
-					t.map(_convertToEvent.bind(null, addressType + 'ContactAdded'))
+					t.map(info => _convertToEvent(addressType + 'ContactAdded', info))
 				)),
 
 			mainSubAddressStream
@@ -61,7 +61,7 @@ function _makeSubAddressStream(addressType, rowElements, rowIndex, gmailComposeV
 					t.filter(_isRecipientNode),
 					t.map(getAddressInformationExtractor(addressType, gmailComposeView)),
 					t.keep(),
-					t.map(_convertToEvent.bind(null, addressType + 'ContactRemoved'))
+					t.map(info => _convertToEvent(addressType + 'ContactRemoved', info))
 				))
 		]);
 	});
