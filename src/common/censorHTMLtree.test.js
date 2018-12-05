@@ -1,6 +1,6 @@
 /* @flow */
 
-import censorHTMLtree from './censor-html-tree';
+import censorHTMLtree from './censorHTMLtree';
 
 (document.documentElement: any).innerHTML = `
 <head><title>foo</title></head>

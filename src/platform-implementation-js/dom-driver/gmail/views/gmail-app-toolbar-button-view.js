@@ -1,7 +1,7 @@
 /* @flow */
 
 import querySelector from '../../../lib/dom/querySelectorOrFail';
-import censorHTMLtree from '../../../../common/censor-html-tree';
+import censorHTMLtree from '../../../../common/censorHTMLtree';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import type {Stopper} from 'kefir-stopper';

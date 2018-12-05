@@ -3,7 +3,7 @@
 import type {PageParserTreeOptions} from 'page-parser-tree';
 
 import Logger from '../../lib/logger';
-import censorHTMLtree from '../../../common/censor-html-tree';
+import censorHTMLtree from '../../../common/censorHTMLtree';
 import t from 'transducers.js';
 import find from 'lodash/find';
 import uniq from 'lodash/uniq';

@@ -49,7 +49,7 @@ import manageButtonGrouping from './gmail-compose-view/manage-button-grouping';
 import type {TooltipDescriptor} from '../../../views/compose-button-view';
 import {getSelectedHTMLInElement, getSelectedTextInElement} from '../../../lib/dom/get-selection';
 import getMinimizedStream from './gmail-compose-view/get-minimized-stream';
-import censorHTMLstring from '../../../../common/censor-html-string';
+import censorHTMLstring from '../../../../common/censorHTMLstring';
 
 import insertLinkIntoBody from './gmail-compose-view/insert-link-into-body';
 import getAddressChangesStream from './gmail-compose-view/get-address-changes-stream';

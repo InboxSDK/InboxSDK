@@ -10,7 +10,7 @@ import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import type {Bus} from 'kefir-bus';
 import autoHtml from 'auto-html';
-import censorHTMLstring from '../../../../common/censor-html-string';
+import censorHTMLstring from '../../../../common/censorHTMLstring';
 import delayAsap from '../../../lib/delay-asap';
 import arrayToLifetimes from '../../../lib/array-to-lifetimes';
 import querySelector from '../../../lib/dom/querySelectorOrFail';

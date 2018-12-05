@@ -1,6 +1,6 @@
 /* @flow */
 
-import censorHTMLtree from '../../../../../common/censor-html-tree';
+import censorHTMLtree from '../../../../../common/censorHTMLtree';
 import {simulateClick} from '../../../../lib/dom/simulate-mouse-event';
 
 

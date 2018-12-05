@@ -5,7 +5,7 @@ import PageParserTree from 'page-parser-tree';
 import type Kefir from 'kefir';
 import udKefir from 'ud-kefir';
 import pageParserOptions from './pageParserOptions';
-import censorHTMLtree from '../../../common/censor-html-tree';
+import censorHTMLtree from '../../../common/censorHTMLtree';
 
 const pageParserOptionsStream: Kefir.Observable<*> = udKefir(module, pageParserOptions);
 

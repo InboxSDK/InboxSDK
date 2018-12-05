@@ -1,6 +1,6 @@
 /* @flow */
 
-import censorHTMLstring from './censor-html-string';
+import censorHTMLstring from './censorHTMLstring';
 
 it('works', () => {
   expect(

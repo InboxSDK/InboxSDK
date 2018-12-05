@@ -2,7 +2,7 @@
 
 import find from 'lodash/find';
 import uniqBy from 'lodash/uniqBy';
-import censorHTMLstring from '../../../../common/censor-html-string';
+import censorHTMLstring from '../../../../common/censorHTMLstring';
 import Logger from '../../../lib/logger';
 import waitFor from '../../../lib/wait-for';
 

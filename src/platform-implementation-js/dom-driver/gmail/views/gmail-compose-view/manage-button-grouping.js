@@ -10,7 +10,7 @@ import {simulateClick} from '../../../../lib/dom/simulate-mouse-event';
 import waitFor from '../../../../lib/wait-for';
 import Logger from '../../../../lib/logger';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
-import censorHTMLtree from '../../../../../common/censor-html-tree';
+import censorHTMLtree from '../../../../../common/censorHTMLtree';
 import positionFormattingToolbar from './position-formatting-toolbar';
 import type GmailComposeView from '../gmail-compose-view';
 import get from '../../../../../common/get-or-fail';

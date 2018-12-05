@@ -1,7 +1,7 @@
 /* @flow */
 
 import autoHtml from 'auto-html';
-import censorHTMLstring, {ATTRIBUTE_WHITELIST} from './censor-html-string';
+import censorHTMLstring, {ATTRIBUTE_WHITELIST} from './censorHTMLstring';
 
 export default function censorHTMLtree(target: HTMLElement): string {
   const openers: string[] = [];

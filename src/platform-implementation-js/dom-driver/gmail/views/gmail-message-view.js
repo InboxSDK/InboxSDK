@@ -24,7 +24,7 @@ import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-ob
 import type {ElementWithLifetime} from '../../../lib/dom/make-element-child-stream';
 import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
 
-import censorHTMLtree from '../../../../common/censor-html-tree';
+import censorHTMLtree from '../../../../common/censorHTMLtree';
 import findParent from '../../../../common/find-parent';
 
 import type GmailDriver from '../gmail-driver';

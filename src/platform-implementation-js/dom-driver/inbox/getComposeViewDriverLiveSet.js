@@ -3,7 +3,7 @@
 import Kefir from 'kefir';
 import type {TagTree} from 'tag-tree';
 import LiveSet from 'live-set';
-import censorHTMLtree from '../../../common/censor-html-tree';
+import censorHTMLtree from '../../../common/censorHTMLtree';
 import InboxComposeView from './views/inbox-compose-view';
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import makeElementStreamMerger from '../../lib/dom/make-element-stream-merger';

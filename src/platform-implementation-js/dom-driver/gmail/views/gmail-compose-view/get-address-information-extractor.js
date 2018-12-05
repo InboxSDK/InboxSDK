@@ -3,7 +3,7 @@
 import Logger from '../../../../lib/logger';
 import extractContactFromEmailContactString from '../../../../lib/extract-contact-from-email-contact-string';
 
-import censorHTMLstring from '../../../../../common/censor-html-string.js';
+import censorHTMLstring from '../../../../../common/censorHTMLstring.js';
 
 import type GmailComposeView from '../gmail-compose-view';
 
