@@ -5,7 +5,7 @@ import {defn} from 'ud';
 import gmailAjax from '../../../driver-common/gmailAjax';
 import {readDraftId} from '../gmail-response-processor';
 import type GmailDriver from '../gmail-driver';
-import isStreakAppId from '../../../lib/is-streak-app-id';
+import isStreakAppId from '../../../lib/isStreakAppId';
 
 export type GetDraftIdResult = {
   draftID: ?string;

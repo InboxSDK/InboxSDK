@@ -1,6 +1,6 @@
 /* @flow */
 
-import isStreakAppId from './is-streak-app-id';
+import isStreakAppId from './isStreakAppId';
 
 it('works', () => {
   expect(isStreakAppId('sdk_streak_21e9788951')).toBe(true);

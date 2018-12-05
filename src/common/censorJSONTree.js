@@ -1,6 +1,6 @@
 /* @flow */
 
-import isStreakAppId from '../platform-implementation-js/lib/is-streak-app-id';
+import isStreakAppId from '../platform-implementation-js/lib/isStreakAppId';
 
 const hasStreakInstalled = () => {
   const appIds = JSON.parse(

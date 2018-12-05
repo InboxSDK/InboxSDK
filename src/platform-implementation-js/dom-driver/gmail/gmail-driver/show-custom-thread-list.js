@@ -8,7 +8,7 @@ import * as GRP from '../gmail-response-processor';
 import * as SyncGRP from '../gmail-sync-response-processor';
 import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
-import isStreakAppId from '../../../lib/is-streak-app-id';
+import isStreakAppId from '../../../lib/isStreakAppId';
 
 type ThreadDescriptor = string|{
   gmailThreadId?: ?string;
