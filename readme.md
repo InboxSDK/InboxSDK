@@ -21,7 +21,7 @@ source files for changes to trigger rebuilds of the bundle automatically
 (`--reload`).
 
 The `-h` (`--hot`) flag is also available, which uses
-[Browserify-HMR](https://github.com/AgentME/browserify-hmr) to make code
+[Browserify-HMR](https://github.com/Macil/browserify-hmr) to make code
 changes be hot-reloadable into a running extension.
 
 Separate SDK and implementation bundles can be built and a local test server
