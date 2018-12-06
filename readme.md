@@ -1,4 +1,4 @@
-# Build
+# Development Cycle Essentials
 
 Run `yarn` to install the necessary dependencies, and run `yarn start` to
 start the automatic builder. Then load `examples/hello-world/` as an unpacked
@@ -10,6 +10,114 @@ extension is supported, and if it is detected then it will be triggered whenever
 any changes are made to any SDK files, so that you don't have to click reload on
 the test extension yourself on every change. (You'll still need to refresh
 Gmail!)
+
+When you are working on the InboxSDK, you should test with one of the example
+extensions in the examples directory. If you are working on a specific feature,
+find an example extension that uses that feature, or edit a relevant example to
+use the feature. If you are adding a new feature to the InboxSDK, make one of
+the examples use the new feature. The new feature should be easily usable in
+isolation in an example extension, and must not depend on Streak (including
+Streak's CSS). Any new features that add elements controlled by the extension
+ought to be styled (positioned) reasonably by the InboxSDK without requiring
+the extension to include its own non-trivial CSS.
+
+## Types
+
+This project uses Facebook's Flow type checker (https://flowtype.org/). You can
+use the `yarn flow` command from within the repo to do type checking. You
+should run this frequently (or install an editor plugin) while developing in
+order to check your code for type safety.
+
+Some tools like editor plugins may rely on Flow to be installed globally. On
+MacOS, you can install flow through brew: `brew install flow`.
+
+## Fixing Unreproducible Bugs
+
+Gmail frequently delivers rolling updates to users, so that a small percent of
+users run different versions of Gmail than most people. These different
+versions of Gmail may visually appear the same but contain internal differences
+(HTML structure, ajax request/response formats, etc.) that cause
+compatibility issues for the InboxSDK.
+
+In general, we should try to add error logging that makes it obvious whenever
+Gmail's HTML structure or ajax formats aren't what we expect. For example, if
+we have code that calls `.querySelector(...)` on an element and then requires
+an element to be returned, we should either import and use
+'querySelectorOrFail.js' (which throws an error with a useful message if no
+element is found), or we should handle null being returned from
+`.querySelector(...)` with code like the following:
+
+```js
+const insertionPointEl = el.querySelector('.foo .bar');
+if (!insertionPointEl) {
+  const err = new Error('Could not find FOO element');
+  driver.getLogger().errorSite(err);
+  throw err; // or instead of throwing, do some graceful fallback instead.
+}
+```
+
+If we started seeing that error in our logs, and we weren't able to reproduce
+the issue locally, then you can log the HTML of the unexpectedly-different
+element by passing an object as the details parameter to any of Logger's
+methods. Whenever we log HTML of elements in Gmail, we must either use an HTML
+censoring function (so we don't risk getting users' message contents; use
+either `censorHTMLstring(el.outerHTML)`, or `censorHTMLtree(el)` if information
+about the element's parents is useful too), or restrict the logging to only
+happen for Streak users (by checking the extension's appId with the
+`isStreakAppId.js` function). Same rule of thumb applies for logging ajax
+request/responses too (see `censorJSONTree`).
+
+See the *Querying for Error Logs* section below for instructions on reading the
+logged errors and their details.
+
+Whenever we update our code for a new Gmail version that isn't completely
+rolled out, we need to make sure our code continues to support previous
+versions of Gmail. The best way to guarantee this is to create a unit test
+which runs the code on all known versions of the HTML. (Ideally, the unit test
+should even work on the censored HTML directly from an error report! Maybe in
+the future for specific errors, we could automate the process of taking the censored HTML from an error report and creating a new failing test case using
+it.)
+
+----------------
+
+# Querying for Error Logs
+
+(Streak Employees) We can use the following BigQuery query to query for the
+details of errors with a specific message. You must update the `20181205` part
+of the query to the date you want to query for, and remove the following
+`@-3600000-` part if you don't want to only query for rows from the last hour.
+
+```sql
+#legacySQL
+SELECT
+LEFT(errors.message, 60) AS summary,
+REGEXP_EXTRACT(headers, r'\n[Rr]eferer:\s+(https://[^/\n]+)') AS domain,
+CONCAT(
+  IFNULL(errors.stack, '(no stack)'),
+  '\n\nlogged from:\n', IFNULL(errors.loggedFrom, '(none given)'),
+  '\n\ndetails:\n', IFNULL(errors.details, '(none given)'),
+  '\n\nappId: ', IFNULL(errors.appIds.appId, '(none given)'),
+  ' (', IF(errors.appIds.causedBy, 'causedBy', 'not cause'), ')',
+  '\nclientVersion: ', IFNULL(errors.appIds.version, '(none given)'),
+  '\nsdkVersion: ', IFNULL(errors.loaderVersion, '(none given)'),
+  '\nsdkImplVersion: ', IFNULL(errors.implementationVersion, '(none given)')
+) AS report,
+headers,
+timestamp,
+errors.sessionId, requestId, errors.emailHash
+FROM [logs.backend_prod_3950ab_20181205@-3600000-]
+WHERE errors.source = "SDK"
+  AND errors.message = 'error message goes here'
+ORDER BY timestamp DESC
+LIMIT 200
+```
+
+The `errors.emailHash` field is the result of `sha256("inboxsdk:" + email)`
+applied to the user's email address. This allows us to find the error logs for
+a user who reports an issue without logging the email addresses of all of the
+InboxSDK end users.
+
+# Build Options
 
 By default, `yarn start` runs the following command:
 
@@ -33,12 +141,6 @@ Building separate SDK and implementation bundles represents how the production
 builds will work. When using the local test server to host the
 platform-implementation bundle, you'll need to run Chrome with the
 `--allow-running-insecure-content` flag.
-
-# Types
-
-This project uses Facebook's Flow type checker (https://flowtype.org/). On
-OS X, you can install it through brew (`brew install flow`). You can use the
-`flow` command from within the repo to do type checking.
 
 # Tests
 
