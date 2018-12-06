@@ -1,5 +1,6 @@
 /* @flow */
 
+import _ from 'lodash';
 import delay from 'pdelay';
 import sinon from 'sinon';
 const sinonTest = require('sinon-test')(sinon, {useFakeTimers: false});
@@ -20,90 +21,76 @@ function fakeEl(name: string): Object {
 
 it('should work', done => {
   let child1 = fakeEl('child1'), child2 = fakeEl('child2'), child3 = fakeEl('child3');
+  const childrenToNames = new Map(_.toPairs({
+    child1, child2, child3
+  }).map(([name, el]) => [el, name]));
 
   const target = new MockElementParent([child1, child2]);
 
-  let call = 0;
+  const calls = [];
   kefirMakeElementChildStream((target:Object)).onValue(event => {
-    switch(++call) {
-      case 1:
-        expect(event.el).toBe(child1);
-        event.removalStream.onValue(() => {
-          target.appendChild(child3);
-        });
-        break;
-      case 2:
-        expect(event.el).toBe(child2);
-        expect(event.removalStream).toBeInstanceOf(Kefir.Observable);
-        break;
-      case 3:
-        expect(event.el).toBe(child3);
-        expect(event.removalStream).toBeInstanceOf(Kefir.Observable);
-        done();
-        break;
-      default:
-        throw new Error("should not happen");
+    const name = childrenToNames.get(event.el);
+    calls.push(['add', name]);
+    event.removalStream.onValue(() => {
+      calls.push(['remove', name]);
+
+      if (event.el === child1) {
+        target.appendChild(child3);
+      }
+    });
+
+    if (event.el === child2) {
+      target.removeChild(child1);
+    }
+
+    if (calls.length >= 4) {
+      expect(calls).toEqual([
+        ['add', 'child1'],
+        ['add', 'child2'],
+        ['remove', 'child1'],
+        ['add', 'child3']
+      ]);
+      done();
     }
   });
-
-  setTimeout(() => {
-    target.removeChild(child1);
-  }, 0);
 });
 
 it('triggers removals when no longer listened on', done => {
   const child1 = fakeEl('child1'), child2 = fakeEl('child2');
+  const childrenToNames = new Map(_.toPairs({
+    child1, child2
+  }).map(([name, el]) => [el, name]));
+
   const stopper = kefirBus();
 
   const target = new MockElementParent([child1]);
 
-  let call = 0;
-  let child1Removed = 0, child2Removed = 0;
-  let child1Ended = false, child2Ended = false;
+  const calls = [];
   const stream = kefirMakeElementChildStream((target:Object)).takeUntilBy(stopper);
   stream.onValue(event => {
-    switch(++call) {
-      case 1:
-        expect(event.el).toBe(child1);
-        event.removalStream.onValue(() => {
-          child1Removed++;
-        });
-        event.removalStream.onEnd(() => {
-          child1Ended = true;
-        });
-        setTimeout(() => {
-          target.appendChild(child2);
-        }, 0);
-        break;
-      case 2:
-        expect(event.el).toBe(child2);
-        event.removalStream.onValue(() => {
-          child2Removed++;
-        });
-        event.removalStream.onEnd(() => {
-          child2Ended = true;
-        });
+    const name = childrenToNames.get(event.el);
+    calls.push(['add', name]);
+    event.removalStream.onValue(() => {
+      calls.push(['remove', name]);
 
-        expect(child1Removed).toBe(0);
-        expect(child2Removed).toBe(0);
-        expect(child1Ended).toBe(false);
-        expect(child2Ended).toBe(false);
-        stopper.emit();
-        expect(child1Ended).toBe(false); // no sync removal check
-        expect(child2Ended).toBe(false);
-        break;
-      default:
-        throw new Error("should not happen");
+      if (calls.length >= 5) {
+        expect(calls).toEqual([
+          ['add', 'child1'],
+          ['add', 'child2'],
+          ['stopper'],
+          ['remove', 'child1'],
+          ['remove', 'child2']
+        ]);
+        done();
+      }
+    });
+
+    if (event.el === child1) {
+      target.appendChild(child2);
+    } else if (event.el === child2) {
+      calls.push(['stopper']);
+      stopper.emit();
     }
-  });
-  stream.onEnd(() => {
-    setTimeout(() => {
-      expect(child1Removed).toBe(1);
-      expect(child2Removed).toBe(1);
-      expect(child1Ended).toBe(true);
-      expect(child2Ended).toBe(true);
-      done();
-    }, 0);
   });
 });
 
@@ -174,39 +161,44 @@ it("is exception-safe while emitting", sinonTest(async function() {
   }
 
   const child1 = fakeEl('child1'), child2 = fakeEl('child2'), child3 = fakeEl('child3');
-  const child3RemovalSpy = sinon.spy();
+  const childrenToNames = new Map(_.toPairs({
+    child1, child2, child3
+  }).map(([name, el]) => [el, name]));
 
   const target = new MockElementParent([child1, child2, child3]);
 
-  let i = 0;
+  const calls = [];
   const stream = kefirMakeElementChildStream((target:Object));
-  stream.onValue(event => {
-    switch(++i) {
-      case 1:
-        expect(event.el).toBe(child1);
+
+  await new Promise(resolve => {
+    stream.onValue(event => {
+      const name = childrenToNames.get(event.el);
+      calls.push(['add', name]);
+      event.removalStream.onValue(() => {
+        calls.push(['remove', name]);
+
+        if (event.el === child3) {
+          resolve();
+        }
+      });
+
+      if (event.el === child1) {
         target.removeChild(child1);
-        break;
-      case 2:
-        expect(event.el).toBe(child2);
+      } else if (event.el === child2) {
+        setTimeout(() => {
+          target.removeChild(child3);
+        }, 0);
         throw testError;
-      case 3:
-        expect(event.el).toBe(child3);
-        event.removalStream.onValue(child3RemovalSpy);
-        break;
-      default:
-        throw new Error("should not happen");
-    }
+      }
+    });
   });
 
-  await delay(20);
-
   expect(testErrorCatchCount).toBe(1);
-  expect(i).toBe(3);
-  expect(child3RemovalSpy.callCount).toBe(0);
-
-  target.removeChild(child3);
-
-  await delay(20);
-
-  expect(child3RemovalSpy.callCount).toBe(1);
+  expect(calls).toEqual([
+    ['add', 'child1'],
+    ['add', 'child2'],
+    ['add', 'child3'],
+    ['remove', 'child1'],
+    ['remove', 'child3'],
+  ]);
 }));
