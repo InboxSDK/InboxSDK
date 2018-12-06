@@ -117,6 +117,12 @@ applied to the user's email address. This allows us to find the error logs for
 a user who reports an issue without logging the email addresses of all of the
 InboxSDK end users.
 
+Error stacks and details may be clipped to fit in BigQuery. The field will end
+with the text `<clipped>` if this is the case. For errors that are clipped, the
+full unclipped value can be found in Google Cloud Storage at
+`https://storage.cloud.google.com/streak_error_logs/requestId/REQUEST_ID_HERE.json`
+where REQUEST_ID_HERE is replaced with the row's `requestId` value.
+
 # Build Options
 
 By default, `yarn start` runs the following command:
