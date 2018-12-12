@@ -1,8 +1,16 @@
 /* @flow */
 
-import delay from 'pdelay';
-
 import rateLimit from './rate-limit';
+
+const _originalDateNow = Date.now;
+beforeEach(() => {
+  const start = _originalDateNow.call(Date);
+  (Date: any).now = () => start;
+});
+function advanceNow(time: number) {
+  const newTime = Date.now() + time;
+  (Date: any).now = () => newTime;
+}
 
 test('single call works', () => {
   const fn = rateLimit(() => 5, 15, 2);
@@ -22,14 +30,14 @@ test('going over rate limit throws', () => {
   expect(fn).toThrowError(/^Function rate limit exceeded$/);
   expect(fn).toThrowError(/^Function rate limit exceeded$/);
 });
-test('multiple calls over longer period works', async () => {
+test('multiple calls over longer period works', () => {
   let x = 5;
   const fn = rateLimit(() => x++, 25, 2);
   expect(fn()).toBe(5);
   expect(fn()).toBe(6);
   expect(fn).toThrowError(/^Function rate limit exceeded$/);
   expect(fn).toThrowError(/^Function rate limit exceeded$/);
-  await delay(30);
+  advanceNow(30);
   expect(fn()).toBe(7);
   expect(fn()).toBe(8);
   expect(fn).toThrowError(/^Function rate limit exceeded$/);
