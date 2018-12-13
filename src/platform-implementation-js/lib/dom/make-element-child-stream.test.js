@@ -19,6 +19,15 @@ function fakeEl(name: string): Object {
   return {name, nodeType: 1};
 }
 
+function defer<T>(): {promise: Promise<T>, resolve: (t: T) => void, reject: (err: any) => void} {
+  let resolve, reject;
+  const promise = new Promise((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+  return {resolve: (resolve: any), reject: (reject: any), promise: (promise: any)};
+}
+
 it('should work', done => {
   let child1 = fakeEl('child1'), child2 = fakeEl('child2'), child3 = fakeEl('child3');
   const childrenToNames = new Map(_.toPairs({
@@ -142,6 +151,7 @@ it("doesn't miss children if some are removed during initial emits", done => {
 
 it("is exception-safe while emitting", sinonTest(async function() {
   let testErrorCatchCount = 0;
+  let testErrorDefer = defer();
   const testError = new Error('child2 test error');
   {
     const _setTimeout = setTimeout;
@@ -152,6 +162,7 @@ it("is exception-safe while emitting", sinonTest(async function() {
         } catch (err) {
           if (err === testError) {
             testErrorCatchCount++;
+            testErrorDefer.resolve();
           } else {
             throw err;
           }
@@ -193,6 +204,7 @@ it("is exception-safe while emitting", sinonTest(async function() {
     });
   });
 
+  await testErrorDefer.promise;
   expect(testErrorCatchCount).toBe(1);
   expect(calls).toEqual([
     ['add', 'child1'],
