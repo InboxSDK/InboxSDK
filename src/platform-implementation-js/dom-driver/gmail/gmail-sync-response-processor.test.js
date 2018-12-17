@@ -199,13 +199,15 @@ it('replaceThreadsInSearchResponse works', () => {
     )
   );
 
-  const responesShouldLookLike = fs
-    .readFileSync(
-      __dirname +
-        '/../../../../__tests__/gmail-sync-response-processor/replaced-threads-response-example-data-2018-01-25.json',
-      'utf8'
+  const responesShouldLookLike = JSON.stringify(
+    JSON.parse(
+      fs.readFileSync(
+        __dirname +
+          '/../../../../__tests__/gmail-sync-response-processor/replaced-threads-response-example-data-2018-01-25.json',
+        'utf8'
+      )
     )
-    .replace('\n', '');
+  );
 
   const newResponse = GSRP.replaceThreadsInSearchResponse(
     originalSearchResponse,
