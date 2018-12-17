@@ -1,7 +1,7 @@
 /* @flow */
 
 jest.mock('../views/gmail-route-view/gmail-route-view', () =>
-  jest.fn(() => ({destroy(){}}))
+  jest.fn(() => ({ destroy() {} }))
 );
 
 import _ from 'lodash';
@@ -63,16 +63,16 @@ test('role=main changes are seen', async () => {
 
   main.style.display = 'none';
   main2.style.display = '';
-  mainEmitter({attributeName: 'style'});
-  main2Emitter({attributeName: 'style'});
+  mainEmitter({ attributeName: 'style' });
+  main2Emitter({ attributeName: 'style' });
 
   await delay(1);
   expect(items.length).toBe(2);
 
   main.style.display = '';
   main2.style.display = 'none';
-  mainEmitter({attributeName: 'style'});
-  main2Emitter({attributeName: 'style'});
+  mainEmitter({ attributeName: 'style' });
+  main2Emitter({ attributeName: 'style' });
 
   await delay(1);
   expect(items.length).toBe(3);

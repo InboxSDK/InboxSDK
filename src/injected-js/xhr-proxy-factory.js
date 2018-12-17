@@ -8,13 +8,13 @@ import includes from 'lodash/includes';
 import once from 'lodash/once';
 import assert from 'assert';
 import EventEmitter from 'events';
-import {parse as deparam} from 'querystring';
+import { parse as deparam } from 'querystring';
 
 export type Opts = {
-  logError: (error: Error, details: any) => void;
+  logError: (error: Error, details: any) => void
 };
 
-const WARNING_TIMEOUT = 60*1000;
+const WARNING_TIMEOUT = 60 * 1000;
 
 /**
  * Object with information about the connection in progress. Its fields are
@@ -36,24 +36,24 @@ const WARNING_TIMEOUT = 60*1000;
  */
 
 export type XHRProxyConnectionDetails = {
-  method: string;
-  url: string;
-  params: {[key:string]: string};
-  headers: {[name:string]: string};
-  responseType: string;
-  originalSendBody: ?string;
+  method: string,
+  url: string,
+  params: { [key: string]: string },
+  headers: { [name: string]: string },
+  responseType: string,
+  originalSendBody: ?string
 };
 
-export type XHRProxyConnectionDetailsWithResponse = XHRProxyConnectionDetails&{
-  status: number;
-  originalResponseText: string;
-  modifiedResponseText: string;
+export type XHRProxyConnectionDetailsWithResponse = XHRProxyConnectionDetails & {
+  status: number,
+  originalResponseText: string,
+  modifiedResponseText: string
 };
 
-export type XHRProxyConnectionDetailsAfterListeners = XHRProxyConnectionDetails&{
-  status: number;
-  originalResponseText: ?string;
-  modifiedResponseText: ?string;
+export type XHRProxyConnectionDetailsAfterListeners = XHRProxyConnectionDetails & {
+  status: number,
+  originalResponseText: ?string,
+  modifiedResponseText: ?string
 };
 
 /**
@@ -64,9 +64,9 @@ export type XHRProxyConnectionDetailsAfterListeners = XHRProxyConnectionDetails&
  */
 
 type Request = {|
-  method: string;
-  url: string;
-  body: string;
+  method: string,
+  url: string,
+  body: string
 |};
 
 /**
@@ -95,13 +95,28 @@ type Request = {|
  *  for readystatechange have run
  */
 export type Wrapper = {|
-  isRelevantTo: (connection: XHRProxyConnectionDetails) => boolean;
-  originalSendBodyLogger?: (connection: XHRProxyConnectionDetails, body: string) => void;
-  requestChanger?: (connection: XHRProxyConnectionDetails, request: Object) => Request|Promise<Request>;
-  originalResponseTextLogger?: (connection: XHRProxyConnectionDetailsWithResponse, originalResponseText: string) => void;
-  responseTextChanger?: (connection: XHRProxyConnectionDetailsWithResponse, originalResponseText: string) => string|Promise<string>;
-  finalResponseTextLogger?: (connection: XHRProxyConnectionDetailsWithResponse, finalResponseText: string) => void;
-  afterListeners?: (connection: XHRProxyConnectionDetailsAfterListeners) => void;
+  isRelevantTo: (connection: XHRProxyConnectionDetails) => boolean,
+  originalSendBodyLogger?: (
+    connection: XHRProxyConnectionDetails,
+    body: string
+  ) => void,
+  requestChanger?: (
+    connection: XHRProxyConnectionDetails,
+    request: Object
+  ) => Request | Promise<Request>,
+  originalResponseTextLogger?: (
+    connection: XHRProxyConnectionDetailsWithResponse,
+    originalResponseText: string
+  ) => void,
+  responseTextChanger?: (
+    connection: XHRProxyConnectionDetailsWithResponse,
+    originalResponseText: string
+  ) => string | Promise<string>,
+  finalResponseTextLogger?: (
+    connection: XHRProxyConnectionDetailsWithResponse,
+    finalResponseText: string
+  ) => void,
+  afterListeners?: (connection: XHRProxyConnectionDetailsAfterListeners) => void
 |};
 
 /**
@@ -114,44 +129,64 @@ export type Wrapper = {|
  * @param {Object} [opts] - Can specify a logError function
  * @returns {function} wrapped XMLHttpRequest-like constructor
  */
-export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wrapper[], opts: Opts): typeof XMLHttpRequest {
-  const logError = opts && opts.logError || function(error, label) {
-    setTimeout(function() {
-      // let window.onerror log this
-      throw error;
-    }, 1);
-  };
+export default function XHRProxyFactory(
+  XHR: typeof XMLHttpRequest,
+  wrappers: Wrapper[],
+  opts: Opts
+): typeof XMLHttpRequest {
+  const logError =
+    (opts && opts.logError) ||
+    function(error, label) {
+      setTimeout(function() {
+        // let window.onerror log this
+        throw error;
+      }, 1);
+    };
 
   function transformEvent(oldTarget, newTarget, event) {
     const newEvent = {};
-    Object.keys(event).concat([
-      'bubbles', 'cancelBubble', 'cancelable',
-      'defaultPrevented',
-      'preventDefault',
-      'stopPropagation',
-      'stopImmediatePropagation',
-      'lengthComputable', 'loaded', 'total',
-      'type',
-      'currentTarget', 'target',
-      'srcElement',
-      'NONE', 'CAPTURING_PHASE', 'AT_TARGET', 'BUBBLING_PHASE',
-      'eventPhase'
-    ]).filter(name => name in event).forEach(name => {
-      const value = (event:any)[name];
-      if (value === oldTarget) {
-        newEvent[name] = newTarget;
-      } else if (typeof value === 'function') {
-        newEvent[name] = value.bind(event);
-      } else {
-        newEvent[name] = value;
-      }
-    });
+    Object.keys(event)
+      .concat([
+        'bubbles',
+        'cancelBubble',
+        'cancelable',
+        'defaultPrevented',
+        'preventDefault',
+        'stopPropagation',
+        'stopImmediatePropagation',
+        'lengthComputable',
+        'loaded',
+        'total',
+        'type',
+        'currentTarget',
+        'target',
+        'srcElement',
+        'NONE',
+        'CAPTURING_PHASE',
+        'AT_TARGET',
+        'BUBBLING_PHASE',
+        'eventPhase'
+      ])
+      .filter(name => name in event)
+      .forEach(name => {
+        const value = (event: any)[name];
+        if (value === oldTarget) {
+          newEvent[name] = newTarget;
+        } else if (typeof value === 'function') {
+          newEvent[name] = value.bind(event);
+        } else {
+          newEvent[name] = value;
+        }
+      });
     return newEvent;
   }
 
   function wrapEventListener(oldTarget, newTarget, listener) {
     return function(event) {
-      return listener.call(newTarget, transformEvent(oldTarget, newTarget, event));
+      return listener.call(
+        newTarget,
+        transformEvent(oldTarget, newTarget, event)
+      );
     };
   }
 
@@ -159,7 +194,9 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
     return filter(wrappers, function(wrapper) {
       try {
         return wrapper.isRelevantTo(connection);
-      } catch(e) { logError(e); }
+      } catch (e) {
+        logError(e);
+      }
     });
   }
 
@@ -173,7 +210,10 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
 
     if (XHR.bind && XHR.bind.apply) {
       // call constructor with variable number of arguments
-      this._realxhr = new ((XHR:any).bind.apply(XHR, [null].concat(arguments)))();
+      this._realxhr = new ((XHR: any).bind.apply(
+        XHR,
+        [null].concat(arguments)
+      ))();
     } else {
       // Safari's XMLHttpRequest lacks a bind method, but its constructor
       // doesn't support extra arguments anyway, so don't bother logging an
@@ -183,56 +223,82 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
     const self = this;
 
     const triggerEventListeners = (name, event) => {
-      if (this['on'+name]) {
+      if (this['on' + name]) {
         try {
-          wrapEventListener(this._realxhr, this, this['on'+name]).call(this, event);
-        } catch(e) { logError(e, 'XMLHttpRequest event listener error'); }
+          wrapEventListener(this._realxhr, this, this['on' + name]).call(
+            this,
+            event
+          );
+        } catch (e) {
+          logError(e, 'XMLHttpRequest event listener error');
+        }
       }
 
       each(this._boundListeners[name], boundListener => {
         try {
           boundListener(event);
-        } catch(e) { logError(e, 'XMLHttpRequest event listener error'); }
+        } catch (e) {
+          logError(e, 'XMLHttpRequest event listener error');
+        }
       });
     };
 
-    const runRscListeners = (event) => {
+    const runRscListeners = event => {
       triggerEventListeners('readystatechange', event);
     };
 
     this._fakeRscEvent = function() {
-      runRscListeners(Object.freeze({
-        bubbles: false, cancelBubble: false, cancelable: false,
-        defaultPrevented: false,
-        preventDefault: noop,
-        stopPropagation: noop,
-        stopImmediatePropagation: noop,
-        type: 'readystatechange',
-        currentTarget: this, target: this,
-        srcElement: this,
-        NONE: 0, CAPTURING_PHASE: 1, AT_TARGET: 2, BUBBLING_PHASE: 3,
-        eventPhase: 0
-      }));
+      runRscListeners(
+        Object.freeze({
+          bubbles: false,
+          cancelBubble: false,
+          cancelable: false,
+          defaultPrevented: false,
+          preventDefault: noop,
+          stopPropagation: noop,
+          stopImmediatePropagation: noop,
+          type: 'readystatechange',
+          currentTarget: this,
+          target: this,
+          srcElement: this,
+          NONE: 0,
+          CAPTURING_PHASE: 1,
+          AT_TARGET: 2,
+          BUBBLING_PHASE: 3,
+          eventPhase: 0
+        })
+      );
     };
 
-    const deliverFinalRsc = (event) => {
+    const deliverFinalRsc = event => {
       this.readyState = 4;
       // Remember the status now before any event handlers are called, just in
       // case one aborts the request.
       var wasSuccess = this.status == 200;
-      var progressEvent = Object.assign({}, transformEvent(this._realxhr, this, event), {
-        lengthComputable: false, loaded: 0, total: 0
-      });
+      var progressEvent = Object.assign(
+        {},
+        transformEvent(this._realxhr, this, event),
+        {
+          lengthComputable: false,
+          loaded: 0,
+          total: 0
+        }
+      );
 
-      var supportsResponseText = !this._realxhr.responseType || this._realxhr.responseType == 'text';
+      var supportsResponseText =
+        !this._realxhr.responseType || this._realxhr.responseType == 'text';
 
       if (supportsResponseText) {
         each(this._activeWrappers, wrapper => {
           if (wrapper.finalResponseTextLogger) {
             try {
               wrapper.finalResponseTextLogger(
-                this._connection, this.responseText);
-            } catch(e) { logError(e); }
+                this._connection,
+                this.responseText
+              );
+            } catch (e) {
+              logError(e);
+            }
           }
         });
       }
@@ -249,127 +315,169 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
         if (wrapper.afterListeners) {
           try {
             wrapper.afterListeners(this._connection);
-          } catch(e) { logError(e); }
+          } catch (e) {
+            logError(e);
+          }
         }
       });
     };
 
-    this._realxhr.addEventListener('readystatechange', event => {
-      if (!this._connection) {
-        return;
-      }
-      if (this._realxhr.readyState >= 2) {
-        this._connection.status = this._realxhr.status;
-      }
+    this._realxhr.addEventListener(
+      'readystatechange',
+      event => {
+        if (!this._connection) {
+          return;
+        }
+        if (this._realxhr.readyState >= 2) {
+          this._connection.status = this._realxhr.status;
+        }
 
-      const supportsResponseText = !this._realxhr.responseType || this._realxhr.responseType == 'text';
+        const supportsResponseText =
+          !this._realxhr.responseType || this._realxhr.responseType == 'text';
 
-      // Process the response text.
-      if (this._realxhr.readyState == 4) {
-        if (supportsResponseText) {
-          Object.defineProperty(this._connection, 'originalResponseText', {
-            enumerable: true, writable: false, configurable: false,
-            value: self._realxhr.responseText
-          });
+        // Process the response text.
+        if (this._realxhr.readyState == 4) {
+          if (supportsResponseText) {
+            Object.defineProperty(this._connection, 'originalResponseText', {
+              enumerable: true,
+              writable: false,
+              configurable: false,
+              value: self._realxhr.responseText
+            });
 
-          each(this._activeWrappers, wrapper => {
-            if (wrapper.originalResponseTextLogger) {
-              try {
-                wrapper.originalResponseTextLogger(
-                  this._connection, this._connection.originalResponseText);
-              } catch (e) { logError(e); }
-            }
-          });
-
-          const finish = once(deliverFinalRsc.bind(null, event));
-          if (this._connection.async) {
-            // If the XHR object is re-used for another connection, then we need
-            // to make sure that our upcoming async calls here do nothing.
-            // Remember the current connection object, and do nothing in our async
-            // calls if it no longer matches.
-            const startConnection = this._connection;
-
-            (async () => {
-              let modifiedResponseText: string = startConnection.originalResponseText;
-              startConnection.modifiedResponseText = modifiedResponseText;
-
-              for (let responseTextChanger of this._responseTextChangers) {
-                const longRunWarningTimer = setTimeout(() => {
-                  console.warn('responseTextChanger is taking too long', responseTextChanger, startConnection); // eslint-disable-line no-console
-                }, WARNING_TIMEOUT);
+            each(this._activeWrappers, wrapper => {
+              if (wrapper.originalResponseTextLogger) {
                 try {
-                  modifiedResponseText = await responseTextChanger(startConnection, modifiedResponseText);
-                } finally {
-                  clearTimeout(longRunWarningTimer);
+                  wrapper.originalResponseTextLogger(
+                    this._connection,
+                    this._connection.originalResponseText
+                  );
+                } catch (e) {
+                  logError(e);
                 }
-                if (typeof modifiedResponseText !== 'string') {
-                  throw new Error("responseTextChanger returned non-string value "+modifiedResponseText);
-                }
+              }
+            });
+
+            const finish = once(deliverFinalRsc.bind(null, event));
+            if (this._connection.async) {
+              // If the XHR object is re-used for another connection, then we need
+              // to make sure that our upcoming async calls here do nothing.
+              // Remember the current connection object, and do nothing in our async
+              // calls if it no longer matches.
+              const startConnection = this._connection;
+
+              (async () => {
+                let modifiedResponseText: string =
+                  startConnection.originalResponseText;
                 startConnection.modifiedResponseText = modifiedResponseText;
 
-                if (startConnection !== this._connection) break;
-              }
+                for (let responseTextChanger of this._responseTextChangers) {
+                  const longRunWarningTimer = setTimeout(() => {
+                    // eslint-disable-next-line no-console
+                    console.warn(
+                      'responseTextChanger is taking too long',
+                      responseTextChanger,
+                      startConnection
+                    );
+                  }, WARNING_TIMEOUT);
+                  try {
+                    modifiedResponseText = await responseTextChanger(
+                      startConnection,
+                      modifiedResponseText
+                    );
+                  } finally {
+                    clearTimeout(longRunWarningTimer);
+                  }
+                  if (typeof modifiedResponseText !== 'string') {
+                    throw new Error(
+                      'responseTextChanger returned non-string value ' +
+                        modifiedResponseText
+                    );
+                  }
+                  startConnection.modifiedResponseText = modifiedResponseText;
 
-              return modifiedResponseText;
-            })().then(modifiedResponseText => {
-              if (startConnection === self._connection) {
-                this.responseText = modifiedResponseText;
-                finish();
-              }
-            }, err => {
-              logError(err);
-              if (startConnection === this._connection) {
-                this.responseText = this._realxhr.responseText;
-                finish();
-              }
-            }).catch(logError);
-            return;
+                  if (startConnection !== this._connection) break;
+                }
+
+                return modifiedResponseText;
+              })()
+                .then(
+                  modifiedResponseText => {
+                    if (startConnection === self._connection) {
+                      this.responseText = modifiedResponseText;
+                      finish();
+                    }
+                  },
+                  err => {
+                    logError(err);
+                    if (startConnection === this._connection) {
+                      this.responseText = this._realxhr.responseText;
+                      finish();
+                    }
+                  }
+                )
+                .catch(logError);
+              return;
+            } else {
+              self.responseText = self._realxhr.responseText;
+            }
           } else {
-            self.responseText = self._realxhr.responseText;
-          }
-        } else {
-          self.responseText = '';
-        }
-
-        deliverFinalRsc(event);
-      } else {
-        if (self._realxhr.readyState == 1 && self.readyState == 1) {
-          // Delayed open+send just happened. We already delivered an event
-          // for this, so drop this event.
-          return;
-        } else if (self._realxhr.readyState >= 3 && supportsResponseText) {
-          if (self._responseTextChangers.length) {
-            // If we're going to transform the final response, then we don't
-            // want to expose any partial untransformed responses and we don't
-            // want to bother trying to transform partial responses. Only show
-            // an empty string as the loaded response until the connection is
-            // done.
             self.responseText = '';
-          } else {
-            self.responseText = self._realxhr.responseText;
           }
-        } else {
-          self.responseText = '';
-        }
 
-        self.readyState = self._realxhr.readyState;
-        runRscListeners(event);
-      }
-    }, false);
+          deliverFinalRsc(event);
+        } else {
+          if (self._realxhr.readyState == 1 && self.readyState == 1) {
+            // Delayed open+send just happened. We already delivered an event
+            // for this, so drop this event.
+            return;
+          } else if (self._realxhr.readyState >= 3 && supportsResponseText) {
+            if (self._responseTextChangers.length) {
+              // If we're going to transform the final response, then we don't
+              // want to expose any partial untransformed responses and we don't
+              // want to bother trying to transform partial responses. Only show
+              // an empty string as the loaded response until the connection is
+              // done.
+              self.responseText = '';
+            } else {
+              self.responseText = self._realxhr.responseText;
+            }
+          } else {
+            self.responseText = '';
+          }
+
+          self.readyState = self._realxhr.readyState;
+          runRscListeners(event);
+        }
+      },
+      false
+    );
 
     [
       'dispatchEvent',
-      'getAllResponseHeaders','getResponseHeader','overrideMimeType',
-      'responseType','responseXML','responseURL','status','statusText',
-      'timeout','ontimeout','onloadstart','onprogress','onabort',
-      'upload','withCredentials'
+      'getAllResponseHeaders',
+      'getResponseHeader',
+      'overrideMimeType',
+      'responseType',
+      'responseXML',
+      'responseURL',
+      'status',
+      'statusText',
+      'timeout',
+      'ontimeout',
+      'onloadstart',
+      'onprogress',
+      'onabort',
+      'upload',
+      'withCredentials'
     ].forEach(function(prop) {
       Object.defineProperty(self, prop, {
-        enumerable: true, configurable: false,
+        enumerable: true,
+        configurable: false,
         get: function() {
           // If we give the original native methods directly, they'll be called
           // with `this` as the XHRProxy object, which they aren't made for.
-          if (typeof self._realxhr[prop]=='function') {
+          if (typeof self._realxhr[prop] == 'function') {
             return self._realxhr[prop].bind(self._realxhr);
           }
           return self._realxhr[prop];
@@ -383,10 +491,14 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
       });
     });
 
-    (Object:any).defineProperty(self, 'response', {
-      enumerable: true, configurable: false,
+    (Object: any).defineProperty(self, 'response', {
+      enumerable: true,
+      configurable: false,
       get: function() {
-        if (!this._realxhr.responseType || this._realxhr.responseType == 'text') {
+        if (
+          !this._realxhr.responseType ||
+          this._realxhr.responseType == 'text'
+        ) {
           return this.responseText;
         } else {
           // We're not trying to transform non-text responses currently.
@@ -417,10 +529,13 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
   XHRProxy.prototype.setRequestHeader = function(name, value) {
     var self = this;
     if (this.readyState != 1) {
-      console.warn("setRequestHeader improperly called at readyState "+this.readyState); //eslint-disable-line no-console
+      // eslint-disable-next-line no-console
+      console.warn(
+        'setRequestHeader improperly called at readyState ' + this.readyState
+      );
     }
     if (!this._openState) {
-      throw new Error("Can only set headers after open and before send");
+      throw new Error('Can only set headers after open and before send');
     }
 
     this._connection.headers[name] = value;
@@ -482,10 +597,18 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
     };
     this._clientStartedSend = false;
     this._realStartedSend = false;
-    this._activeWrappers = findApplicableWrappers(this._wrappers, this._connection);
-    this._responseTextChangers = this._activeWrappers.map(function(wrapper) {
-      return wrapper.responseTextChanger && wrapper.responseTextChanger.bind(wrapper);
-    }).filter(Boolean);
+    this._activeWrappers = findApplicableWrappers(
+      this._wrappers,
+      this._connection
+    );
+    this._responseTextChangers = this._activeWrappers
+      .map(function(wrapper) {
+        return (
+          wrapper.responseTextChanger &&
+          wrapper.responseTextChanger.bind(wrapper)
+        );
+      })
+      .filter(Boolean);
     this.responseText = '';
     this._openState = true;
 
@@ -494,9 +617,11 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
     }
 
     if (this._connection.async) {
-      this._requestChangers = this._activeWrappers.map(function(wrapper) {
-        return wrapper.requestChanger && wrapper.requestChanger.bind(wrapper);
-      }).filter(Boolean);
+      this._requestChangers = this._activeWrappers
+        .map(function(wrapper) {
+          return wrapper.requestChanger && wrapper.requestChanger.bind(wrapper);
+        })
+        .filter(Boolean);
       if (this._requestChangers.length) {
         if (this.readyState != 1) {
           this.readyState = 1;
@@ -515,16 +640,20 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
     this._clientStartedSend = true;
     this._openState = false;
     Object.defineProperty(this._connection, 'originalSendBody', {
-      enumerable: true, writable: false, configurable: false, value: body
+      enumerable: true,
+      writable: false,
+      configurable: false,
+      value: body
     });
     this._connection.responseType = this._realxhr.responseType || 'text';
 
     each(self._activeWrappers, function(wrapper) {
       if (wrapper.originalSendBodyLogger) {
         try {
-          wrapper.originalSendBodyLogger(
-            self._connection, body);
-        } catch (e) { logError(e); }
+          wrapper.originalSendBodyLogger(self._connection, body);
+        } catch (e) {
+          logError(e);
+        }
       }
     });
 
@@ -550,10 +679,18 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
         let modifiedRequest = request;
         for (let requestChanger of this._requestChangers) {
           const longRunWarningTimer = setTimeout(() => {
-            console.warn('requestChanger is taking too long', requestChanger, startConnection); // eslint-disable-line no-console
+            // eslint-disable-next-line no-console
+            console.warn(
+              'requestChanger is taking too long',
+              requestChanger,
+              startConnection
+            );
           }, WARNING_TIMEOUT);
           try {
-            modifiedRequest = await requestChanger(this._connection, Object.freeze(modifiedRequest));
+            modifiedRequest = await requestChanger(
+              this._connection,
+              Object.freeze(modifiedRequest)
+            );
           } finally {
             clearTimeout(longRunWarningTimer);
           }
@@ -562,20 +699,23 @@ export default function XHRProxyFactory(XHR: typeof XMLHttpRequest, wrappers: Wr
           assert(has(modifiedRequest, 'url'), 'modifiedRequest has url');
           assert(has(modifiedRequest, 'body'), 'modifiedRequest has body');
 
-          if (startConnection !== this._connection || this._realStartedSend) break;
+          if (startConnection !== this._connection || this._realStartedSend)
+            break;
         }
 
         return modifiedRequest;
-      })().catch(err => {
-        logError(err);
-        return request;
-      }).then(modifiedRequest => {
-        if (startConnection === this._connection && !this._realStartedSend) {
-          this._realxhr.open(modifiedRequest.method, modifiedRequest.url);
-          this._events.emit('realOpen');
-          finish(modifiedRequest.body);
-        }
-      });
+      })()
+        .catch(err => {
+          logError(err);
+          return request;
+        })
+        .then(modifiedRequest => {
+          if (startConnection === this._connection && !this._realStartedSend) {
+            this._realxhr.open(modifiedRequest.method, modifiedRequest.url);
+            this._events.emit('realOpen');
+            finish(modifiedRequest.body);
+          }
+        });
     } else {
       finish(body);
     }

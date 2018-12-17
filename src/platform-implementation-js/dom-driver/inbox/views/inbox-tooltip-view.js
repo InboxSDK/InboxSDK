@@ -1,9 +1,9 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import type {TooltipDescriptor} from '../../../views/compose-button-view';
+import type { TooltipDescriptor } from '../../../views/compose-button-view';
 import containByScreen from 'contain-by-screen';
 
 class InboxTooltipView {
@@ -71,19 +71,26 @@ class InboxTooltipView {
       }
     }
 
-    ((document.body:any):HTMLElement).appendChild(this._el);
-    ((document.body:any):HTMLElement).appendChild(this._arrowEl);
+    ((document.body: any): HTMLElement).appendChild(this._el);
+    ((document.body: any): HTMLElement).appendChild(this._arrowEl);
     this._updatePosition(true);
-    this._el.addEventListener('load', (event:any) => {
-      this._updatePosition(true);
-    }, true);
+    this._el.addEventListener(
+      'load',
+      (event: any) => {
+        this._updatePosition(true);
+      },
+      true
+    );
 
     Kefir.interval(200)
       .takeUntilBy(this._stopper)
       .map(() => target.getBoundingClientRect())
-      .skipDuplicates((a:ClientRect,b:ClientRect) =>
-        a.top === b.top && a.left === b.left && a.right === b.right &&
-        a.bottom === b.bottom
+      .skipDuplicates(
+        (a: ClientRect, b: ClientRect) =>
+          a.top === b.top &&
+          a.left === b.left &&
+          a.right === b.right &&
+          a.bottom === b.bottom
       )
       .onValue(() => {
         this._updatePosition();
@@ -100,12 +107,12 @@ class InboxTooltipView {
     return this._stopper;
   }
 
-  _updatePosition(noTransition:boolean=false) {
+  _updatePosition(noTransition: boolean = false) {
     if (noTransition) {
       this._el.classList.add('inboxsdk__notransition');
       this._arrowEl.classList.add('inboxsdk__notransition');
     }
-    const {position} = containByScreen(this._el, this._target, {
+    const { position } = containByScreen(this._el, this._target, {
       position: 'top',
       hAlign: 'center',
       vAlign: 'center',
@@ -120,10 +127,10 @@ class InboxTooltipView {
       forceVAlign: true,
       buffer: 11 // needs to overlap 1px of border
     });
-    ['top','bottom','left','right'].forEach(x => {
-      this._arrowEl.classList.remove('inboxsdk__'+x);
+    ['top', 'bottom', 'left', 'right'].forEach(x => {
+      this._arrowEl.classList.remove('inboxsdk__' + x);
     });
-    this._arrowEl.classList.add('inboxsdk__'+position);
+    this._arrowEl.classList.add('inboxsdk__' + position);
     if (noTransition) {
       this._el.offsetHeight; // Trigger a reflow, flushing the CSS changes
       this._arrowEl.offsetHeight;

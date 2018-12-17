@@ -1,6 +1,6 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import Kefir from 'kefir';
 
 import getSyncThreadFromSyncThreadId from './getSyncThreadFromSyncThreadId';
@@ -20,25 +20,33 @@ class ThreadRowIdentifier {
     this._driver = driver;
     this._composeViews = new Set();
 
-    this._driver.getComposeViewDriverStream().onValue((gmailComposeView: Object) => {
-      this._composeViews.add(gmailComposeView);
+    this._driver
+      .getComposeViewDriverStream()
+      .onValue((gmailComposeView: Object) => {
+        this._composeViews.add(gmailComposeView);
 
-      gmailComposeView.getStopper().onValue(() => {
-        this._composeViews.delete(gmailComposeView);
+        gmailComposeView.getStopper().onValue(() => {
+          this._composeViews.delete(gmailComposeView);
+        });
       });
-    });
   }
 
-  getThreadIdForThreadRow(gmailThreadRowView: GmailThreadRowView, elements: HTMLElement[]): ?string {
+  getThreadIdForThreadRow(
+    gmailThreadRowView: GmailThreadRowView,
+    elements: HTMLElement[]
+  ): ?string {
     {
-      const threadID = this._driver.getPageCommunicator().getThreadIdForThreadRowByDatabase(elements[0]);
+      const threadID = this._driver
+        .getPageCommunicator()
+        .getThreadIdForThreadRowByDatabase(elements[0]);
       if (threadID) {
         return threadID;
       }
     }
 
     if (
-      gmailThreadRowView.getVisibleMessageCount() == 0 && gmailThreadRowView.getVisibleDraftCount() > 0
+      gmailThreadRowView.getVisibleMessageCount() == 0 &&
+      gmailThreadRowView.getVisibleDraftCount() > 0
     ) {
       const composeView = this._findComposeForThreadRow(gmailThreadRowView);
       if (composeView) {
@@ -47,7 +55,8 @@ class ThreadRowIdentifier {
     }
 
     // TODO fix or remove
-    if (false) { // eslint-disable-line
+    // eslint-disable-next-line
+    if (false) {
       // Try identifying the row by simulating a ctrl-click on it. Note that if
       // the thread row corresponds to an open minimized draft, then we won't
       // get a result, and the compose will be restored, so we counteract that
@@ -59,7 +68,9 @@ class ThreadRowIdentifier {
           minimizedComposes.push(composeView);
         }
       }
-      const threadID = this._driver.getPageCommunicator().getThreadIdForThreadRowByClick(elements[0]);
+      const threadID = this._driver
+        .getPageCommunicator()
+        .getThreadIdForThreadRowByClick(elements[0]);
       if (threadID) {
         return threadID;
       }
@@ -71,7 +82,9 @@ class ThreadRowIdentifier {
     return null;
   }
 
-  async getDraftIdForThreadRow(gmailThreadRowView: GmailThreadRowView): Promise<?string> {
+  async getDraftIdForThreadRow(
+    gmailThreadRowView: GmailThreadRowView
+  ): Promise<?string> {
     if (
       gmailThreadRowView.getVisibleMessageCount() > 0 ||
       gmailThreadRowView.getVisibleDraftCount() == 0
@@ -84,11 +97,15 @@ class ThreadRowIdentifier {
       return composeView.getDraftID();
     }
 
-    const {draftID} = await this._driver.getDraftIDForMessageID(gmailThreadRowView.getThreadID());
+    const { draftID } = await this._driver.getDraftIDForMessageID(
+      gmailThreadRowView.getThreadID()
+    );
     return draftID;
   }
 
-  _findComposeForThreadRow(gmailThreadRowView: GmailThreadRowView): ?GmailComposeView {
+  _findComposeForThreadRow(
+    gmailThreadRowView: GmailThreadRowView
+  ): ?GmailComposeView {
     const candidates = [];
     const subject = gmailThreadRowView.getSubject();
     for (let gmailComposeView of this._composeViews) {

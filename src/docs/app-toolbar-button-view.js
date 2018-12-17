@@ -4,33 +4,32 @@
  * navigation area of Gmail or Inbox. This class is returned by {Toolbars.addToolbarButtonForApp()}.
  */
 var AppToolbarButtonView = /** @lends AppToolbarButtonView */ {
+  /**
+   *	Open the dropdown for the app toolbar button
+   * @return {void}
+   */
+  open: function() {},
 
-	/**
-	*	Open the dropdown for the app toolbar button
-	* @return {void}
-	*/
-	open: function(){},
+  /**
+   *	Close the dropdown for the app toolbar button
+   * @return {void}
+   */
+  close: function() {},
 
-	/**
-	*	Close the dropdown for the app toolbar button
-	* @return {void}
-	*/
-	close: function(){},
+  /**
+   *	Remove the app toolbar button from Gmail/Inbox
+   * @return {void}
+   */
+  remove: function() {},
 
-	/**
-	*	Remove the app toolbar button from Gmail/Inbox
-	* @return {void}
-	*/
-	remove: function(){},
+  /**
+   * This property is set to true once the view is destroyed.
+   * @type {boolean}
+   */
+  destroyed: false
 
-	/**
-	 * This property is set to true once the view is destroyed.
-	 * @type {boolean}
-	 */
-	destroyed: false,
-
-	/**
-	 * Fires when this view has been removed.
-	 * @event AppToolbarButtonView#destroy
-	 */
+  /**
+   * Fires when this view has been removed.
+   * @event AppToolbarButtonView#destroy
+   */
 };

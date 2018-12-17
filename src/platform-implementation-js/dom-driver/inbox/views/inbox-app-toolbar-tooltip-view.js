@@ -1,11 +1,11 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 
 class InboxAppToolbarTooltipView {
-  _stopper: Kefir.Observable<null>&{destroy():void} = kefirStopper();
+  _stopper: Kefir.Observable<null> & { destroy(): void } = kefirStopper();
   _anchorElement: HTMLElement;
   _el: HTMLElement;
   _containerEl: HTMLElement;
@@ -16,7 +16,7 @@ class InboxAppToolbarTooltipView {
 
     this._arrowEl = document.createElement('div');
     this._arrowEl.className = 'inboxsdk__tooltip_arrow inboxsdk__bottom';
-    ((document.body:any):HTMLElement).appendChild(this._arrowEl);
+    ((document.body: any): HTMLElement).appendChild(this._arrowEl);
     if (arrowColor) {
       this._arrowEl.style.borderColor = arrowColor;
     }
@@ -29,19 +29,26 @@ class InboxAppToolbarTooltipView {
     this._el.setAttribute('role', 'region');
 
     this._containerEl.appendChild(this._el);
-    ((document.body:any):HTMLElement).appendChild(this._containerEl);
+    ((document.body: any): HTMLElement).appendChild(this._containerEl);
 
     this._reposition();
   }
 
   _reposition() {
     const buttonPos = this._anchorElement.getBoundingClientRect();
-    const buttonCenter = buttonPos.left+buttonPos.width/2;
-    this._arrowEl.style.top = `${buttonPos.bottom+18}px`;
-    this._arrowEl.style.right = `${(window.innerWidth-buttonPos.right)+buttonPos.width/2-this._arrowEl.offsetWidth/2-1}px`;
+    const buttonCenter = buttonPos.left + buttonPos.width / 2;
+    this._arrowEl.style.top = `${buttonPos.bottom + 18}px`;
+    this._arrowEl.style.right = `${window.innerWidth -
+      buttonPos.right +
+      buttonPos.width / 2 -
+      this._arrowEl.offsetWidth / 2 -
+      1}px`;
 
-    this._containerEl.style.top = `${buttonPos.bottom+17}px`;
-    this._containerEl.style.minWidth = `${(window.innerWidth-buttonCenter-30)*2}px`;
+    this._containerEl.style.top = `${buttonPos.bottom + 17}px`;
+    this._containerEl.style.minWidth = `${(window.innerWidth -
+      buttonCenter -
+      30) *
+      2}px`;
   }
 
   getDropdownOptions() {

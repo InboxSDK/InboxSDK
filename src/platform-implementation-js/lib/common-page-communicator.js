@@ -5,31 +5,34 @@ import asap from 'asap';
 import RSVP from 'rsvp';
 import Kefir from 'kefir';
 import Logger from './logger';
-import type {AjaxOpts} from '../../common/ajax';
+import type { AjaxOpts } from '../../common/ajax';
 
 export default class CommonPageCommunicator {
   ajaxInterceptStream: Kefir.Observable<Object>;
 
-  constructor(){
-    this.ajaxInterceptStream =
-      Kefir.fromEvents(document, 'inboxSDKajaxIntercept')
-            .map(x => x.detail);
+  constructor() {
+    this.ajaxInterceptStream = Kefir.fromEvents(
+      document,
+      'inboxSDKajaxIntercept'
+    ).map(x => x.detail);
   }
 
   getUserEmailAddress(): string {
-    const s = (document.head:any).getAttribute('data-inboxsdk-user-email-address');
+    const s = (document.head: any).getAttribute(
+      'data-inboxsdk-user-email-address'
+    );
     if (typeof s !== 'string') throw new Error('should not happen');
     return s;
   }
 
   getUserLanguage(): string {
-    const s = (document.head:any).getAttribute('data-inboxsdk-user-language');
+    const s = (document.head: any).getAttribute('data-inboxsdk-user-language');
     if (typeof s !== 'string') throw new Error('should not happen');
     return s;
   }
 
   getIkValue(): string {
-    const ownIk = (document.head:any).getAttribute('data-inboxsdk-ik-value');
+    const ownIk = (document.head: any).getAttribute('data-inboxsdk-ik-value');
     if (ownIk) {
       return ownIk;
     }
@@ -45,42 +48,52 @@ export default class CommonPageCommunicator {
   }
 
   async getXsrfToken(): Promise<string> {
-    const existingHeader = (document.head:any).getAttribute('data-inboxsdk-xsrf-token');
+    const existingHeader = (document.head: any).getAttribute(
+      'data-inboxsdk-xsrf-token'
+    );
     if (existingHeader) {
       return existingHeader;
     } else {
       await this.ajaxInterceptStream
-        .filter(({type}) => type === 'xsrfTokenHeaderReceived')
+        .filter(({ type }) => type === 'xsrfTokenHeaderReceived')
         .take(1)
         .toPromise();
 
-      const newHeader = (document.head:any).getAttribute('data-inboxsdk-xsrf-token');
-      if (!newHeader) throw new Error("Failed to look up XSRF token");
+      const newHeader = (document.head: any).getAttribute(
+        'data-inboxsdk-xsrf-token'
+      );
+      if (!newHeader) throw new Error('Failed to look up XSRF token');
       return newHeader;
     }
   }
 
   async getBtaiHeader(): Promise<string> {
-    const existingHeader = (document.head:any).getAttribute('data-inboxsdk-btai-header');
+    const existingHeader = (document.head: any).getAttribute(
+      'data-inboxsdk-btai-header'
+    );
     if (existingHeader) {
       return existingHeader;
     } else {
       await this.ajaxInterceptStream
-        .filter(({type}) => type === 'btaiHeaderReceived')
+        .filter(({ type }) => type === 'btaiHeaderReceived')
         .take(1)
         .toPromise();
 
-      const newHeader = (document.head:any).getAttribute('data-inboxsdk-btai-header');
-      if (!newHeader) throw new Error("Failed to look up BTAI header");
+      const newHeader = (document.head: any).getAttribute(
+        'data-inboxsdk-btai-header'
+      );
+      if (!newHeader) throw new Error('Failed to look up BTAI header');
       return newHeader;
     }
   }
 
   resolveUrlRedirects(url: string): Promise<string> {
-    return this.pageAjax({url, method: 'HEAD'}).then(result => result.responseURL);
+    return this.pageAjax({ url, method: 'HEAD' }).then(
+      result => result.responseURL
+    );
   }
 
-  pageAjax(opts: AjaxOpts): Promise<{text: string, responseURL: string}> {
+  pageAjax(opts: AjaxOpts): Promise<{ text: string, responseURL: string }> {
     var id = `${Date.now()}-${Math.random()}`;
     var promise = Kefir.fromEvents(document, 'inboxSDKpageAjaxDone')
       .filter(event => event.detail && event.detail.id === id)
@@ -88,8 +101,8 @@ export default class CommonPageCommunicator {
       .flatMap(event => {
         if (event.detail.error) {
           var err = Object.assign(
-            (new Error(event.detail.message || "Connection error"): any),
-            {status: event.detail.status}
+            (new Error(event.detail.message || 'Connection error'): any),
+            { status: event.detail.status }
           );
           if (event.detail.stack) {
             err.stack = event.detail.stack;
@@ -104,28 +117,37 @@ export default class CommonPageCommunicator {
       })
       .toPromise(RSVP.Promise);
 
-    document.dispatchEvent(new CustomEvent('inboxSDKpageAjax', {
-      bubbles: false, cancelable: false,
-      detail: Object.assign({}, opts, {id})
-    }));
+    document.dispatchEvent(
+      new CustomEvent('inboxSDKpageAjax', {
+        bubbles: false,
+        cancelable: false,
+        detail: Object.assign({}, opts, { id })
+      })
+    );
 
     return promise;
   }
 
-  silenceGmailErrorsForAMoment(): ()=>void {
-    document.dispatchEvent(new CustomEvent('inboxSDKsilencePageErrors', {
-      bubbles: false, cancelable: false, detail: null
-    }));
-    // create error here for stacktrace
-    var error = new Error("Forgot to unsilence page errors");
-    var unsilenced = false;
-    var unsilence = once(() => {
-      unsilenced = true;
-      document.dispatchEvent(new CustomEvent('inboxSDKunsilencePageErrors', {
+  silenceGmailErrorsForAMoment(): () => void {
+    document.dispatchEvent(
+      new CustomEvent('inboxSDKsilencePageErrors', {
         bubbles: false,
         cancelable: false,
         detail: null
-      }));
+      })
+    );
+    // create error here for stacktrace
+    var error = new Error('Forgot to unsilence page errors');
+    var unsilenced = false;
+    var unsilence = once(() => {
+      unsilenced = true;
+      document.dispatchEvent(
+        new CustomEvent('inboxSDKunsilencePageErrors', {
+          bubbles: false,
+          cancelable: false,
+          detail: null
+        })
+      );
     });
     asap(() => {
       if (!unsilenced) {
@@ -137,10 +159,12 @@ export default class CommonPageCommunicator {
   }
 
   registerAllowedHashLinkStartTerm(term: string) {
-    document.dispatchEvent(new CustomEvent('inboxSDKregisterAllowedHashLinkStartTerm', {
-      bubbles: false,
-      cancelable: false,
-      detail: {term}
-    }));
+    document.dispatchEvent(
+      new CustomEvent('inboxSDKregisterAllowedHashLinkStartTerm', {
+        bubbles: false,
+        cancelable: false,
+        detail: { term }
+      })
+    );
   }
 }

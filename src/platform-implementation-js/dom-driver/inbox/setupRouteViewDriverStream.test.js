@@ -21,7 +21,7 @@ function makeMockDriver(): Object {
   return {
     getStopper: _.constant(stopper),
     getCustomRouteIDs: _.constant(new Set()),
-    showNativeRouteView: jest.fn(),
+    showNativeRouteView: jest.fn()
   };
 }
 
@@ -43,13 +43,20 @@ test('test', async () => {
   items[0].getStopper().onValue(firstStopper);
   expect(firstStopper).toHaveBeenCalledTimes(0);
 
-  document.dispatchEvent(new CustomEvent('inboxSDKpushState', {
-    bubbles: false, cancelable: false,
-    detail: {
-      __test_url: 'https://inbox.google.com/u/0/snoozed',
-      args: ["%5B1%2C%5B%5B11%2C0%2Cfalse%2Cnull%2Cnull%2C0%5D%5D%5D", "", "/u/0/snoozed"]
-    }
-  }));
+  document.dispatchEvent(
+    new CustomEvent('inboxSDKpushState', {
+      bubbles: false,
+      cancelable: false,
+      detail: {
+        __test_url: 'https://inbox.google.com/u/0/snoozed',
+        args: [
+          '%5B1%2C%5B%5B11%2C0%2Cfalse%2Cnull%2Cnull%2C0%5D%5D%5D',
+          '',
+          '/u/0/snoozed'
+        ]
+      }
+    })
+  );
 
   expect(items.length).toBe(2);
   expect(items[1]).toBeInstanceOf(InboxDummyRouteView);
@@ -64,16 +71,23 @@ test('test', async () => {
   expect(items.length).toBe(3);
   expect(items[2]).toBeInstanceOf(InboxCustomRouteView);
   expect(items[2].getRouteID()).toBe('bar/:id/blah');
-  expect(items[2].getParams()).toEqual({id: '123'});
+  expect(items[2].getParams()).toEqual({ id: '123' });
   expect(driver.showNativeRouteView).toHaveBeenCalledTimes(2);
 
-  document.dispatchEvent(new CustomEvent('inboxSDKpushState', {
-    bubbles: false, cancelable: false,
-    detail: {
-      __test_url: 'https://inbox.google.com/u/0/done',
-      args: ["%5B1%2C%5B%5B2%2C0%2Cfalse%2Cnull%2Cnull%2C0%5D%5D%5D", "", "/u/0/done"]
-    }
-  }));
+  document.dispatchEvent(
+    new CustomEvent('inboxSDKpushState', {
+      bubbles: false,
+      cancelable: false,
+      detail: {
+        __test_url: 'https://inbox.google.com/u/0/done',
+        args: [
+          '%5B1%2C%5B%5B2%2C0%2Cfalse%2Cnull%2Cnull%2C0%5D%5D%5D',
+          '',
+          '/u/0/done'
+        ]
+      }
+    })
+  );
 
   expect(items.length).toBe(4);
   expect(items[3]).toBeInstanceOf(InboxDummyRouteView);

@@ -1,6 +1,6 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import InboxToolbarButtonView from './InboxToolbarButtonView';
@@ -13,7 +13,11 @@ class InboxToolbarView {
   _driver: InboxDriver;
   _inboxThreadView: ?InboxThreadView;
 
-  constructor(el: HTMLElement, driver: InboxDriver, inboxThreadView: ?InboxThreadView) {
+  constructor(
+    el: HTMLElement,
+    driver: InboxDriver,
+    inboxThreadView: ?InboxThreadView
+  ) {
     this._el = el;
     this._driver = driver;
     this._inboxThreadView = inboxThreadView;
@@ -53,7 +57,11 @@ class InboxToolbarView {
   }
 
   addButton(buttonDescriptor: Object, id?: string) {
-    const button = new InboxToolbarButtonView(buttonDescriptor, this._driver.getAppId(), this._el);
+    const button = new InboxToolbarButtonView(
+      buttonDescriptor,
+      this._driver.getAppId(),
+      this._el
+    );
     this._stopper.takeUntilBy(button.getStopper()).onValue(() => {
       button.destroy();
     });

@@ -8,7 +8,7 @@ import cx from 'classnames';
 import idMap from '../../../lib/idMap';
 import parseParamsFromRouteID from '../../../lib/parseParamsFromRouteID';
 import getSidebarClassnames from '../getSidebarClassnames';
-import type {RouteViewDriver} from '../../../driver-interfaces/route-view-driver';
+import type { RouteViewDriver } from '../../../driver-interfaces/route-view-driver';
 
 export default class InboxCustomRouteView {
   _routeID: string;
@@ -27,7 +27,8 @@ export default class InboxCustomRouteView {
   }
 
   setFullWidth(fullWidth: boolean) {
-    const centerListClassName = getSidebarClassnames().centerList || 'UNKNOWN_centerList';
+    const centerListClassName =
+      getSidebarClassnames().centerList || 'UNKNOWN_centerList';
     this._customViewElement.className = cx(idMap('custom_view_container'), {
       [idMap('custom_view_min_margins')]: fullWidth,
       [centerListClassName]: !fullWidth
@@ -38,7 +39,7 @@ export default class InboxCustomRouteView {
     return this._stopper;
   }
 
-  destroy(){
+  destroy() {
     this._eventStream.end();
     this._stopper.destroy();
     this._customViewElement.remove();
@@ -68,7 +69,7 @@ export default class InboxCustomRouteView {
     return this._eventStream;
   }
 
-  getCustomViewElement(): ?HTMLElement{
+  getCustomViewElement(): ?HTMLElement {
     return this._customViewElement;
   }
 
@@ -80,11 +81,17 @@ export default class InboxCustomRouteView {
     throw new Error('should not happen');
   }
 
-  addCollapsibleSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any) {
+  addCollapsibleSection(
+    sectionDescriptorProperty: Kefir.Observable<?Object>,
+    groupOrderHint: any
+  ) {
     throw new Error('should not happen');
   }
 
-  addSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any) {
+  addSection(
+    sectionDescriptorProperty: Kefir.Observable<?Object>,
+    groupOrderHint: any
+  ) {
     throw new Error('should not happen');
   }
 }

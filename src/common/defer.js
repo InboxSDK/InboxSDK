@@ -4,9 +4,9 @@
 // this, and should use the Promise constructor instead!
 
 type Defer<T> = {
-  resolve: (value: T) => void;
-  reject: (err: any) => void;
-  promise: Promise<T>;
+  resolve: (value: T) => void,
+  reject: (err: any) => void,
+  promise: Promise<T>
 };
 
 export default function defer<T>(): Defer<T> {
@@ -16,5 +16,5 @@ export default function defer<T>(): Defer<T> {
     resolve = _resolve;
     reject = _reject;
   });
-  return {resolve, reject, promise};
+  return { resolve, reject, promise };
 }

@@ -1,13 +1,13 @@
 /**
-* @class
-* Represents a drawer panel.
-*/
-var DrawerView = /** @lends DrawerView */{
+ * @class
+ * Represents a drawer panel.
+ */
+var DrawerView = /** @lends DrawerView */ {
   /**
    * This closes the drawer. Does nothing if already closed.
    * @return {void}
    */
-  close: function(){},
+  close: function() {},
 
   /**
    * This method allows a compose view to be associated with a pre-existing
@@ -32,7 +32,7 @@ var DrawerView = /** @lends DrawerView */{
    * This property is set to true once the view is destroyed.
    * @type {boolean}
    */
-  destroyed: false,
+  destroyed: false
 
   /**
    * Fires when this DrawerView instance is visible and in position.

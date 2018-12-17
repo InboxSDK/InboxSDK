@@ -1,12 +1,12 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import InboxBackdrop from './inbox-backdrop';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
-import type {DrawerViewOptions} from '../../../driver-interfaces/driver';
+import type { DrawerViewOptions } from '../../../driver-interfaces/driver';
 import type ComposeView from '../../../views/compose-view';
 import findParent from '../../../../common/find-parent';
 
@@ -28,12 +28,15 @@ class InboxDrawerView {
   constructor(options: DrawerViewOptions) {
     this._chrome = typeof options.chrome === 'boolean' ? options.chrome : true;
 
-    let insertionTarget = ((document.body:any):HTMLElement);
+    let insertionTarget = ((document.body: any): HTMLElement);
     let composeRect = null;
 
-    const {composeView, closeWithCompose} = options;
+    const { composeView, closeWithCompose } = options;
     if (composeView) {
-      const ret = this._setupComposeInsertionTarget(composeView, closeWithCompose);
+      const ret = this._setupComposeInsertionTarget(
+        composeView,
+        closeWithCompose
+      );
       insertionTarget = ret.insertionTarget;
       composeRect = ret.composeRect;
     }
@@ -44,7 +47,11 @@ class InboxDrawerView {
     let composeNeedToMoveLeft = 0;
     if (composeView) {
       if (!composeRect) throw new Error('should not happen');
-      composeNeedToMoveLeft = this._setupComposeAnimation(composeView, composeRect, true);
+      composeNeedToMoveLeft = this._setupComposeAnimation(
+        composeView,
+        composeRect,
+        true
+      );
     }
 
     this._el.offsetHeight; // force layout so that adding a class does a transition.
@@ -62,7 +69,7 @@ class InboxDrawerView {
     // drawer for any escape keypresses which weren't preventDefaulted by the
     // current extension.
     fromEventTargetCapture(document, 'keydown')
-      .filter(e => e.key ? e.key === 'Escape' : e.which === 27)
+      .filter(e => (e.key ? e.key === 'Escape' : e.which === 27))
       .takeUntilBy(this._closing)
       .onValue(e => {
         const origPreventDefault = e.preventDefault;
@@ -72,7 +79,7 @@ class InboxDrawerView {
         };
       });
     Kefir.fromEvents(document, 'keydown')
-      .filter(e => e.key ? e.key === 'Escape' : e.which === 27)
+      .filter(e => (e.key ? e.key === 'Escape' : e.which === 27))
       .filter(e => !e._defaultPreventedInContext)
       .filter(event => {
         let isCanceled = false;
@@ -92,7 +99,10 @@ class InboxDrawerView {
       });
   }
 
-  _setupComposeInsertionTarget(composeView: ComposeView, closeWithCompose: ?boolean): {composeRect: ClientRect, insertionTarget: HTMLElement} {
+  _setupComposeInsertionTarget(
+    composeView: ComposeView,
+    closeWithCompose: ?boolean
+  ): { composeRect: ClientRect, insertionTarget: HTMLElement } {
     if (composeView.isMinimized()) {
       throw new Error("Can't attach DrawerView to minimized ComposeView");
     }
@@ -118,7 +128,6 @@ class InboxDrawerView {
       .takeUntilBy(this._closing.merge(this._composeChanges))
       .onValue(() => this.close());
 
-
     const composeEl = composeView.getElement();
 
     // Read the compose size before any DOM modifications besides un-fullscreening it.
@@ -138,22 +147,37 @@ class InboxDrawerView {
     // set up the z-indexes of the ComposeView's offsetParent and the
     // insertionTarget point so everything will look right.
     const composeOffsetParent = composeEl.offsetParent;
-    if (!(composeOffsetParent instanceof HTMLElement)) throw new Error('should not happen');
-    const insertionTarget = findParent(
-      composeOffsetParent,
-      el => window.getComputedStyle(el).getPropertyValue('z-index') !== 'auto' &&
-        el.getBoundingClientRect().left === 0
-    ) || ((document.body:any):HTMLElement);
+    if (!(composeOffsetParent instanceof HTMLElement))
+      throw new Error('should not happen');
+    const insertionTarget =
+      findParent(
+        composeOffsetParent,
+        el =>
+          window.getComputedStyle(el).getPropertyValue('z-index') !== 'auto' &&
+          el.getBoundingClientRect().left === 0
+      ) || ((document.body: any): HTMLElement);
 
-    composeEl.dispatchEvent(new CustomEvent(TAKE_OVER_EVENT, {
-      bubbles: false, cancelable: false, detail: null
-    }));
-    composeOffsetParent.dispatchEvent(new CustomEvent(TAKE_OVER_EVENT, {
-      bubbles: false, cancelable: false, detail: null
-    }));
-    insertionTarget.dispatchEvent(new CustomEvent(TAKE_OVER_EVENT, {
-      bubbles: false, cancelable: false, detail: null
-    }));
+    composeEl.dispatchEvent(
+      new CustomEvent(TAKE_OVER_EVENT, {
+        bubbles: false,
+        cancelable: false,
+        detail: null
+      })
+    );
+    composeOffsetParent.dispatchEvent(
+      new CustomEvent(TAKE_OVER_EVENT, {
+        bubbles: false,
+        cancelable: false,
+        detail: null
+      })
+    );
+    insertionTarget.dispatchEvent(
+      new CustomEvent(TAKE_OVER_EVENT, {
+        bubbles: false,
+        cancelable: false,
+        detail: null
+      })
+    );
 
     // Needed to stop composeviews from coming apart visually in Gmail.
     insertionTarget.classList.add('inboxsdk__drawers_in_use');
@@ -161,9 +185,12 @@ class InboxDrawerView {
     insertionTarget.style.zIndex = String(zIndex);
 
     if (!composeOffsetParent.hasAttribute('data-drawer-old-zindex')) {
-      composeOffsetParent.setAttribute('data-drawer-old-zindex', composeOffsetParent.style.zIndex);
+      composeOffsetParent.setAttribute(
+        'data-drawer-old-zindex',
+        composeOffsetParent.style.zIndex
+      );
     }
-    composeOffsetParent.style.zIndex = String(zIndex+2); // 1 more than compose
+    composeOffsetParent.style.zIndex = String(zIndex + 2); // 1 more than compose
 
     this._closed
       .takeUntilBy(Kefir.fromEvents(insertionTarget, TAKE_OVER_EVENT))
@@ -174,23 +201,30 @@ class InboxDrawerView {
       .merge(this._composeChanges)
       .takeUntilBy(Kefir.fromEvents(composeOffsetParent, TAKE_OVER_EVENT))
       .onValue(() => {
-        composeOffsetParent.style.zIndex = composeOffsetParent.getAttribute('data-drawer-old-zindex') || '';
+        composeOffsetParent.style.zIndex =
+          composeOffsetParent.getAttribute('data-drawer-old-zindex') || '';
         composeOffsetParent.removeAttribute('data-drawer-old-zindex');
       });
 
-    return {composeRect, insertionTarget};
+    return { composeRect, insertionTarget };
   }
 
   _setupElement(options: DrawerViewOptions, insertionTarget: HTMLElement) {
-    const backdrop = this._backdrop = new InboxBackdrop(zIndex, insertionTarget);
+    const backdrop = (this._backdrop = new InboxBackdrop(
+      zIndex,
+      insertionTarget
+    ));
     this._preAutoCloseStream.plug(backdrop.getPreAutoCloseStream());
-    backdrop.getStopper().takeUntilBy(this._closing).onValue(() => {
-      this.close();
-    });
+    backdrop
+      .getStopper()
+      .takeUntilBy(this._closing)
+      .onValue(() => {
+        this.close();
+      });
 
     this._containerEl = document.createElement('div');
     this._containerEl.className = 'inboxsdk__drawer_view_container';
-    this._containerEl.style.zIndex = String(zIndex+1);
+    this._containerEl.style.zIndex = String(zIndex + 1);
 
     this._el = document.createElement('div');
     this._el.setAttribute('role', 'dialog');
@@ -237,14 +271,20 @@ class InboxDrawerView {
     });
   }
 
-  _setupComposeAnimation(composeView: ComposeView, composeRect: ClientRect, forceLayout: boolean): number {
+  _setupComposeAnimation(
+    composeView: ComposeView,
+    composeRect: ClientRect,
+    forceLayout: boolean
+  ): number {
     const composeEl = composeView.getElement();
     const parentEl: HTMLElement = (composeEl.parentElement: any);
     const drawerRect = this._el.getBoundingClientRect();
 
     const margin = 24;
     const preexistingLeftAdjustment = parseInt(parentEl.style.left) || 0;
-    const composeNeedToMoveLeft = composeRect.right - preexistingLeftAdjustment -
+    const composeNeedToMoveLeft =
+      composeRect.right -
+      preexistingLeftAdjustment -
       (window.innerWidth - drawerRect.width - margin);
     if (composeNeedToMoveLeft > 0) {
       parentEl.style.position = 'relative';
@@ -277,9 +317,9 @@ class InboxDrawerView {
         .onValue(() => {
           parentEl.style.left = '0';
         })
-        .flatMap(() =>
-          Kefir.fromEvents(parentEl, 'transitionend')
-            .merge(Kefir.later(200)) // transition might not finish if element is hidden
+        .flatMap(
+          () =>
+            Kefir.fromEvents(parentEl, 'transitionend').merge(Kefir.later(200)) // transition might not finish if element is hidden
         )
         .merge(this._composeChanges)
         .take(1)
@@ -295,13 +335,21 @@ class InboxDrawerView {
   associateComposeView(composeView: ComposeView, closeWithCompose: boolean) {
     this._composeChanges.emit(null);
 
-    const {insertionTarget, composeRect} = this._setupComposeInsertionTarget(composeView, closeWithCompose);
+    const { insertionTarget, composeRect } = this._setupComposeInsertionTarget(
+      composeView,
+      closeWithCompose
+    );
 
-    if (this._backdrop) insertionTarget.appendChild(this._backdrop.getElement());
-    if (this._containerEl.parentElement !== insertionTarget) insertionTarget.appendChild(this._containerEl);
+    if (this._backdrop)
+      insertionTarget.appendChild(this._backdrop.getElement());
+    if (this._containerEl.parentElement !== insertionTarget)
+      insertionTarget.appendChild(this._containerEl);
 
-
-    const composeNeedToMoveLeft = this._setupComposeAnimation(composeView, composeRect, false);
+    const composeNeedToMoveLeft = this._setupComposeAnimation(
+      composeView,
+      composeRect,
+      false
+    );
     this._positionCompose(composeView, composeNeedToMoveLeft);
   }
 

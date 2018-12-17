@@ -1,14 +1,14 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import Kefir from 'kefir';
 import imageRequest from '../lib/imageRequest';
 import rateLimitQueuer from '../../common/rate-limit-queuer';
 import ajax from '../../common/ajax';
 
-import type {AjaxOpts, AjaxResponse} from '../../common/ajax';
+import type { AjaxOpts, AjaxResponse } from '../../common/ajax';
 
-const IMAGE_REQUEST_TIMEOUT = 1000*60; // one minute
+const IMAGE_REQUEST_TIMEOUT = 1000 * 60; // one minute
 
 const limitedAjax = rateLimitQueuer(ajax, 1000, 7);
 
@@ -25,7 +25,7 @@ async function gmailAjax(opts: AjaxOpts): Promise<AjaxResponse> {
   }
 
   try {
-    return await limitedAjax({...opts, canRetry: false});
+    return await limitedAjax({ ...opts, canRetry: false });
   } catch (e) {
     if (e && e.status === 0) {
       // The connection failed for an unspecified reason. One possible reason
@@ -36,7 +36,9 @@ async function gmailAjax(opts: AjaxOpts): Promise<AjaxResponse> {
       // request (which doesn't have cross-domain restrictions) so the Gmail
       // cookies get set, and then retrying the original ajax request.
       try {
-        await Kefir.fromPromise(imageRequest('https://mail.google.com/mail/u/0/'))
+        await Kefir.fromPromise(
+          imageRequest('https://mail.google.com/mail/u/0/')
+        )
           .merge(Kefir.later(IMAGE_REQUEST_TIMEOUT))
           .take(1)
           .takeErrors(1)

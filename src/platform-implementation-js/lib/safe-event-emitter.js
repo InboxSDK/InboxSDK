@@ -9,7 +9,7 @@ export default class SafeEventEmitter extends EventEmitter {
   emit(event: string, ...args: Array<any>): boolean {
     try {
       return super.emit.apply(this, arguments);
-    } catch(e) {
+    } catch (e) {
       Logger.error(e);
       return true;
     }

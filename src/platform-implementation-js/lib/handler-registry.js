@@ -12,14 +12,14 @@ export default class HandlerRegistry<T> {
   _handlers: Array<Handler<T>> = [];
 
   registerHandler(handler: Handler<T>): () => void {
-    if(this._pendingHandlers.indexOf(handler) === -1) {
+    if (this._pendingHandlers.indexOf(handler) === -1) {
       this._pendingHandlers.push(handler);
 
       asap(() => {
         const pendingHandlers = this._pendingHandlers.slice();
-        for(let ii=pendingHandlers.length - 1; ii>=0; ii--){
+        for (let ii = pendingHandlers.length - 1; ii >= 0; ii--) {
           const handler = pendingHandlers[ii];
-          if(this._handlers.indexOf(handler) === -1){
+          if (this._handlers.indexOf(handler) === -1) {
             this._handlers.push(handler);
             this._informHandlerOfTargets(handler);
           }
@@ -38,7 +38,11 @@ export default class HandlerRegistry<T> {
   addTarget(target: T) {
     this._targets.push(target);
 
-    if(target && typeof target === 'object' && typeof target.on === 'function') {
+    if (
+      target &&
+      typeof target === 'object' &&
+      typeof target.on === 'function'
+    ) {
       target.on('destroy', () => {
         this.removeTarget(target);
       });
@@ -58,25 +62,23 @@ export default class HandlerRegistry<T> {
 
   _informHandlerOfTargets(handler: Handler<T>) {
     const targets = this._targets.slice();
-    for(let ii = 0; ii < targets.length; ii++){
+    for (let ii = 0; ii < targets.length; ii++) {
       _tryCatch(handler, targets[ii]);
     }
   }
 
   _informHandlersOfTarget(target: T) {
     const handlers = this._handlers.slice();
-    for(let ii = 0; ii< handlers.length; ii++){
+    for (let ii = 0; ii < handlers.length; ii++) {
       _tryCatch(handlers[ii], target);
     }
-
   }
 }
 
-function _tryCatch<T>(fn: (arg: T) => void, arg: T){
-  try{
+function _tryCatch<T>(fn: (arg: T) => void, arg: T) {
+  try {
     fn(arg);
-  }
-  catch(err){
+  } catch (err) {
     Logger.error(err);
   }
 }

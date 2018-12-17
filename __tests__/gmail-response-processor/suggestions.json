@@ -96,21 +96,7 @@
       null,
       null,
       1,
-      [
-        "aso.clc",
-        null,
-        null,
-        null,
-        [
-          [
-            "aso.stg",
-            5,
-            "0"
-          ]
-        ],
-        null,
-        []
-      ],
+      ["aso.clc", null, null, null, [["aso.stg", 5, "0"]], null, []],
       null,
       null,
       0
@@ -216,21 +202,7 @@
       null,
       null,
       1,
-      [
-        "aso.clc",
-        null,
-        null,
-        null,
-        [
-          [
-            "aso.stg",
-            5,
-            "0"
-          ]
-        ],
-        null,
-        []
-      ],
+      ["aso.clc", null, null, null, [["aso.stg", 5, "0"]], null, []],
       null,
       null,
       0

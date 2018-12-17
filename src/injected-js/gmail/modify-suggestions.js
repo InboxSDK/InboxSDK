@@ -2,30 +2,30 @@
 
 import escape from 'lodash/escape';
 import autoHtml from 'auto-html';
-import {defn} from 'ud';
+import { defn } from 'ud';
 import htmlToText from '../../common/html-to-text';
 import * as GRP from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 
 // This is the type that the user provides.
 export type AutocompleteSearchResult = {
-  name?: ?string;
-  nameHTML?: ?string;
-  description?: ?string;
-  descriptionHTML?: ?string;
-  routeName?: ?string;
-  routeParams?: ?{[ix: string]: string|number};
-  externalURL?: ?string;
-  searchTerm?: ?string;
-  iconUrl?: ?string;
-  iconClass?: ?string;
-  onClick?: ?()=>void;
+  name?: ?string,
+  nameHTML?: ?string,
+  description?: ?string,
+  descriptionHTML?: ?string,
+  routeName?: ?string,
+  routeParams?: ?{ [ix: string]: string | number },
+  externalURL?: ?string,
+  searchTerm?: ?string,
+  iconUrl?: ?string,
+  iconClass?: ?string,
+  onClick?: ?() => void
 };
 
 // These ids are part of the object constructed by the SDK used to refer to a
 // suggestion to the injected script.
-export type AutocompleteSearchResultWithId = AutocompleteSearchResult&{
-  id: string;
-  providerId: string;
+export type AutocompleteSearchResultWithId = AutocompleteSearchResult & {
+  id: string,
+  providerId: string
 };
 
 /*
@@ -54,8 +54,11 @@ Currently modifySuggestions modifies the first section and adds the
 app-provided suggestions into the search term/contact suggestions array.
 */
 
-function modifySuggestions(responseText: string, modifications: AutocompleteSearchResultWithId[]): string {
-  const {value: parsed, options} = GRP.deserialize(responseText);
+function modifySuggestions(
+  responseText: string,
+  modifications: AutocompleteSearchResultWithId[]
+): string {
+  const { value: parsed, options } = GRP.deserialize(responseText);
   const query = parsed[0][1];
   for (let modification of modifications) {
     let name, nameHTML;
@@ -67,7 +70,7 @@ function modifySuggestions(responseText: string, modifications: AutocompleteSear
       name = htmlToText(nameHTML);
     }
     if (name == null || nameHTML == null) {
-      throw new Error("name or nameHTML must be provided");
+      throw new Error('name or nameHTML must be provided');
     }
     let description, descriptionHTML;
     if (typeof modification.description === 'string') {
@@ -83,10 +86,11 @@ function modifySuggestions(responseText: string, modifications: AutocompleteSear
       routeParams: modification.routeParams,
       externalURL: modification.externalURL
     };
-    nameHTML +=
-      autoHtml ` <span style="display:none" data-inboxsdk-suggestion="${JSON.stringify(data)}"></span>`;
+    nameHTML += autoHtml` <span style="display:none" data-inboxsdk-suggestion="${JSON.stringify(
+      data
+    )}"></span>`;
     const newItem = [
-      "aso.sug",
+      'aso.sug',
       modification.searchTerm || query,
       nameHTML,
       (null: ?[string, ?string, string, ?string, string]),
@@ -98,23 +102,20 @@ function modifySuggestions(responseText: string, modifications: AutocompleteSear
       0,
 
       (null: ?[string, string]),
-      "asor inboxsdk__custom_suggestion "+modification.providerId + " " + (modification.iconClass || ''),
+      'asor inboxsdk__custom_suggestion ' +
+        modification.providerId +
+        ' ' +
+        (modification.iconClass || ''),
       0
     ];
     if (descriptionHTML != null) {
-      newItem[3] = [
-        'aso.eme',
-        description,
-        name,
-        descriptionHTML,
-        nameHTML
-      ];
+      newItem[3] = ['aso.eme', description, name, descriptionHTML, nameHTML];
     }
     if (modification.iconUrl) {
       newItem[6] = ['aso.thn', modification.iconUrl];
-      newItem[7] += " inboxsdk__no_bg";
+      newItem[7] += ' inboxsdk__no_bg';
     } else {
-      newItem[7] += " asor_i4";
+      newItem[7] += ' asor_i4';
     }
     parsed[0][3].push(newItem);
   }

@@ -2,21 +2,23 @@
 
 import once from 'lodash/once';
 import Kefir from 'kefir';
-import {defn} from 'ud';
+import { defn } from 'ud';
 import querySelector from './dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chunked-stream';
-import type {ComposeViewDriver} from '../driver-interfaces/compose-view-driver';
+import type { ComposeViewDriver } from '../driver-interfaces/compose-view-driver';
 
-const extId = ''+Math.random();
+const extId = '' + Math.random();
 
 const Z_SPACE_CHAR = '\u200b';
 const X_URL = 'https://ssl.gstatic.com/ui/v1/icons/common/x_8px.png';
 
-const handleComposeLinkChips = defn(module, function(composeView: ComposeViewDriver) {
+const handleComposeLinkChips = defn(module, function(
+  composeView: ComposeViewDriver
+) {
   // Abort if we're missing elements we'll need.
   try {
     composeView.getBodyElement();
-  } catch(err) {
+  } catch (err) {
     return;
   }
 
@@ -29,40 +31,43 @@ const handleComposeLinkChips = defn(module, function(composeView: ComposeViewDri
         mainElement.classList.remove('inboxsdk__ensure_link_active');
       });
 
-      composeView.getEventStream()
+      composeView
+        .getEventStream()
         .filter(event => event.eventName === 'bodyChanged')
-        .toProperty(()=>null)
-        .debounce(100, {immediate:true})
+        .toProperty(() => null)
+        .debounce(100, { immediate: true })
         .takeUntilBy(composeView.getStopper())
         .onValue(() => {
           doFixing(composeView);
         });
 
-      composeView.getEventStream()
+      composeView
+        .getEventStream()
         .filter(event => event.eventName === 'presending')
         .onValue(() => {
           doPresendFixing(composeView);
         });
-
     });
 });
 export default handleComposeLinkChips;
 
-const doFixing = defn(module, function(composeView: ComposeViewDriver) {
-  const bodyElement = composeView.getBodyElement();
-  const chips = _getChipElements(bodyElement);
+const doFixing = defn(
+  module,
+  function(composeView: ComposeViewDriver) {
+    const bodyElement = composeView.getBodyElement();
+    const chips = _getChipElements(bodyElement);
 
-  chips
-    .filter(_isNotEnhanced)
-    .forEach(_addEnhancements);
-}, 'doFixing');
+    chips.filter(_isNotEnhanced).forEach(_addEnhancements);
+  },
+  'doFixing'
+);
 
-const doPresendFixing = defn(module, function(composeView: ComposeViewDriver) {
-  const bodyElement = composeView.getBodyElement();
-  const chips = _getChipElements(bodyElement);
-  chips
-    .filter(_isOurEnhanced)
-    .forEach(chip => {
+const doPresendFixing = defn(
+  module,
+  function(composeView: ComposeViewDriver) {
+    const bodyElement = composeView.getBodyElement();
+    const chips = _getChipElements(bodyElement);
+    chips.filter(_isOurEnhanced).forEach(chip => {
       const xBtn = chip.querySelector(`img[src="${X_URL}"]`);
       if (xBtn) {
         xBtn.remove();
@@ -72,7 +77,9 @@ const doPresendFixing = defn(module, function(composeView: ComposeViewDriver) {
         title.style.textDecoration = 'none';
       }
     });
-}, 'doPresendFixing');
+  },
+  'doPresendFixing'
+);
 
 function _getChipElements(bodyElement: HTMLElement): HTMLElement[] {
   const chipInnerEls = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
@@ -83,8 +90,12 @@ function _getChipElements(bodyElement: HTMLElement): HTMLElement[] {
 }
 
 function _waitToClaim(el: HTMLElement): Kefir.Observable<boolean> {
-  return Kefir.later(0).merge(
-      makeMutationObserverChunkedStream(el, {attributes: true, attributeFilter: ['class']})
+  return Kefir.later(0)
+    .merge(
+      makeMutationObserverChunkedStream(el, {
+        attributes: true,
+        attributeFilter: ['class']
+      })
     )
     .map(() => !el.classList.contains('inboxsdk__ensure_link_active'))
     .filter(Boolean)
@@ -92,67 +103,76 @@ function _waitToClaim(el: HTMLElement): Kefir.Observable<boolean> {
 }
 
 function _isNotEnhanced(chipElement: HTMLElement): boolean {
-    var claim = chipElement.getAttribute('data-sdk-linkchip-claimed');
-    if (extId === claim) {
-      return !(chipElement:any)._linkChipEnhancedByThisExtension;
-    }
-    return claim == null;
+  var claim = chipElement.getAttribute('data-sdk-linkchip-claimed');
+  if (extId === claim) {
+    return !(chipElement: any)._linkChipEnhancedByThisExtension;
+  }
+  return claim == null;
 }
 
 // Returns whether the chip is enhanced specifically by this extension
 function _isOurEnhanced(chipElement: HTMLElement): boolean {
-    return !!(chipElement:any)._linkChipEnhancedByThisExtension;
+  return !!(chipElement: any)._linkChipEnhancedByThisExtension;
 }
 
 function _addEnhancements(chipElement: HTMLElement) {
-    const anchor = chipElement.querySelector('a');
-    if (anchor) {
-      anchor.addEventListener('mousedown', function(e: MouseEvent) {
+  const anchor = chipElement.querySelector('a');
+  if (anchor) {
+    anchor.addEventListener(
+      'mousedown',
+      function(e: MouseEvent) {
         e.stopImmediatePropagation();
-      }, true);
-      anchor.addEventListener('click', function(e: MouseEvent) {
+      },
+      true
+    );
+    anchor.addEventListener(
+      'click',
+      function(e: MouseEvent) {
         e.stopImmediatePropagation();
-      }, true);
-    }
-
-    const xElement = document.createElement('img');
-    xElement.src = X_URL;
-    xElement.setAttribute('style', 'opacity: 0.55; cursor: pointer; float: right; position: relative; top: -1px;');
-
-    xElement.addEventListener('mousedown', function(e: MouseEvent){
-        chipElement.remove();
-    }, true);
-
-    xElement.addEventListener('click', function(e: MouseEvent){
-        e.stopImmediatePropagation();
-        e.preventDefault();
-    }, true);
-
-
-    chipElement.addEventListener(
-        'mouseenter',
-        function(){
-            chipElement.appendChild(xElement);
-            querySelector(chipElement, 'a > span').style.textDecoration = 'underline';
-        }
+      },
+      true
     );
+  }
 
-    chipElement.addEventListener(
-        'mouseleave',
-        function(){
-            (xElement:any).remove();
-            querySelector(chipElement, 'a > span').style.textDecoration = 'none';
-        }
-    );
+  const xElement = document.createElement('img');
+  xElement.src = X_URL;
+  xElement.setAttribute(
+    'style',
+    'opacity: 0.55; cursor: pointer; float: right; position: relative; top: -1px;'
+  );
 
-    chipElement.addEventListener(
-        'mousedown',
-        function(e: MouseEvent){
-            e.preventDefault();
-        }
-    );
+  xElement.addEventListener(
+    'mousedown',
+    function(e: MouseEvent) {
+      chipElement.remove();
+    },
+    true
+  );
 
-    chipElement.contentEditable = 'false';
-    chipElement.setAttribute('data-sdk-linkchip-claimed', extId);
-    (chipElement:any)._linkChipEnhancedByThisExtension = true;
+  xElement.addEventListener(
+    'click',
+    function(e: MouseEvent) {
+      e.stopImmediatePropagation();
+      e.preventDefault();
+    },
+    true
+  );
+
+  chipElement.addEventListener('mouseenter', function() {
+    chipElement.appendChild(xElement);
+    querySelector(chipElement, 'a > span').style.textDecoration = 'underline';
+  });
+
+  chipElement.addEventListener('mouseleave', function() {
+    (xElement: any).remove();
+    querySelector(chipElement, 'a > span').style.textDecoration = 'none';
+  });
+
+  chipElement.addEventListener('mousedown', function(e: MouseEvent) {
+    e.preventDefault();
+  });
+
+  chipElement.contentEditable = 'false';
+  chipElement.setAttribute('data-sdk-linkchip-claimed', extId);
+  (chipElement: any)._linkChipEnhancedByThisExtension = true;
 }

@@ -18,7 +18,9 @@ export default function showAppIdWarning(driver: GmailDriver) {
 <input type="button" value="" title="Close" class="inboxsdk__x_close_button" />
 `;
 
-  const topMessageBarDriver = driver.createTopMessageBarDriver(kefirCast(Kefir, {el: topDiv}));
+  const topMessageBarDriver = driver.createTopMessageBarDriver(
+    kefirCast(Kefir, { el: topDiv })
+  );
 
   const closeBtn = topDiv.querySelector('.inboxsdk__x_close_button');
   if (!closeBtn) throw new Error('Should not happen');

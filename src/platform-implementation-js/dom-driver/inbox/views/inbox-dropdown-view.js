@@ -6,7 +6,7 @@ export default class InboxDropdownView {
 
   constructor(className?: string) {
     this._containerEl = document.createElement('div');
-    this._containerEl.className = 'inboxsdk__dropdown '+(className||'');
+    this._containerEl.className = 'inboxsdk__dropdown ' + (className || '');
     this._contentEl = document.createElement('div');
     this._contentEl.className = 'inboxsdk__dropdown_content';
     this._containerEl.appendChild(this._contentEl);

@@ -6,32 +6,35 @@ import streamWaitFor from '../../lib/stream-wait-for';
 import querySelector from '../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
-const elements = streamWaitFor(() => document.querySelector('body > div[id][jsaction] > div[id] > div[class][jsaction][aria-hidden]'))
+const elements = streamWaitFor(() =>
+  document.querySelector(
+    'body > div[id][jsaction] > div[id] > div[class][jsaction][aria-hidden]'
+  )
+)
   .map((googleNotice: HTMLElement) => {
     const noticeContainer = googleNotice.parentElement;
     if (!noticeContainer) throw new Error('Should not happen');
     let sdkNotice = noticeContainer.querySelector('.inboxsdk__butterbar');
     if (!sdkNotice) {
       sdkNotice = document.createElement('div');
-      sdkNotice.className = googleNotice.className+' inboxsdk__butterbar';
+      sdkNotice.className = googleNotice.className + ' inboxsdk__butterbar';
       sdkNotice.style.display = 'none';
       noticeContainer.insertBefore(sdkNotice, googleNotice.nextSibling);
     }
-    return {noticeContainer, googleNotice, sdkNotice};
+    return { noticeContainer, googleNotice, sdkNotice };
   })
   .toProperty();
 
 // We queue our notices separately from the native ones in Inbox.
 
-const sdkNoticeIdChanges = elements
-  .flatMapLatest(({sdkNotice}) =>
-    makeMutationObserverChunkedStream(
-      sdkNotice, {attributes:true, attributeFilter:['data-inboxsdk-id']}
-    ).map(() => sdkNotice.getAttribute('data-inboxsdk-id'))
-  );
+const sdkNoticeIdChanges = elements.flatMapLatest(({ sdkNotice }) =>
+  makeMutationObserverChunkedStream(sdkNotice, {
+    attributes: true,
+    attributeFilter: ['data-inboxsdk-id']
+  }).map(() => sdkNotice.getAttribute('data-inboxsdk-id'))
+);
 
-const sdkRemovedNotice = sdkNoticeIdChanges
-  .filter(id => id == null);
+const sdkRemovedNotice = sdkNoticeIdChanges.filter(id => id == null);
 
 const noticeAvailableStream = sdkRemovedNotice;
 
@@ -66,21 +69,23 @@ export default class InboxButterBarDriver {
   }
 
   getSharedMessageQueue(): Array<Object> {
-    const attr = (document.head:any).getAttribute('data-inboxsdk-butterbar-queue');
+    const attr = (document.head: any).getAttribute(
+      'data-inboxsdk-butterbar-queue'
+    );
     return attr ? JSON.parse(attr) : [];
   }
 
   setSharedMessageQueue(queue: Object) {
     const attr = JSON.stringify(queue);
-    (document.head:any).setAttribute('data-inboxsdk-butterbar-queue', attr);
+    (document.head: any).setAttribute('data-inboxsdk-butterbar-queue', attr);
   }
 
   // Immediately displays the message, overriding anything else on the screen.
   // Priority and queuing logic is handled by butter-bar.js above this.
-  showMessage(rawOptions: Object): {destroy(): void} {
-    const instanceId = Date.now()+'-'+Math.random();
+  showMessage(rawOptions: Object): { destroy(): void } {
+    const instanceId = Date.now() + '-' + Math.random();
 
-    elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
+    elements.take(1).onValue(({ noticeContainer, googleNotice, sdkNotice }) => {
       sdkNotice.className = googleNotice.className;
       sdkNotice.classList.add('inboxsdk__butterbar');
 
@@ -132,12 +137,15 @@ export default class InboxButterBarDriver {
 
     return {
       destroy() {
-        elements.take(1).onValue(({noticeContainer, googleNotice, sdkNotice}) => {
-          if (sdkNotice.getAttribute('data-inboxsdk-id') === instanceId) {
-            if (rawOptions.className) sdkNotice.classList.remove(rawOptions.className);
-            hideMessage(noticeContainer, googleNotice, sdkNotice);
-          }
-        });
+        elements
+          .take(1)
+          .onValue(({ noticeContainer, googleNotice, sdkNotice }) => {
+            if (sdkNotice.getAttribute('data-inboxsdk-id') === instanceId) {
+              if (rawOptions.className)
+                sdkNotice.classList.remove(rawOptions.className);
+              hideMessage(noticeContainer, googleNotice, sdkNotice);
+            }
+          });
       }
     };
   }

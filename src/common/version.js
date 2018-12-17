@@ -5,6 +5,6 @@
 
 exports.BUILD_VERSION = ((process.env.VERSION: any): string);
 
-if ((module:any).hot) {
-  ((module:any).hot.accept());
+if ((module: any).hot) {
+  (module: any).hot.accept();
 }

@@ -21,7 +21,7 @@ import {
   pageFullscreen20160620,
   page20160727,
   page20160823,
-  page20170317,
+  page20170317
 } from '../lib/pages';
 
 describe('Inbox Thread Detection', () => {
@@ -35,7 +35,10 @@ describe('Inbox Thread Detection', () => {
     });
 
     it('2016-06-20 fullscreen and bundled inline', () => {
-      const thread = querySelector(pageFullscreen20160620(), '[data-test-id=openthread]');
+      const thread = querySelector(
+        pageFullscreen20160620(),
+        '[data-test-id=openthread]'
+      );
 
       const results = finder(pageFullscreen20160620());
       expect(results.length).toBe(1);
@@ -74,16 +77,23 @@ describe('Inbox Thread Detection', () => {
       expect(results.errors).toEqual([]);
       expect(results.score).toBe(1);
       expect(results.attributes.inBundle).toBe(false);
-      expect(results.attributes.inboxThreadId).toBe('thread-f:1512997563584199246');
+      expect(results.attributes.inboxThreadId).toBe(
+        'thread-f:1512997563584199246'
+      );
     });
 
     it('2016-06-20 bundled inline', () => {
-      const thread = querySelector(pageFullscreen20160620(), '[data-test-id=openthread]');
+      const thread = querySelector(
+        pageFullscreen20160620(),
+        '[data-test-id=openthread]'
+      );
       const results = parser(thread);
       expect(results.errors).toEqual([]);
       expect(results.score).toBe(1);
       expect(results.attributes.inBundle).toBe(true);
-      expect(results.attributes.inboxThreadId).toBe('thread-f:1513306953051471524');
+      expect(results.attributes.inboxThreadId).toBe(
+        'thread-f:1513306953051471524'
+      );
     });
 
     it('2016-07-27 search', () => {
@@ -92,7 +102,9 @@ describe('Inbox Thread Detection', () => {
       expect(results.errors).toEqual([]);
       expect(results.score).toBe(1);
       expect(results.attributes.inBundle).toBe(false);
-      expect(results.attributes.inboxThreadId).toBe('thread-f:1513627950174214078');
+      expect(results.attributes.inboxThreadId).toBe(
+        'thread-f:1513627950174214078'
+      );
     });
 
     it('2016-08-23 thread in bundle', () => {
@@ -101,7 +113,9 @@ describe('Inbox Thread Detection', () => {
       expect(results.errors).toEqual([]);
       expect(results.score).toBe(1);
       expect(results.attributes.inBundle).toBe(true);
-      expect(results.attributes.inboxThreadId).toBe('thread-f:1543480514786604144');
+      expect(results.attributes.inboxThreadId).toBe(
+        'thread-f:1543480514786604144'
+      );
     });
 
     it('2017-03-17 thread', () => {
@@ -110,7 +124,9 @@ describe('Inbox Thread Detection', () => {
       expect(results.errors).toEqual([]);
       expect(results.score).toBe(1);
       expect(results.attributes.inBundle).toBe(false);
-      expect(results.attributes.inboxThreadId).toBe('thread-f:1562058394397337503');
+      expect(results.attributes.inboxThreadId).toBe(
+        'thread-f:1562058394397337503'
+      );
     });
   });
 
@@ -121,16 +137,27 @@ describe('Inbox Thread Detection', () => {
       const root = page20160614();
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       expect(liveSet.values().size).toBe(1);
-      expect(lsMap(liveSet, x => x.getValue()).values().has(thread)).toBe(true);
+      expect(
+        lsMap(liveSet, x => x.getValue())
+          .values()
+          .has(thread)
+      ).toBe(true);
     });
 
     it('2016-06-20 fullscreen and bundled inline', () => {
-      const thread = querySelector(pageFullscreen20160620(), '[data-test-id=openthread]');
+      const thread = querySelector(
+        pageFullscreen20160620(),
+        '[data-test-id=openthread]'
+      );
 
       const root = pageFullscreen20160620();
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       expect(liveSet.values().size).toBe(1);
-      expect(lsMap(liveSet, x => x.getValue()).values().has(thread)).toBe(true);
+      expect(
+        lsMap(liveSet, x => x.getValue())
+          .values()
+          .has(thread)
+      ).toBe(true);
     });
 
     it('2016-07-27 search', () => {
@@ -139,7 +166,11 @@ describe('Inbox Thread Detection', () => {
       const root = page20160727();
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       expect(liveSet.values().size).toBe(1);
-      expect(lsMap(liveSet, x => x.getValue()).values().has(thread)).toBe(true);
+      expect(
+        lsMap(liveSet, x => x.getValue())
+          .values()
+          .has(thread)
+      ).toBe(true);
     });
 
     it('2016-08-23 thread in bundle', () => {
@@ -148,7 +179,11 @@ describe('Inbox Thread Detection', () => {
       const root = page20160823();
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       expect(liveSet.values().size).toBe(1);
-      expect(lsMap(liveSet, x => x.getValue()).values().has(thread)).toBe(true);
+      expect(
+        lsMap(liveSet, x => x.getValue())
+          .values()
+          .has(thread)
+      ).toBe(true);
     });
 
     it('2017-03-17 thread', () => {
@@ -157,7 +192,11 @@ describe('Inbox Thread Detection', () => {
       const root = page20170317();
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       expect(liveSet.values().size).toBe(1);
-      expect(lsMap(liveSet, x => x.getValue()).values().has(thread)).toBe(true);
+      expect(
+        lsMap(liveSet, x => x.getValue())
+          .values()
+          .has(thread)
+      ).toBe(true);
     });
   });
 });

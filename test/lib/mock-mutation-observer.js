@@ -19,22 +19,20 @@ class MockMutationObserver {
     assert(options);
 
     if ((element: any)._emitsMutations) {
-      Kefir
-        .fromEvents(element, 'mutation')
-        .takeUntilBy( Kefir.fromEvents(element, 'removed') )
-        .takeUntilBy( this._stopper )
+      Kefir.fromEvents(element, 'mutation')
+        .takeUntilBy(Kefir.fromEvents(element, 'removed'))
+        .takeUntilBy(this._stopper)
         .map(event => {
-          const newEvent: Object = {target: event.target};
-          if ((options:any).childList && event.addedNodes) {
+          const newEvent: Object = { target: event.target };
+          if ((options: any).childList && event.addedNodes) {
             newEvent.addedNodes = event.addedNodes;
             newEvent.removedNodes = event.removedNodes;
           }
           if (
-            (options:any).attributes && event.attributeName &&
-            (
-              !(options:any).attributeFilter ||
-              (options:any).attributeFilter.includes(event.attributeName)
-            )
+            (options: any).attributes &&
+            event.attributeName &&
+            (!(options: any).attributeFilter ||
+              (options: any).attributeFilter.includes(event.attributeName))
           ) {
             newEvent.attributeName = event.attributeName;
           }

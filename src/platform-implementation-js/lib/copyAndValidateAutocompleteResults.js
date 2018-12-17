@@ -1,7 +1,7 @@
 /* @flow */
 
-import type {Driver} from '../driver-interfaces/driver';
-import type {AutocompleteSearchResult} from '../../injected-js/gmail/modify-suggestions';
+import type { Driver } from '../driver-interfaces/driver';
+import type { AutocompleteSearchResult } from '../../injected-js/gmail/modify-suggestions';
 
 export default function copyAndValidateAutocompleteResults(
   driver: Driver,
@@ -12,7 +12,7 @@ export default function copyAndValidateAutocompleteResults(
   }
 
   return results.map(result => {
-    const resultCopy = {...result};
+    const resultCopy = { ...result };
     if (
       typeof resultCopy.name !== 'string' &&
       typeof resultCopy.nameHTML !== 'string'
@@ -27,20 +27,23 @@ export default function copyAndValidateAutocompleteResults(
     ) {
       throw new Error(
         'suggestion must have routeName, externalURL, ' +
-        'searchTerm, or onClick property'
+          'searchTerm, or onClick property'
       );
     }
     if (typeof (resultCopy: any).iconURL === 'string') {
       const iconURL = (resultCopy: any).iconURL;
-      driver.getLogger().deprecationWarning(
-        'AutocompleteSearchResult "iconURL" property',
-        'AutocompleteSearchResult.iconUrl'
-      );
+      driver
+        .getLogger()
+        .deprecationWarning(
+          'AutocompleteSearchResult "iconURL" property',
+          'AutocompleteSearchResult.iconUrl'
+        );
       if (!resultCopy.iconUrl) {
         if (driver.getOpts().REQUESTED_API_VERSION === 1) {
           resultCopy.iconUrl = iconURL;
         } else {
-          console.error( //eslint-disable-line no-console
+          // eslint-disable-next-line no-console
+          console.error(
             'Support for iconURL property was dropped after API version 1'
           );
         }

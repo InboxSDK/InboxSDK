@@ -6,14 +6,15 @@ export default function quotedSplit(s: string): string[] {
   let split: string[] = [];
   let lastEnd = 0;
   const quoteRe = /"[^"]*"/g;
-  while (true) { //eslint-disable-line no-constant-condition
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
     const match = quoteRe.exec(s);
     split = split.concat(
-      (
-        match ? s.substring(lastEnd, match.index) : s.substring(lastEnd)
-      ).split(/ +/).filter(Boolean));
-    if (!match)
-      break;
+      (match ? s.substring(lastEnd, match.index) : s.substring(lastEnd))
+        .split(/ +/)
+        .filter(Boolean)
+    );
+    if (!match) break;
     lastEnd = match.index + match[0].length;
     split.push(match[0]);
   }

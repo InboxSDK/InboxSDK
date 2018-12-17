@@ -4,7 +4,9 @@
 import 'yarn-deps-check';
 
 var fs = require('fs');
-const packageJson = JSON.parse(fs.readFileSync(__dirname+'/package.json', 'utf8'));
+const packageJson = JSON.parse(
+  fs.readFileSync(__dirname + '/package.json', 'utf8')
+);
 
 var _ = require('lodash');
 var gulp = require('gulp');
@@ -18,7 +20,7 @@ var uglify = require('gulp-uglify');
 var sourcemaps = require('gulp-sourcemaps');
 var stdio = require('stdio');
 var gutil = require('gulp-util');
-var rename = require("gulp-rename");
+var rename = require('gulp-rename');
 import extReloader from './live/ext-reloader';
 var rimraf = require('rimraf');
 var Kefir = require('kefir');
@@ -29,7 +31,7 @@ import exec from './src/build/exec';
 import spawn from './src/build/spawn';
 import escapeShellArg from './src/build/escape-shell-arg';
 var dir = require('node-dir');
-var babelify = require("babelify");
+var babelify = require('babelify');
 var lazyPipe = require('lazypipe');
 var concat = require('gulp-concat');
 var addsrc = require('gulp-add-src');
@@ -37,54 +39,63 @@ var addsrc = require('gulp-add-src');
 var sdkFilename = 'inboxsdk.js';
 
 var args = stdio.getopt({
-  'watch': {key: 'w', description: 'Automatic rebuild'},
-  'reloader': {key: 'r', description: 'Automatic extension reloader'},
-  'hot': {key: 'h', description: 'hot module replacement'},
-  'singleBundle': {key: 's', description: 'Single bundle build (for development)'},
-  'minify': {key: 'm', description: 'Minify build'},
-  'production': {key: 'p', description: 'Production build'},
-  'copy': {key: 'c', description: 'Also copy to Streak'},
-  'fullPaths': {key: 'f', description: 'Use fullPaths browserify setting (for bundle size checking; recommended to use --minify with this)'},
+  watch: { key: 'w', description: 'Automatic rebuild' },
+  reloader: { key: 'r', description: 'Automatic extension reloader' },
+  hot: { key: 'h', description: 'hot module replacement' },
+  singleBundle: {
+    key: 's',
+    description: 'Single bundle build (for development)'
+  },
+  minify: { key: 'm', description: 'Minify build' },
+  production: { key: 'p', description: 'Production build' },
+  copy: { key: 'c', description: 'Also copy to Streak' },
+  fullPaths: {
+    key: 'f',
+    description:
+      'Use fullPaths browserify setting (for bundle size checking; recommended to use --minify with this)'
+  }
 });
 
 // Don't let production be built without minification.
 // Could just make the production flag imply the minify flag, but that seems
 // like it would harm discoverability.
 if (args.production && !args.minify) {
-  throw new Error("--production requires --minify");
+  throw new Error('--production requires --minify');
 }
 
 // --watch causes Browserify to use full paths in module references. We don't
 // want those visible in production.
 if (args.production && (args.watch || args.singleBundle || args.fullPaths)) {
-  throw new Error("--production can not be used with --watch, --singleBundle, or --fullPaths");
+  throw new Error(
+    '--production can not be used with --watch, --singleBundle, or --fullPaths'
+  );
 }
 
 process.env.NODE_ENV = args.production ? 'production' : 'development';
-process.env.IMPLEMENTATION_URL = args.production ?
-  'https://www.inboxsdk.com/build/platform-implementation.js' :
-  'http://localhost:4567/platform-implementation.js';
+process.env.IMPLEMENTATION_URL = args.production
+  ? 'https://www.inboxsdk.com/build/platform-implementation.js'
+  : 'http://localhost:4567/platform-implementation.js';
 
 function setupExamples() {
   // Copy inboxsdk.js (and .map) to all subdirs under examples/
-  return globp('./examples/*/').then(function(dirs){
-    if(args.copy){
-      dirs.push('../MailFoo/extensions/devBuilds/chrome/');
-    }
-    return dirs;
-  }).then(function(dirs) {
-    return dirs.reduce(
-      function(stream, dir) {
+  return globp('./examples/*/')
+    .then(function(dirs) {
+      if (args.copy) {
+        dirs.push('../MailFoo/extensions/devBuilds/chrome/');
+      }
+      return dirs;
+    })
+    .then(function(dirs) {
+      return dirs.reduce(function(stream, dir) {
         return stream.pipe(destAtomic(dir));
-      },
-      gulp.src('./dist/'+sdkFilename)
-        .pipe(rename('inboxsdk.js'))
-    );
-  }).then(streamToPromise).then(function() {
-    if (args.reloader) {
-      return extReloader();
-    }
-  });
+      }, gulp.src('./dist/' + sdkFilename).pipe(rename('inboxsdk.js')));
+    })
+    .then(streamToPromise)
+    .then(function() {
+      if (args.reloader) {
+        return extReloader();
+      }
+    });
 }
 
 gulp.task('noop', _.noop);
@@ -94,7 +105,10 @@ function getVersion(): Promise<string> {
     exec('git rev-list HEAD --max-count=1'),
     exec('git status --porcelain')
   ]).then(function(results) {
-    var commit = results[0].toString().trim().slice(0, 16);
+    var commit = results[0]
+      .toString()
+      .trim()
+      .slice(0, 16);
     var isModified = /^\s*M/m.test(results[1].toString());
 
     var version = `${packageJson.version}-${Date.now()}-${commit}`;
@@ -120,25 +134,30 @@ async function getBrowserifyHmrOptions(port: number) {
     tlskey = keyFile;
     tlscert = certFile;
   }
-  return {url, tlskey, tlscert, port};
+  return { url, tlskey, tlscert, port };
 }
 
 function browserifyTask(name, deps, entry, destname, port: ?number) {
-  var willMinify = args.minify && (args.singleBundle || name !== "sdk");
+  var willMinify = args.minify && (args.singleBundle || name !== 'sdk');
 
   gulp.task(name, deps, async function() {
     process.env.VERSION = await getVersion();
-    const browserifyHmrOptions = port && await getBrowserifyHmrOptions(port);
+    const browserifyHmrOptions = port && (await getBrowserifyHmrOptions(port));
 
     let bundler = browserify({
       entries: entry,
       debug: true,
       fullPaths: args.fullPaths,
-      cache: {}, packageCache: {}
-    }).transform(babelify.configure({
-      presets: args.hot && port ? ["react-hmre"] : [],
-      plugins: "transform-inline-environment-variables"
-    })).transform('redirectify', {global: true});
+      cache: {},
+      packageCache: {}
+    })
+      .transform(
+        babelify.configure({
+          presets: args.hot && port ? ['react-hmre'] : [],
+          plugins: 'transform-inline-environment-variables'
+        })
+      )
+      .transform('redirectify', { global: true });
 
     if (args.hot && port) {
       bundler.plugin(require('browserify-hmr'), browserifyHmrOptions);
@@ -146,22 +165,37 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
 
     function buildBundle() {
       var sourcemapPipeline = lazyPipe()
-        .pipe(addsrc.prepend, (willMinify || args.production) ? ["./src/inboxsdk-js/header.js"] : [])
-        .pipe(sourcemaps.init, {loadMaps: true})
-        .pipe(concat, destname)
-        .pipe(() => gulpif(willMinify, uglify({preserveComments: 'some'})))
-        .pipe(sourcemaps.write, args.production ? '.' : null, {
-          // don't include sourcemap comment in the inboxsdk.js file that we
-          // distribute to developers since it'd always be broken.
-          addComment: !args.production || name != 'sdk',
-          sourceMappingURLPrefix: name == 'injected' ?
-            'https://www.inboxsdk.com/build/' : null
-        });
+        .pipe(
+          addsrc.prepend,
+          willMinify || args.production ? ['./src/inboxsdk-js/header.js'] : []
+        )
+        .pipe(
+          sourcemaps.init,
+          { loadMaps: true }
+        )
+        .pipe(
+          concat,
+          destname
+        )
+        .pipe(() => gulpif(willMinify, uglify({ preserveComments: 'some' })))
+        .pipe(
+          sourcemaps.write,
+          args.production ? '.' : null,
+          {
+            // don't include sourcemap comment in the inboxsdk.js file that we
+            // distribute to developers since it'd always be broken.
+            addComment: !args.production || name != 'sdk',
+            sourceMappingURLPrefix:
+              name == 'injected' ? 'https://www.inboxsdk.com/build/' : null
+          }
+        );
 
       var bundle = bundler.bundle();
       var result = bundle
         .pipe(source(destname))
-        .pipe(gulpif(willMinify || args.production, streamify(sourcemapPipeline())))
+        .pipe(
+          gulpif(willMinify || args.production, streamify(sourcemapPipeline()))
+        )
         .pipe(destAtomic('./dist/'));
 
       return new RSVP.Promise(function(resolve, reject) {
@@ -177,23 +211,32 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
 
     if (args.watch) {
       bundler = watchify(bundler);
-      Kefir
-        .fromEvents(bundler, 'update')
+      Kefir.fromEvents(bundler, 'update')
         .throttle(10)
         .onValue(function() {
-          gutil.log("Rebuilding '"+gutil.colors.cyan(name)+"'");
-          buildBundle().then(function() {
-            if (name === 'sdk') {
-              return setupExamples();
-            }
-          }).then(function() {
-            gutil.log("Finished rebuild of '"+gutil.colors.cyan(name)+"'");
-          }, function(err) {
-            gutil.log(
-              gutil.colors.red("Error")+" rebuilding '"+
-              gutil.colors.cyan(name)+"':", err.message
+          gutil.log("Rebuilding '" + gutil.colors.cyan(name) + "'");
+          buildBundle()
+            .then(function() {
+              if (name === 'sdk') {
+                return setupExamples();
+              }
+            })
+            .then(
+              function() {
+                gutil.log(
+                  "Finished rebuild of '" + gutil.colors.cyan(name) + "'"
+                );
+              },
+              function(err) {
+                gutil.log(
+                  gutil.colors.red('Error') +
+                    " rebuilding '" +
+                    gutil.colors.cyan(name) +
+                    "':",
+                  err.message
+                );
+              }
             );
-          });
         });
     }
 
@@ -203,18 +246,35 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
 
 if (args.singleBundle) {
   gulp.task('default', ['sdk', 'examples']);
-  browserifyTask('sdk', ['injected'], './src/inboxsdk-js/main-DEV.js', sdkFilename, 3140);
+  browserifyTask(
+    'sdk',
+    ['injected'],
+    './src/inboxsdk-js/main-DEV.js',
+    sdkFilename,
+    3140
+  );
   gulp.task('imp', function() {
-    throw new Error("No separate imp bundle in singleBundle bundle mode");
+    throw new Error('No separate imp bundle in singleBundle bundle mode');
   });
 } else {
   gulp.task('default', ['sdk', 'imp', 'examples']);
   browserifyTask('sdk', [], './src/inboxsdk-js/main.js', sdkFilename);
-  browserifyTask('imp', ['injected'],
-    './src/platform-implementation-js/main.js', 'platform-implementation.js', 3141);
+  browserifyTask(
+    'imp',
+    ['injected'],
+    './src/platform-implementation-js/main.js',
+    'platform-implementation.js',
+    3141
+  );
 }
 
-browserifyTask('injected', [], './src/injected-js/main.js', 'injected.js', 3142);
+browserifyTask(
+  'injected',
+  [],
+  './src/injected-js/main.js',
+  'injected.js',
+  3142
+);
 
 gulp.task('examples', ['sdk'], setupExamples);
 
@@ -230,73 +290,91 @@ gulp.task('docs', function(cb) {
   dir.paths(__dirname + '/src', function(err, paths) {
     if (err) throw err;
 
-    Promise.all(_.chain(paths.files)
-      .filter(isFileEligbleForDocs)
-      .sort()
-      .map(parseCommentsInFile)
-      .value()
-    ).then(files => {
-      var classes = _.chain(files)
-        .filter(Boolean)
-        .map(x => x.classes)
-        .flatten()
-        .filter(Boolean)
-        .map(transformClass)
-        .forEach(checkForDocIssues)
-        .value();
+    Promise.all(
+      _.chain(paths.files)
+        .filter(isFileEligbleForDocs)
+        .sort()
+        .map(parseCommentsInFile)
+        .value()
+    )
+      .then(files => {
+        var classes = _.chain(files)
+          .filter(Boolean)
+          .map(x => x.classes)
+          .flatten()
+          .filter(Boolean)
+          .map(transformClass)
+          .forEach(checkForDocIssues)
+          .value();
 
-      var docsJson = {
-        classes: _.chain(classes)
-          .map(ele => [ele.name, ele])
-          .fromPairs()
-          .value()
-      };
+        var docsJson = {
+          classes: _.chain(classes)
+            .map(ele => [ele.name, ele])
+            .fromPairs()
+            .value()
+        };
 
-      const outDir = './dist';
-      try {
-        fs.statSync(outDir);
-      } catch(err) {
-        fs.mkdirSync(outDir);
-      }
+        const outDir = './dist';
+        try {
+          fs.statSync(outDir);
+        } catch (err) {
+          fs.mkdirSync(outDir);
+        }
 
-      fs.writeFile('dist/docs.json', JSON.stringify(docsJson, null, 2), cb);
-    }).catch(err => cb(err));
+        fs.writeFile('dist/docs.json', JSON.stringify(docsJson, null, 2), cb);
+      })
+      .catch(err => cb(err));
   });
-
 });
 
 function checkForDocIssues(c) {
   if (c.functions) {
-    c.functions.forEach(function(func){
+    c.functions.forEach(function(func) {
       if (!func.returns) {
-        console.error("WARNING: " + func.name + " in " + c.name + " doesn't have a return tag");
+        console.error(
+          'WARNING: ' +
+            func.name +
+            ' in ' +
+            c.name +
+            " doesn't have a return tag"
+        );
       }
     });
   }
 }
 
 function parseCommentsInFile(file) {
-  gutil.log("Parsing: " + gutil.colors.cyan(file));
-  return exec('node_modules/.bin/jsdoc ' + escapeShellArg(file) + ' -t templates/haruki -d console -q format=json', {passStdErr: true})
-    .then(({stdout, stderr}) => {
-      var filteredStderr = stderr.replace(/^WARNING:.*(ArrowFunctionExpression|TemplateLiteral|TemplateElement|ExportDeclaration|ImportSpecifier|ImportDeclaration).*\n?/gm, '');
+  gutil.log('Parsing: ' + gutil.colors.cyan(file));
+  return exec(
+    'node_modules/.bin/jsdoc ' +
+      escapeShellArg(file) +
+      ' -t templates/haruki -d console -q format=json',
+    { passStdErr: true }
+  ).then(
+    ({ stdout, stderr }) => {
+      var filteredStderr = stderr.replace(
+        /^WARNING:.*(ArrowFunctionExpression|TemplateLiteral|TemplateElement|ExportDeclaration|ImportSpecifier|ImportDeclaration).*\n?/gm,
+        ''
+      );
       if (filteredStderr) {
         process.stderr.write(filteredStderr);
-        throw new Error("Got stderr");
+        throw new Error('Got stderr');
       }
       try {
         var comments = JSON.parse(stdout);
         comments['filename'] = file;
         return comments;
-      } catch(err) {
+      } catch (err) {
         console.error('error in file', file, err);
         console.error('char count:', stdout.length);
         throw err;
       }
-    }, err => {
+    },
+    err => {
       console.error(err);
       throw err;
-    });
+    }
+  );
 }
 
 function transformClass(c) {
@@ -332,8 +410,11 @@ function transformClass(c) {
 }
 
 function isFileEligbleForDocs(filename) {
-  return filename.endsWith(".js") && (
-    filename.includes("src/docs/") ||
-    filename.endsWith("src/platform-implementation-js/constants/nav-item-types.js")
+  return (
+    filename.endsWith('.js') &&
+    (filename.includes('src/docs/') ||
+      filename.endsWith(
+        'src/platform-implementation-js/constants/nav-item-types.js'
+      ))
   );
 }

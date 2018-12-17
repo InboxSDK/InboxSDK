@@ -1,12 +1,12 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import delayAsap from '../../lib/delay-asap';
-import type {Driver} from '../../driver-interfaces/driver';
+import type { Driver } from '../../driver-interfaces/driver';
 import idMap from '../../lib/idMap';
 import querySelector from '../../lib/dom/querySelectorOrFail';
 import checkInUserInputEvent from '../../lib/checkInUserInputEvent';
@@ -23,57 +23,85 @@ class ContentPanelViewDriver {
   _sidebarId: string;
   _isGlobal: boolean;
 
-  constructor(driver: Driver, descriptor: Kefir.Observable<Object>, sidebarId: string, isGlobal?: boolean) {
+  constructor(
+    driver: Driver,
+    descriptor: Kefir.Observable<Object>,
+    sidebarId: string,
+    isGlobal?: boolean
+  ) {
     this._driver = driver;
     this._sidebarId = sidebarId;
     this._isGlobal = Boolean(isGlobal);
-    this._stopper = this._eventStream.ignoreValues().beforeEnd(() => null).toProperty();
+    this._stopper = this._eventStream
+      .ignoreValues()
+      .beforeEnd(() => null)
+      .toProperty();
 
     const document = global.document; //fix for unit test
 
     this._eventStream.plug(
-      Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelActivated')
+      Kefir.fromEvents((document.body: any), 'inboxsdkSidebarPanelActivated')
         .filter(e => e.detail.instanceId === this._instanceId)
         .map(() => {
           this._isActive = true;
-          return {eventName: 'activate'};
+          return { eventName: 'activate' };
         })
     );
     this._eventStream.plug(
-      Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelDeactivated')
+      Kefir.fromEvents((document.body: any), 'inboxsdkSidebarPanelDeactivated')
         .filter(e => e.detail.instanceId === this._instanceId)
         .map(() => {
           this._isActive = false;
-          return {eventName: 'deactivate'};
+          return { eventName: 'deactivate' };
         })
     );
 
     // Attach a value-listener so that it immediately subscribes and the
     // property retains its value.
-    const afterAsap = delayAsap().toProperty().onValue(()=>{});
+    const afterAsap = delayAsap()
+      .toProperty()
+      .onValue(() => {});
 
     let hasPlacedAlready = false;
     let appName;
-    const waitingPlatform = querySelector((document.body:any), '.'+idMap('app_sidebar_waiting_platform'));
+    const waitingPlatform = querySelector(
+      (document.body: any),
+      '.' + idMap('app_sidebar_waiting_platform')
+    );
 
     descriptor
-      .flatMap(x => afterAsap.map(()=>x))
+      .flatMap(x => afterAsap.map(() => x))
       .takeUntilBy(this._stopper)
       .onValue(descriptor => {
-        const {el, iconUrl, iconClass, title, orderHint, id, hideTitleBar, appIconUrl, primaryColor, secondaryColor} = descriptor;
-        appName = descriptor.appName || driver.getOpts().appName || descriptor.title;
-        if (!((document.body:any):HTMLElement).contains(el)) {
+        const {
+          el,
+          iconUrl,
+          iconClass,
+          title,
+          orderHint,
+          id,
+          hideTitleBar,
+          appIconUrl,
+          primaryColor,
+          secondaryColor
+        } = descriptor;
+        appName =
+          descriptor.appName || driver.getOpts().appName || descriptor.title;
+        if (!((document.body: any): HTMLElement).contains(el)) {
           waitingPlatform.appendChild(el);
         }
-        const eventName = hasPlacedAlready ? 'inboxsdkUpdateSidebarPanel' : 'inboxsdkNewSidebarPanel';
+        const eventName = hasPlacedAlready
+          ? 'inboxsdkUpdateSidebarPanel'
+          : 'inboxsdkNewSidebarPanel';
         hasPlacedAlready = true;
 
-        el.dispatchEvent(new CustomEvent(
-          eventName,
-          {
-            bubbles: true, cancelable: false,
+        el.dispatchEvent(
+          new CustomEvent(eventName, {
+            bubbles: true,
+            cancelable: false,
             detail: {
-              appIconUrl: appIconUrl || this._driver.getOpts().appIconUrl || iconUrl,
+              appIconUrl:
+                appIconUrl || this._driver.getOpts().appIconUrl || iconUrl,
               appId: this._driver.getAppId(),
               appName,
               hideTitleBar: Boolean(hideTitleBar),
@@ -84,24 +112,28 @@ class ContentPanelViewDriver {
               isGlobal,
               orderHint: typeof orderHint === 'number' ? orderHint : 0,
               primaryColor: primaryColor || this._driver.getOpts().primaryColor,
-              secondaryColor: secondaryColor || this._driver.getOpts().secondaryColor,
+              secondaryColor:
+                secondaryColor || this._driver.getOpts().secondaryColor,
               sidebarId: this._sidebarId,
               title
             }
-          }
-        ));
+          })
+        );
       });
 
     this._stopper.onValue(() => {
       if (!hasPlacedAlready) return;
-      ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkRemoveSidebarPanel', {
-        bubbles: true, cancelable: false,
-        detail: {
-          appName,
-          sidebarId: this._sidebarId,
-          instanceId: this._instanceId
-        }
-      }));
+      ((document.body: any): HTMLElement).dispatchEvent(
+        new CustomEvent('inboxsdkRemoveSidebarPanel', {
+          bubbles: true,
+          cancelable: false,
+          detail: {
+            appName,
+            sidebarId: this._sidebarId,
+            instanceId: this._instanceId
+          }
+        })
+      );
     });
   }
 
@@ -114,39 +146,45 @@ class ContentPanelViewDriver {
   }
 
   scrollIntoView() {
-    ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelScrollIntoView', {
-      bubbles: true,
-      cancelable: false,
-      detail: {
-        instanceId: this._instanceId,
-        sidebarId: this._sidebarId
-      }
-    }));
+    ((document.body: any): HTMLElement).dispatchEvent(
+      new CustomEvent('inboxsdkSidebarPanelScrollIntoView', {
+        bubbles: true,
+        cancelable: false,
+        detail: {
+          instanceId: this._instanceId,
+          sidebarId: this._sidebarId
+        }
+      })
+    );
   }
 
   close() {
-    ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelClose', {
-      bubbles: true,
-      cancelable: false,
-      detail: {
-        instanceId: this._instanceId,
-        isGlobal: this._isGlobal,
-        sidebarId: this._sidebarId
-      }
-    }));
+    ((document.body: any): HTMLElement).dispatchEvent(
+      new CustomEvent('inboxsdkSidebarPanelClose', {
+        bubbles: true,
+        cancelable: false,
+        detail: {
+          instanceId: this._instanceId,
+          isGlobal: this._isGlobal,
+          sidebarId: this._sidebarId
+        }
+      })
+    );
   }
 
   open() {
     checkInUserInputEvent();
-    ((document.body:any):HTMLElement).dispatchEvent(new CustomEvent('inboxsdkSidebarPanelOpen', {
-      bubbles: true,
-      cancelable: false,
-      detail: {
-        instanceId: this._instanceId,
-        isGlobal: this._isGlobal,
-        sidebarId: this._sidebarId
-      }
-    }));
+    ((document.body: any): HTMLElement).dispatchEvent(
+      new CustomEvent('inboxsdkSidebarPanelOpen', {
+        bubbles: true,
+        cancelable: false,
+        detail: {
+          instanceId: this._instanceId,
+          isGlobal: this._isGlobal,
+          sidebarId: this._sidebarId
+        }
+      })
+    );
   }
 
   isActive(): boolean {

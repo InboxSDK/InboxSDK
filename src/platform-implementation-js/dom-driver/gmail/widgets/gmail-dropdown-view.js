@@ -3,34 +3,34 @@
 import blockAndReemiteKeyboardEvents from '../../../lib/dom/block-and-reemit-keyboard-events';
 
 export default class GmailDropdownView {
-	_containerElement: HTMLElement;
-	_contentElement: HTMLElement;
+  _containerElement: HTMLElement;
+  _contentElement: HTMLElement;
 
-	constructor() {
-		this._setupElement();
-	}
+  constructor() {
+    this._setupElement();
+  }
 
-	_setupElement() {
-		this._containerElement = document.createElement('div');
-		this._containerElement.setAttribute('class', 'inboxsdk__menu');
+  _setupElement() {
+    this._containerElement = document.createElement('div');
+    this._containerElement.setAttribute('class', 'inboxsdk__menu');
 
-		this._contentElement = document.createElement('div');
-		this._contentElement.setAttribute('class', 'inboxsdk__menuContent');
+    this._contentElement = document.createElement('div');
+    this._contentElement.setAttribute('class', 'inboxsdk__menuContent');
 
-		this._containerElement.appendChild(this._contentElement);
+    this._containerElement.appendChild(this._contentElement);
 
-		blockAndReemiteKeyboardEvents(this._containerElement);
-	}
+    blockAndReemiteKeyboardEvents(this._containerElement);
+  }
 
-	destroy() {
-		this._containerElement.remove();
-	}
+  destroy() {
+    this._containerElement.remove();
+  }
 
-	getContainerElement() {
-		return this._containerElement;
-	}
+  getContainerElement() {
+    return this._containerElement;
+  }
 
-	getContentElement() {
-		return this._contentElement;
-	}
+  getContentElement() {
+    return this._contentElement;
+  }
 }

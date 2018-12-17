@@ -15,13 +15,19 @@ import pageParserOptions from '../../src/platform-implementation-js/dom-driver/i
 import parser from '../../src/platform-implementation-js/dom-driver/inbox/detection/compose/parser';
 
 function inlineFinder(documentElement: HTMLHtmlElement) {
-  return Array.from(pageParserOptions.finders.inlineCompose.fn(documentElement));
+  return Array.from(
+    pageParserOptions.finders.inlineCompose.fn(documentElement)
+  );
 }
 function regularFinder(documentElement: HTMLHtmlElement) {
-  return Array.from(pageParserOptions.finders.regularCompose.fn(documentElement));
+  return Array.from(
+    pageParserOptions.finders.regularCompose.fn(documentElement)
+  );
 }
 function fullscreenFinder(documentElement: HTMLHtmlElement) {
-  return Array.from(pageParserOptions.finders.fullscreenCompose.fn(documentElement));
+  return Array.from(
+    pageParserOptions.finders.fullscreenCompose.fn(documentElement)
+  );
 }
 function finder(documentElement: HTMLHtmlElement) {
   return [
@@ -42,7 +48,7 @@ import {
   page20160629_3,
   page20160818,
   page20161102,
-  page20170302,
+  page20170302
 } from '../lib/pages';
 
 describe('Inbox Compose Detection', () => {
@@ -50,7 +56,10 @@ describe('Inbox Compose Detection', () => {
     it('2016-06-14', () => {
       const compose1 = querySelector(page20160614(), '[data-test-id=compose1]');
       const compose2 = querySelector(page20160614(), '[data-test-id=compose2]');
-      const inlineCompose = querySelector(page20160614(), '[data-test-id=inlinecompose]');
+      const inlineCompose = querySelector(
+        page20160614(),
+        '[data-test-id=inlinecompose]'
+      );
 
       const results = finder(page20160614());
       expect(results.length).toBe(3);
@@ -60,7 +69,10 @@ describe('Inbox Compose Detection', () => {
     });
 
     it('2016-06-14 with chat sidebar', () => {
-      const compose1 = querySelector(pageWithSidebar20160614(), '[data-test-id=compose1]');
+      const compose1 = querySelector(
+        pageWithSidebar20160614(),
+        '[data-test-id=compose1]'
+      );
 
       const results = finder(pageWithSidebar20160614());
       expect(results.length).toBe(1);
@@ -68,8 +80,14 @@ describe('Inbox Compose Detection', () => {
     });
 
     it('2016-06-20 fullscreen and bundled inline', () => {
-      const bundledInlineCompose = querySelector(pageFullscreen20160620(), '[data-test-id=bundledInlineCompose]');
-      const fullscreenCompose = querySelector(pageFullscreen20160620(), '[data-test-id=fullscreenCompose]');
+      const bundledInlineCompose = querySelector(
+        pageFullscreen20160620(),
+        '[data-test-id=bundledInlineCompose]'
+      );
+      const fullscreenCompose = querySelector(
+        pageFullscreen20160620(),
+        '[data-test-id=fullscreenCompose]'
+      );
 
       const results = finder(pageFullscreen20160620());
       expect(results.length).toBe(2);
@@ -128,7 +146,10 @@ describe('Inbox Compose Detection', () => {
     });
 
     it('2016-06-14 inline', () => {
-      const compose = querySelector(page20160614(), '[data-test-id=inlinecompose]');
+      const compose = querySelector(
+        page20160614(),
+        '[data-test-id=inlinecompose]'
+      );
       const results = parser(compose);
       expect(results.errors).toEqual([]);
       expect(results.score).toBe(1);
@@ -136,7 +157,10 @@ describe('Inbox Compose Detection', () => {
     });
 
     it('2016-06-20 fullscreen', () => {
-      const fullscreenCompose = querySelector(pageFullscreen20160620(), '[data-test-id=fullscreenCompose]');
+      const fullscreenCompose = querySelector(
+        pageFullscreen20160620(),
+        '[data-test-id=fullscreenCompose]'
+      );
       const results = parser(fullscreenCompose);
       expect(results.errors).toEqual([]);
       expect(results.score).toBe(1);
@@ -144,7 +168,10 @@ describe('Inbox Compose Detection', () => {
     });
 
     it('2016-06-20 bundled inline', () => {
-      const bundledInlineCompose = querySelector(pageFullscreen20160620(), '[data-test-id=bundledInlineCompose]');
+      const bundledInlineCompose = querySelector(
+        pageFullscreen20160620(),
+        '[data-test-id=bundledInlineCompose]'
+      );
       const results = parser(bundledInlineCompose);
       expect(results.errors).toEqual([]);
       expect(results.score).toBe(1);
@@ -212,31 +239,53 @@ describe('Inbox Compose Detection', () => {
     it('2016-06-14', async () => {
       const compose1 = querySelector(page20160614(), '[data-test-id=compose1]');
       const compose2 = querySelector(page20160614(), '[data-test-id=compose2]');
-      const inlineCompose = querySelector(page20160614(), '[data-test-id=inlinecompose]');
+      const inlineCompose = querySelector(
+        page20160614(),
+        '[data-test-id=inlinecompose]'
+      );
 
       const spy = sinon.spy();
       const root = page20160614();
       const tree = makePageParserTree(null, root).tree;
 
       expect(tree.getAllByTag('regularCompose').values().size).toBe(2);
-      expect(lsMap(tree.getAllByTag('regularCompose'), x => x.getValue()).values().has(compose1)).toBe(true);
-      expect(lsMap(tree.getAllByTag('regularCompose'), x => x.getValue()).values().has(compose2)).toBe(true);
+      expect(
+        lsMap(tree.getAllByTag('regularCompose'), x => x.getValue())
+          .values()
+          .has(compose1)
+      ).toBe(true);
+      expect(
+        lsMap(tree.getAllByTag('regularCompose'), x => x.getValue())
+          .values()
+          .has(compose2)
+      ).toBe(true);
 
       expect(tree.getAllByTag('inlineCompose').values().size).toBe(1);
-      expect(lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue()).values().has(inlineCompose)).toBe(true);
+      expect(
+        lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue())
+          .values()
+          .has(inlineCompose)
+      ).toBe(true);
 
       expect(tree.getAllByTag('fullscreenCompose').values().size).toBe(0);
     });
 
     it('2016-06-14 with chat sidebar', () => {
-      const compose1 = querySelector(pageWithSidebar20160614(), '[data-test-id=compose1]');
+      const compose1 = querySelector(
+        pageWithSidebar20160614(),
+        '[data-test-id=compose1]'
+      );
 
       const spy = sinon.spy();
       const root = pageWithSidebar20160614();
       const tree = makePageParserTree(null, root).tree;
 
       expect(tree.getAllByTag('regularCompose').values().size).toBe(1);
-      expect(lsMap(tree.getAllByTag('regularCompose'), x => x.getValue()).values().has(compose1)).toBe(true);
+      expect(
+        lsMap(tree.getAllByTag('regularCompose'), x => x.getValue())
+          .values()
+          .has(compose1)
+      ).toBe(true);
 
       expect(tree.getAllByTag('inlineCompose').values().size).toBe(0);
 
@@ -244,8 +293,14 @@ describe('Inbox Compose Detection', () => {
     });
 
     it('2016-06-20 fullscreen and bundled inline', () => {
-      const bundledInlineCompose = querySelector(pageFullscreen20160620(), '[data-test-id=bundledInlineCompose]');
-      const fullscreenCompose = querySelector(pageFullscreen20160620(), '[data-test-id=fullscreenCompose]');
+      const bundledInlineCompose = querySelector(
+        pageFullscreen20160620(),
+        '[data-test-id=bundledInlineCompose]'
+      );
+      const fullscreenCompose = querySelector(
+        pageFullscreen20160620(),
+        '[data-test-id=fullscreenCompose]'
+      );
 
       const spy = sinon.spy();
       const root = pageFullscreen20160620();
@@ -254,10 +309,18 @@ describe('Inbox Compose Detection', () => {
       expect(tree.getAllByTag('regularCompose').values().size).toBe(0);
 
       expect(tree.getAllByTag('inlineCompose').values().size).toBe(1);
-      expect(lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue()).values().has(bundledInlineCompose)).toBe(true);
+      expect(
+        lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue())
+          .values()
+          .has(bundledInlineCompose)
+      ).toBe(true);
 
       expect(tree.getAllByTag('fullscreenCompose').values().size).toBe(1);
-      expect(lsMap(tree.getAllByTag('fullscreenCompose'), x => x.getValue()).values().has(fullscreenCompose)).toBe(true);
+      expect(
+        lsMap(tree.getAllByTag('fullscreenCompose'), x => x.getValue())
+          .values()
+          .has(fullscreenCompose)
+      ).toBe(true);
     });
 
     it('2016-06-28 inline compose in search page', () => {
@@ -270,7 +333,11 @@ describe('Inbox Compose Detection', () => {
       expect(tree.getAllByTag('regularCompose').values().size).toBe(0);
 
       expect(tree.getAllByTag('inlineCompose').values().size).toBe(1);
-      expect(lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue()).values().has(compose)).toBe(true);
+      expect(
+        lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue())
+          .values()
+          .has(compose)
+      ).toBe(true);
 
       expect(tree.getAllByTag('fullscreenCompose').values().size).toBe(0);
     });
@@ -283,7 +350,11 @@ describe('Inbox Compose Detection', () => {
       const tree = makePageParserTree(null, root).tree;
 
       expect(tree.getAllByTag('regularCompose').values().size).toBe(1);
-      expect(lsMap(tree.getAllByTag('regularCompose'), x => x.getValue()).values().has(compose)).toBe(true);
+      expect(
+        lsMap(tree.getAllByTag('regularCompose'), x => x.getValue())
+          .values()
+          .has(compose)
+      ).toBe(true);
 
       expect(tree.getAllByTag('inlineCompose').values().size).toBe(0);
 
@@ -300,7 +371,11 @@ describe('Inbox Compose Detection', () => {
       expect(tree.getAllByTag('regularCompose').values().size).toBe(0);
 
       expect(tree.getAllByTag('inlineCompose').values().size).toBe(1);
-      expect(lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue()).values().has(compose)).toBe(true);
+      expect(
+        lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue())
+          .values()
+          .has(compose)
+      ).toBe(true);
 
       expect(tree.getAllByTag('fullscreenCompose').values().size).toBe(0);
     });
@@ -315,7 +390,11 @@ describe('Inbox Compose Detection', () => {
       expect(tree.getAllByTag('regularCompose').values().size).toBe(0);
 
       expect(tree.getAllByTag('inlineCompose').values().size).toBe(1);
-      expect(lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue()).values().has(compose)).toBe(true);
+      expect(
+        lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue())
+          .values()
+          .has(compose)
+      ).toBe(true);
 
       expect(tree.getAllByTag('fullscreenCompose').values().size).toBe(0);
     });

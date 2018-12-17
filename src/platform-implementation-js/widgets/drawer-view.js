@@ -2,11 +2,11 @@
 
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
-import {defn} from 'ud';
+import { defn } from 'ud';
 import EventEmitter from '../lib/safe-event-emitter';
 import ComposeView from '../views/compose-view';
 
-import type {DrawerViewDriver} from '../driver-interfaces/driver';
+import type { DrawerViewDriver } from '../driver-interfaces/driver';
 
 // documented in src/docs/
 class DrawerView extends EventEmitter {
@@ -25,13 +25,17 @@ class DrawerView extends EventEmitter {
       this.destroyed = true;
       this.emit('destroy');
     });
-    this._driver.getPreAutoCloseStream().onValue((event) => {
+    this._driver.getPreAutoCloseStream().onValue(event => {
       this.emit('preautoclose', event);
     });
 
-    document.dispatchEvent(new CustomEvent('inboxSDKcloseDrawers', {
-      bubbles: false, cancelable: false, detail: null
-    }));
+    document.dispatchEvent(
+      new CustomEvent('inboxSDKcloseDrawers', {
+        bubbles: false,
+        cancelable: false,
+        detail: null
+      })
+    );
     Kefir.fromEvents(document, 'inboxSDKcloseDrawers')
       .takeUntilBy(Kefir.fromEvents(this, 'closing'))
       .onValue(() => {
@@ -39,7 +43,7 @@ class DrawerView extends EventEmitter {
       });
   }
 
-  close(){
+  close() {
     this._driver.close();
   }
 

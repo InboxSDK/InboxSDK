@@ -1,179 +1,20 @@
 [
   [
-    [
-      "v",
-      "XP3DaZaCFYM.en.",
-      "8",
-      "7acdff71914261f3"
-    ],
-    [
-      "di",
-      87,
-      null,
-      null,
-      null,
-      null,
-      [],
-      [],
-      null,
-      null,
-      [],
-      [],
-      []
-    ],
+    ["v", "XP3DaZaCFYM.en.", "8", "7acdff71914261f3"],
+    ["di", 87, null, null, null, null, [], [], null, null, [], [], []],
     [
       "ld",
       [
-        [
-          "^i",
-          312,
-          -1,
-          -1,
-          2,
-          0,
-          "l",
-          null,
-          0,
-          1,
-          1,
-          null,
-          0
-        ],
-        [
-          "^ig",
-          127,
-          -1,
-          -1,
-          2,
-          0,
-          "l",
-          null,
-          0,
-          47,
-          1,
-          null,
-          1
-        ],
-        [
-          "^t",
-          -1,
-          -1,
-          -1,
-          2,
-          0,
-          "l",
-          null,
-          0,
-          4,
-          1,
-          null,
-          1
-        ],
-        [
-          "^io_im",
-          132,
-          -1,
-          -1,
-          0,
-          0,
-          "l",
-          null,
-          0,
-          32,
-          1,
-          null,
-          1
-        ],
-        [
-          "^b",
-          -1,
-          -1,
-          -1,
-          0,
-          1,
-          "l",
-          null,
-          0,
-          10,
-          1,
-          null,
-          1
-        ],
-        [
-          "^f",
-          -1,
-          -1,
-          -1,
-          2,
-          0,
-          "l",
-          null,
-          0,
-          8,
-          1,
-          null,
-          1
-        ],
-        [
-          "^r",
-          -1,
-          0,
-          -1,
-          2,
-          0,
-          "l",
-          null,
-          0,
-          9,
-          1,
-          null,
-          1
-        ],
-        [
-          "^all",
-          -1,
-          -1,
-          -1,
-          0,
-          0,
-          "l",
-          null,
-          0,
-          48,
-          1,
-          null,
-          1
-        ],
-        [
-          "^s",
-          0,
-          0,
-          -1,
-          0,
-          0,
-          "l",
-          null,
-          0,
-          3,
-          1,
-          null,
-          1
-        ],
-        [
-          "^k",
-          -1,
-          1,
-          -1,
-          0,
-          0,
-          "l",
-          null,
-          0,
-          2,
-          1,
-          null,
-          1
-        ]
+        ["^i", 312, -1, -1, 2, 0, "l", null, 0, 1, 1, null, 0],
+        ["^ig", 127, -1, -1, 2, 0, "l", null, 0, 47, 1, null, 1],
+        ["^t", -1, -1, -1, 2, 0, "l", null, 0, 4, 1, null, 1],
+        ["^io_im", 132, -1, -1, 0, 0, "l", null, 0, 32, 1, null, 1],
+        ["^b", -1, -1, -1, 0, 1, "l", null, 0, 10, 1, null, 1],
+        ["^f", -1, -1, -1, 2, 0, "l", null, 0, 8, 1, null, 1],
+        ["^r", -1, 0, -1, 2, 0, "l", null, 0, 9, 1, null, 1],
+        ["^all", -1, -1, -1, 0, 0, "l", null, 0, 48, 1, null, 1],
+        ["^s", 0, 0, -1, 0, 0, "l", null, 0, 3, 1, null, 1],
+        ["^k", -1, 1, -1, 0, 0, "l", null, 0, 2, 1, null, 1]
       ],
       [
         [
@@ -331,51 +172,9 @@
       ],
       [],
       [
-        [
-          "^sl_root",
-          -1,
-          -1,
-          -1,
-          0,
-          0,
-          "l",
-          null,
-          0,
-          0,
-          1,
-          null,
-          1
-        ],
-        [
-          "^smartlabel_social",
-          1,
-          -1,
-          -1,
-          0,
-          0,
-          "l",
-          null,
-          0,
-          54,
-          0,
-          null,
-          1
-        ],
-        [
-          "^smartlabel_promo",
-          5,
-          -1,
-          -1,
-          0,
-          0,
-          "l",
-          null,
-          0,
-          49,
-          0,
-          null,
-          1
-        ],
+        ["^sl_root", -1, -1, -1, 0, 0, "l", null, 0, 0, 1, null, 1],
+        ["^smartlabel_social", 1, -1, -1, 0, 0, "l", null, 0, 54, 0, null, 1],
+        ["^smartlabel_promo", 5, -1, -1, 0, 0, "l", null, 0, 49, 0, null, 1],
         [
           "^smartlabel_notification",
           1597,
@@ -391,21 +190,7 @@
           null,
           1
         ],
-        [
-          "^smartlabel_group",
-          345,
-          -1,
-          -1,
-          0,
-          0,
-          "l",
-          null,
-          0,
-          55,
-          0,
-          null,
-          1
-        ]
+        ["^smartlabel_group", 345, -1, -1, 0, 0, "l", null, 0, 55, 0, null, 1]
       ],
       []
     ],
@@ -433,20 +218,8 @@
     [
       "mla",
       [
-        [
-          "erik@ipsumcreative.com",
-          0,
-          0,
-          1,
-          "Erik Munson"
-        ],
-        [
-          "erik@streak.com",
-          1,
-          0,
-          0,
-          "Erik Munson"
-        ]
+        ["erik@ipsumcreative.com", 0, 0, 1, "Erik Munson"],
+        ["erik@streak.com", 1, 0, 0, "Erik Munson"]
       ]
     ]
   ],
@@ -515,16 +288,12 @@
           [],
           null,
           0,
-          [
-            "eng.streak.com"
-          ],
+          ["eng.streak.com"],
           null,
           [],
           null,
           null,
-          [
-            1
-          ],
+          [1],
           null,
           "omar@streak.com",
           null,
@@ -535,124 +304,38 @@
         ]
       ]
     ],
-    [
-      "te"
-    ],
-    [
-      "slo",
-      298465
-    ],
+    ["te"],
+    ["slo", 298465],
     [
       "ub",
       [
-        [
-          "Streak Bot/Billing Changes",
-          298465
-        ],
-        [
-          "^smartlabel_personal",
-          298403
-        ],
-        [
-          "Streak Bot/GAM App Installs",
-          294182
-        ],
-        [
-          "^smartlabel_social",
-          0
-        ],
-        [
-          "Streak Bot/Deploys",
-          293141
-        ],
-        [
-          "^smartlabel_pure_notif",
-          298465
-        ],
-        [
-          "^smartlabel_receipt",
-          0
-        ],
-        [
-          "^act",
-          0
-        ],
-        [
-          "Streak Bot",
-          0
-        ],
-        [
-          "^cff",
-          0
-        ],
-        [
-          "Streak Bot/Experiments",
-          0
-        ],
-        [
-          "Streak Bot/App ID Signups",
-          293435
-        ],
-        [
-          "Streak Bot/Redoing Trial",
-          293964
-        ],
-        [
-          "Streak Bot/Stripe Data Errors",
-          0
-        ],
-        [
-          "^all",
-          298465
-        ],
-        [
-          "^smartlabel_travel",
-          0
-        ],
-        [
-          "^smartlabel_notification",
-          298465
-        ],
-        [
-          "^smartlabel_group",
-          298465
-        ],
-        [
-          "^b",
-          0
-        ],
-        [
-          "^f",
-          290174
-        ],
-        [
-          "^i",
-          298403
-        ],
-        [
-          "^k",
-          0
-        ],
-        [
-          "^smartlabel_promo",
-          285189
-        ],
-        [
-          "^smartlabel_finance",
-          0
-        ],
-        [
-          "^r",
-          0
-        ],
-        [
-          "^s",
-          0
-        ],
-        [
-          "^t",
-          0
-        ]
+        ["Streak Bot/Billing Changes", 298465],
+        ["^smartlabel_personal", 298403],
+        ["Streak Bot/GAM App Installs", 294182],
+        ["^smartlabel_social", 0],
+        ["Streak Bot/Deploys", 293141],
+        ["^smartlabel_pure_notif", 298465],
+        ["^smartlabel_receipt", 0],
+        ["^act", 0],
+        ["Streak Bot", 0],
+        ["^cff", 0],
+        ["Streak Bot/Experiments", 0],
+        ["Streak Bot/App ID Signups", 293435],
+        ["Streak Bot/Redoing Trial", 293964],
+        ["Streak Bot/Stripe Data Errors", 0],
+        ["^all", 298465],
+        ["^smartlabel_travel", 0],
+        ["^smartlabel_notification", 298465],
+        ["^smartlabel_group", 298465],
+        ["^b", 0],
+        ["^f", 290174],
+        ["^i", 298403],
+        ["^k", 0],
+        ["^smartlabel_promo", 285189],
+        ["^smartlabel_finance", 0],
+        ["^r", 0],
+        ["^s", 0],
+        ["^t", 0]
       ],
       298465
     ]
@@ -661,123 +344,36 @@
     [
       "ua",
       [
-        [
-          "Streak Bot/Billing Changes",
-          298465
-        ],
-        [
-          "^smartlabel_personal",
-          298403
-        ],
-        [
-          "Streak Bot/GAM App Installs",
-          294182
-        ],
-        [
-          "^smartlabel_social",
-          0
-        ],
-        [
-          "Streak Bot/Deploys",
-          293141
-        ],
-        [
-          "^smartlabel_pure_notif",
-          298465
-        ],
-        [
-          "^smartlabel_receipt",
-          0
-        ],
-        [
-          "^act",
-          0
-        ],
-        [
-          "Streak Bot",
-          0
-        ],
-        [
-          "^cff",
-          0
-        ],
-        [
-          "Streak Bot/Experiments",
-          0
-        ],
-        [
-          "Streak Bot/App ID Signups",
-          293435
-        ],
-        [
-          "Streak Bot/Redoing Trial",
-          293964
-        ],
-        [
-          "Streak Bot/Stripe Data Errors",
-          0
-        ],
-        [
-          "^all",
-          298465
-        ],
-        [
-          "^smartlabel_travel",
-          0
-        ],
-        [
-          "^smartlabel_notification",
-          298465
-        ],
-        [
-          "^smartlabel_group",
-          298465
-        ],
-        [
-          "^b",
-          0
-        ],
-        [
-          "^f",
-          290174
-        ],
-        [
-          "^i",
-          298403
-        ],
-        [
-          "^k",
-          0
-        ],
-        [
-          "^smartlabel_promo",
-          285189
-        ],
-        [
-          "^smartlabel_finance",
-          0
-        ],
-        [
-          "^r",
-          0
-        ],
-        [
-          "^s",
-          0
-        ],
-        [
-          "^t",
-          0
-        ]
+        ["Streak Bot/Billing Changes", 298465],
+        ["^smartlabel_personal", 298403],
+        ["Streak Bot/GAM App Installs", 294182],
+        ["^smartlabel_social", 0],
+        ["Streak Bot/Deploys", 293141],
+        ["^smartlabel_pure_notif", 298465],
+        ["^smartlabel_receipt", 0],
+        ["^act", 0],
+        ["Streak Bot", 0],
+        ["^cff", 0],
+        ["Streak Bot/Experiments", 0],
+        ["Streak Bot/App ID Signups", 293435],
+        ["Streak Bot/Redoing Trial", 293964],
+        ["Streak Bot/Stripe Data Errors", 0],
+        ["^all", 298465],
+        ["^smartlabel_travel", 0],
+        ["^smartlabel_notification", 298465],
+        ["^smartlabel_group", 298465],
+        ["^b", 0],
+        ["^f", 290174],
+        ["^i", 298403],
+        ["^k", 0],
+        ["^smartlabel_promo", 285189],
+        ["^smartlabel_finance", 0],
+        ["^r", 0],
+        ["^s", 0],
+        ["^t", 0]
       ],
       298465
     ],
-    [
-      "e",
-      12,
-      null,
-      null,
-      11863
-    ]
+    ["e", 12, null, null, 11863]
   ]
 ]

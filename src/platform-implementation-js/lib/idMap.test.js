@@ -1,11 +1,11 @@
 /* @flow */
 
-import idMap, {_reset} from './idMap';
+import idMap, { _reset } from './idMap';
 
 const original_Date_now = Date.now;
 afterEach(() => {
   _reset();
-  (Date:any).now = original_Date_now;
+  (Date: any).now = original_Date_now;
 });
 
 for (let env of ['test', 'development']) {
@@ -17,7 +17,9 @@ for (let env of ['test', 'development']) {
     });
     afterAll(() => {
       process.env.NODE_ENV = original_NODE_ENV;
-      ((document.documentElement:any):HTMLElement).removeAttribute('data-map-id');
+      ((document.documentElement: any): HTMLElement).removeAttribute(
+        'data-map-id'
+      );
     });
 
     describe('common', () => {
@@ -35,7 +37,7 @@ for (let env of ['test', 'development']) {
 
       test('ids are unique', () => {
         const ids = new Set();
-        for (let i=0; i<20; i++) {
+        for (let i = 0; i < 20; i++) {
           const id = idMap(`foo${i}`);
           expect(ids.has(id)).toBe(false);
           ids.add(id);
@@ -46,14 +48,14 @@ for (let env of ['test', 'development']) {
     describe('env-specific', () => {
       if (env === 'development') {
         test('ids are similar to the name', () => {
-          for (let i=0; i<10; i++) {
+          for (let i = 0; i < 10; i++) {
             const id = idMap(`foo${i}`);
             expect(id).toMatch(new RegExp(`^idm\\d_foo${i}$`));
           }
         });
       } else {
         test('ids are only alphabetic and are at least 6 characters', () => {
-          for (let i=0; i<10; i++) {
+          for (let i = 0; i < 10; i++) {
             const id = idMap(`foo${i}`);
             expect(/^[a-zA-Z]+$/.test(id)).toBe(true);
             expect(id.length).toBeGreaterThanOrEqual(6);
@@ -65,8 +67,10 @@ for (let env of ['test', 'development']) {
           const a2 = idMap('foo');
           expect(a2).toBe(a1);
 
-          (Date:any).now = () => original_Date_now() + 1000*60*60;
-          ((document.documentElement:any):HTMLElement).removeAttribute('data-map-id');
+          (Date: any).now = () => original_Date_now() + 1000 * 60 * 60;
+          ((document.documentElement: any): HTMLElement).removeAttribute(
+            'data-map-id'
+          );
           _reset();
 
           const b1 = idMap('foo');

@@ -1,9 +1,8 @@
 /**
-* @class
-* Object that represents a visible thread row view in a list of rows
-*/
+ * @class
+ * Object that represents a visible thread row view in a list of rows
+ */
 var ThreadRowView = /** @lends ThreadRowView */ {
-
   /**
    * Adds a label to the thread row view. This label will appear like a normal
    * Gmail label, but it is purely a temporary visual modification. This method
@@ -13,7 +12,7 @@ var ThreadRowView = /** @lends ThreadRowView */ {
    * @param {LabelDescriptor|Stream.<LabelDescriptor>} labelDescriptor - An options object for the label.
    * @return {void}
    */
-  addLabel: function(){},
+  addLabel: function() {},
 
   /**
    * Adds an image to the thread row view.
@@ -22,7 +21,7 @@ var ThreadRowView = /** @lends ThreadRowView */ {
    * @param {ImageDescriptor|Stream.<ImageDescriptor>} imageDescriptor - An options object for the image.
    * @return {void}
    */
-  addImage: function(){},
+  addImage: function() {},
 
   /**
    * Adds an icon style button to this row, placed right next to the star button.
@@ -30,14 +29,14 @@ var ThreadRowView = /** @lends ThreadRowView */ {
    * @param {ThreadRowButtonDescriptor|Stream.<ThreadRowButtonDescriptor>} buttonDescriptor - An options object for the button.
    * @return {void}
    */
-  addButton: function(){},
+  addButton: function() {},
 
   /**
    * Adds an action button to the right of the subject.
    * @param {ThreadRowActionButtonDescriptor|Stream.<ThreadRowActionButtonDescriptor>} buttonDescriptor - An options object for the button.
    * @return {void}
    */
-  addActionButton: function(){},
+  addActionButton: function() {},
 
   /**
    * Adds an attachment icon to the row.
@@ -45,7 +44,7 @@ var ThreadRowView = /** @lends ThreadRowView */ {
    * @param {ThreadRowAttachmentIconDescriptor|Stream.<ThreadRowAttachmentIconDescriptor>} threadRowAttachmentIconDescriptor - The options for the icon to add.
    * @return {void}
    */
-  addAttachmentIcon: function(){},
+  addAttachmentIcon: function() {},
 
   /**
    * Replaces the text inside the date column.
@@ -53,7 +52,7 @@ var ThreadRowView = /** @lends ThreadRowView */ {
    * @param {ThreadRowDateDescriptor|Stream.<ThreadRowDateDescriptor>} threadRowDateDescriptor - The options for the date replacement.
    * @return {void}
    */
-  replaceDate: function(){},
+  replaceDate: function() {},
 
   /**
    * If this row represents a draft, then this allows the word "Draft" and the number next to it
@@ -61,26 +60,26 @@ var ThreadRowView = /** @lends ThreadRowView */ {
    * ^gmail
    * ^inbox
    * @param {ThreadRowDraftLabelDescriptor|Stream.<ThreadRowDraftLabelDescriptor>} draftLabelDescriptor - The options for the replacement.
-    * @return {void}
+   * @return {void}
    */
-  replaceDraftLabel: function(){},
+  replaceDraftLabel: function() {},
 
   /**
-  * Gets the subject of this thread.
-  * ^gmail
-  * ^inbox
-  * @return {string}
-  */
-  getSubject: function(){},
+   * Gets the subject of this thread.
+   * ^gmail
+   * ^inbox
+   * @return {string}
+   */
+  getSubject: function() {},
 
   /**
-  * Gets string representation of the timestamp of the most recent message on the thread.
-  * Note: this returns a string representation because timezone information is not available,
-  * the accuracy is limited to minutes, and it is formatted to the user's language.
-  * ^gmail
-  * @return {string}
-  */
-  getDateString: function(){},
+   * Gets string representation of the timestamp of the most recent message on the thread.
+   * Note: this returns a string representation because timezone information is not available,
+   * the accuracy is limited to minutes, and it is formatted to the user's language.
+   * ^gmail
+   * @return {string}
+   */
+  getDateString: function() {},
 
   /**
    * Gets the Gmail Thread ID of the thread and returns it as a Promise.
@@ -88,20 +87,20 @@ var ThreadRowView = /** @lends ThreadRowView */ {
    * ^inbox
    * @return {Promise.<string>}
    */
-  getThreadIDAsync: function(){},
+  getThreadIDAsync: function() {},
 
   /**
-  * Gets the Gmail Thread ID of the thread only if the thread ID is stable. Some threads
-  * such as those with only a single Draft message in them will occasionally change their
-  * thread ID. If you're using the thread ID as a key, you may experiemnce unexpected behaviour
-  * if you're not careful about this fact. This method provides you with an easy way to tell if
-  * the thread has a stable ID. It will only return a Promise for the thread ID
-  * if it is expected to stay the same, otherwise it will return a Promise for <code>null</code>.
-  * ^gmail
-  * ^inbox
-  * @return {Promise.<string|null>}
-  */
-  getThreadIDIfStableAsync: function(){},
+   * Gets the Gmail Thread ID of the thread only if the thread ID is stable. Some threads
+   * such as those with only a single Draft message in them will occasionally change their
+   * thread ID. If you're using the thread ID as a key, you may experiemnce unexpected behaviour
+   * if you're not careful about this fact. This method provides you with an easy way to tell if
+   * the thread has a stable ID. It will only return a Promise for the thread ID
+   * if it is expected to stay the same, otherwise it will return a Promise for <code>null</code>.
+   * ^gmail
+   * ^inbox
+   * @return {Promise.<string|null>}
+   */
+  getThreadIDIfStableAsync: function() {},
 
   /**
    * Returns a Promise for the thread row's draft ID, if the thread row
@@ -113,119 +112,115 @@ var ThreadRowView = /** @lends ThreadRowView */ {
   getDraftID: function() {},
 
   /**
-  * Gets the number of visible draft messages in the row. This is purely an estimate based on
-  * what is visible in the row.
-  * ^gmail
-  * ^inbox
-  * @return {number}
-  */
-  getVisibleDraftCount: function(){},
+   * Gets the number of visible draft messages in the row. This is purely an estimate based on
+   * what is visible in the row.
+   * ^gmail
+   * ^inbox
+   * @return {number}
+   */
+  getVisibleDraftCount: function() {},
 
   /**
-  * Gets the number of visible messages in the thread based on the visible numeric marker.
-  * ^gmail
-  * ^inbox
-  * @return {number}
-  */
-  getVisibleMessageCount: function(){},
+   * Gets the number of visible messages in the thread based on the visible numeric marker.
+   * ^gmail
+   * ^inbox
+   * @return {number}
+   */
+  getVisibleMessageCount: function() {},
 
   /**
-  * Gets an Array of the <b>visible</b> contacts listed on the row. Note: this may not include all
-  * participants on the thread as this information is not visible.
-  * ^gmail
-  * ^inbox
-  * @return {Contact[]}
-  */
-  getContacts: function(){},
+   * Gets an Array of the <b>visible</b> contacts listed on the row. Note: this may not include all
+   * participants on the thread as this information is not visible.
+   * ^gmail
+   * ^inbox
+   * @return {Contact[]}
+   */
+  getContacts: function() {},
 
   /**
    * This property is set to true once the view is destroyed.
    * @type {boolean}
    */
-  destroyed: false,
+  destroyed: false
 
   /**
    * Fires when the thread row is no longer visible.
    * @event ThreadRowView#destroy
    */
-
 };
 
 /**
-* @class
-* This type is used to describe labels that you add to {ThreadRowView} and {CollapsibleSectionView}.
-*/
-var LabelDescriptor = /** @lends LabelDescriptor */{
+ * @class
+ * This type is used to describe labels that you add to {ThreadRowView} and {CollapsibleSectionView}.
+ */
+var LabelDescriptor = /** @lends LabelDescriptor */ {
+  /**
+   * Text of the label.
+   * @type {string}
+   */
+  title: null,
 
   /**
-  * Text of the label.
-  * @type {string}
-  */
-  title:null,
+   * The text color of the label.
+   * ^optional
+   * @type {string}
+   */
+  foregroundColor: null,
 
   /**
-  * The text color of the label.
-  * ^optional
-  * @type {string}
-  */
-  foregroundColor:null,
+   * The background color of the label.
+   * ^optional
+   * @type {string}
+   */
+  backgroundColor: null,
 
   /**
-  * The background color of the label.
-  * ^optional
-  * @type {string}
-  */
-  backgroundColor:null,
+   * URL for the icon to show on the label. Should be a local extension file URL or a HTTPS URL.
+   * @type {string}
+   */
+  iconUrl: null,
 
   /**
-  * URL for the icon to show on the label. Should be a local extension file URL or a HTTPS URL.
-  * @type {string}
-  */
-  iconUrl:null,
+   * A CSS class to apply to the icon.
+   * ^optional
+   * @type {string}
+   */
+  iconClass: null,
 
   /**
-  * A CSS class to apply to the icon.
-  * ^optional
-  * @type {string}
-  */
-  iconClass:null,
-
-  /**
-  * A background color to put on the icon element if present.
-  * ^optional
-  * @type {string}
-  */
-  iconBackgroundColor:null
+   * A background color to put on the icon element if present.
+   * ^optional
+   * @type {string}
+   */
+  iconBackgroundColor: null
 };
 
-
 /**
-* @class
-* This type is used to describe images that you add to {ThreadRowView}.
-*/
-var ImageDescriptor = /** @lends ImageDescriptor */{
+ * @class
+ * This type is used to describe images that you add to {ThreadRowView}.
+ */
+var ImageDescriptor = /** @lends ImageDescriptor */ {
+  /**
+   * URL for the image to show on the row. Should be a local extension file URL or a HTTPS URL.
+   * @type {string}
+   */
+  imageUrl: null,
 
   /**
-  * URL for the image to show on the row. Should be a local extension file URL or a HTTPS URL.
-  * @type {string}
-  */
-  imageUrl:null,
-
-  /**
-  * A CSS class to apply to the image.
-  * ^optional
-  * ^default=null
-  * @type {string}
-  */
+   * A CSS class to apply to the image.
+   * ^optional
+   * ^default=null
+   * @type {string}
+   */
   imageClass: null,
 
   /**
-  * The tooltip text to show when the user hovers over the image.
-  * ^optional
-  * ^default=null
-  * @type {string}
-  */
-  tooltip:null,
+   * The tooltip text to show when the user hovers over the image.
+   * ^optional
+   * ^default=null
+   * @type {string}
+   */
+  tooltip: null,
 
   /**
    * If multiple images from your app are added then they will be ordered by this value,
@@ -233,166 +228,159 @@ var ImageDescriptor = /** @lends ImageDescriptor */{
    * ^default=0
    * @type {number}
    */
-  orderHint:null
-};
-
-
-/**
-* @class
-* This type is used to describe a button you add to a {ThreadRowView}.
-*/
-var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */{
-
-  /**
-  * Text to show when the user hovers the mouse over the button.
-  * @type {string}
-  */
- title:null,
-
-  /**
-  * URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL.
-  * @type {string}
-  */
-  iconUrl:null,
-
-  /**
-  * A CSS class to apply to the icon button.
-  * ^optional
-  * @type {string}
-  */
-  iconClass:null,
-
-  /**
-  * A handler that gets called when the button is clicked on. The event object contains a
-  * {threadRowView} property and optionally a {dropdown} property if
-  * the {hasDropdown} was set to {true}.
-  * @type {func(event)}
-  */
-  onClick:null,
-
-  /**
-  * If true, the button will open a dropdown menu above it, and the event object will have a {dropdown} property of type {DropdownView} that
-  * allows the dropdown to be customized when opened.
-  * ^optional
-  * ^default=false
-  * @type {boolean}
-  */
-  hasDropdown:null
+  orderHint: null
 };
 
 /**
-* @class
-* This type is used to describe an action button you add to a {ThreadRowView}.
-*/
-var ThreadRowActionButtonDescriptor = /** @lends ThreadRowActionButtonDescriptor */{
+ * @class
+ * This type is used to describe a button you add to a {ThreadRowView}.
+ */
+var ThreadRowButtonDescriptor = /** @lends ThreadRowButtonDescriptor */ {
+  /**
+   * Text to show when the user hovers the mouse over the button.
+   * @type {string}
+   */
+  title: null,
 
   /**
-  * The type of action button to show. Only LINK is currently supported.
-  * @type {ActionButtonTypes}
-  */
-  type:null,
+   * URL for the icon to show on the button. Should be a local extension file URL or a HTTPS URL.
+   * @type {string}
+   */
+  iconUrl: null,
 
   /**
-  * Text of the button.
-  * @type {string}
-  */
-  title:null,
+   * A CSS class to apply to the icon button.
+   * ^optional
+   * @type {string}
+   */
+  iconClass: null,
 
   /**
-  * A CSS class to apply to the action button.
-  * ^optional
-  * @type {string}
-  */
-  className:null,
+   * A handler that gets called when the button is clicked on. The event object contains a
+   * {threadRowView} property and optionally a {dropdown} property if
+   * the {hasDropdown} was set to {true}.
+   * @type {func(event)}
+   */
+  onClick: null,
 
   /**
-  * A handler that gets called when the action button is clicked on.
-  * ^optional
-  * @type {func(event)}
-  */
-  onClick:null,
-
-  /**
-  * For LINK action buttons only. This is the URL to open when the button is clicked.
-  * @type {string}
-  */
-  url:null
+   * If true, the button will open a dropdown menu above it, and the event object will have a {dropdown} property of type {DropdownView} that
+   * allows the dropdown to be customized when opened.
+   * ^optional
+   * ^default=false
+   * @type {boolean}
+   */
+  hasDropdown: null
 };
 
 /**
-* @class
-* This type is used to describe an icon you add to a {ThreadRowView}.
-*/
-var ThreadRowAttachmentIconDescriptor = /** @lends ThreadRowAttachmentIconDescriptor */{
+ * @class
+ * This type is used to describe an action button you add to a {ThreadRowView}.
+ */
+var ThreadRowActionButtonDescriptor = /** @lends ThreadRowActionButtonDescriptor */ {
+  /**
+   * The type of action button to show. Only LINK is currently supported.
+   * @type {ActionButtonTypes}
+   */
+  type: null,
 
   /**
-  * URL for the icon to show on in the attachments column. Should be a local extension file URL or a HTTPS URL.
-  * ^optional
-  * @type {string}
-  */
-  iconUrl:null,
+   * Text of the button.
+   * @type {string}
+   */
+  title: null,
 
   /**
-  * A CSS class to apply to the icon.
-  * ^optional
-  * @type {string}
-  */
-  iconClass:null,
+   * A CSS class to apply to the action button.
+   * ^optional
+   * @type {string}
+   */
+  className: null,
 
   /**
-  * The tooltip text to show when the user hovers over the icon.
-  * ^optional
-  * @type {string}
-  */
-  tooltip:null
-};
-
-
-/**
-* @class
-* This type is used to modify {ThreadRowView}'s which represent drafts.
-*/
-var ThreadRowDateDescriptor = /** @lends ThreadRowDateDescriptor */{
+   * A handler that gets called when the action button is clicked on.
+   * ^optional
+   * @type {func(event)}
+   */
+  onClick: null,
 
   /**
-  * The date text to replace with.
-  * @type {string}
-  */
-  text:null,
-
-  /**
-  * The text color of the replaced date text.
-  * ^optional
-  * @type {string}
-  */
-  textColor:null,
-
-  /**
-  * The tooltip text to show when the user hovers over the date.
-  * ^optional
-  * @type {string}
-  */
-  tooltip:null
+   * For LINK action buttons only. This is the URL to open when the button is clicked.
+   * @type {string}
+   */
+  url: null
 };
 
 /**
-* @class
-* This type is used to describe a modification you can do to a {ThreadRowView}.
-*/
-var ThreadRowDraftLabelDescriptor = /** @lends ThreadRowDraftLabelDescriptor */{
+ * @class
+ * This type is used to describe an icon you add to a {ThreadRowView}.
+ */
+var ThreadRowAttachmentIconDescriptor = /** @lends ThreadRowAttachmentIconDescriptor */ {
+  /**
+   * URL for the icon to show on in the attachments column. Should be a local extension file URL or a HTTPS URL.
+   * ^optional
+   * @type {string}
+   */
+  iconUrl: null,
 
   /**
-  * The text to replace "Draft" with.
-  * @type {string}
-  */
-  text:null,
+   * A CSS class to apply to the icon.
+   * ^optional
+   * @type {string}
+   */
+  iconClass: null,
 
   /**
-  * The number to show in parentheses next to "Draft". No number will be shown
-  * if this is 1.
-  * ^optional
-  * ^default=1
-  * @type {string}
-  */
-  count:null
+   * The tooltip text to show when the user hovers over the icon.
+   * ^optional
+   * @type {string}
+   */
+  tooltip: null
+};
+
+/**
+ * @class
+ * This type is used to modify {ThreadRowView}'s which represent drafts.
+ */
+var ThreadRowDateDescriptor = /** @lends ThreadRowDateDescriptor */ {
+  /**
+   * The date text to replace with.
+   * @type {string}
+   */
+  text: null,
+
+  /**
+   * The text color of the replaced date text.
+   * ^optional
+   * @type {string}
+   */
+  textColor: null,
+
+  /**
+   * The tooltip text to show when the user hovers over the date.
+   * ^optional
+   * @type {string}
+   */
+  tooltip: null
+};
+
+/**
+ * @class
+ * This type is used to describe a modification you can do to a {ThreadRowView}.
+ */
+var ThreadRowDraftLabelDescriptor = /** @lends ThreadRowDraftLabelDescriptor */ {
+  /**
+   * The text to replace "Draft" with.
+   * @type {string}
+   */
+  text: null,
+
+  /**
+   * The number to show in parentheses next to "Draft". No number will be shown
+   * if this is 1.
+   * ^optional
+   * ^default=1
+   * @type {string}
+   */
+  count: null
 };

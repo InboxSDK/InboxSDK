@@ -6,7 +6,7 @@ import EventEmitter from '../lib/safe-event-emitter';
 const memberMap = new WeakMap();
 
 export default class TopMessageBarView extends EventEmitter {
-  constructor(options: {topMessageBarViewDriver: Object}) {
+  constructor(options: { topMessageBarViewDriver: Object }) {
     super();
     const members = {
       driver: options.topMessageBarViewDriver

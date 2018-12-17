@@ -1,6 +1,6 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import rateLimitQueuer from '../../common/rate-limit-queuer';
 import ajax from '../../common/ajax';
 

@@ -1,13 +1,16 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 
 class GmailBackdrop {
-  _stopper: Kefir.Observable<null>&{destroy():void} = kefirStopper();
+  _stopper: Kefir.Observable<null> & { destroy(): void } = kefirStopper();
 
-  constructor(zIndex: number = 500, target: HTMLElement = (document.body: any)) {
+  constructor(
+    zIndex: number = 500,
+    target: HTMLElement = (document.body: any)
+  ) {
     const el = document.createElement('div');
     el.className = 'Kj-JD-Jh inboxsdk__modal_overlay';
     el.style.zIndex = String(zIndex);

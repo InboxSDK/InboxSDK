@@ -3,8 +3,8 @@
 const cproc = require('child_process');
 
 // Executes a process and captures stdout.
-export default function exec(cmd: string, options:Object={}): Promise<any> {
-  const {passStdErr} = options;
+export default function exec(cmd: string, options: Object = {}): Promise<any> {
+  const { passStdErr } = options;
   return new Promise((resolve, reject) => {
     cproc.exec(cmd, (err, stdout, stderr) => {
       if (err) {
@@ -14,9 +14,8 @@ export default function exec(cmd: string, options:Object={}): Promise<any> {
         reject(err);
       } else {
         if (passStdErr) {
-          resolve({stdout, stderr});
-        }
-        else {
+          resolve({ stdout, stderr });
+        } else {
           if (stderr) {
             process.stderr.write(stderr);
           }

@@ -23,7 +23,7 @@ import {
   page20160810,
   page20160810_2,
   page20160818_2,
-  page20160819,
+  page20160819
 } from '../lib/pages';
 
 describe('Inbox Message Detection', () => {
@@ -37,7 +37,10 @@ describe('Inbox Message Detection', () => {
     });
 
     it('2016-06-20 fullscreen and bundled inline', () => {
-      const message = querySelector(pageFullscreen20160620(), '[data-test-id=message]');
+      const message = querySelector(
+        pageFullscreen20160620(),
+        '[data-test-id=message]'
+      );
 
       const results = finder(pageFullscreen20160620());
       expect(results.length).toBe(1);
@@ -86,18 +89,25 @@ describe('Inbox Message Detection', () => {
       expect(results.attributes.loaded).toBe(true);
       expect(results.attributes.isDraft).toBe(false);
       expect(results.attributes.viewState).toBe('EXPANDED');
-      expect(results.attributes.inboxMessageId).toBe('msg-f:1512997563584199246');
+      expect(results.attributes.inboxMessageId).toBe(
+        'msg-f:1512997563584199246'
+      );
     });
 
     it('2016-06-20 bundled inline', () => {
-      const message = querySelector(pageFullscreen20160620(), '[data-test-id=message]');
+      const message = querySelector(
+        pageFullscreen20160620(),
+        '[data-test-id=message]'
+      );
       const results = parser(message);
       expect(results.errors).toEqual([]);
       expect(results.score).toBe(1);
       expect(results.attributes.loaded).toBe(true);
       expect(results.attributes.isDraft).toBe(false);
       expect(results.attributes.viewState).toBe('EXPANDED');
-      expect(results.attributes.inboxMessageId).toBe('msg-f:1513306953051471524');
+      expect(results.attributes.inboxMessageId).toBe(
+        'msg-f:1513306953051471524'
+      );
     });
 
     it('2016-08-10 message', () => {
@@ -108,7 +118,9 @@ describe('Inbox Message Detection', () => {
       expect(results.attributes.loaded).toBe(true);
       expect(results.attributes.isDraft).toBe(false);
       expect(results.attributes.viewState).toBe('EXPANDED');
-      expect(results.attributes.inboxMessageId).toBe('msg-f:1542295687109342844');
+      expect(results.attributes.inboxMessageId).toBe(
+        'msg-f:1542295687109342844'
+      );
     });
 
     it('2016-08-10 message with attachments', () => {
@@ -119,7 +131,9 @@ describe('Inbox Message Detection', () => {
       expect(results.attributes.loaded).toBe(true);
       expect(results.attributes.isDraft).toBe(false);
       expect(results.attributes.viewState).toBe('EXPANDED');
-      expect(results.attributes.inboxMessageId).toBe('msg-a:r7822902296672552911');
+      expect(results.attributes.inboxMessageId).toBe(
+        'msg-a:r7822902296672552911'
+      );
     });
 
     it('2016-08-18', () => {
@@ -130,7 +144,9 @@ describe('Inbox Message Detection', () => {
       expect(results.attributes.loaded).toBe(true);
       expect(results.attributes.isDraft).toBe(false);
       expect(results.attributes.viewState).toBe('EXPANDED');
-      expect(results.attributes.inboxMessageId).toBe('msg-f:1542955973201340003');
+      expect(results.attributes.inboxMessageId).toBe(
+        'msg-f:1542955973201340003'
+      );
     });
 
     it('2016-08-19 draft in thread', () => {
@@ -139,7 +155,9 @@ describe('Inbox Message Detection', () => {
       expect(results.errors).toEqual([]);
       expect(results.score).toBe(1);
       expect(results.attributes.isDraft).toBe(true);
-      expect(results.attributes.inboxMessageId).toBe('msg-a:r-663027805731183423');
+      expect(results.attributes.inboxMessageId).toBe(
+        'msg-a:r-663027805731183423'
+      );
     });
   });
 
@@ -149,19 +167,34 @@ describe('Inbox Message Detection', () => {
 
       const spy = sinon.spy();
       const root = page20160614();
-      const liveSet = makePageParserTree(null, root).tree.getAllByTag('message');
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag(
+        'message'
+      );
       expect(liveSet.values().size).toBe(1);
-      expect(lsMap(liveSet, x => x.getValue()).values().has(message)).toBe(true);
+      expect(
+        lsMap(liveSet, x => x.getValue())
+          .values()
+          .has(message)
+      ).toBe(true);
     });
 
     it('2016-06-20 fullscreen and bundled inline', () => {
-      const message = querySelector(pageFullscreen20160620(), '[data-test-id=message]');
+      const message = querySelector(
+        pageFullscreen20160620(),
+        '[data-test-id=message]'
+      );
 
       const spy = sinon.spy();
       const root = pageFullscreen20160620();
-      const liveSet = makePageParserTree(null, root).tree.getAllByTag('message');
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag(
+        'message'
+      );
       expect(liveSet.values().size).toBe(1);
-      expect(lsMap(liveSet, x => x.getValue()).values().has(message)).toBe(true);
+      expect(
+        lsMap(liveSet, x => x.getValue())
+          .values()
+          .has(message)
+      ).toBe(true);
     });
 
     it('2016-08-10 message', () => {
@@ -169,9 +202,15 @@ describe('Inbox Message Detection', () => {
 
       const spy = sinon.spy();
       const root = page20160810();
-      const liveSet = makePageParserTree(null, root).tree.getAllByTag('message');
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag(
+        'message'
+      );
       expect(liveSet.values().size).toBe(1);
-      expect(lsMap(liveSet, x => x.getValue()).values().has(message)).toBe(true);
+      expect(
+        lsMap(liveSet, x => x.getValue())
+          .values()
+          .has(message)
+      ).toBe(true);
     });
 
     it('2016-08-10 message with attachments', () => {
@@ -179,9 +218,15 @@ describe('Inbox Message Detection', () => {
 
       const spy = sinon.spy();
       const root = page20160810_2();
-      const liveSet = makePageParserTree(null, root).tree.getAllByTag('message');
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag(
+        'message'
+      );
       expect(liveSet.values().size).toBe(1);
-      expect(lsMap(liveSet, x => x.getValue()).values().has(message)).toBe(true);
+      expect(
+        lsMap(liveSet, x => x.getValue())
+          .values()
+          .has(message)
+      ).toBe(true);
     });
 
     it('2016-08-18', () => {
@@ -189,9 +234,15 @@ describe('Inbox Message Detection', () => {
 
       const spy = sinon.spy();
       const root = page20160818_2();
-      const liveSet = makePageParserTree(null, root).tree.getAllByTag('message');
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag(
+        'message'
+      );
       expect(liveSet.values().size).toBe(1);
-      expect(lsMap(liveSet, x => x.getValue()).values().has(message)).toBe(true);
+      expect(
+        lsMap(liveSet, x => x.getValue())
+          .values()
+          .has(message)
+      ).toBe(true);
     });
 
     it('2016-08-19 draft in thread', () => {
@@ -199,9 +250,15 @@ describe('Inbox Message Detection', () => {
 
       const spy = sinon.spy();
       const root = page20160819();
-      const liveSet = makePageParserTree(null, root).tree.getAllByTag('message');
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag(
+        'message'
+      );
       expect(liveSet.values().size).toBe(1);
-      expect(lsMap(liveSet, x => x.getValue()).values().has(message)).toBe(true);
+      expect(
+        lsMap(liveSet, x => x.getValue())
+          .values()
+          .has(message)
+      ).toBe(true);
     });
   });
 });

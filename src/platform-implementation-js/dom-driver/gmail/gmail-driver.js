@@ -283,15 +283,14 @@ class GmailDriver {
   }
   getAttachmentCardViewDriverStream() {
     return this._messageViewDriverStream
-      .flatMap(
-        messageViewDriver =>
-          messageViewDriver.isLoaded()
-            ? Kefir.constant(messageViewDriver)
-            : messageViewDriver
-                .getEventStream()
-                .filter(event => event.eventName === 'messageLoad')
-                .map(() => messageViewDriver)
-                .take(1)
+      .flatMap(messageViewDriver =>
+        messageViewDriver.isLoaded()
+          ? Kefir.constant(messageViewDriver)
+          : messageViewDriver
+              .getEventStream()
+              .filter(event => event.eventName === 'messageLoad')
+              .map(() => messageViewDriver)
+              .take(1)
       )
       .map(messageView => messageView.getAttachmentCardViewDrivers())
       .flatten();
@@ -542,13 +541,24 @@ class GmailDriver {
     }
   }
 
-  getNextComposeViewDriver(timeout: number = 10 * 1000): Promise<GmailComposeView> {
+  getNextComposeViewDriver(
+    timeout: number = 10 * 1000
+  ): Promise<GmailComposeView> {
     return this._composeViewDriverStream
       .merge(
-        Kefir.later(timeout, new Error('Reached timeout while waiting for getNextComposeViewDriver'))
+        Kefir.later(
+          timeout,
+          new Error(
+            'Reached timeout while waiting for getNextComposeViewDriver'
+          )
+        )
       )
-      .beforeEnd(() => new Error('Driver was shut down before a new compose was found'))
-      .flatMap(x => x instanceof Error ? Kefir.constantError(x) : Kefir.constant(x))
+      .beforeEnd(
+        () => new Error('Driver was shut down before a new compose was found')
+      )
+      .flatMap(x =>
+        x instanceof Error ? Kefir.constantError(x) : Kefir.constant(x)
+      )
       .take(1)
       .takeErrors(1)
       .toPromise();

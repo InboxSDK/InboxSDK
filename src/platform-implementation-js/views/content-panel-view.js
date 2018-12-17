@@ -15,7 +15,7 @@ export default class ContentPanelView extends EventEmitter {
   constructor(contentPanelViewImplementation: ContentPanelViewDriver) {
     super();
 
-    const members = {contentPanelViewImplementation};
+    const members = { contentPanelViewImplementation };
     membersMap.set(this, members);
 
     this._bindToStreamEvents();
@@ -38,8 +38,11 @@ export default class ContentPanelView extends EventEmitter {
   }
 
   _bindToStreamEvents() {
-    const stream: Kefir.Observable<any> = get(membersMap, this).contentPanelViewImplementation.getEventStream();
-    stream.onValue(({eventName}) => {
+    const stream: Kefir.Observable<any> = get(
+      membersMap,
+      this
+    ).contentPanelViewImplementation.getEventStream();
+    stream.onValue(({ eventName }) => {
       this.emit(eventName);
     });
     stream.onEnd(() => {
@@ -47,5 +50,4 @@ export default class ContentPanelView extends EventEmitter {
       this.emit('destroy');
     });
   }
-
 }

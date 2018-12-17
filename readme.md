@@ -67,7 +67,7 @@ happen for Streak users (by checking the extension's appId with the
 `isStreakAppId.js` function). Same rule of thumb applies for logging ajax
 request/responses too (see `censorJSONTree`).
 
-See the *Querying for Error Logs* section below for instructions on reading the
+See the _Querying for Error Logs_ section below for instructions on reading the
 logged errors and their details.
 
 Whenever we update our code for a new Gmail version that isn't completely
@@ -78,7 +78,7 @@ should even work on the censored HTML directly from an error report! Maybe in
 the future for specific errors, we could automate the process of taking the censored HTML from an error report and creating a new failing test case using
 it.)
 
-----------------
+---
 
 # Querying for Error Logs
 

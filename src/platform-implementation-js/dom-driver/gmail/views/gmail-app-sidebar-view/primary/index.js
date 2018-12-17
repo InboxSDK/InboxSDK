@@ -15,7 +15,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import AppSidebar from '../../../../../driver-common/sidebar/AppSidebar';
-import type {PanelDescriptor} from '../../../../../driver-common/sidebar/AppSidebar';
+import type { PanelDescriptor } from '../../../../../driver-common/sidebar/AppSidebar';
 
 import type GmailDriver from '../../../gmail-driver';
 import GmailElementGetter from '../../../gmail-element-getter';
@@ -377,8 +377,7 @@ class GmailAppSidebarPrimary {
           querySelector(
             buttonContainer,
             '.inboxsdk__button_selectedIndicator'
-          ).style.backgroundColor =
-            event.detail.primaryColor;
+          ).style.backgroundColor = event.detail.primaryColor;
         }
 
         if (isGlobal) {

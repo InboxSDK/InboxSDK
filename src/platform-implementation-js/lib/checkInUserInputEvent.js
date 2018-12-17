@@ -7,7 +7,9 @@ const UIEvent = global.UIEvent;
 // function to only be called in response to a user action.
 export default function checkInUserInputEvent() {
   if (!isInUserInputEvent()) {
-    throw new Error('This function is restricted so it may only be called during a user input event.');
+    throw new Error(
+      'This function is restricted so it may only be called during a user input event.'
+    );
   }
 }
 

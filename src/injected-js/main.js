@@ -6,7 +6,7 @@ if (!global.__InboxSDKInjected) {
   const logger = require('./injected-logger');
   let oldDefine;
   try {
-    if (typeof define !== "undefined" && define && define.amd) {
+    if (typeof define !== 'undefined' && define && define.amd) {
       // work around amd compatibility issue
       // https://groups.google.com/forum/#!msg/inboxsdk/U_bq82Exmwc/I3iIinxxCAAJ
       oldDefine = define;
@@ -28,7 +28,9 @@ if (!global.__InboxSDKInjected) {
     const setupComposeViewDraftIDFinder = require('./inbox/setupComposeViewDraftIDFinder');
     const setupInboxAjaxInterceptor = require('./inbox/setupAjaxInterceptor');
 
-    const pageOrigin: string = (process.env.NODE_ENV === 'test' && global.__test_origin) || document.location.origin;
+    const pageOrigin: string =
+      (process.env.NODE_ENV === 'test' && global.__test_origin) ||
+      document.location.origin;
 
     if (pageOrigin === 'https://mail.google.com') {
       gmailInterceptor();
@@ -39,7 +41,7 @@ if (!global.__InboxSDKInjected) {
       setupComposeViewDraftIDFinder();
       setupInboxAjaxInterceptor();
     } else {
-      throw new Error("Should not happen");
+      throw new Error('Should not happen');
     }
 
     xhrHelper();
@@ -49,7 +51,7 @@ if (!global.__InboxSDKInjected) {
     setupCustomViewEventAssassin();
     setupPushStateListener();
     setupInboxCustomViewLinkFixer();
-  } catch(err) {
+  } catch (err) {
     logger.error(err);
   } finally {
     if (oldDefine) {

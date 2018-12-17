@@ -7,10 +7,8 @@ import ajax from './ajax';
 import delay from 'pdelay';
 
 const isContentScript: () => boolean = once(function() {
-  if (global.chrome && global.chrome.extension)
-    return true;
-  if (global.safari && global.safari.extension)
-    return true;
+  if (global.chrome && global.chrome.extension) return true;
+  if (global.safari && global.safari.extension) return true;
   return false;
 });
 
@@ -22,17 +20,30 @@ function addScriptToPage(url: string, cors: boolean): Promise<void> {
   }
 
   const promise = new Promise(function(resolve, reject) {
-    script.addEventListener('error', function(event:any) {
-      reject(event.error ||
-        new (Error:any)(
-          event.message || "Load failure: "+url,
-          event.filename, event.lineno, event.column));
-    }, false);
-    script.addEventListener('load', function() {
-      // Make sure the script has a moment to execute before this promise
-      // resolves.
-      setTimeout(resolve, 1);
-    }, false);
+    script.addEventListener(
+      'error',
+      function(event: any) {
+        reject(
+          event.error ||
+            new (Error: any)(
+              event.message || 'Load failure: ' + url,
+              event.filename,
+              event.lineno,
+              event.column
+            )
+        );
+      },
+      false
+    );
+    script.addEventListener(
+      'load',
+      function() {
+        // Make sure the script has a moment to execute before this promise
+        // resolves.
+        setTimeout(resolve, 1);
+      },
+      false
+    );
   });
 
   script.src = url;
@@ -45,20 +56,25 @@ export type LoadScriptOptions = {
   // By default, the script is executed within a function, so that top-level
   // variables defined in it don't become global variables. Setting nowrap to
   // true disables this behavior.
-  nowrap?: boolean;
-  disableSourceMappingURL?: boolean;
+  nowrap?: boolean,
+  disableSourceMappingURL?: boolean
 };
 
-export default function loadScript(url: string, opts?: LoadScriptOptions): Promise<void> {
+export default function loadScript(
+  url: string,
+  opts?: LoadScriptOptions
+): Promise<void> {
   let pr;
   if (isContentScript()) {
     const attempt = function(retryNum: number, lastErr: ?Error): Promise<void> {
       if (retryNum > 3) {
-        throw lastErr || new Error("Ran out of loadScript attempts for unknown reason");
+        throw lastErr ||
+          new Error('Ran out of loadScript attempts for unknown reason');
       }
 
       return ajax({
-        url, cachebust: retryNum > 0
+        url,
+        cachebust: retryNum > 0
       }).then(response => {
         // Q: Why put the code into a function before executing it instead of
         //    evaling it immediately?
@@ -77,31 +93,40 @@ export default function loadScript(url: string, opts?: LoadScriptOptions): Promi
         let codeParts = [];
         if (opts && opts.disableSourceMappingURL) {
           // Don't remove a data: URI sourcemap (used in dev)
-          codeParts.push(originalCode.replace(/\/\/# sourceMappingURL=(?!data:)[^\n]*\n?$/, ''));
+          codeParts.push(
+            originalCode.replace(
+              /\/\/# sourceMappingURL=(?!data:)[^\n]*\n?$/,
+              ''
+            )
+          );
         } else {
           codeParts.push(originalCode);
         }
 
         if (!opts || !opts.nowrap) {
-          codeParts.unshift("(function(){");
-          codeParts.push("\n});");
+          codeParts.unshift('(function(){');
+          codeParts.push('\n});');
         }
 
-        codeParts.push("\n//# sourceURL="+url+"\n");
+        codeParts.push('\n//# sourceURL=' + url + '\n');
 
         const codeToRun = codeParts.join('');
         let program;
         try {
           program = indirectEval(codeToRun);
-        } catch(err) {
+        } catch (err) {
           if (err && err.name === 'SyntaxError') {
-            logError(err, {
-              retryNum,
-              caughtSyntaxError: true,
-              url,
-              message: `SyntaxError in loading ${url}. Did we not load it fully? Trying again...`
-            }, {});
-            return delay(5000).then(() => attempt(retryNum+1, err));
+            logError(
+              err,
+              {
+                retryNum,
+                caughtSyntaxError: true,
+                url,
+                message: `SyntaxError in loading ${url}. Did we not load it fully? Trying again...`
+              },
+              {}
+            );
+            return delay(5000).then(() => attempt(retryNum + 1, err));
           }
           // SyntaxErrors are the only errors that can happen during eval that we
           // retry because sometimes AppEngine doesn't serve the full javascript.
@@ -120,19 +145,28 @@ export default function loadScript(url: string, opts?: LoadScriptOptions): Promi
     pr = addScriptToPage(url, true).catch(() => {
       // Only show the warning if we successfully load the script on retry.
       return addScriptToPage(url, false).then(() => {
-        console.warn("Script "+url+" included without CORS headers. Error logs might be censored by the browser."); //eslint-disable-line no-console
+        // eslint-disable-next-line no-console
+        console.warn(
+          'Script ' +
+            url +
+            ' included without CORS headers. Error logs might be censored by the browser.'
+        );
       });
     });
   }
   pr.catch(err => {
     return connectivityTest().then(connectivityTestResults => {
-      logError(err, {
-        url,
-        connectivityTestResults,
-        status: err && err.status,
-        response: (err && err.xhr) ? err.xhr.responseText : null,
-        message: 'Failed to load script'
-      }, {});
+      logError(
+        err,
+        {
+          url,
+          connectivityTestResults,
+          status: err && err.status,
+          response: err && err.xhr ? err.xhr.responseText : null,
+          message: 'Failed to load script'
+        },
+        {}
+      );
     });
   });
   return pr;

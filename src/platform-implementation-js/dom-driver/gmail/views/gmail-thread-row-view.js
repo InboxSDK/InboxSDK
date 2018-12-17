@@ -7,18 +7,18 @@ import includes from 'lodash/includes';
 import intersection from 'lodash/intersection';
 import uniqBy from 'lodash/uniqBy';
 import flatMap from 'lodash/flatMap';
-import {defn, defonce} from 'ud';
+import { defn, defonce } from 'ud';
 import assert from 'assert';
 import Kefir from 'kefir';
 import asap from 'asap';
 import kefirBus from 'kefir-bus';
-import type {Bus} from 'kefir-bus';
+import type { Bus } from 'kefir-bus';
 
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import kefirCast from 'kefir-cast';
-import type {ThreadRowViewDriver} from '../../../driver-interfaces/thread-row-view-driver';
+import type { ThreadRowViewDriver } from '../../../driver-interfaces/thread-row-view-driver';
 import delayAsap from '../../../lib/delay-asap';
 import kefirStopper from 'kefir-stopper';
 
@@ -31,23 +31,40 @@ import type GmailRowListView from './gmail-row-list-view';
 
 import updateIcon from '../../../driver-common/update-icon';
 
-type LabelMod = {gmailLabelView: Object, remove(): void};
-type ActionButtonMod = {gmailActionButtonView: GmailActionButtonView, remove(): void};
-type ButtonMod = {buttonSpan: HTMLElement, iconSettings: Object, remove(): void};
-type ImageMod = {iconSettings: Object, iconWrapper: HTMLElement, remove(): void};
-type ReplacedDateMod = {el: HTMLElement, remove(): void};
+type LabelMod = { gmailLabelView: Object, remove(): void };
+type ActionButtonMod = {
+  gmailActionButtonView: GmailActionButtonView,
+  remove(): void
+};
+type ButtonMod = {
+  buttonSpan: HTMLElement,
+  iconSettings: Object,
+  remove(): void
+};
+type ImageMod = {
+  iconSettings: Object,
+  iconWrapper: HTMLElement,
+  remove(): void
+};
+type ReplacedDateMod = { el: HTMLElement, remove(): void };
 type ReplacedDraftLabelMod = ReplacedDateMod;
 
 type Mods = {
-  label: {unclaimed: LabelMod[], claimed: LabelMod[]};
-  action: {unclaimed: ActionButtonMod[], claimed: ActionButtonMod[]};
-  button: {unclaimed: ButtonMod[], claimed: ButtonMod[]};
-  image: {unclaimed: ImageMod[], claimed: ImageMod[]};
-  replacedDate: {unclaimed: ReplacedDateMod[], claimed: ReplacedDateMod[]};
-  replacedDraftLabel: {unclaimed: ReplacedDraftLabelMod[], claimed: ReplacedDraftLabelMod[]};
+  label: { unclaimed: LabelMod[], claimed: LabelMod[] },
+  action: { unclaimed: ActionButtonMod[], claimed: ActionButtonMod[] },
+  button: { unclaimed: ButtonMod[], claimed: ButtonMod[] },
+  image: { unclaimed: ImageMod[], claimed: ImageMod[] },
+  replacedDate: { unclaimed: ReplacedDateMod[], claimed: ReplacedDateMod[] },
+  replacedDraftLabel: {
+    unclaimed: ReplacedDraftLabelMod[],
+    claimed: ReplacedDraftLabelMod[]
+  }
 };
 
-const cachedModificationsByRow: WeakMap<HTMLElement, Mods> = defonce(module, () => new WeakMap());
+const cachedModificationsByRow: WeakMap<HTMLElement, Mods> = defonce(
+  module,
+  () => new WeakMap()
+);
 
 function focusAndNoPropagation(event) {
   this.focus();
@@ -62,10 +79,21 @@ function starGroupEventInterceptor(event) {
     if (!isOnSDKButton || event.type == 'mouseover') {
       const newEvent: Object = document.createEvent('MouseEvents');
       newEvent.initMouseEvent(
-        event.type, event.bubbles, event.cancelable, event.view,
-        event.detail, event.screenX, event.screenY, event.clientX, event.clientY,
-        event.ctrlKey, event.altKey, event.shiftKey, event.metaKey,
-        event.button, event.relatedTarget
+        event.type,
+        event.bubbles,
+        event.cancelable,
+        event.view,
+        event.detail,
+        event.screenX,
+        event.screenY,
+        event.clientX,
+        event.clientY,
+        event.ctrlKey,
+        event.altKey,
+        event.shiftKey,
+        event.metaKey,
+        event.button,
+        event.relatedTarget
       );
       this.parentElement.dispatchEvent(newEvent);
     }
@@ -73,8 +101,8 @@ function starGroupEventInterceptor(event) {
 }
 
 type Counts = {
-  messageCount: number;
-  draftCount: number;
+  messageCount: number,
+  draftCount: number
 };
 
 class GmailThreadRowView {
@@ -97,27 +125,30 @@ class GmailThreadRowView {
   _isVertical: boolean;
   _isDestroyed: boolean = false;
 
-  constructor(element: HTMLElement, rowListViewDriver: GmailRowListView, gmailDriver: GmailDriver) {
+  constructor(
+    element: HTMLElement,
+    rowListViewDriver: GmailRowListView,
+    gmailDriver: GmailDriver
+  ) {
     (this: ThreadRowViewDriver);
     assert(element.hasAttribute('id'), 'check element is main thread row');
 
-    this._isVertical = intersection(Array.from(element.classList), ['zA','apv']).length === 2;
+    this._isVertical =
+      intersection(Array.from(element.classList), ['zA', 'apv']).length === 2;
     if (this._isVertical) {
       const threadRow2 = element.nextElementSibling;
 
-      if(!threadRow2) throw new Error('threadRow2 not found');
+      if (!threadRow2) throw new Error('threadRow2 not found');
 
       const threadRow3 = threadRow2.nextElementSibling;
-      const has3Rows = (threadRow3 && threadRow3.classList.contains('apw'));
-      this._elements = has3Rows ?
-        [
-          element,
-          (element:any).nextElementSibling,
-          (element:any).nextElementSibling.nextElementSibling
-        ] : [
-          element,
-          (element:any).nextElementSibling
-        ];
+      const has3Rows = threadRow3 && threadRow3.classList.contains('apw');
+      this._elements = has3Rows
+        ? [
+            element,
+            (element: any).nextElementSibling,
+            (element: any).nextElementSibling.nextElementSibling
+          ]
+        : [element, (element: any).nextElementSibling];
     } else {
       this._elements = [element];
     }
@@ -126,12 +157,12 @@ class GmailThreadRowView {
     if (!modifications) {
       this._alreadyHadModifications = false;
       this._modifications = {
-        label: {unclaimed: [], claimed: []},
-        action: {unclaimed: [], claimed: []},
-        button: {unclaimed: [], claimed: []},
-        image: {unclaimed: [], claimed: []},
-        replacedDate: {unclaimed: [], claimed: []},
-        replacedDraftLabel: {unclaimed: [], claimed: []}
+        label: { unclaimed: [], claimed: [] },
+        action: { unclaimed: [], claimed: [] },
+        button: { unclaimed: [], claimed: [] },
+        image: { unclaimed: [], claimed: [] },
+        replacedDate: { unclaimed: [], claimed: [] },
+        replacedDraftLabel: { unclaimed: [], claimed: [] }
       };
       cachedModificationsByRow.set(this._elements[0], this._modifications);
     } else {
@@ -155,40 +186,47 @@ class GmailThreadRowView {
   }
 
   destroy() {
-    if(!this._elements.length){
+    if (!this._elements.length) {
       return;
     }
 
     this._isDestroyed = true;
 
-    this._modifications.label.unclaimed = this._modifications.label.claimed
-      .concat(this._modifications.label.unclaimed);
+    this._modifications.label.unclaimed = this._modifications.label.claimed.concat(
+      this._modifications.label.unclaimed
+    );
     this._modifications.label.claimed.length = 0;
 
-    this._modifications.action.unclaimed = this._modifications.action.claimed
-      .concat(this._modifications.action.unclaimed);
+    this._modifications.action.unclaimed = this._modifications.action.claimed.concat(
+      this._modifications.action.unclaimed
+    );
     this._modifications.action.claimed.length = 0;
 
-    this._modifications.button.unclaimed = this._modifications.button.claimed
-      .concat(this._modifications.button.unclaimed);
+    this._modifications.button.unclaimed = this._modifications.button.claimed.concat(
+      this._modifications.button.unclaimed
+    );
     this._modifications.button.claimed.length = 0;
 
-    this._modifications.image.unclaimed = this._modifications.image.claimed
-      .concat(this._modifications.image.unclaimed);
+    this._modifications.image.unclaimed = this._modifications.image.claimed.concat(
+      this._modifications.image.unclaimed
+    );
     this._modifications.image.claimed.length = 0;
 
-    this._modifications.replacedDate.unclaimed = this._modifications.replacedDate.claimed
-      .concat(this._modifications.replacedDate.unclaimed);
+    this._modifications.replacedDate.unclaimed = this._modifications.replacedDate.claimed.concat(
+      this._modifications.replacedDate.unclaimed
+    );
     this._modifications.replacedDate.claimed.length = 0;
 
-    this._modifications.replacedDraftLabel.unclaimed = this._modifications.replacedDraftLabel.claimed
-      .concat(this._modifications.replacedDraftLabel.unclaimed);
+    this._modifications.replacedDraftLabel.unclaimed = this._modifications.replacedDraftLabel.claimed.concat(
+      this._modifications.replacedDraftLabel.unclaimed
+    );
     this._modifications.replacedDraftLabel.claimed.length = 0;
 
-    flatMap(this._elements, el => Array.from(el.getElementsByClassName('inboxsdk__thread_row_addition')))
-      .forEach(el => {
-        el.remove();
-      });
+    flatMap(this._elements, el =>
+      Array.from(el.getElementsByClassName('inboxsdk__thread_row_addition'))
+    ).forEach(el => {
+      el.remove();
+    });
 
     this._stopper.destroy();
     this._elements.length = 0;
@@ -210,18 +248,20 @@ class GmailThreadRowView {
   // make sure you take until by on the gmailThreadRowView.getStopper() because waitForReady
   // must not be called after the gmailThreadRowView is destroyed
   waitForReady(): Kefir.Observable<GmailThreadRowView> {
-    const time = [0,10,100,1000,15000];
+    const time = [0, 10, 100, 1000, 15000];
     const step = () => {
       if (this._threadIdReady()) {
         asap(() => {
-          if (this._elements.length)
-            this._removeUnclaimedModifications();
+          if (this._elements.length) this._removeUnclaimedModifications();
         });
         return Kefir.constant(this);
       } else {
         const stepTime = time.shift();
         if (stepTime == undefined) {
-          console.log('Should not happen: ThreadRowViewDriver never became ready', this);
+          console.log(
+            'Should not happen: ThreadRowViewDriver never became ready',
+            this
+          );
           return Kefir.never();
         } else {
           return Kefir.later(stepTime).flatMap(step);
@@ -238,30 +278,45 @@ class GmailThreadRowView {
 
   getCounts(): Counts {
     let counts = this._counts;
-    if(!counts){
+    if (!counts) {
       const recipientsElement = querySelector(this._elements[0], 'td div.yW');
 
-      if(this._driver.isUsingSyncAPI()){
+      if (this._driver.isUsingSyncAPI()) {
         const draftCount = recipientsElement.querySelectorAll('.boq').length;
-        const messageCountMatch = recipientsElement.innerHTML.match(/\((\d+)\)$/);
-        const messageCount =
-          messageCountMatch ?
-            +messageCountMatch[1] :
-          draftCount ? 0 : 1;
+        const messageCountMatch = recipientsElement.innerHTML.match(
+          /\((\d+)\)$/
+        );
+        const messageCount = messageCountMatch
+          ? +messageCountMatch[1]
+          : draftCount
+          ? 0
+          : 1;
 
-        counts = this._counts = {messageCount, draftCount};
-      }
-      else {
-        const [preDrafts, drafts] = recipientsElement.innerHTML.split(/<font color=[^>]+>[^>]+<\/font>/);
+        counts = this._counts = { messageCount, draftCount };
+      } else {
+        const [preDrafts, drafts] = recipientsElement.innerHTML.split(
+          /<font color=[^>]+>[^>]+<\/font>/
+        );
 
-        const preDraftsWithoutNames = preDrafts.replace(/<span\b[^>]*>.*?<\/span>/g, '');
+        const preDraftsWithoutNames = preDrafts.replace(
+          /<span\b[^>]*>.*?<\/span>/g,
+          ''
+        );
 
         const messageCountMatch = preDraftsWithoutNames.match(/\((\d+)\)/);
-        const messageCount = messageCountMatch ? +messageCountMatch[1] : (preDrafts ? 1 : 0);
+        const messageCount = messageCountMatch
+          ? +messageCountMatch[1]
+          : preDrafts
+          ? 1
+          : 0;
 
         const draftCountMatch = drafts && drafts.match(/\((\d+)\)/);
-        const draftCount = draftCountMatch ? +draftCountMatch[1] : (drafts != null ? 1 : 0);
-        counts = this._counts = {messageCount, draftCount};
+        const draftCount = draftCountMatch
+          ? +draftCountMatch[1]
+          : drafts != null
+          ? 1
+          : 0;
+        counts = this._counts = { messageCount, draftCount };
       }
     }
 
@@ -277,68 +332,88 @@ class GmailThreadRowView {
       console.warn('addLabel called on destroyed thread row');
       return;
     }
-    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, label)
+      .takeUntilBy(this._stopper)
+      .toProperty();
     let labelMod = null;
 
-    prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([labelDescriptor]) => {
-      if(!labelDescriptor){
-        if (labelMod) {
-          labelMod.remove();
-          this._modifications.label.claimed.splice(
-            this._modifications.label.claimed.indexOf(labelMod), 1);
-          labelMod = null;
-        }
-      } else {
-        if (!labelMod) {
-          labelMod = this._modifications.label.unclaimed.shift();
+    prop
+      .combine(this._getRefresher())
+      .takeUntilBy(this._stopper)
+      .onValue(([labelDescriptor]) => {
+        if (!labelDescriptor) {
+          if (labelMod) {
+            labelMod.remove();
+            this._modifications.label.claimed.splice(
+              this._modifications.label.claimed.indexOf(labelMod),
+              1
+            );
+            labelMod = null;
+          }
+        } else {
           if (!labelMod) {
-            const gmailLabelView = new GmailLabelView({
-              classes: ['inboxsdk__thread_row_label']
-            });
-            const el = gmailLabelView.getElement();
-            labelMod = {
-              gmailLabelView,
-              remove: el.remove.bind(el)
-            };
-          }
-          this._modifications.label.claimed.push(labelMod);
-        }
-
-        labelMod.gmailLabelView.updateLabelDescriptor(labelDescriptor);
-
-        const labelParentDiv = this._getLabelParent();
-
-
-        if (labelParentDiv !== labelMod.gmailLabelView.getElement().parentElement) {
-          if(this._driver.isUsingMaterialUI()){
-            labelParentDiv.insertAdjacentElement('afterbegin', labelMod.gmailLabelView.getElement());
-          }
-          else {
-            //we are vertical preview pane
-            if(this._elements.length > 1){
-              labelParentDiv.insertAdjacentElement('afterbegin', labelMod.gmailLabelView.getElement());
+            labelMod = this._modifications.label.unclaimed.shift();
+            if (!labelMod) {
+              const gmailLabelView = new GmailLabelView({
+                classes: ['inboxsdk__thread_row_label']
+              });
+              const el = gmailLabelView.getElement();
+              labelMod = {
+                gmailLabelView,
+                remove: el.remove.bind(el)
+              };
             }
-            else {
-              labelParentDiv.insertBefore(
-                labelMod.gmailLabelView.getElement(), labelParentDiv.querySelector('.y6')
+            this._modifications.label.claimed.push(labelMod);
+          }
+
+          labelMod.gmailLabelView.updateLabelDescriptor(labelDescriptor);
+
+          const labelParentDiv = this._getLabelParent();
+
+          if (
+            labelParentDiv !==
+            labelMod.gmailLabelView.getElement().parentElement
+          ) {
+            if (this._driver.isUsingMaterialUI()) {
+              labelParentDiv.insertAdjacentElement(
+                'afterbegin',
+                labelMod.gmailLabelView.getElement()
               );
+            } else {
+              //we are vertical preview pane
+              if (this._elements.length > 1) {
+                labelParentDiv.insertAdjacentElement(
+                  'afterbegin',
+                  labelMod.gmailLabelView.getElement()
+                );
+              } else {
+                labelParentDiv.insertBefore(
+                  labelMod.gmailLabelView.getElement(),
+                  labelParentDiv.querySelector('.y6')
+                );
+              }
             }
           }
-        }
 
-        this._getImageFixer().emit();
-      }
-    });
+          this._getImageFixer().emit();
+        }
+      });
   }
 
-  addImage(inIconDescriptor: Object){
+  addImage(inIconDescriptor: Object) {
     if (!this._elements.length) {
       console.warn('addImage called on destroyed thread row');
       return;
     }
     const prop = kefirCast(Kefir, inIconDescriptor)
       .toProperty()
-      .combine(Kefir.merge([this._getRefresher(), this._getSubjectRefresher(), this._getImageContainerRefresher()]))
+      .combine(
+        Kefir.merge([
+          this._getRefresher(),
+          this._getSubjectRefresher(),
+          this._getImageContainerRefresher()
+        ])
+      )
       .takeUntilBy(this._stopper);
 
     let imageMod = null;
@@ -348,14 +423,15 @@ class GmailThreadRowView {
         if (imageMod) {
           imageMod.remove();
           this._modifications.image.claimed.splice(
-            this._modifications.image.claimed.indexOf(imageMod), 1);
+            this._modifications.image.claimed.indexOf(imageMod),
+            1
+          );
           imageMod = null;
         }
       } else {
         if (!imageMod) {
           imageMod = this._modifications.image.unclaimed.shift();
           if (!imageMod) {
-
             imageMod = {
               iconSettings: {},
               iconWrapper: document.createElement('div'),
@@ -363,33 +439,48 @@ class GmailThreadRowView {
                 this.iconWrapper.remove();
               }
             };
-            imageMod.iconWrapper.className = 'inboxsdk__thread_row_icon_wrapper';
+            imageMod.iconWrapper.className =
+              'inboxsdk__thread_row_icon_wrapper';
           }
           this._modifications.image.claimed.push(imageMod);
         }
-        const {iconSettings, iconWrapper} = imageMod;
+        const { iconSettings, iconWrapper } = imageMod;
 
-        updateIcon(iconSettings, iconWrapper, false, iconDescriptor.imageClass, iconDescriptor.imageUrl);
+        updateIcon(
+          iconSettings,
+          iconWrapper,
+          false,
+          iconDescriptor.imageClass,
+          iconDescriptor.imageUrl
+        );
 
-        const containerRow = this._elements.length === 3 ? this._elements[2] : this._elements[0];
+        const containerRow =
+          this._elements.length === 3 ? this._elements[2] : this._elements[0];
         containerRow.classList.add('inboxsdk__thread_row_image_added');
 
-        if(iconDescriptor.tooltip){
-          iconSettings.iconElement.setAttribute('data-tooltip', iconDescriptor.tooltip);
+        if (iconDescriptor.tooltip) {
+          iconSettings.iconElement.setAttribute(
+            'data-tooltip',
+            iconDescriptor.tooltip
+          );
         }
 
         const labelParent = this._getLabelParent();
 
-        if(!labelParent.contains(iconWrapper)) {
-          if(this._driver.isUsingMaterialUI()){
-            querySelector(labelParent, '.y6').insertAdjacentElement('beforebegin', iconWrapper);
-          }
-          else if(this._elements.length > 1){
+        if (!labelParent.contains(iconWrapper)) {
+          if (this._driver.isUsingMaterialUI()) {
+            querySelector(labelParent, '.y6').insertAdjacentElement(
+              'beforebegin',
+              iconWrapper
+            );
+          } else if (this._elements.length > 1) {
             labelParent.insertAdjacentElement('beforeend', iconWrapper);
-          }
-          else {
+          } else {
             const insertionPoint = querySelector(labelParent, '.y6');
-            insertionPoint.insertBefore(iconWrapper, insertionPoint.firstElementChild);
+            insertionPoint.insertBefore(
+              iconWrapper,
+              insertionPoint.firstElementChild
+            );
           }
         }
 
@@ -398,10 +489,14 @@ class GmailThreadRowView {
     });
 
     this._getImageFixerTask().onValue(() => {
-      const el = imageMod && imageMod.iconWrapper && imageMod.iconWrapper.firstElementChild;
+      const el =
+        imageMod &&
+        imageMod.iconWrapper &&
+        imageMod.iconWrapper.firstElementChild;
       if (el instanceof HTMLElement) {
         // Make the image reposition itself horizontally.
-        el.style.display = (el.style && el.style.display === 'block') ? 'inline-block' : 'block';
+        el.style.display =
+          el.style && el.style.display === 'block' ? 'inline-block' : 'block';
       }
     });
   }
@@ -416,7 +511,9 @@ class GmailThreadRowView {
     let activeDropdown = null;
     let buttonMod = null;
 
-    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, buttonDescriptor).toProperty().takeUntilBy(this._stopper);
+    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, buttonDescriptor)
+      .toProperty()
+      .takeUntilBy(this._stopper);
 
     prop.merge(this._stopper).onValue(buttonDescriptor => {
       if (!buttonDescriptor) {
@@ -429,7 +526,7 @@ class GmailThreadRowView {
 
     this._stopper.onValue(() => {
       if (buttonMod && buttonMod.buttonSpan) {
-        (buttonMod.buttonSpan:any).onclick = null;
+        (buttonMod.buttonSpan: any).onclick = null;
       }
     });
 
@@ -439,7 +536,9 @@ class GmailThreadRowView {
         if (buttonMod) {
           buttonMod.remove();
           this._modifications.button.claimed.splice(
-            this._modifications.button.claimed.indexOf(buttonMod), 1);
+            this._modifications.button.claimed.indexOf(buttonMod),
+            1
+          );
           buttonMod = null;
         }
       } else {
@@ -450,16 +549,17 @@ class GmailThreadRowView {
         }
 
         let buttonSpan, iconSettings;
-        const buttonToolbar = this._elements[0].querySelector('ul[role=toolbar]');
+        const buttonToolbar = this._elements[0].querySelector(
+          'ul[role=toolbar]'
+        );
 
         if (!buttonMod) {
           buttonMod = this._modifications.button.unclaimed.shift();
           if (!buttonMod) {
-            if(buttonToolbar){
+            if (buttonToolbar) {
               buttonSpan = document.createElement('li');
               buttonSpan.classList.add('bqX');
-            }
-            else {
+            } else {
               buttonSpan = document.createElement('span');
               // T-KT is one of the class names on the star button.
               buttonSpan.classList.add('T-KT');
@@ -472,9 +572,15 @@ class GmailThreadRowView {
             } else {
               buttonSpan.removeAttribute('title');
             }
-            buttonSpan.setAttribute('tabindex', "-1");
-            buttonSpan.setAttribute('data-order-hint', String(buttonDescriptor.orderHint || 0));
-            (buttonSpan:any).addEventListener('onmousedown', focusAndNoPropagation);
+            buttonSpan.setAttribute('tabindex', '-1');
+            buttonSpan.setAttribute(
+              'data-order-hint',
+              String(buttonDescriptor.orderHint || 0)
+            );
+            (buttonSpan: any).addEventListener(
+              'onmousedown',
+              focusAndNoPropagation
+            );
 
             iconSettings = {
               iconUrl: null,
@@ -493,12 +599,14 @@ class GmailThreadRowView {
         }
 
         // could also be trash icon
-        const starGroup = buttonToolbar ? null : querySelector(this._elements[0], 'td.apU.xY, td.aqM.xY');
+        const starGroup = buttonToolbar
+          ? null
+          : querySelector(this._elements[0], 'td.apU.xY, td.aqM.xY');
         buttonSpan = buttonMod.buttonSpan;
         iconSettings = buttonMod.iconSettings;
 
-        if(buttonDescriptor.onClick){
-          (buttonSpan:any).onclick = (event) => {
+        if (buttonDescriptor.onClick) {
+          (buttonSpan: any).onclick = event => {
             const appEvent = {
               dropdown: (null: ?DropdownView),
               threadRowView: this._userView
@@ -513,9 +621,15 @@ class GmailThreadRowView {
               } else {
                 this._elements[0].classList.add('inboxsdk__dropdown_active');
                 this._elements[0].classList.add('buL'); // gmail class to force row button toolbar to be visible
-                appEvent.dropdown = activeDropdown = new DropdownView(new GmailDropdownView(), buttonSpan, null);
+                appEvent.dropdown = activeDropdown = new DropdownView(
+                  new GmailDropdownView(),
+                  buttonSpan,
+                  null
+                );
                 activeDropdown.setPlacementOptions({
-                  position: 'bottom', hAlign: 'left', vAlign: 'top'
+                  position: 'bottom',
+                  hAlign: 'left',
+                  vAlign: 'top'
                 });
                 activeDropdown.on('destroy', function() {
                   setTimeout(function() {
@@ -528,13 +642,18 @@ class GmailThreadRowView {
           };
         }
 
-        updateIcon(iconSettings, buttonSpan, false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
-        if(buttonToolbar && buttonSpan.parentElement !== buttonToolbar){
+        updateIcon(
+          iconSettings,
+          buttonSpan,
+          false,
+          buttonDescriptor.iconClass,
+          buttonDescriptor.iconUrl
+        );
+        if (buttonToolbar && buttonSpan.parentElement !== buttonToolbar) {
           insertElementInOrder(buttonToolbar, buttonSpan, undefined, true);
-        }
-        else if (starGroup && buttonSpan.parentElement !== starGroup) {
+        } else if (starGroup && buttonSpan.parentElement !== starGroup) {
           insertElementInOrder(starGroup, buttonSpan);
-          this._expandColumn('col.y5', 26*starGroup.children.length);
+          this._expandColumn('col.y5', 26 * starGroup.children.length);
 
           // Don't let the whole column count as the star for click and mouse over purposes.
           // Click events that aren't directly on the star should be stopped.
@@ -544,7 +663,7 @@ class GmailThreadRowView {
           // Click events that are on one of our buttons should be stopped. Click events
           // that aren't on the star button or our buttons should be re-emitted from the
           // thread row so it counts as clicking on the thread.
-          (starGroup:any).onmouseover = (starGroup:any).onclick = starGroupEventInterceptor;
+          (starGroup: any).onmouseover = (starGroup: any).onclick = starGroupEventInterceptor;
         }
         this._getImageFixer().emit();
       }
@@ -555,7 +674,12 @@ class GmailThreadRowView {
     if (this._elements.length !== 1) {
       return;
     }
-    const prop: Kefir.Observable<?Object> = kefirCast(Kefir, actionButtonDescriptor).takeUntilBy(this._stopper).toProperty();
+    const prop: Kefir.Observable<?Object> = kefirCast(
+      Kefir,
+      actionButtonDescriptor
+    )
+      .takeUntilBy(this._stopper)
+      .toProperty();
     let actionMod = null;
 
     this._stopper.onEnd(() => {
@@ -570,11 +694,13 @@ class GmailThreadRowView {
         return;
       }
 
-      if(!actionButtonDescriptor){
+      if (!actionButtonDescriptor) {
         if (actionMod) {
           actionMod.remove();
           this._modifications.action.claimed.splice(
-            this._modifications.action.claimed.indexOf(actionMod), 1);
+            this._modifications.action.claimed.indexOf(actionMod),
+            1
+          );
           actionMod = null;
         }
       } else {
@@ -591,9 +717,11 @@ class GmailThreadRowView {
           this._modifications.action.claimed.push(actionMod);
         }
 
-        actionMod.gmailActionButtonView.updateDescriptor(actionButtonDescriptor);
-        const {url, onClick} = actionButtonDescriptor;
-        actionMod.gmailActionButtonView.setOnClick((event) => {
+        actionMod.gmailActionButtonView.updateDescriptor(
+          actionButtonDescriptor
+        );
+        const { url, onClick } = actionButtonDescriptor;
+        actionMod.gmailActionButtonView.setOnClick(event => {
           event.stopPropagation();
           window.open(url, '_blank');
           if (onClick) {
@@ -601,9 +729,16 @@ class GmailThreadRowView {
           }
         });
 
-        const actionParentDiv = this._elements[0].querySelector('td.a4W .a4X .aKS') || this._elements[0].querySelector('td.a4W div.xS');
+        const actionParentDiv =
+          this._elements[0].querySelector('td.a4W .a4X .aKS') ||
+          this._elements[0].querySelector('td.a4W div.xS');
         if (!actionParentDiv) throw new Error('Failed to find actionParentDiv');
-        if (!includes(actionParentDiv.children, actionMod.gmailActionButtonView.getElement())) {
+        if (
+          !includes(
+            actionParentDiv.children,
+            actionMod.gmailActionButtonView.getElement()
+          )
+        ) {
           actionParentDiv.insertBefore(
             actionMod.gmailActionButtonView.getElement(),
             actionParentDiv.firstChild
@@ -628,61 +763,84 @@ class GmailThreadRowView {
     var currentIconUrl;
 
     var prop: Kefir.Observable<?Object> = kefirCast(Kefir, opts).toProperty();
-    prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
-      const attachmentDiv = querySelector(this._elements[0], 'td.yf.xY');
-      if (!opts) {
-        if (added) {
-          getImgElement().remove();
-          added = false;
+    prop
+      .combine(this._getRefresher())
+      .takeUntilBy(this._stopper)
+      .onValue(([opts]) => {
+        const attachmentDiv = querySelector(this._elements[0], 'td.yf.xY');
+        if (!opts) {
+          if (added) {
+            getImgElement().remove();
+            added = false;
 
-          if(!attachmentDiv.querySelector('.inboxsdk__thread_row_attachment_icon')) {
-            attachmentDiv.classList.remove('inboxsdk__thread_row_attachment_icons_present');
+            if (
+              !attachmentDiv.querySelector(
+                '.inboxsdk__thread_row_attachment_icon'
+              )
+            ) {
+              attachmentDiv.classList.remove(
+                'inboxsdk__thread_row_attachment_icons_present'
+              );
+            }
           }
-        }
-      } else {
-        const img = getImgElement();
-        if(opts.tooltip){
-          img.setAttribute('data-tooltip', opts.tooltip);
-        }
-        else{
-          img.removeAttribute('data-tooltip');
-        }
-
-        img.className =
-          'inboxsdk__thread_row_addition inboxsdk__thread_row_attachment_icon ' +
-          (opts.iconClass || '');
-        if (currentIconUrl != opts.iconUrl) {
-          img.style.background = opts.iconUrl ? "url("+opts.iconUrl+") no-repeat 0 0" : '';
-          currentIconUrl = opts.iconUrl;
-        }
-
-        if (!attachmentDiv.contains(img)) {
-          attachmentDiv.appendChild(img);
-          added = true;
-          this._expandColumn('col.yg', attachmentDiv.children.length*16);
-          if (this._elements.length > 1) {
-            this._fixDateColumnWidth();
+        } else {
+          const img = getImgElement();
+          if (opts.tooltip) {
+            img.setAttribute('data-tooltip', opts.tooltip);
+          } else {
+            img.removeAttribute('data-tooltip');
           }
+
+          img.className =
+            'inboxsdk__thread_row_addition inboxsdk__thread_row_attachment_icon ' +
+            (opts.iconClass || '');
+          if (currentIconUrl != opts.iconUrl) {
+            img.style.background = opts.iconUrl
+              ? 'url(' + opts.iconUrl + ') no-repeat 0 0'
+              : '';
+            currentIconUrl = opts.iconUrl;
+          }
+
+          if (!attachmentDiv.contains(img)) {
+            attachmentDiv.appendChild(img);
+            added = true;
+            this._expandColumn('col.yg', attachmentDiv.children.length * 16);
+            if (this._elements.length > 1) {
+              this._fixDateColumnWidth();
+            }
+          }
+          attachmentDiv.classList.add(
+            'inboxsdk__thread_row_attachment_icons_present'
+          );
         }
-        attachmentDiv.classList.add('inboxsdk__thread_row_attachment_icons_present');
-      }
-    });
+      });
   }
 
   _fixDateColumnWidth() {
     asap(() => {
       if (!this._elements.length) return;
 
-      const dateContainer = this._elements[0].querySelector('td.xW, td.yf > div.apm');
+      const dateContainer = this._elements[0].querySelector(
+        'td.xW, td.yf > div.apm'
+      );
       if (!dateContainer) return;
-      const visibleDateSpan = dateContainer.querySelector('.inboxsdk__thread_row_custom_date') ||
+      const visibleDateSpan =
+        dateContainer.querySelector('.inboxsdk__thread_row_custom_date') ||
         dateContainer.firstElementChild;
       if (!visibleDateSpan || !(visibleDateSpan instanceof HTMLElement)) return;
 
       // Attachment icons are only in the date column in vertical preivew pane.
-      const dateColumnAttachmentIconCount = this._elements[0].querySelectorAll('td.yf > img').length;
-      this._expandColumn('col.xX',
-        visibleDateSpan.offsetWidth + 8 + 2 + 20 + dateColumnAttachmentIconCount*16);
+      const dateColumnAttachmentIconCount = this._elements[0].querySelectorAll(
+        'td.yf > img'
+      ).length;
+      this._expandColumn(
+        'col.xX',
+        visibleDateSpan.offsetWidth +
+          8 +
+          2 +
+          20 +
+          dateColumnAttachmentIconCount * 16
+      );
     });
   }
 
@@ -694,72 +852,87 @@ class GmailThreadRowView {
     let labelMod;
     let draftElement, countElement;
     const prop: Kefir.Observable<?Object> = kefirCast(Kefir, opts).toProperty();
-    prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
-      const originalLabel = querySelector(this._elements[0], 'td > div.yW');
-      const recipientsContainer = originalLabel.parentElement;
-      if (!recipientsContainer) throw new Error("Should not happen");
+    prop
+      .combine(this._getRefresher())
+      .takeUntilBy(this._stopper)
+      .onValue(([opts]) => {
+        const originalLabel = querySelector(this._elements[0], 'td > div.yW');
+        const recipientsContainer = originalLabel.parentElement;
+        if (!recipientsContainer) throw new Error('Should not happen');
 
-      if (!opts) {
-        if (labelMod) {
-          labelMod.remove();
-          this._modifications.replacedDraftLabel.claimed.splice(
-            this._modifications.replacedDraftLabel.claimed.indexOf(labelMod), 1);
-          labelMod = null;
-        }
-      } else {
-        opts = Object.assign({count: 1}, opts);
+        if (!opts) {
+          if (labelMod) {
+            labelMod.remove();
+            this._modifications.replacedDraftLabel.claimed.splice(
+              this._modifications.replacedDraftLabel.claimed.indexOf(labelMod),
+              1
+            );
+            labelMod = null;
+          }
+        } else {
+          opts = Object.assign({ count: 1 }, opts);
 
-        if (!labelMod) {
-          labelMod = this._modifications.replacedDraftLabel.unclaimed.shift();
           if (!labelMod) {
-            labelMod = {
-              el: Object.assign(document.createElement('span'), {className: 'inboxsdk__thread_row_custom_draft_label'}),
-              remove() {
-                this.el.remove();
+            labelMod = this._modifications.replacedDraftLabel.unclaimed.shift();
+            if (!labelMod) {
+              labelMod = {
+                el: Object.assign(document.createElement('span'), {
+                  className: 'inboxsdk__thread_row_custom_draft_label'
+                }),
+                remove() {
+                  this.el.remove();
+                }
+              };
+            }
+            this._modifications.replacedDraftLabel.claimed.push(labelMod);
+          }
+
+          const needToAdd = !includes(
+            recipientsContainer.children,
+            labelMod.el
+          );
+
+          if (needToAdd || !draftElement) {
+            labelMod.el.innerHTML = originalLabel.innerHTML;
+            const materiaUIlDraftElements = Array.from(
+              labelMod.el.querySelectorAll('.boq')
+            );
+            if (materiaUIlDraftElements.length > 0) {
+              materiaUIlDraftElements.forEach(el => el.remove());
+              draftElement = Object.assign(document.createElement('span'), {
+                className: 'boq'
+              });
+              labelMod.el.appendChild(draftElement);
+            } else {
+              draftElement = labelMod.el.querySelector('font');
+              if (!draftElement) {
+                return;
               }
-            };
-          }
-          this._modifications.replacedDraftLabel.claimed.push(labelMod);
-        }
 
-        const needToAdd = !includes(recipientsContainer.children, labelMod.el);
-
-        if (needToAdd || !draftElement) {
-          labelMod.el.innerHTML = originalLabel.innerHTML;
-          const materiaUIlDraftElements = Array.from(labelMod.el.querySelectorAll('.boq'));
-          if(materiaUIlDraftElements.length > 0){
-            materiaUIlDraftElements.forEach(el => el.remove());
-            draftElement = Object.assign(document.createElement('span'), {
-              className: 'boq'});
-            labelMod.el.appendChild(draftElement);
-          }
-          else {
-            draftElement = labelMod.el.querySelector('font');
-            if (!draftElement) {
-              return;
+              const nextSibling = draftElement.nextElementSibling;
+              if (nextSibling) {
+                nextSibling.remove();
+              }
             }
 
-            const nextSibling = draftElement.nextElementSibling;
-            if (nextSibling) {
-              nextSibling.remove();
-            }
+            draftElement.classList.add(
+              'inboxsdk__thread_row_custom_draft_part'
+            );
+
+            countElement = Object.assign(document.createElement('span'), {
+              className: 'inboxsdk__thread_row_custom_draft_count'
+            });
+            labelMod.el.appendChild(countElement);
           }
 
-          draftElement.classList.add('inboxsdk__thread_row_custom_draft_part');
+          draftElement.textContent = opts.text;
+          countElement.textContent = opts.count !== 1 ? ` (${opts.count})` : '';
 
-          countElement = Object.assign(document.createElement('span'), {
-            className: 'inboxsdk__thread_row_custom_draft_count'});
-          labelMod.el.appendChild(countElement);
+          if (needToAdd) {
+            recipientsContainer.insertBefore(labelMod.el, originalLabel);
+          }
         }
-
-        draftElement.textContent = opts.text;
-        countElement.textContent = opts.count !== 1 ? ` (${opts.count})` : '';
-
-        if (needToAdd) {
-          recipientsContainer.insertBefore(labelMod.el, originalLabel);
-        }
-      }
-    });
+      });
   }
 
   replaceDate(opts: Object) {
@@ -769,50 +942,64 @@ class GmailThreadRowView {
     }
     let dateMod;
     const prop: Kefir.Observable<?Object> = kefirCast(Kefir, opts).toProperty();
-    prop.combine(this._getRefresher()).takeUntilBy(this._stopper).onValue(([opts]) => {
-      const dateContainer = querySelector(this._elements[0], 'td.xW, td.yf > div.apm');
-      const originalDateSpan = dateContainer.firstElementChild;
+    prop
+      .combine(this._getRefresher())
+      .takeUntilBy(this._stopper)
+      .onValue(([opts]) => {
+        const dateContainer = querySelector(
+          this._elements[0],
+          'td.xW, td.yf > div.apm'
+        );
+        const originalDateSpan = dateContainer.firstElementChild;
 
-      if (!opts) {
-        if (dateMod) {
-          dateMod.remove();
-          this._modifications.replacedDate.claimed.splice(
-            this._modifications.replacedDate.claimed.indexOf(dateMod), 1);
-          dateMod = null;
-        }
-      } else {
-        if (!dateMod) {
-          dateMod = this._modifications.replacedDate.unclaimed.shift();
-          if (!dateMod) {
-            dateMod = {
-              el: Object.assign(document.createElement('span'), {className: 'inboxsdk__thread_row_custom_date'}),
-              remove() {
-                this.el.remove();
-                dateContainer.classList.remove('inboxsdk__thread_row_custom_date_container');
-              }
-            };
+        if (!opts) {
+          if (dateMod) {
+            dateMod.remove();
+            this._modifications.replacedDate.claimed.splice(
+              this._modifications.replacedDate.claimed.indexOf(dateMod),
+              1
+            );
+            dateMod = null;
           }
-          this._modifications.replacedDate.claimed.push(dateMod);
-        }
-
-        dateMod.el.textContent = opts.text;
-        if (opts.tooltip) {
-          dateMod.el.setAttribute('data-tooltip', opts.tooltip);
-          dateMod.el.setAttribute('aria-label', opts.tooltip);
         } else {
-          dateMod.el.removeAttribute('data-tooltip');
-          dateMod.el.removeAttribute('aria-label');
-        }
-        dateMod.el.style.color = opts.textColor || '';
+          if (!dateMod) {
+            dateMod = this._modifications.replacedDate.unclaimed.shift();
+            if (!dateMod) {
+              dateMod = {
+                el: Object.assign(document.createElement('span'), {
+                  className: 'inboxsdk__thread_row_custom_date'
+                }),
+                remove() {
+                  this.el.remove();
+                  dateContainer.classList.remove(
+                    'inboxsdk__thread_row_custom_date_container'
+                  );
+                }
+              };
+            }
+            this._modifications.replacedDate.claimed.push(dateMod);
+          }
 
-        if (!includes(dateContainer.children, dateMod.el)) {
-          dateContainer.insertBefore(dateMod.el, dateContainer.firstChild);
-          dateContainer.classList.add('inboxsdk__thread_row_custom_date_container');
-        }
+          dateMod.el.textContent = opts.text;
+          if (opts.tooltip) {
+            dateMod.el.setAttribute('data-tooltip', opts.tooltip);
+            dateMod.el.setAttribute('aria-label', opts.tooltip);
+          } else {
+            dateMod.el.removeAttribute('data-tooltip');
+            dateMod.el.removeAttribute('aria-label');
+          }
+          dateMod.el.style.color = opts.textColor || '';
 
-        this._fixDateColumnWidth();
-      }
-    });
+          if (!includes(dateContainer.children, dateMod.el)) {
+            dateContainer.insertBefore(dateMod.el, dateContainer.firstChild);
+            dateContainer.classList.add(
+              'inboxsdk__thread_row_custom_date_container'
+            );
+          }
+
+          this._fixDateColumnWidth();
+        }
+      });
   }
 
   getEventStream(): Kefir.Observable<any> {
@@ -825,14 +1012,19 @@ class GmailThreadRowView {
 
   getSubject(): string {
     if (this._elements.length > 1) {
-      return querySelector(this._elements[1], 'div.xS div.xT div.y6 > span[id]').textContent;
+      return querySelector(this._elements[1], 'div.xS div.xT div.y6 > span[id]')
+        .textContent;
     } else {
-      return querySelector(this._elements[0], 'td.a4W div.xS div.xT div.y6 > span[id]').textContent;
+      return querySelector(
+        this._elements[0],
+        'td.a4W div.xS div.xT div.y6 > span[id]'
+      ).textContent;
     }
   }
 
   getDateString(): string {
-    return querySelector(this._elements[0],
+    return querySelector(
+      this._elements[0],
       'td.xW > span[title]:not(.inboxsdk__thread_row_custom_date), td.yf.apt > div.apm > span[title]:not(.inboxsdk__thread_row_custom_date)'
     ).title;
   }
@@ -846,34 +1038,42 @@ class GmailThreadRowView {
       return this._cachedThreadID;
     }
 
-    if(this._driver.isUsingSyncAPI()){
-      const elementWithId =
-        flatten(
-          this._elements.map(
-            el => Array.from(el.querySelectorAll('[data-thread-id][data-legacy-thread-id]'))
+    if (this._driver.isUsingSyncAPI()) {
+      const elementWithId = flatten(
+        this._elements.map(el =>
+          Array.from(
+            el.querySelectorAll('[data-thread-id][data-legacy-thread-id]')
           )
-        ).filter(Boolean)[0];
+        )
+      ).filter(Boolean)[0];
 
-      if(elementWithId){
-        this._cachedSyncThreadID = elementWithId.getAttribute('data-thread-id').replace('#', '');
-        this._cachedThreadID = elementWithId.getAttribute('data-legacy-thread-id').replace('#', '');
+      if (elementWithId) {
+        this._cachedSyncThreadID = elementWithId
+          .getAttribute('data-thread-id')
+          .replace('#', '');
+        this._cachedThreadID = elementWithId
+          .getAttribute('data-legacy-thread-id')
+          .replace('#', '');
 
         return this._cachedThreadID;
-      }
-      else {
-        const threadID = this._driver.getThreadRowIdentifier().getThreadIdForThreadRow(this, this._elements);
+      } else {
+        const threadID = this._driver
+          .getThreadRowIdentifier()
+          .getThreadIdForThreadRow(this, this._elements);
         this._cachedSyncThreadID = threadID;
 
-        if(threadID){
-          this._driver.getOldGmailThreadIdFromSyncThreadId(threadID)
+        if (threadID) {
+          this._driver
+            .getOldGmailThreadIdFromSyncThreadId(threadID)
             .then(oldGmailThreadID => {
               this._cachedThreadID = oldGmailThreadID;
             });
         }
       }
-    }
-    else {
-      this._cachedThreadID = this._driver.getThreadRowIdentifier().getThreadIdForThreadRow(this, this._elements);
+    } else {
+      this._cachedThreadID = this._driver
+        .getThreadRowIdentifier()
+        .getThreadIdForThreadRow(this, this._elements);
     }
 
     return this._cachedThreadID;
@@ -882,7 +1082,7 @@ class GmailThreadRowView {
   getThreadID(): string {
     const threadID = this._getThreadID();
     if (!threadID) {
-      throw new Error("Should not happen: thread id was null");
+      throw new Error('Should not happen: thread id was null');
     }
     return threadID;
   }
@@ -896,23 +1096,26 @@ class GmailThreadRowView {
   }
 
   getDraftID(): Promise<?string> {
-    if(this._cachedSyncDraftIDPromise) return this._cachedSyncDraftIDPromise;
+    if (this._cachedSyncDraftIDPromise) return this._cachedSyncDraftIDPromise;
 
-    if(this._driver.isUsingSyncAPI()){
-      const elementWithId =
-        flatten(
-          this._elements.map(
-            el => Array.from(el.querySelectorAll('[data-standalone-draft-id]'))
-          )
-        ).filter(Boolean)[0];
+    if (this._driver.isUsingSyncAPI()) {
+      const elementWithId = flatten(
+        this._elements.map(el =>
+          Array.from(el.querySelectorAll('[data-standalone-draft-id]'))
+        )
+      ).filter(Boolean)[0];
 
       this._cachedSyncDraftIDPromise = Promise.resolve(
-        elementWithId ?
-        elementWithId.getAttribute('data-standalone-draft-id').replace('#msg-a:', '') : null
+        elementWithId
+          ? elementWithId
+              .getAttribute('data-standalone-draft-id')
+              .replace('#msg-a:', '')
+          : null
       );
-    }
-    else {
-      this._cachedSyncDraftIDPromise = this._driver.getThreadRowIdentifier().getDraftIdForThreadRow(this);
+    } else {
+      this._cachedSyncDraftIDPromise = this._driver
+        .getThreadRowIdentifier()
+        .getDraftIdForThreadRow(this);
     }
 
     return this._cachedSyncDraftIDPromise;
@@ -929,28 +1132,32 @@ class GmailThreadRowView {
   getContacts(): Contact[] {
     const senderSpans = this._elements[0].querySelectorAll('[email]');
 
-    const contacts = Array.from(senderSpans)
-      .map((span) => ({
-        emailAddress: span.getAttribute('email'),
-        name: span.getAttribute('name')
-      }));
+    const contacts = Array.from(senderSpans).map(span => ({
+      emailAddress: span.getAttribute('email'),
+      name: span.getAttribute('name')
+    }));
 
     return uniqBy(contacts, contact => contact.emailAddress);
   }
 
   isSelected(): boolean {
-    return !!this._elements[0].querySelector('div[role=checkbox][aria-checked=true]');
+    return !!this._elements[0].querySelector(
+      'div[role=checkbox][aria-checked=true]'
+    );
   }
 
   _getLabelParent(): HTMLElement {
-    return this._elements.length > 1 ?
-      querySelector(this._elements[ this._elements.length === 2 ? 0 : 2 ], 'div.apu') :
-      querySelector(this._elements[0], 'td.a4W div.xS div.xT');
+    return this._elements.length > 1
+      ? querySelector(
+          this._elements[this._elements.length === 2 ? 0 : 2],
+          'div.apu'
+        )
+      : querySelector(this._elements[0], 'td.a4W div.xS div.xT');
   }
 
   _getImageFixer(): Bus<any> {
     let imageFixer = this._imageFixer;
-    if(!imageFixer){
+    if (!imageFixer) {
       imageFixer = this._imageFixer = kefirBus(); // emit into this to queue an image fixer run
     }
 
@@ -959,21 +1166,21 @@ class GmailThreadRowView {
 
   _getImageFixerTask(): Kefir.Observable<any> {
     let imageFixerTask = this._imageFixerTask;
-    if(!imageFixerTask){
-      imageFixerTask = this._imageFixerTask =
-        this._getImageFixer()
-          .bufferBy(this._getImageFixer().flatMap(x => delayAsap()))
-          .filter(x => x.length > 0)
-          .map(x => null)
-          .takeUntilBy(this._stopper);
+    if (!imageFixerTask) {
+      imageFixerTask = this._imageFixerTask = this._getImageFixer()
+        .bufferBy(this._getImageFixer().flatMap(x => delayAsap()))
+        .filter(x => x.length > 0)
+        .map(x => null)
+        .takeUntilBy(this._stopper);
     }
 
     return imageFixerTask;
   }
 
   _getWatchElement(): HTMLElement {
-    return this._elements.length === 1 ?
-      this._elements[0] : (this._elements[0].children[2]: any);
+    return this._elements.length === 1
+      ? this._elements[0]
+      : (this._elements[0].children[2]: any);
   }
 
   _getRefresher(): Kefir.Observable<any> {
@@ -986,11 +1193,16 @@ class GmailThreadRowView {
     // stream is not listened on and no MutationObserver ever gets made, saving
     // us a little bit of work.
     let refresher = this._refresher;
-    if(!refresher){
-      refresher = this._refresher = makeMutationObserverChunkedStream(this._getWatchElement(), {
-        childList: true
-      })
-      .map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
+    if (!refresher) {
+      refresher = this._refresher = makeMutationObserverChunkedStream(
+        this._getWatchElement(),
+        {
+          childList: true
+        }
+      )
+        .map(() => null)
+        .takeUntilBy(this._stopper)
+        .toProperty(() => null);
     }
 
     return refresher;
@@ -998,23 +1210,32 @@ class GmailThreadRowView {
 
   _getSubjectRefresher(): Kefir.Observable<any> {
     let subjectRefresher = this._subjectRefresher;
-    if(!subjectRefresher){
+    if (!subjectRefresher) {
       if (this._isVertical) {
         subjectRefresher = this._subjectRefresher = Kefir.constant(null);
       } else {
         const watchElement = this._getWatchElement();
         const subjectElement = querySelector(watchElement, '.y6');
-        subjectRefresher = this._subjectRefresher = makeMutationObserverChunkedStream(subjectElement, {
+        subjectRefresher = this._subjectRefresher = makeMutationObserverChunkedStream(
+          subjectElement,
+          {
             childList: true
-          })
+          }
+        )
           .merge(
             makeMutationObserverChunkedStream(watchElement, {
-              attributes: true, attributeFilter: ['class']
+              attributes: true,
+              attributeFilter: ['class']
             })
-            .map(() => Array.from(watchElement.classList).filter(className => className.indexOf('inboxsdk') !== 0).sort().join(' '))
-            .skipDuplicates()
+              .map(() =>
+                Array.from(watchElement.classList)
+                  .filter(className => className.indexOf('inboxsdk') !== 0)
+                  .sort()
+                  .join(' ')
+              )
+              .skipDuplicates()
           )
-          .map(()=>null)
+          .map(() => null)
           .takeUntilBy(this._stopper)
           .toProperty(() => null);
       }
@@ -1025,23 +1246,33 @@ class GmailThreadRowView {
 
   _getImageContainerRefresher(): Kefir.Observable<any> {
     let imageRefresher = this._imageRefresher;
-    if(!imageRefresher){
-      if(this._isVertical){
-        const containerRow = this._elements.length === 3 ? this._elements[2] : this._elements[0];
-        const classChangeStream = makeMutationObserverChunkedStream(containerRow, {
-          attributes: true,
-          attributeFilter: ['class']
-        });
+    if (!imageRefresher) {
+      if (this._isVertical) {
+        const containerRow =
+          this._elements.length === 3 ? this._elements[2] : this._elements[0];
+        const classChangeStream = makeMutationObserverChunkedStream(
+          containerRow,
+          {
+            attributes: true,
+            attributeFilter: ['class']
+          }
+        );
 
-        imageRefresher = this._imageRefresher =  classChangeStream
-            .bufferBy(classChangeStream.flatMapLatest(() => delayAsap()))
-            .filter(() =>
-              containerRow.querySelectorAll('.inboxsdk__thread_row_icon_wrapper').length > 0 &&
-              !containerRow.classList.contains('inboxsdk__thread_row_image_added')
-            )
-            .map(()=>null).takeUntilBy(this._stopper).toProperty(() => null);
-      }
-      else {
+        imageRefresher = this._imageRefresher = classChangeStream
+          .bufferBy(classChangeStream.flatMapLatest(() => delayAsap()))
+          .filter(
+            () =>
+              containerRow.querySelectorAll(
+                '.inboxsdk__thread_row_icon_wrapper'
+              ).length > 0 &&
+              !containerRow.classList.contains(
+                'inboxsdk__thread_row_image_added'
+              )
+          )
+          .map(() => null)
+          .takeUntilBy(this._stopper)
+          .toProperty(() => null);
+      } else {
         imageRefresher = this._imageRefresher = Kefir.constant(null);
       }
     }
@@ -1052,54 +1283,52 @@ class GmailThreadRowView {
 
 export default defn(module, GmailThreadRowView);
 
-export function removeAllThreadRowUnclaimedModifications(){
-    // run in a setTimeout so that the thread rows get destroyed
-    // and populate the unclaimed modifications
-    setTimeout(() => {
-
-      const modifiedRows = document.querySelectorAll('.inboxsdk__thread_row');
-      Array.prototype.forEach.call(modifiedRows, row => {
-        const modifications = cachedModificationsByRow.get(row);
-        if(modifications){
-          _removeThreadRowUnclaimedModifications(modifications);
-        }
-      });
-
-    }, 15);
-
-
+export function removeAllThreadRowUnclaimedModifications() {
+  // run in a setTimeout so that the thread rows get destroyed
+  // and populate the unclaimed modifications
+  setTimeout(() => {
+    const modifiedRows = document.querySelectorAll('.inboxsdk__thread_row');
+    Array.prototype.forEach.call(modifiedRows, row => {
+      const modifications = cachedModificationsByRow.get(row);
+      if (modifications) {
+        _removeThreadRowUnclaimedModifications(modifications);
+      }
+    });
+  }, 15);
 }
 
-
-
-function _removeThreadRowUnclaimedModifications(modifications){
-  for (let ii=0; ii<modifications.label.unclaimed.length; ii++) {
+function _removeThreadRowUnclaimedModifications(modifications) {
+  for (let ii = 0; ii < modifications.label.unclaimed.length; ii++) {
     const mod = modifications.label.unclaimed[ii];
     //console.log('removing unclaimed label mod', mod);
     mod.remove();
   }
   modifications.label.unclaimed.length = 0;
-  for (let ii=0; ii<modifications.button.unclaimed.length; ii++) {
+  for (let ii = 0; ii < modifications.button.unclaimed.length; ii++) {
     const mod = modifications.button.unclaimed[ii];
     //console.log('removing unclaimed button mod', mod);
     mod.remove();
   }
   modifications.button.unclaimed.length = 0;
-  for (let ii=0; ii<modifications.image.unclaimed.length; ii++) {
+  for (let ii = 0; ii < modifications.image.unclaimed.length; ii++) {
     const mod = modifications.image.unclaimed[ii];
     //console.log('removing unclaimed image mod', mod);
     mod.remove();
   }
   modifications.image.unclaimed.length = 0;
 
-  for (let ii=0; ii<modifications.replacedDate.unclaimed.length; ii++) {
+  for (let ii = 0; ii < modifications.replacedDate.unclaimed.length; ii++) {
     const mod = modifications.replacedDate.unclaimed[ii];
     //console.log('removing unclaimed replacedDate mod', mod);
     mod.remove();
   }
   modifications.replacedDate.unclaimed.length = 0;
 
-  for (let ii=0; ii<modifications.replacedDraftLabel.unclaimed.length; ii++) {
+  for (
+    let ii = 0;
+    ii < modifications.replacedDraftLabel.unclaimed.length;
+    ii++
+  ) {
     const mod = modifications.replacedDraftLabel.unclaimed[ii];
     mod.remove();
   }

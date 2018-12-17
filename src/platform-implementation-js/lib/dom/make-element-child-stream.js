@@ -3,19 +3,24 @@
 import asap from 'asap';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import type {Stopper} from 'kefir-stopper';
+import type { Stopper } from 'kefir-stopper';
 
-export type ItemWithLifetime<T> = {el: T, removalStream: Kefir.Observable<null>};
+export type ItemWithLifetime<T> = {
+  el: T,
+  removalStream: Kefir.Observable<null>
+};
 export type ElementWithLifetime = ItemWithLifetime<HTMLElement>;
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
-export default function makeElementChildStream(element: HTMLElement): Kefir.Observable<ElementWithLifetime> {
+export default function makeElementChildStream(
+  element: HTMLElement
+): Kefir.Observable<ElementWithLifetime> {
   if (!element || !element.nodeType) {
-    throw new Error("Expected element, got "+String(element));
+    throw new Error('Expected element, got ' + String(element));
   }
 
-  return Kefir.stream((emitter) => {
+  return Kefir.stream(emitter => {
     const removalStreams: Map<HTMLElement, Stopper> = new Map();
     let ended = false;
 
@@ -23,13 +28,17 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Obse
       if (el.nodeType !== 1) return;
 
       if (removalStreams.has(el)) {
-        throwLater(new Error("Already had removalStream for element with class "+el.className));
+        throwLater(
+          new Error(
+            'Already had removalStream for element with class ' + el.className
+          )
+        );
       }
 
       const removalStream = kefirStopper();
       removalStreams.set(el, removalStream);
       try {
-        emitter.emit({el, removalStream});
+        emitter.emit({ el, removalStream });
       } catch (err) {
         throwLater(err);
       }
@@ -47,12 +56,17 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Obse
           throwLater(err);
         }
       } else {
-        throwLater(new Error("Could not find removalStream for element with class "+el.className));
+        throwLater(
+          new Error(
+            'Could not find removalStream for element with class ' +
+              el.className
+          )
+        );
       }
     }
 
     const observer = new MutationObserver(function(mutations) {
-      mutations.forEach((mutation) => {
+      mutations.forEach(mutation => {
         Array.prototype.forEach.call(mutation.addedNodes, newEl);
         Array.prototype.forEach.call(mutation.removedNodes, removedEl);
       });
@@ -62,7 +76,7 @@ export default function makeElementChildStream(element: HTMLElement): Kefir.Obse
     // stream listeners are subscribed.
     asap(() => {
       if (!ended) {
-        observer.observe(element, {childList: true});
+        observer.observe(element, { childList: true });
         // Clone child list first because it can change
         Array.prototype.slice.call(element.children).forEach(newEl);
       }

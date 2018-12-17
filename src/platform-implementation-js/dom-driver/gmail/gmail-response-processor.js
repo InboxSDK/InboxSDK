@@ -7,13 +7,16 @@ import mapIndexed from 'map-indexed-xf';
 import assert from 'assert';
 import htmlToText from '../../../common/html-to-text';
 
-export function interpretSentEmailResponse(responseString: string): {threadID: string, messageID: string} {
+export function interpretSentEmailResponse(
+  responseString: string
+): { threadID: string, messageID: string } {
   const emailSentArray = deserialize(responseString).value;
 
   const gmailMessageId = extractGmailMessageIdFromSentEmail(emailSentArray);
-  const gmailThreadId = extractGmailThreadIdFromSentEmail(emailSentArray) || gmailMessageId;
+  const gmailThreadId =
+    extractGmailThreadIdFromSentEmail(emailSentArray) || gmailMessageId;
   if (!gmailMessageId || !gmailThreadId) {
-    throw new Error("Failed to read email response");
+    throw new Error('Failed to read email response');
   }
   return {
     threadID: gmailThreadId,
@@ -21,40 +24,61 @@ export function interpretSentEmailResponse(responseString: string): {threadID: s
   };
 }
 
-export function extractGmailMessageIdFromSentEmail(emailSentArray: any): ?string {
-  const messageIdArrayMarker = "a";
-  const messageIdArray = _searchArray(emailSentArray, messageIdArrayMarker, markerArray =>
-    markerArray.length > 3 && Array.isArray(markerArray[3]) && markerArray[3].length > 0
+export function extractGmailMessageIdFromSentEmail(
+  emailSentArray: any
+): ?string {
+  const messageIdArrayMarker = 'a';
+  const messageIdArray = _searchArray(
+    emailSentArray,
+    messageIdArrayMarker,
+    markerArray =>
+      markerArray.length > 3 &&
+      Array.isArray(markerArray[3]) &&
+      markerArray[3].length > 0
   );
 
-  if(!messageIdArray){
+  if (!messageIdArray) {
     return null;
   }
 
   return messageIdArray[3][0];
 }
 
-export function extractGmailThreadIdFromSentEmail(emailSentArray: any): ?string {
-  const threadIdArrayMarker = "csd";
-  const threadIdArray = _searchArray(emailSentArray, threadIdArrayMarker, function(markerArray) {
-    return markerArray.length == 3 && Array.isArray(markerArray[2]) && markerArray[2].length > 5;
-  });
+export function extractGmailThreadIdFromSentEmail(
+  emailSentArray: any
+): ?string {
+  const threadIdArrayMarker = 'csd';
+  const threadIdArray = _searchArray(
+    emailSentArray,
+    threadIdArrayMarker,
+    function(markerArray) {
+      return (
+        markerArray.length == 3 &&
+        Array.isArray(markerArray[2]) &&
+        markerArray[2].length > 5
+      );
+    }
+  );
 
-  if(!threadIdArray){
+  if (!threadIdArray) {
     return null;
   }
 
   return threadIdArray[1];
 }
 
-export function extractGmailThreadIdFromMessageIdSearch(responseString: string): ?string {
+export function extractGmailThreadIdFromMessageIdSearch(
+  responseString: string
+): ?string {
   const threadResponseArray = deserialize(responseString).value;
-  const threadIdArrayMarker = "cs";
-  const threadIdArray = _searchArray(threadResponseArray, threadIdArrayMarker, markerArray =>
-    markerArray[0] === "cs" && markerArray.length > 20
+  const threadIdArrayMarker = 'cs';
+  const threadIdArray = _searchArray(
+    threadResponseArray,
+    threadIdArrayMarker,
+    markerArray => markerArray[0] === 'cs' && markerArray.length > 20
   );
 
-  if(!threadIdArray){
+  if (!threadIdArray) {
     return null;
   }
 
@@ -69,8 +93,10 @@ export function rewriteSingleQuotes(s: string): string {
 
   // i is our position in the input string. result is our result string that
   // we'll copy the parts of the input to as we interpret them.
-  let i = 0, resultParts = [];
-  while (true) { //eslint-disable-line no-constant-condition
+  let i = 0,
+    resultParts = [];
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
     // Find the position of the next singly or doubly quoted part.
     // `i` is increasing monotonically every round of this loop, and the loop
     // ends as soon as no matches are found after the `i`th position in the
@@ -83,28 +109,29 @@ export function rewriteSingleQuotes(s: string): string {
     // Copy the unquoted part preceding the quoted section we found into the
     // result, and put a double-quote into the result to begin the quoted
     // section we found.
-    resultParts.push(s.substr(i,nextQuoteIndex-i));
+    resultParts.push(s.substr(i, nextQuoteIndex - i));
     resultParts.push('"');
     i = nextQuoteIndex + 1;
     if (s[nextQuoteIndex] === '"') {
       // Find the next quotation mark not preceded by a backslash.
       const nextDoubleQuoteIndex = findNextUnescapedCharacter(s, i, '"');
       if (nextDoubleQuoteIndex < 0) {
-        throw new Error("Unclosed double quote");
+        throw new Error('Unclosed double quote');
       }
       // Add that entire double-quoted part to the result.
-      resultParts.push(s.slice(i,nextDoubleQuoteIndex+1));
+      resultParts.push(s.slice(i, nextDoubleQuoteIndex + 1));
       i = nextDoubleQuoteIndex + 1;
     } else {
       // Same logic as above, but for a single-quoted part.
       const nextSingleQuoteIndex = findNextUnescapedCharacter(s, i, "'");
       if (nextSingleQuoteIndex < 0) {
-        throw new Error("Unclosed single quote");
+        throw new Error('Unclosed single quote');
       }
       // Escape all double-quotes inside the part, un-escape all single-quotes
       // inside the part, and then write it out into the result with the ending
       // single-quote replaced with a double-quote.
-      const part = s.slice(i,nextSingleQuoteIndex)
+      const part = s
+        .slice(i, nextSingleQuoteIndex)
         .replace(/"/g, '\\"')
         .replace(/\\'/g, "'");
       resultParts.push(part);
@@ -116,7 +143,7 @@ export function rewriteSingleQuotes(s: string): string {
 }
 
 function findNextQuote(s: string, start: number): number {
-  for (let i=start, len=s.length; i<len; i++) {
+  for (let i = start, len = s.length; i < len; i++) {
     if (s[i] === '"' || s[i] === "'") {
       return i;
     }
@@ -124,8 +151,12 @@ function findNextQuote(s: string, start: number): number {
   return -1;
 }
 
-function findNextUnescapedCharacter(s: string, start: number, char: string): number {
-  for (let i=start, len=s.length; i<len; i++) {
+function findNextUnescapedCharacter(
+  s: string,
+  start: number,
+  char: string
+): number {
+  for (let i = start, len = s.length; i < len; i++) {
     if (s[i] === '\\') {
       i++;
     } else if (s[i] === char) {
@@ -136,13 +167,15 @@ function findNextUnescapedCharacter(s: string, start: number, char: string): num
 }
 
 export type MessageOptions = {
-  includeLengths: boolean;
-  suggestionMode: boolean;
-  noArrayNewLines: boolean;
-  includeExplicitNulls: boolean;
+  includeLengths: boolean,
+  suggestionMode: boolean,
+  noArrayNewLines: boolean,
+  includeExplicitNulls: boolean
 };
 
-export function deserialize(threadResponseString: string): {value: any[], options: MessageOptions} {
+export function deserialize(
+  threadResponseString: string
+): { value: any[], options: MessageOptions } {
   const options = {
     includeLengths: false,
     suggestionMode: /^5\n/.test(threadResponseString),
@@ -154,24 +187,24 @@ export function deserialize(threadResponseString: string): {value: any[], option
 
   let pos;
   if (options.suggestionMode) {
-    pos = threadResponseString.indexOf('\'\n');
+    pos = threadResponseString.indexOf("'\n");
     if (pos === -1) {
-      throw new Error("Message was missing beginning header");
+      throw new Error('Message was missing beginning header');
     }
     pos += 2;
   } else {
     pos = threadResponseString.indexOf('\n\n');
     if (pos === -1) {
-      throw new Error("Message was missing beginning newlines");
+      throw new Error('Message was missing beginning newlines');
     }
     pos += 2;
   }
 
   while (pos < threadResponseString.length) {
-    let lineEnd = threadResponseString.indexOf('\n', pos+1);
+    let lineEnd = threadResponseString.indexOf('\n', pos + 1);
     if (lineEnd === -1) {
       lineEnd = threadResponseString.length;
-    } else if (threadResponseString[lineEnd-1] === '\r') {
+    } else if (threadResponseString[lineEnd - 1] === '\r') {
       // seriously Gmail is crazy. The chunk length only sometimes includes the
       // newline after the chunk length.
       lineEnd += 1;
@@ -182,8 +215,8 @@ export function deserialize(threadResponseString: string): {value: any[], option
     if (/^\d+\s*$/.test(line)) {
       options.includeLengths = true;
       const length = +line;
-      dataLine = threadResponseString.slice(lineEnd, lineEnd+length);
-      pos = lineEnd+length;
+      dataLine = threadResponseString.slice(lineEnd, lineEnd + length);
+      pos = lineEnd + length;
     } else {
       dataLine = threadResponseString.slice(pos);
       pos = threadResponseString.length;
@@ -192,25 +225,28 @@ export function deserialize(threadResponseString: string): {value: any[], option
     value.push(deserializeArray(dataLine));
   }
 
-  return {value, options};
+  return { value, options };
 }
 
-function transformUnquotedSections(str: string, cb: (str: string) => string): string {
+function transformUnquotedSections(
+  str: string,
+  cb: (str: string) => string
+): string {
   const parts = [];
   let nextQuote;
   let position = 0;
   let in_string = false;
   while ((nextQuote = findNextUnescapedCharacter(str, position, '"')) !== -1) {
     if (in_string) {
-      parts.push(str.slice(position, nextQuote+1));
+      parts.push(str.slice(position, nextQuote + 1));
     } else {
-      parts.push(cb(str.slice(position, nextQuote+1)));
+      parts.push(cb(str.slice(position, nextQuote + 1)));
     }
-    position = nextQuote+1;
+    position = nextQuote + 1;
     in_string = !in_string;
   }
   if (in_string) {
-    throw new Error("string ended inside quoted section");
+    throw new Error('string ended inside quoted section');
   }
   parts.push(cb(str.slice(position)));
   return parts.join('');
@@ -226,15 +262,17 @@ export function deserializeArray(value: string): any[] {
 
   // Fix some things with the data. (It's in a weird minified JSON-like
   // format). Make sure we don't modify any data inside of strings!
-  value = transformUnquotedSections(value, match =>
-    match
-      .replace(/,\s*(?=,|\])/g, ',null') // fix implied nulls
-      .replace(/\[\s*(?=,)/g, '[null') // "
+  value = transformUnquotedSections(
+    value,
+    match =>
+      match
+        .replace(/,\s*(?=,|\])/g, ',null') // fix implied nulls
+        .replace(/\[\s*(?=,)/g, '[null') // "
   );
 
   try {
-    return JSON.parse(value, (k, v) => v == null ? undefined : v);
-  } catch(err) {
+    return JSON.parse(value, (k, v) => (v == null ? undefined : v));
+  } catch (err) {
     throw new Error('deserialization error');
   }
 }
@@ -247,16 +285,14 @@ export function serialize(value: any[], options: MessageOptions): string {
   return threadListSerialize(value, options);
 }
 
-function threadListSerialize(threadResponseArray: any[], options: MessageOptions): string {
-  const {
-    includeLengths,
-    noArrayNewLines,
-    includeExplicitNulls
-  } = options;
-
+function threadListSerialize(
+  threadResponseArray: any[],
+  options: MessageOptions
+): string {
+  const { includeLengths, noArrayNewLines, includeExplicitNulls } = options;
 
   let response = ")]}'\n" + (noArrayNewLines && includeLengths ? '' : '\n');
-  for(let ii=0; ii<threadResponseArray.length; ii++){
+  for (let ii = 0; ii < threadResponseArray.length; ii++) {
     const arraySection = threadResponseArray[ii];
     const arraySectionString = serializeArray(
       arraySection,
@@ -264,15 +300,16 @@ function threadListSerialize(threadResponseArray: any[], options: MessageOptions
       includeExplicitNulls
     );
 
-    if(!includeLengths){
+    if (!includeLengths) {
       response += arraySectionString;
     } else {
       const length = arraySectionString.length + (noArrayNewLines ? 2 : 1);
-      response += (noArrayNewLines ? '\n' : '') + length + '\n' + arraySectionString;
+      response +=
+        (noArrayNewLines ? '\n' : '') + length + '\n' + arraySectionString;
     }
   }
 
-  if(!includeLengths){
+  if (!includeLengths) {
     if (!noArrayNewLines) {
       const lines = response.split(/\r|\n/);
       const firstLines = lines.slice(0, -3);
@@ -295,7 +332,7 @@ function suggestionSerialize(
   includeExplicitNulls: boolean
 ): string {
   let response = "5\n)]}'\n";
-  for(let ii=0; ii<suggestionsArray.length; ii++){
+  for (let ii = 0; ii < suggestionsArray.length; ii++) {
     const arraySection = suggestionsArray[ii];
     const arraySectionString = serializeArray(
       arraySection,
@@ -316,25 +353,23 @@ function serializeArray(
   includeExplicitNulls: boolean
 ): string {
   let response = '[';
-  for(let ii=0; ii<array.length; ii++){
+  for (let ii = 0; ii < array.length; ii++) {
     const item = array[ii];
 
     let addition;
-    if(Array.isArray(item)){
+    if (Array.isArray(item)) {
       addition = serializeArray(item, noArrayNewLines, includeExplicitNulls);
-    }
-    else if (item == null) {
+    } else if (item == null) {
       addition = includeExplicitNulls ? 'null' : '';
-    }
-    else {
+    } else {
       addition = JSON.stringify(item)
-        .replace(/</igm, '\\u003c')
-        .replace(/=/igm, '\\u003d')
-        .replace(/>/igm, '\\u003e')
-        .replace(/&/igm, '\\u0026');
+        .replace(/</gim, '\\u003c')
+        .replace(/=/gim, '\\u003d')
+        .replace(/>/gim, '\\u003e')
+        .replace(/&/gim, '\\u0026');
     }
 
-    if(ii > 0){
+    if (ii > 0) {
       response += ',';
     }
     response += addition;
@@ -346,29 +381,32 @@ function serializeArray(
 }
 
 export type Thread = {
-  subject: string;
-  shortDate: string;
-  timeString: string;
-  peopleHtml: string;
-  timestamp: number;
-  isUnread: boolean;
-  lastEmailAddress: ?string;
-  bodyPreviewHtml: string;
-  someGmailMessageIds: string[];
-  gmailThreadId: string;
+  subject: string,
+  shortDate: string,
+  timeString: string,
+  peopleHtml: string,
+  timestamp: number,
+  isUnread: boolean,
+  lastEmailAddress: ?string,
+  bodyPreviewHtml: string,
+  someGmailMessageIds: string[],
+  gmailThreadId: string
 };
 
 export function readDraftId(response: string, messageID: string): ?string {
   const decoded = deserialize(response).value;
 
-  const msgA = t.toArray(decoded, t.compose(
-    t.cat,
-    t.filter(Array.isArray),
-    t.cat,
-    t.filter(x => x[0] === 'ms' && x[1] === messageID),
-    t.take(1),
-    t.map(x => x[60])
-  ))[0];
+  const msgA = t.toArray(
+    decoded,
+    t.compose(
+      t.cat,
+      t.filter(Array.isArray),
+      t.cat,
+      t.filter(x => x[0] === 'ms' && x[1] === messageID),
+      t.take(1),
+      t.map(x => x[60])
+    )
+  )[0];
   if (msgA) {
     const match = msgA.match(/^msg-[^:]:(\S+)$/i);
     return match && match[1];
@@ -379,16 +417,17 @@ export function readDraftId(response: string, messageID: string): ?string {
 export function replaceThreadsInResponse(
   response: string,
   replacementThreads: Thread[],
-  { start, total }: { start: number, total?: number|'MANY' }
+  { start, total }: { start: number, total?: number | 'MANY' }
 ): string {
-  const {value, options} = deserialize(response);
+  const { value, options } = deserialize(response);
 
-  const actionResponseMode = value.length === 1 &&
+  const actionResponseMode =
+    value.length === 1 &&
     value[0].length === 2 &&
     typeof value[0][1] === 'string';
   const threadValue = actionResponseMode ? value[0][0].map(x => [x]) : value;
 
-/*
+  /*
 threadValue looks like this:
 [
   [ // group
@@ -451,7 +490,8 @@ it all back together.
           if (item[6]) {
             item[6][0] = [query, 1];
           } else {
-            console.error('replaceThreadsInResponse(): Missing item[6]'); //eslint-disable-line no-console
+            // eslint-disable-next-line no-console
+            console.error('replaceThreadsInResponse(): Missing item[6]');
           }
         }
       }
@@ -483,26 +523,24 @@ it all back together.
   }
   if (postTbItems.length) {
     if (newTbs.length) {
-      newTbs[newTbs.length-1] = newTbs[newTbs.length-1].concat(postTbItems);
+      newTbs[newTbs.length - 1] = newTbs[newTbs.length - 1].concat(postTbItems);
     } else {
       newTbs.push(postTbItems);
     }
   }
-  const parsedNew = flatten([
-    preTbGroups,
-    newTbs,
-    postTbGroups
-  ]);
+  const parsedNew = flatten([preTbGroups, newTbs, postTbGroups]);
 
   const allSections = flatten(parsedNew);
   const endSection = last(allSections);
 
   if (endSection[0] !== 'e') {
-    throw new Error("Failed to find end section");
+    throw new Error('Failed to find end section');
   }
   endSection[1] = allSections.length;
 
-  const fullNew = actionResponseMode ? [[flatten(parsedNew), value[0][1]]] : parsedNew;
+  const fullNew = actionResponseMode
+    ? [[flatten(parsedNew), value[0][1]]]
+    : parsedNew;
   return serialize(fullNew, options);
 }
 
@@ -511,22 +549,32 @@ export function extractThreads(response: string): Thread[] {
 }
 
 export function extractThreadsFromDeserialized(value: any[]): Thread[] {
-  if (value.length === 1 && value[0].length === 2 && typeof value[0][1] === 'string') {
+  if (
+    value.length === 1 &&
+    value[0].length === 2 &&
+    typeof value[0][1] === 'string'
+  ) {
     value = [value[0][0]];
   }
   return _extractThreadArraysFromResponseArray(value).map(thread =>
-    Object.freeze((Object:any).defineProperty({
-      subject: htmlToText(thread[9]),
-      shortDate: htmlToText(thread[14]),
-      timeString: htmlToText(thread[15]),
-      peopleHtml: cleanupPeopleLine(thread[7]),
-      timestamp: thread[16] / 1000,
-      isUnread: thread[9].indexOf('<b>') > -1,
-      lastEmailAddress: thread[28],
-      bodyPreviewHtml: thread[10],
-      someGmailMessageIds: [thread[1], thread[2]],
-      gmailThreadId: thread[0]
-    }, '_originalGmailFormat', {value: thread}))
+    Object.freeze(
+      (Object: any).defineProperty(
+        {
+          subject: htmlToText(thread[9]),
+          shortDate: htmlToText(thread[14]),
+          timeString: htmlToText(thread[15]),
+          peopleHtml: cleanupPeopleLine(thread[7]),
+          timestamp: thread[16] / 1000,
+          isUnread: thread[9].indexOf('<b>') > -1,
+          lastEmailAddress: thread[28],
+          bodyPreviewHtml: thread[10],
+          someGmailMessageIds: [thread[1], thread[2]],
+          gmailThreadId: thread[0]
+        },
+        '_originalGmailFormat',
+        { value: thread }
+      )
+    )
   );
 }
 
@@ -536,8 +584,10 @@ const _extractMessageIdsFromThreadBatchRequestXf = t.compose(
   t.filter(item => item[0] === 'cs'),
   t.map(item => [item[1], item[2]])
 );
-export function extractMessageIdsFromThreadBatchRequest(response: string): {[threadId:string]: string} {
-  const {value} = deserialize(response);
+export function extractMessageIdsFromThreadBatchRequest(
+  response: string
+): { [threadId: string]: string } {
+  const { value } = deserialize(response);
   return t.toObj(value, _extractMessageIdsFromThreadBatchRequestXf);
 }
 
@@ -555,19 +605,23 @@ const _extractThreadArraysFromResponseArrayXf = t.compose(
   t.map(item => item[2]),
   t.cat
 );
-function _extractThreadArraysFromResponseArray(threadResponseArray: any[]): any[] {
-  return t.toArray(threadResponseArray, _extractThreadArraysFromResponseArrayXf);
+function _extractThreadArraysFromResponseArray(
+  threadResponseArray: any[]
+): any[] {
+  return t.toArray(
+    threadResponseArray,
+    _extractThreadArraysFromResponseArrayXf
+  );
 }
-
 
 export type Message = {
-  date: number;
-  messageID?: string;
+  date: number,
+  messageID?: string,
   recipients?: Array<{
-    emailAddress: string;
-    name: ?string;
-  }>;
-}
+    emailAddress: string,
+    name: ?string
+  }>
+};
 
 const _extractThreadsFromConversationViewResponseArrayXf = t.compose(
   t.cat,
@@ -587,44 +641,56 @@ const _extractMessagesFromResponseArrayXf = t.compose(
   }))
 );
 
-export function extractMessages(response: string): Array<{threadID: string; messages: Message[]}> {
+export function extractMessages(
+  response: string
+): Array<{ threadID: string, messages: Message[] }> {
   // regular view=cv requests have a top level array length of 1
   // whereas view=cv requests when you refresh Gmail while looking at a thread
   // have a top level array with more elements
- let {value} = deserialize(response);
- if(value.length === 1) value = value[0];
+  let { value } = deserialize(response);
+  if (value.length === 1) value = value[0];
 
- const threads = t.toArray(value, _extractThreadsFromConversationViewResponseArrayXf);
- const messages = t.toArray(value, _extractMessagesFromResponseArrayXf);
+  const threads = t.toArray(
+    value,
+    _extractThreadsFromConversationViewResponseArrayXf
+  );
+  const messages = t.toArray(value, _extractMessagesFromResponseArrayXf);
 
- const messageMap = {};
- messages.forEach(message => {
-   messageMap[message.messageID] = message;
- });
+  const messageMap = {};
+  messages.forEach(message => {
+    messageMap[message.messageID] = message;
+  });
 
- return threads.map(({threadID, messageIDs}) => ({
-   threadID,
-   messages: messageIDs.map(messageID => messageMap[messageID])
- }));
+  return threads.map(({ threadID, messageIDs }) => ({
+    threadID,
+    messages: messageIDs.map(messageID => messageMap[messageID])
+  }));
 }
 
 function _threadsToTbGroups(threads: any[], start: number): Array<Array<any>> {
   const _threadsToTbGroupsXf = t.compose(
     t.map(thread => thread._originalGmailFormat),
     t.partition(10),
-    mapIndexed((threadsChunk, i) => [['tb', start + i*10, threadsChunk]])
+    mapIndexed((threadsChunk, i) => [['tb', start + i * 10, threadsChunk]])
   );
   return t.toArray(threads, _threadsToTbGroupsXf);
 }
 
-function _searchArray(responseArray: any, marker: string, markerArrayValidator: (markerArray: any[]) => boolean): any {
+function _searchArray(
+  responseArray: any,
+  marker: string,
+  markerArrayValidator: (markerArray: any[]) => boolean
+): any {
   const pathArray = _searchObject(responseArray, marker, 100);
 
-  for(let ii=0; ii<pathArray.length; ii++){
+  for (let ii = 0; ii < pathArray.length; ii++) {
     const pathToMarkerArray = pathArray[ii].path.slice(0, -1);
-    const markerArray = _getArrayValueFromPath(responseArray, pathToMarkerArray);
+    const markerArray = _getArrayValueFromPath(
+      responseArray,
+      pathToMarkerArray
+    );
 
-    if(markerArrayValidator(markerArray)){
+    if (markerArrayValidator(markerArray)) {
       return markerArray;
     }
   }
@@ -641,7 +707,7 @@ function _searchObject(element: Object, query: string, maxDepth: number): any {
   while (nodeList.length > 0) {
     const node = nodeList.pop();
     if (node.path.length <= maxDepth) {
-      if(node.el !== null && typeof node.el === 'object'){
+      if (node.el !== null && typeof node.el === 'object') {
         const keys = Object.keys(node.el);
         for (let i = 0; i < keys.length; i++) {
           const key = keys[i];
@@ -663,8 +729,8 @@ function _searchObject(element: Object, query: string, maxDepth: number): any {
 
 function _getArrayValueFromPath(responseArray: any, path: string[]): any {
   let currentArray = responseArray;
-  for(let ii=0; ii<path.length; ii++){
-    currentArray = currentArray[ path[ii] ];
+  for (let ii = 0; ii < path.length; ii++) {
+    currentArray = currentArray[path[ii]];
   }
   return currentArray;
 }

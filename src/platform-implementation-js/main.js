@@ -2,11 +2,13 @@
 
 if (!global.__InboxSDKImpLoader) {
   var piMainStarted = Date.now();
-  var wasAccountSwitcherReadyAtStart = !!document.querySelector('[role=banner] div[aria-label] div div a[href^="https://myaccount.google."], [role=banner]+div div[aria-label] div div a[href^="https://myaccount.google."]');
+  var wasAccountSwitcherReadyAtStart = !!document.querySelector(
+    '[role=banner] div[aria-label] div div a[href^="https://myaccount.google."], [role=banner]+div div[aria-label] div div a[href^="https://myaccount.google."]'
+  );
 
   var oldDefine;
   try {
-    if (typeof define !== "undefined" && define && define.amd) {
+    if (typeof define !== 'undefined' && define && define.amd) {
       // work around amd compatibility issue
       // https://groups.google.com/forum/#!msg/inboxsdk/U_bq82Exmwc/I3iIinxxCAAJ
       oldDefine = define;
@@ -18,37 +20,47 @@ if (!global.__InboxSDKImpLoader) {
     var Kefir = require('kefir');
 
     var onready = new RSVP.Promise((resolve, reject) => {
-      if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      if (
+        document.readyState === 'complete' ||
+        document.readyState === 'interactive'
+      ) {
         resolve();
       } else {
         resolve(
           Kefir.merge([
             Kefir.fromEvents(document, 'DOMContentLoaded'),
             Kefir.fromEvents(window, 'load')
-          ]).take(1).map(() => null).toPromise(RSVP.Promise)
+          ])
+            .take(1)
+            .map(() => null)
+            .toPromise(RSVP.Promise)
         );
       }
     });
 
     global.__InboxSDKImpLoader = {
       load: function(version, appId, opts) {
-        if (version !== "0.1") {
-          throw new Error("Unsupported InboxSDK version");
+        if (version !== '0.1') {
+          throw new Error('Unsupported InboxSDK version');
         }
 
         var piLoadStarted = Date.now();
         return onready.then(() => {
           var oldDefine;
           try {
-            if (typeof define !== "undefined" && define && define.amd) {
+            if (typeof define !== 'undefined' && define && define.amd) {
               // work around amd compatibility issue
               // https://groups.google.com/forum/#!msg/inboxsdk/U_bq82Exmwc/I3iIinxxCAAJ
               oldDefine = define;
               define = null;
             }
-            const {makePlatformImplementation} = require('./platform-implementation');
+            const {
+              makePlatformImplementation
+            } = require('./platform-implementation');
             return makePlatformImplementation(appId, opts, {
-              piMainStarted, piLoadStarted, wasAccountSwitcherReadyAtStart
+              piMainStarted,
+              piLoadStarted,
+              wasAccountSwitcherReadyAtStart
             });
           } finally {
             if (oldDefine) {

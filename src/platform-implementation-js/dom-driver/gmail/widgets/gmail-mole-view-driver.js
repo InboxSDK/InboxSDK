@@ -1,7 +1,7 @@
 /* @flow */
 
 import last from 'lodash/last';
-import {defn} from 'ud';
+import { defn } from 'ud';
 import addAccessors from 'add-accessors';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -9,7 +9,10 @@ import kefirStopper from 'kefir-stopper';
 import streamWaitFor from '../../../lib/stream-wait-for';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import findParent from '../../../../common/find-parent';
-import type {MoleViewDriver, MoleOptions} from '../../../driver-interfaces/mole-view-driver';
+import type {
+  MoleViewDriver,
+  MoleOptions
+} from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
 
@@ -23,15 +26,17 @@ class GmailMoleViewDriver {
     (this: MoleViewDriver); // interface check
     this._driver = driver;
     this._element = Object.assign(document.createElement('div'), {
-      className: 'inboxsdk__mole_view '+(options.className||''),
+      className: 'inboxsdk__mole_view ' + (options.className || ''),
       innerHTML: getHTMLString(options)
     });
 
-    if(options.chrome === false){
+    if (options.chrome === false) {
       this._element.classList.add('inboxsdk__mole_view_chromeless');
-    }
-    else{
-      querySelector(this._element, '.inboxsdk__mole_view_titlebar').addEventListener('click', (e: MouseEvent) => {
+    } else {
+      querySelector(
+        this._element,
+        '.inboxsdk__mole_view_titlebar'
+      ).addEventListener('click', (e: MouseEvent) => {
         this.setMinimized(!this.getMinimized());
         e.preventDefault();
         e.stopPropagation();
@@ -69,10 +74,13 @@ class GmailMoleViewDriver {
 
       const titleButtons = options.titleButtons;
       if (titleButtons) {
-        const titleButtonContainer = querySelector(this._element, '.inboxsdk__mole_title_buttons');
-        const lastChild: HTMLElement = (titleButtonContainer.lastElementChild:any);
+        const titleButtonContainer = querySelector(
+          this._element,
+          '.inboxsdk__mole_title_buttons'
+        );
+        const lastChild: HTMLElement = (titleButtonContainer.lastElementChild: any);
         titleButtons.forEach(titleButton => {
-          const img: HTMLImageElement = (document.createElement('img'):any);
+          const img: HTMLImageElement = (document.createElement('img'): any);
           if (titleButton.iconClass) {
             img.className = titleButton.iconClass;
           }
@@ -88,13 +96,18 @@ class GmailMoleViewDriver {
       }
     }
 
-    querySelector(this._element, '.inboxsdk__mole_view_content').appendChild(options.el);
+    querySelector(this._element, '.inboxsdk__mole_view_content').appendChild(
+      options.el
+    );
   }
 
   show() {
-    const doShow = (moleParent) => {
+    const doShow = moleParent => {
       moleParent.insertBefore(this._element, last(moleParent.children));
-      const dw = findParent(moleParent, el => el.nodeName === 'DIV' && el.classList.contains('dw'));
+      const dw = findParent(
+        moleParent,
+        el => el.nodeName === 'DIV' && el.classList.contains('dw')
+      );
       if (dw) {
         dw.classList.add('inboxsdk__moles_in_use');
       }
@@ -104,7 +117,9 @@ class GmailMoleViewDriver {
     if (moleParent) {
       doShow(moleParent);
     } else {
-      const moleParentReadyEvent = streamWaitFor(() => GmailElementGetter.getMoleParent())
+      const moleParentReadyEvent = streamWaitFor(() =>
+        GmailElementGetter.getMoleParent()
+      )
         .takeUntilBy(this._stopper)
         .onValue(doShow);
 
@@ -117,7 +132,7 @@ class GmailMoleViewDriver {
       Kefir.fromPromise(GmailElementGetter.waitForGmailModeToSettle())
         .flatMap(() => {
           // delay until we've passed TimestampOnReady + 10 seconds
-          return this._driver.delayToTimeAfterReady(10*1000);
+          return this._driver.delayToTimeAfterReady(10 * 1000);
         })
         .takeUntilBy(moleParentReadyEvent)
         .takeUntilBy(this._stopper)
@@ -133,7 +148,7 @@ class GmailMoleViewDriver {
   setMinimized(minimized: boolean) {
     if (minimized) {
       this._element.classList.add('inboxsdk__minimized');
-      this._eventStream.emit({eventName:'minimize'});
+      this._eventStream.emit({ eventName: 'minimize' });
     } else {
       this._element.classList.remove('inboxsdk__minimized');
 
@@ -144,7 +159,7 @@ class GmailMoleViewDriver {
         moleParent.insertBefore(this._element, last(moleParent.children));
       }
 
-      this._eventStream.emit({eventName:'restore'});
+      this._eventStream.emit({ eventName: 'restore' });
     }
   }
 
@@ -153,23 +168,29 @@ class GmailMoleViewDriver {
   }
 
   setTitle(text: string) {
-    const titleElement = this._element.querySelector('.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_default');
-    if(titleElement){
+    const titleElement = this._element.querySelector(
+      '.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_default'
+    );
+    if (titleElement) {
       titleElement.textContent = text;
     }
   }
 
   _setTitleEl(el: HTMLElement) {
-    const container = this._element.querySelector('.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_default');
-    if(container){
+    const container = this._element.querySelector(
+      '.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_default'
+    );
+    if (container) {
       container.textContent = '';
       container.appendChild(el);
     }
   }
 
   _setMinimizedTitleEl(el: HTMLElement) {
-    const container = this._element.querySelector('.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_minimized');
-    if(container){
+    const container = this._element.querySelector(
+      '.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_minimized'
+    );
+    if (container) {
       this._element.classList.add('inboxsdk__mole_use_minimize_title');
       container.textContent = '';
       container.appendChild(el);
@@ -189,7 +210,7 @@ class GmailMoleViewDriver {
 
 export default defn(module, GmailMoleViewDriver);
 
-function getHTMLString(options: MoleOptions){
+function getHTMLString(options: MoleOptions) {
   return `
     <div class="inboxsdk__mole_view_inner">
       ${getTitleHTMLString(options)}
@@ -198,11 +219,10 @@ function getHTMLString(options: MoleOptions){
   `;
 }
 
-function getTitleHTMLString(options: MoleOptions){
-  if(options.chrome === false){
+function getTitleHTMLString(options: MoleOptions) {
+  if (options.chrome === false) {
     return '';
-  }
-  else{
+  } else {
     return `<div class="inboxsdk__mole_view_titlebar">
     <div class="inboxsdk__mole_title_buttons">
       <img class="Hl" src="images/cleardot.gif" alt="Minimize" aria-label="Minimize" data-tooltip-delay="800" data-tooltip="Minimize"><img class="Hk" id=":rp" src="images/cleardot.gif" alt="Minimize" aria-label="Maximize" data-tooltip-delay="800" data-tooltip="Maximize"><!--<img class="Hq aUG" src="images/cleardot.gif" alt="Pop-out" aria-label="Full-screen (Shift for Pop-out)" data-tooltip-delay="800" data-tooltip="Full-screen (Shift for Pop-out)">--><img class="Ha" src="images/cleardot.gif" alt="Close" aria-label="Close" data-tooltip-delay="800" data-tooltip="Close">

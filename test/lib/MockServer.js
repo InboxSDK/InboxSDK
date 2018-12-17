@@ -4,32 +4,39 @@ import _ from 'lodash';
 
 function makeEvent(self, isProgressEvent) {
   const props = {
-    currentTarget: {value:self},
-    target: {value:self},
-    srcElement: {value:self},
-    timeStamp: {value:Date.now()},
-    type: {value:'readystatechange'}
+    currentTarget: { value: self },
+    target: { value: self },
+    srcElement: { value: self },
+    timeStamp: { value: Date.now() },
+    type: { value: 'readystatechange' }
   };
   if (isProgressEvent) {
     _.assign(props, {
-      lengthComputable: {value:self._lengthComputable},
-      loaded: {value:self._loaded},
-      total: {value:self._total}
+      lengthComputable: { value: self._lengthComputable },
+      loaded: { value: self._loaded },
+      total: { value: self._total }
     });
   }
   return Object.freeze(Object.defineProperties({}, props));
 }
 
-function checkResponderFilter(filter, method, path, responseType, requestHeaders, body) {
-  if (filter.method && filter.method != method){
+function checkResponderFilter(
+  filter,
+  method,
+  path,
+  responseType,
+  requestHeaders,
+  body
+) {
+  if (filter.method && filter.method != method) {
     return false;
   }
 
-  if (filter.path && filter.path != path){
+  if (filter.path && filter.path != path) {
     return false;
   }
 
-  if (filter.responseType && filter.responseType != responseType){
+  if (filter.responseType && filter.responseType != responseType) {
     return false;
   }
 
@@ -37,20 +44,22 @@ function checkResponderFilter(filter, method, path, responseType, requestHeaders
     return false;
   }
 
-  if (!_.every(filter.headers, (value, name) =>
-    name in requestHeaders && requestHeaders[name] == value
-  )) {
+  if (
+    !_.every(
+      filter.headers,
+      (value, name) => name in requestHeaders && requestHeaders[name] == value
+    )
+  ) {
     return false;
   }
-
 
   return true;
 }
 
 const defaultResponder = {
   status: 404,
-  headers: {"Content-Type": "text/plain"},
-  response: "Content not found",
+  headers: { 'Content-Type': 'text/plain' },
+  response: 'Content not found',
   delay: (null: ?number),
   noDelay: false
 };
@@ -61,14 +70,27 @@ const statusTextCodes = {
   '404': 'not found'
 };
 
-function selectResponder(responders, method, path, responseType, requestHeaders, body) {
+function selectResponder(
+  responders,
+  method,
+  path,
+  responseType,
+  requestHeaders,
+  body
+) {
   const foundPair = _.find(responders, pair =>
-    checkResponderFilter(pair.filter, method, path, responseType, requestHeaders, body)
+    checkResponderFilter(
+      pair.filter,
+      method,
+      path,
+      responseType,
+      requestHeaders,
+      body
+    )
   );
-  if(foundPair == null){
+  if (foundPair == null) {
     return defaultResponder;
-  }
-  else{
+  } else {
     return foundPair.responder;
   }
 }
@@ -115,37 +137,47 @@ export default class MockServer {
 
       constructor() {
         [
-          'readyState','response','responseText','responseXML','status','statusText'
+          'readyState',
+          'response',
+          'responseText',
+          'responseXML',
+          'status',
+          'statusText'
         ].forEach(prop => {
           Object.defineProperty(this, prop, {
-            configurable: false, enumerable: true,
+            configurable: false,
+            enumerable: true,
             get() {
               // Safari throws exceptions when you read some properties too early.
-              if ((this._readyState < 2 && prop.match(/^status/)) ||
-                (this._readyState < 3 && prop.match(/^response/)))
-              {
-                throw new Error(prop+" can't be accessed yet");
+              if (
+                (this._readyState < 2 && prop.match(/^status/)) ||
+                (this._readyState < 3 && prop.match(/^response/))
+              ) {
+                throw new Error(prop + " can't be accessed yet");
               }
               if (prop == 'responseText') {
                 if (this.responseType && this.responseType != 'text') {
                   throw new Error(
                     "The value is only accessible if the object's 'responseType' " +
-                    "is '' or 'text' (was '"+this.responseType+"').");
+                      "is '' or 'text' (was '" +
+                      this.responseType +
+                      "')."
+                  );
                 }
                 return this._response;
               }
-              return (this: any)['_'+prop];
+              return (this: any)['_' + prop];
             },
             set(v) {
-              throw new Error("Can not modify read-only property "+prop);
+              throw new Error('Can not modify read-only property ' + prop);
             }
           });
         });
       }
 
-      open(method: string, path: string, async: ?boolean=undefined) {
+      open(method: string, path: string, async: ?boolean = undefined) {
         if (this._server._verbose) {
-          console.log("Connection opened", method, path); //eslint-disable-line no-console
+          console.log('Connection opened', method, path); //eslint-disable-line no-console
         }
         this._terminate();
         this._sendFlag = false;
@@ -192,25 +224,28 @@ export default class MockServer {
         this._body = body;
         this._sendFlag = true;
         if (this._readyState != 1)
-          throw new Error("Invalid state "+this._readyState);
+          throw new Error('Invalid state ' + this._readyState);
 
         this._responder = selectResponder(
-          this._server._responders, this._method, this._path,
-          this.responseType || 'text', this._requestHeaders, body);
+          this._server._responders,
+          this._method,
+          this._path,
+          this.responseType || 'text',
+          this._requestHeaders,
+          body
+        );
 
         const delay = this._responder.delay;
         const noDelay = this._responder.noDelay;
 
-        const step = (fn) => {
+        const step = fn => {
           if (this._async) {
-            if(delay != null){
-                return setTimeout(fn, delay);
-            }
-            else if(noDelay){
+            if (delay != null) {
+              return setTimeout(fn, delay);
+            } else if (noDelay) {
               fn();
-            }
-            else{
-                return setTimeout(fn, 0);
+            } else {
+              return setTimeout(fn, 0);
             }
           } else {
             fn();
@@ -220,7 +255,8 @@ export default class MockServer {
         const headers = () => {
           this._readyState = 2;
           this._status = this._responder.status;
-          this._statusText = this._responder.statusText || statusTextCodes[this._status];
+          this._statusText =
+            this._responder.statusText || statusTextCodes[this._status];
           if (this._responder.total !== false && this._responder.response) {
             this._lengthComputable = true;
             this._total = this._responder.response.length;
@@ -243,13 +279,18 @@ export default class MockServer {
           this._readyState = 4;
 
           if (typeof this._responder.responseFunction === 'function') {
-            this._response = this._responder.responseFunction(this._method, this._path, this._requestHeaders, this._body);
+            this._response = this._responder.responseFunction(
+              this._method,
+              this._path,
+              this._requestHeaders,
+              this._body
+            );
           } else {
             this._response = this._responder.response;
           }
 
           this._responseXML = this._responder.responseXML;
-          this._loaded = this._response && this._response.length || 0;
+          this._loaded = (this._response && this._response.length) || 0;
           this._callListeners('readystatechange', makeEvent(this));
           if (this._status == 200) {
             this._callListeners('load', makeEvent(this, true));
@@ -263,8 +304,7 @@ export default class MockServer {
       }
 
       _callListeners(name: string, event: Object) {
-        if ((this: any)['on'+name])
-          (this: any)['on'+name](event);
+        if ((this: any)['on' + name]) (this: any)['on' + name](event);
 
         _.each(this._listeners[name], listener => {
           listener.call(this, event);
@@ -273,7 +313,9 @@ export default class MockServer {
 
       setRequestHeader(header: string, value: string) {
         if (this._readyState != 1 || this._sendFlag) {
-          throw new Error("Can't set headers now at readyState "+this._readyState);
+          throw new Error(
+            "Can't set headers now at readyState " + this._readyState
+          );
         }
         this._requestHeaders[header.toLowerCase()] = value;
       }
@@ -292,12 +334,14 @@ export default class MockServer {
         if (this._readyState < 2) {
           return null;
         }
-        return _.map(this._responder.headers, (value, name) => name+': '+value+'\n').join('');
+        return _.map(
+          this._responder.headers,
+          (value, name) => name + ': ' + value + '\n'
+        ).join('');
       }
 
       addEventListener(name, listener) {
-        if (!this._listeners[name])
-          this._listeners[name] = [];
+        if (!this._listeners[name]) this._listeners[name] = [];
         if (!_.includes(this._listeners[name], listener))
           this._listeners[name].push(listener);
       }
@@ -323,7 +367,7 @@ export default class MockServer {
     filter.headers = lowercaseHeaderNames(filter.headers);
     responder.headers = lowercaseHeaderNames(responder.headers);
 
-    this._responders.push({filter: filter, responder: responder});
+    this._responders.push({ filter: filter, responder: responder });
   }
 
   setVerbose(verbose: boolean) {

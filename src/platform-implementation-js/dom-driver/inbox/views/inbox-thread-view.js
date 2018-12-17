@@ -1,11 +1,11 @@
 /* @flow */
 
 import find from 'lodash/find';
-import {defn} from 'ud';
+import { defn } from 'ud';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
-import type {Bus} from 'kefir-bus';
+import type { Bus } from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import BigNumber from 'bignumber.js';
 import delayAsap from '../../../lib/delay-asap';
@@ -18,8 +18,8 @@ import type ContentPanelViewDriver from '../../../driver-common/sidebar/ContentP
 import SimpleElementView from '../../../views/SimpleElementView';
 import CustomMessageView from '../../../views/conversations/custom-message-view';
 import parser from '../detection/thread/parser';
-import type {Parsed} from '../detection/thread/parser';
-import type {CustomMessageDescriptor} from '../../../views/conversations/custom-message-view';
+import type { Parsed } from '../detection/thread/parser';
+import type { CustomMessageDescriptor } from '../../../views/conversations/custom-message-view';
 
 class InboxThreadView {
   _element: HTMLElement;
@@ -37,7 +37,10 @@ class InboxThreadView {
     this._driver = driver;
     this._p = parsed;
 
-    this._stopper = this._eventStream.ignoreValues().beforeEnd(()=>null).toProperty();
+    this._stopper = this._eventStream
+      .ignoreValues()
+      .beforeEnd(() => null)
+      .toProperty();
 
     this._driver.getThreadViewElementsMap().set(this._element, this);
 
@@ -49,7 +52,10 @@ class InboxThreadView {
       .toProperty();
 
     if (this.isLoadingStub()) {
-      makeMutationObserverChunkedStream(this._element, {attributes: true, attributeFilter: ['aria-busy']})
+      makeMutationObserverChunkedStream(this._element, {
+        attributes: true,
+        attributeFilter: ['aria-busy']
+      })
         .takeUntilBy(this._stopper)
         .onValue(() => {
           if (!this.isLoadingStub()) {
@@ -73,10 +79,13 @@ class InboxThreadView {
 
   addMessageViewDriver(messageView: InboxMessageView) {
     this._messageViews.push(messageView);
-    this._eventStream.plug(messageView.getEventStream()
-      .filter(event => event.eventName === 'contactHover')
+    this._eventStream.plug(
+      messageView
+        .getEventStream()
+        .filter(event => event.eventName === 'contactHover')
     );
-    messageView.getStopper()
+    messageView
+      .getStopper()
       .takeUntilBy(this._stopper)
       .onValue(() => {
         this._messageViews = this._messageViews.filter(m => m !== messageView);
@@ -103,12 +112,15 @@ class InboxThreadView {
   }
 
   getThreadID(): string {
-    const {inboxThreadId} = this._p.attributes;
+    const { inboxThreadId } = this._p.attributes;
     if (!inboxThreadId) {
       throw new Error('Failed to find thread id');
     }
     if (/^msg-a:/.test(inboxThreadId)) {
-      console.warn('ThreadView.getThreadID() returned an incorrect thread ID. This method will be deprecated soon. Use getThreadIDAsync() instead which does not have this problem.'); //eslint-disable-line no-console
+      // eslint-disable-next-line no-console
+      console.warn(
+        'ThreadView.getThreadID() returned an incorrect thread ID. This method will be deprecated soon. Use getThreadIDAsync() instead which does not have this problem.'
+      );
     }
     const m = /\d+$/.exec(inboxThreadId);
     if (!m) throw new Error('Should not happen');
@@ -116,7 +128,7 @@ class InboxThreadView {
   }
 
   async getThreadIDAsync(): Promise<string> {
-    const {inboxThreadId} = this._p.attributes;
+    const { inboxThreadId } = this._p.attributes;
     if (!inboxThreadId) {
       throw new Error('Failed to find message id');
     }
@@ -135,41 +147,51 @@ class InboxThreadView {
     }
   }
 
-  registerHiddenCustomMessageNoticeProvider(provider: (numberCustomMessagesHidden: number, numberNativeMessagesHidden: ?number) => HTMLElement) {
+  registerHiddenCustomMessageNoticeProvider(
+    provider: (
+      numberCustomMessagesHidden: number,
+      numberNativeMessagesHidden: ?number
+    ) => HTMLElement
+  ) {
     throw new Error('not supported');
   }
 
-  addCustomMessage(descriptorStream: Kefir.Observable<CustomMessageDescriptor>): CustomMessageView {
+  addCustomMessage(
+    descriptorStream: Kefir.Observable<CustomMessageDescriptor>
+  ): CustomMessageView {
     throw new Error('not supported');
   }
 
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
-    const panel = this._driver.getAppSidebarView().addSidebarContentPanel(descriptor);
+    const panel = this._driver
+      .getAppSidebarView()
+      .addSidebarContentPanel(descriptor);
     this._sidebarPanels.add(panel);
-    panel.getStopper()
-      .onValue(() => {
-        this._sidebarPanels.delete(panel);
-      });
-    this._stopper
-      .takeUntilBy(panel.getStopper())
-      .onValue(() => {
-        panel.remove();
-      });
+    panel.getStopper().onValue(() => {
+      this._sidebarPanels.delete(panel);
+    });
+    this._stopper.takeUntilBy(panel.getStopper()).onValue(() => {
+      panel.remove();
+    });
 
     descriptor
       .takeUntilBy(this._stopper)
       .takeUntilBy(panel.getStopper())
       .take(1)
       .onValue(descriptor => {
-        const {stickyHeading} = this._p.elements;
+        const { stickyHeading } = this._p.elements;
         if (!stickyHeading) return;
 
-        let iconArea = stickyHeading.querySelector('.'+idMap('sidebar_iconArea'));
+        let iconArea = stickyHeading.querySelector(
+          '.' + idMap('sidebar_iconArea')
+        );
         if (!iconArea) {
-          const _iconArea = iconArea = document.createElement('div');
+          const _iconArea = (iconArea = document.createElement('div'));
           iconArea.className = idMap('sidebar_iconArea');
 
-          this._driver.getAppSidebarView().getOpenOrOpeningStream()
+          this._driver
+            .getAppSidebarView()
+            .getOpenOrOpeningStream()
             .takeUntilBy(this._stopper)
             .onValue(open => {
               _iconArea.style.display = open ? 'none' : '';
@@ -178,13 +200,19 @@ class InboxThreadView {
           stickyHeading.appendChild(iconArea);
         }
 
-        const appName = descriptor.appName || this._driver.getOpts().appName || descriptor.title;
-        const appIconUrl = descriptor.appIconUrl || this._driver.getOpts().appIconUrl || descriptor.iconUrl;
+        const appName =
+          descriptor.appName ||
+          this._driver.getOpts().appName ||
+          descriptor.title;
+        const appIconUrl =
+          descriptor.appIconUrl ||
+          this._driver.getOpts().appIconUrl ||
+          descriptor.iconUrl;
 
         // If there's an existing button for the app, then just increment its
         // data-count attribute instead of adding a new button.
         const existingButtonContainer = find(
-          iconArea.querySelectorAll('.'+idMap('sidebar_button_container')),
+          iconArea.querySelectorAll('.' + idMap('sidebar_button_container')),
           el => {
             const button = el.querySelector('button');
             if (!button || button.title !== appName) return false;
@@ -196,22 +224,27 @@ class InboxThreadView {
 
         let container;
         if (existingButtonContainer) {
-          const currentCount = Number(existingButtonContainer.getAttribute('data-count')) || 1;
-          existingButtonContainer.setAttribute('data-count', currentCount+1);
+          const currentCount =
+            Number(existingButtonContainer.getAttribute('data-count')) || 1;
+          existingButtonContainer.setAttribute('data-count', currentCount + 1);
           container = existingButtonContainer;
         } else {
           container = document.createElement('div');
           container.className = idMap('sidebar_button_container');
-          container.innerHTML = autoHtml `
+          container.innerHTML = autoHtml`
             <button class="inboxsdk__button_icon" type="button" title="${appName}">
               <img class="inboxsdk__button_iconImg" src="${appIconUrl}">
             </button>
           `;
-          querySelector(container, 'button').addEventListener('click', (event: MouseEvent) => {
-            event.stopPropagation();
-            this._driver.getAppSidebarView().open();
-            panel.scrollIntoView();
-          }, true);
+          querySelector(container, 'button').addEventListener(
+            'click',
+            (event: MouseEvent) => {
+              event.stopPropagation();
+              this._driver.getAppSidebarView().open();
+              panel.scrollIntoView();
+            },
+            true
+          );
           iconArea.appendChild(container);
         }
 
@@ -222,7 +255,7 @@ class InboxThreadView {
           } else if (currentCount === 2) {
             container.removeAttribute('data-count');
           } else {
-            container.setAttribute('data-count', String(currentCount-1));
+            container.setAttribute('data-count', String(currentCount - 1));
           }
         });
       });
@@ -240,7 +273,7 @@ class InboxThreadView {
     const el = document.createElement('div');
     el.className = idMap('thread_noticeBar');
 
-    const {heading} = this._p.elements;
+    const { heading } = this._p.elements;
     if (!heading) {
       throw new Error('Failed to find subject');
     }

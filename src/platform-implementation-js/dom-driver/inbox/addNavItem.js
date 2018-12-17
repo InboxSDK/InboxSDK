@@ -8,7 +8,7 @@ import querySelector from '../../lib/dom/querySelectorOrFail';
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 
 import type LiveSet from 'live-set';
-import type {TagTreeNode} from 'tag-tree';
+import type { TagTreeNode } from 'tag-tree';
 
 export default function addNavItem(
   navItemDescriptor: Kefir.Observable<Object>,
@@ -17,30 +17,34 @@ export default function addNavItem(
 ): InboxNavItemView {
   const inboxNavItemView = new InboxNavItemView(navItemDescriptor, 0);
 
-  toItemWithLifetimeStream(leftNavLiveSet).take(1)
-    .map(({el: node}) => node.getValue())
-    .onValue((el) => {
-      inboxNavItemView.getEventStream()
+  toItemWithLifetimeStream(leftNavLiveSet)
+    .take(1)
+    .map(({ el: node }) => node.getValue())
+    .onValue(el => {
+      inboxNavItemView
+        .getEventStream()
         .filter(eventNameFilter('orderChanged'))
-        .onValue(() => (
+        .onValue(() =>
           insertElementInOrder(containerEl, inboxNavItemView.getElement())
-        ));
+        );
 
       if (!el.contains(containerEl)) {
-        const existingCustomSections = el.querySelectorAll('.inboxsdk__navItem_appContainer');
+        const existingCustomSections = el.querySelectorAll(
+          '.inboxsdk__navItem_appContainer'
+        );
         if (existingCustomSections.length > 0) {
-          const lastCustomSection = existingCustomSections[existingCustomSections.length - 1];
+          const lastCustomSection =
+            existingCustomSections[existingCustomSections.length - 1];
           lastCustomSection.insertAdjacentElement('afterend', containerEl);
         } else {
           // Locate <ul> with native folders by finding draft icon image
           const draftsImg = querySelector(el, 'ul > li > img[src*="ic_draft"]');
 
-          const nativeFolderSection = (
-            draftsImg.parentElement &&
-            draftsImg.parentElement.parentElement
-          );
+          const nativeFolderSection =
+            draftsImg.parentElement && draftsImg.parentElement.parentElement;
 
-          if (!nativeFolderSection) throw new Error('could not locate insertion point');
+          if (!nativeFolderSection)
+            throw new Error('could not locate insertion point');
 
           nativeFolderSection.insertAdjacentElement('afterend', containerEl);
         }

@@ -9,7 +9,7 @@ It was a strange world, can you believe who the President of the United States w
 
 import findIndex from 'lodash/findIndex';
 import asap from 'asap';
-import {defn} from 'ud';
+import { defn } from 'ud';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -25,7 +25,7 @@ import incrementName from '../../../lib/incrementName';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
-import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
+import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 import fakeWindowResize from '../../../lib/fake-window-resize';
 import type GmailDriver from '../gmail-driver';
 
@@ -62,12 +62,16 @@ class GmailAppSidebarView {
     // attribute to see whether a previous extension's GmailAppSidebarView has
     // already set up the sidebar or not.
     const idElement = addonSidebarElement || sidebarContainerEl;
-    if(!idElement) throw new Error('should not happen');
+    if (!idElement) throw new Error('should not happen');
     const instanceId = idElement.getAttribute('data-sdk-sidebar-instance-id');
     if (instanceId != null) {
       this._instanceId = instanceId;
     } else {
-      this._createElement(sidebarContainerEl, addonSidebarElement, widthManager);
+      this._createElement(
+        sidebarContainerEl,
+        addonSidebarElement,
+        widthManager
+      );
     }
   }
 
@@ -83,18 +87,28 @@ class GmailAppSidebarView {
   // itself when available when the chat sidebar isn't present. It's only set
   // if the user interacts with the app sidebar button.
   _getShouldAppSidebarOpen(): boolean {
-    return global.localStorage.getItem('inboxsdk__app_sidebar_should_open') !== 'false';
+    return (
+      global.localStorage.getItem('inboxsdk__app_sidebar_should_open') !==
+      'false'
+    );
   }
 
   _setShouldAppSidebarOpen(open: boolean) {
     try {
-      global.localStorage.setItem('inboxsdk__app_sidebar_should_open', String(open));
-    } catch(err) {
+      global.localStorage.setItem(
+        'inboxsdk__app_sidebar_should_open',
+        String(open)
+      );
+    } catch (err) {
       console.error('error saving', err); //eslint-disable-line no-console
     }
   }
 
-  _createElement(_sidebarContainerEl: ?HTMLElement, _addonSidebarContainerEl: ?HTMLElement, widthManager: ?WidthManager) {
+  _createElement(
+    _sidebarContainerEl: ?HTMLElement,
+    _addonSidebarContainerEl: ?HTMLElement,
+    widthManager: ?WidthManager
+  ) {
     let container, iconArea;
     let component: AppSidebar;
 
@@ -102,7 +116,7 @@ class GmailAppSidebarView {
 
     {
       const idElement = _addonSidebarContainerEl || _sidebarContainerEl;
-      if(!idElement) throw new Error('should not happen');
+      if (!idElement) throw new Error('should not happen');
       idElement.setAttribute('data-sdk-sidebar-instance-id', this._instanceId);
       this._stopper.onValue(() => {
         idElement.removeAttribute('data-sdk-sidebar-instance-id');
@@ -119,15 +133,20 @@ class GmailAppSidebarView {
     let usedAddonsSidebar = false;
 
     const updateHighlightedAppIconBus = kefirBus();
-    this._stopper.onEnd(() => {updateHighlightedAppIconBus.end();});
+    this._stopper.onEnd(() => {
+      updateHighlightedAppIconBus.end();
+    });
 
-    if(_addonSidebarContainerEl){
+    if (_addonSidebarContainerEl) {
       const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
-      if(mainContentBodyContainerElement){
+      if (mainContentBodyContainerElement) {
         contentContainer = mainContentBodyContainerElement.parentElement;
-        if(!contentContainer) throw new Error('should not happen');
+        if (!contentContainer) throw new Error('should not happen');
         contentContainer.classList.add('container_app_sidebar_in_use');
-        querySelector(_addonSidebarContainerEl, ADD_ON_SIDEBAR_CONTENT_SELECTOR).insertAdjacentElement('beforebegin', el);
+        querySelector(
+          _addonSidebarContainerEl,
+          ADD_ON_SIDEBAR_CONTENT_SELECTOR
+        ).insertAdjacentElement('beforebegin', el);
 
         // See if the element is visible.
         // Give it some content temporarily to check if it becomes sized to show it.
@@ -142,73 +161,101 @@ class GmailAppSidebarView {
         _addonSidebarContainerEl.classList.remove('app_sidebar_visible');
         contentContainer.classList.remove('container_app_sidebar_visible');
 
-        const supportedScreenSize = window.innerWidth >= 1024 && window.innerHeight >= 600;
-        if (!global._APP_SIDEBAR_TEST && (
-          elRect.width == 0 ||
-          elRect.height == 0 ||
-          (supportedScreenSize && Math.floor(elRect.right) > Math.floor(window.innerWidth))
-        )) {
-          this._driver.getLogger().error(new Error('SDK sidebar inserted into add-ons sidebar was not visible'), {
-            rect: { // rect's properties aren't enumerable so we have to do this
-              top: elRect.top,
-              bottom: elRect.bottom,
-              left: elRect.left,
-              right: elRect.right,
-              width: elRect.width,
-              height: elRect.height
-            },
-            window: {
-              innerWidth: window.innerWidth,
-              innerHeight: window.innerHeight
-            }
-          });
-        }
-        else {
+        const supportedScreenSize =
+          window.innerWidth >= 1024 && window.innerHeight >= 600;
+        if (
+          !global._APP_SIDEBAR_TEST &&
+          (elRect.width == 0 ||
+            elRect.height == 0 ||
+            (supportedScreenSize &&
+              Math.floor(elRect.right) > Math.floor(window.innerWidth)))
+        ) {
+          this._driver
+            .getLogger()
+            .error(
+              new Error(
+                'SDK sidebar inserted into add-ons sidebar was not visible'
+              ),
+              {
+                rect: {
+                  // rect's properties aren't enumerable so we have to do this
+                  top: elRect.top,
+                  bottom: elRect.bottom,
+                  left: elRect.left,
+                  right: elRect.right,
+                  width: elRect.width,
+                  height: elRect.height
+                },
+                window: {
+                  innerWidth: window.innerWidth,
+                  innerHeight: window.innerHeight
+                }
+              }
+            );
+        } else {
           usedAddonsSidebar = true;
         }
 
         if (!usedAddonsSidebar) {
-          if(contentContainer) contentContainer.classList.remove('container_app_sidebar_in_use');
-          _addonSidebarContainerEl.classList.remove(idMap('app_sidebar_in_use'));
+          if (contentContainer)
+            contentContainer.classList.remove('container_app_sidebar_in_use');
+          _addonSidebarContainerEl.classList.remove(
+            idMap('app_sidebar_in_use')
+          );
         }
       }
     }
 
-    const addonSidebarContainerEl = usedAddonsSidebar ? _addonSidebarContainerEl : null;
-    const sidebarContainerEl = usedAddonsSidebar ? _addonSidebarContainerEl : _sidebarContainerEl;
-    if(!sidebarContainerEl) throw new Error('should not happen');
+    const addonSidebarContainerEl = usedAddonsSidebar
+      ? _addonSidebarContainerEl
+      : null;
+    const sidebarContainerEl = usedAddonsSidebar
+      ? _addonSidebarContainerEl
+      : _sidebarContainerEl;
+    if (!sidebarContainerEl) throw new Error('should not happen');
     if (!usedAddonsSidebar) {
       sidebarContainerEl.insertBefore(el, sidebarContainerEl.firstElementChild);
       sidebarContainerEl.classList.add(idMap('app_sidebar_in_use'));
     }
 
-    if (!((document.body:any):HTMLElement).querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
+    if (
+      !((document.body: any): HTMLElement).querySelector(
+        '.' + idMap('app_sidebar_waiting_platform')
+      )
+    ) {
       const waitingPlatform = document.createElement('div');
       waitingPlatform.className = idMap('app_sidebar_waiting_platform');
-      ((document.body:any):HTMLElement).appendChild(waitingPlatform);
+      ((document.body: any): HTMLElement).appendChild(waitingPlatform);
     }
 
-    if(addonSidebarContainerEl) {
+    if (addonSidebarContainerEl) {
       container = () => el;
       el.classList.add('addon_sidebar');
-    }
-    else {
-      const containerEl = findParent(sidebarContainerEl, el => window.getComputedStyle(el).overflowY !== 'visible');
-      container = containerEl ? (() => containerEl) : undefined;
+    } else {
+      const containerEl = findParent(
+        sidebarContainerEl,
+        el => window.getComputedStyle(el).overflowY !== 'visible'
+      );
+      container = containerEl ? () => containerEl : undefined;
     }
 
     const currentIds = new Set();
     const orderManager = new OrderManager({
       get() {
         try {
-          return JSON.parse(global.localStorage.getItem('inboxsdk__sidebar_ordering') || 'null');
+          return JSON.parse(
+            global.localStorage.getItem('inboxsdk__sidebar_ordering') || 'null'
+          );
         } catch (err) {
           console.error('failed to read sidebar order data', err); //eslint-disable-line no-console
         }
       },
       set(data) {
         try {
-          global.localStorage.setItem('inboxsdk__sidebar_ordering', JSON.stringify(data));
+          global.localStorage.setItem(
+            'inboxsdk__sidebar_ordering',
+            JSON.stringify(data)
+          );
         } catch (err) {
           console.error('failed to set sidebar order data', err); //eslint-disable-line no-console
         }
@@ -224,23 +271,36 @@ class GmailAppSidebarView {
         const boundingTop = elBoundingBox.top + el.scrollTop;
         const boundingBottom = boundingTop + elBoundingBox.height;
 
-        const titleBars = Array.from(el.querySelectorAll(`.${idMap('app_sidebar_content_panel')}.${idMap('expanded')} .${idMap('app_sidebar_content_panel_top_line')}`));
+        const titleBars = Array.from(
+          el.querySelectorAll(
+            `.${idMap('app_sidebar_content_panel')}.${idMap(
+              'expanded'
+            )} .${idMap('app_sidebar_content_panel_top_line')}`
+          )
+        );
 
         const titleBar = titleBars.find(t => {
           const tBoundingBox = t.getBoundingClientRect();
-          return tBoundingBox.bottom > boundingTop && tBoundingBox.bottom < boundingBottom;
+          return (
+            tBoundingBox.bottom > boundingTop &&
+            tBoundingBox.bottom < boundingBottom
+          );
         });
 
-        if(titleBar){
+        if (titleBar) {
           const instanceId = titleBar.getAttribute('data-instance-id');
           const appName = titleBar.getAttribute('data-app-name');
-          if(!appName) return;
+          if (!appName) return;
           const appButton = buttonContainers.get(appName);
-          if(!appButton || !iconArea) return;
+          if (!appButton || !iconArea) return;
 
-          const activeButtonContainer = iconArea.querySelector('.sidebar_button_container_active');
-          if(activeButtonContainer){
-            activeButtonContainer.classList.remove('sidebar_button_container_active');
+          const activeButtonContainer = iconArea.querySelector(
+            '.sidebar_button_container_active'
+          );
+          if (activeButtonContainer) {
+            activeButtonContainer.classList.remove(
+              'sidebar_button_container_active'
+            );
           }
 
           appButton.classList.add('sidebar_button_container_active');
@@ -262,11 +322,15 @@ class GmailAppSidebarView {
             orderManager.moveItem(oldIndex, newIndex);
             render();
           }}
-          onExpandedToggle={() => {updateHighlightedAppIconBus.emit(null);}}
+          onExpandedToggle={() => {
+            updateHighlightedAppIconBus.emit(null);
+          }}
           container={container}
         />,
         el,
-        () => {updateHighlightedAppIconBus.emit(null);}
+        () => {
+          updateHighlightedAppIconBus.emit(null);
+        }
       );
     };
     render();
@@ -284,19 +348,19 @@ class GmailAppSidebarView {
       el.remove();
       sidebarContainerEl.classList.remove(idMap('app_sidebar_in_use'));
       sidebarContainerEl.classList.remove('app_sidebar_visible');
-      if(iconArea) iconArea.remove();
+      if (iconArea) iconArea.remove();
 
       const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
-      if(mainContentBodyContainerElement){
+      if (mainContentBodyContainerElement) {
         contentContainer = mainContentBodyContainerElement.parentElement;
-        if(contentContainer) {
+        if (contentContainer) {
           contentContainer.classList.remove('container_app_sidebar_in_use');
           contentContainer.classList.remove('container_app_sidebar_visible');
         }
       }
     });
 
-    Kefir.fromEvents((document.body:any), 'inboxsdkNewSidebarPanel')
+    Kefir.fromEvents((document.body: any), 'inboxsdkNewSidebarPanel')
       .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
@@ -312,7 +376,8 @@ class GmailAppSidebarView {
           id,
           orderHint: event.detail.orderHint,
           value: {
-            id, appName,
+            id,
+            appName,
             appId: event.detail.appId,
             instanceId: event.detail.instanceId,
             title: event.detail.title,
@@ -324,9 +389,11 @@ class GmailAppSidebarView {
         });
         render();
 
-        if(!addonSidebarContainerEl) return;
+        if (!addonSidebarContainerEl) return;
 
-        iconArea = addonSidebarContainerEl.querySelector('.'+idMap('sidebar_iconArea'));
+        iconArea = addonSidebarContainerEl.querySelector(
+          '.' + idMap('sidebar_iconArea')
+        );
         if (!iconArea) {
           iconArea = document.createElement('div');
           iconArea.className = idMap('sidebar_iconArea');
@@ -338,7 +405,7 @@ class GmailAppSidebarView {
         // panel with that app name. This means we need to wait for all the panels for a particular appName
         // to be added first, and then we can get the correct position
         asap(() => {
-          if(!iconArea) throw new Error('should not happen');
+          if (!iconArea) throw new Error('should not happen');
           const instanceId = event.detail.instanceId;
           const appIconUrl = event.detail.appIconUrl;
 
@@ -348,118 +415,164 @@ class GmailAppSidebarView {
 
           let buttonContainer;
           if (existingButtonContainer) {
-            const currentCount = Number(existingButtonContainer.getAttribute('data-count')) || 1;
-            existingButtonContainer.setAttribute('data-count', String(currentCount+1));
+            const currentCount =
+              Number(existingButtonContainer.getAttribute('data-count')) || 1;
+            existingButtonContainer.setAttribute(
+              'data-count',
+              String(currentCount + 1)
+            );
             buttonContainer = existingButtonContainer;
           } else {
             buttonContainer = document.createElement('div');
             buttonContainer.className = idMap('sidebar_button_container');
             buttonContainer.setAttribute('data-app-name', appName);
             buttonContainer.setAttribute('data-count', String(1));
-            buttonContainer.innerHTML = autoHtml `
+            buttonContainer.innerHTML = autoHtml`
               <button class="inboxsdk__button_icon" type="button" data-tooltip="${appName}">
                 <img class="inboxsdk__button_iconImg" src="${appIconUrl}">
               </button>
               <div class="inboxsdk__button_selectedIndicator"></div>
             `;
 
-            if(event.detail.primaryColor){
-              querySelector(buttonContainer, '.inboxsdk__button_selectedIndicator').style.backgroundColor = event.detail.primaryColor;
+            if (event.detail.primaryColor) {
+              querySelector(
+                buttonContainer,
+                '.inboxsdk__button_selectedIndicator'
+              ).style.backgroundColor = event.detail.primaryColor;
             }
 
             buttonContainers.set(appName, buttonContainer);
 
-            querySelector(buttonContainer, 'button').addEventListener('click', (event: MouseEvent) => {
-              event.stopPropagation();
+            querySelector(buttonContainer, 'button').addEventListener(
+              'click',
+              (event: MouseEvent) => {
+                event.stopPropagation();
 
-              const activeButtonContainer = iconArea ? iconArea.querySelector('.sidebar_button_container_active') : null;
-              if(activeButtonContainer){
-                activeButtonContainer.classList.remove('sidebar_button_container_active');
-              }
-
-              if(activeButtonContainer === buttonContainer) {
-                if(addonSidebarContainerEl) addonSidebarContainerEl.classList.remove('app_sidebar_visible');
-                if(contentContainer) contentContainer.classList.remove('container_app_sidebar_visible');
-
-                this._setShouldAppSidebarOpen(false);
-              }
-              else {
-                if(addonSidebarContainerEl) addonSidebarContainerEl.classList.add('app_sidebar_visible');
-                buttonContainer.classList.add('sidebar_button_container_active');
-                if(contentContainer) contentContainer.classList.add('container_app_sidebar_visible');
-
-                this._setShouldAppSidebarOpen(true);
-
-                if(addonSidebarContainerEl) {
-                  // check and deactivate add-on sidebar
-                  const activeAddOnIcon = addonSidebarContainerEl.querySelector(ACTIVE_ADD_ON_ICON_SELECTOR);
-                  if(activeAddOnIcon) simulateClick(activeAddOnIcon);
-
-                  //fake resize to get gmail to fix any heights that are messed up
-                  fakeWindowResize();
-
-                  // if the tabList is still loading then handle the case where the user
-                  // clicks on an SDK icon to bring up an SDK app when Gmail thinks that it needs
-                  // to bring up an Add-On sidebar (since that was last visible from Gmail's perspective)
-                  // so we need to suppress Gmail bringing up their sidebar. This handles the flag of if we
-                  // need to suppress
-                  const nativeIconArea = addonSidebarContainerEl.firstElementChild;
-                  if(!nativeIconArea) return;
-                  const loadingHolderAsAny: any = nativeIconArea.firstElementChild;
-                  const loadingHolder = (loadingHolderAsAny: ?HTMLElement);
-                  if(!loadingHolder) return;
-
-                  if(loadingHolder.style.display !== 'none'){
-                    activatedWhileLoading = true;
-                    makeMutationObserverChunkedStream(loadingHolder, {attributes: true, attributeFilter: ['style']})
-                      .toProperty(() => null)
-                      .map(() => loadingHolder.style.display === 'none')
-                      .filter(Boolean)
-                      .take(1)
-                      .delay(150)
-                      .takeUntilBy(this._stopper)
-                      .onValue(() => {
-                        activatedWhileLoading = false;
-                      });
-                  }
+                const activeButtonContainer = iconArea
+                  ? iconArea.querySelector('.sidebar_button_container_active')
+                  : null;
+                if (activeButtonContainer) {
+                  activeButtonContainer.classList.remove(
+                    'sidebar_button_container_active'
+                  );
                 }
 
-                component.openPanel(instanceId);
-                component.scrollPanelIntoView(instanceId, true);
-              }
-            }, true);
+                if (activeButtonContainer === buttonContainer) {
+                  if (addonSidebarContainerEl)
+                    addonSidebarContainerEl.classList.remove(
+                      'app_sidebar_visible'
+                    );
+                  if (contentContainer)
+                    contentContainer.classList.remove(
+                      'container_app_sidebar_visible'
+                    );
 
+                  this._setShouldAppSidebarOpen(false);
+                } else {
+                  if (addonSidebarContainerEl)
+                    addonSidebarContainerEl.classList.add(
+                      'app_sidebar_visible'
+                    );
+                  buttonContainer.classList.add(
+                    'sidebar_button_container_active'
+                  );
+                  if (contentContainer)
+                    contentContainer.classList.add(
+                      'container_app_sidebar_visible'
+                    );
 
-            if(iconArea) addToIconArea(orderManager, appName, buttonContainer, iconArea);
+                  this._setShouldAppSidebarOpen(true);
 
-            if(widthManager) widthManager.fixWidths();
+                  if (addonSidebarContainerEl) {
+                    // check and deactivate add-on sidebar
+                    const activeAddOnIcon = addonSidebarContainerEl.querySelector(
+                      ACTIVE_ADD_ON_ICON_SELECTOR
+                    );
+                    if (activeAddOnIcon) simulateClick(activeAddOnIcon);
 
-            if(this._getShouldAppSidebarOpen()){
+                    //fake resize to get gmail to fix any heights that are messed up
+                    fakeWindowResize();
+
+                    // if the tabList is still loading then handle the case where the user
+                    // clicks on an SDK icon to bring up an SDK app when Gmail thinks that it needs
+                    // to bring up an Add-On sidebar (since that was last visible from Gmail's perspective)
+                    // so we need to suppress Gmail bringing up their sidebar. This handles the flag of if we
+                    // need to suppress
+                    const nativeIconArea =
+                      addonSidebarContainerEl.firstElementChild;
+                    if (!nativeIconArea) return;
+                    const loadingHolderAsAny: any =
+                      nativeIconArea.firstElementChild;
+                    const loadingHolder = (loadingHolderAsAny: ?HTMLElement);
+                    if (!loadingHolder) return;
+
+                    if (loadingHolder.style.display !== 'none') {
+                      activatedWhileLoading = true;
+                      makeMutationObserverChunkedStream(loadingHolder, {
+                        attributes: true,
+                        attributeFilter: ['style']
+                      })
+                        .toProperty(() => null)
+                        .map(() => loadingHolder.style.display === 'none')
+                        .filter(Boolean)
+                        .take(1)
+                        .delay(150)
+                        .takeUntilBy(this._stopper)
+                        .onValue(() => {
+                          activatedWhileLoading = false;
+                        });
+                    }
+                  }
+
+                  component.openPanel(instanceId);
+                  component.scrollPanelIntoView(instanceId, true);
+                }
+              },
+              true
+            );
+
+            if (iconArea)
+              addToIconArea(orderManager, appName, buttonContainer, iconArea);
+
+            if (widthManager) widthManager.fixWidths();
+
+            if (this._getShouldAppSidebarOpen()) {
               // if we last had an SDK sidebar open then bring up the SDK sidebar when the first
               // panel gets added
-              const activeButtonContainer = iconArea.querySelector('.sidebar_button_container_active');
-              if(!activeButtonContainer){
-                buttonContainer.classList.add('sidebar_button_container_active');
+              const activeButtonContainer = iconArea.querySelector(
+                '.sidebar_button_container_active'
+              );
+              if (!activeButtonContainer) {
+                buttonContainer.classList.add(
+                  'sidebar_button_container_active'
+                );
 
-                if(addonSidebarContainerEl) addonSidebarContainerEl.classList.add('app_sidebar_visible');
-                if(contentContainer) contentContainer.classList.add('container_app_sidebar_visible');
+                if (addonSidebarContainerEl)
+                  addonSidebarContainerEl.classList.add('app_sidebar_visible');
+                if (contentContainer)
+                  contentContainer.classList.add(
+                    'container_app_sidebar_visible'
+                  );
 
                 //fake resize to get gmail to fix any heights that are messed up
                 fakeWindowResize();
               }
             }
           }
-
         });
       });
 
-    Kefir.fromEvents((document.body:any), 'inboxsdkUpdateSidebarPanel')
+    Kefir.fromEvents((document.body: any), 'inboxsdkUpdateSidebarPanel')
       .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
         const orderedItems = orderManager.getOrderedItems();
-        const index = findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
-        if (index === -1) throw new Error('should not happen: failed to find orderItem');
+        const index = findIndex(
+          orderedItems,
+          x => x.value.instanceId === event.detail.instanceId
+        );
+        if (index === -1)
+          throw new Error('should not happen: failed to find orderItem');
         orderManager.updateItemValueByIndex(index, {
           id: orderedItems[index].value.id,
           appId: event.detail.appId,
@@ -474,13 +587,17 @@ class GmailAppSidebarView {
         render();
       });
 
-    Kefir.fromEvents((document.body:any), 'inboxsdkRemoveSidebarPanel')
+    Kefir.fromEvents((document.body: any), 'inboxsdkRemoveSidebarPanel')
       .filter(e => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue(event => {
         const orderedItems = orderManager.getOrderedItems();
-        const index = findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
-        if (index === -1) throw new Error('should not happen: failed to find orderItem');
+        const index = findIndex(
+          orderedItems,
+          x => x.value.instanceId === event.detail.instanceId
+        );
+        if (index === -1)
+          throw new Error('should not happen: failed to find orderItem');
         currentIds.delete(orderedItems[index].id);
         orderManager.removeItemByIndex(index);
         if (orderManager.getOrderedItems().length === 0) {
@@ -489,26 +606,33 @@ class GmailAppSidebarView {
           render();
         }
 
-        if(!addonSidebarContainerEl) return;
+        if (!addonSidebarContainerEl) return;
 
-        iconArea = addonSidebarContainerEl.querySelector('.'+idMap('sidebar_iconArea'));
-        if(!iconArea) return;
+        iconArea = addonSidebarContainerEl.querySelector(
+          '.' + idMap('sidebar_iconArea')
+        );
+        if (!iconArea) return;
 
-        if(widthManager) widthManager.fixWidths();
+        if (widthManager) widthManager.fixWidths();
 
         const appName = event.detail.appName;
 
         const container = buttonContainers.get(appName);
-        if(container){
+        if (container) {
           const currentCount = Number(container.getAttribute('data-count'));
           if (currentCount <= 1) {
-            const activeButtonContainer = el.querySelector('.sidebar_button_container_active');
+            const activeButtonContainer = el.querySelector(
+              '.sidebar_button_container_active'
+            );
             container.remove();
             buttonContainers.delete(appName);
-            if(container === activeButtonContainer){
-              if(addonSidebarContainerEl){
+            if (container === activeButtonContainer) {
+              if (addonSidebarContainerEl) {
                 addonSidebarContainerEl.classList.remove('app_sidebar_visible');
-                if(contentContainer) contentContainer.classList.remove('container_app_sidebar_visible');
+                if (contentContainer)
+                  contentContainer.classList.remove(
+                    'container_app_sidebar_visible'
+                  );
               }
 
               this._setShouldAppSidebarOpen(false);
@@ -516,82 +640,102 @@ class GmailAppSidebarView {
           } else if (currentCount === 2) {
             container.removeAttribute('data-count');
           } else {
-            container.setAttribute('data-count', String(currentCount-1));
+            container.setAttribute('data-count', String(currentCount - 1));
           }
         }
       });
 
-    Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelScrollIntoView')
+    Kefir.fromEvents((document.body: any), 'inboxsdkSidebarPanelScrollIntoView')
       .takeUntilBy(this._stopper)
       .onValue(event => {
         component.scrollPanelIntoView(event.detail.instanceId);
       });
 
-    Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelClose')
+    Kefir.fromEvents((document.body: any), 'inboxsdkSidebarPanelClose')
       .takeUntilBy(this._stopper)
       .onValue(event => {
         component.closePanel(event.detail.instanceId);
       });
 
-    if(addonSidebarContainerEl){
+    if (addonSidebarContainerEl) {
       // listen for add-on sidebar contents to become visible which can happen in 1 of two cases
       //  1. user clicks on an Add-Icon icon
       //  2. Gmail automatically opens an Add-on sidebar because it was last open in previous thread
-      const addonSidebarContentContainerElement = querySelector(addonSidebarContainerEl, ADD_ON_SIDEBAR_CONTENT_SELECTOR);
+      const addonSidebarContentContainerElement = querySelector(
+        addonSidebarContainerEl,
+        ADD_ON_SIDEBAR_CONTENT_SELECTOR
+      );
       makeElementChildStream(addonSidebarContentContainerElement)
-        .flatMap(({el, removalStream}) =>
-          makeMutationObserverChunkedStream(el, {attributes: true, attributeFilter: ['style']})
+        .flatMap(({ el, removalStream }) =>
+          makeMutationObserverChunkedStream(el, {
+            attributes: true,
+            attributeFilter: ['style']
+          })
             .toProperty(() => null)
             .map(() => el.style.display !== 'none')
         )
         .takeUntilBy(this._stopper)
-        .onValue((isDisplayingGmailAddonSidebar) => {
-          if(isDisplayingGmailAddonSidebar){
-            if(contentContainer) contentContainer.classList.add('container_addon_sidebar_visible');
+        .onValue(isDisplayingGmailAddonSidebar => {
+          if (isDisplayingGmailAddonSidebar) {
+            if (contentContainer)
+              contentContainer.classList.add('container_addon_sidebar_visible');
 
             // we need to suppress this sidebar from loading
-            if(activatedWhileLoading){
-              const activeAddOnIcon = addonSidebarContainerEl.querySelector(ACTIVE_ADD_ON_ICON_SELECTOR);
-              if(activeAddOnIcon) simulateClick(activeAddOnIcon);
+            if (activatedWhileLoading) {
+              const activeAddOnIcon = addonSidebarContainerEl.querySelector(
+                ACTIVE_ADD_ON_ICON_SELECTOR
+              );
+              if (activeAddOnIcon) simulateClick(activeAddOnIcon);
               return;
             }
 
             this._setShouldAppSidebarOpen(false);
 
-            const activeButtonContainer = iconArea ? iconArea.querySelector('.sidebar_button_container_active') : null;
-            if(activeButtonContainer){
+            const activeButtonContainer = iconArea
+              ? iconArea.querySelector('.sidebar_button_container_active')
+              : null;
+            if (activeButtonContainer) {
               addonSidebarContainerEl.classList.remove('app_sidebar_visible');
-              activeButtonContainer.classList.remove('sidebar_button_container_active');
-              if(contentContainer) contentContainer.classList.remove('container_app_sidebar_visible');
+              activeButtonContainer.classList.remove(
+                'sidebar_button_container_active'
+              );
+              if (contentContainer)
+                contentContainer.classList.remove(
+                  'container_app_sidebar_visible'
+                );
             }
-          }
-          else {
-            if(contentContainer) contentContainer.classList.remove('container_addon_sidebar_visible');
+          } else {
+            if (contentContainer)
+              contentContainer.classList.remove(
+                'container_addon_sidebar_visible'
+              );
           }
         });
     }
 
-    if(addonSidebarContainerEl){
+    if (addonSidebarContainerEl) {
       //listen for scroll and update active icon if needed
       Kefir.fromEvents(el, 'scroll')
         .takeUntilBy(this._stopper)
-        .onValue(() => {updateHighlightedAppIconBus.emit(null);});
+        .onValue(() => {
+          updateHighlightedAppIconBus.emit(null);
+        });
     }
   }
 
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
-    const panel = new ContentPanelViewDriver(this._driver, descriptor, this._instanceId);
+    const panel = new ContentPanelViewDriver(
+      this._driver,
+      descriptor,
+      this._instanceId
+    );
 
-    this._stopper
-      .takeUntilBy(panel.getStopper())
-      .onValue(() => {
-        panel.remove();
-      });
+    this._stopper.takeUntilBy(panel.getStopper()).onValue(() => {
+      panel.remove();
+    });
 
     return panel;
   }
-
-
 }
 
 export default defn(module, GmailAppSidebarView);

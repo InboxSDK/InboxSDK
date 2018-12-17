@@ -2,7 +2,7 @@
 
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
-const {EventEmitter} = require('events');
+const { EventEmitter } = require('events');
 import MockElementParent from '../../../../test/lib/mock-element-parent';
 import MockMutationObserver from '../../../../test/lib/mock-mutation-observer';
 
@@ -12,11 +12,13 @@ import makeElementChildStream from './make-element-child-stream';
 global.MutationObserver = MockMutationObserver;
 
 function fakeEl(name: string): Object {
-  return {name, nodeType: 1};
+  return { name, nodeType: 1 };
 }
 
 it('should work with makeElementChildStream', done => {
-  const child1 = fakeEl('child1'), child2 = fakeEl('child2'), child3 = fakeEl('child3');
+  const child1 = fakeEl('child1'),
+    child2 = fakeEl('child2'),
+    child3 = fakeEl('child3');
 
   const stopper = kefirBus();
   let activeViewCount = 0;
@@ -24,23 +26,26 @@ it('should work with makeElementChildStream', done => {
   const target = new MockElementParent([child1, child2]);
 
   let call = 0;
-  makeElementChildStream((target:Object))
+  makeElementChildStream((target: Object))
     .takeUntilBy(stopper)
-    .flatMap(makeElementViewStream(el => {
-      activeViewCount++;
-      return {
-        el: el,
-        destroy: () => {
-          activeViewCount--;
-          if (el === child2) {
-            target.appendChild(child3);
-          } else if (activeViewCount === 0) {
-            done();
+    .flatMap(
+      makeElementViewStream(el => {
+        activeViewCount++;
+        return {
+          el: el,
+          destroy: () => {
+            activeViewCount--;
+            if (el === child2) {
+              target.appendChild(child3);
+            } else if (activeViewCount === 0) {
+              done();
+            }
           }
-        }
-      };
-    })).onValue(view => {
-      switch(++call) {
+        };
+      })
+    )
+    .onValue(view => {
+      switch (++call) {
         case 1:
           expect(view.el).toBe(child1);
           break;
@@ -52,7 +57,7 @@ it('should work with makeElementChildStream', done => {
           stopper.emit('beep');
           break;
         default:
-          throw new Error("should not happen");
+          throw new Error('should not happen');
       }
     });
 
