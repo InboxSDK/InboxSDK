@@ -11,6 +11,6 @@ const get: Get = function get<K,V>(map: Map<K,V>|WeakMap<any,V>, key: K): V {
     throw new Error("Key not found in map");
   }
   return value;
-}
+};
 
 export default get;

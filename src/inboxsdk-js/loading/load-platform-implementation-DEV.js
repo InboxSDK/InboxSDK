@@ -2,8 +2,8 @@
 
 import once from 'lodash/once';
 
-module.exports = function(delay: number) {
-	return once(() => new Promise<void>((resolve, reject) => {
+module.exports = function(delay: number): () => Promise<void> {
+	return once(() => new Promise((resolve, reject) => {
 		setTimeout(() => {
 			try {
 				require('../../platform-implementation-js/main.js');
