@@ -155,7 +155,7 @@ This project has different kinds of unit tests and integration tests.
 All .js files under `__tests__` and all `*.test.js` files are tests executed by
 Jest. All new (non-integration) tests should be Jest tests.
 
-There are Selenium-based browser integration tests in `test/chrome/*.js` files.
+There are (presently inactive) Selenium-based browser integration tests in `test/chrome/*.js` files.
 These are the only tests which test the InboxSDK against the live Gmail and
 Inbox sites. These tests are primarily about checking whether Gmail or Inbox
 have broken support with us, and our CI system runs these for us. These tests

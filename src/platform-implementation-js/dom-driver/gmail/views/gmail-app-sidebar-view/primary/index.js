@@ -15,6 +15,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import AppSidebar from '../../../../../driver-common/sidebar/AppSidebar';
+import type {PanelDescriptor} from '../../../../../driver-common/sidebar/AppSidebar';
 
 import type GmailDriver from '../../../gmail-driver';
 import GmailElementGetter from '../../../gmail-element-getter';
@@ -71,7 +72,7 @@ class GmailAppSidebarPrimary {
 
   _currentIds: Set<string> = new Set();
 
-  _orderManager = new OrderManager({
+  _orderManager = new OrderManager<PanelDescriptor>({
     get() {
       try {
         return JSON.parse(
@@ -274,7 +275,7 @@ class GmailAppSidebarPrimary {
     this._renderThreadSidebar();
   }
 
-  _appSidebarRefSetter = threadSidebarComponent => {
+  _appSidebarRefSetter: (el: ?AppSidebar) => void = threadSidebarComponent => {
     if (threadSidebarComponent) {
       this._threadSidebarComponent = threadSidebarComponent;
     }

@@ -49,7 +49,8 @@ class MessageView extends EventEmitter {
 		return attachmentCardView;
 	}
 
-	addAttachmentCardViewNoPreview(cardOptions) {
+	// TODO why is this a separate method?
+	addAttachmentCardViewNoPreview(cardOptions: Object): AttachmentCardView {
 		return this.addAttachmentCardView(cardOptions);
 	}
 

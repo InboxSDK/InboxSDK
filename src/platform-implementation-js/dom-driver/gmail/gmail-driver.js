@@ -74,7 +74,7 @@ import type Logger from '../../lib/logger';
 import type PageCommunicator from './gmail-page-communicator';
 import type { RouteParams } from '../../namespaces/router';
 import type ButterBar from '../../namespaces/butter-bar';
-import type { Driver } from '../../driver-interfaces/driver';
+import type { Driver, DrawerViewOptions } from '../../driver-interfaces/driver';
 import type { ComposeViewDriver } from '../../driver-interfaces/compose-view-driver';
 import type GmailComposeView from './views/gmail-compose-view';
 import type GmailMessageView from './views/gmail-message-view';
@@ -542,7 +542,7 @@ class GmailDriver {
     }
   }
 
-  getNextComposeViewDriver(timeout = 10 * 1000): Promise<GmailComposeView> {
+  getNextComposeViewDriver(timeout: number = 10 * 1000): Promise<GmailComposeView> {
     return this._composeViewDriverStream
       .merge(
         Kefir.later(timeout, new Error('Reached timeout while waiting for getNextComposeViewDriver'))
@@ -566,11 +566,11 @@ class GmailDriver {
     return new GmailMoleViewDriver(this, options);
   }
 
-  createDrawerViewDriver(options) {
+  createDrawerViewDriver(options: DrawerViewOptions) {
     return new InboxDrawerView(options);
   }
 
-  createBackdrop(zIndex, target) {
+  createBackdrop(zIndex?: number, target?: HTMLElement) {
     return new GmailBackdrop(zIndex, target);
   }
 
@@ -875,7 +875,7 @@ class GmailDriver {
 
   getDraftIDForMessageID(
     messageID: string,
-    skipCache = false
+    skipCache: boolean = false
   ): Promise<GetDraftIdResult> {
     return getDraftIDForMessageID(this, messageID, skipCache);
   }

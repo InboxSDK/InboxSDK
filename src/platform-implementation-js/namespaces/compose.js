@@ -44,7 +44,7 @@ class Compose {
     });
   }
 
-  registerComposeViewHandler(handler){
+  registerComposeViewHandler(handler: Handler<ComposeView>){
     return get(memberMap, this).handlerRegistry.registerHandler(handler);
   }
 

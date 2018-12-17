@@ -11,7 +11,6 @@
     "jest": "jest",
     "start": "gulp default --singleBundle --watch --reloader",
     "test": "yarn run lint && yarn run flow_check && jest",
-    "test-browser": "wdio",
     "lint": "eslint .",
     "lint-fix": "eslint . --fix"
   },
@@ -64,7 +63,7 @@
     "eslint-plugin-flowtype": "^3.0.0",
     "eslint-plugin-react": "^7.1.0",
     "event-listener-with-options": "^1.0.3",
-    "flow-bin": "^0.83.0",
+    "flow-bin": "^0.89.0",
     "glob": "^7.0.3",
     "gulp": "^3.9.0",
     "gulp-add-src": "^0.2.0",
@@ -90,7 +89,6 @@
     "lodash": "^4.14.0",
     "map-indexed-xf": "^1.0.0",
     "matches-selector-ng": "^1.0.0",
-    "mocha": "^5.2.0",
     "mock-webstorage": "^1.0.3",
     "node-dir": "^0.1.6",
     "notp": "^2.0.3",
@@ -131,9 +129,6 @@
     "ud-kefir": "^2.0.1",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.4.0",
-    "wdio-mocha-framework": "^0.5.4",
-    "wdio-selenium-standalone-service": "0.0.7",
-    "webdriverio": "^4.1.0",
     "yarn-deps-check": "^1.0.0"
   }
 }

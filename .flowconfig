@@ -16,3 +16,5 @@
 flow-libs/
 
 [options]
+module.use_strict=true
+munge_underscores=true

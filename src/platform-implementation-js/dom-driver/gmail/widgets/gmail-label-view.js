@@ -10,7 +10,7 @@ class GmailLabelView {
 	_labelDescriptor: Object;
 	_iconSettings: Object;
 
-	constructor(opts={}) {
+	constructor(opts: {classes?: ?string[]} = {}) {
 		this._element = document.createElement('div');
 		this._element.className = 'inboxsdk__gmail_label ar as ' + (opts.classes || []).join(' ');
 		this._element.innerHTML = `

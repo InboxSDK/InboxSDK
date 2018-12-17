@@ -88,7 +88,7 @@ import InboxDrawerView from './views/inbox-drawer-view';
 import InboxBackdrop from './views/inbox-backdrop';
 import type ButterBar from '../../namespaces/butter-bar';
 import type {RouteParams} from '../../namespaces/router';
-import type {Driver} from '../../driver-interfaces/driver';
+import type {Driver, DrawerViewOptions} from '../../driver-interfaces/driver';
 import type {PiOpts, EnvData} from '../../platform-implementation';
 
 class InboxDriver {
@@ -607,7 +607,7 @@ class InboxDriver {
     return composeViewDriverPromise;
   }
 
-  getNextComposeViewDriver(timeout = 10 * 1000): Promise<InboxComposeView> {
+  getNextComposeViewDriver(timeout: number = 10 * 1000): Promise<InboxComposeView> {
     const s = Kefir.stream(em => {
       const subscription = this._composeViewDriverLiveSet.subscribe({
         next: changes => {
@@ -939,7 +939,7 @@ class InboxDriver {
     throw new Error("Not implemented");
   }
 
-  createDrawerViewDriver(options) {
+  createDrawerViewDriver(options: DrawerViewOptions) {
     const drawerView = new InboxDrawerView(options);
     // TODO if a native drawer was already open, we should close the native
     // drawer istead of the new one.
@@ -960,7 +960,7 @@ class InboxDriver {
     return drawerView;
   }
 
-  createBackdrop(zIndex, target) {
+  createBackdrop(zIndex?: number, target?: HTMLElement) {
     return new InboxBackdrop(zIndex, target);
   }
 

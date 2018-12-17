@@ -3,6 +3,7 @@
 import GenericButtonView from '../../../../lib/dom/generic-button-view';
 
 export default class InboxDropdownButtonView extends GenericButtonView {
+	_element: HTMLElement; // inherited
 
 	constructor() {
 		const element = document.createElement('div');
