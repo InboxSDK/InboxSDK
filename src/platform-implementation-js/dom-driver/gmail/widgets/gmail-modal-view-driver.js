@@ -3,8 +3,8 @@
 import sortBy from 'lodash/sortBy';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
-import type {Bus} from 'kefir-bus';
-import {defn} from 'ud';
+import type { Bus } from 'kefir-bus';
+import { defn } from 'ud';
 import ModalButtonView from './buttons/modal-button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
@@ -26,18 +26,29 @@ class GmailModalViewDriver {
     this._eventStream.end();
   }
 
-  getModalContainerElement(): HTMLElement { return this._modalContainerElement; }
-  getEventStream(): Kefir.Observable<Object> { return this._eventStream; }
+  getModalContainerElement(): HTMLElement {
+    return this._modalContainerElement;
+  }
+  getEventStream(): Kefir.Observable<Object> {
+    return this._eventStream;
+  }
 
   _processOptions(options: Object) {
     this.setTitle(options.title);
     this.setContentElement(options.el);
     this.setButtons(options.buttons || []);
-    this.setChromeClass(options.chrome, options.showCloseButton, (options.buttons || []).length > 0);
+    this.setChromeClass(
+      options.chrome,
+      options.showCloseButton,
+      (options.buttons || []).length > 0
+    );
   }
 
   setTitle(title: string) {
-    const heading = querySelector(this._modalContainerElement, '[role=heading]');
+    const heading = querySelector(
+      this._modalContainerElement,
+      '[role=heading]'
+    );
     if (!title) {
       heading.style.display = 'none';
     } else {
@@ -47,51 +58,68 @@ class GmailModalViewDriver {
   }
 
   setContentElement(element: HTMLElement) {
-    const content = querySelector(this._modalContainerElement, '.inboxsdk__modal_content');
+    const content = querySelector(
+      this._modalContainerElement,
+      '.inboxsdk__modal_content'
+    );
     content.innerHTML = '';
     if (typeof element === 'string') {
       content.innerHTML = element;
-    } else if(element instanceof Element) {
+    } else if (element instanceof Element) {
       content.appendChild(element);
     }
   }
 
   setButtons(buttons: Object[]) {
-    const buttonsEl = querySelector(this._modalContainerElement, '.inboxsdk__modal_buttons');
+    const buttonsEl = querySelector(
+      this._modalContainerElement,
+      '.inboxsdk__modal_buttons'
+    );
     buttonsEl.innerHTML = '';
 
     if (buttons.length === 0) {
       buttonsEl.style.display = 'none';
-      this._modalContainerElement.classList.add('inboxsdk__modal_content_no_buttons');
+      this._modalContainerElement.classList.add(
+        'inboxsdk__modal_content_no_buttons'
+      );
     } else {
       buttonsEl.style.display = '';
-      this._modalContainerElement.classList.remove('inboxsdk__modal_content_no_buttons');
+      this._modalContainerElement.classList.remove(
+        'inboxsdk__modal_content_no_buttons'
+      );
     }
 
-    sortBy(buttons, button => button.orderHint || 0)
-      .forEach(this._addButton.bind(this, buttonsEl));
+    sortBy(buttons, button => button.orderHint || 0).forEach(
+      this._addButton.bind(this, buttonsEl)
+    );
   }
 
-  setChromeClass(chrome: boolean, showCloseButton: boolean, hasButtons: boolean) {
+  setChromeClass(
+    chrome: boolean,
+    showCloseButton: boolean,
+    hasButtons: boolean
+  ) {
     this._modalContainerElement.classList.remove('inboxsdk__modal_hideSides');
     this._modalContainerElement.classList.remove('inboxsdk__modal_hideTop');
     this._modalContainerElement.classList.remove('inboxsdk__modal_hideBottom');
 
-    if(chrome === false){
+    if (chrome === false) {
       this._modalContainerElement.classList.add('inboxsdk__modal_hideSides');
 
-      if(!showCloseButton){
+      if (!showCloseButton) {
         this._modalContainerElement.classList.add('inboxsdk__modal_hideTop');
       }
 
-      if(!hasButtons){
+      if (!hasButtons) {
         this._modalContainerElement.classList.add('inboxsdk__modal_hideBottom');
       }
     }
   }
 
   _setupModalContainerElement(options: Object) {
-    const constrainTitleWidthTopRowClass = options.constrainTitleWidth ? 'inboxsdk__modal_toprow--constrain-title-width' : '';
+    const constrainTitleWidthTopRowClass = options.constrainTitleWidth
+      ? 'inboxsdk__modal_toprow--constrain-title-width'
+      : '';
 
     this._modalContainerElement = document.createElement('div');
     this._modalContainerElement.className = 'inboxsdk__modal_fullscreen';
@@ -112,8 +140,10 @@ class GmailModalViewDriver {
   }
 
   _addButton(buttonContainer: HTMLElement, buttonDescriptor: Object) {
-    const buttonOptions = {...buttonDescriptor};
-    const buttonColor = ['blue', 'red', 'green'].includes(buttonDescriptor.color) && buttonDescriptor.color;
+    const buttonOptions = { ...buttonDescriptor };
+    const buttonColor =
+      ['blue', 'red', 'green'].includes(buttonDescriptor.color) &&
+      buttonDescriptor.color;
     buttonOptions.isPrimary = buttonDescriptor.type === 'PRIMARY_ACTION';
 
     const buttonView = new ModalButtonView(buttonOptions);
@@ -122,14 +152,20 @@ class GmailModalViewDriver {
     const buttonViewController = new BasicButtonViewController(buttonOptions);
 
     if (buttonDescriptor.type === 'PRIMARY_ACTION') {
-      buttonContainer.insertBefore(buttonView.getElement(), (buttonContainer.firstElementChild:any));
+      buttonContainer.insertBefore(
+        buttonView.getElement(),
+        (buttonContainer.firstElementChild: any)
+      );
     } else {
       buttonContainer.appendChild(buttonView.getElement());
     }
   }
 
   _setupEventStream() {
-    const closeElement = querySelector(this._modalContainerElement, '.inboxsdk__modal_close');
+    const closeElement = querySelector(
+      this._modalContainerElement,
+      '.inboxsdk__modal_close'
+    );
 
     closeElement.addEventListener('click', (event: MouseEvent) => {
       this._eventStream.emit({

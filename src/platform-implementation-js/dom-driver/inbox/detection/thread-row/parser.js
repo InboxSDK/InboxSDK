@@ -14,23 +14,24 @@ export default function parser(el: HTMLElement) {
     if (!el.hasAttribute('tabindex')) throw new Error('expected tabindex');
   });
 
-  const subject = ec.run('subject', () => (
+  const subject = ec.run('subject', () =>
     querySelectorOne(
       el,
       'div[jsaction][jslog] > div:not(:first-child):not(:last-child) > div > div[class]:not([style]):not(:first-child) > div:not(:first-child):not(:last-child) > div:not([style]):not(:first-child):not(:last-child):not([class*="inboxsdk"])'
     )
-  ));
+  );
 
-  const checkbox = ec.run('checkbox', () => (
+  const checkbox = ec.run('checkbox', () =>
     querySelectorOne(
       el,
       'div[jsaction] > div > div[jsaction] > div[role=checkbox]'
     )
-  ));
+  );
 
-  const recipients = ec.run(
-    'recipients',
-    () => el.querySelectorAll('div[jsaction] > div:not(:first-child):not(:last-child) > div > div > span[email]')
+  const recipients = ec.run('recipients', () =>
+    el.querySelectorAll(
+      'div[jsaction] > div:not(:first-child):not(:last-child) > div > div > span[email]'
+    )
   );
 
   const isOnlyDraft = ec.run(
@@ -38,107 +39,101 @@ export default function parser(el: HTMLElement) {
     () => !(recipients && recipients.length > 0)
   );
 
-  const draftLabels = ec.run(
-    'draftLabels',
-    () => {
-      const recipientCandidates = el.querySelectorAll('div[jsaction] > div:not(:first-child):not(:last-child) > div > div > span');
+  const draftLabels = ec.run('draftLabels', () => {
+    const recipientCandidates = el.querySelectorAll(
+      'div[jsaction] > div:not(:first-child):not(:last-child) > div > div > span'
+    );
 
-      // We have to locate draft labels via text color because it's impossible
-      // to locate them with reliable CSS selectors
-      return Array.from(recipientCandidates).filter((candidate) => {
-        const colorString = getComputedStyle(candidate).getPropertyValue('color');
-        const colorMatch = RGB_REGEX.exec(colorString);
-        if (!colorMatch) throw new Error("Failed to read color string");
+    // We have to locate draft labels via text color because it's impossible
+    // to locate them with reliable CSS selectors
+    return Array.from(recipientCandidates).filter(candidate => {
+      const colorString = getComputedStyle(candidate).getPropertyValue('color');
+      const colorMatch = RGB_REGEX.exec(colorString);
+      if (!colorMatch) throw new Error('Failed to read color string');
 
-        const r = +colorMatch[1], g = +colorMatch[2], b = +colorMatch[3];
+      const r = +colorMatch[1],
+        g = +colorMatch[2],
+        b = +colorMatch[3];
 
-        return r > 200 && g < 100 && b < 100; // Draft labels are red
-      });
+      return r > 200 && g < 100 && b < 100; // Draft labels are red
+    });
+  });
+
+  const recipientParent = ec.run('recipientParent', () => {
+    if (recipients && recipients.length > 0) return recipients[0].parentElement;
+
+    // There are no recipient elements with an email attr, which means this
+    // thread only has drafts. In order to find the recipient parent we need
+    // to work from a draft label upwards.
+    if (!(draftLabels && draftLabels.length > 0))
+      throw new Error('Could not locate draft labels');
+    return draftLabels[0].parentElement;
+  });
+
+  const inboxThreadId: ?string = ec.run('thread id', () => {
+    const m = /thread-[^:]+:[^:\d]*(\d+)/.exec(
+      el.getAttribute('data-item-id') || ''
+    );
+    if (!m) {
+      throw new Error('thread row id regex failed');
     }
-  );
-
-  const recipientParent = ec.run(
-    'recipientParent',
-    () => {
-      if (recipients && recipients.length > 0) return recipients[0].parentElement;
-
-      // There are no recipient elements with an email attr, which means this
-      // thread only has drafts. In order to find the recipient parent we need
-      // to work from a draft label upwards.
-      if (!(draftLabels && draftLabels.length > 0)) throw new Error('Could not locate draft labels');
-      return draftLabels[0].parentElement;
-    }
-  );
-
-  const inboxThreadId: ?string = ec.run(
-    'thread id',
-    () => {
-      const m = /thread-[^:]+:[^:\d]*(\d+)/.exec(el.getAttribute('data-item-id') || '');
-      if (!m) {
-        throw new Error('thread row id regex failed');
-      }
-      return m[0];
-    }
-  );
+    return m[0];
+  });
 
   const messageCountParent = ec.run(
     'messageCountParent',
     () => recipientParent && recipientParent.nextElementSibling
   );
 
-  const visibleMessageCount = ec.run(
-    'visibleMessageCount',
-    () => {
-      const messageCountEl = messageCountParent && messageCountParent.querySelector('span');
-      const match = messageCountEl && /^\((\d+)\)$/.exec(messageCountEl.textContent);
-      if (!match) return 1;
-      return parseInt(match[1]);
-    }
-  );
+  const visibleMessageCount = ec.run('visibleMessageCount', () => {
+    const messageCountEl =
+      messageCountParent && messageCountParent.querySelector('span');
+    const match =
+      messageCountEl && /^\((\d+)\)$/.exec(messageCountEl.textContent);
+    if (!match) return 1;
+    return parseInt(match[1]);
+  });
 
-  const visibleDraftCount = ec.run(
-    'visibleDraftCount',
-    () => {
-      if (isOnlyDraft && visibleMessageCount) return visibleMessageCount;
+  const visibleDraftCount = ec.run('visibleDraftCount', () => {
+    if (isOnlyDraft && visibleMessageCount) return visibleMessageCount;
 
-      if (!draftLabels) throw new Error('Could not locate draft labels');
-      return draftLabels.length;
-    }
-  );
+    if (!draftLabels) throw new Error('Could not locate draft labels');
+    return draftLabels.length;
+  });
 
-  const contacts = ec.run(
-    'contacts',
-    () => {
-      if (!recipients) return null;
+  const contacts = ec.run('contacts', () => {
+    if (!recipients) return null;
 
-      return Array.from(recipients).map((recipientEl) => {
+    return Array.from(recipients)
+      .map(recipientEl => {
         const emailAddress = recipientEl.getAttribute('email');
         if (!emailAddress) return null;
 
-        return {name: null, emailAddress};
-      }).filter(Boolean);
-    }
-  );
+        return { name: null, emailAddress };
+      })
+      .filter(Boolean);
+  });
 
-  const labelParent = ec.run(
-    'labelParent',
-    () => (
-      querySelectorOne(
-        el,
-        'div[jsaction][jslog] > div:not(:first-child):not(:last-child) > div > div[class]:not([style]):not(:first-child) > div:not(:first-child):not(:last-child)'
-      )
+  const labelParent = ec.run('labelParent', () =>
+    querySelectorOne(
+      el,
+      'div[jsaction][jslog] > div:not(:first-child):not(:last-child) > div > div[class]:not([style]):not(:first-child) > div:not(:first-child):not(:last-child)'
     )
   );
 
-  const toolbar = ec.run(
-    'toolbar',
-    () => querySelectorOne(el, 'div[jsaction] div[jsaction] > ul[aria-label]')
+  const toolbar = ec.run('toolbar', () =>
+    querySelectorOne(el, 'div[jsaction] div[jsaction] > ul[aria-label]')
   );
 
   const elements = {
-    subject, checkbox, labelParent, toolbar, recipientParent, messageCountParent
+    subject,
+    checkbox,
+    labelParent,
+    toolbar,
+    recipientParent,
+    messageCountParent
   };
-  const score = 1 - (ec.errorCount() / ec.runCount());
+  const score = 1 - ec.errorCount() / ec.runCount();
   return {
     elements,
     attributes: {

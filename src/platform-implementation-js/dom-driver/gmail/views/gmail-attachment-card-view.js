@@ -6,7 +6,7 @@ import kefirStopper from 'kefir-stopper';
 import RSVP from 'rsvp';
 import util from 'util';
 import autoHtml from 'auto-html';
-import {defn} from 'ud';
+import { defn } from 'ud';
 import type GmailDriver from '../gmail-driver';
 
 import type GmailMessageView from './gmail-message-view';
@@ -15,171 +15,190 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import ButtonView from '../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
-import {simulateClick} from '../../../lib/dom/simulate-mouse-event';
+import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 import waitFor from '../../../lib/wait-for';
 import streamWaitFor from '../../../lib/stream-wait-for';
 
 class GmailAttachmentCardView {
-	_element: HTMLElement;
-	_driver: GmailDriver;
-	_messageViewDriver: ?GmailMessageView;
-	_cachedType: any;
-	_stopper: Kefir.Observable<null>&{destroy():void} = kefirStopper();
-	_previewClicks = Kefir.pool();
+  _element: HTMLElement;
+  _driver: GmailDriver;
+  _messageViewDriver: ?GmailMessageView;
+  _cachedType: any;
+  _stopper: Kefir.Observable<null> & { destroy(): void } = kefirStopper();
+  _previewClicks = Kefir.pool();
 
-	constructor(options: Object, driver: GmailDriver, messageViewDriver: ?GmailMessageView) {
-		this._driver = driver;
-		this._messageViewDriver = messageViewDriver;
+  constructor(
+    options: Object,
+    driver: GmailDriver,
+    messageViewDriver: ?GmailMessageView
+  ) {
+    this._driver = driver;
+    this._messageViewDriver = messageViewDriver;
 
-		if(options.element){
-			this._element = options.element;
-		}
-		else{
-			this._createNewElement(options);
-		}
-	}
+    if (options.element) {
+      this._element = options.element;
+    } else {
+      this._createNewElement(options);
+    }
+  }
 
-	destroy() {
-		this._stopper.destroy();
-	}
+  destroy() {
+    this._stopper.destroy();
+  }
 
-	getElement(): HTMLElement {
-		return this._element;
-	}
+  getElement(): HTMLElement {
+    return this._element;
+  }
 
-	getMessageViewDriver() {
-		return this._messageViewDriver;
-	}
+  getMessageViewDriver() {
+    return this._messageViewDriver;
+  }
 
-	getStopper(): Kefir.Observable<null> {
-		return this._stopper;
-	}
+  getStopper(): Kefir.Observable<null> {
+    return this._stopper;
+  }
 
-	getPreviewClicks(): Kefir.Observable<Event> {
-		return this._previewClicks.takeUntilBy(this._stopper);
-	}
+  getPreviewClicks(): Kefir.Observable<Event> {
+    return this._previewClicks.takeUntilBy(this._stopper);
+  }
 
-	_isStandardAttachment(): boolean {
-		return this.getAttachmentType() === 'FILE';
-	}
+  _isStandardAttachment(): boolean {
+    return this.getAttachmentType() === 'FILE';
+  }
 
-	getAttachmentType(): string {
-		if (this._cachedType) {
-			return this._cachedType;
-		}
-		const type = this._readAttachmentType();
-		if (type !== 'UNLOADED') {
-			this._cachedType = type;
-		}
-		return type;
-	}
+  getAttachmentType(): string {
+    if (this._cachedType) {
+      return this._cachedType;
+    }
+    const type = this._readAttachmentType();
+    if (type !== 'UNLOADED') {
+      this._cachedType = type;
+    }
+    return type;
+  }
 
-	_readAttachmentType(): string {
-		if (this._element.classList.contains('inboxsdk__attachmentCard')) {
-			return 'CUSTOM';
-		}
-		// FILE attachment cards are never in unloaded state.
-		if (this._element.children.length === 1 && this._element.children[0].children.length === 0) {
-			return 'UNLOADED';
-		}
-		const link = this._getDownloadLink();
-		if (!link || link.match(/^https?:\/\/mail\.google\.com\//)) {
-			// Only files and unloaded ever lack a link.
-			return 'FILE';
-		}
-		if (link.match(/^https?:\/\/([^/]*\.)?google(usercontent)?\.com\//)) {
-			return 'DRIVE';
-		}
-		return 'UNKNOWN';
-	}
+  _readAttachmentType(): string {
+    if (this._element.classList.contains('inboxsdk__attachmentCard')) {
+      return 'CUSTOM';
+    }
+    // FILE attachment cards are never in unloaded state.
+    if (
+      this._element.children.length === 1 &&
+      this._element.children[0].children.length === 0
+    ) {
+      return 'UNLOADED';
+    }
+    const link = this._getDownloadLink();
+    if (!link || link.match(/^https?:\/\/mail\.google\.com\//)) {
+      // Only files and unloaded ever lack a link.
+      return 'FILE';
+    }
+    if (link.match(/^https?:\/\/([^/]*\.)?google(usercontent)?\.com\//)) {
+      return 'DRIVE';
+    }
+    return 'UNKNOWN';
+  }
 
-	addButton(options: Object) {
-		var buttonView = new ButtonView({
-			iconUrl: options.iconUrl,
-			tooltip: options.tooltip
-		});
+  addButton(options: Object) {
+    var buttonView = new ButtonView({
+      iconUrl: options.iconUrl,
+      tooltip: options.tooltip
+    });
 
-		var basicButtonViewController = new BasicButtonViewController({
-			activateFunction: () => {
-				if(options.onClick){
-					options.onClick({
-						getDownloadURL: () => this.getDownloadURL()
-					});
-				}
-			},
-			buttonView: buttonView
-		});
+    var basicButtonViewController = new BasicButtonViewController({
+      activateFunction: () => {
+        if (options.onClick) {
+          options.onClick({
+            getDownloadURL: () => this.getDownloadURL()
+          });
+        }
+      },
+      buttonView: buttonView
+    });
 
-		this._addButton(buttonView);
-	}
+    this._addButton(buttonView);
+  }
 
-	getTitle(): string {
-		const title = this._element.querySelector('span .aV3');
-		return title ? title.textContent : "";
-	}
+  getTitle(): string {
+    const title = this._element.querySelector('span .aV3');
+    return title ? title.textContent : '';
+  }
 
-	_getDownloadLink(): ?string {
-		const firstChild: ?HTMLAnchorElement = (this._element.firstElementChild: any);
-		if (!firstChild) throw new Error("Failed to find link");
-		if (firstChild.tagName !== 'A' || !firstChild.href) {
-			const download_url = this._element.getAttribute('download_url');
-			if (download_url) {
-				const m = /:(https:\/\/[^:]+)/.exec(download_url);
-				return m ? m[1] : null;
-			}
-		}
-		else {
-			const firstChildHref = firstChild.href;
-			if (firstChildHref) {
-				return firstChildHref.replace(/([?&])disp=inline(?=&|$)/, '$1disp=safe');
-			}
-			return firstChildHref;
-		}
-	}
+  _getDownloadLink(): ?string {
+    const firstChild: ?HTMLAnchorElement = (this._element
+      .firstElementChild: any);
+    if (!firstChild) throw new Error('Failed to find link');
+    if (firstChild.tagName !== 'A' || !firstChild.href) {
+      const download_url = this._element.getAttribute('download_url');
+      if (download_url) {
+        const m = /:(https:\/\/[^:]+)/.exec(download_url);
+        return m ? m[1] : null;
+      }
+    } else {
+      const firstChildHref = firstChild.href;
+      if (firstChildHref) {
+        return firstChildHref.replace(
+          /([?&])disp=inline(?=&|$)/,
+          '$1disp=safe'
+        );
+      }
+      return firstChildHref;
+    }
+  }
 
-	// Resolves the short-lived cookie-less download URL
-	async getDownloadURL(): Promise<?string> {
-		try {
-			if (this._isStandardAttachment()) {
-				const downloadUrl = await waitFor(() => this._getDownloadLink());
-				if (!downloadUrl) return null;
-				const finalUrl: string = await this._driver.resolveUrlRedirects(downloadUrl);
-				if (!/^https:\/\/mail-attachment\.googleusercontent\.com\/attachment\//.test(finalUrl)) {
-					console.error('getDownloadURL returned unexpected url', finalUrl); //eslint-disable-line
-					const err = new Error('getDownloadURL returned unexpected url');
-					this._driver.getLogger().error(err, {
-						finalUrlCensored: finalUrl.replace(/\?[^/]+$/, '?[...]')
-					});
-					if (/^https:\/\/mail\.google\.com\//.test(finalUrl)) {
-						// This URL definitely isn't right: these URLs generally require
-						// authentication and shouldn't be returned by getDownloadURL.
-						throw err;
-					}
-					// Otherwise, don't throw; only log. Maybe Gmail has changed the URL
-					// structure and things will just work.
-				}
-				return finalUrl;
-			} else {
-				const downloadButton = this._element.querySelector('[data-inboxsdk-download-url]');
-				return downloadButton ?
-					downloadButton.getAttribute('data-inboxsdk-download-url') : null;
-			}
-		} catch (err) {
-			this._driver.getLogger().error(err);
-			throw err;
-		}
-	}
+  // Resolves the short-lived cookie-less download URL
+  async getDownloadURL(): Promise<?string> {
+    try {
+      if (this._isStandardAttachment()) {
+        const downloadUrl = await waitFor(() => this._getDownloadLink());
+        if (!downloadUrl) return null;
+        const finalUrl: string = await this._driver.resolveUrlRedirects(
+          downloadUrl
+        );
+        if (
+          !/^https:\/\/mail-attachment\.googleusercontent\.com\/attachment\//.test(
+            finalUrl
+          )
+        ) {
+          console.error('getDownloadURL returned unexpected url', finalUrl); //eslint-disable-line
+          const err = new Error('getDownloadURL returned unexpected url');
+          this._driver.getLogger().error(err, {
+            finalUrlCensored: finalUrl.replace(/\?[^/]+$/, '?[...]')
+          });
+          if (/^https:\/\/mail\.google\.com\//.test(finalUrl)) {
+            // This URL definitely isn't right: these URLs generally require
+            // authentication and shouldn't be returned by getDownloadURL.
+            throw err;
+          }
+          // Otherwise, don't throw; only log. Maybe Gmail has changed the URL
+          // structure and things will just work.
+        }
+        return finalUrl;
+      } else {
+        const downloadButton = this._element.querySelector(
+          '[data-inboxsdk-download-url]'
+        );
+        return downloadButton
+          ? downloadButton.getAttribute('data-inboxsdk-download-url')
+          : null;
+      }
+    } catch (err) {
+      this._driver.getLogger().error(err);
+      throw err;
+    }
+  }
 
-	_extractFileNameFromElement(): string {
-		return querySelector(this._element, '.aQA > span').textContent;
-	}
+  _extractFileNameFromElement(): string {
+    return querySelector(this._element, '.aQA > span').textContent;
+  }
 
-	_createNewElement(options: Object) {
-		this._element = document.createElement('span');
-		this._element.classList.add('aZo');
-		this._element.classList.add('inboxsdk__attachmentCard');
+  _createNewElement(options: Object) {
+    this._element = document.createElement('span');
+    this._element.classList.add('aZo');
+    this._element.classList.add('inboxsdk__attachmentCard');
 
-		var htmlArray = [autoHtml `
+    var htmlArray = [
+      autoHtml`
 			<a target="_blank" role="link" class="aQy e" href="">
 				<div aria-hidden="true">
 					<div class="aSG"></div>
@@ -187,23 +206,25 @@ class GmailAttachmentCardView {
 						<div class="aZm"></div>
 					</div>
 					<div class="aSH">`
-		];
+    ];
 
-		if(options.iconThumbnailUrl){
-			htmlArray = htmlArray.concat([autoHtml `
+    if (options.iconThumbnailUrl) {
+      htmlArray = htmlArray.concat([
+        autoHtml`
 				<div class="aYv">
 					<img class="aZG aYw" src="${options.iconThumbnailUrl}">
 				</div>`
-			]);
-		}
-		else{
-			htmlArray = htmlArray.concat([autoHtml `
+      ]);
+    } else {
+      htmlArray = htmlArray.concat([
+        autoHtml`
 				<img class="aQG aYB inboxsdk__attachmentCard_previewThumbnailUrl"
 					src="${options.previewThumbnailUrl}">`
-			]);
-		}
+      ]);
+    }
 
-		htmlArray = htmlArray.concat([autoHtml `
+    htmlArray = htmlArray.concat([
+      autoHtml`
 			<div class="aYy">
 				<div class="aYA">
 					<img class="aSM" src="${options.fileIconImageUrl}">
@@ -226,169 +247,177 @@ class GmailAttachmentCardView {
 	</div>
 </a>
 <div class="aQw"></div>`
-		]);
+    ]);
 
-		this._element.innerHTML = htmlArray.join('');
+    this._element.innerHTML = htmlArray.join('');
 
-		(this._element.children[0]:any).href = options.previewUrl;
+    (this._element.children[0]: any).href = options.previewUrl;
 
-		if(options.mimeType && options.mimeType.split('/')[0] === 'image'){
-			this._element.children[0].classList.add('aZI');
-		}
+    if (options.mimeType && options.mimeType.split('/')[0] === 'image') {
+      this._element.children[0].classList.add('aZI');
+    }
 
+    querySelector(this._element, 'span .aV3').textContent = options.title;
+    querySelector(this._element, 'div.aYp > span').textContent =
+      options.description || '';
+    querySelector(this._element, 'div.aSJ').style.borderColor =
+      options.foldColor;
 
-		querySelector(this._element, 'span .aV3').textContent = options.title;
-		querySelector(this._element, 'div.aYp > span').textContent = options.description || '';
-		querySelector(this._element, 'div.aSJ').style.borderColor = options.foldColor;
+    this._addHoverEvents();
 
-		this._addHoverEvents();
+    if (options.buttons) {
+      const downloadButton = find(options.buttons, function(button) {
+        return button.downloadUrl;
+      });
 
-		if(options.buttons){
-			const downloadButton = find(options.buttons, function(button){
-				return button.downloadUrl;
-			});
+      if (downloadButton) {
+        this._addDownloadButton(downloadButton);
+      }
 
-			if(downloadButton){
-				this._addDownloadButton(downloadButton);
-			}
+      this._addMoreButtons(options.buttons);
+    }
 
+    var self = this;
+    // :any to work around https://github.com/facebook/flow/issues/1155
+    this._previewClicks.plug(
+      Kefir.fromEvents(this._element, 'click').map(event => ({
+        preventDefault: () => event.preventDefault()
+      }))
+    );
 
-			this._addMoreButtons(options.buttons);
-		}
+    if (options.previewThumbnailUrl && options.failoverPreviewIconUrl) {
+      const previewThumbnailUrlImage = querySelector(
+        this._element,
+        '.inboxsdk__attachmentCard_previewThumbnailUrl'
+      );
+      previewThumbnailUrlImage.onerror = e => {
+        var iconDiv = document.createElement('div');
+        iconDiv.classList.add('aYv');
+        iconDiv.innerHTML =
+          '<img class="aZG aYw" src="' + options.failoverPreviewIconUrl + '">';
+        const parent = previewThumbnailUrlImage.parentElement;
+        if (!parent) throw new Error('Could not find parent element');
+        parent.insertBefore(
+          iconDiv,
+          previewThumbnailUrlImage.nextElementSibling
+        );
 
-		var self = this;
-		// :any to work around https://github.com/facebook/flow/issues/1155
-		this._previewClicks.plug(
-			Kefir.fromEvents(this._element, 'click')
-				.map(event => ({
-					preventDefault: () => event.preventDefault()
-				}))
-		);
+        previewThumbnailUrlImage.remove();
+      };
+    }
+  }
 
-		if(options.previewThumbnailUrl && options.failoverPreviewIconUrl){
-			const previewThumbnailUrlImage = querySelector(this._element, '.inboxsdk__attachmentCard_previewThumbnailUrl');
-			previewThumbnailUrlImage.onerror = (e) => {
-				var iconDiv = document.createElement('div');
-				iconDiv.classList.add('aYv');
-				iconDiv.innerHTML = '<img class="aZG aYw" src="' + options.failoverPreviewIconUrl + '">';
-				const parent = previewThumbnailUrlImage.parentElement;
-				if (!parent) throw new Error("Could not find parent element");
-				parent.insertBefore(iconDiv, previewThumbnailUrlImage.nextElementSibling);
+  _addHoverEvents() {
+    Kefir.merge([
+      Kefir.fromEvents(this._element, 'mouseenter'),
+      fromEventTargetCapture(this._element, 'focus')
+    ]).onValue(() => {
+      this._element.classList.add('aZp');
+    });
 
-				previewThumbnailUrlImage.remove();
-			};
-		}
-	}
+    Kefir.merge([
+      Kefir.fromEvents(this._element, 'mouseleave'),
+      fromEventTargetCapture(this._element, 'blur')
+    ]).onValue(() => {
+      this._element.classList.remove('aZp');
+    });
 
-	_addHoverEvents(){
-		Kefir.merge([
-				Kefir.fromEvents(this._element, 'mouseenter'),
-				fromEventTargetCapture(this._element, 'focus')
-			])
-			.onValue(() => {
-				this._element.classList.add('aZp');
-			});
+    const anchor = querySelector(this._element, 'a');
+    Kefir.fromEvents(anchor, 'focus').onValue(() => {
+      anchor.classList.add('a1U');
+    });
+    Kefir.fromEvents(anchor, 'blur').onValue(() => {
+      anchor.classList.remove('a1U');
+    });
+  }
 
-		Kefir.merge([
-				Kefir.fromEvents(this._element, 'mouseleave'),
-				fromEventTargetCapture(this._element, 'blur')
-			])
-			.onValue(() => {
-				this._element.classList.remove('aZp');
-			});
+  _addDownloadButton(options: Object) {
+    const buttonView = new ButtonView({
+      tooltip: 'Download',
+      iconClass: 'aSK J-J5-Ji aYr'
+    });
 
-		const anchor = querySelector(this._element, 'a');
-		Kefir.fromEvents(anchor, 'focus')
-			.onValue(() => {
-				anchor.classList.add('a1U');
-			});
-		Kefir.fromEvents(anchor, 'blur')
-			.onValue(() => {
-				anchor.classList.remove('a1U');
-			});
-	}
+    buttonView
+      .getElement()
+      .setAttribute('data-inboxsdk-download-url', options.downloadUrl);
 
-	_addDownloadButton(options: Object) {
-		const buttonView = new ButtonView({
-			tooltip: 'Download',
-			iconClass: 'aSK J-J5-Ji aYr'
-		});
+    const basicButtonViewController = new BasicButtonViewController({
+      activateFunction: function() {
+        let prevented = false;
 
-		buttonView.getElement().setAttribute('data-inboxsdk-download-url', options.downloadUrl);
+        if (options.onClick) {
+          options.onClick({
+            preventDefault: function() {
+              prevented = true;
+            }
+          });
+        }
 
-		const basicButtonViewController = new BasicButtonViewController({
-			activateFunction: function(){
-				let prevented = false;
+        if (prevented) {
+          return;
+        }
 
-				if(options.onClick){
-					options.onClick({
-						preventDefault: function(){
-							prevented = true;
-						}
-					});
-				}
+        const downloadLink = document.createElement('a');
+        downloadLink.href = options.downloadUrl;
+        if (options.downloadFilename) {
+          downloadLink.download = options.downloadFilename;
+        }
 
-				if(prevented){
-					return;
-				}
+        downloadLink.addEventListener(
+          'click',
+          function(e: MouseEvent) {
+            e.stopPropagation();
+          },
+          true
+        );
 
-				const downloadLink = document.createElement('a');
-				downloadLink.href = options.downloadUrl;
-				if (options.downloadFilename) {
-					downloadLink.download = options.downloadFilename;
-				}
+        if (options.openInNewTab) {
+          downloadLink.setAttribute('target', '_blank');
+        }
 
-				downloadLink.addEventListener('click', function(e: MouseEvent) {
-					e.stopPropagation();
-				}, true);
+        ((document.body: any): HTMLElement).appendChild(downloadLink);
 
-				if(options.openInNewTab){
-					downloadLink.setAttribute('target', '_blank');
-				}
+        simulateClick(downloadLink);
+        downloadLink.remove();
+      },
+      buttonView: buttonView
+    });
 
-				((document.body:any):HTMLElement).appendChild(downloadLink);
+    this._addButton(buttonView);
+  }
 
-				simulateClick(downloadLink);
-				downloadLink.remove();
-			},
-			buttonView: buttonView
-		});
+  _addMoreButtons(buttonDescriptors: ?(Object[])) {
+    (buttonDescriptors || [])
+      .filter(function(buttonDescriptor) {
+        return !buttonDescriptor.downloadUrl;
+      })
+      .forEach(desc => {
+        this.addButton(desc);
+      });
+  }
 
-		this._addButton(buttonView);
-	}
+  _addButton(buttonView: ButtonView) {
+    buttonView.addClass('aQv');
 
-	_addMoreButtons(buttonDescriptors: ?Object[]){
-		(buttonDescriptors || [])
-			.filter(function(buttonDescriptor){
-				return !buttonDescriptor.downloadUrl;
-			})
-			.forEach(desc => {
-				this.addButton(desc);
-			});
-	}
+    this._getButtonContainerElement().appendChild(buttonView.getElement());
+  }
 
-	_addButton(buttonView: ButtonView) {
-		buttonView.addClass('aQv');
+  _getPreviewImageUrl(): ?string {
+    var previewImage = this._getPreviewImage();
+    if (!previewImage) {
+      return null;
+    }
 
-		this._getButtonContainerElement().appendChild(buttonView.getElement());
-	}
+    return previewImage.src;
+  }
 
-	_getPreviewImageUrl(): ?string {
-		var previewImage = this._getPreviewImage();
-		if(!previewImage){
-			return null;
-		}
+  _getPreviewImage(): HTMLImageElement {
+    return (this._element.querySelector('img.aQG'): any);
+  }
 
-		return previewImage.src;
-	}
-
-	_getPreviewImage(): HTMLImageElement {
-		return (this._element.querySelector('img.aQG'): any);
-	}
-
-	_getButtonContainerElement(): HTMLElement {
-		return querySelector(this._element, '.aQw');
-	}
+  _getButtonContainerElement(): HTMLElement {
+    return querySelector(this._element, '.aQw');
+  }
 }
 
 export default defn(module, GmailAttachmentCardView);

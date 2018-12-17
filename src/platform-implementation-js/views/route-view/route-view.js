@@ -2,68 +2,68 @@
 
 import EventEmitter from '../../lib/safe-event-emitter';
 import RSVP from 'rsvp';
-import {defn} from 'ud';
+import { defn } from 'ud';
 import get from '../../../common/get-or-fail';
-import type {MinRouteViewDriver} from '../../driver-interfaces/route-view-driver';
+import type { MinRouteViewDriver } from '../../driver-interfaces/route-view-driver';
 
 const membersMap = new WeakMap();
 
 // documented in src/docs/
 class RouteView extends EventEmitter {
-	destroyed: boolean;
+  destroyed: boolean;
 
-	constructor(routeViewDriver: MinRouteViewDriver) {
-		super();
+  constructor(routeViewDriver: MinRouteViewDriver) {
+    super();
 
-		const members = {
-			routeID: (null: ?string),
-			routeType: (null: ?string),
-			params: (null: ?{[ix:string]:string}),
-			routeViewDriver
-		};
-		membersMap.set(this, members);
+    const members = {
+      routeID: (null: ?string),
+      routeType: (null: ?string),
+      params: (null: ?{ [ix: string]: string }),
+      routeViewDriver
+    };
+    membersMap.set(this, members);
 
-		this.destroyed = false;
-		_bindToEventStream(routeViewDriver, this);
-	}
+    this.destroyed = false;
+    _bindToEventStream(routeViewDriver, this);
+  }
 
-	getRouteID(): string {
-		const members = get(membersMap, this);
+  getRouteID(): string {
+    const members = get(membersMap, this);
 
-		if(!members.routeID){
-			members.routeID = members.routeViewDriver.getRouteID();
-		}
+    if (!members.routeID) {
+      members.routeID = members.routeViewDriver.getRouteID();
+    }
 
-		return members.routeID;
-	}
+    return members.routeID;
+  }
 
-	getRouteType(): string {
-		const members = get(membersMap, this);
+  getRouteType(): string {
+    const members = get(membersMap, this);
 
-		if(!members.routeType){
-			members.routeType = members.routeViewDriver.getRouteType();
-		}
+    if (!members.routeType) {
+      members.routeType = members.routeViewDriver.getRouteType();
+    }
 
-		return members.routeType;
-	}
+    return members.routeType;
+  }
 
-	getParams(): {[ix:string]:string} {
-		const members = get(membersMap, this);
+  getParams(): { [ix: string]: string } {
+    const members = get(membersMap, this);
 
-		if(!members.params){
-			members.params = members.routeViewDriver.getParams();
-		}
+    if (!members.params) {
+      members.params = members.routeViewDriver.getParams();
+    }
 
-		return members.params;
-	}
+    return members.params;
+  }
 }
 
-function _bindToEventStream(routeViewDriver, routeView){
-	routeViewDriver.getEventStream().onEnd(() => {
-		routeView.destroyed = true;
-		routeView.emit('destroy');
-		routeView.removeAllListeners();
-	});
+function _bindToEventStream(routeViewDriver, routeView) {
+  routeViewDriver.getEventStream().onEnd(() => {
+    routeView.destroyed = true;
+    routeView.emit('destroy');
+    routeView.removeAllListeners();
+  });
 }
 
 export default defn(module, RouteView);

@@ -1,7 +1,7 @@
 /* @flow */
 
 import findIndex from 'lodash/findIndex';
-import {defn} from 'ud';
+import { defn } from 'ud';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -39,14 +39,17 @@ class InboxAppSidebarView {
     // restricted to being used for references to DOM nodes. When
     // InboxAppSidebarView is instantiated, we check to see if the element
     // already exists and create it if it doesn't.
-    const el = document.querySelector('.'+idMap('app_sidebar_container'));
+    const el = document.querySelector('.' + idMap('app_sidebar_container'));
     if (el) {
       this._el = el;
     } else {
       this._createElement();
     }
 
-    const mainParent = findParent(querySelector(document, '[role=application]'), el => el.parentElement === document.body);
+    const mainParent = findParent(
+      querySelector(document, '[role=application]'),
+      el => el.parentElement === document.body
+    );
     if (!mainParent) {
       const err = new Error('Failed to find main parent');
       this._driver.getLogger().errorSite(err);
@@ -54,13 +57,15 @@ class InboxAppSidebarView {
     }
     this._mainParent = mainParent;
 
-    this._openOrOpeningProp = makeMutationObserverChunkedStream(
-      this._el, {attributes: true, attributeFilter: ['data-open', 'data-is-opening']}
-    )
+    this._openOrOpeningProp = makeMutationObserverChunkedStream(this._el, {
+      attributes: true,
+      attributeFilter: ['data-open', 'data-is-opening']
+    })
       .toProperty(() => null)
-      .map(() =>
-        this._el.getAttribute('data-open') === 'true' ||
-        this._el.getAttribute('data-is-opening') === 'true'
+      .map(
+        () =>
+          this._el.getAttribute('data-open') === 'true' ||
+          this._el.getAttribute('data-is-opening') === 'true'
       )
       .skipDuplicates();
   }
@@ -93,34 +98,39 @@ class InboxAppSidebarView {
   _setShouldAppSidebarOpen(open: boolean) {
     try {
       localStorage.setItem('inboxsdk__app_sidebar_should_open', String(open));
-    } catch(err) {
+    } catch (err) {
       console.error('error saving', err); //eslint-disable-line no-console
     }
   }
 
   _createElement() {
-    const el = this._el = document.createElement('div');
+    const el = (this._el = document.createElement('div'));
     el.className = idMap('app_sidebar_container');
     // Store the open state in the DOM rather than a class property because
     // multiple instances of InboxAppSidebarView from different apps need to
     // share the value.
     el.setAttribute('data-open', 'false');
     el.setAttribute('data-is-opening', 'false');
-    ((document.body:any):HTMLElement).appendChild(el);
+    ((document.body: any): HTMLElement).appendChild(el);
 
-    if (!((document.body:any):HTMLElement).querySelector('.'+idMap('app_sidebar_waiting_platform'))) {
+    if (
+      !((document.body: any): HTMLElement).querySelector(
+        '.' + idMap('app_sidebar_waiting_platform')
+      )
+    ) {
       const waitingPlatform = document.createElement('div');
       waitingPlatform.className = idMap('app_sidebar_waiting_platform');
-      ((document.body:any):HTMLElement).appendChild(waitingPlatform);
+      ((document.body: any): HTMLElement).appendChild(waitingPlatform);
     }
 
     // If the user clicks the chat button while the chat sidebar and app
     // sidebar are both open, then we want the chat sidebar to become visible.
     // We block Inbox from closing the chat sidebar, and we close the app sidebar.
     fromEventTargetCapture(this._driver.getChatSidebarButton(), 'click')
-      .filter(() =>
-        el.getAttribute('data-open') === 'true' &&
-        this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR'
+      .filter(
+        () =>
+          el.getAttribute('data-open') === 'true' &&
+          this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR'
       )
       .takeUntilBy(this._stopper)
       .onValue(event => {
@@ -129,7 +139,9 @@ class InboxAppSidebarView {
         this._setOpenedNow(false);
       });
 
-    this._driver.getCurrentChatSidebarView().getModeStream()
+    this._driver
+      .getCurrentChatSidebarView()
+      .getModeStream()
       .changes()
       .takeUntilBy(this._stopper)
       .onValue(mode => {
@@ -155,14 +167,19 @@ class InboxAppSidebarView {
     const orderManager = new OrderManager({
       get() {
         try {
-          return JSON.parse(localStorage.getItem('inboxsdk__sidebar_ordering') || 'null');
+          return JSON.parse(
+            localStorage.getItem('inboxsdk__sidebar_ordering') || 'null'
+          );
         } catch (err) {
           console.error('failed to read sidebar order data', err); //eslint-disable-line no-console
         }
       },
       set(data) {
         try {
-          localStorage.setItem('inboxsdk__sidebar_ordering', JSON.stringify(data));
+          localStorage.setItem(
+            'inboxsdk__sidebar_ordering',
+            JSON.stringify(data)
+          );
         } catch (err) {
           console.error('failed to set sidebar order data', err); //eslint-disable-line no-console
         }
@@ -211,7 +228,7 @@ class InboxAppSidebarView {
       el.remove();
     });
 
-    Kefir.fromEvents((document.body:any), 'inboxsdkNewSidebarPanel')
+    Kefir.fromEvents((document.body: any), 'inboxsdkNewSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
         let id = event.detail.id;
@@ -236,12 +253,16 @@ class InboxAppSidebarView {
         });
         render();
       });
-    Kefir.fromEvents((document.body:any), 'inboxsdkUpdateSidebarPanel')
+    Kefir.fromEvents((document.body: any), 'inboxsdkUpdateSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
         const orderedItems = orderManager.getOrderedItems();
-        const index = findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
-        if (index === -1) throw new Error('should not happen: failed to find orderItem');
+        const index = findIndex(
+          orderedItems,
+          x => x.value.instanceId === event.detail.instanceId
+        );
+        if (index === -1)
+          throw new Error('should not happen: failed to find orderItem');
         orderManager.updateItemValueByIndex(index, {
           id: orderedItems[index].value.id,
           appId: event.detail.appId,
@@ -254,12 +275,16 @@ class InboxAppSidebarView {
         });
         render();
       });
-    Kefir.fromEvents((document.body:any), 'inboxsdkRemoveSidebarPanel')
+    Kefir.fromEvents((document.body: any), 'inboxsdkRemoveSidebarPanel')
       .takeUntilBy(this._stopper)
       .onValue(event => {
         const orderedItems = orderManager.getOrderedItems();
-        const index = findIndex(orderedItems, x => x.value.instanceId === event.detail.instanceId);
-        if (index === -1) throw new Error('should not happen: failed to find orderItem');
+        const index = findIndex(
+          orderedItems,
+          x => x.value.instanceId === event.detail.instanceId
+        );
+        if (index === -1)
+          throw new Error('should not happen: failed to find orderItem');
         currentIds.delete(orderedItems[index].id);
         orderManager.removeItemByIndex(index);
         if (orderManager.getOrderedItems().length === 0) {
@@ -267,7 +292,7 @@ class InboxAppSidebarView {
         }
         render();
       });
-    Kefir.fromEvents((document.body:any), 'inboxsdkSidebarPanelScrollIntoView')
+    Kefir.fromEvents((document.body: any), 'inboxsdkSidebarPanelScrollIntoView')
       .takeUntilBy(this._stopper)
       .onValue(event => {
         component.scrollPanelIntoView(event.detail.instanceId);
@@ -276,7 +301,7 @@ class InboxAppSidebarView {
 
   _setOpenedNow(open: boolean) {
     this._el.setAttribute('data-open', String(open));
-    const {chat} = getSidebarClassnames();
+    const { chat } = getSidebarClassnames();
     if (!chat) return;
     if (!open) {
       if (
@@ -301,9 +326,12 @@ class InboxAppSidebarView {
     this._el.setAttribute('data-is-opening', 'true');
     waitForAnimationClickBlockerGone()
       .takeUntilBy(this._stopper)
-      .takeUntilBy(makeMutationObserverChunkedStream(
-        this._el, {attributes: true, attributeFilter: ['data-open']}
-      ))
+      .takeUntilBy(
+        makeMutationObserverChunkedStream(this._el, {
+          attributes: true,
+          attributeFilter: ['data-open']
+        })
+      )
       .onValue(() => {
         this._setOpenedNow(open);
       })
@@ -323,11 +351,9 @@ class InboxAppSidebarView {
       this._setOpenedAfterAnimation(true);
     }
 
-    this._stopper
-      .takeUntilBy(view.getStopper())
-      .onValue(() => {
-        view.remove();
-      });
+    this._stopper.takeUntilBy(view.getStopper()).onValue(() => {
+      view.remove();
+    });
 
     return view;
   }

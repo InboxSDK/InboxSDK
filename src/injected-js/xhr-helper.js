@@ -22,50 +22,65 @@ export default function xhrHelper() {
           method: opts.method || 'GET',
           credentials: 'include'
         });
-        document.dispatchEvent(new CustomEvent('inboxSDKpageAjaxDone', {
-          bubbles: false, cancelable: false,
-          detail: {
-            id,
-            error: false,
-            text: await response.text(),
-            responseURL: response.url
-          }
-        }));
+        document.dispatchEvent(
+          new CustomEvent('inboxSDKpageAjaxDone', {
+            bubbles: false,
+            cancelable: false,
+            detail: {
+              id,
+              error: false,
+              text: await response.text(),
+              responseURL: response.url
+            }
+          })
+        );
       })().catch(err => {
-        document.dispatchEvent(new CustomEvent('inboxSDKpageAjaxDone', {
-          bubbles: false, cancelable: false,
-          detail: {
-            id,
-            error: true,
-            message: err && err.message,
-            stack: err && err.stack,
-            status: err && err.xhr && err.xhr.status
-          }
-        }));
+        document.dispatchEvent(
+          new CustomEvent('inboxSDKpageAjaxDone', {
+            bubbles: false,
+            cancelable: false,
+            detail: {
+              id,
+              error: true,
+              message: err && err.message,
+              stack: err && err.stack,
+              status: err && err.xhr && err.xhr.status
+            }
+          })
+        );
       });
     } else {
-      ajax(opts).then(({text, xhr}) => {
-        document.dispatchEvent(new CustomEvent('inboxSDKpageAjaxDone', {
-          bubbles: false, cancelable: false,
-          detail: {
-            id,
-            error: false,
-            text,
-            responseURL: (xhr:any).responseURL
-          }
-        }));
-      }, err => {
-        document.dispatchEvent(new CustomEvent('inboxSDKpageAjaxDone', {
-          bubbles: false, cancelable: false,
-          detail: {
-            id,
-            error: true,
-            message: err && err.message,
-            stack: err && err.stack,
-            status: err && err.xhr && err.xhr.status
-          }
-        }));
-      });
+      ajax(opts).then(
+        ({ text, xhr }) => {
+          document.dispatchEvent(
+            new CustomEvent('inboxSDKpageAjaxDone', {
+              bubbles: false,
+              cancelable: false,
+              detail: {
+                id,
+                error: false,
+                text,
+                responseURL: (xhr: any).responseURL
+              }
+            })
+          );
+        },
+        err => {
+          document.dispatchEvent(
+            new CustomEvent('inboxSDKpageAjaxDone', {
+              bubbles: false,
+              cancelable: false,
+              detail: {
+                id,
+                error: true,
+                message: err && err.message,
+                stack: err && err.stack,
+                status: err && err.xhr && err.xhr.status
+              }
+            })
+          );
+        }
+      );
     }
   });
 }

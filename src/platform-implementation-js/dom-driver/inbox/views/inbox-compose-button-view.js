@@ -1,15 +1,15 @@
 /* @flow */
 
 import includes from 'lodash/includes';
-import {defn} from 'ud';
+import { defn } from 'ud';
 import Kefir from 'kefir';
 import type InboxComposeView from './inbox-compose-view';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
 import InboxDropdownView from './inbox-dropdown-view';
-import type {TooltipDescriptor} from '../../../views/compose-button-view';
-import type {ComposeButtonDescriptor} from '../../../driver-interfaces/compose-view-driver';
+import type { TooltipDescriptor } from '../../../views/compose-button-view';
+import type { ComposeButtonDescriptor } from '../../../driver-interfaces/compose-view-driver';
 import InboxTooltipView from './inbox-tooltip-view';
 
 let insertionOrderHint: number = 0;
@@ -19,12 +19,20 @@ class InboxComposeButtonView {
   _buttonEl: HTMLElement;
   _tooltip: ?InboxTooltipView;
 
-  constructor(composeView: InboxComposeView, buttonDescriptor: Kefir.Observable<?ComposeButtonDescriptor>, groupOrderHint: string, extraOnClickOptions: Object) {
+  constructor(
+    composeView: InboxComposeView,
+    buttonDescriptor: Kefir.Observable<?ComposeButtonDescriptor>,
+    groupOrderHint: string,
+    extraOnClickOptions: Object
+  ) {
     this._tooltip = null;
     this._composeView = composeView;
-    const buttonEl = this._buttonEl = document.createElement('div');
+    const buttonEl = (this._buttonEl = document.createElement('div'));
     buttonEl.setAttribute('role', 'button');
-    buttonEl.setAttribute('data-insertion-order-hint', String(insertionOrderHint++));
+    buttonEl.setAttribute(
+      'data-insertion-order-hint',
+      String(insertionOrderHint++)
+    );
     buttonEl.setAttribute('data-group-order-hint', groupOrderHint);
     buttonEl.tabIndex = 0;
     buttonEl.className = 'inboxsdk__button_icon';
@@ -35,7 +43,9 @@ class InboxComposeButtonView {
     let dropdown = null;
     Kefir.merge([
       Kefir.fromEvents(buttonEl, 'click'),
-      fromEventTargetCapture(buttonEl, 'keyup').filter(e => includes([32/*space*/, 13/*enter*/], e.which))
+      fromEventTargetCapture(buttonEl, 'keyup').filter(e =>
+        includes([32 /*space*/, 13 /*enter*/], e.which)
+      )
     ]).onValue(event => {
       event.preventDefault();
       event.stopPropagation();
@@ -59,33 +69,39 @@ class InboxComposeButtonView {
           });
         }
       }
-      onClick(Object.assign(({dropdown}:any), extraOnClickOptions));
+      onClick(Object.assign(({ dropdown }: any), extraOnClickOptions));
     });
     let lastOrderHint = null;
 
-    buttonDescriptor.takeUntilBy(composeView.getStopper()).onValue(buttonDescriptor => {
-      if (!buttonDescriptor) {
-        buttonEl.remove();
-        lastOrderHint = null;
-        return;
-      }
-      hasDropdown = buttonDescriptor.hasDropdown;
-      buttonEl.title = buttonDescriptor.title;
-      buttonEl.className = 'inboxsdk__button_icon '+(buttonDescriptor.iconClass||'');
-      onClick = buttonDescriptor.onClick;
-      if (buttonDescriptor.iconUrl) {
-        img.src = buttonDescriptor.iconUrl;
-        buttonEl.appendChild(img);
-      } else {
-        img.remove();
-      }
-      const orderHint = buttonDescriptor.orderHint||0;
-      if (lastOrderHint !== orderHint) {
-        lastOrderHint = orderHint;
-        buttonEl.setAttribute('data-order-hint', String(orderHint));
-        insertElementInOrder(composeView.getModifierButtonContainer(), buttonEl);
-      }
-    });
+    buttonDescriptor
+      .takeUntilBy(composeView.getStopper())
+      .onValue(buttonDescriptor => {
+        if (!buttonDescriptor) {
+          buttonEl.remove();
+          lastOrderHint = null;
+          return;
+        }
+        hasDropdown = buttonDescriptor.hasDropdown;
+        buttonEl.title = buttonDescriptor.title;
+        buttonEl.className =
+          'inboxsdk__button_icon ' + (buttonDescriptor.iconClass || '');
+        onClick = buttonDescriptor.onClick;
+        if (buttonDescriptor.iconUrl) {
+          img.src = buttonDescriptor.iconUrl;
+          buttonEl.appendChild(img);
+        } else {
+          img.remove();
+        }
+        const orderHint = buttonDescriptor.orderHint || 0;
+        if (lastOrderHint !== orderHint) {
+          lastOrderHint = orderHint;
+          buttonEl.setAttribute('data-order-hint', String(orderHint));
+          insertElementInOrder(
+            composeView.getModifierButtonContainer(),
+            buttonEl
+          );
+        }
+      });
 
     composeView.getStopper().onValue(() => {
       this.closeTooltip();
@@ -107,7 +123,10 @@ class InboxComposeButtonView {
     if (this._tooltip) {
       this.closeTooltip();
     }
-    const tooltip = this._tooltip = new InboxTooltipView(this._buttonEl, tooltipDescriptor);
+    const tooltip = (this._tooltip = new InboxTooltipView(
+      this._buttonEl,
+      tooltipDescriptor
+    ));
     tooltip.getStopper().onValue(() => {
       if (this._tooltip === tooltip) {
         this._tooltip = null;

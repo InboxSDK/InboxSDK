@@ -21,7 +21,9 @@ const cssProcessor = cssParser();
 // keep it lined up with the search bar.
 
 const getSidebarClassnames: () => {
-  chat: ?string, nav: ?string, centerList: ?string
+  chat: ?string,
+  nav: ?string,
+  centerList: ?string
 } = once(() => {
   // We know that the page has a CSS rule which looks like
   //   .blah.chat .foo { margin-right: bigger number; margin-left: smaller number; }
@@ -39,43 +41,57 @@ const getSidebarClassnames: () => {
 
   // So first we find all the classnames on the [role=application] and make a
   // regex for each one.
-  const classRegexes: RegExp[] = Array.from((querySelector(document, '[role=application]').classList: any))
-    .map(x => new RegExp('\\.'+x+'\\b'));
+  const classRegexes: RegExp[] = Array.from(
+    (querySelector(document, '[role=application]').classList: any)
+  ).map(x => new RegExp('\\.' + x + '\\b'));
   if (classRegexes.length === 0) throw new Error('no class names on element');
 
   // rules will contain both the chat and nav sidebar rules.
-  const rules = t.toArray(Array.prototype.slice.call(document.styleSheets), t.compose(
-    t.filter(sheet => {
-      try {
-        return sheet.cssRules && sheet.cssRules.length;
-      } catch (err) {
-        // ignore. Sometimes pages have stylesheets that don't permit their
-        // rules to be enumerated. Possibly caused by other extensions including
-        // a css file from another domain?
-        return false;
-      }
-    }),
-    t.mapcat(sheet => Array.prototype.slice.call(sheet.cssRules || [])),
-    t.mapcat(rulesToStyleRules),
-    // We have all page rules. Filter it down to just rules mentioning one of
-    // [role=application]'s classnames.
-    t.filter(rule => classRegexes.some(r => r.test(rule.selectorText))),
-    // Now just the rules that contain both margin-left and -right rules.
-    t.filter(rule => rule.style['margin-left'] && rule.style['margin-right'])
-  ));
+  const rules = t.toArray(
+    Array.prototype.slice.call(document.styleSheets),
+    t.compose(
+      t.filter(sheet => {
+        try {
+          return sheet.cssRules && sheet.cssRules.length;
+        } catch (err) {
+          // ignore. Sometimes pages have stylesheets that don't permit their
+          // rules to be enumerated. Possibly caused by other extensions including
+          // a css file from another domain?
+          return false;
+        }
+      }),
+      t.mapcat(sheet => Array.prototype.slice.call(sheet.cssRules || [])),
+      t.mapcat(rulesToStyleRules),
+      // We have all page rules. Filter it down to just rules mentioning one of
+      // [role=application]'s classnames.
+      t.filter(rule => classRegexes.some(r => r.test(rule.selectorText))),
+      // Now just the rules that contain both margin-left and -right rules.
+      t.filter(rule => rule.style['margin-left'] && rule.style['margin-right'])
+    )
+  );
 
-  const onlyNavSidebarRule = t.toArray(Array.prototype.slice.call(rules), t.compose(
-    t.filter(rule =>
-      parseFloat(rule.style['margin-left']) > parseFloat(rule.style['margin-right'])
-    ),
-    t.take(1)
-  ))[0];
-  const onlyChatSidebarRule = t.toArray(Array.prototype.slice.call(rules), t.compose(
-    t.filter(rule =>
-      parseFloat(rule.style['margin-left']) < parseFloat(rule.style['margin-right'])
-    ),
-    t.take(1)
-  ))[0];
+  const onlyNavSidebarRule = t.toArray(
+    Array.prototype.slice.call(rules),
+    t.compose(
+      t.filter(
+        rule =>
+          parseFloat(rule.style['margin-left']) >
+          parseFloat(rule.style['margin-right'])
+      ),
+      t.take(1)
+    )
+  )[0];
+  const onlyChatSidebarRule = t.toArray(
+    Array.prototype.slice.call(rules),
+    t.compose(
+      t.filter(
+        rule =>
+          parseFloat(rule.style['margin-left']) <
+          parseFloat(rule.style['margin-right'])
+      ),
+      t.take(1)
+    )
+  )[0];
   if (!onlyNavSidebarRule || !onlyChatSidebarRule) {
     const err = new Error('Failed to parse element CSS rules');
     Logger.error(err, {
@@ -115,10 +131,16 @@ const getSidebarClassnames: () => {
     onlyChatSidebarRuleClassNames
   );
 
-  const centerListClassName: ?string = last(onlyNavSidebarRuleClassNames) === last(onlyChatSidebarRuleClassNames) ?
-    last(onlyNavSidebarRuleClassNames) : null;
+  const centerListClassName: ?string =
+    last(onlyNavSidebarRuleClassNames) === last(onlyChatSidebarRuleClassNames)
+      ? last(onlyNavSidebarRuleClassNames)
+      : null;
 
-  if (chatSidebarClassNames.length !== 1 || navSidebarClassNames.length !== 1 || !centerListClassName) {
+  if (
+    chatSidebarClassNames.length !== 1 ||
+    navSidebarClassNames.length !== 1 ||
+    !centerListClassName
+  ) {
     Logger.error(new Error('Failed to find sidebar classnames'), {
       onlyNavSidebarRuleClassNames,
       onlyChatSidebarRuleClassNames,

@@ -1,6 +1,6 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import includes from 'lodash/includes';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -15,10 +15,17 @@ class InboxToolbarButtonView {
   _stopper = kefirStopper();
   _buttonEl: HTMLElement;
 
-  constructor(buttonDescriptor: Object, groupOrderHint: string, container: HTMLElement) {
-    const buttonEl = this._buttonEl = document.createElement('li');
+  constructor(
+    buttonDescriptor: Object,
+    groupOrderHint: string,
+    container: HTMLElement
+  ) {
+    const buttonEl = (this._buttonEl = document.createElement('li'));
     buttonEl.setAttribute('role', 'button');
-    buttonEl.setAttribute('data-insertion-order-hint', String(insertionOrderHint++));
+    buttonEl.setAttribute(
+      'data-insertion-order-hint',
+      String(insertionOrderHint++)
+    );
     buttonEl.setAttribute('data-group-order-hint', groupOrderHint);
     buttonEl.tabIndex = 0;
     buttonEl.className = 'inboxsdk__button_icon';
@@ -29,7 +36,9 @@ class InboxToolbarButtonView {
     let dropdown = null;
     Kefir.merge([
       Kefir.fromEvents(buttonEl, 'click'),
-      fromEventTargetCapture(buttonEl, 'keyup').filter(e => includes([32/*space*/, 13/*enter*/], e.which))
+      fromEventTargetCapture(buttonEl, 'keyup').filter(e =>
+        includes([32 /*space*/, 13 /*enter*/], e.which)
+      )
     ]).onValue(event => {
       event.preventDefault();
       event.stopPropagation();
@@ -52,14 +61,15 @@ class InboxToolbarButtonView {
           });
         }
       }
-      onClick({dropdown});
+      onClick({ dropdown });
     });
     let lastOrderHint = null;
 
     {
       hasDropdown = buttonDescriptor.hasDropdown;
       buttonEl.title = buttonDescriptor.title;
-      buttonEl.className = 'inboxsdk__button_icon '+(buttonDescriptor.iconClass||'');
+      buttonEl.className =
+        'inboxsdk__button_icon ' + (buttonDescriptor.iconClass || '');
       onClick = buttonDescriptor.onClick;
       if (buttonDescriptor.iconUrl) {
         img.src = buttonDescriptor.iconUrl;
@@ -67,7 +77,7 @@ class InboxToolbarButtonView {
       } else {
         img.remove();
       }
-      const orderHint = buttonDescriptor.orderHint||0;
+      const orderHint = buttonDescriptor.orderHint || 0;
       if (lastOrderHint !== orderHint) {
         lastOrderHint = orderHint;
         buttonEl.setAttribute('data-order-hint', String(orderHint));

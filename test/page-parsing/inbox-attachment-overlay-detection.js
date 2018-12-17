@@ -13,14 +13,16 @@ import pageParserOptions from '../../src/platform-implementation-js/dom-driver/i
 import parser from '../../src/platform-implementation-js/dom-driver/inbox/detection/attachmentOverlay/parser';
 
 function finder(documentElement: HTMLHtmlElement) {
-  return Array.from(pageParserOptions.finders.attachmentOverlay.fn(documentElement));
+  return Array.from(
+    pageParserOptions.finders.attachmentOverlay.fn(documentElement)
+  );
 }
 
 import {
   page20160816,
   page20160817,
   page20160830,
-  page20170209,
+  page20170209
 } from '../lib/pages';
 
 describe('Inbox Attachment Overlay Detection', () => {
@@ -31,7 +33,10 @@ describe('Inbox Attachment Overlay Detection', () => {
     });
 
     it('2016-08-17 with preview overlay', () => {
-      const overlay = querySelector((querySelector(page20160817(), 'iframe#FfJ3bf'):any).contentDocument, '[data-test-id=overlay]');
+      const overlay = querySelector(
+        (querySelector(page20160817(), 'iframe#FfJ3bf'): any).contentDocument,
+        '[data-test-id=overlay]'
+      );
       const results = finder(page20160817());
       expect(results.length).toBe(1);
       expect(results).toContain(overlay);
@@ -40,7 +45,10 @@ describe('Inbox Attachment Overlay Detection', () => {
 
   describe('parser', () => {
     it('2016-08-17 with preview overlay', () => {
-      const overlay = querySelector((querySelector(page20160817(), 'iframe#FfJ3bf'):any).contentDocument, '[data-test-id=overlay]');
+      const overlay = querySelector(
+        (querySelector(page20160817(), 'iframe#FfJ3bf'): any).contentDocument,
+        '[data-test-id=overlay]'
+      );
       const results = parser(overlay);
       expect(results.errors).toEqual([]);
       expect(results.score).toBe(1);
@@ -51,7 +59,9 @@ describe('Inbox Attachment Overlay Detection', () => {
       const results = parser(overlay);
       expect(results.errors).toEqual([]);
       expect(results.score).toBe(1);
-      expect(results.elements.downloadButton).toBe(querySelector(page20160830(), '[data-test-id="downloadButton"]'));
+      expect(results.elements.downloadButton).toBe(
+        querySelector(page20160830(), '[data-test-id="downloadButton"]')
+      );
     });
 
     it('2017-02-09', () => {
@@ -59,7 +69,9 @@ describe('Inbox Attachment Overlay Detection', () => {
       const results = parser(overlay);
       expect(results.errors).toEqual([]);
       expect(results.score).toBe(1);
-      expect(results.elements.downloadButton).toBe(querySelector(page20170209(), '[data-test-id="downloadButton"]'));
+      expect(results.elements.downloadButton).toBe(
+        querySelector(page20170209(), '[data-test-id="downloadButton"]')
+      );
     });
   });
 
@@ -67,16 +79,27 @@ describe('Inbox Attachment Overlay Detection', () => {
     it('2016-08-16 message with attachment', () => {
       const spy = sinon.spy();
       const root = page20160816();
-      const liveSet = makePageParserTree(null, root).tree.getAllByTag('attachmentOverlay');
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag(
+        'attachmentOverlay'
+      );
       expect(liveSet.values().size).toBe(0);
     });
 
     it('2016-08-17 with preview overlay', () => {
-      const overlay = querySelector((querySelector(page20160817(), 'iframe#FfJ3bf'):any).contentDocument, '[data-test-id=overlay]');
+      const overlay = querySelector(
+        (querySelector(page20160817(), 'iframe#FfJ3bf'): any).contentDocument,
+        '[data-test-id=overlay]'
+      );
       const root = page20160817();
-      const liveSet = makePageParserTree(null, root).tree.getAllByTag('attachmentOverlay');
+      const liveSet = makePageParserTree(null, root).tree.getAllByTag(
+        'attachmentOverlay'
+      );
       expect(liveSet.values().size).toBe(1);
-      expect(lsMap(liveSet, x => x.getValue()).values().has(overlay)).toBe(true);
+      expect(
+        lsMap(liveSet, x => x.getValue())
+          .values()
+          .has(overlay)
+      ).toBe(true);
     });
   });
 });

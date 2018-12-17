@@ -3,40 +3,44 @@
 import intersection from 'lodash/intersection';
 import assert from 'assert';
 import * as logger from '../../injected-logger';
-import {cleanupPeopleLine} from '../../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
+import { cleanupPeopleLine } from '../../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 
 export type ThreadRowMetadata = {
-  timeString: string;
-  subject: string;
-  peopleHtml: string;
+  timeString: string,
+  subject: string,
+  peopleHtml: string
 };
 
-export function extractMetadataFromThreadRow(threadRow: HTMLElement): ThreadRowMetadata {
+export function extractMetadataFromThreadRow(
+  threadRow: HTMLElement
+): ThreadRowMetadata {
   var timeSpan, subjectSpan, peopleDiv;
 
   assert(threadRow.hasAttribute('id'), 'check element is main thread row');
 
   var errors = [];
-  var threadRowIsVertical = intersection(Array.from(threadRow.classList), ['zA','apv']).length === 2;
+  var threadRowIsVertical =
+    intersection(Array.from(threadRow.classList), ['zA', 'apv']).length === 2;
   if (threadRowIsVertical) {
     var threadRow2 = threadRow.nextElementSibling;
-    if(!threadRow2){
+    if (!threadRow2) {
       errors.push('failed to find threadRow2');
-    }
-    else{
+    } else {
       var threadRow3 = threadRow2.nextElementSibling;
       if (!threadRow3 || !threadRow3.classList.contains('apw')) {
         threadRow3 = null;
       }
 
-      timeSpan = threadRow.querySelector("td.apt > div.apm > span[title]");
-      subjectSpan = threadRow2.querySelector("td div.xS div.xT div.y6 > span");
-      peopleDiv = threadRow.querySelector("td.apy > div.yW, td.apx > div.yW");
+      timeSpan = threadRow.querySelector('td.apt > div.apm > span[title]');
+      subjectSpan = threadRow2.querySelector('td div.xS div.xT div.y6 > span');
+      peopleDiv = threadRow.querySelector('td.apy > div.yW, td.apx > div.yW');
     }
   } else {
-    timeSpan = threadRow.querySelector("td.xW > span[title]");
+    timeSpan = threadRow.querySelector('td.xW > span[title]');
 
-    var subjectAreaDiv = threadRow.querySelector("td.a4W div[role=link] div.y6");
+    var subjectAreaDiv = threadRow.querySelector(
+      'td.a4W div[role=link] div.y6'
+    );
     if (subjectAreaDiv && subjectAreaDiv.children.length >= 1) {
       subjectSpan = subjectAreaDiv.children[0];
 
@@ -44,7 +48,7 @@ export function extractMetadataFromThreadRow(threadRow: HTMLElement): ThreadRowM
       //var bodySnippetSpan = subjectAreaDiv.children[1];
     }
 
-    peopleDiv = threadRow.querySelector("td.yX > div.yW");
+    peopleDiv = threadRow.querySelector('td.yX > div.yW');
   }
 
   if (!timeSpan) {
@@ -57,7 +61,7 @@ export function extractMetadataFromThreadRow(threadRow: HTMLElement): ThreadRowM
     errors.push('failed to find peopleDiv');
   }
   if (errors.length) {
-    logger.error(new Error("Errors in thread row parsing"), {errors});
+    logger.error(new Error('Errors in thread row parsing'), { errors });
   }
 
   return {

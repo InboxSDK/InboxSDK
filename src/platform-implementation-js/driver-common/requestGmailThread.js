@@ -1,11 +1,14 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import querystring from 'querystring';
 import gmailAjax from './gmailAjax';
 import getAccountUrlPart from './getAccountUrlPart';
 
-async function requestGmailThread(ikValue: string, threadId: string): Promise<string> {
+async function requestGmailThread(
+  ikValue: string,
+  threadId: string
+): Promise<string> {
   const queryParameters = {
     ui: 2,
     ik: ikValue,
@@ -18,9 +21,11 @@ async function requestGmailThread(ikValue: string, threadId: string): Promise<st
     type: threadId
   };
 
-  const {text} = await gmailAjax({
+  const { text } = await gmailAjax({
     method: 'POST',
-    url: `https://mail.google.com/mail${getAccountUrlPart()}?${querystring.stringify(queryParameters)}`,
+    url: `https://mail.google.com/mail${getAccountUrlPart()}?${querystring.stringify(
+      queryParameters
+    )}`,
     canRetry: true
   });
 

@@ -9,7 +9,7 @@
 .inboxsdk__close_button {
   height: 24px;
   width: 24px;
-  opacity: .7;
+  opacity: 0.7;
   position: relative;
   background: none;
   border: none;
@@ -18,11 +18,12 @@
   outline: none;
   cursor: pointer;
 }
-.inboxsdk__close_button:focus, .inboxsdk__close_button:hover {
+.inboxsdk__close_button:focus,
+.inboxsdk__close_button:hover {
   opacity: 1;
 }
 .inboxsdk__close_button:focus::before {
-  background-color: rgba(0,0,0,.12);
+  background-color: rgba(0, 0, 0, 0.12);
 }
 .inboxsdk__close_button::before {
   border-radius: 50%;
@@ -68,17 +69,18 @@
   bottom: 0;
   right: 0;
   width: 452px;
-  font: normal normal normal normal 13px / normal "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal normal normal normal 13px / normal 'Helvetica Neue', Helvetica,
+    Arial, sans-serif;
   display: -webkit-flex;
   display: flex;
   -webkit-flex-direction: column;
   flex-direction: column;
   background-color: #fff;
   outline: none;
-  box-shadow: 0 0 8px rgba(0,0,0,.18), 0 8px 16px rgba(0,0,0,.36);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.18), 0 8px 16px rgba(0, 0, 0, 0.36);
   -webkit-transform: translateX(100%);
   transform: translateX(100%);
-  transition: transform 150ms cubic-bezier(.4,0,.2,1);
+  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .inboxsdk__drawer_view.inboxsdk__active {
@@ -104,7 +106,8 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font: normal normal normal normal 20px / 24px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font: normal normal normal normal 20px / 24px 'Helvetica Neue', Helvetica,
+    Arial, sans-serif;
 }
 
 /* backdrop */
@@ -121,8 +124,8 @@
   transition: background-color 150ms cubic-bezier(0.4, 0, 1, 1);
 }
 .inboxsdk__inbox_backdrop.inboxsdk__active {
-  background-color: rgba(10,10,10,.6);
-  transition: background-color 70ms cubic-bezier(0,0,.2,1);
+  background-color: rgba(10, 10, 10, 0.6);
+  transition: background-color 70ms cubic-bezier(0, 0, 0.2, 1);
 }
 
 .inboxsdk__inbox_backdrop ~ .inboxsdk__inbox_backdrop {
@@ -165,13 +168,16 @@
   cursor: default;
 }
 
-   .IDMAP_app_sidebar_content_panel:not(.IDMAP_expanded) .IDMAP_app_sidebar_content_panel_top_line {
-     border-bottom: 1px solid #ddd;
-   }
+.IDMAP_app_sidebar_content_panel:not(.IDMAP_expanded)
+  .IDMAP_app_sidebar_content_panel_top_line {
+  border-bottom: 1px solid #ddd;
+}
 
-.IDMAP_app_sidebar_content_panel.IDMAP_showControls .IDMAP_app_sidebar_content_panel_top_line:hover,
-.IDMAP_app_sidebar_content_panel.IDMAP_dragged .IDMAP_app_sidebar_content_panel_top_line {
-  background: rgba(0,0,0,.03);
+.IDMAP_app_sidebar_content_panel.IDMAP_showControls
+  .IDMAP_app_sidebar_content_panel_top_line:hover,
+.IDMAP_app_sidebar_content_panel.IDMAP_dragged
+  .IDMAP_app_sidebar_content_panel_top_line {
+  background: rgba(0, 0, 0, 0.03);
 }
 
 .IDMAP_app_sidebar_content_panel_title {
@@ -180,28 +186,33 @@
   text-overflow: ellipsis;
 }
 
-.IDMAP_app_sidebar_content_panel.IDMAP_showControls .IDMAP_app_sidebar_content_panel_title {
+.IDMAP_app_sidebar_content_panel.IDMAP_showControls
+  .IDMAP_app_sidebar_content_panel_title {
   cursor: move;
 }
 
 .IDMAP_app_sidebar_content_panel_title_text {
   padding-left: 6px;
   vertical-align: middle;
-  font: bold 13px / 40px "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: rgba(0,0,0, 0.87);
+  font: bold 13px / 40px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: rgba(0, 0, 0, 0.87);
 }
 
-.IDMAP_app_sidebar.IDMAP_hideTitleBar .IDMAP_app_sidebar_content_panel_top_line {
+.IDMAP_app_sidebar.IDMAP_hideTitleBar
+  .IDMAP_app_sidebar_content_panel_top_line {
   display: none;
 }
 
-.IDMAP_app_sidebar_content_panel.IDMAP_showControls .IDMAP_app_sidebar_content_panel_top_line:hover .IDMAP_app_sidebar_content_panel_grip {
+.IDMAP_app_sidebar_content_panel.IDMAP_showControls
+  .IDMAP_app_sidebar_content_panel_top_line:hover
+  .IDMAP_app_sidebar_content_panel_grip {
   position: absolute;
   top: 0px;
   left: 0px;
   width: 10px;
   height: 40px;
-  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHdpZHRoPSI2cHgiIGhlaWdodD0iMTJweCIgdmlld0JveD0iMCAwIDYgMTIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+ICAgICAgICA8dGl0bGU+Q29tYmluZWQgU2hhcGU8L3RpdGxlPiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4gICAgPGRlZnM+PC9kZWZzPiAgICA8ZyBpZD0iRkluYWxzLSoqSmFuLTkqKiIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+ICAgICAgICA8ZyBpZD0iU2lkZWJhci1jbG9zZWQtQ29weSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsIC0xNC4wMDAwMDApIiBmaWxsPSIjQUFBQUFBIj4gICAgICAgICAgICA8ZyBpZD0iU2lkZWJhciIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTEwLjAwMDAwMCwgMC4wMDAwMDApIj4gICAgICAgICAgICAgICAgPGcgaWQ9IkJveC1pbmZvLUNvcHkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwLjAwMDAwMCwgMC4wMDAwMDApIj4gICAgICAgICAgICAgICAgICAgIDxnIGlkPSJHcmlwcHkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLCAxNC41MDAwMDApIj4gICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMC42NjY2NjY2NjcsNS40MTY2NjY2NyBDMC42NjY2NjY2NjcsNC44NjQzODE5MiAxLjExMDUzMTQ5LDQuNDE2NjY2NjcgMS42NjY2NjY2Nyw0LjQxNjY2NjY3IEMyLjIxODk1MTQyLDQuNDE2NjY2NjcgMi42NjY2NjY2Nyw0Ljg2MDUzMTQ5IDIuNjY2NjY2NjcsNS40MTY2NjY2NyBDMi42NjY2NjY2Nyw1Ljk2ODk1MTQyIDIuMjIyODAxODQsNi40MTY2NjY2NyAxLjY2NjY2NjY3LDYuNDE2NjY2NjcgQzEuMTE0MzgxOTIsNi40MTY2NjY2NyAwLjY2NjY2NjY2Nyw1Ljk3MjgwMTg0IDAuNjY2NjY2NjY3LDUuNDE2NjY2NjcgWiBNMC42NjY2NjY2NjcsMS4yNSBDMC42NjY2NjY2NjcsMC42OTc3MTUyNSAxLjExMDUzMTQ5LDAuMjUgMS42NjY2NjY2NywwLjI1IEMyLjIxODk1MTQyLDAuMjUgMi42NjY2NjY2NywwLjY5Mzg2NDgyMiAyLjY2NjY2NjY3LDEuMjUgQzIuNjY2NjY2NjcsMS44MDIyODQ3NSAyLjIyMjgwMTg0LDIuMjUgMS42NjY2NjY2NywyLjI1IEMxLjExNDM4MTkyLDIuMjUgMC42NjY2NjY2NjcsMS44MDYxMzUxOCAwLjY2NjY2NjY2NywxLjI1IFogTTAuNjY2NjY2NjY3LDkuNTgzMzMzMzMgQzAuNjY2NjY2NjY3LDkuMDMxMDQ4NTggMS4xMTA1MzE0OSw4LjU4MzMzMzMzIDEuNjY2NjY2NjcsOC41ODMzMzMzMyBDMi4yMTg5NTE0Miw4LjU4MzMzMzMzIDIuNjY2NjY2NjcsOS4wMjcxOTgxNiAyLjY2NjY2NjY3LDkuNTgzMzMzMzMgQzIuNjY2NjY2NjcsMTAuMTM1NjE4MSAyLjIyMjgwMTg0LDEwLjU4MzMzMzMgMS42NjY2NjY2NywxMC41ODMzMzMzIEMxLjExNDM4MTkyLDEwLjU4MzMzMzMgMC42NjY2NjY2NjcsMTAuMTM5NDY4NSAwLjY2NjY2NjY2Nyw5LjU4MzMzMzMzIFogTTMuMzAwMDAwMTksMS4yNSBDMy4zMDAwMDAxOSwwLjY5NzcxNTI1IDMuNzQzODY1MDEsMC4yNSA0LjMwMDAwMDE5LDAuMjUgQzQuODUyMjg0OTQsMC4yNSA1LjMwMDAwMDE5LDAuNjkzODY0ODIyIDUuMzAwMDAwMTksMS4yNSBDNS4zMDAwMDAxOSwxLjgwMjI4NDc1IDQuODU2MTM1MzcsMi4yNSA0LjMwMDAwMDE5LDIuMjUgQzMuNzQ3NzE1NDQsMi4yNSAzLjMwMDAwMDE5LDEuODA2MTM1MTggMy4zMDAwMDAxOSwxLjI1IFogTTMuMzAwMDAwMTksNS40MTY2NjY2NyBDMy4zMDAwMDAxOSw0Ljg2NDM4MTkyIDMuNzQzODY1MDEsNC40MTY2NjY2NyA0LjMwMDAwMDE5LDQuNDE2NjY2NjcgQzQuODUyMjg0OTQsNC40MTY2NjY2NyA1LjMwMDAwMDE5LDQuODYwNTMxNDkgNS4zMDAwMDAxOSw1LjQxNjY2NjY3IEM1LjMwMDAwMDE5LDUuOTY4OTUxNDIgNC44NTYxMzUzNyw2LjQxNjY2NjY3IDQuMzAwMDAwMTksNi40MTY2NjY2NyBDMy43NDc3MTU0NCw2LjQxNjY2NjY3IDMuMzAwMDAwMTksNS45NzI4MDE4NCAzLjMwMDAwMDE5LDUuNDE2NjY2NjcgWiBNMy4zMDAwMDAxOSw5LjU4MzMzMzMzIEMzLjMwMDAwMDE5LDkuMDMxMDQ4NTggMy43NDM4NjUwMSw4LjU4MzMzMzMzIDQuMzAwMDAwMTksOC41ODMzMzMzMyBDNC44NTIyODQ5NCw4LjU4MzMzMzMzIDUuMzAwMDAwMTksOS4wMjcxOTgxNiA1LjMwMDAwMDE5LDkuNTgzMzMzMzMgQzUuMzAwMDAwMTksMTAuMTM1NjE4MSA0Ljg1NjEzNTM3LDEwLjU4MzMzMzMgNC4zMDAwMDAxOSwxMC41ODMzMzMzIEMzLjc0NzcxNTQ0LDEwLjU4MzMzMzMgMy4zMDAwMDAxOSwxMC4xMzk0Njg1IDMuMzAwMDAwMTksOS41ODMzMzMzMyBaIiBpZD0iQ29tYmluZWQtU2hhcGUiPjwvcGF0aD4gICAgICAgICAgICAgICAgICAgIDwvZz4gICAgICAgICAgICAgICAgPC9nPiAgICAgICAgICAgIDwvZz4gICAgICAgIDwvZz4gICAgPC9nPjwvc3ZnPg==) 50% center no-repeat;
+  background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz48c3ZnIHdpZHRoPSI2cHgiIGhlaWdodD0iMTJweCIgdmlld0JveD0iMCAwIDYgMTIiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayI+ICAgICAgICA8dGl0bGU+Q29tYmluZWQgU2hhcGU8L3RpdGxlPiAgICA8ZGVzYz5DcmVhdGVkIHdpdGggU2tldGNoLjwvZGVzYz4gICAgPGRlZnM+PC9kZWZzPiAgICA8ZyBpZD0iRkluYWxzLSoqSmFuLTkqKiIgc3Ryb2tlPSJub25lIiBzdHJva2Utd2lkdGg9IjEiIGZpbGw9Im5vbmUiIGZpbGwtcnVsZT0iZXZlbm9kZCI+ICAgICAgICA8ZyBpZD0iU2lkZWJhci1jbG9zZWQtQ29weSIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoMC4wMDAwMDAsIC0xNC4wMDAwMDApIiBmaWxsPSIjQUFBQUFBIj4gICAgICAgICAgICA8ZyBpZD0iU2lkZWJhciIgdHJhbnNmb3JtPSJ0cmFuc2xhdGUoLTEwLjAwMDAwMCwgMC4wMDAwMDApIj4gICAgICAgICAgICAgICAgPGcgaWQ9IkJveC1pbmZvLUNvcHkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwLjAwMDAwMCwgMC4wMDAwMDApIj4gICAgICAgICAgICAgICAgICAgIDxnIGlkPSJHcmlwcHkiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDAuMDAwMDAwLCAxNC41MDAwMDApIj4gICAgICAgICAgICAgICAgICAgICAgICA8cGF0aCBkPSJNMC42NjY2NjY2NjcsNS40MTY2NjY2NyBDMC42NjY2NjY2NjcsNC44NjQzODE5MiAxLjExMDUzMTQ5LDQuNDE2NjY2NjcgMS42NjY2NjY2Nyw0LjQxNjY2NjY3IEMyLjIxODk1MTQyLDQuNDE2NjY2NjcgMi42NjY2NjY2Nyw0Ljg2MDUzMTQ5IDIuNjY2NjY2NjcsNS40MTY2NjY2NyBDMi42NjY2NjY2Nyw1Ljk2ODk1MTQyIDIuMjIyODAxODQsNi40MTY2NjY2NyAxLjY2NjY2NjY3LDYuNDE2NjY2NjcgQzEuMTE0MzgxOTIsNi40MTY2NjY2NyAwLjY2NjY2NjY2Nyw1Ljk3MjgwMTg0IDAuNjY2NjY2NjY3LDUuNDE2NjY2NjcgWiBNMC42NjY2NjY2NjcsMS4yNSBDMC42NjY2NjY2NjcsMC42OTc3MTUyNSAxLjExMDUzMTQ5LDAuMjUgMS42NjY2NjY2NywwLjI1IEMyLjIxODk1MTQyLDAuMjUgMi42NjY2NjY2NywwLjY5Mzg2NDgyMiAyLjY2NjY2NjY3LDEuMjUgQzIuNjY2NjY2NjcsMS44MDIyODQ3NSAyLjIyMjgwMTg0LDIuMjUgMS42NjY2NjY2NywyLjI1IEMxLjExNDM4MTkyLDIuMjUgMC42NjY2NjY2NjcsMS44MDYxMzUxOCAwLjY2NjY2NjY2NywxLjI1IFogTTAuNjY2NjY2NjY3LDkuNTgzMzMzMzMgQzAuNjY2NjY2NjY3LDkuMDMxMDQ4NTggMS4xMTA1MzE0OSw4LjU4MzMzMzMzIDEuNjY2NjY2NjcsOC41ODMzMzMzMyBDMi4yMTg5NTE0Miw4LjU4MzMzMzMzIDIuNjY2NjY2NjcsOS4wMjcxOTgxNiAyLjY2NjY2NjY3LDkuNTgzMzMzMzMgQzIuNjY2NjY2NjcsMTAuMTM1NjE4MSAyLjIyMjgwMTg0LDEwLjU4MzMzMzMgMS42NjY2NjY2NywxMC41ODMzMzMzIEMxLjExNDM4MTkyLDEwLjU4MzMzMzMgMC42NjY2NjY2NjcsMTAuMTM5NDY4NSAwLjY2NjY2NjY2Nyw5LjU4MzMzMzMzIFogTTMuMzAwMDAwMTksMS4yNSBDMy4zMDAwMDAxOSwwLjY5NzcxNTI1IDMuNzQzODY1MDEsMC4yNSA0LjMwMDAwMDE5LDAuMjUgQzQuODUyMjg0OTQsMC4yNSA1LjMwMDAwMDE5LDAuNjkzODY0ODIyIDUuMzAwMDAwMTksMS4yNSBDNS4zMDAwMDAxOSwxLjgwMjI4NDc1IDQuODU2MTM1MzcsMi4yNSA0LjMwMDAwMDE5LDIuMjUgQzMuNzQ3NzE1NDQsMi4yNSAzLjMwMDAwMDE5LDEuODA2MTM1MTggMy4zMDAwMDAxOSwxLjI1IFogTTMuMzAwMDAwMTksNS40MTY2NjY2NyBDMy4zMDAwMDAxOSw0Ljg2NDM4MTkyIDMuNzQzODY1MDEsNC40MTY2NjY2NyA0LjMwMDAwMDE5LDQuNDE2NjY2NjcgQzQuODUyMjg0OTQsNC40MTY2NjY2NyA1LjMwMDAwMDE5LDQuODYwNTMxNDkgNS4zMDAwMDAxOSw1LjQxNjY2NjY3IEM1LjMwMDAwMDE5LDUuOTY4OTUxNDIgNC44NTYxMzUzNyw2LjQxNjY2NjY3IDQuMzAwMDAwMTksNi40MTY2NjY2NyBDMy43NDc3MTU0NCw2LjQxNjY2NjY3IDMuMzAwMDAwMTksNS45NzI4MDE4NCAzLjMwMDAwMDE5LDUuNDE2NjY2NjcgWiBNMy4zMDAwMDAxOSw5LjU4MzMzMzMzIEMzLjMwMDAwMDE5LDkuMDMxMDQ4NTggMy43NDM4NjUwMSw4LjU4MzMzMzMzIDQuMzAwMDAwMTksOC41ODMzMzMzMyBDNC44NTIyODQ5NCw4LjU4MzMzMzMzIDUuMzAwMDAwMTksOS4wMjcxOTgxNiA1LjMwMDAwMDE5LDkuNTgzMzMzMzMgQzUuMzAwMDAwMTksMTAuMTM1NjE4MSA0Ljg1NjEzNTM3LDEwLjU4MzMzMzMgNC4zMDAwMDAxOSwxMC41ODMzMzMzIEMzLjc0NzcxNTQ0LDEwLjU4MzMzMzMgMy4zMDAwMDAxOSwxMC4xMzk0Njg1IDMuMzAwMDAwMTksOS41ODMzMzMzMyBaIiBpZD0iQ29tYmluZWQtU2hhcGUiPjwvcGF0aD4gICAgICAgICAgICAgICAgICAgIDwvZz4gICAgICAgICAgICAgICAgPC9nPiAgICAgICAgICAgIDwvZz4gICAgICAgIDwvZz4gICAgPC9nPjwvc3ZnPg==)
+    50% center no-repeat;
 }
 
 .IDMAP_app_sidebar_content_panel_title_icon_container {
@@ -228,7 +239,8 @@
   visibility: hidden;
 }
 
-.IDMAP_app_sidebar_content_panel.IDMAP_showControls .IDMAP_app_sidebar_content_panel_toggle {
+.IDMAP_app_sidebar_content_panel.IDMAP_showControls
+  .IDMAP_app_sidebar_content_panel_toggle {
   visibility: visible;
   cursor: pointer;
 }
@@ -236,24 +248,29 @@
 .IDMAP_app_sidebar_content_panel_toggle_button {
   margin-top: 12px;
   margin-right: 4px;
-  background: url(https://www.streak.com/build/images/arrowDown.png) center / 20px no-repeat;
+  background: url(https://www.streak.com/build/images/arrowDown.png) center /
+    20px no-repeat;
   border: none;
   width: 14px;
   height: 14px;
   -webkit-transform: rotate(-90deg);
   transform: rotate(-90deg);
-  transition: -webkit-transform .15s, transform .15s;
+  transition: -webkit-transform 0.15s, transform 0.15s;
   outline: none;
-  opacity: .6;
+  opacity: 0.6;
   cursor: pointer;
 }
 
-.IDMAP_app_sidebar_content_panel_top_line:hover .IDMAP_app_sidebar_content_panel_toggle_button,
-.IDMAP_app_sidebar_content_panel.IDMAP_dragged .IDMAP_app_sidebar_content_panel_top_line .IDMAP_app_sidebar_content_panel_toggle_button {
-  opacity: .9;
+.IDMAP_app_sidebar_content_panel_top_line:hover
+  .IDMAP_app_sidebar_content_panel_toggle_button,
+.IDMAP_app_sidebar_content_panel.IDMAP_dragged
+  .IDMAP_app_sidebar_content_panel_top_line
+  .IDMAP_app_sidebar_content_panel_toggle_button {
+  opacity: 0.9;
 }
 
-.IDMAP_app_sidebar_content_panel.IDMAP_expanded .IDMAP_app_sidebar_content_panel_toggle_button {
+.IDMAP_app_sidebar_content_panel.IDMAP_expanded
+  .IDMAP_app_sidebar_content_panel_toggle_button {
   -webkit-transform: rotate(0);
   transform: rotate(0);
 }
@@ -299,7 +316,7 @@ a.inboxsdk__appid_register {
   background: #1989ff;
   border-radius: 3px;
   text-decoration: none;
-  box-shadow: 0 0 5px rgba(0,0,0,0.3);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   padding: 7px;
   font-size: 10pt;
   vertical-align: middle;

@@ -9,7 +9,7 @@ const memberMap = new WeakMap();
 export default class MoleView extends EventEmitter {
   destroyed: boolean = false;
 
-  constructor(options: {moleViewDriver: Object}) {
+  constructor(options: { moleViewDriver: Object }) {
     super();
     const members = {
       driver: options.moleViewDriver

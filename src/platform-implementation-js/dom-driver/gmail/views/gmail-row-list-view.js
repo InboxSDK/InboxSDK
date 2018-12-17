@@ -1,13 +1,13 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import find from 'lodash/find';
 import zip from 'lodash/zip';
 import asap from 'asap';
 import assert from 'assert';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
-import type {Bus} from 'kefir-bus';
+import type { Bus } from 'kefir-bus';
 import delayAsap from '../../../lib/delay-asap';
 import elementViewMapper from '../../../lib/dom/element-view-mapper';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
@@ -16,7 +16,7 @@ import GmailToolbarView from './gmail-toolbar-view';
 import GmailThreadRowView from './gmail-thread-row-view';
 
 import streamWaitFor from '../../../lib/stream-wait-for';
-import type {ElementWithLifetime} from '../../../lib/dom/make-element-child-stream';
+import type { ElementWithLifetime } from '../../../lib/dom/make-element-child-stream';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import makeElementViewStream from '../../../lib/dom/make-element-view-stream';
 
@@ -24,184 +24,208 @@ import type GmailDriver from '../gmail-driver';
 import type GmailRouteView from './gmail-route-view/gmail-route-view';
 
 class GmailRowListView {
+  _element: HTMLElement;
+  _gmailDriver: GmailDriver;
+  _routeViewDriver: GmailRouteView;
+  _pendingExpansions: Map<string, number>;
+  _pendingExpansionsSignal: Bus<any>;
+  _toolbarView: ?GmailToolbarView;
+  _threadRowViewDrivers: Set<GmailThreadRowView>;
+  _eventStreamBus: Bus<any>;
+  _rowViewDriverStream: Kefir.Observable<GmailThreadRowView>;
+  _stopper: Kefir.Observable<any>;
 
-	_element: HTMLElement;
-	_gmailDriver: GmailDriver;
-	_routeViewDriver: GmailRouteView;
-	_pendingExpansions: Map<string, number>;
-	_pendingExpansionsSignal: Bus<any>;
-	_toolbarView: ?GmailToolbarView;
-	_threadRowViewDrivers: Set<GmailThreadRowView>;
-	_eventStreamBus: Bus<any>;
-	_rowViewDriverStream: Kefir.Observable<GmailThreadRowView>;
-	_stopper: Kefir.Observable<any>;
+  constructor(
+    rootElement: HTMLElement,
+    routeViewDriver: GmailRouteView,
+    gmailDriver: GmailDriver
+  ) {
+    this._eventStreamBus = kefirBus();
+    this._stopper = this._eventStreamBus.ignoreValues().beforeEnd(() => null);
+    this._gmailDriver = gmailDriver;
 
-	constructor(rootElement: HTMLElement, routeViewDriver: GmailRouteView, gmailDriver: GmailDriver){
+    this._element = rootElement;
+    this._routeViewDriver = routeViewDriver;
+    this._threadRowViewDrivers = new Set();
 
-		this._eventStreamBus = kefirBus();
-		this._stopper = this._eventStreamBus.ignoreValues().beforeEnd(() => null);
-		this._gmailDriver = gmailDriver;
+    this._pendingExpansions = new Map();
+    this._pendingExpansionsSignal = kefirBus();
+    this._pendingExpansionsSignal
+      .bufferBy(this._pendingExpansionsSignal.flatMap(delayAsap))
+      .filter(x => x.length > 0)
+      .takeUntilBy(this._stopper)
+      .onValue(this._expandColumnJob.bind(this));
 
-		this._element = rootElement;
-		this._routeViewDriver = routeViewDriver;
-		this._threadRowViewDrivers = new Set();
+    this._setupToolbarView();
+    this._startWatchingForRowViews();
+  }
 
-		this._pendingExpansions = new Map();
-		this._pendingExpansionsSignal = kefirBus();
-		this._pendingExpansionsSignal
-			.bufferBy(
-				this._pendingExpansionsSignal.flatMap(delayAsap)
-			)
-			.filter(x => x.length > 0)
-			.takeUntilBy(this._stopper)
-			.onValue(this._expandColumnJob.bind(this));
+  destroy() {
+    this._threadRowViewDrivers.forEach(threadRow => threadRow.destroy());
+    this._eventStreamBus.end();
+    if (this._toolbarView) this._toolbarView.destroy();
+  }
 
-		this._setupToolbarView();
-		this._startWatchingForRowViews();
-	}
+  getElement(): HTMLElement {
+    return this._element;
+  }
 
-	destroy(){
-		this._threadRowViewDrivers.forEach(threadRow => threadRow.destroy());
-		this._eventStreamBus.end();
-		if(this._toolbarView) this._toolbarView.destroy();
-	}
+  getRouteViewDriver(): GmailRouteView {
+    return this._routeViewDriver;
+  }
 
-	getElement(): HTMLElement {
-		return this._element;
-	}
+  getToolbarView(): ?GmailToolbarView {
+    return this._toolbarView;
+  }
 
-	getRouteViewDriver(): GmailRouteView {
-		return this._routeViewDriver;
-	}
+  getThreadRowViewDrivers(): Set<GmailThreadRowView> {
+    return this._threadRowViewDrivers;
+  }
 
-	getToolbarView(): ?GmailToolbarView {
-		return this._toolbarView;
-	}
+  getRowViewDriverStream(): Kefir.Observable<GmailThreadRowView> {
+    return this._rowViewDriverStream;
+  }
 
-	getThreadRowViewDrivers(): Set<GmailThreadRowView> {
-		return this._threadRowViewDrivers;
-	}
+  getEventStream(): Kefir.Observable<any> {
+    return this._eventStreamBus;
+  }
 
-	getRowViewDriverStream(): Kefir.Observable<GmailThreadRowView> {
-		return this._rowViewDriverStream;
-	}
+  _setupToolbarView() {
+    var toolbarElement = this._findToolbarElement();
 
-	getEventStream(): Kefir.Observable<any> {
-		return this._eventStreamBus;
-	}
+    if (toolbarElement) {
+      this._toolbarView = new GmailToolbarView(
+        toolbarElement,
+        this._gmailDriver,
+        this._routeViewDriver,
+        this
+      );
+    } else {
+      this._toolbarView = null;
+    }
+  }
 
-	_setupToolbarView(){
-		var toolbarElement = this._findToolbarElement();
+  _findToolbarElement() {
+    /* multiple inbox extra section */
+    const firstTry = this._element.querySelector('[gh=mtb]');
+    if (firstTry) {
+      return firstTry;
+    }
+    const el = find(
+      document.querySelectorAll('[gh=tm]'),
+      toolbarContainerElement =>
+        toolbarContainerElement.parentElement.parentElement ===
+          (this._element: any).parentElement.parentElement.parentElement
+            .parentElement.parentElement ||
+        toolbarContainerElement.parentElement.parentElement ===
+          this._element.parentElement
+    );
+    return el ? el.querySelector('[gh=mtb]') : null;
+  }
 
-		if (toolbarElement) {
-			this._toolbarView = new GmailToolbarView(toolbarElement, this._gmailDriver, this._routeViewDriver, this);
-		} else {
-			this._toolbarView = null;
-		}
-	}
+  // When a new table is added to a row list, if an existing table has had its
+  // column widths modified (by GmailThreadRowView), then the new table needs to
+  // match.
+  _fixColumnWidths(newTableParent: ?HTMLElement) {
+    if (!newTableParent || !newTableParent.parentElement) {
+      return;
+    }
 
-	_findToolbarElement(){
-		/* multiple inbox extra section */
-		const firstTry = this._element.querySelector('[gh=mtb]');
-		if (firstTry) {
-			return firstTry;
-		}
-		const el = find(document.querySelectorAll('[gh=tm]'), toolbarContainerElement =>
-			toolbarContainerElement.parentElement.parentElement ===
-			(this._element:any).parentElement.parentElement.parentElement.parentElement.parentElement ||
-			toolbarContainerElement.parentElement.parentElement ===
-			this._element.parentElement
-		);
-		return el ? el.querySelector('[gh=mtb]') : null;
-	}
+    const firstTableParent = newTableParent.parentElement.firstElementChild;
+    if (firstTableParent !== newTableParent && firstTableParent) {
+      const firstCols = firstTableParent.querySelectorAll(
+        'table.cf > colgroup > col'
+      );
+      const newCols = newTableParent.querySelectorAll(
+        'table.cf > colgroup > col'
+      );
+      assert.strictEqual(firstCols.length, newCols.length);
+      zip(firstCols, newCols).forEach(([firstCol, newCol]) => {
+        newCol.style.width = firstCol.style.width;
+      });
+    }
+  }
 
-	// When a new table is added to a row list, if an existing table has had its
-	// column widths modified (by GmailThreadRowView), then the new table needs to
-	// match.
-	_fixColumnWidths(newTableParent: ?HTMLElement) {
-		if(!newTableParent || !newTableParent.parentElement){
-			return;
-		}
+  expandColumn(colSelector: string, width: number) {
+    const pendingWidth = this._pendingExpansions.get(colSelector);
+    if (!pendingWidth || width > pendingWidth) {
+      this._pendingExpansions.set(colSelector, width);
+      this._pendingExpansionsSignal.emit();
+    }
+  }
 
-		const firstTableParent = newTableParent.parentElement.firstElementChild;
-		if (firstTableParent !== newTableParent && firstTableParent) {
-			const firstCols = firstTableParent.querySelectorAll('table.cf > colgroup > col');
-			const newCols = newTableParent.querySelectorAll('table.cf > colgroup > col');
-			assert.strictEqual(firstCols.length, newCols.length);
-			zip(firstCols, newCols).forEach(([firstCol, newCol]) => {
-				newCol.style.width = firstCol.style.width;
-			});
-		}
-	}
+  _expandColumnJob() {
+    this._pendingExpansions.forEach((width, colSelector) => {
+      Array.prototype.forEach.call(
+        this._element.querySelectorAll('table.cf > colgroup > ' + colSelector),
+        col => {
+          const currentWidth = parseInt(col.style.width, 10);
+          if (isNaN(currentWidth) || currentWidth < width) {
+            col.style.width = width + 'px';
+          }
+        }
+      );
+    });
+    this._pendingExpansions.clear();
+  }
 
-	expandColumn(colSelector: string, width: number) {
-		const pendingWidth = this._pendingExpansions.get(colSelector);
-		if (!pendingWidth || width > pendingWidth) {
-			this._pendingExpansions.set(colSelector, width);
-			this._pendingExpansionsSignal.emit();
-		}
-	}
+  _startWatchingForRowViews() {
+    const tableDivParents = Array.from(
+      this._element.querySelectorAll('div.Cp')
+    );
 
-	_expandColumnJob() {
-		this._pendingExpansions.forEach((width, colSelector) => {
-			Array.prototype.forEach.call(this._element.querySelectorAll('table.cf > colgroup > '+colSelector), col => {
-				const currentWidth = parseInt(col.style.width, 10);
-				if (isNaN(currentWidth) || currentWidth < width) {
-					col.style.width = width+'px';
-				}
-			});
-		});
-		this._pendingExpansions.clear();
-	}
+    const elementStream: Kefir.Observable<ElementWithLifetime> = Kefir.merge(
+      tableDivParents.map(makeElementChildStream)
+    ).flatMap(event => {
+      this._fixColumnWidths(event.el);
+      const tbody = querySelector(event.el, 'table > tbody');
 
-	_startWatchingForRowViews() {
-		const tableDivParents = Array.from(this._element.querySelectorAll('div.Cp'));
+      // In vertical preview pane mode, each thread row has three <tr>
+      // elements. We just want to pass the first one (which has an id) to
+      // GmailThreadRowView().
+      return makeElementChildStream(tbody)
+        .takeUntilBy(event.removalStream)
+        .filter(rowEvent => rowEvent.el.id);
+    });
 
-		const elementStream: Kefir.Observable<ElementWithLifetime> = Kefir.merge(tableDivParents.map(makeElementChildStream)).flatMap(event => {
-			this._fixColumnWidths(event.el);
-			const tbody = querySelector(event.el, 'table > tbody');
+    const laterStream = Kefir.later(2);
 
-			// In vertical preview pane mode, each thread row has three <tr>
-			// elements. We just want to pass the first one (which has an id) to
-			// GmailThreadRowView().
-			return makeElementChildStream(tbody)
-				.takeUntilBy(event.removalStream)
-				.filter(rowEvent => rowEvent.el.id);
-		});
+    this._rowViewDriverStream = elementStream
+      .map(
+        elementViewMapper(
+          element => new GmailThreadRowView(element, this, this._gmailDriver)
+        )
+      )
+      .flatMap(threadRowView => {
+        if (threadRowView.getAlreadyHadModifications()) {
+          // Performance hack: If the row already has old modifications on it, wait
+          // a moment before we re-emit the thread row and process our new
+          // modifications.
 
-		const laterStream = Kefir.later(2);
+          return laterStream
+            .flatMap(() => threadRowView.waitForReady())
+            .takeUntilBy(threadRowView.getStopper());
+        } else {
+          return threadRowView
+            .waitForReady()
+            .takeUntilBy(threadRowView.getStopper());
+        }
+      })
+      .takeUntilBy(this._stopper);
 
-		this._rowViewDriverStream = elementStream
-			.map(elementViewMapper(element => new GmailThreadRowView(element, this, this._gmailDriver)))
-			.flatMap(threadRowView => {
-				if(threadRowView.getAlreadyHadModifications()){
-					// Performance hack: If the row already has old modifications on it, wait
-					// a moment before we re-emit the thread row and process our new
-					// modifications.
+    this._rowViewDriverStream.onValue(x => this._addThreadRowView(x));
+  }
 
-					return laterStream.flatMap(() =>
-						threadRowView.waitForReady()
-					).takeUntilBy(threadRowView.getStopper());
-				}
-				else{
-					return threadRowView.waitForReady().takeUntilBy(threadRowView.getStopper());
-				}
-			})
-			.takeUntilBy(this._stopper);
+  _addThreadRowView(gmailThreadRowView: GmailThreadRowView) {
+    this._threadRowViewDrivers.add(gmailThreadRowView);
 
-		this._rowViewDriverStream.onValue(x => this._addThreadRowView(x));
-	}
-
-	_addThreadRowView(gmailThreadRowView: GmailThreadRowView) {
-		this._threadRowViewDrivers.add(gmailThreadRowView);
-
-		gmailThreadRowView
-			.getStopper()
-			.takeUntilBy(this._stopper)
-			.onValue(() => {
-				this._threadRowViewDrivers.delete(gmailThreadRowView);
-			});
-	}
+    gmailThreadRowView
+      .getStopper()
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        this._threadRowViewDrivers.delete(gmailThreadRowView);
+      });
+  }
 }
 
 export default defn(module, GmailRowListView);

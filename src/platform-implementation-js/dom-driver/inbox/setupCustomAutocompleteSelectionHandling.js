@@ -6,23 +6,23 @@ import closest from 'closest-ng';
 
 const SELECTION_MASTER_ATTR = 'data-inboxsdk-selection-master-claimed';
 
-const hasNativeResults = (resultsEl: HTMLElement) => (
-  resultsEl.querySelectorAll(
-    'li:not(.inboxsdk__search_suggestion)'
-  ).length > 0
-);
+const hasNativeResults = (resultsEl: HTMLElement) =>
+  resultsEl.querySelectorAll('li:not(.inboxsdk__search_suggestion)').length > 0;
 
-const hasCustomResults = (resultsEl: HTMLElement) => (
-  resultsEl.querySelectorAll('.inboxsdk__search_suggestion').length > 0
-);
+const hasCustomResults = (resultsEl: HTMLElement) =>
+  resultsEl.querySelectorAll('.inboxsdk__search_suggestion').length > 0;
 
 const getSelectedNativeResult = (resultsEl: HTMLElement) => {
-  const nativeResults = resultsEl.querySelectorAll('li:not(.inboxsdk__search_suggestion)');
+  const nativeResults = resultsEl.querySelectorAll(
+    'li:not(.inboxsdk__search_suggestion)'
+  );
 
   // Unfortunately there are no distinguishable features of a selected
   // native result besides its background color... (ಥ﹏ಥ)
   return Array.from(nativeResults).find(result => {
-    const {backgroundColor}: {backgroundColor: string} = getComputedStyle(result);
+    const { backgroundColor }: { backgroundColor: string } = getComputedStyle(
+      result
+    );
 
     const colorValues = backgroundColor.match(/([\d.]+)/g);
 
@@ -33,7 +33,7 @@ const getSelectedNativeResult = (resultsEl: HTMLElement) => {
 const selectFirstCustomResult = (resultsEl: HTMLElement) => {
   const firstCustomResult = resultsEl.querySelector(
     '.inboxsdk__search_suggestion_group:first-of-type > ' +
-    '.inboxsdk__search_suggestion:first-child'
+      '.inboxsdk__search_suggestion:first-child'
   );
 
   firstCustomResult && firstCustomResult.classList.add('inboxsdk__selected');
@@ -42,27 +42,31 @@ const selectFirstCustomResult = (resultsEl: HTMLElement) => {
 const setupCustomResultHoverListeners = (resultsEl, resultsElRemovalStream) => {
   Kefir.fromEvents(resultsEl, 'mouseover')
     .takeUntilBy(resultsElRemovalStream)
-    .map(({target}: {target: HTMLElement}) => (
+    .map(({ target }: { target: HTMLElement }) =>
       closest(target, '.inboxsdk__search_suggestion:not(.inboxsdk__selected)')
-    )).filter(Boolean).onValue(el => {
+    )
+    .filter(Boolean)
+    .onValue(el => {
       const customResults = resultsEl.querySelectorAll(
         '.inboxsdk__search_suggestion.inboxsdk__selected'
       );
 
       // Needed to ensure custom results selected via keyboard events
       // have their selected state removed (since no mouseout event fires).
-      Array.from(customResults).forEach((result) => (
+      Array.from(customResults).forEach(result =>
         result.classList.remove('inboxsdk__selected')
-      ));
+      );
 
       el.classList.add('inboxsdk__selected');
     });
 
   Kefir.fromEvents(resultsEl, 'mouseout')
     .takeUntilBy(resultsElRemovalStream)
-    .map(({target}: {target: HTMLElement}) => (
+    .map(({ target }: { target: HTMLElement }) =>
       closest(target, '.inboxsdk__search_suggestion.inboxsdk__selected')
-    )).filter(Boolean).onValue(el => el.classList.remove('inboxsdk__selected'));
+    )
+    .filter(Boolean)
+    .onValue(el => el.classList.remove('inboxsdk__selected'));
 };
 
 export default function setupCustomAutocompleteSelectionHandling({
@@ -86,26 +90,29 @@ export default function setupCustomAutocompleteSelectionHandling({
   // As a result, we need to grab the search box's parent element so we can
   // capture and cancel events prior to Inbox's listeners (and our own).
   const searchInputParent = searchInput.parentElement;
-  if (!searchInputParent) { throw new Error(); }
+  if (!searchInputParent) {
+    throw new Error();
+  }
 
   const keyboardEvents: Kefir.Observable<KeyboardEvent> = fromEventTargetCapture(
     searchInputParent,
     'keydown'
   ).takeUntilBy(resultsElRemovalStream);
 
-  const upArrowPresses = keyboardEvents.filter(({keyCode}) => keyCode === 38);
-  const downArrowPresses = keyboardEvents.filter(({keyCode}) => keyCode === 40);
-  const enterPresses = keyboardEvents.filter(({keyCode}) => keyCode === 13);
+  const upArrowPresses = keyboardEvents.filter(({ keyCode }) => keyCode === 38);
+  const downArrowPresses = keyboardEvents.filter(
+    ({ keyCode }) => keyCode === 40
+  );
+  const enterPresses = keyboardEvents.filter(({ keyCode }) => keyCode === 13);
 
   upArrowPresses.onValue(event => {
     const selectedNativeResult = getSelectedNativeResult(resultsEl);
     const selectedCustomResult = resultsEl.querySelector(
       '.inboxsdk__search_suggestion.inboxsdk__selected'
     );
-    const customResultGroup = selectedCustomResult && closest(
-      selectedCustomResult,
-      '.inboxsdk__search_suggestion_group'
-    );
+    const customResultGroup =
+      selectedCustomResult &&
+      closest(selectedCustomResult, '.inboxsdk__search_suggestion_group');
 
     if (selectedNativeResult) {
       return;
@@ -124,15 +131,12 @@ export default function setupCustomAutocompleteSelectionHandling({
       // with native behavior (hitting the up arrow with the first item selected
       // leaves *nothing* selected).
       selectedCustomResult.classList.remove('inboxsdk__selected');
-    } else if (
-      hasCustomResults(resultsEl) &&
-      !selectedCustomResult
-    ) {
+    } else if (hasCustomResults(resultsEl) && !selectedCustomResult) {
       event.stopPropagation();
 
       const lastCustomResult = resultsEl.querySelector(
         '.inboxsdk__search_suggestion_group:last-of-type > ' +
-        '.inboxsdk__search_suggestion:last-child'
+          '.inboxsdk__search_suggestion:last-child'
       );
 
       lastCustomResult && lastCustomResult.classList.add('inboxsdk__selected');
@@ -145,15 +149,19 @@ export default function setupCustomAutocompleteSelectionHandling({
       // the selected result is the first item in a non-first group.
       if (selectedCustomResult.matches(':first-child')) {
         const previousResultGroup = customResultGroup.previousElementSibling;
-        const customResultToSelect = previousResultGroup && previousResultGroup
-          .querySelector('.inboxsdk__search_suggestion:last-child');
+        const customResultToSelect =
+          previousResultGroup &&
+          previousResultGroup.querySelector(
+            '.inboxsdk__search_suggestion:last-child'
+          );
 
-        customResultToSelect && customResultToSelect
-          .classList.add('inboxsdk__selected');
+        customResultToSelect &&
+          customResultToSelect.classList.add('inboxsdk__selected');
       } else {
-        const previousCustomResult = selectedCustomResult.previousElementSibling;
-        previousCustomResult && previousCustomResult
-          .classList.add('inboxsdk__selected');
+        const previousCustomResult =
+          selectedCustomResult.previousElementSibling;
+        previousCustomResult &&
+          previousCustomResult.classList.add('inboxsdk__selected');
       }
     }
   });
@@ -163,12 +171,14 @@ export default function setupCustomAutocompleteSelectionHandling({
     const selectedCustomResult = resultsEl.querySelector(
       '.inboxsdk__search_suggestion.inboxsdk__selected'
     );
-    const customResultGroup = selectedCustomResult && closest(
-      selectedCustomResult,
-      '.inboxsdk__search_suggestion_group'
-    );
+    const customResultGroup =
+      selectedCustomResult &&
+      closest(selectedCustomResult, '.inboxsdk__search_suggestion_group');
 
-    if (selectedNativeResult && !selectedNativeResult.matches(':last-of-type')) {
+    if (
+      selectedNativeResult &&
+      !selectedNativeResult.matches(':last-of-type')
+    ) {
       return;
     }
 
@@ -205,15 +215,18 @@ export default function setupCustomAutocompleteSelectionHandling({
       // the selected result is the last item in a non-last group.
       if (selectedCustomResult.matches(':last-child')) {
         const nextResultGroup = customResultGroup.nextElementSibling;
-        const customResultToSelect = nextResultGroup && nextResultGroup
-          .querySelector('.inboxsdk__search_suggestion:first-child');
+        const customResultToSelect =
+          nextResultGroup &&
+          nextResultGroup.querySelector(
+            '.inboxsdk__search_suggestion:first-child'
+          );
 
-        customResultToSelect && customResultToSelect
-          .classList.add('inboxsdk__selected');
+        customResultToSelect &&
+          customResultToSelect.classList.add('inboxsdk__selected');
       } else {
         const nextCustomResult = selectedCustomResult.nextElementSibling;
-        nextCustomResult && nextCustomResult
-          .classList.add('inboxsdk__selected');
+        nextCustomResult &&
+          nextCustomResult.classList.add('inboxsdk__selected');
       }
     }
   });

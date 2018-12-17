@@ -24,9 +24,9 @@ div.T-I.inboxsdk__button {
   opacity: 0.55;
 }
 
-  .inboxsdk__button_icon + .inboxsdk__button_text {
-    margin-left: 5px;
-  }
+.inboxsdk__button_icon + .inboxsdk__button_text {
+  margin-left: 5px;
+}
 
 .inboxsdk__button_icon {
   display: inline-block;
@@ -43,11 +43,11 @@ div.T-I.inboxsdk__button {
 }
 
 .inboxsdk__button_green_inactive {
-  -webkit-box-shadow: 0 1px 0 rgba(0,0,0,.05);
-  box-shadow: 0 1px 0 rgba(0,0,0,.05);
+  -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
   background-color: #53a93f;
-  background-image: -webkit-linear-gradient(top,transparent,transparent);
-  background-image: linear-gradient(top,transparent,transparent);
+  background-image: -webkit-linear-gradient(top, transparent, transparent);
+  background-image: linear-gradient(top, transparent, transparent);
   border: 1px solid transparent;
   color: #fff;
   text-shadow: none;
@@ -57,8 +57,8 @@ div.T-I.inboxsdk__button {
   -webkit-box-shadow: inset 0 -1px 0 #4c8534;
   box-shadow: inset 0 -1px 0 #4c8534;
   background-color: #65b045;
-  background-image: -webkit-linear-gradient(top,transparent,transparent);
-  background-image: linear-gradient(top,transparent,transparent);
+  background-image: -webkit-linear-gradient(top, transparent, transparent);
+  background-image: linear-gradient(top, transparent, transparent);
   border: 1px solid transparent;
   border-bottom: 1px solid #4c8534;
   text-shadow: none;
@@ -91,15 +91,16 @@ div.T-I.inboxsdk__button {
 
 .inboxsdk__menu > .inboxsdk__menuContent {
   padding: 0;
-  box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.2);
-  transition: opacity .218s;
-  border: 1px solid rgba(0,0,0,.2);
+  box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),
+    0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2);
+  transition: opacity 0.218s;
+  border: 1px solid rgba(0, 0, 0, 0.2);
   background: #fff;
   outline: none;
 }
 
 body.inboxsdk__gmailv1css .inboxsdk__menu > .inboxsdk__menuContent {
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .f4.J-N-JX.inboxsdk__message_more_icon {
@@ -112,7 +113,9 @@ body.inboxsdk__gmailv1css .J-N .f4.J-N-JX.inboxsdk__message_more_icon {
   margin-left: 3px;
 }
 
-body.inboxsdk__gmailv1css .J-N:not(.J-N-JT) .f4.J-N-JX.inboxsdk__message_more_icon {
+body.inboxsdk__gmailv1css
+  .J-N:not(.J-N-JT)
+  .f4.J-N-JX.inboxsdk__message_more_icon {
   margin-top: 0;
 }
 
@@ -131,7 +134,11 @@ steps to repro:
 2. open non-native sidebar
 3. mole overlaps sidebar
 */
-body:not(.inboxsdk__gmailv1css) .dw .nH > .no .nH.nn:last-child[style="width: 320px;"] {
+body:not(.inboxsdk__gmailv1css)
+  .dw
+  .nH
+  > .no
+  .nH.nn:last-child[style='width: 320px;'] {
   width: 376px !important;
 }
 
@@ -145,23 +152,36 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose .a8X > .bAK {
 }
 
 /* in material Gmail reduce padding between buttons  */
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_narrow_buttons .gU:not(:first-child) {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__compose_narrow_buttons
+  .gU:not(:first-child) {
   padding-left: 5px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_narrow_buttons .inboxsdk__compose_actionToolbar {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__compose_narrow_buttons
+  .inboxsdk__compose_actionToolbar {
   padding-left: 10px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_narrow_buttons .wG:not(:first-child) {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__compose_narrow_buttons
+  .wG:not(:first-child) {
   margin-left: 15px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_narrow_buttons .inboxsdk__compose_actionToolbar div.inboxsdk__composeButton:last-child {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__compose_narrow_buttons
+  .inboxsdk__compose_actionToolbar
+  div.inboxsdk__composeButton:last-child {
   margin-right: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_narrow_buttons .inboxsdk__compose_actionToolbar div.inboxsdk__composeButton + div.inboxsdk__composeButton {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__compose_narrow_buttons
+  .inboxsdk__compose_actionToolbar
+  div.inboxsdk__composeButton
+  + div.inboxsdk__composeButton {
   margin-left: 3px;
 }
 
@@ -181,19 +201,19 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_narrow_buttons .inboxsdk__com
   position: relative;
 }
 
-  body.inboxsdk__gmailv1css .inboxsdk__composeButton {
-    border-radius: 2px;
-    border-width: 1px;
-    border-style: solid;
-    border-color: rgb(245, 245, 245);
-    height: 19px;
-  }
+body.inboxsdk__gmailv1css .inboxsdk__composeButton {
+  border-radius: 2px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: rgb(245, 245, 245);
+  height: 19px;
+}
 
-  body.inboxsdk__gmailv1css .inboxsdk__composeButton:hover {
-    border-color: #dcdcdc;
-    background-color: #f8f8f8;
-    background-image: linear-gradient(top,#f8f8f8,#f1f1f1);
-  }
+body.inboxsdk__gmailv1css .inboxsdk__composeButton:hover {
+  border-color: #dcdcdc;
+  background-color: #f8f8f8;
+  background-image: linear-gradient(top, #f8f8f8, #f1f1f1);
+}
 
 .inboxsdk__composeButton + .inboxsdk__composeButton {
   margin-left: 4px;
@@ -214,9 +234,9 @@ body.inboxsdk__gmailv1css .inboxsdk__composeButton + .inboxsdk__composeButton {
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton::before {
-  transition-property: background-size,opacity;
-  transition-duration: .15s;
-  transition-timing-function: cubic-bezier(0.4,0.0,0.2,1);
+  transition-property: background-size, opacity;
+  transition-duration: 0.15s;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   border-radius: 2px;
   opacity: 0.75;
   content: '';
@@ -229,16 +249,27 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton::before {
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton:focus::before,
-body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton.inboxsdk__composeButton_active::before {
-  background: transparent radial-gradient(ellipse closest-corner,rgba(0,0,0,0.161) 0%,transparent 100%) no-repeat center/100%;
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__composeButton.inboxsdk__composeButton_active::before {
+  background: transparent
+    radial-gradient(
+      ellipse closest-corner,
+      rgba(0, 0, 0, 0.161) 0%,
+      transparent 100%
+    )
+    no-repeat center/100%;
   background-size: 200%;
 }
 
-body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar .inboxsdk__composeButton:last-child {
+body.inboxsdk__gmailv1css
+  .inboxsdk__compose_actionToolbar
+  .inboxsdk__composeButton:last-child {
   margin-right: 2px;
 }
 
-.inboxsdk__compose_actionToolbar .inboxsdk__compose_groupedActionToolbar div.inboxsdk__composeButton:last-child {
+.inboxsdk__compose_actionToolbar
+  .inboxsdk__compose_groupedActionToolbar
+  div.inboxsdk__composeButton:last-child {
   margin-right: 0px;
 }
 
@@ -261,14 +292,17 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_sendButton {
   height: 20px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_inlineReply .inboxsdk__compose_sendButton {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__compose_inlineReply
+  .inboxsdk__compose_sendButton {
   height: 24px;
 }
 
 .inboxsdk__compose_sendButton:focus,
 .inboxsdk__compose_sendButton.inboxsdk__composeButton_active {
   background-color: #5094ed;
-  box-shadow: 0 1px 1px 0 rgba(66,133,244,0.30), 0 1px 3px 1px rgba(66,133,244,0.15);
+  box-shadow: 0 1px 1px 0 rgba(66, 133, 244, 0.3),
+    0 1px 3px 1px rgba(66, 133, 244, 0.15);
   border: none;
 }
 
@@ -281,8 +315,8 @@ body.inboxsdk__gmailv1css .T-I + .inboxsdk__compose_sendButton {
   height: 15px;
   box-shadow: none;
   background-color: #4d90fe;
-  background-image: -webkit-linear-gradient(top,#4d90fe,#4787ed);
-  background-image: linear-gradient(top,#4d90fe,#4787ed);
+  background-image: -webkit-linear-gradient(top, #4d90fe, #4787ed);
+  background-image: linear-gradient(top, #4d90fe, #4787ed);
   border: 1px solid #3079ed;
   border-radius: 2px;
 }
@@ -291,8 +325,8 @@ body.inboxsdk__gmailv1css .T-I + .inboxsdk__compose_sendButton:focus {
   -webkit-box-shadow: inset 0 0 0 1px #fff;
   box-shadow: inset 0 0 0 1px #fff;
   border: 1px solid #fff;
-  border: rgba(0,0,0,0) solid 1px;
-  outline: rgba(0,0,0,0) 0;
+  border: rgba(0, 0, 0, 0) solid 1px;
+  outline: rgba(0, 0, 0, 0) 0;
 }
 
 .inboxsdk__compose_actionToolbar {
@@ -324,15 +358,19 @@ body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar {
   margin-top: -1px;
 }
 
-body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar .inboxsdk__composeButton:focus {
+body.inboxsdk__gmailv1css
+  .inboxsdk__compose_actionToolbar
+  .inboxsdk__composeButton:focus {
   border: 1px solid #4d90fe;
   outline: none;
 }
 
-body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar .inboxsdk__composeButton.inboxsdk__composeButton_active {
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+body.inboxsdk__gmailv1css
+  .inboxsdk__compose_actionToolbar
+  .inboxsdk__composeButton.inboxsdk__composeButton_active {
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
   background-color: #eee;
-  background-image: linear-gradient(top,#eee,#e0e0e0);
+  background-image: linear-gradient(top, #eee, #e0e0e0);
 }
 
 .inboxsdk__compose_actionToolbar + .gU:not(.inboxsdk__compose_separator) {
@@ -351,7 +389,8 @@ body.inboxsdk__gmailv1css .inboxsdk__compose_actionToolbar .inboxsdk__composeBut
   z-index: 10;
   left: 0px;
   border-radius: 2px;
-  box-shadow: 0 4px 5px 0 rgba(0,0,0,0.14), 0 1px 10px 0 rgba(0,0,0,0.12), 0 2px 4px -1px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12),
+    0 2px 4px -1px rgba(0, 0, 0, 0.2);
   padding: 5px 15px;
 }
 
@@ -362,20 +401,27 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar {
   left: -3px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_inlineReply .inboxsdk__compose_groupedActionToolbar {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__compose_inlineReply
+  .inboxsdk__compose_groupedActionToolbar {
   left: 14px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar .inboxsdk__composeButton:first-child {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__compose_groupedActionToolbar
+  .inboxsdk__composeButton:first-child {
   margin-left: 0px;
   margin-right: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton.inboxsdk__compose_groupedActionButton {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__composeButton.inboxsdk__compose_groupedActionButton {
   margin-right: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar .inboxsdk__composeButton {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__compose_groupedActionToolbar
+  .inboxsdk__composeButton {
   padding: 4px;
 }
 
@@ -384,17 +430,21 @@ there's an element that gets a height of 40px when the gmail formatting toolbar
 is visible. This rule makes that same element get the 40px height when
 the actionToolbar is visible
 */
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar_visible .bA3 {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__compose_groupedActionToolbar_visible
+  .bA3 {
   height: 40px;
 }
 
-body.inboxsdk__gmailv1css .inboxsdk__compose_groupedActionToolbar .inboxsdk__composeButton {
+body.inboxsdk__gmailv1css
+  .inboxsdk__compose_groupedActionToolbar
+  .inboxsdk__composeButton {
   padding: 2px;
 }
 
 body.inboxsdk__gmailv1css .inboxsdk__compose_groupedActionToolbar {
   background: #f5f5f5;
-  box-shadow: 0 2px 2px -1px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
   border: 1px solid #cfcfcf;
   padding: 4px !important;
 }
@@ -403,13 +453,16 @@ body.inboxsdk__gmailv1css .inboxsdk__compose_groupedActionToolbar {
   z-index: 1;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar div.inboxsdk__button {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__compose_groupedActionToolbar
+  div.inboxsdk__button {
   margin-right: 0px;
 }
 
 body.inboxsdk__gmailv1css .inboxsdk__compose_groupedActionToolbar_arrow {
   position: absolute;
-  background: url('https://ssl.gstatic.com/ui/v1/icons/mail/down_pointer.png') no-repeat;
+  background: url('https://ssl.gstatic.com/ui/v1/icons/mail/down_pointer.png')
+    no-repeat;
   width: 17px;
   height: 18px;
   bottom: -16px;
@@ -535,7 +588,9 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_custom_date_container {
   max-width: inherit;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_button .inboxsdk__button_iconImg {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__thread_row_button
+  .inboxsdk__button_iconImg {
   height: 20px;
   width: 20px;
   margin-top: 0px;
@@ -557,9 +612,9 @@ body.inboxsdk__gmailv1css .inboxsdk__thread_row_button {
   margin-left: 1em;
   cursor: default;
   padding: 0 6px;
-  background-image: -webkit-linear-gradient(top,#e9e9e9,#e6e6e6);
-  background-image: linear-gradient(top,#e9e9e9,#e6e6e6);
-  border: 1px solid rgba(0,0,0,0.1);
+  background-image: -webkit-linear-gradient(top, #e9e9e9, #e6e6e6);
+  background-image: linear-gradient(top, #e9e9e9, #e6e6e6);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-color: #ccc;
   color: #444;
   height: 17px;
@@ -579,14 +634,14 @@ body.inboxsdk__gmailv1css .inboxsdk__thread_row_button {
 }
 
 .inboxsdk__gmail_action:active {
-  box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
 .inboxsdk__gmail_action:hover {
-  box-shadow: 0 1px 1px rgba(0,0,0,.05);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
   background-color: #ededed;
-  background-image: -webkit-linear-gradient(top,#ededed,#eaeaea);
-  background-image: linear-gradient(top,#ededed,#eaeaea);
+  background-image: -webkit-linear-gradient(top, #ededed, #eaeaea);
+  background-image: linear-gradient(top, #ededed, #eaeaea);
   border-color: #b8b8b8;
 }
 
@@ -596,17 +651,19 @@ body.inboxsdk__gmailv1css .inboxsdk__thread_row_button {
   right: 5px;
   top: 5px;
   margin-left: 5px;
-  background: no-repeat url(https://ssl.gstatic.com/mail/sprites/smartmail-561acb673be75c1d374881a95997fce4.png) -67px -100px;
+  background: no-repeat
+    url(https://ssl.gstatic.com/mail/sprites/smartmail-561acb673be75c1d374881a95997fce4.png) -67px -100px;
   width: 7px;
   height: 7px;
-  opacity: .55;
+  opacity: 0.55;
 }
 
 .inboxsdk__thread_row_custom_date {
   margin-left: 2px;
 }
 
-span.inboxsdk__thread_row_custom_date + span:not(.inboxsdk__thread_row_custom_date) {
+span.inboxsdk__thread_row_custom_date
+  + span:not(.inboxsdk__thread_row_custom_date) {
   display: none;
 }
 
@@ -625,27 +682,36 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
  The following rules fix the issue where threadRowButtons were spilling over into the thread row email text.
  */
 body:not(.inboxsdk__gmailv1css) .zA td.apU.xY {
-    width: initial;
+  width: initial;
 }
 
 body:not(.inboxsdk__gmailv1css) .zA td.apU.xY span.inboxsdk__thread_row_button {
-    margin: 0 10px;
-    opacity: 0.16;
+  margin: 0 10px;
+  opacity: 0.16;
 }
 
-body:not(.inboxsdk__gmailv1css) .zA.aqw td.apU.xY span.inboxsdk__thread_row_button {
-    opacity: 0.54;
+body:not(.inboxsdk__gmailv1css)
+  .zA.aqw
+  td.apU.xY
+  span.inboxsdk__thread_row_button {
+  opacity: 0.54;
 }
 
-body:not(.inboxsdk__gmailv1css) .zA.aqw td.apU.xY span.inboxsdk__thread_row_button:hover {
-    opacity: 1;
+body:not(.inboxsdk__gmailv1css)
+  .zA.aqw
+  td.apU.xY
+  span.inboxsdk__thread_row_button:hover {
+  opacity: 1;
 }
 
-body:not(.inboxsdk__gmailv1css) .zA td.apU.xY span.inboxsdk__thread_row_button::before {
+body:not(.inboxsdk__gmailv1css)
+  .zA
+  td.apU.xY
+  span.inboxsdk__thread_row_button::before {
   /* Google adds in a pseduo ::before element to span elems with the T-KT class applied.
   Explicity setting this width and height to zero as remove weird positioning that results */
-    width: 0px;
-    height: 0px;
+  width: 0px;
+  height: 0px;
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_attachment_icon {
@@ -657,7 +723,9 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_attachment_icons_present {
 }
 
 /* narrow vertical preview pane */
-body:not(.inboxsdk__gmailv1css) .Zs .inboxsdk__thread_row_attachment_icons_present {
+body:not(.inboxsdk__gmailv1css)
+  .Zs
+  .inboxsdk__thread_row_attachment_icons_present {
   flex-grow: 0;
 }
 
@@ -673,8 +741,12 @@ body:not(.inboxsdk__gmailv1css) .Zs .inboxsdk__thread_row_icon_wrapper {
 /* end narrow vertical preview pane */
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_icon_wrapper,
-body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon,
-body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__thread_row_icon_wrapper
+  .inboxsdk__button_icon,
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__thread_row_icon_wrapper
+  .inboxsdk__button_iconImg {
   height: 18px;
   width: 18px;
 }
@@ -691,8 +763,12 @@ body:not(.inboxsdk__gmailv1css) .zA:hover .inboxsdk__thread_row_icon_wrapper {
   height: 20px;
 }
 
-body.inboxsdk__gmailv1css .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon,
-body.inboxsdk__gmailv1css .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
+body.inboxsdk__gmailv1css
+  .inboxsdk__thread_row_icon_wrapper
+  .inboxsdk__button_icon,
+body.inboxsdk__gmailv1css
+  .inboxsdk__thread_row_icon_wrapper
+  .inboxsdk__button_iconImg {
   height: 20px;
   width: 20px;
 }
@@ -705,7 +781,9 @@ body.inboxsdk__gmailv1css .inboxsdk__thread_row_icon_wrapper {
   height: 0px;
 }
 
-body.inboxsdk__gmailv1css .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon {
+body.inboxsdk__gmailv1css
+  .inboxsdk__thread_row_icon_wrapper
+  .inboxsdk__button_icon {
   height: 24px;
   width: 24px;
   margin-top: -12px;
@@ -714,21 +792,31 @@ body.inboxsdk__gmailv1css .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_i
   overflow: hidden;
 }
 
-body.inboxsdk__gmailv1css .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon .zA.apw {
+body.inboxsdk__gmailv1css
+  .inboxsdk__thread_row_icon_wrapper
+  .inboxsdk__button_icon
+  .zA.apw {
   margin-top: -15px;
 }
 
-body.inboxsdk__gmailv1css .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
+body.inboxsdk__gmailv1css
+  .inboxsdk__thread_row_icon_wrapper
+  .inboxsdk__button_iconImg {
   height: 24px;
   width: 24px;
   vertical-align: middle;
 }
 
-.inboxsdk__thread_row_image_added .y6 .inboxsdk__thread_row_icon_wrapper ~ span[id] {
+.inboxsdk__thread_row_image_added
+  .y6
+  .inboxsdk__thread_row_icon_wrapper
+  ~ span[id] {
   margin-left: 3px;
 }
 
-.inboxsdk__thread_row_image_added .a4W, .inboxsdk__thread_row_image_added .apA, .inboxsdk__thread_row_image_added .apx {
+.inboxsdk__thread_row_image_added .a4W,
+.inboxsdk__thread_row_image_added .apA,
+.inboxsdk__thread_row_image_added .apx {
   position: relative;
 }
 
@@ -800,7 +888,7 @@ body .dw {
   width: 400px;
   bottom: 0px;
   border-left: 1px solid silver;
-  box-shadow: -2px 0px 1px #E6E6E6;
+  box-shadow: -2px 0px 1px #e6e6e6;
   display: block;
 }
 
@@ -810,14 +898,17 @@ body .dw {
   left: -400px;
 }
 
-.inboxsdk__outerSidebarActive .aSs > div { width: 50% !important; margin-left: 30%; }
+.inboxsdk__outerSidebarActive .aSs > div {
+  width: 50% !important;
+  margin-left: 30%;
+}
 
 .inboxsdk__compose_outerSidebar_header {
   background: #404040;
   font-size: 80%;
   padding: 10px 10px 11px 10px;
   color: white;
-  border-bottom: 1px solid #C4C4C4;
+  border-bottom: 1px solid #c4c4c4;
 }
 
 .inboxsdk__compose_outerSidebar_body {
@@ -837,7 +928,8 @@ body .dw {
   display: block;
 }
 
-.inboxsdk__compose_innerSidebarActive form, .inboxsdk__compose_innerSidebarActive .GQ {
+.inboxsdk__compose_innerSidebarActive form,
+.inboxsdk__compose_innerSidebarActive .GQ {
   padding-right: 200px;
 }
 
@@ -918,33 +1010,36 @@ body.inboxsdk__gmailv1css .inboxsdk__recipient_row td.az3 {
 
 /* toolbar visibility */
 
-[data-thread-toolbar=true] [data-rowlist-toolbar=true] {
+[data-thread-toolbar='true'] [data-rowlist-toolbar='true'] {
   display: none !important;
 }
 
-[data-toolbar-expanded=true] [data-toolbar-expanded=false] {
+[data-toolbar-expanded='true'] [data-toolbar-expanded='false'] {
   display: none !important;
 }
 
-[data-toolbar-expanded=false] [data-toolbar-expanded=true] {
+[data-toolbar-expanded='false'] [data-toolbar-expanded='true'] {
   display: none !important;
 }
 
-
-[data-toolbar-icononly=true] .inboxsdk__button_text {
+[data-toolbar-icononly='true'] .inboxsdk__button_text {
   display: none !important;
 }
 
-body:not(.inboxsdk__gmailv1css) [data-toolbar-icononly=false] .inboxsdk__button_text {
+body:not(.inboxsdk__gmailv1css)
+  [data-toolbar-icononly='false']
+  .inboxsdk__button_text {
   color: #5f6368;
 }
 
-body:not(.inboxsdk__gmailv1css) [data-toolbar-icononly=false] .asa:before {
+body:not(.inboxsdk__gmailv1css) [data-toolbar-icononly='false'] .asa:before {
   border-radius: 4px;
   border: none !important;
 }
 
-body:not(.inboxsdk__gmailv1css) [data-toolbar-icononly=false] .inboxsdk__button {
+body:not(.inboxsdk__gmailv1css)
+  [data-toolbar-icononly='false']
+  .inboxsdk__button {
   align-items: center;
   border: none;
   display: inline-flex;
@@ -953,9 +1048,9 @@ body:not(.inboxsdk__gmailv1css) [data-toolbar-icononly=false] .inboxsdk__button 
   position: relative;
   z-index: 0;
   -webkit-font-smoothing: antialiased;
-  font-family: 'Google Sans',Roboto,RobotoDraft,Helvetica,Arial,sans-serif;
+  font-family: 'Google Sans', Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
   font-size: 14px;
-  letter-spacing: .15px;
+  letter-spacing: 0.15px;
   background: none;
   box-sizing: border-box;
   color: #5f6368;
@@ -965,7 +1060,8 @@ body:not(.inboxsdk__gmailv1css) [data-toolbar-icononly=false] .inboxsdk__button 
   padding: 0 8px;
 }
 
-.inboxsdk__menuItem img, .inboxsdk__menuItem .inboxsdk__icon {
+.inboxsdk__menuItem img,
+.inboxsdk__menuItem .inboxsdk__icon {
   height: 16px;
   width: 16px;
   margin-top: -1px;
@@ -1005,23 +1101,26 @@ body.inboxsdk__gmailv1css .inboxsdk__menuItem.J-N:not(.J-N-JT) .J-N-JX {
 }
 
 .inboxsdk__modal_content {
-    margin-top: 30px; margin-bottom: 30px;
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 
-.inboxsdk__modal_fullscreen.inboxsdk__modal_content_no_buttons .inboxsdk__modal_content {
+.inboxsdk__modal_fullscreen.inboxsdk__modal_content_no_buttons
+  .inboxsdk__modal_content {
   margin-bottom: 0px;
 }
 
-  body:not(.inboxsdk__gmailv1css) .inboxsdk__modal_fullscreen.inboxsdk__modal_content_no_buttons:not(.inboxsdk__modal_hideBottom) .inboxsdk__modal_content {
-    margin-bottom: 0px;
-    padding-bottom: 24px;
-  }
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__modal_fullscreen.inboxsdk__modal_content_no_buttons:not(.inboxsdk__modal_hideBottom)
+  .inboxsdk__modal_content {
+  margin-bottom: 0px;
+  padding-bottom: 24px;
+}
 
 .inboxsdk__modal_close {
   outline: none;
   cursor: pointer;
 }
-
 
 .inboxsdk__modal_fullscreen .inboxsdk__modal_container {
   position: relative;
@@ -1051,17 +1150,20 @@ body.inboxsdk__gmailv1css .inboxsdk__menuItem.J-N:not(.J-N-JT) .J-N-JX {
   display: none;
 }
 
-.inboxsdk__modal_fullscreen.inboxsdk__modal_hideSides .inboxsdk__modal_container,
+.inboxsdk__modal_fullscreen.inboxsdk__modal_hideSides
+  .inboxsdk__modal_container,
 .inboxsdk__modal_fullscreen.inboxsdk__modal_hideSides .inboxsdk__modal_content {
   padding-left: 0px;
-  padding-right: 0px
+  padding-right: 0px;
 }
 
-.inboxsdk__modal_fullscreen.inboxsdk__modal_hideBottom .inboxsdk__modal_content {
+.inboxsdk__modal_fullscreen.inboxsdk__modal_hideBottom
+  .inboxsdk__modal_content {
   margin-bottom: 0px;
 }
 
-.inboxsdk__modal_fullscreen.inboxsdk__modal_hideBottom .inboxsdk__modal_container {
+.inboxsdk__modal_fullscreen.inboxsdk__modal_hideBottom
+  .inboxsdk__modal_container {
   padding-bottom: 0px;
 }
 
@@ -1070,7 +1172,7 @@ body.inboxsdk__gmailv1css .inboxsdk__menuItem.J-N:not(.J-N-JT) .J-N-JX {
   display: flex;
 }
 
-.inboxsdk__modal_toprow--constrain-title-width > span[role="heading"] {
+.inboxsdk__modal_toprow--constrain-title-width > span[role='heading'] {
   -webkit-flex: 1;
   flex: 1;
   width: 0;
@@ -1120,7 +1222,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__moles_in_use .aDi {
   visibility: visible;
   box-sizing: border-box;
   margin-right: 5px;
-  box-shadow: rgba(0,0,0,0.2) 0 2px 6px;
+  box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px;
   min-width: 260px;
   min-height: 36px;
 }
@@ -1179,9 +1281,11 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__mole_view_titlebar {
 }
 
 .inboxsdk__mole_view.inboxsdk__minimized .inboxsdk__mole_view_content,
-.inboxsdk__mole_view.inboxsdk__minimized.inboxsdk__mole_use_minimize_title h2.inboxsdk__mole_default,
+.inboxsdk__mole_view.inboxsdk__minimized.inboxsdk__mole_use_minimize_title
+  h2.inboxsdk__mole_default,
 .inboxsdk__mole_view:not(.inboxsdk__minimized) h2.inboxsdk__mole_minimized,
-.inboxsdk__mole_view:not(.inboxsdk__mole_use_minimize_title) h2.inboxsdk__mole_minimized,
+.inboxsdk__mole_view:not(.inboxsdk__mole_use_minimize_title)
+  h2.inboxsdk__mole_minimized,
 .inboxsdk__mole_view.inboxsdk__minimized .Hl,
 .inboxsdk__mole_view:not(.inboxsdk__minimized) .Hk {
   display: none;
@@ -1207,7 +1311,6 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__mole_view_titlebar {
 
 /* end mole */
 
-
 /* tabs */
 
 .inboxsdk__tab {
@@ -1222,7 +1325,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__mole_view_titlebar {
   width: auto;
 }
 
-table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
+table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role='tab'] {
   height: 28px;
 }
 
@@ -1246,7 +1349,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
   top: 4px;
 }
 
-.inboxsdk__sidebar div[role=complementary] {
+.inboxsdk__sidebar div[role='complementary'] {
   position: static !important;
 }
 
@@ -1256,7 +1359,10 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role=tab] {
   display: none;
 }
 
-table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=tab] {
+table.aKk
+  .inboxsdk__contentTabContainer
+  .inboxsdk__tab:first-child
+  .aAy[role='tab'] {
   border-left-width: 1px;
 }
 
@@ -1272,16 +1378,14 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
 .inboxsdk__contentPanelContainer_contentContainer {
   overflow: hidden;
   margin-bottom: 10px;
-  border-bottom: 1px solid #D8D8D8;
+  border-bottom: 1px solid #d8d8d8;
 }
-
 
 /* end old sidebar */
 
-
 /* sidebar */
 
-.IDMAP_app_sidebar_in_use > div[role=complementary] {
+.IDMAP_app_sidebar_in_use > div[role='complementary'] {
   position: static !important;
   width: 216px !important;
 }
@@ -1315,8 +1419,8 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab:first-child .aAy[role=ta
   width: 100%;
 }
 
-body[dir=rtl] .container_app_sidebar_in_use.no[dir=ltr],
-body[dir=rtl] .idm5_container_app_sidebar_no_icons.no[dir=ltr] {
+body[dir='rtl'] .container_app_sidebar_in_use.no[dir='ltr'],
+body[dir='rtl'] .idm5_container_app_sidebar_no_icons.no[dir='ltr'] {
   flex-direction: row-reverse;
   -webkit-flex-direction: row-reverse;
 }
@@ -1325,22 +1429,26 @@ body[dir=rtl] .idm5_container_app_sidebar_no_icons.no[dir=ltr] {
    to line up properly */
 
 /* when no siebar is visible */
-.container_app_sidebar_in_use.no .G-atb.inboxsdk__thread_toolbar_parent[gh=tm] {
+.container_app_sidebar_in_use.no
+  .G-atb.inboxsdk__thread_toolbar_parent[gh='tm'] {
   margin-right: -57px !important;
 }
 
 /* when addon sidebar visible */
-.container_addon_sidebar_visible.container_app_sidebar_in_use.no .G-atb.inboxsdk__thread_toolbar_parent[gh=tm] {
+.container_addon_sidebar_visible.container_app_sidebar_in_use.no
+  .G-atb.inboxsdk__thread_toolbar_parent[gh='tm'] {
   margin-right: -321px !important;
 }
 
 /* when sdk sidebar visible */
-.container_app_sidebar_visible.container_app_sidebar_in_use.no .G-atb.inboxsdk__thread_toolbar_parent[gh=tm] {
+.container_app_sidebar_visible.container_app_sidebar_in_use.no
+  .G-atb.inboxsdk__thread_toolbar_parent[gh='tm'] {
   margin-right: -321px !important;
 }
 
 /* no sdk icons and no native addons */
-.IDMAP_container_app_sidebar_no_icons .G-atb.inboxsdk__thread_toolbar_parent[gh=tm] {
+.IDMAP_container_app_sidebar_no_icons
+  .G-atb.inboxsdk__thread_toolbar_parent[gh='tm'] {
   margin-right: 0px !important;
 }
 
@@ -1372,11 +1480,15 @@ body[dir=rtl] .idm5_container_app_sidebar_no_icons.no[dir=ltr] {
   display: block !important;
 }
 
-.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container {
+.container_app_sidebar_in_use
+  .IDMAP_app_sidebar_in_use
+  .IDMAP_app_sidebar_container {
   display: none;
 }
 
-.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible .IDMAP_app_sidebar_container {
+.container_app_sidebar_in_use
+  .IDMAP_app_sidebar_in_use.app_sidebar_visible
+  .IDMAP_app_sidebar_container {
   display: block;
   float: left;
   height: 100%;
@@ -1386,33 +1498,49 @@ body[dir=rtl] .idm5_container_app_sidebar_no_icons.no[dir=ltr] {
   overflow: auto;
 }
 
-
-.container_app_sidebar_in_use .IDMAP_app_sidebar_container .IDMAP_app_sidebar_content_area {
+.container_app_sidebar_in_use
+  .IDMAP_app_sidebar_container
+  .IDMAP_app_sidebar_content_area {
   width: calc(100% - 16px);
   padding-right: 16px;
 }
 
-.container_app_sidebar_in_use .IDMAP_app_sidebar_in_use.app_sidebar_visible .J-KU-Jz {
+.container_app_sidebar_in_use
+  .IDMAP_app_sidebar_in_use.app_sidebar_visible
+  .J-KU-Jz {
   width: auto;
   padding-right: 50px;
 }
 
 /* make the native addon loading+icon container (div.bvq) always visible */
-body.inboxsdk__gmailv1css .container_app_sidebar_in_use .IDMAP_app_sidebar_in_use > div:first-child {
+body.inboxsdk__gmailv1css
+  .container_app_sidebar_in_use
+  .IDMAP_app_sidebar_in_use
+  > div:first-child {
   display: block !important;
 }
 
 /* hide the native addon loading div */
-body.inboxsdk__gmailv1css .container_app_sidebar_in_use .IDMAP_app_sidebar_in_use > div:first-child > div:first-child {
+body.inboxsdk__gmailv1css
+  .container_app_sidebar_in_use
+  .IDMAP_app_sidebar_in_use
+  > div:first-child
+  > div:first-child {
   display: none !important;
 }
 
 /* remove extraneous left border from our clone of the addon loading div */
-body.inboxsdk__gmailv1css .IDMAP_app_sidebar_in_use .inboxsdk__addon_icon_loading > div {
+body.inboxsdk__gmailv1css
+  .IDMAP_app_sidebar_in_use
+  .inboxsdk__addon_icon_loading
+  > div {
   border-left: none !important;
 }
 
-body.inboxsdk__gmailv1css .IDMAP_app_sidebar_in_use  .IDMAP_sidebar_iconArea .IDMAP_sidebar_button_container:not(.sidebar_button_container_active) {
+body.inboxsdk__gmailv1css
+  .IDMAP_app_sidebar_in_use
+  .IDMAP_sidebar_iconArea
+  .IDMAP_sidebar_button_container:not(.sidebar_button_container_active) {
   filter: grayscale(100%);
   opacity: 0.6;
 }
@@ -1429,30 +1557,38 @@ body.inboxsdk__gmailv1css .IDMAP_app_sidebar_in_use  .IDMAP_sidebar_iconArea .ID
   position: relative;
 }
 
-  .IDMAP_sidebar_iconArea.sidebar_global_iconArea .inboxsdk__button_icon {
-    margin-bottom: 16px;
-  }
+.IDMAP_sidebar_iconArea.sidebar_global_iconArea .inboxsdk__button_icon {
+  margin-bottom: 16px;
+}
 
-  body:not(.inboxsdk__gmailv1css) .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
-    overflow: visible;
-  }
+body:not(.inboxsdk__gmailv1css) .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
+  overflow: visible;
+}
 
-  body:not(.inboxsdk__gmailv1css) .IDMAP_sidebar_iconArea .sidebar_button_container_active .inboxsdk__button_icon::before,
-  body:not(.inboxsdk__gmailv1css) .IDMAP_sidebar_iconArea .inboxsdk__button_icon:hover:before {
-    content: '';
-    background: #f1f3f4;
-    position: absolute;
-    top: -8px;
-    left: -8px;
-    right: -8px;
-    bottom: -8px;
-    border-radius: 50%;
-    z-index: 0;
-  }
+body:not(.inboxsdk__gmailv1css)
+  .IDMAP_sidebar_iconArea
+  .sidebar_button_container_active
+  .inboxsdk__button_icon::before,
+body:not(.inboxsdk__gmailv1css)
+  .IDMAP_sidebar_iconArea
+  .inboxsdk__button_icon:hover:before {
+  content: '';
+  background: #f1f3f4;
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  border-radius: 50%;
+  z-index: 0;
+}
 
-  body:not(.inboxsdk__gmailv1css) .IDMAP_sidebar_iconArea .sidebar_button_container_active .inboxsdk__button_icon::before {
-    background: #e8eaed;
-  }
+body:not(.inboxsdk__gmailv1css)
+  .IDMAP_sidebar_iconArea
+  .sidebar_button_container_active
+  .inboxsdk__button_icon::before {
+  background: #e8eaed;
+}
 
 body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
   margin-bottom: 0px;
@@ -1464,28 +1600,38 @@ body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
   margin-top: 0px;
 }
 
-  body:not(.inboxsdk__gmailv1css) .IDMAP_sidebar_iconArea .inboxsdk__button_icon .inboxsdk__button_iconImg {
-    position: absolute;
-    left: 0px;
-    top: 0px;
-    z-index: 1;
-  }
+body:not(.inboxsdk__gmailv1css)
+  .IDMAP_sidebar_iconArea
+  .inboxsdk__button_icon
+  .inboxsdk__button_iconImg {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  z-index: 1;
+}
 
-.IDMAP_sidebar_iconArea .sidebar_button_container_active .inboxsdk__button_selectedIndicator {
+.IDMAP_sidebar_iconArea
+  .sidebar_button_container_active
+  .inboxsdk__button_selectedIndicator {
   height: 40px;
   width: 4px;
   position: absolute;
   right: 0px;
   bottom: 0px;
   background-color: rgb(66, 133, 244);
-  border-radius: 3px 0 0 3px
+  border-radius: 3px 0 0 3px;
 }
 
-  .IDMAP_sidebar_iconArea.sidebar_global_iconArea .sidebar_button_container_active .inboxsdk__button_selectedIndicator {
-    bottom: 8px;
-  }
+.IDMAP_sidebar_iconArea.sidebar_global_iconArea
+  .sidebar_button_container_active
+  .inboxsdk__button_selectedIndicator {
+  bottom: 8px;
+}
 
-body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea .sidebar_button_container_active .inboxsdk__button_selectedIndicator {
+body.inboxsdk__gmailv1css
+  .IDMAP_sidebar_iconArea
+  .sidebar_button_container_active
+  .inboxsdk__button_selectedIndicator {
   height: 24px;
   border-radius: 0px;
 }
@@ -1510,13 +1656,14 @@ body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea + div:before {
   display: block !important;
 }
 
-  .companion_global_app_sidebar_visible .thread_app_sidebar {
-    display: none;
-  }
+.companion_global_app_sidebar_visible .thread_app_sidebar {
+  display: none;
+}
 
-  .companion_app_sidebar_visible:not(.companion_global_app_sidebar_visible) .global_app_sidebar {
-    display: none;
-  }
+.companion_app_sidebar_visible:not(.companion_global_app_sidebar_visible)
+  .global_app_sidebar {
+  display: none;
+}
 
 .nH.companion_container_app_sidebar_visible {
   width: calc(100% - 300px) !important;
@@ -1526,40 +1673,59 @@ body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea + div:before {
   display: none !important;
 }
 
-body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container.addon_sidebar {
+body:not(.inboxsdk__gmailv1css)
+  .IDMAP_app_sidebar_in_use
+  .IDMAP_app_sidebar_container.addon_sidebar {
   height: 100%;
   overflow: auto;
 }
 
-body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container.addon_sidebar .IDMAP_app_sidebar_content_area {
+body:not(.inboxsdk__gmailv1css)
+  .IDMAP_app_sidebar_in_use
+  .IDMAP_app_sidebar_container.addon_sidebar
+  .IDMAP_app_sidebar_content_area {
   width: 100%;
 }
 
-body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use:not(.companion_app_sidebar_visible) .addon_sidebar {
+body:not(.inboxsdk__gmailv1css)
+  .IDMAP_app_sidebar_in_use:not(.companion_app_sidebar_visible)
+  .addon_sidebar {
   display: none;
 }
 
-body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_content_panel_title_icon_container {
+body:not(.inboxsdk__gmailv1css)
+  .IDMAP_app_sidebar_content_panel_title_icon_container {
   margin-left: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_content_panel .IDMAP_app_sidebar_content_panel_top_line {
+body:not(.inboxsdk__gmailv1css)
+  .IDMAP_app_sidebar_content_panel
+  .IDMAP_app_sidebar_content_panel_top_line {
   padding: 0px 16px;
 }
 
 /* hide thread addon icons when in custom view */
-body:not(.inboxsdk__gmailv1css).inboxsdk__custom_view_active .brC-aT5-aOt-ato-Kp-Jw [role=tablist] > div:not(:last-child) {
+body:not(.inboxsdk__gmailv1css).inboxsdk__custom_view_active
+  .brC-aT5-aOt-ato-Kp-Jw
+  [role='tablist']
+  > div:not(:last-child) {
   display: none;
 }
 
 /* make the native addon icon container for thread add-ons (div.bvq) always visible */
 body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use .bvq,
-body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use .bvq > div:last-child {
+body:not(.inboxsdk__gmailv1css)
+  .IDMAP_app_sidebar_in_use
+  .bvq
+  > div:last-child {
   display: block !important;
 }
 
 /* hide the native addon loading div */
-body:not(.inboxsdk__gmailv1css) .IDMAP_companion_container_app_sidebar_in_use .bvq > div:first-child {
+body:not(.inboxsdk__gmailv1css)
+  .IDMAP_companion_container_app_sidebar_in_use
+  .bvq
+  > div:first-child {
   display: none !important;
 }
 
@@ -1573,9 +1739,7 @@ body:not(.inboxsdk__gmailv1css) .IDMAP_companion_container_app_sidebar_in_use .b
 
 /* end custom content */
 
-
 /* nav menu */
-
 
 .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) {
   border-left-color: transparent;
@@ -1584,14 +1748,25 @@ body:not(.inboxsdk__gmailv1css) .IDMAP_companion_container_app_sidebar_in_use .b
   font-weight: normal;
 }
 
-body.inboxsdk__gmailv1css .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .nZ .aio * {
+body.inboxsdk__gmailv1css
+  .inboxsdk__hide_native_marker
+  .ain:not(.inboxsdk__navItem)
+  .nZ
+  .aio
+  * {
   color: inherit !important;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .bsU {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__hide_native_marker
+  .ain:not(.inboxsdk__navItem)
+  .bsU {
   font-weight: normal;
 }
-body:not(.inboxsdk__gmailv1css) .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .TO {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__hide_native_marker
+  .ain:not(.inboxsdk__navItem)
+  .TO {
   background: none;
 }
 
@@ -1603,7 +1778,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__hide_native_marker .ain:not(.inboxsdk
   width: 100% !important;
 }
 
-body[dir=rtl] .inboxsdk__hide_addon_container[dir=ltr] {
+body[dir='rtl'] .inboxsdk__hide_addon_container[dir='ltr'] {
   flex-direction: row-reverse;
   -webkit-flex-direction: row-reverse;
 }
@@ -1650,10 +1825,13 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .qj:empty::after {
   content: '';
   border: 8px solid;
   border-radius: 50%;
-  border-color: rgb(118, 118, 118)
+  border-color: rgb(118, 118, 118);
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .qj[style*="border-color"]:empty::after {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__navItem
+  > .TO
+  .qj[style*='border-color']:empty::after {
   border-color: inherit;
 }
 
@@ -1680,7 +1858,12 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO img.afM.afO {
 }
 
 /* Keep the subtitle hidden while the dropdown is active */
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO img.afM.afO ~ .aio > .bsU {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__navItem
+  > .TO
+  img.afM.afO
+  ~ .aio
+  > .bsU {
   display: none;
 }
 
@@ -1688,11 +1871,14 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO:hover .bsU {
   display: none;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem.inboxsdk__navItem_nonClickable > .TO:active {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__navItem.inboxsdk__navItem_nonClickable
+  > .TO:active {
   background-color: initial;
 }
 
-.inboxsdk__navItem_hover .aj0, .inboxsdk__navItem_hover .p8 {
+.inboxsdk__navItem_hover .aj0,
+.inboxsdk__navItem_hover .p8 {
   visibility: visible;
 }
 
@@ -1715,7 +1901,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .inboxsdk__button {
   margin-right: 0;
 }
 
-[dir=rtl] .inboxsdk__navItem_link {
+[dir='rtl'] .inboxsdk__navItem_link {
   left: -4px;
   right: initial;
 }
@@ -1760,8 +1946,6 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link > a:hover,
 
 /* end nav menu */
 
-
-
 /* search results section */
 
 .inboxsdk__custom_sections {
@@ -1781,22 +1965,24 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__custom_sections {
   padding-top: 20px;
 }
 
-.inboxsdk__resultsSection.inboxsdk__resultsSection_nonCollapsible .inboxsdk__resultsSection_title .Wp {
+.inboxsdk__resultsSection.inboxsdk__resultsSection_nonCollapsible
+  .inboxsdk__resultsSection_title
+  .Wp {
   visibility: hidden;
 }
 
-  .inboxsdk__custom_sections.Wc .inboxsdk__resultsSection {
-    padding-top: 0px;
-  }
+.inboxsdk__custom_sections.Wc .inboxsdk__resultsSection {
+  padding-top: 0px;
+}
 
 .inboxsdk__custom_sections .Wg {
   padding-top: 0px;
 }
 
-  .inboxsdk__custom_sections.Wc .Wg {
-    border-bottom: 0;
-    padding: 0px;
-  }
+.inboxsdk__custom_sections.Wc .Wg {
+  border-bottom: 0;
+  padding: 0px;
+}
 
 body.inboxsdk__gmailv1css .inboxsdk__results_collapsedContainer > div {
   display: inline;
@@ -1805,12 +1991,20 @@ body.inboxsdk__gmailv1css .inboxsdk__results_collapsedContainer > div {
 /* lone collapsed SectionView in Gmailv1 */
 /* If only a single SectionView is collapsed then its dropdown button and titleTextLink are still shown */
 
-body.inboxsdk__gmailv1css .inboxsdk__results_collapsedContainer > div > .inboxsdk__resultsSection_collapsed:first-child:last-child {
+body.inboxsdk__gmailv1css
+  .inboxsdk__results_collapsedContainer
+  > div
+  > .inboxsdk__resultsSection_collapsed:first-child:last-child {
   display: block;
   margin-right: 0;
 }
 
-body.inboxsdk__gmailv1css .inboxsdk__results_collapsedContainer > div > .inboxsdk__resultsSection_collapsed:first-child:last-child > .inboxsdk__resultsSection_header > .Cr {
+body.inboxsdk__gmailv1css
+  .inboxsdk__results_collapsedContainer
+  > div
+  > .inboxsdk__resultsSection_collapsed:first-child:last-child
+  > .inboxsdk__resultsSection_header
+  > .Cr {
   display: block;
 }
 
@@ -1831,26 +2025,38 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer > div {
 
 /* lone collapsed SectionView in Gmailv2 */
 /* If only a single SectionView is collapsed then its dropdown button and titleTextLink are still shown */
-body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer > div > .inboxsdk__resultsSection_collapsed:first-child:last-child {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__results_collapsedContainer
+  > div
+  > .inboxsdk__resultsSection_collapsed:first-child:last-child {
   flex: 1;
   -webkit-flex: 1;
   margin-right: 0;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer > div > .inboxsdk__resultsSection_collapsed:first-child:last-child > .inboxsdk__resultsSection_header {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__results_collapsedContainer
+  > div
+  > .inboxsdk__resultsSection_collapsed:first-child:last-child
+  > .inboxsdk__resultsSection_header {
   display: flex;
   display: -webkit-flex;
   align-items: center;
-  -webkit-align-items:  center;
+  -webkit-align-items: center;
   flex: 1;
   -webkit-flex: 1;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer > div > .inboxsdk__resultsSection_collapsed:first-child:last-child > .inboxsdk__resultsSection_header > .Cr {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__results_collapsedContainer
+  > div
+  > .inboxsdk__resultsSection_collapsed:first-child:last-child
+  > .inboxsdk__resultsSection_header
+  > .Cr {
   display: flex;
   display: -webkit-flex;
   align-items: center;
-  -webkit-align-items:  center;
+  -webkit-align-items: center;
   margin-left: auto;
 }
 
@@ -1861,13 +2067,14 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer > div > .i
   margin-right: 20px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
   display: inline-flex;
 }
 
-  .Wc .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
-    margin-right: 0px;
-  }
+.Wc .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
+  margin-right: 0px;
+}
 
 .inboxsdk__resultsSection_collapsed .Cr {
   display: none;
@@ -1884,9 +2091,9 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_title {
   height: 48px;
 }
 
-  .Wc .inboxsdk__resultsSection_title {
-    padding: 3px 0 3px 8px;
-  }
+.Wc .inboxsdk__resultsSection_title {
+  padding: 3px 0 3px 8px;
+}
 
 body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title_subtitle {
   opacity: 0.5;
@@ -1894,8 +2101,8 @@ body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title_subtitle {
 }
 
 body.inboxsdk__gmailv1css .Wc .inboxsdk__resultsSection_title_subtitle {
-    font-size: 80%;
-  }
+  font-size: 80%;
+}
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_header {
   min-height: 48px;
@@ -1925,9 +2132,10 @@ body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title h3 {
   margin-right: 0px;
 }
 
-  .inboxsdk__custom_sections.Wc .inboxsdk__resultsSection_header_summaryText:last-child {
-    margin-right: 11px;
-  }
+.inboxsdk__custom_sections.Wc
+  .inboxsdk__resultsSection_header_summaryText:last-child {
+  margin-right: 11px;
+}
 
 .inboxsdk__custom_sections.Wc .J-JN-M-I {
   margin-right: 13px;
@@ -1946,19 +2154,25 @@ body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title h3 {
   width: 15px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow.zA:hover > .xW {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__resultsSection
+  .inboxsdk__resultsSection_tableRow.zA:hover
+  > .xW {
   /* Gmailv2 tries to hide the "xW" element when a "zA" element is hovered. This prevent that. */
   display: flex;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow.zA > .xW {
+body:not(.inboxsdk__gmailv1css)
+  .inboxsdk__resultsSection
+  .inboxsdk__resultsSection_tableRow.zA
+  > .xW {
   max-width: none;
   flex-basis: auto;
 }
 
 .inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow .xT {
   align-items: center;
-  -webkit-align-items:  center;
+  -webkit-align-items: center;
 }
 
 .inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow .WA > div {
@@ -2016,13 +2230,15 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_label_icon {
   margin-top: 1px;
 }
 
-.inboxsdk__resultsSection .av, .inboxsdk__thread_row_label .av {
+.inboxsdk__resultsSection .av,
+.inboxsdk__thread_row_label .av {
   max-width: 90px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.inboxsdk__resultsSection_label_icon + .av, .inboxsdk__thread_row_label .inboxsdk__button_icon + .av {
+.inboxsdk__resultsSection_label_icon + .av,
+.inboxsdk__thread_row_label .inboxsdk__button_icon + .av {
   margin-left: 16px;
 }
 
@@ -2032,25 +2248,24 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_label_icon {
 
 /* end search results section */
 
-
 /* tooltip */
 
 /* gmail styles */
 
 .inboxsdk__tooltip .T-P {
-  -webkit-box-shadow: 0 1px 3px rgba(0,0,0,.2);
-  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   background-color: #fff;
   border: 1px solid;
   border-color: #bbb #bbb #a8a8a8;
   padding: 16px;
   position: absolute;
-  z-index: 1201!important;
+  z-index: 1201 !important;
 }
 
-  .inboxsdk__tooltip.inboxdk__tooltip_content .T-P {
-    padding: 0px;
-  }
+.inboxsdk__tooltip.inboxdk__tooltip_content .T-P {
+  padding: 0px;
+}
 
 .inboxsdk__tooltip .aRM {
   outline: none;
@@ -2059,9 +2274,9 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_label_icon {
   font: normal normal normal normal 16px / normal arial, sans-serif;
 }
 
-  .inboxdk__tooltip_content.inboxsdk__tooltip .aRM {
-    padding: 0px;
-  }
+.inboxdk__tooltip_content.inboxsdk__tooltip .aRM {
+  padding: 0px;
+}
 
 .inboxsdk__tooltip .aRR {
   color: #333;
@@ -2074,9 +2289,6 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_label_icon {
   font-size: 13px;
   margin: 3px 0 14px 0;
 }
-
-
-
 
 /* end gmail styles */
 
@@ -2121,7 +2333,6 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_label_icon {
 
 /* end tooltip */
 
-
 /* attachment card */
 
 .inboxsdk__attachmentCard img.aQG.aYB {
@@ -2141,7 +2352,6 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_label_icon {
 }
 
 /* end attachment card */
-
 
 /* keyboard shortcut help */
 
@@ -2191,7 +2401,6 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 /* end keyboard shortcut help */
 
-
 /* search suggestions */
 
 .asor.inboxsdk__custom_suggestion {
@@ -2211,32 +2420,31 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 /* end send suggestions */
 
-
 /* app toolbar */
 
 .inboxsdk__gmailv1css .inboxsdk__appButton {
   margin-right: -15px;
 }
 
-  .inboxsdk__gmailv1css .inboxsdk__appButton:first-child {
-    margin-left: -45px;
-  }
+.inboxsdk__gmailv1css .inboxsdk__appButton:first-child {
+  margin-left: -45px;
+}
 
-  body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton:first-child {
-    margin-left: -15px;
-  }
+body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton:first-child {
+  margin-left: -15px;
+}
 
-  .inboxsdk__gmailv1css .inboxsdk__appButton + .inboxsdk__appButton {
-    margin-left: 35px;
-  }
+.inboxsdk__gmailv1css .inboxsdk__appButton + .inboxsdk__appButton {
+  margin-left: 35px;
+}
 
-  body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton + .inboxsdk__appButton {
-    margin-left: 20px;
-  }
+body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton + .inboxsdk__appButton {
+  margin-left: 20px;
+}
 
-  .inboxsdk__appButton.inboxsdk__appButton_noGPlus {
-    margin-right: 0px;
-  }
+.inboxsdk__appButton.inboxsdk__appButton_noGPlus {
+  margin-right: 0px;
+}
 
 .inboxsdk__appButton .inboxsdk__button_icon {
   margin-right: 5px;
@@ -2268,7 +2476,7 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 .inboxsdk__appButton_tooltip {
   outline: none;
   transition: none;
-  -webkit-animation: gb__a .2s;
+  -webkit-animation: gb__a 0.2s;
 }
 
 .inboxsdk__appButton_tooltip .inboxsdk__tooltip_close {
@@ -2368,7 +2576,7 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 .inboxsdk__custom_message_view_app_notice_content {
   align-items: center;
   display: flex;
-  font-size: .75rem !important;
+  font-size: 0.75rem !important;
   justify-content: flex-start;
   margin-left: 0;
   padding: 0px;
@@ -2379,11 +2587,12 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   content: none !important;
 }
 
-.adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container > span:first-child {
+.adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container
+  > span:first-child {
   display: none;
 }
 
-.inboxsdk__custom_message_view_app_notice_container::before{
+.inboxsdk__custom_message_view_app_notice_container::before {
   position: absolute;
 }
 
@@ -2391,35 +2600,44 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   color: #555;
 }
 
-table[role=presentation].inboxsdk__thread_view_with_custom_view {
+table[role='presentation'].inboxsdk__thread_view_with_custom_view {
   table-layout: fixed;
 }
 
-table[role=presentation].inboxsdk__thread_view_with_custom_view > tr {
+table[role='presentation'].inboxsdk__thread_view_with_custom_view > tr {
   display: block;
 }
 
 /* compact density setting */
 
-body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon img {
+body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact
+  .inboxsdk__custom_message_view
+  .inboxsdk__custom_message_view_icon
+  img {
   height: 24px;
   width: 24px;
 }
 
-body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view  {
+body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact
+  .inboxsdk__custom_message_view {
   padding-top: 6px;
 }
 
-body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon {
+body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact
+  .inboxsdk__custom_message_view
+  .inboxsdk__custom_message_view_icon {
   padding-left: 5px;
   padding-right: 7px;
 }
 
-body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
+body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact
+  .inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
   padding-bottom: 2px;
 }
 
-body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact .inboxsdk__custom_message_view .inboxsdk__custom_message_view_content {
+body.inboxsdk__gmailv1css.inboxsdk__gmail_density_compact
+  .inboxsdk__custom_message_view
+  .inboxsdk__custom_message_view_content {
   padding-top: 4px;
 }
 
@@ -2434,16 +2652,22 @@ body.inboxsdk__gmailv1css .inboxsdk__custom_message_view {
 /* gmail v1 specific ui */
 
 body.inboxsdk__gmailv1css .inboxsdk__custom_message_view_app_notice_content > *,
-body.inboxsdk__gmailv1css .inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
+body.inboxsdk__gmailv1css
+  .inboxsdk__custom_message_view.inboxsdk__custom_message_view_collapsed {
   background-color: rgb(245, 245, 245);
 }
 
-body.inboxsdk__gmailv1css .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon {
+body.inboxsdk__gmailv1css
+  .inboxsdk__custom_message_view
+  .inboxsdk__custom_message_view_icon {
   padding-left: 8px;
   padding-right: 12px;
 }
 
-body.inboxsdk__gmailv1css .inboxsdk__custom_message_view .inboxsdk__custom_message_view_icon img {
+body.inboxsdk__gmailv1css
+  .inboxsdk__custom_message_view
+  .inboxsdk__custom_message_view_icon
+  img {
   border-radius: 0%;
 }
 
@@ -2451,10 +2675,9 @@ body.inboxsdk__gmailv1css .inboxsdk__custom_message_view .inboxsdk__custom_messa
 
 /* end custom message views */
 
-
 /* butter/snack bar */
 
-body.inboxsdk__gmailv1css .inboxsdk__butterbar div[role="button"].bBe {
+body.inboxsdk__gmailv1css .inboxsdk__butterbar div[role='button'].bBe {
   display: none;
 }
 

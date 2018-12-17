@@ -3,10 +3,10 @@
 import _ from 'lodash';
 import delay from 'pdelay';
 import sinon from 'sinon';
-const sinonTest = require('sinon-test')(sinon, {useFakeTimers: false});
+const sinonTest = require('sinon-test')(sinon, { useFakeTimers: false });
 import Kefir from 'kefir';
 import events from 'events';
-const {EventEmitter} = events;
+const { EventEmitter } = events;
 import MockElementParent from '../../../../test/lib/mock-element-parent';
 import MockMutationObserver from '../../../../test/lib/mock-mutation-observer';
 import kefirBus from 'kefir-bus';
@@ -16,28 +16,42 @@ import kefirMakeElementChildStream from './make-element-child-stream';
 global.MutationObserver = MockMutationObserver;
 
 function fakeEl(name: string): Object {
-  return {name, nodeType: 1};
+  return { name, nodeType: 1 };
 }
 
-function defer<T>(): {promise: Promise<T>, resolve: (t: T) => void, reject: (err: any) => void} {
+function defer<T>(): {
+  promise: Promise<T>,
+  resolve: (t: T) => void,
+  reject: (err: any) => void
+} {
   let resolve, reject;
   const promise = new Promise((_resolve, _reject) => {
     resolve = _resolve;
     reject = _reject;
   });
-  return {resolve: (resolve: any), reject: (reject: any), promise: (promise: any)};
+  return {
+    resolve: (resolve: any),
+    reject: (reject: any),
+    promise: (promise: any)
+  };
 }
 
 it('should work', done => {
-  let child1 = fakeEl('child1'), child2 = fakeEl('child2'), child3 = fakeEl('child3');
-  const childrenToNames = new Map(_.toPairs({
-    child1, child2, child3
-  }).map(([name, el]) => [el, name]));
+  let child1 = fakeEl('child1'),
+    child2 = fakeEl('child2'),
+    child3 = fakeEl('child3');
+  const childrenToNames = new Map(
+    _.toPairs({
+      child1,
+      child2,
+      child3
+    }).map(([name, el]) => [el, name])
+  );
 
   const target = new MockElementParent([child1, child2]);
 
   const calls = [];
-  kefirMakeElementChildStream((target:Object)).onValue(event => {
+  kefirMakeElementChildStream((target: Object)).onValue(event => {
     const name = childrenToNames.get(event.el);
     calls.push(['add', name]);
     event.removalStream.onValue(() => {
@@ -65,17 +79,23 @@ it('should work', done => {
 });
 
 it('triggers removals when no longer listened on', done => {
-  const child1 = fakeEl('child1'), child2 = fakeEl('child2');
-  const childrenToNames = new Map(_.toPairs({
-    child1, child2
-  }).map(([name, el]) => [el, name]));
+  const child1 = fakeEl('child1'),
+    child2 = fakeEl('child2');
+  const childrenToNames = new Map(
+    _.toPairs({
+      child1,
+      child2
+    }).map(([name, el]) => [el, name])
+  );
 
   const stopper = kefirBus();
 
   const target = new MockElementParent([child1]);
 
   const calls = [];
-  const stream = kefirMakeElementChildStream((target:Object)).takeUntilBy(stopper);
+  const stream = kefirMakeElementChildStream((target: Object)).takeUntilBy(
+    stopper
+  );
   stream.onValue(event => {
     const name = childrenToNames.get(event.el);
     calls.push(['add', name]);
@@ -104,14 +124,15 @@ it('triggers removals when no longer listened on', done => {
 });
 
 it("doesn't miss children added during initial emits", done => {
-  const child1 = fakeEl('child1'), child2 = fakeEl('child2');
+  const child1 = fakeEl('child1'),
+    child2 = fakeEl('child2');
 
   const target = new MockElementParent([child1]);
 
   let i = 0;
-  const stream = kefirMakeElementChildStream((target:Object));
+  const stream = kefirMakeElementChildStream((target: Object));
   stream.onValue(event => {
-    switch(++i) {
+    switch (++i) {
       case 1:
         expect(event.el).toBe(child1);
         target.appendChild(child2);
@@ -121,20 +142,21 @@ it("doesn't miss children added during initial emits", done => {
         done();
         break;
       default:
-        throw new Error("should not happen");
+        throw new Error('should not happen');
     }
   });
 });
 
 it("doesn't miss children if some are removed during initial emits", done => {
-  const child1 = fakeEl('child1'), child2 = fakeEl('child2');
+  const child1 = fakeEl('child1'),
+    child2 = fakeEl('child2');
 
   const target = new MockElementParent([child1, child2]);
 
   let i = 0;
-  const stream = kefirMakeElementChildStream((target:Object));
+  const stream = kefirMakeElementChildStream((target: Object));
   stream.onValue(event => {
-    switch(++i) {
+    switch (++i) {
       case 1:
         expect(event.el).toBe(child1);
         target.removeChild(child1);
@@ -144,73 +166,86 @@ it("doesn't miss children if some are removed during initial emits", done => {
         done();
         break;
       default:
-        throw new Error("should not happen");
+        throw new Error('should not happen');
     }
   });
 });
 
-it("is exception-safe while emitting", sinonTest(async function() {
-  let testErrorCatchCount = 0;
-  let testErrorDefer = defer();
-  const testError = new Error('child2 test error');
-  {
-    const _setTimeout = setTimeout;
-    this.stub(global, 'setTimeout').callsFake((fn, delay, ...args) => {
-      return _setTimeout(function() {
-        try {
-          return fn.apply(this, arguments);
-        } catch (err) {
-          if (err === testError) {
-            testErrorCatchCount++;
-            testErrorDefer.resolve();
-          } else {
-            throw err;
+it(
+  'is exception-safe while emitting',
+  sinonTest(async function() {
+    let testErrorCatchCount = 0;
+    let testErrorDefer = defer();
+    const testError = new Error('child2 test error');
+    {
+      const _setTimeout = setTimeout;
+      this.stub(global, 'setTimeout').callsFake((fn, delay, ...args) => {
+        return _setTimeout(
+          function() {
+            try {
+              return fn.apply(this, arguments);
+            } catch (err) {
+              if (err === testError) {
+                testErrorCatchCount++;
+                testErrorDefer.resolve();
+              } else {
+                throw err;
+              }
+            }
+          },
+          delay,
+          ...args
+        );
+      });
+    }
+
+    const child1 = fakeEl('child1'),
+      child2 = fakeEl('child2'),
+      child3 = fakeEl('child3');
+    const childrenToNames = new Map(
+      _.toPairs({
+        child1,
+        child2,
+        child3
+      }).map(([name, el]) => [el, name])
+    );
+
+    const target = new MockElementParent([child1, child2, child3]);
+
+    const calls = [];
+    const stream = kefirMakeElementChildStream((target: Object));
+
+    await new Promise(resolve => {
+      stream.onValue(event => {
+        const name = childrenToNames.get(event.el);
+        calls.push(['add', name]);
+        event.removalStream.onValue(() => {
+          calls.push(['remove', name]);
+
+          if (event.el === child3) {
+            resolve();
           }
-        }
-      }, delay, ...args);
-    });
-  }
+        });
 
-  const child1 = fakeEl('child1'), child2 = fakeEl('child2'), child3 = fakeEl('child3');
-  const childrenToNames = new Map(_.toPairs({
-    child1, child2, child3
-  }).map(([name, el]) => [el, name]));
-
-  const target = new MockElementParent([child1, child2, child3]);
-
-  const calls = [];
-  const stream = kefirMakeElementChildStream((target:Object));
-
-  await new Promise(resolve => {
-    stream.onValue(event => {
-      const name = childrenToNames.get(event.el);
-      calls.push(['add', name]);
-      event.removalStream.onValue(() => {
-        calls.push(['remove', name]);
-
-        if (event.el === child3) {
-          resolve();
+        if (event.el === child1) {
+          target.removeChild(child1);
+        } else if (event.el === child2) {
+          setTimeout(() => {
+            target.removeChild(child3);
+          }, 0);
+          throw testError;
         }
       });
-
-      if (event.el === child1) {
-        target.removeChild(child1);
-      } else if (event.el === child2) {
-        setTimeout(() => {
-          target.removeChild(child3);
-        }, 0);
-        throw testError;
-      }
     });
-  });
 
-  await testErrorDefer.promise;
-  expect(testErrorCatchCount).toBe(1);
-  expect(calls).toEqual([
-    ['add', 'child1'],
-    ['add', 'child2'],
-    ['add', 'child3'],
-    ['remove', 'child1'],
-    ['remove', 'child3'],
-  ]);
-}));
+    await testErrorDefer.promise;
+    expect(testErrorCatchCount).toBe(1);
+    expect(calls).toEqual([
+      ['add', 'child1'],
+      ['add', 'child2'],
+      ['add', 'child3'],
+      ['remove', 'child1'],
+      ['remove', 'child3']
+    ]);
+  })
+);

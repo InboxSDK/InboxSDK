@@ -1,7 +1,7 @@
 /* @flow */
 
 import includes from 'lodash/includes';
-import {defn} from 'ud';
+import { defn } from 'ud';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -12,7 +12,7 @@ import type InboxDriver from '../inbox-driver';
 import type InboxMessageView from './inbox-message-view';
 import type InboxAttachmentOverlayView from './inbox-attachment-overlay-view';
 
-import type {Parsed} from '../detection/attachmentCard/parser';
+import type { Parsed } from '../detection/attachmentCard/parser';
 
 class InboxAttachmentCardView {
   _stopper = kefirStopper();
@@ -60,7 +60,9 @@ class InboxAttachmentCardView {
 
   _findMessageView(): ?InboxMessageView {
     const map = this._driver.getMessageViewElementsMap();
-    const messageViewElement = findParent(this._element, el => map.has((el:any)));
+    const messageViewElement = findParent(this._element, el =>
+      map.has((el: any))
+    );
     if (!messageViewElement) return null;
     return map.get(messageViewElement);
   }
@@ -77,8 +79,9 @@ class InboxAttachmentCardView {
 
     const setupInnerHtml = options => {
       if (options.previewThumbnailUrl) {
-        this._element.className = 'inboxsdk__attachment_card inboxsdk__attachment_card_with_preview';
-        this._element.innerHTML = autoHtml `
+        this._element.className =
+          'inboxsdk__attachment_card inboxsdk__attachment_card_with_preview';
+        this._element.innerHTML = autoHtml`
           <img alt="" aria-hidden="true"
             style="width: 100%"
             src="${options.previewThumbnailUrl}"
@@ -102,7 +105,7 @@ class InboxAttachmentCardView {
         }
       } else {
         this._element.className = 'inboxsdk__attachment_card';
-        this._element.innerHTML = autoHtml `
+        this._element.innerHTML = autoHtml`
           <div class="inboxsdk__attachment_card_nohover">
             <div class="inboxsdk__attachment_card_title">${options.title}</div>
             <div class="inboxsdk__attachment_card_description">
@@ -125,7 +128,9 @@ class InboxAttachmentCardView {
     this._previewClicks.plug(
       Kefir.merge([
         Kefir.fromEvents(this._element, 'click'),
-        Kefir.fromEvents(this._element, 'keypress').filter(e => includes([32/*space*/, 13/*enter*/], e.which))
+        Kefir.fromEvents(this._element, 'keypress').filter(e =>
+          includes([32 /*space*/, 13 /*enter*/], e.which)
+        )
       ])
     );
 
@@ -161,12 +166,15 @@ class InboxAttachmentCardView {
     if (!this._p) {
       // artificial SDK-added card. Native cards don't have their added buttons
       // processed here. They're added in InboxAttachmentOverlayView.
-      const buttonContainer = querySelector(this._element, '.inboxsdk__attachment_card_buttons');
+      const buttonContainer = querySelector(
+        this._element,
+        '.inboxsdk__attachment_card_buttons'
+      );
       const el = document.createElement('button');
       el.className = 'inboxsdk__attachment_card_button';
       if (button.downloadUrl) {
         el.setAttribute('data-inboxsdk-download-url', button.downloadUrl);
-        (el:any).addEventListener('click', (event: MouseEvent) => {
+        (el: any).addEventListener('click', (event: MouseEvent) => {
           event.stopPropagation();
           event.preventDefault();
           let prevented = false;
@@ -183,13 +191,17 @@ class InboxAttachmentCardView {
           if (button.downloadFilename) {
             downloadLink.download = button.downloadFilename;
           }
-          downloadLink.addEventListener('click', function(e: MouseEvent) {
-            e.stopPropagation();
-          }, true);
+          downloadLink.addEventListener(
+            'click',
+            function(e: MouseEvent) {
+              e.stopPropagation();
+            },
+            true
+          );
           if (button.openInNewTab) {
             downloadLink.setAttribute('target', '_blank');
           }
-          ((document.body:any):HTMLElement).appendChild(downloadLink);
+          ((document.body: any): HTMLElement).appendChild(downloadLink);
           downloadLink.click();
           downloadLink.remove();
         });
@@ -203,12 +215,14 @@ class InboxAttachmentCardView {
           if (button.onClick) {
             button.onClick({
               getDownloadURL() {
-                throw new Error('not implemented for artificial sdk-added cardViews!');
+                throw new Error(
+                  'not implemented for artificial sdk-added cardViews!'
+                );
               }
             });
           }
         });
-        el.innerHTML = autoHtml `
+        el.innerHTML = autoHtml`
           <img src="${button.iconUrl}">
         `;
         el.title = button.tooltip;
@@ -223,7 +237,10 @@ class InboxAttachmentCardView {
 
   async getDownloadURL(): Promise<?string> {
     const overlayView = this._overlayView;
-    if (!overlayView) throw new Error('This method only works during a button onClick callback in Inbox');
+    if (!overlayView)
+      throw new Error(
+        'This method only works during a button onClick callback in Inbox'
+      );
     return overlayView.getDownloadURL();
   }
 

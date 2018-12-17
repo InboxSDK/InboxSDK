@@ -18,17 +18,37 @@ function getIfOwn(object: Object, prop: string): any {
 export default function clickAndGetPopupUrl(element: HTMLElement): ?string {
   const event = document.createEvent('MouseEvents');
   const options = {
-    bubbles: true, cancelable: true, button: 0, pointerX: 0, pointerY: 0,
-    ctrlKey: true, altKey: false, shiftKey: false, metaKey: true
+    bubbles: true,
+    cancelable: true,
+    button: 0,
+    pointerX: 0,
+    pointerY: 0,
+    ctrlKey: true,
+    altKey: false,
+    shiftKey: false,
+    metaKey: true
   };
-  (event:any).initMouseEvent(
-    'click', options.bubbles, options.cancelable, document.defaultView,
-    options.button, options.pointerX, options.pointerY, options.pointerX, options.pointerY,
-    options.ctrlKey, options.altKey, options.shiftKey, options.metaKey, options.button, null
+  (event: any).initMouseEvent(
+    'click',
+    options.bubbles,
+    options.cancelable,
+    document.defaultView,
+    options.button,
+    options.pointerX,
+    options.pointerY,
+    options.pointerX,
+    options.pointerY,
+    options.ctrlKey,
+    options.altKey,
+    options.shiftKey,
+    options.metaKey,
+    options.button,
+    null
   );
 
   let url;
-  const oldWindowOpen = window.open, oldWindowOnerror = window.onerror,
+  const oldWindowOpen = window.open,
+    oldWindowOnerror = window.onerror,
     oldFocus = getIfOwn(window.HTMLElement.prototype, 'focus'),
     oldBlur = getIfOwn(window.HTMLElement.prototype, 'blur');
   try {
@@ -39,7 +59,8 @@ export default function clickAndGetPopupUrl(element: HTMLElement): ?string {
       url = _url;
       // Gmail checks the returned object for these two values specifically.
       const newWin = {
-        closed: false, focus: noop
+        closed: false,
+        focus: noop
       };
       setTimeout(function() {
         newWin.closed = true;
@@ -52,7 +73,7 @@ export default function clickAndGetPopupUrl(element: HTMLElement): ?string {
     // could have failed. Log to see if this is a thing that ever happens, and
     // avoid letting windows be opened.
     if (window.open !== newOpen) {
-      logger.error(new Error("Failed to override window.open"));
+      logger.error(new Error('Failed to override window.open'));
       return null;
     }
 

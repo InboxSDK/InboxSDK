@@ -13,9 +13,7 @@ class Foo {
 }
 
 it('works', () => {
-  const mappers = [
-    [FooDriver, sinon.spy(fooDriver => new Foo(fooDriver))]
-  ];
+  const mappers = [[FooDriver, sinon.spy(fooDriver => new Foo(fooDriver))]];
   const membrane = new Membrane(mappers);
 
   const fd = new FooDriver();

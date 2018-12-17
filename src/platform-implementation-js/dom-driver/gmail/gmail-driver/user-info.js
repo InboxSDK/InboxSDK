@@ -23,7 +23,8 @@ export default class UserInfo {
     }
     const contact: Contact = find(
       this.getAccountSwitcherContactList(),
-      (contact: Contact) => contact.emailAddress === this._userEmail);
+      (contact: Contact) => contact.emailAddress === this._userEmail
+    );
     if (contact && contact.name != null) {
       return contact.name;
     }
@@ -31,10 +32,14 @@ export default class UserInfo {
   }
 
   getAccountSwitcherContactList(): Contact[] {
-    const main: Contact[] = Array.from(document.querySelectorAll('[role=banner] div[aria-label] div div a[href^="https://myaccount.google."]'))
+    const main: Contact[] = Array.from(
+      document.querySelectorAll(
+        '[role=banner] div[aria-label] div div a[href^="https://myaccount.google."]'
+      )
+    )
       .slice(0, 1)
       .map((btn: HTMLElement) => {
-        const btnParent: HTMLElement = (btn:any).parentElement;
+        const btnParent: HTMLElement = (btn: any).parentElement;
         const nameEl = btnParent.children[0];
         const emailAddressEl = btnParent.children[1];
         if (!nameEl || !emailAddressEl) return null;
@@ -45,11 +50,13 @@ export default class UserInfo {
       })
       .filter(Boolean);
     const extras: Contact[] = Array.from(
-      document.querySelectorAll('[role=banner] div[aria-label] div > a[target="_blank"] > img + div')
+      document.querySelectorAll(
+        '[role=banner] div[aria-label] div > a[target="_blank"] > img + div'
+      )
     ).map((el: HTMLElement) => {
       const match = el.children[1].textContent.match(/\S+/);
       if (!match) {
-        throw new Error("Failed to match");
+        throw new Error('Failed to match');
       }
       return {
         name: el.children[0].textContent,
@@ -60,14 +67,19 @@ export default class UserInfo {
   }
 
   waitForAccountSwitcherReady(): Promise<void> {
-    return waitFor(() => this.getAccountSwitcherContactList().length > 0, 10*1000)
+    return waitFor(
+      () => this.getAccountSwitcherContactList().length > 0,
+      10 * 1000
+    )
       .then(() => undefined)
       .catch(err => {
         this._failedWaitFor = true;
         Logger.error(err, {
-          reason: "waiting for user account switcher",
+          reason: 'waiting for user account switcher',
           switcherHTML: Array.from(
-            document.querySelectorAll('div.gb_w[aria-label], div.gb_va[aria-label]')
+            document.querySelectorAll(
+              'div.gb_w[aria-label], div.gb_va[aria-label]'
+            )
           ).map((el: HTMLElement) => censorHTMLstring(el.outerHTML))
         });
       });

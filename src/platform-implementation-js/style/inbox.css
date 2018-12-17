@@ -37,13 +37,13 @@
 }
 .inboxsdk__appButton.inboxsdk__button_icon.inboxsdk__active::before,
 .inboxsdk__appButton.inboxsdk__button_icon:focus::before {
-  background-color: rgba(0,0,0,0.1);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 .inboxsdk__list_toolbar > .inboxsdk__button_icon.inboxsdk__active::before,
 .inboxsdk__navItem_accessory > .inboxsdk__button_icon:focus::before,
 .inboxsdk__navItem_accessory > .inboxsdk__button_icon.inboxsdk__active::before,
 .inboxsdk__list_toolbar > .inboxsdk__button_icon:focus::before {
-  background-color: rgba(0,0,0,0.12);
+  background-color: rgba(0, 0, 0, 0.12);
 }
 
 .inboxsdk__appButton_tooltip_container {
@@ -60,8 +60,8 @@
   white-space: initial;
   text-align: center;
   font: normal normal normal normal 16px / normal arial, sans-serif;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  border: 1px solid rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.2);
   background: white;
 }
 
@@ -118,7 +118,7 @@
   padding: 12px 8px;
 }
 
-.IDMAP_app_sidebar_container[data-open="false"] {
+.IDMAP_app_sidebar_container[data-open='false'] {
   display: none;
 }
 
@@ -130,7 +130,6 @@
 .IDMAP_app_sidebar_content_panel {
   background: #f2f2f2;
 }
-
 
 /* thread sidebar icon */
 
@@ -149,9 +148,9 @@
 
 .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
   margin-top: 10px;
-  transition: box-shadow .2s cubic-bezier(.4,0,.2,1);
+  transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   transition-delay: 0.01s;
-  box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.14), 0 4px 8px rgba(0, 0, 0, 0.28);
   border: none;
   border-radius: 50%;
   background: #fff;
@@ -163,7 +162,7 @@
 
 .IDMAP_sidebar_iconArea .inboxsdk__button_icon:focus,
 .IDMAP_sidebar_iconArea .inboxsdk__button_icon:hover {
-  box-shadow: 0 0 6px rgba(0,0,0,.16), 0 6px 12px rgba(0,0,0,.32);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.16), 0 6px 12px rgba(0, 0, 0, 0.32);
 }
 
 .IDMAP_sidebar_iconArea .inboxsdk__button_iconImg {
@@ -200,9 +199,10 @@
   opacity: 1;
   outline: none;
 }
-.inboxsdk__compose_actionToolbar .inboxsdk__button_icon.inboxsdk__active::before,
+.inboxsdk__compose_actionToolbar
+  .inboxsdk__button_icon.inboxsdk__active::before,
 .inboxsdk__compose_actionToolbar .inboxsdk__button_icon:focus::before {
-  background-color: rgba(0,0,0,0.1);
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .inboxsdk__compose_actionToolbar .inboxsdk__button_iconImg {
@@ -289,7 +289,7 @@
   min-height: 1em;
   padding: 0;
   margin: 0;
-  box-shadow: 0 0 6px rgba(0,0,0,.16), 0 6px 12px rgba(0,0,0,.32);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.16), 0 6px 12px rgba(0, 0, 0, 0.32);
   border-radius: 2px;
   position: relative;
 }
@@ -303,8 +303,8 @@
   min-height: 1em;
   padding: 29px 36px 32px;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  border: 1px solid rgba(0,0,0,0.2);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.2);
   font: normal normal normal normal 16px / normal arial, sans-serif;
 }
 
@@ -352,7 +352,7 @@
 }
 .inboxsdk__tooltip_arrow.inboxsdk__top::before {
   border-bottom-width: 0;
-  border-color: rgba(0,0,0,0.2) transparent;
+  border-color: rgba(0, 0, 0, 0.2) transparent;
   left: -9px;
 }
 .inboxsdk__tooltip_arrow.inboxsdk__top::after {
@@ -363,7 +363,7 @@
 }
 .inboxsdk__tooltip_arrow.inboxsdk__bottom::before {
   border-top-width: 0;
-  border-color: rgba(0,0,0,0.2) transparent;
+  border-color: rgba(0, 0, 0, 0.2) transparent;
   top: -8px;
   left: -9px;
 }
@@ -378,7 +378,7 @@
 }
 .inboxsdk__tooltip_arrow.inboxsdk__left::before {
   border-right-width: 0;
-  border-color: transparent rgba(0,0,0,0.2);
+  border-color: transparent rgba(0, 0, 0, 0.2);
   top: -8px;
 }
 .inboxsdk__tooltip_arrow.inboxsdk__left::after {
@@ -391,7 +391,7 @@
 }
 .inboxsdk__tooltip_arrow.inboxsdk__right::before {
   border-left-width: 0;
-  border-color: transparent rgba(0,0,0,0.2);
+  border-color: transparent rgba(0, 0, 0, 0.2);
   top: -8px;
   left: -8px;
 }
@@ -429,43 +429,49 @@
   position: relative;
   background: #fff;
   color: #000;
-  box-shadow: 0 4px 16px rgba(0,0,0,.2);
-  border: 1px solid rgba(0,0,0,.333);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(0, 0, 0, 0.333);
   outline: 0;
   padding: 30px 42px;
   pointer-events: auto;
 }
-.inboxsdk__modal_toprow [role=heading] {
+.inboxsdk__modal_toprow [role='heading'] {
   font-size: 16px;
   line-height: 24px;
   margin: 0 0 16px;
-  font: bold 1em arial,sans-serif;
+  font: bold 1em arial, sans-serif;
   padding-right: 20px;
 }
 .inboxsdk__modal_content {
   margin: 30px 0;
   line-height: 1.4em;
   word-wrap: break-word;
-  font: normal 0.8em arial,sans-serif;
+  font: normal 0.8em arial, sans-serif;
 }
-.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless .inboxsdk__modal_container {
+.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless
+  .inboxsdk__modal_container {
   padding-left: 0;
   padding-right: 0;
 }
-.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless .inboxsdk__modal_content {
+.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless
+  .inboxsdk__modal_content {
   margin-left: 0;
   margin-right: 0;
 }
-.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_showCloseButton) .inboxsdk__modal_container {
+.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_showCloseButton)
+  .inboxsdk__modal_container {
   padding-top: 0;
 }
-.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_showCloseButton) .inboxsdk__modal_content {
+.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_showCloseButton)
+  .inboxsdk__modal_content {
   margin-top: 0;
 }
-.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_hasButtons) .inboxsdk__modal_container {
+.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_hasButtons)
+  .inboxsdk__modal_container {
   padding-bottom: 0;
 }
-.inboxsdk__modal_fullscreen:not(.inboxsdk__modal_hasButtons) .inboxsdk__modal_content {
+.inboxsdk__modal_fullscreen:not(.inboxsdk__modal_hasButtons)
+  .inboxsdk__modal_content {
   margin-bottom: 0;
 }
 .inboxsdk__modal_buttons input {
@@ -480,7 +486,9 @@
   top: 0;
   margin: 17px;
 }
-.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_showCloseButton) .inboxsdk__modal_toprow .inboxsdk__close_button {
+.inboxsdk__modal_fullscreen.inboxsdk__modal_chromeless:not(.inboxsdk__modal_showCloseButton)
+  .inboxsdk__modal_toprow
+  .inboxsdk__close_button {
   display: none;
 }
 .inboxsdk__modal_toprow.inboxsdk__modal_toprow--constrain-title-width {
@@ -488,7 +496,7 @@
   display: flex;
 }
 
-.inboxsdk__modal_toprow--constrain-title-width > span[role="heading"] {
+.inboxsdk__modal_toprow--constrain-title-width > span[role='heading'] {
   -webkit-flex: 1;
   flex: 1;
   width: 0;
@@ -503,25 +511,27 @@
   margin-right: 12px;
   margin-bottom: 12px;
 
-  box-shadow: 0 0 1px rgba(0,0,0,.11), 0 1px 2px rgba(0,0,0,.22);
+  box-shadow: 0 0 1px rgba(0, 0, 0, 0.11), 0 1px 2px rgba(0, 0, 0, 0.22);
   box-sizing: border-box;
   overflow: hidden;
   height: 88px;
   width: 132px;
   z-index: 0;
   justify-content: center;
-  background: rgba(0,0,0,.03);
+  background: rgba(0, 0, 0, 0.03);
   border-radius: 2px;
-  transition: background-color .15s cubic-bezier(.4,0,.2,1), box-shadow .15s cubic-bezier(.4,0,.2,1), outline-color .15s cubic-bezier(.4,0,.2,1);
+  transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1),
+    outline-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid transparent;
   outline: 1px solid transparent;
 }
 .inboxsdk__attachment_card:hover {
-  box-shadow: 0 0 3px rgba(0,0,0,.13), 0 3px 6px rgba(0,0,0,.26);
+  box-shadow: 0 0 3px rgba(0, 0, 0, 0.13), 0 3px 6px rgba(0, 0, 0, 0.26);
 }
 .inboxsdk__attachment_card:active,
 .inboxsdk__attachment_card:focus {
-  box-shadow: 0 0 5px rgba(0,0,0,.15), 0 5px 10px rgba(0,0,0,.3);
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.15), 0 5px 10px rgba(0, 0, 0, 0.3);
   border-color: #f2f2f2;
   outline-color: #4285f4;
 }
@@ -535,7 +545,7 @@
   padding: 12px;
 }
 .inboxsdk__attachment_card .inboxsdk__attachment_card_hover_overlay {
-  background: rgba(255,255,255,.7);
+  background: rgba(255, 255, 255, 0.7);
 }
 .inboxsdk__attachment_card .inboxsdk__attachment_card_hover_overlay,
 .inboxsdk__attachment_card:hover .inboxsdk__attachment_card_nohover {
@@ -553,7 +563,7 @@
 }
 .inboxsdk__attachment_card_button {
   cursor: pointer;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   border: 1px solid #c6c6c6;
   border-radius: 3px;
   margin-right: 3px;
@@ -566,8 +576,8 @@
   text-align: center;
 }
 .inboxsdk__attachment_card_button:hover {
-  background: rgba(0,0,0,0.8);
-  border-color: rgba(0,0,0,0.8);
+  background: rgba(0, 0, 0, 0.8);
+  border-color: rgba(0, 0, 0, 0.8);
 }
 .inboxsdk__attachment_card_button > div {
   height: 21px;
@@ -613,7 +623,7 @@
   border: none;
   cursor: pointer;
   margin-left: 8px;
-  background-color: rgba(255,255,255,0);
+  background-color: rgba(255, 255, 255, 0);
   box-sizing: border-box;
   border-radius: 2px;
   height: 40px;
@@ -629,8 +639,8 @@
 .inboxsdk__attachment_overlay_button:focus {
   outline: none;
   opacity: 1;
-  color: rgba(255,255,255,1);
-  background-color: rgba(255,255,255,0.25);
+  color: rgba(255, 255, 255, 1);
+  background-color: rgba(255, 255, 255, 0.25);
 }
 .inboxsdk__attachment_overlay_button > img {
   display: inline-block;
@@ -671,7 +681,7 @@ first-child will do the trick.
 }
 
 .inboxsdk__search_suggestion.inboxsdk__selected {
-  background-color: rgba(0,0,0,.03);
+  background-color: rgba(0, 0, 0, 0.03);
 }
 
 .inboxsdk__search_suggestion > img {
@@ -713,7 +723,7 @@ first-child will do the trick.
   display: -webkit-flex;
   font-size: 11px;
   display: flex;
-  margin-right: .333em;
+  margin-right: 0.333em;
   outline: 1px solid transparent;
   padding: 0 8px;
   -webkit-flex: 0 0 auto;
@@ -758,7 +768,8 @@ first-child will do the trick.
   width: 20px;
 }
 
-.inboxsdk__thread_row_draft_label_replaced > span:not(.inboxsdk__thread_row_custom_draft_label) {
+.inboxsdk__thread_row_draft_label_replaced
+  > span:not(.inboxsdk__thread_row_custom_draft_label) {
   display: none;
 }
 
@@ -766,7 +777,8 @@ first-child will do the trick.
   color: rgb(210, 63, 49);
 }
 
-.inboxsdk__thread_row_draft_count_replaced span:not(.inboxsdk__thread_row_custom_draft_count) {
+.inboxsdk__thread_row_draft_count_replaced
+  span:not(.inboxsdk__thread_row_custom_draft_count) {
   display: none;
 }
 
@@ -797,9 +809,15 @@ first-child will do the trick.
   outline: none;
 }
 
-.inboxsdk__navItem_wrapper:not(.inboxsdk__navItem_hasChildren) > .inboxsdk__navItem_subNav,
-.inboxsdk__navItem_wrapper:not(.inboxsdk__navItem_hasChildren):not(.inboxsdk__navItem_hasColor) > .inboxsdk__navItem > .inboxsdk__navItem_expander,
-.inboxsdk__navItem_wrapper:not(.inboxsdk__navItem_hasChildren) > .inboxsdk__navItem > .inboxsdk__navItem_expander > svg {
+.inboxsdk__navItem_wrapper:not(.inboxsdk__navItem_hasChildren)
+  > .inboxsdk__navItem_subNav,
+.inboxsdk__navItem_wrapper:not(.inboxsdk__navItem_hasChildren):not(.inboxsdk__navItem_hasColor)
+  > .inboxsdk__navItem
+  > .inboxsdk__navItem_expander,
+.inboxsdk__navItem_wrapper:not(.inboxsdk__navItem_hasChildren)
+  > .inboxsdk__navItem
+  > .inboxsdk__navItem_expander
+  > svg {
   display: none;
 }
 
@@ -814,17 +832,17 @@ first-child will do the trick.
 }
 
 .inboxsdk__navItem:not(.inboxsdk__navItem_link):hover {
-  background-color: rgba(0,0,0,.03);
+  background-color: rgba(0, 0, 0, 0.03);
   border-radius: 2px;
 }
 
 .inboxsdk__navItem:focus {
-  background-color: rgba(0,0,0,.05);
+  background-color: rgba(0, 0, 0, 0.05);
   outline: 2px solid transparent;
 }
 
 .inboxsdk__navItem.inboxsdk__navItem_active {
-  background-color: rgba(0,0,0,.05);
+  background-color: rgba(0, 0, 0, 0.05);
   border-radius: 2px;
   color: #212121;
   font-weight: bold;
@@ -842,7 +860,7 @@ first-child will do the trick.
 }
 
 .inboxsdk__navItem_expander:hover {
-  background-color: rgba(0,0,0,.12);
+  background-color: rgba(0, 0, 0, 0.12);
 }
 
 .inboxsdk__navItem_expander > svg {
@@ -855,7 +873,10 @@ first-child will do the trick.
   fill: #616161;
 }
 
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_collapsed > .inboxsdk__navItem > .inboxsdk__navItem_expander > svg {
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_collapsed
+  > .inboxsdk__navItem
+  > .inboxsdk__navItem_expander
+  > svg {
   transform: rotate(-90deg);
 }
 
@@ -872,8 +893,10 @@ first-child will do the trick.
   padding-left: 24px;
 }
 
-.inboxsdk__navItem_level0:not(.inboxsdk__navItem_disabled):not(.inboxsdk__navItem_hasChildren):not(.inboxsdk__navItem_hasColor) > .inboxsdk__navItem:not(.inboxsdk__navItem_hasIcon),
-.inboxsdk__navItem_level1:not(.inboxsdk__navItem_hasChildren):not(.inboxsdk__navItem_hasColor) > .inboxsdk__navItem:not(.inboxsdk__navItem_hasIcon) {
+.inboxsdk__navItem_level0:not(.inboxsdk__navItem_disabled):not(.inboxsdk__navItem_hasChildren):not(.inboxsdk__navItem_hasColor)
+  > .inboxsdk__navItem:not(.inboxsdk__navItem_hasIcon),
+.inboxsdk__navItem_level1:not(.inboxsdk__navItem_hasChildren):not(.inboxsdk__navItem_hasColor)
+  > .inboxsdk__navItem:not(.inboxsdk__navItem_hasIcon) {
   padding-left: 64px;
 }
 
@@ -911,11 +934,12 @@ first-child will do the trick.
 .inboxsdk__navItem_level0.inboxsdk__navItem_disabled > .inboxsdk__navItem,
 .inboxsdk__navItem_level0.inboxsdk__navItem_disabled > .inboxsdk__navItem:hover,
 .inboxsdk__navItem_level0.inboxsdk__navItem_disabled > .inboxsdk__navItem:focus,
-.inboxsdk__navItem_level0.inboxsdk__navItem_disabled > .inboxsdk__navItem:active {
+.inboxsdk__navItem_level0.inboxsdk__navItem_disabled
+  > .inboxsdk__navItem:active {
   background-color: transparent;
   border-radius: 0;
   outline: none;
-  font-size: .9em;
+  font-size: 0.9em;
   font-weight: normal;
   line-height: 24px;
   white-space: normal;
@@ -940,22 +964,36 @@ first-child will do the trick.
   margin-bottom: 0;
 }
 
-.inboxsdk__navItem_level0.inboxsdk__navItem_disabled > .inboxsdk__navItem > .inboxsdk__button_icon {
+.inboxsdk__navItem_level0.inboxsdk__navItem_disabled
+  > .inboxsdk__navItem
+  > .inboxsdk__button_icon {
   display: none;
 }
 
-.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem > .inboxsdk__navItem_expander {
+.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren
+  > .inboxsdk__navItem
+  > .inboxsdk__navItem_expander {
   display: none;
 }
 
-.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem > .inboxsdk__navItem_name,
-.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:hover > .inboxsdk__navItem_name,
-.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:focus > .inboxsdk__navItem_name,
-.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren > .inboxsdk__navItem:active > .inboxsdk__navItem_name {
+.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren
+  > .inboxsdk__navItem
+  > .inboxsdk__navItem_name,
+.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren
+  > .inboxsdk__navItem:hover
+  > .inboxsdk__navItem_name,
+.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren
+  > .inboxsdk__navItem:focus
+  > .inboxsdk__navItem_name,
+.inboxsdk__navItem_level0.inboxsdk__navItem_hasChildren
+  > .inboxsdk__navItem:active
+  > .inboxsdk__navItem_name {
   color: #616161;
 }
 
-.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory > .inboxsdk__navItem > .inboxsdk__navItem_accessory {
+.inboxsdk__navItem_wrapper.inboxsdk__navItem_hasAccessory
+  > .inboxsdk__navItem
+  > .inboxsdk__navItem_accessory {
   display: block;
   position: relative;
 }
@@ -964,14 +1002,24 @@ first-child will do the trick.
   opacity: 0;
 }
 
-.inboxsdk__navItem:hover > .inboxsdk__navItem_accessory > .inboxsdk__button_icon,
-.inboxsdk__navItem.inboxsdk__navItem_active > .inboxsdk__navItem_accessory > .inboxsdk__button_icon {
+.inboxsdk__navItem:hover
+  > .inboxsdk__navItem_accessory
+  > .inboxsdk__button_icon,
+.inboxsdk__navItem.inboxsdk__navItem_active
+  > .inboxsdk__navItem_accessory
+  > .inboxsdk__button_icon {
   opacity: 0.6;
 }
 
-.inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon:hover,
-.inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon:focus,
-.inboxsdk__navItem > .inboxsdk__navItem_accessory > .inboxsdk__button_icon.inboxsdk__active {
+.inboxsdk__navItem
+  > .inboxsdk__navItem_accessory
+  > .inboxsdk__button_icon:hover,
+.inboxsdk__navItem
+  > .inboxsdk__navItem_accessory
+  > .inboxsdk__button_icon:focus,
+.inboxsdk__navItem
+  > .inboxsdk__navItem_accessory
+  > .inboxsdk__button_icon.inboxsdk__active {
   opacity: 1;
 }
 
@@ -984,15 +1032,18 @@ first-child will do the trick.
   transition: height 150ms ease-in-out;
 }
 
-.inboxsdk__navItem_level1.inboxsdk__navItem_hasChildren .inboxsdk__navItem_subNav {
+.inboxsdk__navItem_level1.inboxsdk__navItem_hasChildren
+  .inboxsdk__navItem_subNav {
   padding-left: 48px;
 }
 
-.inboxsdk__navItem_level2.inboxsdk__navItem_hasChildren .inboxsdk__navItem_subNav {
+.inboxsdk__navItem_level2.inboxsdk__navItem_hasChildren
+  .inboxsdk__navItem_subNav {
   padding-left: 34px;
 }
 
-.inboxsdk__navItem_level1.inboxsdk__navItem_hasChildren > .inboxsdk__navItem_subNav {
+.inboxsdk__navItem_level1.inboxsdk__navItem_hasChildren
+  > .inboxsdk__navItem_subNav {
   padding-left: 48px;
 }
 
@@ -1004,9 +1055,15 @@ first-child will do the trick.
   margin-right: 10px;
 }
 
-.inboxsdk__navItem_level1.inboxsdk__navItem_hasChildren > .inboxsdk__navItem_hasIcon > .inboxsdk__navItem_name,
-.inboxsdk__navItem_level2 > .inboxsdk__navItem_hasIcon > .inboxsdk__navItem_name,
-.inboxsdk__navItem_level3 > .inboxsdk__navItem_hasIcon > .inboxsdk__navItem_name {
+.inboxsdk__navItem_level1.inboxsdk__navItem_hasChildren
+  > .inboxsdk__navItem_hasIcon
+  > .inboxsdk__navItem_name,
+.inboxsdk__navItem_level2
+  > .inboxsdk__navItem_hasIcon
+  > .inboxsdk__navItem_name,
+.inboxsdk__navItem_level3
+  > .inboxsdk__navItem_hasIcon
+  > .inboxsdk__navItem_name {
   padding-left: 10px;
 }
 
@@ -1044,7 +1101,7 @@ first-child will do the trick.
   bottom: 0;
   right: 0;
   outline: none;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.45);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.45);
   border-top-left-radius: 7.5px;
   border-top-right-radius: 7.5px;
   transform: translateZ(0);
@@ -1110,7 +1167,9 @@ first-child will do the trick.
   outline: none;
 }
 
-.inboxsdk__mole_title_buttons > button.inboxsdk__mole_custom_title_button > img {
+.inboxsdk__mole_title_buttons
+  > button.inboxsdk__mole_custom_title_button
+  > img {
   width: 18px;
   height: 18px;
 }

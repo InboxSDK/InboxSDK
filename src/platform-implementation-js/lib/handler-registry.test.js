@@ -31,7 +31,7 @@ it('handler called on new targets', async () => {
 
   let calls = 0;
   reg.registerHandler(target => {
-    switch(calls++) {
+    switch (calls++) {
       case 0:
         expect(target).toBe(target1);
         break;
@@ -42,7 +42,7 @@ it('handler called on new targets', async () => {
         expect(target).toBe(target3);
         break;
       default:
-        throw new Error("Should not happen");
+        throw new Error('Should not happen');
     }
   });
 
@@ -104,8 +104,7 @@ it('dumpHandlers works', async () => {
   reg.addTarget(target1);
 
   reg.registerHandler(target => {
-    if (i++ !== 0)
-      throw new Error('Should not happen');
+    if (i++ !== 0) throw new Error('Should not happen');
   });
 
   await delay(2);

@@ -13,13 +13,13 @@ export default function parser(el: HTMLElement) {
     }
   });
 
-  const searchInput = collector.run('searchInput', () => (
+  const searchInput = collector.run('searchInput', () =>
     querySelectorOne(el, 'div[role=search] input[role=combobox]')
-  ));
+  );
 
   return {
-    elements: {searchInput},
-    score: 1 - (collector.errorCount() / collector.runCount()),
+    elements: { searchInput },
+    score: 1 - collector.errorCount() / collector.runCount(),
     errors: collector.getErrorLogs()
   };
 }

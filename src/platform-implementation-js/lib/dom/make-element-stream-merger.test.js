@@ -3,12 +3,12 @@
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import sinon from 'sinon';
-const sinonTest = require('sinon-test')(sinon, {useFakeTimers: false});
+const sinonTest = require('sinon-test')(sinon, { useFakeTimers: false });
 
 import makeElementStreamMerger from './make-element-stream-merger';
 
 function fakeEl(name: string): Object {
-  return {name, nodeType: 1};
+  return { name, nodeType: 1 };
 }
 
 it('passes through unrelated events', done => {
@@ -21,27 +21,29 @@ it('passes through unrelated events', done => {
     removalStream: kefirBus()
   };
   let i = 0;
-  Kefir.sequentially(0, [e1, e2]).flatMap(makeElementStreamMerger()).onValue(event => {
-    switch (++i) {
-      case 1:
-        expect(event.el).toBe(e1.el);
-        event.removalStream.onValue(() => {
-          expect(i).toBe(2);
-          done();
-        });
-        break;
-      case 2:
-        expect(event.el).toBe(e2.el);
-        event.removalStream.onValue(() => {
-          throw new Error("Should not be removed");
-        });
-        e1.removalStream.emit(null);
-        e1.removalStream.end();
-        break;
-      default:
-        throw new Error("Should not happen");
-    }
-  });
+  Kefir.sequentially(0, [e1, e2])
+    .flatMap(makeElementStreamMerger())
+    .onValue(event => {
+      switch (++i) {
+        case 1:
+          expect(event.el).toBe(e1.el);
+          event.removalStream.onValue(() => {
+            expect(i).toBe(2);
+            done();
+          });
+          break;
+        case 2:
+          expect(event.el).toBe(e2.el);
+          event.removalStream.onValue(() => {
+            throw new Error('Should not be removed');
+          });
+          e1.removalStream.emit(null);
+          e1.removalStream.end();
+          break;
+        default:
+          throw new Error('Should not happen');
+      }
+    });
 });
 
 it('can persist elements', done => {
@@ -75,9 +77,10 @@ it('can persist elements', done => {
     removalStream: kefirBus()
   };
   const bus = kefirBus();
-  let i = 0, elWasRemoved = false;
+  let i = 0,
+    elWasRemoved = false;
   bus.flatMap(makeElementStreamMerger()).onValue(event => {
-    switch(++i) {
+    switch (++i) {
       case 1:
         expect(event.el).toBe(e1.el);
         event.removalStream.onValue(() => {
@@ -112,7 +115,7 @@ it('can persist elements', done => {
         done();
         break;
       default:
-        throw new Error("Should not happen");
+        throw new Error('Should not happen');
     }
   });
   bus.emit(e1);
@@ -124,40 +127,43 @@ it('can persist elements', done => {
   }, 0);
 });
 
-it('warns if element stays in multiple streams', sinonTest(async function() {
-  this.stub(console, "warn");
-  const e1 = {
-    el: fakeEl('e1.el'),
-    removalStream: kefirBus()
-  };
-  const e2 = {
-    el: e1.el,
-    removalStream: kefirBus()
-  };
-  const e3 = {
-    el: e1.el,
-    removalStream: kefirBus()
-  };
-  const e4 = {
-    el: fakeEl('e4.el'),
-    removalStream: kefirBus()
-  };
-  let i = 0;
+it(
+  'warns if element stays in multiple streams',
+  sinonTest(async function() {
+    this.stub(console, 'warn');
+    const e1 = {
+      el: fakeEl('e1.el'),
+      removalStream: kefirBus()
+    };
+    const e2 = {
+      el: e1.el,
+      removalStream: kefirBus()
+    };
+    const e3 = {
+      el: e1.el,
+      removalStream: kefirBus()
+    };
+    const e4 = {
+      el: fakeEl('e4.el'),
+      removalStream: kefirBus()
+    };
+    let i = 0;
 
-  await new Promise(resolve => {
-    Kefir.sequentially(0, [e1, e2, e3, e4])
-      .flatMap(makeElementStreamMerger())
-      .onValue(event => {
-        switch(++i) {
-          case 1:
-            break;
-          case 2:
-            expect(console.warn.callCount).toBeGreaterThan(0); // eslint-disable-line no-console
-            resolve();
-            break;
-          default:
-            throw new Error("Should not happen");
-        }
-      });
-  });
-}));
+    await new Promise(resolve => {
+      Kefir.sequentially(0, [e1, e2, e3, e4])
+        .flatMap(makeElementStreamMerger())
+        .onValue(event => {
+          switch (++i) {
+            case 1:
+              break;
+            case 2:
+              expect(console.warn.callCount).toBeGreaterThan(0); // eslint-disable-line no-console
+              resolve();
+              break;
+            default:
+              throw new Error('Should not happen');
+          }
+        });
+    });
+  })
+);

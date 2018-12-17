@@ -1,11 +1,13 @@
 /* @flow */
 
 type Event = {
-	eventName: string;
+  eventName: string
 };
 
-export default function eventNameFilter(eventName: string): (event: Event) => boolean {
-	return function(event: Event) {
-		return event.eventName === eventName;
-	};
+export default function eventNameFilter(
+  eventName: string
+): (event: Event) => boolean {
+  return function(event: Event) {
+    return event.eventName === eventName;
+  };
 }

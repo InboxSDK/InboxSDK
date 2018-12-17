@@ -15,16 +15,17 @@ function imageTest(url: string): Promise<boolean> {
     img.onload = function() {
       resolve(true);
     };
-    (img:any).onloadend = img.onerror = function() {
+    (img: any).onloadend = img.onerror = function() {
       resolve(false);
     };
     img.src = cachebustUrl(url);
   });
 }
 
-export default function connectivityTest(): Promise<{[url:string]:boolean}> {
-  return Promise.all(URLS.map(url =>
-      imageTest(url).then(success => [url, success])
-    ))
-    .then(results => fromPairs(results));
+export default function connectivityTest(): Promise<{
+  [url: string]: boolean
+}> {
+  return Promise.all(
+    URLS.map(url => imageTest(url).then(success => [url, success]))
+  ).then(results => fromPairs(results));
 }

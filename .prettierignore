@@ -4,3 +4,4 @@
 /examples
 /test/data/**/*.html
 /__tests__/**/*.html
+*.snap

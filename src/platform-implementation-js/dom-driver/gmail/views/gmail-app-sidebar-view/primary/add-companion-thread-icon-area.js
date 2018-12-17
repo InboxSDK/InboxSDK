@@ -1,6 +1,6 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 
 import Kefir from 'kefir';
 import makeMutationObserverChunkedStream from '../../../../../lib/dom/make-mutation-observer-chunked-stream';
@@ -16,20 +16,33 @@ As of Feb 6th, 2018.
 
 const TAB_LIST_SELECTOR = '[role=tablist],.J-KU-Jg';
 
-function addCompanionThreadIconArea(logger: Logger, iconArea: HTMLElement, companionSidebarIconContainerEl: HTMLElement){
-  const tabList = companionSidebarIconContainerEl.querySelector(TAB_LIST_SELECTOR);
-  if(!tabList) {
+function addCompanionThreadIconArea(
+  logger: Logger,
+  iconArea: HTMLElement,
+  companionSidebarIconContainerEl: HTMLElement
+) {
+  const tabList = companionSidebarIconContainerEl.querySelector(
+    TAB_LIST_SELECTOR
+  );
+  if (!tabList) {
     logger.error(new Error('addCompanionThreadIconArea: no tablist'));
     return;
   }
 
-  const separator = companionSidebarIconContainerEl.querySelector('[role=separator]');
+  const separator = companionSidebarIconContainerEl.querySelector(
+    '[role=separator]'
+  );
   if (!separator) {
-    logger.error(new Error('addCompanionThreadIconArea: failed to find separator'));
+    logger.error(
+      new Error('addCompanionThreadIconArea: failed to find separator')
+    );
     tabList.insertAdjacentElement('beforebegin', iconArea);
   } else {
     if (!separator.parentElement) throw new Error();
-    separator.parentElement.insertBefore(iconArea, separator.nextElementSibling);
+    separator.parentElement.insertBefore(
+      iconArea,
+      separator.nextElementSibling
+    );
   }
 }
 

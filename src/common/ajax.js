@@ -4,7 +4,7 @@ import querystring from 'querystring';
 import delay from 'pdelay';
 import cachebustUrl from './cachebust-url';
 
-const MAX_TIMEOUT = 64*1000; //64 seconds
+const MAX_TIMEOUT = 64 * 1000; //64 seconds
 const MAX_RETRIES = 5;
 const serversToIgnore = {};
 
@@ -17,41 +17,47 @@ const serversToIgnore = {};
 // * [xhrFields] - object
 // * [data]
 export type AjaxOpts = {
-  url: string;
-  method?: ?string;
-  cachebust?: ?boolean;
-  headers?: ?{[index: string]: string};
-  xhrFields?: ?Object;
-  data?: ?{[index: string]: string}|string;
-  canRetry?: ?boolean;
-  retryNum?: number;
+  url: string,
+  method?: ?string,
+  cachebust?: ?boolean,
+  headers?: ?{ [index: string]: string },
+  xhrFields?: ?Object,
+  data?: ?{ [index: string]: string } | string,
+  canRetry?: ?boolean,
+  retryNum?: number
 };
 
 export type AjaxResponse = {
-  text: string;
-  xhr: XMLHttpRequest;
+  text: string,
+  xhr: XMLHttpRequest
 };
 
 export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
-  if(!opts || typeof opts.url !== 'string') {
+  if (!opts || typeof opts.url !== 'string') {
     throw new Error('URL must be given');
   }
   return new Promise(function(resolve, reject) {
-    const method = opts.method ? opts.method : "GET";
+    const method = opts.method ? opts.method : 'GET';
     let url = opts.url;
     let stringData: ?string = undefined;
     if (opts.data) {
-      stringData = typeof opts.data === "string" ? opts.data : querystring.stringify(opts.data);
-      if (method === "GET" || method === "HEAD") {
-        url += (/\?/.test(url) ? "&" : "?") + stringData;
+      stringData =
+        typeof opts.data === 'string'
+          ? opts.data
+          : querystring.stringify(opts.data);
+      if (method === 'GET' || method === 'HEAD') {
+        url += (/\?/.test(url) ? '&' : '?') + stringData;
         stringData = null;
       }
     }
-    const canRetry: boolean = opts.canRetry != null ? opts.canRetry : (method === "GET" || method === "HEAD");
+    const canRetry: boolean =
+      opts.canRetry != null
+        ? opts.canRetry
+        : method === 'GET' || method === 'HEAD';
 
     const match = url.match(/(?:(?:[a-z]+:)?\/\/)?([^/]*)\//);
     if (!match) {
-      throw new Error("Failed to match url");
+      throw new Error('Failed to match url');
     }
     const server = match[1];
     if (Object.prototype.hasOwnProperty.call(serversToIgnore, server)) {
@@ -77,7 +83,9 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
       }
 
       const err = Object.assign((new Error(`Failed to load ${url}`): any), {
-        event, xhr, status: xhr.status
+        event,
+        xhr,
+        status: xhr.status
       });
 
       // give a way for a server to tell us to go away for now. Good fallback
@@ -99,7 +107,7 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
     };
     xhr.open(method, url, true);
     if (opts.headers) {
-      const {headers} = opts;
+      const { headers } = opts;
       Object.keys(headers).forEach(name => {
         const value = headers[name];
         xhr.setRequestHeader(name, value);
@@ -113,7 +121,9 @@ function _retry(opts: AjaxOpts): Promise<AjaxResponse> {
   const retryNum = (opts.retryNum || 0) + 1;
 
   // 2000 4000 8000...
-  const retryTimeout = Math.min(Math.pow(2, retryNum)*1000, MAX_TIMEOUT);
+  const retryTimeout = Math.min(Math.pow(2, retryNum) * 1000, MAX_TIMEOUT);
 
-  return delay(retryTimeout).then(() => ajax(Object.assign({}, opts, {retryNum})));
+  return delay(retryTimeout).then(() =>
+    ajax(Object.assign({}, opts, { retryNum }))
+  );
 }

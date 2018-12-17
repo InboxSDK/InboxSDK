@@ -3,16 +3,19 @@
 import type GmailComposeView from '../gmail-compose-view';
 
 type Options = {
-	title: string;
-	el: HTMLElement;
+  title: string,
+  el: HTMLElement
 };
 
-export default function addInnerSidebar(gmailComposeView: GmailComposeView, options: Options) {
-	// if(!gmailComposeView.getAdditionalAreas().innerSidebar){
-	// 	_createInnerSidebar(gmailComposeView);
-	// }
-	//
-	// gmailComposeView.getAdditionalAreas().innerSidebar.appendChild(options.el);
+export default function addInnerSidebar(
+  gmailComposeView: GmailComposeView,
+  options: Options
+) {
+  // if(!gmailComposeView.getAdditionalAreas().innerSidebar){
+  // 	_createInnerSidebar(gmailComposeView);
+  // }
+  //
+  // gmailComposeView.getAdditionalAreas().innerSidebar.appendChild(options.el);
 }
 
 // function _createInnerSidebar(gmailComposeView){

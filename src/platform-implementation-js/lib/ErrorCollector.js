@@ -6,8 +6,8 @@ export default class ErrorCollector {
   _name: string;
   _runCount: number = 0;
   _errorLogs: Array<{
-    name: string;
-    message: string;
+    name: string,
+    message: string
   }> = [];
   _hasReported: boolean = false;
 
@@ -17,14 +17,15 @@ export default class ErrorCollector {
 
   run<T>(name: string, cb: () => T): ?T {
     if (this._hasReported) {
-      throw new Error("Has already reported");
+      throw new Error('Has already reported');
     }
     this._runCount++;
     try {
       return cb();
-    } catch(e) {
+    } catch (e) {
       this._errorLogs.push({
-        name, message: e.message
+        name,
+        message: e.message
       });
       return null;
     }
@@ -32,7 +33,7 @@ export default class ErrorCollector {
 
   report(errorDataCb: () => any) {
     if (this._hasReported) {
-      throw new Error("Has already reported");
+      throw new Error('Has already reported');
     }
     this._hasReported = true;
     if (this._errorLogs.length) {

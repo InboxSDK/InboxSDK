@@ -2,7 +2,7 @@
 
 let oldDefine;
 try {
-  if (typeof define !== "undefined" && define && define.amd) {
+  if (typeof define !== 'undefined' && define && define.amd) {
     // work around amd compatibility issue
     // https://groups.google.com/forum/#!msg/inboxsdk/U_bq82Exmwc/I3iIinxxCAAJ
     oldDefine = define;

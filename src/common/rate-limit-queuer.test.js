@@ -98,7 +98,7 @@ test('going over rate limit simultaneously queues', async () => {
         expect(Date.now() - start).toBeGreaterThanOrEqual(200);
       })
   ]);
-  for (let i=0; i<20; i++) {
+  for (let i = 0; i < 20; i++) {
     advanceTimers(50);
     await advancePromises();
   }

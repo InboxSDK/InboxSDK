@@ -4,38 +4,37 @@
  * viewport, like a compose view.
  */
 var MoleView = /** @lends MoleView */ {
-
   /**
    * This closes the mole view. Does nothing if already closed.
    * @return {void}
    */
-  close: function(){},
+  close: function() {},
 
   /**
    * This allows the title to be changed.
    * @param  {string} text
- 	 * @return {void}
+   * @return {void}
    */
-  setTitle: function(){},
+  setTitle: function() {},
 
   /**
    * This allows the minimize state to be changed.
    * @param  {boolean} minimized - If true, the mole view will be minimized.
- 	 * @return {void}
+   * @return {void}
    */
-  setMinimized: function(){},
+  setMinimized: function() {},
 
   /**
    * This allows the minimize state to be retrieved.
- 	 * @return {boolean}
+   * @return {boolean}
    */
-  getMinimized: function(){},
+  getMinimized: function() {},
 
   /**
    * This property is set to true once the view is destroyed.
    * @type {boolean}
    */
-  destroyed: false,
+  destroyed: false
 
   /**
    * Fires when this MoleView instance is closed.
@@ -51,5 +50,4 @@ var MoleView = /** @lends MoleView */ {
    * Fires when this MoleView instance is restored.
    * @event MoleView#restore
    */
-
 };

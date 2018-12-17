@@ -13,7 +13,10 @@
 import once from 'lodash/once';
 import noop from 'lodash/noop';
 
-export default function makeRevocableFunction<F: Function>(inputFn: F, revokedFn: Function=noop): {fn: F, revoke: ()=>void} {
+export default function makeRevocableFunction<F: Function>(
+  inputFn: F,
+  revokedFn: Function = noop
+): { fn: F, revoke: () => void } {
   let key = {};
 
   return {
@@ -24,10 +27,10 @@ export default function makeRevocableFunction<F: Function>(inputFn: F, revokedFn
       const _revokedFn = revokedFn;
       const wm = new WeakMap();
       wm.set(key, inputFn);
-      inputFn = revokedFn = (null:any);
+      inputFn = revokedFn = (null: any);
 
       return (function() {
-        return ((key ? wm.get(key) : _revokedFn):any).apply(this, arguments);
+        return ((key ? wm.get(key) : _revokedFn): any).apply(this, arguments);
       }: any);
     })(),
     revoke: once(function() {

@@ -11,10 +11,13 @@ function getDensity(): string {
   // density setting value.
   const navItemOuter = document.querySelector('.TO .TN');
   if (!navItemOuter) {
-    Logger.error(new Error("Failed to find nav item outer element"));
+    Logger.error(new Error('Failed to find nav item outer element'));
     return 'compact';
   }
-  const padding = parseInt(getComputedStyle(navItemOuter).getPropertyValue('padding-top'), 10);
+  const padding = parseInt(
+    getComputedStyle(navItemOuter).getPropertyValue('padding-top'),
+    10
+  );
   if (padding >= 6) {
     return 'comfortable';
   } else if (padding >= 3) {
@@ -29,34 +32,39 @@ function isDarkTheme(): boolean {
   // in dark theme mode.
   const navItem = document.querySelector('.aio');
   if (!navItem) {
-    Logger.error(new Error("Failed to find nav item"));
+    Logger.error(new Error('Failed to find nav item'));
     return false;
   }
   const colorString = getComputedStyle(navItem).getPropertyValue('color');
   const colorMatch = RGB_REGEX.exec(colorString);
   if (!colorMatch) {
-    Logger.error(new Error("Failed to read color string"), {colorString});
+    Logger.error(new Error('Failed to read color string'), { colorString });
     return false;
   }
-  const r = +colorMatch[1], g = +colorMatch[2], b = +colorMatch[3];
+  const r = +colorMatch[1],
+    g = +colorMatch[2],
+    b = +colorMatch[3];
   // rgb(32, 33, 36) is the default color of nav items in Material Gmail
-  if (r === 32 && g === 33, b === 36) {
+  if ((r === 32 && g === 33, b === 36)) {
     return false;
   }
   if (r !== g || r !== b) {
-    Logger.error(new Error("Nav item color not grayscale"), {r,g,b});
+    Logger.error(new Error('Nav item color not grayscale'), { r, g, b });
   }
   return r > 128;
 }
 
 export default function trackGmailStyles() {
   if (
-    (document.head:any).hasAttribute('data-inboxsdk-gmail-style-tracker') ||
+    (document.head: any).hasAttribute('data-inboxsdk-gmail-style-tracker') ||
     GmailElementGetter.isStandalone()
   ) {
     return;
   }
-  (document.head:any).setAttribute('data-inboxsdk-gmail-style-tracker', 'true');
+  (document.head: any).setAttribute(
+    'data-inboxsdk-gmail-style-tracker',
+    'true'
+  );
 
   let currentDensity = null;
   let currentDarkTheme = null;
@@ -65,24 +73,34 @@ export default function trackGmailStyles() {
     const newDensity = getDensity();
     if (currentDensity !== newDensity) {
       if (currentDensity) {
-        ((document.body:any):HTMLElement).classList.remove('inboxsdk__gmail_density_' + currentDensity);
+        ((document.body: any): HTMLElement).classList.remove(
+          'inboxsdk__gmail_density_' + currentDensity
+        );
       }
       currentDensity = newDensity;
-      ((document.body:any):HTMLElement).classList.add('inboxsdk__gmail_density_' + currentDensity);
+      ((document.body: any): HTMLElement).classList.add(
+        'inboxsdk__gmail_density_' + currentDensity
+      );
     }
 
     const newDarkTheme = isDarkTheme();
     if (currentDarkTheme !== newDarkTheme) {
       currentDarkTheme = newDarkTheme;
       if (currentDarkTheme) {
-        ((document.body:any):HTMLElement).classList.add('inboxsdk__gmail_dark_theme');
+        ((document.body: any): HTMLElement).classList.add(
+          'inboxsdk__gmail_dark_theme'
+        );
       } else {
-        ((document.body:any):HTMLElement).classList.remove('inboxsdk__gmail_dark_theme');
+        ((document.body: any): HTMLElement).classList.remove(
+          'inboxsdk__gmail_dark_theme'
+        );
       }
     }
   }
 
-  waitFor(() => document.querySelector('.TO .TN') && document.querySelector('.aio'))
+  waitFor(
+    () => document.querySelector('.TO .TN') && document.querySelector('.aio')
+  )
     .then(() => {
       // Gmail changes an inline <style> sheet when the display density changes.
       // Watch for changes to all <style> elements.

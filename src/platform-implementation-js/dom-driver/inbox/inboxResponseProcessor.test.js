@@ -1,12 +1,13 @@
 /* @flow */
 
 import fs from 'fs';
-import {extractMessageIdsFromThreadResponse} from './inboxResponseProcessor';
+import { extractMessageIdsFromThreadResponse } from './inboxResponseProcessor';
 
 describe('extractMessageIdsFromThreadResponse()', () => {
   it('Lists the message IDs from a thread', () => {
     const threadResponse = fs.readFileSync(
-      __dirname + '/../../../../test/data/inbox-thread-details-response-2017-07-13.json',
+      __dirname +
+        '/../../../../test/data/inbox-thread-details-response-2017-07-13.json',
       'utf8'
     );
     expect(extractMessageIdsFromThreadResponse(threadResponse)).toEqual([
@@ -16,7 +17,7 @@ describe('extractMessageIdsFromThreadResponse()', () => {
   });
 
   it('Throws when given invalid inputs', () => {
-    const invalidJSON = JSON.stringify({junkKey: 'junkValue'});
+    const invalidJSON = JSON.stringify({ junkKey: 'junkValue' });
 
     expect(() => extractMessageIdsFromThreadResponse(invalidJSON)).toThrow();
     expect(() => extractMessageIdsFromThreadResponse('')).toThrow();

@@ -4,7 +4,7 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 
-import type {RouteViewDriver} from '../../../driver-interfaces/route-view-driver';
+import type { RouteViewDriver } from '../../../driver-interfaces/route-view-driver';
 
 export default class InboxDummyRouteView {
   _type: string;
@@ -21,7 +21,7 @@ export default class InboxDummyRouteView {
     return this._stopper;
   }
 
-  destroy(){
+  destroy() {
     this._eventStream.end();
     this._stopper.destroy();
   }
@@ -50,7 +50,7 @@ export default class InboxDummyRouteView {
     return this._eventStream;
   }
 
-  getCustomViewElement(): ?HTMLElement{
+  getCustomViewElement(): ?HTMLElement {
     return null;
   }
 
@@ -62,11 +62,17 @@ export default class InboxDummyRouteView {
     throw new Error('should not happen');
   }
 
-  addCollapsibleSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any) {
+  addCollapsibleSection(
+    sectionDescriptorProperty: Kefir.Observable<?Object>,
+    groupOrderHint: any
+  ) {
     throw new Error('should not happen');
   }
 
-  addSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any) {
+  addSection(
+    sectionDescriptorProperty: Kefir.Observable<?Object>,
+    groupOrderHint: any
+  ) {
     throw new Error('should not happen');
   }
 

@@ -7,13 +7,13 @@ const EventEmitter = require('events').EventEmitter;
 class MockElementParent extends EventEmitter {
   children: Object[];
 
-  constructor(children: Object[]=[]) {
+  constructor(children: Object[] = []) {
     super();
     assert(Array.isArray(children), 'children must be array');
     this.children = children;
   }
 
-  appendAndRemoveChildren(toAdd: Object[]=[], toRemove: Object[]=[]) {
+  appendAndRemoveChildren(toAdd: Object[] = [], toRemove: Object[] = []) {
     const presentTargets = [];
     for (let target of toRemove) {
       const ix = this.children.indexOf(target);
@@ -52,7 +52,7 @@ class MockElementParent extends EventEmitter {
   }
 }
 
-(MockElementParent:any).prototype._emitsMutations = true;
-(MockElementParent:any).prototype.nodeType = 1;
+(MockElementParent: any).prototype._emitsMutations = true;
+(MockElementParent: any).prototype.nodeType = 1;
 
 export default MockElementParent;

@@ -1,7 +1,7 @@
 /* @flow */
 
 import asap from 'asap';
-import {defn} from 'ud';
+import { defn } from 'ud';
 import find from 'lodash/find';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -11,7 +11,11 @@ import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-ob
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import ElementContainer from '../../../lib/react/ElementContainer';
-import type {MoleViewDriver, MoleOptions, MoleButtonDescriptor} from '../../../driver-interfaces/mole-view-driver';
+import type {
+  MoleViewDriver,
+  MoleOptions,
+  MoleButtonDescriptor
+} from '../../../driver-interfaces/mole-view-driver';
 import type InboxDriver from '../inbox-driver';
 import kefirBus from 'kefir-bus';
 
@@ -28,13 +32,14 @@ class InboxMoleViewDriver {
     this._options = options;
     this._driver = driver;
     this._element = document.createElement('div');
-    this._element.className = 'inboxsdk__mole_view '+(options.className||'');
+    this._element.className =
+      'inboxsdk__mole_view ' + (options.className || '');
     this._element.setAttribute('jsaction', 'global.none');
 
     this._title = String(this._options.title || '');
 
     this._render();
-    (this._element.firstElementChild:any).style.zIndex = '1';
+    (this._element.firstElementChild: any).style.zIndex = '1';
 
     Kefir.fromEvents(this._element, 'click')
       .takeUntilBy(this._stopper)
@@ -49,18 +54,18 @@ class InboxMoleViewDriver {
     // then React will see it.
     const fakeEvent = new MouseEvent('click');
     Object.defineProperties(fakeEvent, {
-      target: {value: event.target},
-      detail: {value: event.detail},
-      screenX: {value: event.screenX},
-      screenY: {value: event.screenY},
-      clientX: {value: event.clientX},
-      clientY: {value: event.clientY},
-      button: {value: event.button},
-      buttons: {value: event.buttons},
-      ctrlKey: {value: event.ctrlKey},
-      shiftKey: {value: event.shiftKey},
-      altKey: {value: event.altKey},
-      metaKey: {value: event.metaKey},
+      target: { value: event.target },
+      detail: { value: event.detail },
+      screenX: { value: event.screenX },
+      screenY: { value: event.screenY },
+      clientX: { value: event.clientX },
+      clientY: { value: event.clientY },
+      button: { value: event.button },
+      buttons: { value: event.buttons },
+      ctrlKey: { value: event.ctrlKey },
+      shiftKey: { value: event.shiftKey },
+      altKey: { value: event.altKey },
+      metaKey: { value: event.metaKey }
     });
     document.dispatchEvent(fakeEvent);
   }
@@ -104,12 +109,15 @@ class InboxMoleViewDriver {
     });
 
     // Keep the mole as the first item in the list
-    makeMutationObserverChunkedStream(container, {childList: true})
+    makeMutationObserverChunkedStream(container, { childList: true })
       .takeUntilBy(this._stopper)
       .onValue(muts => {
         const composeWasAdded = muts.some(mutation =>
-          Array.prototype.some.call(mutation.addedNodes, node =>
-            node.nodeType === 1 && !node.classList.contains('inboxsdk__mole_view')
+          Array.prototype.some.call(
+            mutation.addedNodes,
+            node =>
+              node.nodeType === 1 &&
+              !node.classList.contains('inboxsdk__mole_view')
           )
         );
 
@@ -118,7 +126,10 @@ class InboxMoleViewDriver {
         }
         this._setupWidth();
       });
-    makeMutationObserverChunkedStream(this._options.el, {attributes: true, attributeFilter: ['class', 'style']})
+    makeMutationObserverChunkedStream(this._options.el, {
+      attributes: true,
+      attributeFilter: ['class', 'style']
+    })
       .takeUntilBy(this._stopper)
       .onValue(() => {
         this._setupWidth();
@@ -131,18 +142,25 @@ class InboxMoleViewDriver {
       });
   }
   _setupWidth() {
-    const naturalWidth = querySelector(this._element, '.inboxsdk__mole_view_inner').getBoundingClientRect().width;
+    const naturalWidth = querySelector(
+      this._element,
+      '.inboxsdk__mole_view_inner'
+    ).getBoundingClientRect().width;
 
     // Actually set the width asynchronously in order to reduce thrashing when multiple moles are present
     // and having _setupWidth called on all together.
     asap(() => {
-      this._element.style.width = naturalWidth+'px';
+      this._element.style.width = naturalWidth + 'px';
 
       // If this mole is the leftmost mole/compose element in the mole-container, give it some padding-left
       // so it can't go off the screen's edge. Inbox does the same for its composeviews.
       const parent = this._element.parentElement;
-      if (parent && Array.prototype.indexOf.call(parent.children, this._element) === parent.children.length-2) {
-        this._element.style.paddingLeft = naturalWidth+'px';
+      if (
+        parent &&
+        Array.prototype.indexOf.call(parent.children, this._element) ===
+          parent.children.length - 2
+      ) {
+        this._element.style.paddingLeft = naturalWidth + 'px';
       } else {
         this._element.style.paddingLeft = '';
       }
@@ -153,8 +171,12 @@ class InboxMoleViewDriver {
     this._element.classList.add('inboxsdk__mole_at_front');
 
     const container = this._element.parentElement;
-    if (!(container instanceof HTMLElement)) throw new Error('mole not in document');
-    const selfIndex = Array.prototype.indexOf.call(container.children, this._element);
+    if (!(container instanceof HTMLElement))
+      throw new Error('mole not in document');
+    const selfIndex = Array.prototype.indexOf.call(
+      container.children,
+      this._element
+    );
     if (selfIndex < 0) throw new Error('should not happen');
     const count = container.children.length;
 
@@ -172,7 +194,9 @@ class InboxMoleViewDriver {
       }
       const zIndexedChild = find(child.children, child => child.style.zIndex);
       if (!zIndexedChild) return;
-      zIndexedChild.style.zIndex = String(i > selfIndex ? count-(i-selfIndex) : count);
+      zIndexedChild.style.zIndex = String(
+        i > selfIndex ? count - (i - selfIndex) : count
+      );
     });
 
     // Wait until the next time either a compose is brought to the front or a
@@ -180,21 +204,37 @@ class InboxMoleViewDriver {
     // we need to put all the moles to the back. If a mole was brought to the
     // front, then do nothing because that mole's _bringToFront function will
     // handle the composes and the moles.
-    Kefir.merge([
-      // The user tried to focus the compose that Inbox still thinks is at the
-      // front.
-      !firstComposeParent ? null : fromEventTargetCapture(firstComposeParent, 'focus'),
+    Kefir.merge(
+      [
+        // The user tried to focus the compose that Inbox still thinks is at the
+        // front.
+        !firstComposeParent
+          ? null
+          : fromEventTargetCapture(firstComposeParent, 'focus'),
 
-      // A new compose was added.
-      makeMutationObserverChunkedStream(container, {childList: true})
-        .filter(mutations => mutations.some(mutation => mutation.addedNodes.length > 0))
-    ].concat(Array.prototype.map.call(container.children, el => {
-      const zIndexedChild = find(el.children, child => child.style.zIndex);
-      if (!zIndexedChild) return null;
-      const currentZindex = zIndexedChild.style.zIndex;
-      return makeMutationObserverChunkedStream(zIndexedChild, {attributes: true, attributeFilter: ['style']})
-        .filter(() => zIndexedChild.style.zIndex !== currentZindex);
-    })).filter(Boolean))
+        // A new compose was added.
+        makeMutationObserverChunkedStream(container, {
+          childList: true
+        }).filter(mutations =>
+          mutations.some(mutation => mutation.addedNodes.length > 0)
+        )
+      ]
+        .concat(
+          Array.prototype.map.call(container.children, el => {
+            const zIndexedChild = find(
+              el.children,
+              child => child.style.zIndex
+            );
+            if (!zIndexedChild) return null;
+            const currentZindex = zIndexedChild.style.zIndex;
+            return makeMutationObserverChunkedStream(zIndexedChild, {
+              attributes: true,
+              attributeFilter: ['style']
+            }).filter(() => zIndexedChild.style.zIndex !== currentZindex);
+          })
+        )
+        .filter(Boolean)
+    )
       .takeUntilBy(this._stopper)
       .take(1)
       .onValue(() => {
@@ -202,7 +242,10 @@ class InboxMoleViewDriver {
           this._element.classList.remove('inboxsdk__mole_at_front');
           Array.prototype.forEach.call(container.children, child => {
             if (isComposeParentElement(child)) return;
-            const zIndexedChild = find(child.children, child => child.style.zIndex);
+            const zIndexedChild = find(
+              child.children,
+              child => child.style.zIndex
+            );
             if (!zIndexedChild) return;
             zIndexedChild.style.zIndex = '1';
           });
@@ -217,11 +260,11 @@ class InboxMoleViewDriver {
     if (minimized) {
       this._element.classList.add('inboxsdk__minimized');
       this._render();
-      this._eventStream.emit({eventName:'minimize'});
+      this._eventStream.emit({ eventName: 'minimize' });
     } else {
       this._element.classList.remove('inboxsdk__minimized');
       this._render();
-      this._eventStream.emit({eventName:'restore'});
+      this._eventStream.emit({ eventName: 'restore' });
     }
   }
   getMinimized() {
@@ -239,21 +282,23 @@ class InboxMoleViewDriver {
 }
 
 function isComposeParentElement(el: Element): boolean {
-  return !el.classList.contains('inboxsdk__mole_view') && el.hasAttribute('jsaction');
+  return (
+    !el.classList.contains('inboxsdk__mole_view') && el.hasAttribute('jsaction')
+  );
 }
 
 export default defn(module, InboxMoleViewDriver);
 
 type MoleViewContentsProps = {
-  title: string;
-  titleEl?: ?HTMLElement;
-  minimizedTitleEl?: ?HTMLElement;
-  el: HTMLElement;
-  chrome?: ?boolean;
-  titleButtons?: ?Array<MoleButtonDescriptor>;
-  minimized: boolean;
-  onClose: ()=>void;
-  onSetMinimize: (minimized: boolean)=>void;
+  title: string,
+  titleEl?: ?HTMLElement,
+  minimizedTitleEl?: ?HTMLElement,
+  el: HTMLElement,
+  chrome?: ?boolean,
+  titleButtons?: ?Array<MoleButtonDescriptor>,
+  minimized: boolean,
+  onClose: () => void,
+  onSetMinimize: (minimized: boolean) => void
 };
 
 class MoleViewContents extends React.Component<MoleViewContentsProps> {
@@ -262,39 +307,48 @@ class MoleViewContents extends React.Component<MoleViewContentsProps> {
     if (this.props.chrome !== false) {
       let title;
       if (this.props.minimized && this.props.minimizedTitleEl) {
-        title = <ElementContainer
-          className="inboxsdk__mole_view_title"
-          el={this.props.minimizedTitleEl}
-        />;
+        title = (
+          <ElementContainer
+            className="inboxsdk__mole_view_title"
+            el={this.props.minimizedTitleEl}
+          />
+        );
       } else if (this.props.titleEl) {
-        title = <ElementContainer
-          className="inboxsdk__mole_view_title"
-          el={this.props.titleEl}
-        />;
+        title = (
+          <ElementContainer
+            className="inboxsdk__mole_view_title"
+            el={this.props.titleEl}
+          />
+        );
       } else {
         title = (
-          <div className="inboxsdk__mole_view_title">
-            {this.props.title}
-          </div>
+          <div className="inboxsdk__mole_view_title">{this.props.title}</div>
         );
       }
 
-      const titleButtons = (this.props.titleButtons || []).map((descriptor, i) => {
-        return (
-          <button
-            type="button"
-            key={i}
-            title={descriptor.title}
-            className="inboxsdk__mole_custom_title_button"
-            onClick={event => {
-              event.stopPropagation();
-              descriptor.onClick();
-            }}
-          >
-            <img className={descriptor.iconClass} src={descriptor.iconUrl} alt="" aria-hidden="true" />
-          </button>
-        );
-      });
+      const titleButtons = (this.props.titleButtons || []).map(
+        (descriptor, i) => {
+          return (
+            <button
+              type="button"
+              key={i}
+              title={descriptor.title}
+              className="inboxsdk__mole_custom_title_button"
+              onClick={event => {
+                event.stopPropagation();
+                descriptor.onClick();
+              }}
+            >
+              <img
+                className={descriptor.iconClass}
+                src={descriptor.iconUrl}
+                alt=""
+                aria-hidden="true"
+              />
+            </button>
+          );
+        }
+      );
 
       titlebar = (
         <div
@@ -309,19 +363,29 @@ class MoleViewContents extends React.Component<MoleViewContentsProps> {
           <div className="inboxsdk__mole_title_buttons">
             <button
               type="button"
-              style={{display: this.props.minimized ? "none" : ""}}
+              style={{ display: this.props.minimized ? 'none' : '' }}
               title="Minimize"
               onClick={() => this.props.onSetMinimize(true)}
             >
-              <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_minimize_white_18dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_minimize_white_18dp.png" />
+              <img
+                srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_minimize_white_18dp_2x.png 2x"
+                alt=""
+                aria-hidden="true"
+                src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_minimize_white_18dp.png"
+              />
             </button>
             <button
               type="button"
-              style={{display: this.props.minimized ? "" : "none"}}
+              style={{ display: this.props.minimized ? '' : 'none' }}
               title="Expand"
               onClick={() => this.props.onSetMinimize(false)}
             >
-              <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_maximize_white_18dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_maximize_white_18dp.png" />
+              <img
+                srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_maximize_white_18dp_2x.png 2x"
+                alt=""
+                aria-hidden="true"
+                src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_maximize_white_18dp.png"
+              />
             </button>
             {titleButtons}
             <button
@@ -329,7 +393,12 @@ class MoleViewContents extends React.Component<MoleViewContentsProps> {
               title="Close"
               onClick={() => this.props.onClose()}
             >
-              <img srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_close_white_12dp_2x.png 2x" alt="" aria-hidden="true" src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_close_white_12dp.png" />
+              <img
+                srcSet="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/btw_ic_close_white_12dp_2x.png 2x"
+                alt=""
+                aria-hidden="true"
+                src="//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/1x/btw_ic_close_white_12dp.png"
+              />
             </button>
           </div>
         </div>
@@ -340,7 +409,10 @@ class MoleViewContents extends React.Component<MoleViewContentsProps> {
       <div className="inboxsdk__mole_view_mid">
         <div className="inboxsdk__mole_view_inner">
           {titlebar}
-          <ElementContainer className="inboxsdk__mole_view_content" el={this.props.el} />
+          <ElementContainer
+            className="inboxsdk__mole_view_content"
+            el={this.props.el}
+          />
         </div>
       </div>
     );

@@ -1,6 +1,6 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
@@ -8,11 +8,14 @@ import kefirStopper from 'kefir-stopper';
 
 class InboxBackdrop {
   _preAutoCloseStream: Bus<Object> = kefirBus();
-  _stopper: Kefir.Observable<null>&{destroy():void} = kefirStopper();
+  _stopper: Kefir.Observable<null> & { destroy(): void } = kefirStopper();
   _el: HTMLElement;
 
-  constructor(zIndex: number = 500, target: HTMLElement = (document.body: any)) {
-    const el = this._el = document.createElement('div');
+  constructor(
+    zIndex: number = 500,
+    target: HTMLElement = (document.body: any)
+  ) {
+    const el = (this._el = document.createElement('div'));
     el.className = 'inboxsdk__inbox_backdrop';
     el.style.zIndex = String(zIndex);
 

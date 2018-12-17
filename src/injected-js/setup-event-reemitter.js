@@ -9,10 +9,14 @@ export default function setupEventReemitter() {
   // https://code.google.com/p/chromium/issues/detail?id=327853
   document.addEventListener('inboxsdk_event_relay', function(event: Object) {
     const newEvent = document.createEvent('Events');
-    (newEvent: any).initEvent(event.detail.type, event.detail.bubbles, event.detail.cancelable);
+    (newEvent: any).initEvent(
+      event.detail.type,
+      event.detail.bubbles,
+      event.detail.cancelable
+    );
     Object.assign(newEvent, event.detail.props);
     if (event.detail.dataTransfer) {
-      const {files, fileNames} = event.detail.dataTransfer;
+      const { files, fileNames } = event.detail.dataTransfer;
       if (fileNames) {
         fileNames.forEach((fileName, i) => {
           const file = files[i];
@@ -21,17 +25,24 @@ export default function setupEventReemitter() {
           }
         });
       }
-      (newEvent:any).dataTransfer = {
-        dropEffect: "none",
-        effectAllowed: "all",
+      (newEvent: any).dataTransfer = {
+        dropEffect: 'none',
+        effectAllowed: 'all',
         files,
-        items: files.map(({type}, i) => ({
-          kind: "file", type,
-          getAsFile() {return files[i];},
-          getAsString() {throw new Error('getAsString not supported');}
+        items: files.map(({ type }, i) => ({
+          kind: 'file',
+          type,
+          getAsFile() {
+            return files[i];
+          },
+          getAsString() {
+            throw new Error('getAsString not supported');
+          }
         })),
-        types: ["Files"],
-        getData() {return '';},
+        types: ['Files'],
+        getData() {
+          return '';
+        },
         setData() {},
         setDragImage() {}
       };

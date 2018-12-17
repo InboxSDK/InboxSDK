@@ -7,11 +7,11 @@ import kefirStopper from 'kefir-stopper';
 import type InboxComposeView from './views/inbox-compose-view';
 
 type Options = {
-  labelText?: ?string;
-  el?: ?HTMLElement;
+  labelText?: ?string,
+  el?: ?HTMLElement
 };
 
-const createRowElement = ({labelText, el}: Options): HTMLElement => {
+const createRowElement = ({ labelText, el }: Options): HTMLElement => {
   const row = document.createElement('div');
   const label = document.createElement('span');
   const content = document.createElement('div');
@@ -45,7 +45,7 @@ export default function addRecipientRow(
   recipientRowOptionStream
     .takeUntilBy(inboxComposeView.getStopper())
     .takeUntilBy(destroyStopper)
-    .onValue((options) => {
+    .onValue(options => {
       if (row) {
         row.remove();
         row = null;
@@ -57,7 +57,10 @@ export default function addRecipientRow(
       }
     });
 
-    destroyStopper.merge(inboxComposeView.getStopper()).take(1).onValue(() => {
+  destroyStopper
+    .merge(inboxComposeView.getStopper())
+    .take(1)
+    .onValue(() => {
       if (row) {
         row.remove();
         row = null;

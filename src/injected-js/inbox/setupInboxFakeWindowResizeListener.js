@@ -5,25 +5,25 @@ export default function setupInboxFakeWindowResizeListener() {
 }
 
 function fakeWindowResize() {
-  (Object:any).defineProperty(document.documentElement, 'clientWidth', {
+  (Object: any).defineProperty(document.documentElement, 'clientWidth', {
     configurable: true,
-    value: window.innerWidth-1
+    value: window.innerWidth - 1
   });
 
   {
-    const event = document.createEvent("HTMLEvents");
-    (event:any).initEvent("resize", true, false);
+    const event = document.createEvent('HTMLEvents');
+    (event: any).initEvent('resize', true, false);
     window.dispatchEvent(event);
   }
 
-  (Object:any).defineProperty(document.documentElement, 'clientWidth', {
+  (Object: any).defineProperty(document.documentElement, 'clientWidth', {
     configurable: true,
     get: () => window.innerWidth
   });
 
   {
-    const event = document.createEvent("HTMLEvents");
-    (event:any).initEvent("resize", true, false);
+    const event = document.createEvent('HTMLEvents');
+    (event: any).initEvent('resize', true, false);
     window.dispatchEvent(event);
   }
 }

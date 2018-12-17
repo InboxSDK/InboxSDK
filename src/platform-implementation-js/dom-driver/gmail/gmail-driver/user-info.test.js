@@ -4,10 +4,11 @@ import _ from 'lodash';
 
 import UserInfo from './user-info';
 
-(document.body: any).innerHTML = '<div role="banner"><div id="slot"></div></div>';
+(document.body: any).innerHTML =
+  '<div role="banner"><div id="slot"></div></div>';
 const slot = document.getElementById('slot');
 if (!slot) throw new Error();
-const driver = {getUserEmailAddress: _.constant('cowan@streak.com')};
+const driver = { getUserEmailAddress: _.constant('cowan@streak.com') };
 
 describe('old', () => {
   it('normal signed in, plus one normal and one delegated', async () => {
@@ -18,9 +19,9 @@ describe('old', () => {
     await userInfo.waitForAccountSwitcherReady();
     expect(userInfo.getUserName()).toBe('Chris Cowan');
     expect(userInfo.getAccountSwitcherContactList()).toEqual([
-      {name: 'Chris Cowan', emailAddress: 'cowan@streak.com'},
-      {name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com'},
-      {name: 'Nikola Tesla', emailAddress: 'tesla@streak.com'}
+      { name: 'Chris Cowan', emailAddress: 'cowan@streak.com' },
+      { name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com' },
+      { name: 'Nikola Tesla', emailAddress: 'tesla@streak.com' }
     ]);
   });
 
@@ -32,8 +33,8 @@ describe('old', () => {
     const userInfo = new UserInfo(driver);
     await userInfo.waitForAccountSwitcherReady();
     expect(userInfo.getAccountSwitcherContactList()).toEqual([
-      {name: 'Chris Cowan', emailAddress: 'cowan@streak.com'},
-      {name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com'}
+      { name: 'Chris Cowan', emailAddress: 'cowan@streak.com' },
+      { name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com' }
     ]);
   });
 });
@@ -47,9 +48,9 @@ describe('new', () => {
     await userInfo.waitForAccountSwitcherReady();
     expect(userInfo.getUserName()).toBe('Chris Cowan');
     expect(userInfo.getAccountSwitcherContactList()).toEqual([
-      {name: 'Chris Cowan', emailAddress: 'cowan@streak.com'},
-      {name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com'},
-      {name: 'Nikola Tesla', emailAddress: 'tesla@streak.com'}
+      { name: 'Chris Cowan', emailAddress: 'cowan@streak.com' },
+      { name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com' },
+      { name: 'Nikola Tesla', emailAddress: 'tesla@streak.com' }
     ]);
   });
 
@@ -61,8 +62,8 @@ describe('new', () => {
     const userInfo = new UserInfo(driver);
     await userInfo.waitForAccountSwitcherReady();
     expect(userInfo.getAccountSwitcherContactList()).toEqual([
-      {name: 'Chris Cowan', emailAddress: 'cowan@streak.com'},
-      {name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com'}
+      { name: 'Chris Cowan', emailAddress: 'cowan@streak.com' },
+      { name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com' }
     ]);
   });
 
@@ -74,7 +75,10 @@ describe('new', () => {
     const userInfo = new UserInfo(driver);
     await userInfo.waitForAccountSwitcherReady();
     expect(userInfo.getAccountSwitcherContactList()).toEqual([
-      {name: 'PeopleAggregate Test', emailAddress: 'peopleaggregatetest@gmail.com'}
+      {
+        name: 'PeopleAggregate Test',
+        emailAddress: 'peopleaggregatetest@gmail.com'
+      }
     ]);
   });
 });

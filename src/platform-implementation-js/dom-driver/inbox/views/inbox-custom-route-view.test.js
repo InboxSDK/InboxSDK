@@ -15,11 +15,11 @@ test('works', () => {
   expect(view.getType()).toBe('CUSTOM');
   expect(view.getRouteType()).toBe('CUSTOM');
   expect(view.getRouteID()).toBe('test/:id');
-  expect(view.getParams()).toEqual({id: '456'});
+  expect(view.getParams()).toEqual({ id: '456' });
 
   const el = view.getCustomViewElement();
   if (!el) throw new Error('should not happen');
-  ((document.body:any):HTMLElement).appendChild(el);
+  ((document.body: any): HTMLElement).appendChild(el);
 
   expect(Array.from(el.classList).sort()).toEqual(
     [idMap('custom_view_container'), idMap('custom_view_min_margins')].sort()

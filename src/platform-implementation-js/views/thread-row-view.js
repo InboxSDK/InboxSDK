@@ -11,9 +11,9 @@ const membersMap = new WeakMap();
 export default class ThreadRowView extends EventEmitter {
   destroyed: boolean;
 
-  constructor(threadRowViewDriver: GmailThreadRowView|InboxThreadRowView){
+  constructor(threadRowViewDriver: GmailThreadRowView | InboxThreadRowView) {
     super();
-    const members = {threadRowViewDriver};
+    const members = { threadRowViewDriver };
     membersMap.set(this, members);
 
     this.destroyed = false;
@@ -29,7 +29,7 @@ export default class ThreadRowView extends EventEmitter {
     get(membersMap, this).threadRowViewDriver.addLabel(labelDescriptor);
   }
 
-  addImage(imageDescriptor: Object){
+  addImage(imageDescriptor: Object) {
     get(membersMap, this).threadRowViewDriver.addImage(imageDescriptor);
   }
 
@@ -38,19 +38,27 @@ export default class ThreadRowView extends EventEmitter {
   }
 
   addActionButton(actionButtonDescriptor: Object) {
-    get(membersMap, this).threadRowViewDriver.addActionButton(actionButtonDescriptor);
+    get(membersMap, this).threadRowViewDriver.addActionButton(
+      actionButtonDescriptor
+    );
   }
 
   addAttachmentIcon(threadRowAttachmentIconDescriptor: Object) {
-    get(membersMap, this).threadRowViewDriver.addAttachmentIcon(threadRowAttachmentIconDescriptor);
+    get(membersMap, this).threadRowViewDriver.addAttachmentIcon(
+      threadRowAttachmentIconDescriptor
+    );
   }
 
   replaceDate(threadRowDateDescriptor: Object) {
-    get(membersMap, this).threadRowViewDriver.replaceDate(threadRowDateDescriptor);
+    get(membersMap, this).threadRowViewDriver.replaceDate(
+      threadRowDateDescriptor
+    );
   }
 
   replaceDraftLabel(draftLabelDescriptor: Object) {
-    get(membersMap, this).threadRowViewDriver.replaceDraftLabel(draftLabelDescriptor);
+    get(membersMap, this).threadRowViewDriver.replaceDraftLabel(
+      draftLabelDescriptor
+    );
   }
 
   getSubject(): string {
@@ -79,7 +87,7 @@ export default class ThreadRowView extends EventEmitter {
     }
   }
 
-  getThreadIDIfStableAsync(): Promise<null|string> {
+  getThreadIDIfStableAsync(): Promise<null | string> {
     if (this.getVisibleMessageCount() > 0) {
       return this.getThreadIDAsync();
     } else {

@@ -17,9 +17,8 @@ export default function parser(el: HTMLElement) {
   // for applications is that cardView.addButton() is a no-op on drive cards.
   const type = 'FILE';
 
-  const elements = {
-  };
-  const score = 1 - (ec.errorCount() / ec.runCount());
+  const elements = {};
+  const score = 1 - ec.errorCount() / ec.runCount();
   return {
     elements,
     attributes: {

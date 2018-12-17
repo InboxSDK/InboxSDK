@@ -14,7 +14,9 @@ function searchBarFinder(documentElement: HTMLHtmlElement) {
 }
 
 function searchAutocompleteResultsFinder(documentElement: HTMLHtmlElement) {
-  return Array.from(pageParserOptions.finders.searchAutocompleteResults.fn(documentElement));
+  return Array.from(
+    pageParserOptions.finders.searchAutocompleteResults.fn(documentElement)
+  );
 }
 
 import {
@@ -28,13 +30,17 @@ describe('Inbox Search Detection', () => {
   describe('Search Bar', () => {
     describe('finder', () => {
       it('2016-06-14', () => {
-        const searchBar = page20160614().querySelector('[data-test-id="searchbar"]');
+        const searchBar = page20160614().querySelector(
+          '[data-test-id="searchbar"]'
+        );
         const results = searchBarFinder(page20160614());
         expect(results).toEqual([searchBar]);
       });
 
       it('2016-06-14 with chat sidebar', () => {
-        const searchBar = pageWithSidebar20160614().querySelector('[data-test-id="searchbar"]');
+        const searchBar = pageWithSidebar20160614().querySelector(
+          '[data-test-id="searchbar"]'
+        );
         const results = searchBarFinder(pageWithSidebar20160614());
         expect(results).toEqual([searchBar]);
       });
@@ -42,7 +48,10 @@ describe('Inbox Search Detection', () => {
 
     describe('parser', () => {
       it('2017-03-03', () => {
-        const searchBar = querySelector(pageWithNav20170303(), '[data-test-id="searchInput"]');
+        const searchBar = querySelector(
+          pageWithNav20170303(),
+          '[data-test-id="searchInput"]'
+        );
         const results = parser(searchBar);
         expect(results.errors).toEqual([]);
         expect(results.score).toBe(1);
@@ -53,20 +62,33 @@ describe('Inbox Search Detection', () => {
   describe('Search Autocomplete', () => {
     describe('finder', () => {
       it('2017-03-06', () => {
-        const searchBar = pageWithAutocomplete20170306().querySelector('[data-test-id="searchAutocompleteResults"]');
-        const results = searchAutocompleteResultsFinder(pageWithAutocomplete20170306());
+        const searchBar = pageWithAutocomplete20170306().querySelector(
+          '[data-test-id="searchAutocompleteResults"]'
+        );
+        const results = searchAutocompleteResultsFinder(
+          pageWithAutocomplete20170306()
+        );
         expect(results).toEqual([searchBar]);
       });
     });
 
     describe('watcher', () => {
       it('2016-08-23 thread in bundle', () => {
-        const results = querySelector(pageWithAutocomplete20170306(), '[data-test-id=searchAutocompleteResults]');
+        const results = querySelector(
+          pageWithAutocomplete20170306(),
+          '[data-test-id=searchAutocompleteResults]'
+        );
 
         const root = pageWithAutocomplete20170306();
-        const liveSet = makePageParserTree(null, root).tree.getAllByTag('searchAutocompleteResults');
+        const liveSet = makePageParserTree(null, root).tree.getAllByTag(
+          'searchAutocompleteResults'
+        );
         expect(liveSet.values().size).toBe(1);
-        expect(lsMap(liveSet, x => x.getValue()).values().has(results)).toBe(true);
+        expect(
+          lsMap(liveSet, x => x.getValue())
+            .values()
+            .has(results)
+        ).toBe(true);
       });
     });
   });

@@ -8,25 +8,23 @@ import ComposeView from '../views/compose-view';
 import HandlerRegistry from '../lib/handler-registry';
 
 import type Membrane from '../lib/Membrane';
-import type {PiOpts} from '../platform-implementation';
-import type {Handler} from '../lib/handler-registry';
-import type {Driver} from '../driver-interfaces/driver';
+import type { PiOpts } from '../platform-implementation';
+import type { Handler } from '../lib/handler-registry';
+import type { Driver } from '../driver-interfaces/driver';
 
-const memberMap = ud.defonce(module, ()=>new WeakMap());
-
+const memberMap = ud.defonce(module, () => new WeakMap());
 
 const SAMPLE_RATE = 0.01;
 // documented in src/docs/
 class Compose {
-
   constructor(driver: Driver, membrane: Membrane) {
     const members = {
       driver,
       membrane,
       handlerRegistry: new HandlerRegistry(),
-      composeViewStream: driver.getComposeViewDriverStream().map(viewDriver =>
-        (membrane.get(viewDriver): ComposeView)
-      )
+      composeViewStream: driver
+        .getComposeViewDriverStream()
+        .map(viewDriver => (membrane.get(viewDriver): ComposeView))
     };
     memberMap.set(this, members);
 
@@ -35,16 +33,20 @@ class Compose {
     });
 
     members.composeViewStream.onValue(view => {
-      driver.getLogger().trackFunctionPerformance(() => {
-        members.handlerRegistry.addTarget(view);
-      }, SAMPLE_RATE, {
-        type: 'composeViewHandler',
-        isInlineReplyForm: view.isInlineReplyForm()
-      });
+      driver.getLogger().trackFunctionPerformance(
+        () => {
+          members.handlerRegistry.addTarget(view);
+        },
+        SAMPLE_RATE,
+        {
+          type: 'composeViewHandler',
+          isInlineReplyForm: view.isInlineReplyForm()
+        }
+      );
     });
   }
 
-  registerComposeViewHandler(handler: Handler<ComposeView>){
+  registerComposeViewHandler(handler: Handler<ComposeView>) {
     return get(memberMap, this).handlerRegistry.registerHandler(handler);
   }
 
@@ -60,7 +62,9 @@ class Compose {
       .merge(Kefir.later(3000, null))
       .take(1)
       .flatMap(function(view) {
-        return view ? Kefir.constant(view) : Kefir.constantError(new Error("draft did not open"));
+        return view
+          ? Kefir.constant(view)
+          : Kefir.constantError(new Error('draft did not open'));
       })
       .toPromise(RSVP.Promise);
     members.driver.openDraftByMessageID(messageID);
@@ -68,8 +72,13 @@ class Compose {
   }
 
   getComposeView(): Promise<ComposeView> {
-    const {driver} = get(memberMap, this);
-    driver.getLogger().deprecationWarning('Compose.getComposeView', 'Compose.openNewComposeView');
+    const { driver } = get(memberMap, this);
+    driver
+      .getLogger()
+      .deprecationWarning(
+        'Compose.getComposeView',
+        'Compose.openNewComposeView'
+      );
     if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
       throw new Error('This method was discontinued after API version 1');
     }

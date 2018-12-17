@@ -1,13 +1,13 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import once from 'lodash/once';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import type {Parsed} from '../detection/chatSidebar/parser';
+import type { Parsed } from '../detection/chatSidebar/parser';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 
-export type Mode = 'HIDDEN'|'DROPDOWN'|'SIDEBAR';
+export type Mode = 'HIDDEN' | 'DROPDOWN' | 'SIDEBAR';
 
 class InboxChatSidebarView {
   _el: HTMLElement;
@@ -41,9 +41,10 @@ class InboxChatSidebarView {
 
   getModeStream: () => Kefir.Observable<Mode> = once(() => {
     const parent: HTMLElement = (this._el.parentElement: any);
-    return makeMutationObserverChunkedStream(
-      parent, {attributes: true, attributeFilter: ['class']}
-    )
+    return makeMutationObserverChunkedStream(parent, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
       .toProperty(() => null)
       .map(() => this.getMode())
       .skipDuplicates()

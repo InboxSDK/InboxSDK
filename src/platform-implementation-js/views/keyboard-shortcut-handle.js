@@ -1,6 +1,6 @@
 /* @flow */
 
-import {defn} from 'ud';
+import { defn } from 'ud';
 import EventEmitter from '../lib/safe-event-emitter';
 
 // documented in src/docs/
@@ -14,7 +14,7 @@ class KeyboardShortcutHandle extends EventEmitter {
     this.description = description;
   }
 
-  remove(){
+  remove() {
     this.emit('destroy');
   }
 }

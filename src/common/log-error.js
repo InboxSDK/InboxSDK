@@ -5,25 +5,29 @@ import rateLimit from './rate-limit';
 import getStackTrace from './get-stack-trace';
 import getExtensionId from './get-extension-id';
 import getSessionId from './get-session-id';
-import {BUILD_VERSION} from './version';
+import { BUILD_VERSION } from './version';
 import isObject from 'lodash/isObject';
 
 export type LogErrorContext = {
-  appId?: ?string;
-  appIds?: ?any[];
-  sentByApp?: ?boolean;
-  loaderVersion?: ?string;
-  implVersion?: ?string;
-  userEmailHash?: ?string;
-  isUsingSyncAPI?: ?boolean;
-  isUsingMaterialGmailUI?: ?boolean;
+  appId?: ?string,
+  appIds?: ?(any[]),
+  sentByApp?: ?boolean,
+  loaderVersion?: ?string,
+  implVersion?: ?string,
+  userEmailHash?: ?string,
+  isUsingSyncAPI?: ?boolean,
+  isUsingMaterialGmailUI?: ?boolean
 };
 
 const sessionId = getSessionId();
 
 // code inside the platform-implementation should use logger.js instead of
 // interacting with this directly!
-export default function logError(err: Error, details: any, context: LogErrorContext) {
+export default function logError(
+  err: Error,
+  details: any,
+  context: LogErrorContext
+) {
   if (!global.document) {
     // In tests, just throw the error.
     throw err;
@@ -42,11 +46,21 @@ export default function logError(err: Error, details: any, context: LogErrorCont
     }
 
     if (!(err instanceof Error)) {
-      console.warn('First parameter to Logger.error was not an error object:', err); //eslint-disable-line no-console
-      err = new Error("Logger.error called with non-error: "+err);
+      console.warn(
+        'First parameter to Logger.error was not an error object:',
+        err
+      ); //eslint-disable-line no-console
+      err = new Error('Logger.error called with non-error: ' + err);
       markErrorAsSeen(err);
     }
-    var {appId, appIds, implVersion, isUsingSyncAPI, isUsingMaterialGmailUI, userEmailHash} = context;
+    var {
+      appId,
+      appIds,
+      implVersion,
+      isUsingSyncAPI,
+      isUsingMaterialGmailUI,
+      userEmailHash
+    } = context;
     const loaderVersion = context.loaderVersion || BUILD_VERSION;
     const sentByApp = !!context.sentByApp;
 
@@ -54,7 +68,7 @@ export default function logError(err: Error, details: any, context: LogErrorCont
     for (let name in err) {
       if (Object.prototype.hasOwnProperty.call(err, name)) {
         try {
-          const value = (err:any)[name];
+          const value = (err: any)[name];
           JSON.stringify(value);
           errorProperties[name] = value;
         } catch (err) {
@@ -63,34 +77,48 @@ export default function logError(err: Error, details: any, context: LogErrorCont
       }
     }
     if (Object.keys(errorProperties).length > 0) {
-      details = {errorProperties, details};
+      details = { errorProperties, details };
     }
 
     // Might not have been passed a useful error object with a stack, so get
     // our own current stack just in case.
     const nowStack = getStackTrace();
 
-    let stuffToLog: any[] = ["Error logged:", err];
+    let stuffToLog: any[] = ['Error logged:', err];
     if (err && err.stack) {
-      stuffToLog = stuffToLog.concat(["\n\nOriginal error stack:\n"+err.stack]);
+      stuffToLog = stuffToLog.concat([
+        '\n\nOriginal error stack:\n' + err.stack
+      ]);
     }
-    stuffToLog = stuffToLog.concat(["\n\nError logged from:\n"+nowStack]);
+    stuffToLog = stuffToLog.concat(['\n\nError logged from:\n' + nowStack]);
     if (details) {
-      stuffToLog = stuffToLog.concat(["\n\nError details:", details]);
+      stuffToLog = stuffToLog.concat(['\n\nError details:', details]);
     }
-    stuffToLog = stuffToLog.concat(["\n\nExtension App Ids:", JSON.stringify(appIds, null, 2)]);
-    stuffToLog = stuffToLog.concat(["\nSent by App:", sentByApp]);
-    stuffToLog = stuffToLog.concat(["\nSession Id:", sessionId]);
-    stuffToLog = stuffToLog.concat(["\nExtension Id:", getExtensionId()]);
-    stuffToLog = stuffToLog.concat(["\nInboxSDK Loader Version:", loaderVersion]);
-    stuffToLog = stuffToLog.concat(["\nInboxSDK Implementation Version:", implVersion]);
-    stuffToLog = stuffToLog.concat(["\nIs Using Sync API:", isUsingSyncAPI]);
-    stuffToLog = stuffToLog.concat(["\nIs Using Material Gmail UI:", isUsingMaterialGmailUI]);
+    stuffToLog = stuffToLog.concat([
+      '\n\nExtension App Ids:',
+      JSON.stringify(appIds, null, 2)
+    ]);
+    stuffToLog = stuffToLog.concat(['\nSent by App:', sentByApp]);
+    stuffToLog = stuffToLog.concat(['\nSession Id:', sessionId]);
+    stuffToLog = stuffToLog.concat(['\nExtension Id:', getExtensionId()]);
+    stuffToLog = stuffToLog.concat([
+      '\nInboxSDK Loader Version:',
+      loaderVersion
+    ]);
+    stuffToLog = stuffToLog.concat([
+      '\nInboxSDK Implementation Version:',
+      implVersion
+    ]);
+    stuffToLog = stuffToLog.concat(['\nIs Using Sync API:', isUsingSyncAPI]);
+    stuffToLog = stuffToLog.concat([
+      '\nIs Using Material Gmail UI:',
+      isUsingMaterialGmailUI
+    ]);
 
     console.error.apply(console, stuffToLog); //eslint-disable-line no-console
 
     const report = {
-      message: err && err.message || err,
+      message: (err && err.message) || err,
       stack: err && err.stack,
       loggedFrom: nowStack,
       details,
@@ -104,30 +132,39 @@ export default function logError(err: Error, details: any, context: LogErrorCont
       isUsingSyncAPI,
       isUsingMaterialGmailUI,
       origin: document.location.origin,
-      timestamp: Date.now()*1000
+      timestamp: Date.now() * 1000
     };
 
     sendError(report);
 
-    if (((document.documentElement:any):HTMLElement).getAttribute('inboxsdk-emit-error-event') === 'true') {
-      ((document.documentElement:any):HTMLElement).dispatchEvent(new CustomEvent('inboxSDKerror', {
-        bubbles: false,
-        cancelable: false,
-        detail: {
-          message: err && err.message || err,
-          stack: err && err.stack,
-          loggedFrom: nowStack,
-          details,
-          sentByApp
-        }
-      }));
+    if (
+      ((document.documentElement: any): HTMLElement).getAttribute(
+        'inboxsdk-emit-error-event'
+      ) === 'true'
+    ) {
+      ((document.documentElement: any): HTMLElement).dispatchEvent(
+        new CustomEvent('inboxSDKerror', {
+          bubbles: false,
+          cancelable: false,
+          detail: {
+            message: (err && err.message) || err,
+            stack: err && err.stack,
+            loggedFrom: nowStack,
+            details,
+            sentByApp
+          }
+        })
+      );
     }
-  } catch(err2) {
+  } catch (err2) {
     tooManyErrors(err2, args);
   }
 }
 
-const _extensionSeenErrors: {has(e: Error): boolean, add(e: Error): void} = (() => {
+const _extensionSeenErrors: {
+  has(e: Error): boolean,
+  add(e: Error): void
+} = (() => {
   // Safari <9 doesn't have WeakSet and we don't want to pull in the polyfill,
   // so we make one out of a WeakMap.
   if (!global.__inboxsdk_extensionSeenErrors && global.WeakMap) {
@@ -142,17 +179,23 @@ const _extensionSeenErrors: {has(e: Error): boolean, add(e: Error): void} = (() 
       } else {
         try {
           return !!(e: any).__inboxsdk_extensionHasSeenError;
-        } catch(err) {
+        } catch (err) {
           console.error(err); //eslint-disable-line no-console
           return false;
         }
       }
     },
     add(e: Error) {
-      if (global.__inboxsdk_extensionSeenErrors && global.__inboxsdk_extensionSeenErrors.set) {
+      if (
+        global.__inboxsdk_extensionSeenErrors &&
+        global.__inboxsdk_extensionSeenErrors.set
+      ) {
         // It's a WeakMap.
         global.__inboxsdk_extensionSeenErrors.set(e, true);
-      } else if (global.__inboxsdk_extensionSeenErrors && global.__inboxsdk_extensionSeenErrors.add) {
+      } else if (
+        global.__inboxsdk_extensionSeenErrors &&
+        global.__inboxsdk_extensionSeenErrors.add
+      ) {
         // Older versions of inboxsdk.js initialized it as a WeakSet instead,
         // so handle that too.
         global.__inboxsdk_extensionSeenErrors.add(e);
@@ -161,7 +204,7 @@ const _extensionSeenErrors: {has(e: Error): boolean, add(e: Error): void} = (() 
           Object.defineProperty((e: any), '__inboxsdk_extensionHasSeenError', {
             value: true
           });
-        } catch(err) {
+        } catch (err) {
           console.error(err); //eslint-disable-line no-console
         }
       }
@@ -183,26 +226,30 @@ function markErrorAsSeen(error: Error) {
 }
 
 // Only let 10 errors be sent per minute.
-const sendError = rateLimit(function(report: Object) {
-  const args = arguments;
+const sendError = rateLimit(
+  function(report: Object) {
+    const args = arguments;
 
-  try {
-    ajax({
-      url: 'https://www.inboxsdk.com/api/v2/errors',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      data: JSON.stringify(report)
-    }).catch(err2 => {
+    try {
+      ajax({
+        url: 'https://www.inboxsdk.com/api/v2/errors',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: JSON.stringify(report)
+      }).catch(err2 => {
+        tooManyErrors(err2, args);
+      });
+    } catch (err2) {
       tooManyErrors(err2, args);
-    });
-  } catch(err2) {
-    tooManyErrors(err2, args);
-  }
-}, 60*1000, 10);
+    }
+  },
+  60 * 1000,
+  10
+);
 
 function tooManyErrors(err2: Error, originalArgs: any) {
-  console.error("ERROR REPORTING ERROR", err2); //eslint-disable-line no-console
-  console.error("ORIGINAL ERROR", originalArgs); //eslint-disable-line no-console
+  console.error('ERROR REPORTING ERROR', err2); //eslint-disable-line no-console
+  console.error('ORIGINAL ERROR', originalArgs); //eslint-disable-line no-console
 }

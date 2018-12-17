@@ -29,10 +29,13 @@ export default function parser(el: HTMLElement) {
   });
 
   const chatSidebarButton = ec.run('chatSidebarButton', () =>
-    querySelectorOne(el, 'div[role=button][jsaction*="global.toggle_chat_roster"]')
+    querySelectorOne(
+      el,
+      'div[role=button][jsaction*="global.toggle_chat_roster"]'
+    )
   );
 
-  const score = 1 - (ec.errorCount() / ec.runCount());
+  const score = 1 - ec.errorCount() / ec.runCount();
   return {
     elements: {
       chatSidebarButton

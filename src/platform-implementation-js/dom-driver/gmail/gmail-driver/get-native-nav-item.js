@@ -7,29 +7,40 @@ import waitFor from '../../../lib/wait-for';
 
 import type GmailDriver from '../gmail-driver';
 
-export default function getNativeNavItem(driver: GmailDriver, label: string): Promise<NativeGmailNavItemView> {
-	return waitFor(() => {
-		const navContainer = GmailElementGetter.getLeftNavContainerElement();
-		if (!navContainer) return null;
-		return navContainer.querySelector(`.aim a[href*="#${label}"]`);
-	}, 300*1000).then(labelLinkElement => {
-		const labelElement = findParent(labelLinkElement, el => el.classList.contains('aim'));
+export default function getNativeNavItem(
+  driver: GmailDriver,
+  label: string
+): Promise<NativeGmailNavItemView> {
+  return waitFor(() => {
+    const navContainer = GmailElementGetter.getLeftNavContainerElement();
+    if (!navContainer) return null;
+    return navContainer.querySelector(`.aim a[href*="#${label}"]`);
+  }, 300 * 1000)
+    .then(labelLinkElement => {
+      const labelElement = findParent(labelLinkElement, el =>
+        el.classList.contains('aim')
+      );
 
-		if(!labelElement){
-			throw new Error('native nav item structured weird');
-		}
+      if (!labelElement) {
+        throw new Error('native nav item structured weird');
+      }
 
-		if(!(labelElement:any).__nativeGmailNavItemView){
-			(labelElement:any).__nativeGmailNavItemView = new NativeGmailNavItemView(driver, labelElement, label);
-		}
+      if (!(labelElement: any).__nativeGmailNavItemView) {
+        (labelElement: any).__nativeGmailNavItemView = new NativeGmailNavItemView(
+          driver,
+          labelElement,
+          label
+        );
+      }
 
-		return (labelElement:any).__nativeGmailNavItemView;
-	}).catch(err => {
-		if(GmailElementGetter.isStandalone()){
-			// never resolve
-			return new Promise((resolve, reject) => {});
-		}
+      return (labelElement: any).__nativeGmailNavItemView;
+    })
+    .catch(err => {
+      if (GmailElementGetter.isStandalone()) {
+        // never resolve
+        return new Promise((resolve, reject) => {});
+      }
 
-		throw err;
-	});
+      throw err;
+    });
 }

@@ -3,8 +3,8 @@
 import React from 'react';
 
 type Props = {
-  className?: ?string;
-  el: HTMLElement;
+  className?: ?string,
+  el: HTMLElement
 };
 export default class ElementContainer extends React.Component<Props> {
   props: Props;
@@ -24,14 +24,12 @@ export default class ElementContainer extends React.Component<Props> {
     }
   }
   shouldComponentUpdate(nextProps: Props) {
-    return this.props.className !== nextProps.className || this.props.el !== nextProps.el;
+    return (
+      this.props.className !== nextProps.className ||
+      this.props.el !== nextProps.el
+    );
   }
   render() {
-    return (
-      <div
-        className={this.props.className}
-        ref={this._contentRefCb}
-      />
-    );
+    return <div className={this.props.className} ref={this._contentRefCb} />;
   }
 }

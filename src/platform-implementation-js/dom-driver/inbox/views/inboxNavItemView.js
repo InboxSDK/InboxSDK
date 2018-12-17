@@ -13,12 +13,11 @@ import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 
 import updateIcon from '../../../driver-common/update-icon';
 
-import type {Bus} from 'kefir-bus';
+import type { Bus } from 'kefir-bus';
 
-type Destroyable = {destroy: () => void};
+type Destroyable = { destroy: () => void };
 
 export default class InboxNavItemView {
-
   _eventStream: Bus<any> = kefirBus();
   _level: number;
   _stopper: Kefir.Observable<null>;
@@ -34,13 +33,13 @@ export default class InboxNavItemView {
   _accessory: ?Object = null;
   _accessoryView: ?Destroyable = null;
   _elements: {
-    wrapper: HTMLElement;
-    expander: HTMLElement;
-    navItem: HTMLElement;
-    name: HTMLElement;
-    subNav: HTMLElement;
-    subNavInner: HTMLElement;
-    accessory: HTMLElement;
+    wrapper: HTMLElement,
+    expander: HTMLElement,
+    navItem: HTMLElement,
+    name: HTMLElement,
+    subNav: HTMLElement,
+    subNavInner: HTMLElement,
+    accessory: HTMLElement
   };
 
   constructor(navItemDescriptor: Kefir.Observable<Object>, level: number) {
@@ -59,26 +58,42 @@ export default class InboxNavItemView {
       console.warn('Adding NavItems more than 3 levels deep is not supported'); //eslint-disable-line no-console
     }
 
-    this._stopper = this._eventStream.ignoreValues().beforeEnd(()=>null).toProperty();
+    this._stopper = this._eventStream
+      .ignoreValues()
+      .beforeEnd(() => null)
+      .toProperty();
 
     this._setupElements();
 
-    navItemDescriptor.takeUntilBy(this._stopper).onValue((descriptor) => {
+    navItemDescriptor.takeUntilBy(this._stopper).onValue(descriptor => {
       this._update(descriptor);
       this._navItemDescriptor = descriptor;
     });
   }
 
-  addNavItem(orderGroup: number | string, navItemDescriptor: Kefir.Observable<Object>): InboxNavItemView {
-    const childNavItemView = new InboxNavItemView(navItemDescriptor, this._level + 1);
+  addNavItem(
+    orderGroup: number | string,
+    navItemDescriptor: Kefir.Observable<Object>
+  ): InboxNavItemView {
+    const childNavItemView = new InboxNavItemView(
+      navItemDescriptor,
+      this._level + 1
+    );
 
-    childNavItemView.getEventStream()
+    childNavItemView
+      .getEventStream()
       .filter(eventNameFilter('orderChanged'))
-      .onValue(() => (
-        insertElementInOrder(this._elements.subNavInner, childNavItemView.getElement())
-      ));
+      .onValue(() =>
+        insertElementInOrder(
+          this._elements.subNavInner,
+          childNavItemView.getElement()
+        )
+      );
 
-    insertElementInOrder(this._elements.subNavInner, childNavItemView.getElement());
+    insertElementInOrder(
+      this._elements.subNavInner,
+      childNavItemView.getElement()
+    );
 
     this._children += 1;
 
@@ -146,7 +161,9 @@ export default class InboxNavItemView {
       accessory
     } = this._elements;
 
-    wrapper.className = `inboxsdk__navItem_wrapper inboxsdk__navItem_level${this._level}`;
+    wrapper.className = `inboxsdk__navItem_wrapper inboxsdk__navItem_level${
+      this._level
+    }`;
     wrapper.setAttribute('tabindex', '-1');
     wrapper.setAttribute('data-order-hint', String(this._orderHint));
     navItem.setAttribute('role', 'menuitem');
@@ -159,7 +176,8 @@ export default class InboxNavItemView {
     subNavInner.classList.add('inboxsdk__navItem_subNavInner');
 
     // Arrow SVG
-    expander.innerHTML = '<svg><polygon points="16.59 8.59 12 13.17 7.41 8.59 6 10 12 16 18 10"></polygon></svg>';
+    expander.innerHTML =
+      '<svg><polygon points="16.59 8.59 12 13.17 7.41 8.59 6 10 12 16 18 10"></polygon></svg>';
 
     navItem.appendChild(expander);
     navItem.appendChild(name);
@@ -175,7 +193,7 @@ export default class InboxNavItemView {
         .map((domEvent: MouseEvent) => {
           domEvent.stopPropagation();
           domEvent.preventDefault();
-          return {eventName: 'click', domEvent};
+          return { eventName: 'click', domEvent };
         })
     );
 
@@ -189,7 +207,7 @@ export default class InboxNavItemView {
   }
 
   _collapse() {
-    const {subNav, subNavInner} = this._elements;
+    const { subNav, subNavInner } = this._elements;
 
     this._transitionResetter.emit(null);
     this._elements.wrapper.classList.add('inboxsdk__navItem_collapsed');
@@ -211,7 +229,7 @@ export default class InboxNavItemView {
   }
 
   _expand() {
-    const {subNav, subNavInner} = this._elements;
+    const { subNav, subNavInner } = this._elements;
 
     this._transitionResetter.emit(null);
     this._elements.wrapper.classList.remove('inboxsdk__navItem_collapsed');
@@ -239,8 +257,9 @@ export default class InboxNavItemView {
     this._updateIcon(descriptor);
     this._updateAccessory(descriptor.accessory);
     this._updateOrder(
-      descriptor.orderHint ||
-      descriptor.orderHint === 0 ? descriptor.orderHint : Number.MAX_SAFE_INTEGER
+      descriptor.orderHint || descriptor.orderHint === 0
+        ? descriptor.orderHint
+        : Number.MAX_SAFE_INTEGER
     );
   }
 
@@ -264,7 +283,7 @@ export default class InboxNavItemView {
     this._type = type;
   }
 
-  _updateExpander({backgroundColor, expanderForegroundColor}: Object) {
+  _updateExpander({ backgroundColor, expanderForegroundColor }: Object) {
     this._elements.expander.style.backgroundColor = backgroundColor || '';
 
     const arrow = querySelector(this._elements.expander, 'polygon');
@@ -279,7 +298,8 @@ export default class InboxNavItemView {
   _updateIcon(descriptor: Object) {
     this._elements.navItem.classList.toggle(
       'inboxsdk__navItem_hasIcon',
-      (!this._disabled || this._level > 0) && Boolean(descriptor.iconUrl || descriptor.iconClass)
+      (!this._disabled || this._level > 0) &&
+        Boolean(descriptor.iconUrl || descriptor.iconClass)
     );
 
     updateIcon(
@@ -308,10 +328,9 @@ export default class InboxNavItemView {
   }
 
   _updateDisabledState(descriptor: Object) {
-    this._disabled = (
+    this._disabled =
       !(descriptor.routeID || descriptor.onClick) ||
-      (this._level === 0 && this._children > 0)
-    );
+      (this._level === 0 && this._children > 0);
     this._elements.wrapper.classList.toggle(
       'inboxsdk__navItem_disabled',
       this._disabled
@@ -323,7 +342,7 @@ export default class InboxNavItemView {
 
     this._elements.wrapper.setAttribute('data-order-hint', String(orderHint));
     this._orderHint = orderHint;
-    this._eventStream.emit({eventName: 'orderChanged'});
+    this._eventStream.emit({ eventName: 'orderChanged' });
   }
 
   _updateChildrenClass() {
@@ -347,22 +366,30 @@ export default class InboxNavItemView {
   }
 
   _createCreateAccessory(accessory: Object): Destroyable {
-    const {onClick} = accessory;
+    const { onClick } = accessory;
     return this._createIconButtonAccessory({
       onClick,
-      iconUrl: '//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/ic_add-cluster_24px_g60_r3_2x.png'
+      iconUrl:
+        '//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/ic_add-cluster_24px_g60_r3_2x.png'
     });
   }
 
   _createDropdownButtonAccessory(accessory: Object): Destroyable {
-    const {onClick} = accessory;
-    return this._createIconButtonAccessory({
-      onClick,
-      iconUrl: '//www.gstatic.com/images/icons/material/system/2x/settings_black_18dp.png'
-    }, true);
+    const { onClick } = accessory;
+    return this._createIconButtonAccessory(
+      {
+        onClick,
+        iconUrl:
+          '//www.gstatic.com/images/icons/material/system/2x/settings_black_18dp.png'
+      },
+      true
+    );
   }
 
-  _createIconButtonAccessory(accessory: Object, hasDropdown: boolean = false): Destroyable {
+  _createIconButtonAccessory(
+    accessory: Object,
+    hasDropdown: boolean = false
+  ): Destroyable {
     if (!accessory.onClick) throw new Error('An onClick handler is required');
 
     this._elements.wrapper.classList.add('inboxsdk__navItem_hasAccessory');
@@ -375,7 +402,10 @@ export default class InboxNavItemView {
       accessory.iconUrl
     );
 
-    const iconEl = querySelector(this._elements.accessory, '.inboxsdk__button_icon');
+    const iconEl = querySelector(
+      this._elements.accessory,
+      '.inboxsdk__button_icon'
+    );
     iconEl.setAttribute('tabindex', '-1');
 
     const destroyStopper = kefirStopper();
@@ -410,14 +440,16 @@ export default class InboxNavItemView {
             });
           }
         }
-        accessory.onClick({dropdown});
+        accessory.onClick({ dropdown });
       });
 
-    Kefir.merge([this._stopper, destroyStopper]).take(1).onValue(() => {
-      if (dropdown) {
-        dropdown.close();
-      }
-    });
+    Kefir.merge([this._stopper, destroyStopper])
+      .take(1)
+      .onValue(() => {
+        if (dropdown) {
+          dropdown.close();
+        }
+      });
 
     const destroy = () => {
       this._elements.wrapper.classList.remove('inboxsdk__navItem_hasAccessory');
@@ -425,6 +457,6 @@ export default class InboxNavItemView {
       destroyStopper.destroy();
     };
 
-    return {destroy};
+    return { destroy };
   }
 }

@@ -4,7 +4,7 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import type {Stopper} from 'kefir-stopper';
+import type { Stopper } from 'kefir-stopper';
 import updateIcon from '../../../driver-common/update-icon';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailTooltipView from '../widgets/gmail-tooltip-view';
@@ -26,17 +26,15 @@ export default class GmailAppToolbarButtonView {
     this._driver = driver;
     this._stopper = kefirStopper();
     this._iconSettings = {};
-    inButtonDescriptor
-      .takeUntilBy(this._stopper)
-      .onValue((buttonDescriptor) => {
-        try {
-          this._handleButtonDescriptor(buttonDescriptor);
-        } catch(err) {
-          this._driver.getLogger().error(err);
-        }
-      });
+    inButtonDescriptor.takeUntilBy(this._stopper).onValue(buttonDescriptor => {
+      try {
+        this._handleButtonDescriptor(buttonDescriptor);
+      } catch (err) {
+        this._driver.getLogger().error(err);
+      }
+    });
 
-    if(driver.isUsingMaterialUI()) monitorTopBannerSizeAndReact();
+    if (driver.isUsingMaterialUI()) monitorTopBannerSizeAndReact();
   }
 
   destroy() {
@@ -49,36 +47,52 @@ export default class GmailAppToolbarButtonView {
     }
   }
 
-  getStopper(): Kefir.Observable<null> {return this._stopper;}
-  getElement(): ?HTMLElement {return this._element;}
+  getStopper(): Kefir.Observable<null> {
+    return this._stopper;
+  }
+  getElement(): ?HTMLElement {
+    return this._element;
+  }
 
   open() {
     try {
-      if(!this._activeDropdown){
+      if (!this._activeDropdown) {
         this._handleClick();
       }
-    } catch(err) {
+    } catch (err) {
       this._driver.getLogger().error(err);
     }
   }
 
   close() {
     try {
-      if(this._activeDropdown){
+      if (this._activeDropdown) {
         this._handleClick();
       }
-    } catch(err) {
+    } catch (err) {
       this._driver.getLogger().error(err);
     }
   }
 
   _handleButtonDescriptor(buttonDescriptor: Object) {
-    if(!buttonDescriptor){
-      throw new Error('The application passed an invalid value for buttonDescriptor');
+    if (!buttonDescriptor) {
+      throw new Error(
+        'The application passed an invalid value for buttonDescriptor'
+      );
     }
-    const element = this._element = this._element || _createAppButtonElement(this._driver, () => {this._handleClick();});
+    const element = (this._element =
+      this._element ||
+      _createAppButtonElement(this._driver, () => {
+        this._handleClick();
+      }));
     this._buttonDescriptor = buttonDescriptor;
-    updateIcon(this._iconSettings, querySelector(element, 'a'), false, buttonDescriptor.iconClass, buttonDescriptor.iconUrl);
+    updateIcon(
+      this._iconSettings,
+      querySelector(element, 'a'),
+      false,
+      buttonDescriptor.iconClass,
+      buttonDescriptor.iconUrl
+    );
     _updateTitle(querySelector(element, 'span'), buttonDescriptor);
   }
 
@@ -91,7 +105,9 @@ export default class GmailAppToolbarButtonView {
     }
     const buttonDescriptor = this._buttonDescriptor;
     if (!buttonDescriptor) {
-      throw new Error("app toolbar button clicked before receiving button descriptor");
+      throw new Error(
+        'app toolbar button clicked before receiving button descriptor'
+      );
     }
 
     if (this._activeDropdown) {
@@ -99,33 +115,45 @@ export default class GmailAppToolbarButtonView {
     } else {
       var appEvent = {};
       var tooltipView = new GmailTooltipView();
-      tooltipView.getContainerElement().classList.add('inboxsdk__appButton_tooltip');
+      tooltipView
+        .getContainerElement()
+        .classList.add('inboxsdk__appButton_tooltip');
       tooltipView.getContentElement().innerHTML = '';
 
-      if(buttonDescriptor.arrowColor){
-        querySelector(tooltipView.getContainerElement(), '.T-P-atC').style.borderTopColor = buttonDescriptor.arrowColor;
+      if (buttonDescriptor.arrowColor) {
+        querySelector(
+          tooltipView.getContainerElement(),
+          '.T-P-atC'
+        ).style.borderTopColor = buttonDescriptor.arrowColor;
       }
 
-      appEvent.dropdown = this._activeDropdown = new DropdownView(tooltipView, element, {manualPosition: true});
+      appEvent.dropdown = this._activeDropdown = new DropdownView(
+        tooltipView,
+        element,
+        { manualPosition: true }
+      );
       appEvent.dropdown.on('destroy', () => {
         this._activeDropdown = null;
       });
 
-      if(buttonDescriptor.onClick){
+      if (buttonDescriptor.onClick) {
         buttonDescriptor.onClick.call(null, appEvent);
       }
 
-      if(this._element){
-        tooltipView.anchor(
-          this._element,
-          {position: 'bottom', offset: {top: 8}}
-        );
+      if (this._element) {
+        tooltipView.anchor(this._element, {
+          position: 'bottom',
+          offset: { top: 8 }
+        });
       }
     }
   }
 }
 
-function _createAppButtonElement(driver: Driver, onclick: (event: Object) => void): HTMLElement {
+function _createAppButtonElement(
+  driver: Driver,
+  onclick: (event: Object) => void
+): HTMLElement {
   const element = document.createElement('div');
   element.setAttribute('class', 'inboxsdk__appButton');
 
@@ -139,8 +167,8 @@ function _createAppButtonElement(driver: Driver, onclick: (event: Object) => voi
   });
 
   const topAccountContainer = GmailElementGetter.getTopAccountContainer();
-  if(!topAccountContainer){
-    const err = new Error("Could not make button");
+  if (!topAccountContainer) {
+    const err = new Error('Could not make button');
     const banner = document.querySelector('[role=banner]');
     driver.getLogger().error(err, {
       type: 'failed to make appToolbarButton',
@@ -150,9 +178,11 @@ function _createAppButtonElement(driver: Driver, onclick: (event: Object) => voi
     throw err;
   }
 
-  const insertionElement: ?HTMLElement = driver.isUsingMaterialUI() ? topAccountContainer : (topAccountContainer.children[0]: any);
-  if(!insertionElement){
-    const err = new Error("Could not make button");
+  const insertionElement: ?HTMLElement = driver.isUsingMaterialUI()
+    ? topAccountContainer
+    : (topAccountContainer.children[0]: any);
+  if (!insertionElement) {
+    const err = new Error('Could not make button');
     driver.getLogger().error(err, {
       type: 'failed to make appToolbarButton',
       topAccountContainerHTML: censorHTMLtree(topAccountContainer)
@@ -161,13 +191,13 @@ function _createAppButtonElement(driver: Driver, onclick: (event: Object) => voi
   }
 
   try {
-    if(!GmailElementGetter.isGplusEnabled()){
+    if (!GmailElementGetter.isGplusEnabled()) {
       element.classList.add('inboxsdk__appButton_noGPlus');
     }
 
     insertionElement.insertBefore(element, insertionElement.firstElementChild);
     return element;
-  } catch(err) {
+  } catch (err) {
     driver.getLogger().error(err, {
       type: 'failed to make appToolbarButton',
       insertionElementHTML: censorHTMLtree(insertionElement)
@@ -178,5 +208,6 @@ function _createAppButtonElement(driver: Driver, onclick: (event: Object) => voi
 
 function _updateTitle(element: HTMLElement, descriptor: Object) {
   element.textContent = descriptor.title;
-  element.className = `inboxsdk__appButton_title ${descriptor.titleClass||''}`;
+  element.className = `inboxsdk__appButton_title ${descriptor.titleClass ||
+    ''}`;
 }

@@ -5,11 +5,13 @@ import rewriteCssWithIdMap from './rewriteCssWithIdMap';
 import idMap from './idMap';
 
 test('rewrites single classname', () => {
-  expect(rewriteCssWithIdMap(`
+  expect(
+    rewriteCssWithIdMap(`
     .IDMAP_foo {
       color: red;
     }
-  `)).toBe(`
+  `)
+  ).toBe(`
     .${idMap('foo')} {
       color: red;
     }
@@ -17,7 +19,8 @@ test('rewrites single classname', () => {
 });
 
 test('only rewrites IDMAP_ classnames', () => {
-  expect(rewriteCssWithIdMap(`
+  expect(
+    rewriteCssWithIdMap(`
     .blaaah {
       color: blue;
     }
@@ -25,7 +28,8 @@ test('only rewrites IDMAP_ classnames', () => {
       color: red;
     }
     .xyz .IDMAP_foo::after {}
-  `)).toBe(`
+  `)
+  ).toBe(`
     .blaaah {
       color: blue;
     }

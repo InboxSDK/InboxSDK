@@ -11,7 +11,7 @@ it('should work with one stream', done => {
   const b1 = kefirBus();
   const ender = new StopperPool(b1);
   ender.stream.onAny(event => {
-    switch(++i) {
+    switch (++i) {
       case 1:
         expect(event.type).toBe('value');
         expect(event.value).toBe(null);
@@ -22,7 +22,7 @@ it('should work with one stream', done => {
         done();
         break;
       default:
-        throw new Error("Should not happen");
+        throw new Error('Should not happen');
     }
   });
 
@@ -37,7 +37,7 @@ it('should work with two streams', done => {
   const b1 = kefirBus();
   const ender = new StopperPool(b1);
   ender.stream.onAny(event => {
-    switch(++i) {
+    switch (++i) {
       case 1:
         expect(event.type).toBe('value');
         expect(event.value).toBe(null);
@@ -48,7 +48,7 @@ it('should work with two streams', done => {
         done();
         break;
       default:
-        throw new Error("Should not happen");
+        throw new Error('Should not happen');
     }
   });
 
@@ -77,24 +77,29 @@ it('throws error if you try to add a stream after end', () => {
 it('stops listening to streams after first event', done => {
   const ender = new StopperPool(kefirBus());
   ender.stream.onAny(() => {
-    throw new Error("Should not happen");
+    throw new Error('Should not happen');
   });
-  ender.add(Kefir.stream(emitter => {
-    emitter.emit(1);
-    return done;
-  }));
+  ender.add(
+    Kefir.stream(emitter => {
+      emitter.emit(1);
+      return done;
+    })
+  );
 });
 
 it('supports arrays of streams', done => {
   let hasReachedEnd = false;
   const b1 = kefirBus();
   const b2 = kefirBus();
-  const ender = new StopperPool([Kefir.constant(null), b1.beforeEnd(()=>null)]);
+  const ender = new StopperPool([
+    Kefir.constant(null),
+    b1.beforeEnd(() => null)
+  ]);
   ender.stream.onValue(() => {
     expect(hasReachedEnd).toBe(true);
     done();
   });
-  ender.add([b2.beforeEnd(()=>null), Kefir.constant(null)]);
+  ender.add([b2.beforeEnd(() => null), Kefir.constant(null)]);
   b1.end();
   hasReachedEnd = true;
   b2.end();
@@ -104,13 +109,13 @@ it('getSize method works', () => {
   let hasEnded = false;
   const b1 = kefirBus();
   const b2 = kefirBus();
-  const ender = new StopperPool(b1.beforeEnd(()=>null));
+  const ender = new StopperPool(b1.beforeEnd(() => null));
   ender.stream.onValue(() => {
     expect(ender.getSize()).toBe(0);
     hasEnded = true;
   });
   expect(ender.getSize()).toBe(1);
-  ender.add(b2.beforeEnd(()=>null));
+  ender.add(b2.beforeEnd(() => null));
   expect(ender.getSize()).toBe(2);
   b2.end();
   expect(ender.getSize()).toBe(1);

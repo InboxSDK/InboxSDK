@@ -5,9 +5,9 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 
-import type {RouteViewDriver} from '../../../driver-interfaces/route-view-driver';
+import type { RouteViewDriver } from '../../../driver-interfaces/route-view-driver';
 
-import {NATIVE_ROUTE_IDS} from '../../../constants/router';
+import { NATIVE_ROUTE_IDS } from '../../../constants/router';
 
 function getRouteID(path) {
   if (path === '') {
@@ -62,7 +62,7 @@ export default class InboxRouteView {
     return this._stopper;
   }
 
-  destroy(){
+  destroy() {
     this._eventStream.end();
     this._stopper.destroy();
   }
@@ -103,11 +103,17 @@ export default class InboxRouteView {
     throw new Error('should not happen');
   }
 
-  addCollapsibleSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any) {
+  addCollapsibleSection(
+    sectionDescriptorProperty: Kefir.Observable<?Object>,
+    groupOrderHint: any
+  ) {
     throw new Error('not implemented yet');
   }
 
-  addSection(sectionDescriptorProperty: Kefir.Observable<?Object>, groupOrderHint: any) {
+  addSection(
+    sectionDescriptorProperty: Kefir.Observable<?Object>,
+    groupOrderHint: any
+  ) {
     throw new Error('not implemented yet');
   }
 

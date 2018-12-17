@@ -4,8 +4,8 @@ import Sha256 from 'sha.js/sha256';
 
 function hash(x) {
   const hasher = new Sha256();
-  hasher.update('bdnanNrDjv'+x);
-  return hasher.digest('hex').slice(0,32);
+  hasher.update('bdnanNrDjv' + x);
+  return hasher.digest('hex').slice(0, 32);
 }
 
 export default function isStreakAppId(appId: string): boolean {

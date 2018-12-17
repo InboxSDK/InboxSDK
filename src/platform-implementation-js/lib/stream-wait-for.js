@@ -9,9 +9,13 @@ import Kefir from 'kefir';
  * thrown so that it gets logged. Well-behaving code should not let the timeout
  * get tripped.
  */
-export default function streamWaitFor<T>(condition:() => ?T, timeout:number=60*1000, steptime:number=250): Kefir.Observable<T> {
+export default function streamWaitFor<T>(
+  condition: () => ?T,
+  timeout: number = 60 * 1000,
+  steptime: number = 250
+): Kefir.Observable<T> {
   // make this error here so we have a sensible stack.
-  const timeoutError = new Error("waitFor timeout");
+  const timeoutError = new Error('waitFor timeout');
 
   const timeoutStream = Kefir.later(timeout, null).flatMap(() => {
     const result = condition();

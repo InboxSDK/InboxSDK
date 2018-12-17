@@ -8,15 +8,23 @@ import type GmailComposeView from '../gmail-compose-view';
 
 const fnStream = udKefir(module, getMinimizedStream_);
 
-export default function getMinimizedStream(gmailComposeView: GmailComposeView): Kefir.Observable<boolean> {
-	return fnStream.flatMapLatest(fn => fn(gmailComposeView));
+export default function getMinimizedStream(
+  gmailComposeView: GmailComposeView
+): Kefir.Observable<boolean> {
+  return fnStream.flatMapLatest(fn => fn(gmailComposeView));
 }
 
-function getMinimizedStream_(gmailComposeView: GmailComposeView): Kefir.Observable<boolean> {
-	const element = gmailComposeView.getElement();
-	const bodyElement = gmailComposeView.getBodyElement();
-	const bodyContainer = find(element.children, child => child.contains(bodyElement));
+function getMinimizedStream_(
+  gmailComposeView: GmailComposeView
+): Kefir.Observable<boolean> {
+  const element = gmailComposeView.getElement();
+  const bodyElement = gmailComposeView.getBodyElement();
+  const bodyContainer = find(element.children, child =>
+    child.contains(bodyElement)
+  );
 
-	return makeMutationObserverStream(bodyContainer, {attributes: true, attributeFilter: ['style']})
-		.map(() => gmailComposeView.isMinimized());
+  return makeMutationObserverStream(bodyContainer, {
+    attributes: true,
+    attributeFilter: ['style']
+  }).map(() => gmailComposeView.isMinimized());
 }

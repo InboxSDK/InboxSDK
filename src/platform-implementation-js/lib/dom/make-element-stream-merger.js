@@ -3,16 +3,22 @@
 import Kefir from 'kefir';
 import StopperPool from '../stopper-pool';
 import delayAsap from '../delay-asap';
-import type {ItemWithLifetime} from './make-element-child-stream';
+import type { ItemWithLifetime } from './make-element-child-stream';
 
-export default function makeElementStreamMerger<T>(): (event: ItemWithLifetime<T>) => Kefir.Observable<ItemWithLifetime<T>> {
+export default function makeElementStreamMerger<T>(): (
+  event: ItemWithLifetime<T>
+) => Kefir.Observable<ItemWithLifetime<T>> {
   const knownElementStopperPools: Map<T, StopperPool> = new Map();
 
   return function(event) {
     let stopperPool = knownElementStopperPools.get(event.el);
     if (stopperPool) {
       if (stopperPool.getSize() > 1) {
-        console.warn('element is part of multiple element streams', stopperPool.getSize(), event.el); //eslint-disable-line no-console
+        console.warn(
+          'element is part of multiple element streams',
+          stopperPool.getSize(),
+          event.el
+        ); //eslint-disable-line no-console
       }
       stopperPool.add(event.removalStream.flatMap(delayAsap));
       return Kefir.never();

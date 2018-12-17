@@ -11,7 +11,7 @@ class PersistentQueue<T> {
 
   constructor(id: string) {
     this._fallbackQueue = [];
-    this._sid = "inboxsdk__persistentqueue_" + id;
+    this._sid = 'inboxsdk__persistentqueue_' + id;
   }
 
   _getSavedQueue(): T[] {

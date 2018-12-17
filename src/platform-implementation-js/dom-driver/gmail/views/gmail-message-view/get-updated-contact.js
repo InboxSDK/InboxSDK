@@ -1,27 +1,31 @@
 /* @flow */
 
 import Logger from '../../../../lib/logger';
-import {simulateClick} from '../../../../lib/dom/simulate-mouse-event';
+import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import extractContactFromEmailContactString from '../../../../lib/extract-contact-from-email-contact-string';
 
-const cache: {[key: string]: ?{
-  headerContact: Contact;
-  modalContact: Contact;
-}} =  {};
+const cache: {
+  [key: string]: ?{
+    headerContact: Contact,
+    modalContact: Contact
+  }
+} = {};
 
-export default function getUpdatedContact(headerContact: Contact, element: HTMLElement): Contact {
+export default function getUpdatedContact(
+  headerContact: Contact,
+  element: HTMLElement
+): Contact {
   let cacheEntry = cache[headerContact.emailAddress];
-  if(cacheEntry){
-    if(cacheEntry.headerContact.name !== headerContact.name){
+  if (cacheEntry) {
+    if (cacheEntry.headerContact.name !== headerContact.name) {
       delete cache[headerContact.emailAddress];
-    }
-    else{
+    } else {
       return cacheEntry.modalContact;
     }
   }
 
   const menuButtonElement = element.querySelector('.ajy[aria-haspopup=true]');
-  if(menuButtonElement){
+  if (menuButtonElement) {
     //the modal that contains this email address is not visible, so we need to bring the modal up
     const block = (event: MouseEvent) => {
       event.stopPropagation();
@@ -43,7 +47,7 @@ export default function getUpdatedContact(headerContact: Contact, element: HTMLE
     }
 
     cacheEntry = cache[headerContact.emailAddress];
-    if(cacheEntry){
+    if (cacheEntry) {
       return cacheEntry.modalContact;
     }
   }
@@ -54,24 +58,25 @@ export default function getUpdatedContact(headerContact: Contact, element: HTMLE
 function updateContactCacheFromModal(headerContact) {
   const spans = document.querySelectorAll('.ajC [email]');
 
-  for(let ii=0; ii<spans.length; ii++){
+  for (let ii = 0; ii < spans.length; ii++) {
     const span = spans[ii];
     let emailAddress = span.getAttribute('email');
-    if(!emailAddress) continue;
-    if(cache[emailAddress]) continue;
+    if (!emailAddress) continue;
+    if (cache[emailAddress]) continue;
 
-    let modalContact: Contact = {emailAddress, name: null};
+    let modalContact: Contact = { emailAddress, name: null };
     let name = span.getAttribute('name');
-    if(name){
+    if (name) {
       modalContact.name = name;
-    }
-    else{
-      const stringContact = extractContactFromEmailContactString(span.textContent);
-      if(emailAddress === stringContact.emailAddress){
+    } else {
+      const stringContact = extractContactFromEmailContactString(
+        span.textContent
+      );
+      if (emailAddress === stringContact.emailAddress) {
         modalContact = stringContact;
       }
     }
 
-    cache[emailAddress] = {headerContact,modalContact};
+    cache[emailAddress] = { headerContact, modalContact };
   }
 }

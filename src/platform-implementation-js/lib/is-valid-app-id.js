@@ -4,7 +4,7 @@ import Sha1 from 'sha.js/sha1';
 
 function grandfatherHash(x) {
   const hasher = new Sha1();
-  hasher.update('YlEHtGl72+c'+x);
+  hasher.update('YlEHtGl72+c' + x);
   return hasher.digest('hex');
 }
 
@@ -27,7 +27,8 @@ export default function isValidAppId(appId: string): boolean {
   const m = appIdRegex.exec(appId);
   if (!m) return false;
 
-  const name = m[1], hash = m[2];
+  const name = m[1],
+    hash = m[2];
 
   const shasum = new Sha1();
   shasum.update(name);
