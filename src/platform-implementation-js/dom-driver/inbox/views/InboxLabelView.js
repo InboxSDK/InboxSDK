@@ -10,7 +10,7 @@ class InboxLabelView {
 	_labelDescriptor: Object;
 	_iconSettings: Object;
 
-	constructor(opts={}) {
+	constructor(opts: {classes?: ?string[]} = {}) {
 		this._element = document.createElement('div');
 		this._element.className = 'inboxsdk__inbox_thread_row_label ' + (opts.classes || []).join(' ');
 		this._element.innerHTML = '<span></span>';

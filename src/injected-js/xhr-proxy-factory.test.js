@@ -276,7 +276,7 @@ beforeEach(() => {
     describe('events', () => {
       it('readystatechange', done => {
         const step = _.after(2, done);
-        function checkEvent(event) {
+        function checkEvent(event: Event) {
           assert.strictEqual(event.target, xhr);
           step();
         }
@@ -296,7 +296,7 @@ beforeEach(() => {
 
       it('load', done => {
         const step = _.after(2, done);
-        function checkEvent(event) {
+        function checkEvent(event: Object) {
           assert.strictEqual(event.target, xhr);
           assert.strictEqual(typeof event.lengthComputable, "boolean");
           assert.strictEqual(typeof event.loaded, "number");
@@ -312,7 +312,7 @@ beforeEach(() => {
 
       it('loadstart', done => {
         const step = _.after(2, done);
-        function checkEvent(event) {
+        function checkEvent(event: Object) {
           assert.strictEqual(event.target, xhr);
           assert.strictEqual(event.lengthComputable, false);
           assert.strictEqual(typeof event.loaded, "number");
@@ -328,7 +328,7 @@ beforeEach(() => {
 
       it('loadend', done => {
         const step = _.after(4, done);
-        function checkEvent(event) {
+        function checkEvent(event: Object) {
           assert.strictEqual(event.target, xhr);
           assert.strictEqual(typeof event.lengthComputable, "boolean");
           assert.strictEqual(typeof event.loaded, "number");
@@ -345,7 +345,7 @@ beforeEach(() => {
 
       it('error', done => {
         const step = _.after(4, done);
-        function checkEvent(event) {
+        function checkEvent(event: Object) {
           assert.strictEqual(event.target, xhr);
           assert.strictEqual(typeof event.lengthComputable, "boolean");
           assert.strictEqual(typeof event.loaded, "number");
@@ -363,7 +363,7 @@ beforeEach(() => {
 
       it('abort', done => {
         const step = _.after(2, done);
-        function checkEvent(event) {
+        function checkEvent(event: Object) {
           assert.strictEqual(event.target, xhr);
           assert.strictEqual(typeof event.lengthComputable, "boolean");
           assert.strictEqual(typeof event.loaded, "number");

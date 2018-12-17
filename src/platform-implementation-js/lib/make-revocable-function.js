@@ -18,6 +18,9 @@ export default function makeRevocableFunction<F: Function>(inputFn: F, revokedFn
 
   return {
     fn: (function() {
+      if (!key) {
+        throw new Error('Should not happen');
+      }
       const _revokedFn = revokedFn;
       const wm = new WeakMap();
       wm.set(key, inputFn);

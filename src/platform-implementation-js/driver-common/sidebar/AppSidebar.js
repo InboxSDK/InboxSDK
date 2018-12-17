@@ -26,7 +26,7 @@ type ExpansionSettings = {
 
 const MAX_SIDEBAR_SETTINGS = 200;
 
-type PanelDescriptor = {
+export type PanelDescriptor = {
   instanceId: string;
   appId: string;
   id: string;
@@ -37,7 +37,7 @@ type PanelDescriptor = {
   el: HTMLElement;
   appName?: string;
 };
-type Props = {
+export type Props = {
   panels: PanelDescriptor[];
   onClose?: () => void;
   onOutsideClick?: () => void;

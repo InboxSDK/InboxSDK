@@ -59,7 +59,7 @@ class ComposeView extends EventEmitter {
 		});
 	}
 
-	addButton(buttonDescriptor){
+	addButton(buttonDescriptor: Object){
 		const members = get(memberMap, this);
 		const buttonDescriptorStream = kefirCast((Kefir: any), buttonDescriptor);
 
@@ -79,7 +79,7 @@ class ComposeView extends EventEmitter {
 	}
 	*/
 
-	addStatusBar(statusBarDescriptor) {
+	addStatusBar(statusBarDescriptor?: {height?: number, orderHint?: number, addAboveNativeStatusBar?: boolean}) {
 		return get(memberMap, this).composeViewImplementation.addStatusBar(statusBarDescriptor);
 	}
 
@@ -87,7 +87,7 @@ class ComposeView extends EventEmitter {
 		return get(memberMap, this).composeViewImplementation.hideNativeStatusBar();
 	}
 
-	addRecipientRow(options){
+	addRecipientRow(options: ?Object){
 		return {
 			destroy: get(memberMap, this).composeViewImplementation.addRecipientRow(kefirCast(Kefir, options))
 		};
@@ -195,15 +195,15 @@ class ComposeView extends EventEmitter {
 		return get(memberMap, this).composeViewImplementation.getBccRecipients();
 	}
 
-	insertTextIntoBodyAtCursor(text){
+	insertTextIntoBodyAtCursor(text: string){
 		return get(memberMap, this).composeViewImplementation.insertBodyTextAtCursor(text);
 	}
 
-	insertHTMLIntoBodyAtCursor(html){
+	insertHTMLIntoBodyAtCursor(html: string){
 		return get(memberMap, this).composeViewImplementation.insertBodyHTMLAtCursor(html);
 	}
 
-	insertLinkChipIntoBodyAtCursor(text, url, iconUrl){
+	insertLinkChipIntoBodyAtCursor(text: string, url: string, iconUrl: string){
 		if(!iconUrl || typeof iconUrl !== 'string' || iconUrl.indexOf('http') !== 0){
 			console.warn('You must provide a publicly accessible iconUrl');
 			return;
@@ -216,7 +216,7 @@ class ComposeView extends EventEmitter {
 		});
 	}
 
-	insertLinkIntoBodyAtCursor(text, url){
+	insertLinkIntoBodyAtCursor(text: string, url: string){
 		return get(memberMap, this).composeViewImplementation.insertLinkIntoBody(text, url);
 	}
 
@@ -259,15 +259,15 @@ class ComposeView extends EventEmitter {
 		return get(memberMap, this).composeViewImplementation.isReply();
 	}
 
-	setToRecipients(emails){
+	setToRecipients(emails: string[]){
 		get(memberMap, this).composeViewImplementation.setToRecipients(emails);
 	}
 
-	setCcRecipients(emails){
+	setCcRecipients(emails: string[]){
 		get(memberMap, this).composeViewImplementation.setCcRecipients(emails);
 	}
 
-	setBccRecipients(emails){
+	setBccRecipients(emails: string[]){
 		get(memberMap, this).composeViewImplementation.setBccRecipients(emails);
 	}
 
@@ -283,19 +283,19 @@ class ComposeView extends EventEmitter {
 		get(memberMap, this).composeViewImplementation.setFromEmail(email);
 	}
 
-	setSubject(text){
+	setSubject(text: string){
 		get(memberMap, this).composeViewImplementation.setSubject(text);
 	}
 
-	setBodyHTML(html){
+	setBodyHTML(html: string){
 		get(memberMap, this).composeViewImplementation.setBodyHTML(html);
 	}
 
-	setBodyText(text){
+	setBodyText(text: string){
 		get(memberMap, this).composeViewImplementation.setBodyText(text);
 	}
 
-	async attachFiles(files): Promise<void> {
+	async attachFiles(files: Blob[]): Promise<void> {
 		if (files.length === 0) {
 			return;
 		}
@@ -331,7 +331,7 @@ class ComposeView extends EventEmitter {
 		return get(memberMap, this).composeViewImplementation.getElement();
 	}
 
-	registerRequestModifier(modifier){
+	registerRequestModifier(modifier: (composeParams: {body: string}) => {body: string} | Promise<{body: string}>){
 		get(memberMap, this).composeViewImplementation.registerRequestModifier(modifier);
 	}
 

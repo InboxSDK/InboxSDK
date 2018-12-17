@@ -25,7 +25,7 @@ class InboxAttachmentCardView {
   _addedButtonDescriptors: Object[] = [];
   _overlayView: ?InboxAttachmentOverlayView = null;
 
-  constructor(options, driver: InboxDriver) {
+  constructor(options: Object, driver: InboxDriver) {
     this._driver = driver;
     if (options.element) {
       this._element = options.element;

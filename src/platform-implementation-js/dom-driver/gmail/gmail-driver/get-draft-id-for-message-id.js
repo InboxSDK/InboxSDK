@@ -47,7 +47,7 @@ async function uncachedGetDraftIDForMessageID(driver: GmailDriver, messageID: st
 const cachedGetDraftIDForMessageID: (driver: GmailDriver, messageID: string) => Promise<GetDraftIdResult> =
   memoize(uncachedGetDraftIDForMessageID, (driver, messageID) => messageID);
 
-function getDraftIDForMessageID(driver: GmailDriver, messageID: string, skipCache=false): Promise<GetDraftIdResult> {
+function getDraftIDForMessageID(driver: GmailDriver, messageID: string, skipCache: boolean=false): Promise<GetDraftIdResult> {
   if (skipCache) {
     return uncachedGetDraftIDForMessageID(driver, messageID);
   } else {

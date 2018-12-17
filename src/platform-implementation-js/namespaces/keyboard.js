@@ -15,7 +15,7 @@ class Keyboard {
     memberMap.set(this, members);
   }
 
-  createShortcutHandle(shortcutDescriptor) {
+  createShortcutHandle(shortcutDescriptor: {chord: string, description: string}) {
     const members = get(memberMap, this);
 
     let {chord, description} = shortcutDescriptor;

@@ -379,7 +379,7 @@ class GmailMessageView {
 		}
 	}
 
-	getMessageID(ignoreLoadStatus=false): string {
+	getMessageID(ignoreLoadStatus: boolean=false): string {
 		if(!ignoreLoadStatus && !this._messageLoaded){
 			throw new Error('tried to get message id before message is loaded');
 		}
