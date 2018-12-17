@@ -3,6 +3,7 @@
 import GenericButtonView from '../../../../lib/dom/generic-button-view';
 
 export default class ArrowDropdownButtonView extends GenericButtonView {
+	_element: HTMLElement; // inherited
 
 	constructor(buttonOptions: Object) {
 		const element = document.createElement('img');
