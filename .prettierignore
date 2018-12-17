@@ -1,0 +1,6 @@
+/flow-typed
+/flow-libs
+/dist
+/examples
+/test/data/**/*.html
+/__tests__/**/*.html
