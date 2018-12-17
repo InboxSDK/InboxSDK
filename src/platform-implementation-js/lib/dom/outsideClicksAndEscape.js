@@ -44,9 +44,10 @@ export default function outsideClicksAndEscape(
       if (process.env.NODE_ENV !== 'production') {
         const allElsStillInPage = elements.every(el => document.contains(el));
         if (!allElsStillInPage) {
+          // eslint-disable-next-line no-console
           console.error(
             'outsideClicksAndEscape not unsubscribed from when elements were removed from the page'
-          ); //eslint-disable-line no-console
+          );
         }
       }
       return e;

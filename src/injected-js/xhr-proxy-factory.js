@@ -373,11 +373,12 @@ export default function XHRProxyFactory(
 
                 for (let responseTextChanger of this._responseTextChangers) {
                   const longRunWarningTimer = setTimeout(() => {
+                    // eslint-disable-next-line no-console
                     console.warn(
                       'responseTextChanger is taking too long',
                       responseTextChanger,
                       startConnection
-                    ); // eslint-disable-line no-console
+                    );
                   }, WARNING_TIMEOUT);
                   try {
                     modifiedResponseText = await responseTextChanger(
@@ -528,9 +529,10 @@ export default function XHRProxyFactory(
   XHRProxy.prototype.setRequestHeader = function(name, value) {
     var self = this;
     if (this.readyState != 1) {
+      // eslint-disable-next-line no-console
       console.warn(
         'setRequestHeader improperly called at readyState ' + this.readyState
-      ); //eslint-disable-line no-console
+      );
     }
     if (!this._openState) {
       throw new Error('Can only set headers after open and before send');
@@ -677,11 +679,12 @@ export default function XHRProxyFactory(
         let modifiedRequest = request;
         for (let requestChanger of this._requestChangers) {
           const longRunWarningTimer = setTimeout(() => {
+            // eslint-disable-next-line no-console
             console.warn(
               'requestChanger is taking too long',
               requestChanger,
               startConnection
-            ); // eslint-disable-line no-console
+            );
           }, WARNING_TIMEOUT);
           try {
             modifiedRequest = await requestChanger(

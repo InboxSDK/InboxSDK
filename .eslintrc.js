@@ -26,7 +26,7 @@ module.exports = {
     semi: ['error', 'always'],
     'no-var': ['off'], //["error"],
     'brace-style': ['off'], //["error"],
-    'array-bracket-spacing': ['error', 'never'],
+    'array-bracket-spacing': ['off'], // prettier handles this
     'block-spacing': ['off'], //["error", "always"],
     'no-spaced-func': ['error'],
     'no-whitespace-before-property': ['error'],

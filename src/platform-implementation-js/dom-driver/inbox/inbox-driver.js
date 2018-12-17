@@ -770,7 +770,8 @@ class InboxDriver {
     appName: ?string,
     appIconUrl: ?string
   ): void {
-    console.warn('activateShortcut not implemented'); //eslint-disable-line no-console
+    // eslint-disable-next-line no-console
+    console.warn('activateShortcut not implemented');
   }
 
   getGmailActionToken = once(async () => {
@@ -816,7 +817,8 @@ class InboxDriver {
   }
 
   getAccountSwitcherContactList(): Contact[] {
-    console.log('getAccountSwitcherContactList not implemented'); //eslint-disable-line no-console
+    // eslint-disable-next-line no-console
+    console.log('getAccountSwitcherContactList not implemented');
     return [this.getUserContact()];
   }
 
@@ -835,9 +837,10 @@ class InboxDriver {
       if (inboxToolbarView.isForThread()) {
         if (!options.positions || includes(options.positions, 'THREAD')) {
           if (options.threadSection === 'OTHER') {
+            // eslint-disable-next-line no-console
             console.warn(
               'registerThreadButton does not support OTHER section items in Inbox yet.'
-            ); //eslint-disable-line no-console
+            );
             return;
           }
           removeButtonOnUnregister(
@@ -859,9 +862,10 @@ class InboxDriver {
       } else if (inboxToolbarView.isForRowList()) {
         if (!options.positions || includes(options.positions, 'LIST')) {
           if (options.listSection === 'OTHER') {
+            // eslint-disable-next-line no-console
             console.warn(
               'registerThreadButton does not support OTHER section items in Inbox yet.'
-            ); //eslint-disable-line no-console
+            );
             return;
           }
           removeButtonOnUnregister(
@@ -961,7 +965,8 @@ class InboxDriver {
   }
 
   addCustomListRouteID(routeID: string, handler: Function): () => void {
-    console.log('addCustomListRouteID not implemented'); //eslint-disable-line no-console
+    // eslint-disable-next-line no-console
+    console.log('addCustomListRouteID not implemented');
     return () => {};
   }
 
@@ -1058,7 +1063,8 @@ class InboxDriver {
   }
 
   registerSearchQueryRewriter(obj: Object) {
-    console.log('registerSearchQueryRewriter not implemented'); //eslint-disable-line no-console
+    // eslint-disable-next-line no-console
+    console.log('registerSearchQueryRewriter not implemented');
   }
 
   addToolbarButtonForApp(

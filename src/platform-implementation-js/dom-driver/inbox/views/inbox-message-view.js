@@ -191,9 +191,10 @@ class InboxMessageView {
       throw new Error('Failed to find message id');
     }
     if (/^msg-a:/.test(inboxMessageId)) {
+      // eslint-disable-next-line no-console
       console.warn(
         'MessageView.getMessageID() returned an incorrect message ID. This method will be deprecated soon. Use getMessageIDAsync() instead which does not have this problem.'
-      ); //eslint-disable-line no-console
+      );
     }
     const m = /\d+$/.exec(inboxMessageId);
     if (!m) throw new Error('Should not happen');
@@ -250,9 +251,10 @@ class InboxMessageView {
     throw new Error('not implemented yet');
   }
   addAttachmentIcon(options: Object): void {
+    // eslint-disable-next-line no-console
     console.warn(
       'MessageView.addAttachmentIcon is not implemented yet in Inbox'
-    ); //eslint-disable-line no-console
+    );
   }
   getAttachmentCardViewDrivers() {
     return (this._attachmentCardViews: any);

@@ -145,11 +145,12 @@ export default function loadScript(
     pr = addScriptToPage(url, true).catch(() => {
       // Only show the warning if we successfully load the script on retry.
       return addScriptToPage(url, false).then(() => {
+        // eslint-disable-next-line no-console
         console.warn(
           'Script ' +
             url +
             ' included without CORS headers. Error logs might be censored by the browser.'
-        ); //eslint-disable-line no-console
+        );
       });
     });
   }

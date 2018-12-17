@@ -46,10 +46,11 @@ export default function logError(
     }
 
     if (!(err instanceof Error)) {
+      // eslint-disable-next-line no-console
       console.warn(
         'First parameter to Logger.error was not an error object:',
         err
-      ); //eslint-disable-line no-console
+      );
       err = new Error('Logger.error called with non-error: ' + err);
       markErrorAsSeen(err);
     }
@@ -115,7 +116,8 @@ export default function logError(
       isUsingMaterialGmailUI
     ]);
 
-    console.error.apply(console, stuffToLog); //eslint-disable-line no-console
+    // eslint-disable-next-line no-console
+    console.error.apply(console, stuffToLog);
 
     const report = {
       message: (err && err.message) || err,
@@ -180,7 +182,8 @@ const _extensionSeenErrors: {
         try {
           return !!(e: any).__inboxsdk_extensionHasSeenError;
         } catch (err) {
-          console.error(err); //eslint-disable-line no-console
+          // eslint-disable-next-line no-console
+          console.error(err);
           return false;
         }
       }
@@ -205,7 +208,8 @@ const _extensionSeenErrors: {
             value: true
           });
         } catch (err) {
-          console.error(err); //eslint-disable-line no-console
+          // eslint-disable-next-line no-console
+          console.error(err);
         }
       }
     }
@@ -250,6 +254,8 @@ const sendError = rateLimit(
 );
 
 function tooManyErrors(err2: Error, originalArgs: any) {
-  console.error('ERROR REPORTING ERROR', err2); //eslint-disable-line no-console
-  console.error('ORIGINAL ERROR', originalArgs); //eslint-disable-line no-console
+  // eslint-disable-next-line no-console
+  console.error('ERROR REPORTING ERROR', err2);
+  // eslint-disable-next-line no-console
+  console.error('ORIGINAL ERROR', originalArgs);
 }

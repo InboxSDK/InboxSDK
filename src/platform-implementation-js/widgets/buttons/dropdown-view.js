@@ -131,9 +131,10 @@ class DropdownView extends EventEmitter {
 
   setPlacementOptions(options: ContainByScreenOptions) {
     if (this._options.manualPosition) {
+      // eslint-disable-next-line no-console
       console.error(
         'DropdownView.setPlacementOptions() was called on a manually-positioned DropdownView.'
-      ); //eslint-disable-line no-console
+      );
       return;
     }
     this._userPlacementOptions = { ...this._userPlacementOptions, ...options };

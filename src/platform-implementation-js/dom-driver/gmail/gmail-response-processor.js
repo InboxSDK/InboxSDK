@@ -95,8 +95,8 @@ export function rewriteSingleQuotes(s: string): string {
   // we'll copy the parts of the input to as we interpret them.
   let i = 0,
     resultParts = [];
+  // eslint-disable-next-line no-constant-condition
   while (true) {
-    //eslint-disable-line no-constant-condition
     // Find the position of the next singly or doubly quoted part.
     // `i` is increasing monotonically every round of this loop, and the loop
     // ends as soon as no matches are found after the `i`th position in the
@@ -490,7 +490,8 @@ it all back together.
           if (item[6]) {
             item[6][0] = [query, 1];
           } else {
-            console.error('replaceThreadsInResponse(): Missing item[6]'); //eslint-disable-line no-console
+            // eslint-disable-next-line no-console
+            console.error('replaceThreadsInResponse(): Missing item[6]');
           }
         }
       }

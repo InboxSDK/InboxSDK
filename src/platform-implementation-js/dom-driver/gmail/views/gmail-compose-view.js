@@ -950,7 +950,8 @@ class GmailComposeView {
 
   close() {
     if (this.isInlineReplyForm()) {
-      console.warn("Trying to close an inline reply which doesn't work."); //eslint-disable-line no-console
+      // eslint-disable-next-line no-console
+      console.warn("Trying to close an inline reply which doesn't work.");
       return;
     }
 
@@ -1417,8 +1418,8 @@ class GmailComposeView {
         // request finishes. If we fail to get our draft ID and we see that our
         // message ID has changed since we made the request, then we try again.
         let lastMessageId = null;
+        // eslint-disable-next-line no-constant-condition
         while (true) {
-          //eslint-disable-line no-constant-condition
           i++;
 
           const messageId = this._messageId;

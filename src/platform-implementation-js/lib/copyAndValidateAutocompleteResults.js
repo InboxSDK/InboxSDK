@@ -42,8 +42,8 @@ export default function copyAndValidateAutocompleteResults(
         if (driver.getOpts().REQUESTED_API_VERSION === 1) {
           resultCopy.iconUrl = iconURL;
         } else {
+          // eslint-disable-next-line no-console
           console.error(
-            //eslint-disable-line no-console
             'Support for iconURL property was dropped after API version 1'
           );
         }

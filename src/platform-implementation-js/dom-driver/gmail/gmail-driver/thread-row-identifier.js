@@ -55,8 +55,8 @@ class ThreadRowIdentifier {
     }
 
     // TODO fix or remove
+    // eslint-disable-next-line
     if (false) {
-      // eslint-disable-line
       // Try identifying the row by simulating a ctrl-click on it. Note that if
       // the thread row corresponds to an open minimized draft, then we won't
       // get a result, and the compose will be restored, so we counteract that
