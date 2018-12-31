@@ -184,7 +184,7 @@ class GmailMessageView {
     let sender = this._sender;
     if (sender) return sender;
 
-    const senderSpan = querySelector(this._element, 'h3.iw span[email]');
+    const senderSpan = querySelector(this._element, 'td.gF span[email]');
 
     const emailAddress = senderSpan.getAttribute('email');
     if (!emailAddress) throw new Error('Could not find email address');
