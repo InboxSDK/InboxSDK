@@ -392,14 +392,20 @@ export default function setupGmailInterceptor() {
                 return;
               }
 
+              if (!Array.isArray(sendUpdate[11])) {
+                logger.error(new Error('sendUpdate[11] was not an array'));
+              }
+              const isSentUpdate =
+                currentSendConnectionIDs.has(connection) &&
+                (!Array.isArray(sendUpdate[11]) ||
+                  sendUpdate[11].indexOf('^r') < 0);
+
               triggerEvent({
                 draftID: draftID,
-                type: currentSendConnectionIDs.has(connection)
-                  ? 'emailSent'
-                  : 'emailDraftReceived',
+                type: isSentUpdate ? 'emailSent' : 'emailDraftReceived',
                 rfcID: sendUpdate[14],
                 messageID: sendUpdate[1],
-                oldMessageID: sendUpdate[48]
+                oldMessageID: sendUpdate[48] // TODO problem?
                   ? new BigNumber(sendUpdate[48]).toString(16)
                   : sendUpdate[56],
                 threadID: sendUpdateWrapper[4],
