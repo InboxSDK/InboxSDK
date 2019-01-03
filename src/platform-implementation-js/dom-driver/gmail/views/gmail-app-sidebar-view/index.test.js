@@ -146,13 +146,14 @@ function makeSidebarContainerElement() {
   sidebar.appendChild(separator);
   newDiv.appendChild(sidebar);
 
-  document.body.appendChild(newDiv);
+  document.body && document.body.appendChild(newDiv);
 }
 
 function removeSidebarContainerElement() {
   const oldDivs = Array.from(document.getElementsByClassName('brC-aT5-aOt-Jw'));
   oldDivs.forEach(oldDiv => {
-    oldDiv.parentNode.removeChild(oldDiv);
+    const parent = oldDiv.parentNode;
+    parent && parent.removeChild(oldDiv);
   });
 }
 
