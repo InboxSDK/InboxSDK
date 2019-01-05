@@ -153,7 +153,6 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
     })
       .transform(
         babelify.configure({
-          presets: args.hot && port ? ['react-hmre'] : [],
           plugins: 'transform-inline-environment-variables'
         })
       )
