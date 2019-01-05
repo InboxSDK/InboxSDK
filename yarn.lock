@@ -5461,7 +5461,7 @@ lodash.templatesettings@^3.0.0:
     lodash._reinterpolate "^3.0.0"
     lodash.escape "^3.0.0"
 
-lodash@^4.0.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.16.6, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.2, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.3.0, lodash@^4.6.1:
+lodash@^4.0.0, lodash@^4.13.1, lodash@^4.14.0, lodash@^4.16.6, lodash@^4.17.10, lodash@^4.17.11, lodash@^4.17.2, lodash@^4.17.4, lodash@^4.17.5, lodash@^4.2.0, lodash@^4.6.1:
   version "4.17.11"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
   integrity sha512-cQKh8igo5QUhZ7lg38DYWAxMvjSAKG0A8wGSVimP07SIUEK2UO+arSRKbRZWtelMtN5V0Hkwh5ryOto/SshYIg==
@@ -6887,13 +6887,6 @@ react-multi-ref@^1.0.0:
   integrity sha512-LJuQXEabnv8JLcvcWeJcTogxG4eXVFiPfQ9CECuwWUbfJdrVpPf13m9RxmImyJS0J99BWokGn7dlR1dR06XPDw==
   dependencies:
     "@babel/runtime" "^7.1.2"
-
-react-save-refs@^1.0.1:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/react-save-refs/-/react-save-refs-1.1.0.tgz#a7e491f2ef044fb08aa90405bd13681ca21cef48"
-  integrity sha512-ibdMwbNfsvfHTwD0Xgm/FJHwHNtHdefWmEvNfxVMoI/VY2J4I57M6ckrnYZ5yRy1ySdMaK1AMbXtHIMv1lO9qA==
-  dependencies:
-    lodash "^4.3.0"
 
 react-smooth-collapse@^1.5.0:
   version "1.6.0"

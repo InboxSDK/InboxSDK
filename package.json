@@ -108,7 +108,6 @@
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-draggable-list": "^3.6.0",
-    "react-save-refs": "^1.0.1",
     "react-smooth-collapse": "^1.5.0",
     "react-test-renderer": "^15.3.2",
     "redirectify": "^1.4.0",

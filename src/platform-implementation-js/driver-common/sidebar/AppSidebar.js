@@ -6,7 +6,6 @@ import cx from 'classnames';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import React from 'react';
-import saveRefs from 'react-save-refs';
 import DraggableList from 'react-draggable-list';
 import SmoothCollapse from 'react-smooth-collapse';
 import get from '../../../common/get-or-fail';
