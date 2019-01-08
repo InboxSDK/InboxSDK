@@ -18,3 +18,5 @@ flow-libs/
 [options]
 module.use_strict=true
 munge_underscores=true
+esproposal.optional_chaining=enable
+esproposal.nullish_coalescing=enable

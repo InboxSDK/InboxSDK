@@ -2,7 +2,12 @@
 
 import idMap, { _reset } from './idMap';
 
-const original_Date_now = Date.now;
+// Babel replaces calls to Date.now which makes mocking it awkward, so undo that.
+jest.mock('core-js/library/fn/date/now', () => {
+  return () => (Date: any).now();
+});
+
+const original_Date_now = (Date: any).now;
 afterEach(() => {
   _reset();
   (Date: any).now = original_Date_now;
