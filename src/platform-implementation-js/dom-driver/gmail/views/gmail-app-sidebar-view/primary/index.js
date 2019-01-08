@@ -72,7 +72,7 @@ class GmailAppSidebarPrimary {
 
   _currentIds: Set<string> = new Set();
 
-  _orderManager = new OrderManager({
+  _orderManager = new OrderManager<PanelDescriptor>({
     get() {
       try {
         return JSON.parse(
