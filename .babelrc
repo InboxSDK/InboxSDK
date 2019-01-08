@@ -1,4 +1,18 @@
 {
-  "presets": ["es2015", "stage-1", "react"],
-  "plugins": ["transform-runtime", "add-module-exports"]
+  "presets": [
+    "@babel/preset-env",
+    "@babel/preset-react",
+    "@babel/preset-flow"
+  ],
+  "plugins": [
+    ["@babel/plugin-transform-runtime", {
+      "corejs": 2
+    }],
+    "add-module-exports",
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-proposal-export-namespace-from",
+    "@babel/plugin-proposal-export-default-from",
+    "@babel/plugin-proposal-optional-chaining",
+    "@babel/plugin-proposal-nullish-coalescing-operator"
+  ]
 }

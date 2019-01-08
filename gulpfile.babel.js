@@ -153,8 +153,14 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
     })
       .transform(
         babelify.configure({
-          presets: args.hot && port ? ['react-hmre'] : [],
-          plugins: 'transform-inline-environment-variables'
+          plugins: [
+            [
+              'transform-inline-environment-variables',
+              {
+                include: ['NODE_ENV', 'IMPLEMENTATION_URL', 'VERSION']
+              }
+            ]
+          ]
         })
       )
       .transform('redirectify', { global: true });

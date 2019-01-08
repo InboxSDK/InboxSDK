@@ -22,7 +22,10 @@ jobs:
       - save_cache:
           key: v1-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
-            - ./node_modules
+            - node_modules/
+            - ~/.yarn/bin/
+            - ~/.config/yarn/global/
+            - ~/.cache/yarn
       - run:
           name: Unit Tests
           command: yarn test

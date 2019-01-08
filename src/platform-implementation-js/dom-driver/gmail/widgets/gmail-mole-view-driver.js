@@ -2,7 +2,6 @@
 
 import last from 'lodash/last';
 import { defn } from 'ud';
-import addAccessors from 'add-accessors';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
