@@ -3,8 +3,6 @@
 import GenericButtonView from '../../../../lib/dom/generic-button-view';
 
 export default class ArrowDropdownButtonView extends GenericButtonView {
-  _element: HTMLElement; // inherited
-
   constructor(buttonOptions: Object) {
     const element = document.createElement('img');
     element.setAttribute('class', 'afM');
@@ -25,10 +23,10 @@ export default class ArrowDropdownButtonView extends GenericButtonView {
   }
 
   activate() {
-    this._element.classList.add('afO');
+    this.getElement().classList.add('afO');
   }
 
   deactivate() {
-    this._element.classList.remove('afO');
+    this.getElement().classList.remove('afO');
   }
 }
