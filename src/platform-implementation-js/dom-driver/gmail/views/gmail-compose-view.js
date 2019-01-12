@@ -113,7 +113,6 @@ class GmailComposeView {
   _destroyed: boolean = false;
   _removedFromDOMStopper: Stopper;
   ready: () => Kefir.Observable<GmailComposeView>;
-  getEventStream: () => Kefir.Observable<any>;
 
   constructor(
     element: HTMLElement,
