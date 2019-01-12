@@ -6,7 +6,11 @@ module.exports = {
     node: true,
     es6: true
   },
-  extends: ['eslint:recommended', 'plugin:react/recommended'],
+  extends: [
+    'eslint:recommended',
+    'plugin:react/recommended',
+    'plugin:no-dupe-class-fields/recommended'
+  ],
   parserOptions: {
     ecmaFeatures: {
       experimentalObjectRestSpread: true,
@@ -14,7 +18,7 @@ module.exports = {
     },
     sourceType: 'module'
   },
-  plugins: ['react', 'flowtype', 'deprecate'],
+  plugins: ['flowtype', 'deprecate'],
   rules: {
     'flowtype/define-flow-type': 1,
     'flowtype/require-valid-file-annotation': ['error', 'always'],

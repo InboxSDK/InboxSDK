@@ -758,7 +758,7 @@
     core-js "^2.5.7"
     regenerator-runtime "^0.12.0"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.2.0":
   version "7.2.0"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.2.0.tgz#b03e42eeddf5898e00646e4c840fa07ba8dcad7f"
   integrity sha512-oouEibCbHMVdZSDlJBO6bZmID/zA/G/Qx3H1d3rSNPTD+L8UNKvCat7aKWSJ74zYbm5zWGh0GQN0hKj8zYFTCg==
@@ -2935,6 +2935,13 @@ eslint-plugin-flowtype@^3.0.0:
   integrity sha512-baJmzngM6UKbEkJ5OY3aGw2zjXBt5L2QKZvTsOlXX7yHKIjNRrlJx2ods8Rng6EdqPR9rVNIQNYHpTs0qfn2qA==
   dependencies:
     lodash "^4.17.10"
+
+eslint-plugin-no-dupe-class-fields@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-no-dupe-class-fields/-/eslint-plugin-no-dupe-class-fields-1.0.0.tgz#fdbe1ef4b310e1602a0839e3c69f3ba7c18bfd63"
+  integrity sha512-vxg1TDAiyMD6hdp4OPhAIaj+68BjcM9RWibOB0voiBoglTCBKipl+tIz9CaSG/iYw1vyYd90//fIBakjweEWqg==
+  dependencies:
+    "@babel/runtime" "^7.2.0"
 
 eslint-plugin-react@^7.1.0:
   version "7.12.3"
