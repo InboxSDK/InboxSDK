@@ -3,8 +3,6 @@
 import GenericButtonView from '../../../../lib/dom/generic-button-view';
 
 export default class InboxDropdownButtonView extends GenericButtonView {
-  _element: HTMLElement; // inherited
-
   constructor() {
     const element = document.createElement('div');
     element.setAttribute('class', 'aAE qi J-J5-Ji J-JN-M-I');
@@ -23,12 +21,12 @@ export default class InboxDropdownButtonView extends GenericButtonView {
   }
 
   activate() {
-    this._element.classList.add('J-JN-M-I-JO');
-    this._element.classList.add('J-JN-M-I-Kq');
+    this.getElement().classList.add('J-JN-M-I-JO');
+    this.getElement().classList.add('J-JN-M-I-Kq');
   }
 
   deactivate() {
-    this._element.classList.remove('J-JN-M-I-JO');
-    this._element.classList.remove('J-JN-M-I-Kq');
+    this.getElement().classList.remove('J-JN-M-I-JO');
+    this.getElement().classList.remove('J-JN-M-I-Kq');
   }
 }

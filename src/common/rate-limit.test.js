@@ -2,7 +2,12 @@
 
 import rateLimit from './rate-limit';
 
-const _originalDateNow = Date.now;
+// Babel replaces calls to Date.now which makes mocking it awkward, so undo that.
+jest.mock('core-js/library/fn/date/now', () => {
+  return () => (Date: any).now();
+});
+
+const _originalDateNow = (Date: any).now;
 beforeEach(() => {
   const start = _originalDateNow.call(Date);
   (Date: any).now = () => start;
