@@ -158,9 +158,6 @@ class GmailComposeView {
               return { eventName: 'sending' };
             }
             case 'emailSent': {
-              // `data` will get filled in with getMessageID + getThreadID props from
-              // intercept stream as soon as they are made available in the sync API response.
-
               let syncThreadID = event.threadID;
               let syncMessageID = event.messageID;
 
@@ -170,22 +167,32 @@ class GmailComposeView {
               return {
                 eventName: 'sent',
                 data: {
-                  async getThreadID() {
-                    if (!this._threadID) {
-                      this._threadID = await driver.getOldGmailThreadIdFromSyncThreadId(
+                  getThreadID: once(
+                    async (): Promise<string> => {
+                      if (event.oldThreadID) {
+                        return event.oldThreadID;
+                      }
+                      driver.removeCachedOldGmailThreadIdFromSyncThreadId(
+                        syncMessageID
+                      );
+                      return await driver.getOldGmailThreadIdFromSyncThreadId(
                         syncThreadID
                       );
                     }
-                    return this._threadID;
-                  },
-                  async getMessageID() {
-                    if (!this._messageId) {
-                      this._messageId = driver.getGmailMessageIdForSyncMessageId(
+                  ),
+                  getMessageID: once(
+                    async (): Promise<string> => {
+                      if (event.oldMessageID) {
+                        return event.oldMessageID;
+                      }
+                      driver.removeCachedGmailMessageIdForSyncMessageId(
+                        syncMessageID
+                      );
+                      return await driver.getGmailMessageIdForSyncMessageId(
                         syncMessageID
                       );
                     }
-                    return this._messageId;
-                  }
+                  )
                 }
               };
             }
