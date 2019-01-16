@@ -400,6 +400,15 @@ export default function setupGmailInterceptor() {
                 (!Array.isArray(sendUpdate[11]) ||
                   sendUpdate[11].indexOf('^r') < 0);
 
+              if (isSentUpdate) {
+                if (sendUpdate[22] !== 3) {
+                  logger.error(
+                    new Error('sendUpdate[22] was not expected value'),
+                    { value: sendUpdate[22] }
+                  );
+                }
+              }
+
               triggerEvent({
                 draftID: draftID,
                 type: isSentUpdate ? 'emailSent' : 'emailDraftReceived',
