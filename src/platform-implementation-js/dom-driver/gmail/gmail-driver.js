@@ -126,7 +126,10 @@ class GmailDriver {
   getRfcMessageIdForGmailThreadId: (threadId: string) => Promise<string>;
   getSyncThreadIdForOldGmailThreadId: (threadId: string) => Promise<string>;
   getOldGmailThreadIdFromSyncThreadId: (threadId: string) => Promise<string>;
+  removeCachedOldGmailThreadIdFromSyncThreadId: (threadId: string) => void;
+
   getGmailMessageIdForSyncMessageId: (syncMessageId: string) => Promise<string>;
+  removeCachedGmailMessageIdForSyncMessageId: (syncMessageID: string) => void;
 
   constructor(
     appId: string,
@@ -183,6 +186,9 @@ class GmailDriver {
 
       this.getOldGmailThreadIdFromSyncThreadId = syncThreadId =>
         syncThreadIdToOldGmailThreadIdCache.getBfromA(syncThreadId);
+
+      this.removeCachedOldGmailThreadIdFromSyncThreadId = syncThreadId =>
+        syncThreadIdToOldGmailThreadIdCache.removeAfromCache(syncThreadId);
     }
 
     // mapping between sync message ids and old message ids
@@ -197,6 +203,8 @@ class GmailDriver {
       });
       this.getGmailMessageIdForSyncMessageId = syncMessageId =>
         gmailMessageIdForSyncMessageIdCache.getAfromB(syncMessageId);
+      this.removeCachedGmailMessageIdForSyncMessageId = syncMessageId =>
+        gmailMessageIdForSyncMessageIdCache.removeBfromCache(syncMessageId);
     }
 
     this._gmailRouteProcessor = new GmailRouteProcessor();

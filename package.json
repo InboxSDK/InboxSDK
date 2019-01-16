@@ -57,7 +57,7 @@
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "babelify": "^10.0.0",
     "bignumber.js": "^4.0.0",
-    "bimapcache": "^1.0.0",
+    "bimapcache": "^2.0.0",
     "brfs": "^2.0.1",
     "browserify": "^16.2.2",
     "classnames": "^2.2.5",

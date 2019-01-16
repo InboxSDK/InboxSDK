@@ -1511,12 +1511,12 @@ bignumber.js@^4.0.0:
   resolved "https://registry.yarnpkg.com/bignumber.js/-/bignumber.js-4.1.0.tgz#db6f14067c140bd46624815a7916c92d9b6c24b1"
   integrity sha512-eJzYkFYy9L4JzXsbymsFn3p54D+llV27oTQ+ziJG7WFRheJcNZilgVXMG0LoZtlQSKBsJdWtLFqOD0u+U0jZKA==
 
-bimapcache@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/bimapcache/-/bimapcache-1.0.0.tgz#aa14bce07f36ae176ed9f5834e1d5ebab51067cd"
-  integrity sha1-qhS84H82rhdu2fWDTh1eurUQZ80=
+bimapcache@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/bimapcache/-/bimapcache-2.0.0.tgz#330fcb0581c6bcbfd431e704f4387a80701c42b5"
+  integrity sha512-DRosqiHRqhwbpW92Zb/Mrd8XBrij2B6gSR1JLUJL/A3gxIxdADFMHj/OcM7jStL27Xz+kXA3nfhUKIBOdw77Tg==
   dependencies:
-    babel-runtime "^6.23.0"
+    "@babel/runtime" "^7.0.0"
     lodash "^4.17.4"
 
 binary-extensions@^1.0.0:
