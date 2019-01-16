@@ -414,7 +414,7 @@ export default function setupGmailInterceptor() {
                 type: isSentUpdate ? 'emailSent' : 'emailDraftReceived',
                 rfcID: sendUpdate[14],
                 messageID: sendUpdate[1],
-                oldMessageID: sendUpdate[48] // TODO problem?
+                oldMessageID: sendUpdate[48]
                   ? new BigNumber(sendUpdate[48]).toString(16)
                   : sendUpdate[56],
                 threadID: sendUpdateWrapper[4],
