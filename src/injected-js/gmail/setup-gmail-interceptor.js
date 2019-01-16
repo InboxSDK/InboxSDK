@@ -395,12 +395,12 @@ export default function setupGmailInterceptor() {
               if (!Array.isArray(sendUpdate[11])) {
                 logger.error(new Error('sendUpdate[11] was not an array'));
               }
-              const isSentUpdate =
+              const isEmailSentResponse =
                 currentSendConnectionIDs.has(connection) &&
                 (!Array.isArray(sendUpdate[11]) ||
                   sendUpdate[11].indexOf('^r') < 0);
 
-              if (isSentUpdate) {
+              if (isEmailSentResponse) {
                 if (sendUpdate[22] !== 3) {
                   logger.error(
                     new Error('sendUpdate[22] was not expected value'),
@@ -411,7 +411,7 @@ export default function setupGmailInterceptor() {
 
               triggerEvent({
                 draftID: draftID,
-                type: isSentUpdate ? 'emailSent' : 'emailDraftReceived',
+                type: isEmailSentResponse ? 'emailSent' : 'emailDraftReceived',
                 rfcID: sendUpdate[14],
                 messageID: sendUpdate[1],
                 oldMessageID: sendUpdate[48]
