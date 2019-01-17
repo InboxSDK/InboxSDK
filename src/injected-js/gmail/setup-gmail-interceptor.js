@@ -392,13 +392,21 @@ export default function setupGmailInterceptor() {
                 return;
               }
 
+              const isEmailSentResponse = currentSendConnectionIDs.has(
+                connection
+              );
+
               if (!Array.isArray(sendUpdate[11])) {
                 logger.error(new Error('sendUpdate[11] was not an array'));
+              } else {
+                if (isEmailSentResponse) {
+                  if (sendUpdate[11].indexOf('^r') >= 0) {
+                    logger.error(
+                      new Error('sendUpdate[11] unexpectedly contained "^r"')
+                    );
+                  }
+                }
               }
-              const isEmailSentResponse =
-                currentSendConnectionIDs.has(connection) &&
-                (!Array.isArray(sendUpdate[11]) ||
-                  sendUpdate[11].indexOf('^r') < 0);
 
               if (isEmailSentResponse) {
                 if (sendUpdate[22] !== 3) {
