@@ -426,7 +426,7 @@ export function setupGmailInterceptorOnFrames(
               }
 
               if (isEmailSentResponse) {
-                if (sendUpdate[22] !== 3) {
+                if (sendUpdate[22] !== undefined && sendUpdate[22] !== 3) {
                   logger.error(
                     new Error('sendUpdate[22] was not expected value'),
                     { value: sendUpdate[22] }
