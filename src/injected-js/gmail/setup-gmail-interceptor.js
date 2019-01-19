@@ -372,10 +372,14 @@ export function setupGmailInterceptorOnFrames(
                   );
 
                   if (minimalSendUpdates.length > 0) {
+                    // TODO test this path
+                    const threadID = minimalSendUpdates[0][1][1]
+                      ? minimalSendUpdates[0][1][1].replace(/\|.*$/, '')
+                      : undefined;
                     triggerEvent({
                       draftID,
                       type: 'emailSent',
-                      threadID: minimalSendUpdates[0][1][1],
+                      threadID,
                       messageID:
                         (minimalSendUpdates[0][1][3] &&
                         minimalSendUpdates[0][1][3][5] && //new compose
@@ -434,6 +438,10 @@ export function setupGmailInterceptorOnFrames(
                 }
               }
 
+              const threadID = sendUpdateWrapper[4]
+                ? sendUpdateWrapper[4].replace(/\|.*$/, '')
+                : undefined;
+
               triggerEvent({
                 draftID: draftID,
                 type: isEmailSentResponse ? 'emailSent' : 'emailDraftReceived',
@@ -442,7 +450,7 @@ export function setupGmailInterceptorOnFrames(
                 oldMessageID: sendUpdate[48]
                   ? new BigNumber(sendUpdate[48]).toString(16)
                   : sendUpdate[56],
-                threadID: sendUpdateWrapper[4],
+                threadID,
                 // It seems Gmail is A/B testing including gmailThreadID in response[20] and not including
                 // the encoded version of it in response[18], so pull it from [20] if [18] is not set.
                 oldThreadID:

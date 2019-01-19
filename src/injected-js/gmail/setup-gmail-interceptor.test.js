@@ -218,8 +218,7 @@ describe('sync api', () => {
         oldThreadID: '16863e786439335a',
         rfcID:
           '<CAL_Ays_bOq9jhw5e3e1x7cBS9uYpqnGLYf8YnjrVZhM2e3q2xQ@mail.gmail.com>',
-        // TODO fix thread id
-        threadID: 'thread-a:r-6484824435222735158|msg-a:r1172851975112249697',
+        threadID: 'thread-a:r-6484824435222735158',
         type: 'emailSent'
       }
     ]);
@@ -255,8 +254,7 @@ describe('sync api', () => {
         oldThreadID: '16863e786439335a',
         rfcID:
           '<CAL_Ays_CH2SPfzcVvRNkh6HQ+gF4REhq-vLLBrocRHYsfF9DKQ@mail.gmail.com>',
-        // TODO fix thread id
-        threadID: 'thread-a:r-6484824435222735158|msg-a:r1172851975112249697',
+        threadID: 'thread-a:r-6484824435222735158',
         type: 'emailDraftReceived'
       }
     ]);
