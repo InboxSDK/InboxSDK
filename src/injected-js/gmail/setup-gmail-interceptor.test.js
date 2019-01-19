@@ -287,10 +287,15 @@ describe('sync api', () => {
         draftID: 'r5342060334926697893',
         type: 'emailSending'
       },
-      // TODO fix
       {
         draftID: 'r5342060334926697893',
-        type: 'emailSendFailed'
+        threadID: 'thread-a:r-6484824435222735158',
+        messageID: 'msg-a:r5342060334926697893',
+        oldMessageID: '16863f5d2b7ddd8d',
+        oldThreadID: '16863e786439335a',
+        rfcID:
+          '<CAL_Ays8zR1gD3aWK2a=c9+nuLXQVOUUjg2EZPTFeCLNmFN59Ug@mail.gmail.com>',
+        type: 'emailSent'
       }
     ]);
   });

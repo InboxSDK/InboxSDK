@@ -4,6 +4,7 @@ import clone from 'lodash/clone';
 import flatten from 'lodash/flatten';
 import find from 'lodash/find';
 import intersection from 'lodash/intersection';
+import includes from 'lodash/includes';
 import BigNumber from 'bignumber.js';
 
 import Kefir from 'kefir';
@@ -344,7 +345,7 @@ export function setupGmailInterceptorOnFrames(
                 }
               }
             } else {
-              const updateList = originalResponse[2] && originalResponse[2][6];
+              const updateList = originalResponse[2]?.[6];
               if (!updateList) {
                 sendFailed();
                 return;
@@ -352,27 +353,19 @@ export function setupGmailInterceptorOnFrames(
 
               const sendUpdateMatch = updateList.find(
                 update =>
-                  update[1] &&
-                  update[1][3] &&
-                  update[1][3][7] &&
-                  update[1][3][7][1] &&
-                  update[1][3][7][1][5] &&
-                  update[1][3][7][1][5][0] &&
-                  update[1][3][7][1][5][0][14]
+                  update[1]?.[3]?.[7]?.[1]?.[5]?.[0]?.[14] &&
+                  update[1][3][7][1][5].find(message =>
+                    includes(message[1], draftID)
+                  )
               );
 
               if (!sendUpdateMatch) {
                 if (currentSendConnectionIDs.has(connection)) {
                   const minimalSendUpdates = updateList.filter(
-                    update =>
-                      update[1] &&
-                      update[1][3] &&
-                      update[1][3][5] &&
-                      update[1][3][5][3]
+                    update => update[1]?.[3]?.[5]?.[3]
                   );
 
                   if (minimalSendUpdates.length > 0) {
-                    // TODO test this path
                     const threadID = minimalSendUpdates[0][1][1]
                       ? minimalSendUpdates[0][1][1].replace(/\|.*$/, '')
                       : undefined;
@@ -381,12 +374,9 @@ export function setupGmailInterceptorOnFrames(
                       type: 'emailSent',
                       threadID,
                       messageID:
-                        (minimalSendUpdates[0][1][3] &&
-                        minimalSendUpdates[0][1][3][5] && //new compose
-                          (minimalSendUpdates[0][1][3][5][5] &&
-                            minimalSendUpdates[0][1][3][5][5][0])) || //replies
-                        (minimalSendUpdates[0][1][3][5][3] &&
-                          minimalSendUpdates[0][1][3][5][3][0])
+                        //new compose
+                        minimalSendUpdates[0][1][3]?.[5]?.[5]?.[0] || //replies
+                        minimalSendUpdates[0][1][3][5][3]?.[0]
                     });
                   } else {
                     sendFailed();
@@ -398,11 +388,7 @@ export function setupGmailInterceptorOnFrames(
                 return;
               }
 
-              const sendUpdateWrapper =
-                sendUpdateMatch[1] &&
-                sendUpdateMatch[1][3] &&
-                sendUpdateMatch[1][3][7] &&
-                sendUpdateMatch[1][3][7][1];
+              const sendUpdateWrapper = sendUpdateMatch[1]?.[3]?.[7]?.[1];
 
               const sendUpdate = sendUpdateWrapper[5].find(message =>
                 message[1].includes(draftID)
