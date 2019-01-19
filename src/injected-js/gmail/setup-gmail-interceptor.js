@@ -38,27 +38,44 @@ function logErrorExceptEventListeners(err, details) {
 }
 
 export default function setupGmailInterceptor() {
-  const js_frame_wrappers = [],
-    main_wrappers = [];
-  {
-    const js_frame_element = top.document.getElementById('js_frame');
-    if (js_frame_element) {
-      const js_frame = js_frame_element.contentDocument.defaultView;
-      const js_frame_originalXHR = js_frame.XMLHttpRequest;
-      js_frame.XMLHttpRequest = XHRProxyFactory(
-        js_frame_originalXHR,
-        js_frame_wrappers,
-        { logError: logErrorExceptEventListeners }
-      );
-    } else {
-      logger.eventSdkPassive('noJSFrameElementFound');
-    }
+  let jsFrame: ?WindowProxy = null;
+
+  const js_frame_element = top.document.getElementById('js_frame');
+  if (js_frame_element) {
+    jsFrame = js_frame_element.contentDocument.defaultView;
+  } else {
+    logger.eventSdkPassive('noJSFrameElementFound');
   }
+
+  setupGmailInterceptorOnFrames(window, jsFrame);
+}
+
+// Split into a separate step to make it easy for tests to use.
+export function setupGmailInterceptorOnFrames(
+  mainFrame: WindowProxy,
+  jsFrame: ?WindowProxy
+) {
+  const main_wrappers = [],
+    js_frame_wrappers = [];
+
   {
-    const main_originalXHR = top.XMLHttpRequest;
-    top.XMLHttpRequest = XHRProxyFactory(main_originalXHR, main_wrappers, {
-      logError: logErrorExceptEventListeners
-    });
+    const main_originalXHR = mainFrame.XMLHttpRequest;
+    mainFrame.XMLHttpRequest = XHRProxyFactory(
+      main_originalXHR,
+      main_wrappers,
+      {
+        logError: logErrorExceptEventListeners
+      }
+    );
+  }
+
+  if (jsFrame) {
+    const js_frame_originalXHR = jsFrame.XMLHttpRequest;
+    jsFrame.XMLHttpRequest = XHRProxyFactory(
+      js_frame_originalXHR,
+      js_frame_wrappers,
+      { logError: logErrorExceptEventListeners }
+    );
   }
 
   threadIdentifier.setup();

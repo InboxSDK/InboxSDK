@@ -20,7 +20,7 @@ if (!global.__InboxSDKInjected) {
     const setupPushStateListener = require('./setupPushStateListener');
     const setupInboxCustomViewLinkFixer = require('./setupInboxCustomViewLinkFixer');
 
-    const gmailInterceptor = require('./gmail/setup-gmail-interceptor');
+    const gmailInterceptor = require('./gmail/setup-gmail-interceptor').default;
     const setupGmonkeyHandler = require('./gmail/setup-gmonkey-handler');
 
     const setupClickAndGetNewIframeSrc = require('./inbox/setupClickAndGetNewIframeSrc');
