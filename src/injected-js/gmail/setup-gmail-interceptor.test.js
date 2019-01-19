@@ -7,6 +7,7 @@ import MockServer from '../../../test/lib/MockServer';
 jest.mock('../injected-logger', () => {
   return {
     error(err: Error, details?: any) {
+      // eslint-disable-next-line no-console
       console.error(err, details);
       throw err;
     },
