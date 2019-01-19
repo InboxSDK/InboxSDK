@@ -4,6 +4,7 @@ import clone from 'lodash/clone';
 import flatten from 'lodash/flatten';
 import find from 'lodash/find';
 import intersection from 'lodash/intersection';
+import includes from 'lodash/includes';
 import BigNumber from 'bignumber.js';
 
 import Kefir from 'kefir';
@@ -38,27 +39,44 @@ function logErrorExceptEventListeners(err, details) {
 }
 
 export default function setupGmailInterceptor() {
-  const js_frame_wrappers = [],
-    main_wrappers = [];
-  {
-    const js_frame_element = top.document.getElementById('js_frame');
-    if (js_frame_element) {
-      const js_frame = js_frame_element.contentDocument.defaultView;
-      const js_frame_originalXHR = js_frame.XMLHttpRequest;
-      js_frame.XMLHttpRequest = XHRProxyFactory(
-        js_frame_originalXHR,
-        js_frame_wrappers,
-        { logError: logErrorExceptEventListeners }
-      );
-    } else {
-      logger.eventSdkPassive('noJSFrameElementFound');
-    }
+  let jsFrame: ?WindowProxy = null;
+
+  const js_frame_element = top.document.getElementById('js_frame');
+  if (js_frame_element) {
+    jsFrame = js_frame_element.contentDocument.defaultView;
+  } else {
+    logger.eventSdkPassive('noJSFrameElementFound');
   }
+
+  setupGmailInterceptorOnFrames(window, jsFrame);
+}
+
+// Split into a separate step to make it easy for tests to use.
+export function setupGmailInterceptorOnFrames(
+  mainFrame: WindowProxy,
+  jsFrame: ?WindowProxy
+) {
+  const main_wrappers = [],
+    js_frame_wrappers = [];
+
   {
-    const main_originalXHR = top.XMLHttpRequest;
-    top.XMLHttpRequest = XHRProxyFactory(main_originalXHR, main_wrappers, {
-      logError: logErrorExceptEventListeners
-    });
+    const main_originalXHR = mainFrame.XMLHttpRequest;
+    mainFrame.XMLHttpRequest = XHRProxyFactory(
+      main_originalXHR,
+      main_wrappers,
+      {
+        logError: logErrorExceptEventListeners
+      }
+    );
+  }
+
+  if (jsFrame) {
+    const js_frame_originalXHR = jsFrame.XMLHttpRequest;
+    jsFrame.XMLHttpRequest = XHRProxyFactory(
+      js_frame_originalXHR,
+      js_frame_wrappers,
+      { logError: logErrorExceptEventListeners }
+    );
   }
 
   threadIdentifier.setup();
@@ -327,7 +345,7 @@ export default function setupGmailInterceptor() {
                 }
               }
             } else {
-              const updateList = originalResponse[2] && originalResponse[2][6];
+              const updateList = originalResponse[2]?.[6];
               if (!updateList) {
                 sendFailed();
                 return;
@@ -335,37 +353,30 @@ export default function setupGmailInterceptor() {
 
               const sendUpdateMatch = updateList.find(
                 update =>
-                  update[1] &&
-                  update[1][3] &&
-                  update[1][3][7] &&
-                  update[1][3][7][1] &&
-                  update[1][3][7][1][5] &&
-                  update[1][3][7][1][5][0] &&
-                  update[1][3][7][1][5][0][14]
+                  update[1]?.[3]?.[7]?.[1]?.[5]?.[0]?.[14] &&
+                  update[1][3][7][1][5].find(message =>
+                    includes(message[1], draftID)
+                  )
               );
 
               if (!sendUpdateMatch) {
                 if (currentSendConnectionIDs.has(connection)) {
                   const minimalSendUpdates = updateList.filter(
-                    update =>
-                      update[1] &&
-                      update[1][3] &&
-                      update[1][3][5] &&
-                      update[1][3][5][3]
+                    update => update[1]?.[3]?.[5]?.[3]
                   );
 
                   if (minimalSendUpdates.length > 0) {
+                    const threadID = minimalSendUpdates[0][1][1]
+                      ? minimalSendUpdates[0][1][1].replace(/\|.*$/, '')
+                      : undefined;
                     triggerEvent({
                       draftID,
                       type: 'emailSent',
-                      threadID: minimalSendUpdates[0][1][1],
+                      threadID,
                       messageID:
-                        (minimalSendUpdates[0][1][3] &&
-                        minimalSendUpdates[0][1][3][5] && //new compose
-                          (minimalSendUpdates[0][1][3][5][5] &&
-                            minimalSendUpdates[0][1][3][5][5][0])) || //replies
-                        (minimalSendUpdates[0][1][3][5][3] &&
-                          minimalSendUpdates[0][1][3][5][3][0])
+                        //new compose
+                        minimalSendUpdates[0][1][3]?.[5]?.[5]?.[0] || //replies
+                        minimalSendUpdates[0][1][3][5][3]?.[0]
                     });
                   } else {
                     sendFailed();
@@ -377,11 +388,7 @@ export default function setupGmailInterceptor() {
                 return;
               }
 
-              const sendUpdateWrapper =
-                sendUpdateMatch[1] &&
-                sendUpdateMatch[1][3] &&
-                sendUpdateMatch[1][3][7] &&
-                sendUpdateMatch[1][3][7][1];
+              const sendUpdateWrapper = sendUpdateMatch[1]?.[3]?.[7]?.[1];
 
               const sendUpdate = sendUpdateWrapper[5].find(message =>
                 message[1].includes(draftID)
@@ -409,13 +416,17 @@ export default function setupGmailInterceptor() {
               }
 
               if (isEmailSentResponse) {
-                if (sendUpdate[22] !== 3) {
+                if (sendUpdate[22] !== undefined && sendUpdate[22] !== 3) {
                   logger.error(
                     new Error('sendUpdate[22] was not expected value'),
                     { value: sendUpdate[22] }
                   );
                 }
               }
+
+              const threadID = sendUpdateWrapper[4]
+                ? sendUpdateWrapper[4].replace(/\|.*$/, '')
+                : undefined;
 
               triggerEvent({
                 draftID: draftID,
@@ -425,7 +436,7 @@ export default function setupGmailInterceptor() {
                 oldMessageID: sendUpdate[48]
                   ? new BigNumber(sendUpdate[48]).toString(16)
                   : sendUpdate[56],
-                threadID: sendUpdateWrapper[4],
+                threadID,
                 // It seems Gmail is A/B testing including gmailThreadID in response[20] and not including
                 // the encoded version of it in response[18], so pull it from [20] if [18] is not set.
                 oldThreadID:

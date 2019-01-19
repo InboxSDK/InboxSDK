@@ -1,0 +1,546 @@
+{
+  "1": {
+    "1": [
+      {
+        "1": "6",
+        "2": 0,
+        "4": "21848165"
+      }
+    ]
+  },
+  "2": {
+    "1": 0,
+    "5": {
+      "1": "1622935505952504537",
+      "2": "1622958358028407256"
+    },
+    "6": [
+      {
+        "1": {
+          "1": "thread-f:1622952667964122704|msg-f:1622952667964122704",
+          "3": {
+            "7": {
+              "1": {
+                "1": "Error grouping suggestions, turn on/off email alerts per project, search by exception class, and more",
+                "3": "1547768276213",
+                "4": "thread-f:1622952667964122704|msg-f:1622952667964122704",
+                "5": [
+                  {
+                    "1": "msg-f:1622952667964122704",
+                    "2": {
+                      "1": 1,
+                      "2": "tyler@rollbar.com",
+                      "3": "Tyler @ Rollbar"
+                    },
+                    "3": [
+                      {
+                        "1": 1,
+                        "2": "cowan@streak.com",
+                        "3": "Chris Cowan"
+                      }
+                    ],
+                    "6": [
+                      {
+                        "1": 1,
+                        "2": "tyler@rollbar.com"
+                      }
+                    ],
+                    "7": "1547768276213",
+                    "8": "Error grouping suggestions, turn on/off email alerts per project, search by exception class, and more",
+                    "10": "Rollbar Newsletter TL;DR Welcome to 2019! \ud83c\udf8a New features: grouping suggestions, search by exception class, and ability to turn on/off email alerts per project or when creating new projects. Also:",
+                    "11": [
+                      "^all",
+                      "^i",
+                      "^io_unim",
+                      "^o",
+                      "^oc_unsub",
+                      "^p_mtunsub",
+                      "^smartlabel_promo",
+                      "^unsub"
+                    ],
+                    "14": "\u003c1547768275469.7c3cd5014f32a@Nodemailer\u003e",
+                    "18": "1547768276180",
+                    "30": {
+                      "3": {
+                        "1": 3
+                      },
+                      "4": {
+                        "1": 1
+                      },
+                      "5": {
+                        "1": 0.0039059008
+                      },
+                      "7": {
+                        "1": "100"
+                      },
+                      "8": [21660182, 100],
+                      "10": 1
+                    },
+                    "31": "1547768276180",
+                    "44": 0,
+                    "45": {
+                      "3": 1
+                    },
+                    "56": "1685e2da4d462650"
+                  }
+                ],
+                "9": "msg-a:bump-1622952667964122704",
+                "14": 0.0039059008,
+                "17": 0,
+                "20": "1685e2da4d462650"
+              },
+              "2": "21823976"
+            }
+          }
+        }
+      },
+      {
+        "1": {
+          "1": "thread-f:1622913409083306301|msg-f:1622952231851166400",
+          "3": {
+            "7": {
+              "1": {
+                "1": "Re: Automated UI testing",
+                "3": "1547767860662",
+                "4": "thread-f:1622913409083306301|msg-f:1622952231851166400",
+                "5": [
+                  {
+                    "1": "msg-f:1622952231851166400",
+                    "2": {
+                      "1": 1,
+                      "2": "amiramk@gmail.com",
+                      "3": "Amiram Korach"
+                    },
+                    "3": [
+                      {
+                        "1": 1,
+                        "2": "cowan@streak.com",
+                        "3": "Chris Cowan"
+                      }
+                    ],
+                    "4": [
+                      {
+                        "1": 1,
+                        "2": "inboxsdk@googlegroups.com",
+                        "3": "InboxSDK"
+                      }
+                    ],
+                    "7": "1547767860662",
+                    "8": "Re: Automated UI testing",
+                    "10": "Cypress discourage testing of 3rd party websites. They say it is against T\u0026C of gmail and also they may block you. It is also mentioned somewhere that gmail won't work with cypress because it",
+                    "11": [
+                      "^all",
+                      "^i",
+                      "^io_lr",
+                      "^io_unim",
+                      "^o",
+                      "^p_ag",
+                      "^smartlabel_personal",
+                      "^sq_ig_i_personal"
+                    ],
+                    "14": "\u003cCAJFV7xz3rVDsRBStF4LkH7Z7r5vn22GjXVbqf2w+zstmaH9WDg@mail.gmail.com\u003e",
+                    "15": [
+                      "\u003c99c8912d-7de6-418a-b0dc-489af8ba4688@googlegroups.com\u003e"
+                    ],
+                    "16": "\u003c99c8912d-7de6-418a-b0dc-489af8ba4688@googlegroups.com\u003e",
+                    "18": "1547767860270",
+                    "30": {
+                      "3": {
+                        "1": 2
+                      },
+                      "4": {
+                        "1": 3
+                      },
+                      "5": {
+                        "1": 0.97274303
+                      },
+                      "7": {
+                        "1": "100"
+                      },
+                      "8": [21660182, 100],
+                      "10": 0
+                    },
+                    "31": "1547767860270",
+                    "44": 0,
+                    "45": {
+                      "3": 1
+                    },
+                    "56": "1685e274c2ea8ac0"
+                  }
+                ],
+                "9": "msg-a:bump-1622952231851166400",
+                "14": 0.97274303,
+                "17": 0,
+                "20": "1685bf25a1a0f13d"
+              },
+              "2": "21824214"
+            }
+          }
+        }
+      },
+      {
+        "1": {
+          "1": "thread-f:1622952131514190833|msg-f:1622952131514190833",
+          "3": {
+            "7": {
+              "1": {
+                "1": "\"Next\" button in thread attachment viewer doesn't work",
+                "3": "1547767764903",
+                "4": "thread-f:1622952131514190833|msg-f:1622952131514190833",
+                "5": [
+                  {
+                    "1": "msg-f:1622952131514190833",
+                    "2": {
+                      "1": 1,
+                      "2": "omar@streak.com",
+                      "3": "Omar Ismail"
+                    },
+                    "3": [
+                      {
+                        "1": 1,
+                        "2": "eng@streak.com",
+                        "3": "eng"
+                      }
+                    ],
+                    "7": "1547767764903",
+                    "8": "\"Next\" button in thread attachment viewer doesn't work",
+                    "10": "See gif \\/ -- Omar Pronoun: he/him https://twitter.com/omarismail www.streak.com/careers - we're growing fast and hiring! \u1427",
+                    "11": [
+                      "^all",
+                      "^hunsub",
+                      "^i",
+                      "^iim",
+                      "^io_im",
+                      "^oc_unsub",
+                      "^p_mtunsub",
+                      "^smartlabel_group",
+                      "^sq_ig_i_personal",
+                      "^u",
+                      "^unsub"
+                    ],
+                    "14": "\u003cCA+jPuQ__0MskZsAhZBO0XNJUqVzHHkZ7JDxdKaYdCnZOkHBJug@mail.gmail.com\u003e",
+                    "18": "1547767764581",
+                    "20": "\u003ceveryone.streak.com\u003e",
+                    "30": {
+                      "4": {
+                        "1": 1
+                      },
+                      "5": {
+                        "1": 0.071166754
+                      },
+                      "7": {
+                        "1": "100"
+                      },
+                      "8": [21660182, 100],
+                      "10": 1
+                    },
+                    "31": "1547767764581",
+                    "44": 0,
+                    "45": {
+                      "3": 1
+                    },
+                    "56": "1685e25d665dcbf1"
+                  }
+                ],
+                "9": "msg-a:bump-1622952131514190833",
+                "14": 0.071166754,
+                "17": 0,
+                "20": "1685e25d665dcbf1"
+              },
+              "2": "21823705"
+            }
+          }
+        }
+      },
+      {
+        "1": {
+          "1": "thread-f:1622932484256765644|msg-f:1622935505952504537",
+          "3": {
+            "7": {
+              "1": {
+                "1": "Re: Contact and Orgs Disappear when clicking on Linkedin Icon",
+                "3": "1547751908908",
+                "4": "thread-f:1622932484256765644|msg-f:1622935505952504537",
+                "5": [
+                  {
+                    "1": "msg-f:1622935505952504537",
+                    "2": {
+                      "1": 1,
+                      "2": "sam@streak.com",
+                      "3": "Sam Canino"
+                    },
+                    "3": [
+                      {
+                        "1": 1,
+                        "2": "andrew@streak.com",
+                        "3": "Andrew Stewart"
+                      }
+                    ],
+                    "4": [
+                      {
+                        "1": 1,
+                        "2": "eng@streak.com",
+                        "3": "eng"
+                      }
+                    ],
+                    "7": "1547751908908",
+                    "8": "Re: Contact and Orgs Disappear when clicking on Linkedin Icon",
+                    "10": "Just boxed it. \u1427 On Thu, Jan 17, 2019 at 11:00 AM Andrew Stewart \u003candrew@streak.com\u003e wrote: Is this boxed, Sam? On Thu, Jan 17, 2019 at 10:17 AM Sam Canino \u003csam@streak.com\u003e wrote: Box Id:",
+                    "11": [
+                      "^all",
+                      "^hunsub",
+                      "^i",
+                      "^io_unim",
+                      "^oc_unsub",
+                      "^p_ag",
+                      "^p_mtunsub",
+                      "^smartlabel_group",
+                      "^sq_ig_i_personal",
+                      "^u",
+                      "^unsub"
+                    ],
+                    "14": "\u003cCADmqa0qJBV4vDO_Uvf04ec_FLiPvF0T+Ykq+6H-3a6rwFeKcXw@mail.gmail.com\u003e",
+                    "15": [
+                      "\u003cCAKDYPWCOEuSTFCcz6s_WMnnC0te+cGJLG1VBPi-1\u003dsorqEXx8A@mail.gmail.com\u003e"
+                    ],
+                    "16": "\u003cCAKDYPWCOEuSTFCcz6s_WMnnC0te+cGJLG1VBPi-1\u003dsorqEXx8A@mail.gmail.com\u003e",
+                    "18": "1547751909210",
+                    "20": "\u003ceveryone.streak.com\u003e",
+                    "30": {
+                      "4": {
+                        "1": 1
+                      },
+                      "5": {
+                        "1": 0.028036209
+                      },
+                      "7": {
+                        "1": "100"
+                      },
+                      "8": [21660182, 100],
+                      "10": 1
+                    },
+                    "31": "1547751909210",
+                    "44": 0,
+                    "45": {
+                      "3": 1
+                    },
+                    "56": "1685d33e75aafad9"
+                  }
+                ],
+                "9": "msg-a:bump-1622935505952504537",
+                "14": 0.028036209,
+                "17": 0,
+                "20": "1685d07eea9116cc"
+              },
+              "2": "21820110"
+            }
+          }
+        }
+      },
+      {
+        "1": {
+          "1": "thread-a:r-6484824435222735158|msg-a:r1172851975112249697",
+          "3": {
+            "7": {
+              "1": {
+                "1": "x",
+                "3": "1547864344081",
+                "4": "thread-a:r-6484824435222735158|msg-a:r1172851975112249697",
+                "5": [
+                  {
+                    "1": "msg-a:r1172851975112249697",
+                    "2": {
+                      "1": 1,
+                      "2": "cowan@streak.com",
+                      "3": "Chris Cowan"
+                    },
+                    "3": [
+                      {
+                        "1": 1,
+                        "2": "cowan@streak.com",
+                        "3": "Chris Cowan"
+                      }
+                    ],
+                    "7": "1547864344081",
+                    "8": "x",
+                    "10": "x",
+                    "11": ["^all", "^io_im", "^r", "^r_bt"],
+                    "14": "\u003cCAL_Ays8zYhOZmpwyLRUThyB0ZK+yVAdpzoGNSSBM98Bec\u003dFK4g@mail.gmail.com\u003e",
+                    "18": "1547864344131",
+                    "31": "1547864344131",
+                    "44": 0,
+                    "56": "16863e786439335a"
+                  }
+                ],
+                "9": "msg-a:bump-r1172851975112249697",
+                "17": 0,
+                "20": "16863e786439335a"
+              },
+              "2": "21848156"
+            }
+          }
+        }
+      }
+    ],
+    "7": 1,
+    "8": "21848165",
+    "11": "1622935505952504537"
+  },
+  "3": {
+    "1": [
+      {
+        "1": "^smartlabel_notification",
+        "2": 52066,
+        "3": 123773
+      },
+      {
+        "1": "^smartlabel_group",
+        "2": 15573,
+        "3": 83936
+      },
+      {
+        "1": "^iim",
+        "2": 8,
+        "3": 7765
+      },
+      {
+        "1": "^b",
+        "2": 0,
+        "3": 13283
+      },
+      {
+        "1": "^sq_ig_i_social",
+        "2": 0,
+        "3": 16,
+        "4": 0
+      },
+      {
+        "1": "^sq_ig_i_personal",
+        "2": 21,
+        "3": 23663,
+        "4": 0
+      },
+      {
+        "1": "^f",
+        "2": 59,
+        "3": 3111
+      },
+      {
+        "1": "^i",
+        "2": 21,
+        "3": 25587
+      },
+      {
+        "1": "^cr",
+        "2": 0,
+        "3": 0
+      },
+      {
+        "1": "^p_cc",
+        "2": 0,
+        "3": 13283
+      },
+      {
+        "1": "^io_f_iiim",
+        "2": 21,
+        "3": 25588
+      },
+      {
+        "1": "^k",
+        "2": 0,
+        "3": 190
+      },
+      {
+        "1": "^sq_ig_i_promo",
+        "2": 0,
+        "3": 1913,
+        "4": 0
+      },
+      {
+        "1": "^io_f_iim",
+        "2": 8,
+        "3": 9562
+      },
+      {
+        "1": "^smartlabel_finance",
+        "2": 42,
+        "3": 1090
+      },
+      {
+        "1": "^smartlabel_pure_notif",
+        "2": 51948,
+        "3": 122319
+      },
+      {
+        "1": "^smartlabel_promo",
+        "2": 1802,
+        "3": 26048
+      },
+      {
+        "1": "^r",
+        "2": 0,
+        "3": 2
+      },
+      {
+        "1": "^s",
+        "2": 10,
+        "3": 10
+      },
+      {
+        "1": "^t",
+        "2": 0,
+        "3": 236
+      },
+      {
+        "1": "^io_im",
+        "2": 477,
+        "3": 28081
+      },
+      {
+        "1": "^x_1",
+        "2": 0,
+        "3": 27420
+      },
+      {
+        "1": "^x_2",
+        "2": 51866,
+        "3": 135016
+      },
+      {
+        "1": "^scheduled",
+        "2": 0,
+        "3": 0
+      },
+      {
+        "1": "^x_3808037885660701970",
+        "2": 0,
+        "3": 18
+      },
+      {
+        "1": "^smartlabel_social",
+        "2": 4,
+        "3": 32
+      },
+      {
+        "1": "^all",
+        "2": 70483,
+        "3": 295148
+      },
+      {
+        "1": "^io_f_ti",
+        "2": 0,
+        "3": 192
+      },
+      {
+        "1": "^smartlabel_travel",
+        "2": 0,
+        "3": 1
+      },
+      {
+        "1": "^t_z",
+        "2": 0,
+        "3": 0
+      }
+    ]
+  }
+}
