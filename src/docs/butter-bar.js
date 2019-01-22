@@ -144,16 +144,16 @@ var MessageDescriptor = /** @lends MessageDescriptor */ {
   /**
    * An array of buttons to support functionality in addition to the preview functionality
    * ^optional
-   * @type {Array.<ButterBarButtonDescriptor>}
+   * @type {Array.<MessageButtonDescriptor>}
    */
   buttons: null
 };
 
 /**
  * @class
- * This type is used to describe the buttons for ButterBar to show
+ * This type is used to describe the buttons for ButterBar to show.
  */
-var ButterBarButtonDescriptor = /** @lends ButterBarButtonDescriptor */ {
+var MessageButtonDescriptor = /** @lends MessageButtonDescriptor */ {
   /**
    * This is called when a button is clicked and gets passed an event object.
    * @type {func(event)}
@@ -165,6 +165,77 @@ var ButterBarButtonDescriptor = /** @lends ButterBarButtonDescriptor */ {
    * @type {string}
    */
   title: null
+};
+
+/**
+ * @class
+ * This type is used to describe the messages for {ButterBar.showLoading} to show
+ */
+var LoadingMessageDescriptor = /** @lends LoadingMessageDescriptor */ {
+  /**
+   * Text shown while the loading is ongoing.
+   * ^optional
+   * ^default='Loading...'
+   * @type {string}
+   */
+  text: null,
+
+  /**
+   * String to use as the innerHTML of the ButterBar instead of using the given text.
+   * ^optional
+   * @type {string}
+   */
+  html: null,
+
+  /**
+   * HTML element to insert into the ButterBar instead of using the given text.
+   * ^optional
+   * @type {HTMLElement}
+   */
+  el: null,
+
+  /**
+   * String to add as a css class to the ButterBar container element.
+   * ^optional
+   * @type {string}
+   */
+  className: null,
+
+  /**
+   * Messages with lower priorities won't interrupt a currently displayed message.
+   * Loading messages default to a lower priority than other message types.
+   * ^optional
+   * ^default=-3
+   * @type {number}
+   */
+  priority: null,
+
+  /**
+   * If true, the message will immediately disappear if the user navigates to
+   * another route view.
+   * ^optional
+   * ^default=true
+   * @type {boolean}
+   */
+  hideOnViewChanged: null,
+
+  /**
+   * Whether this message should re-appear after being interrupted by another
+   * message.
+   * ^optional
+   * ^default=true
+   * @type {boolean}
+   */
+  persistent: null,
+
+  /**
+   * If a new message has the same messageKey as the current message, then the
+   * current message will always be destroyed, regardless of its priority. Sets
+   * the {messageKey} of both the initial message and the confirmation message.
+   * ^optional
+   * @type {Object}
+   */
+  messageKey: null
 };
 
 /**
@@ -243,77 +314,6 @@ var SavingMessageDescriptor = /** @lends SavingMessageDescriptor */ {
    * @type {boolean}
    */
   showConfirmation: null,
-
-  /**
-   * If true, the message will immediately disappear if the user navigates to
-   * another route view.
-   * ^optional
-   * ^default=true
-   * @type {boolean}
-   */
-  hideOnViewChanged: null,
-
-  /**
-   * Whether this message should re-appear after being interrupted by another
-   * message.
-   * ^optional
-   * ^default=true
-   * @type {boolean}
-   */
-  persistent: null,
-
-  /**
-   * If a new message has the same messageKey as the current message, then the
-   * current message will always be destroyed, regardless of its priority. Sets
-   * the {messageKey} of both the initial message and the confirmation message.
-   * ^optional
-   * @type {Object}
-   */
-  messageKey: null
-};
-
-/**
- * @class
- * This type is used to describe the messages for {ButterBar.showLoading} to show
- */
-var LoadingMessageDescriptor = /** @lends LoadingMessageDescriptor */ {
-  /**
-   * Text shown while the loading is ongoing.
-   * ^optional
-   * ^default='Loading...'
-   * @type {string}
-   */
-  text: null,
-
-  /**
-   * String to use as the innerHTML of the ButterBar instead of using the given text.
-   * ^optional
-   * @type {string}
-   */
-  html: null,
-
-  /**
-   * HTML element to insert into the ButterBar instead of using the given text.
-   * ^optional
-   * @type {HTMLElement}
-   */
-  el: null,
-
-  /**
-   * String to add as a css class to the ButterBar container element.
-   * ^optional
-   * @type {string}
-   */
-  className: null,
-
-  /**
-   * Messages with lower priorities won't interrupt a currently displayed message.
-   * Loading messages default to a lower priority than other message types.
-   * ^optional
-   * ^default=-3
-   * @type {number}
-   */
-  priority: null,
 
   /**
    * If true, the message will immediately disappear if the user navigates to
