@@ -164,6 +164,9 @@ class GmailComposeView {
               if (event.oldMessageID) this._messageId = event.oldMessageID;
               if (event.oldThreadID) this._threadID = event.oldThreadID;
 
+              driver.removeCachedGmailMessageIdForSyncMessageId(syncMessageID);
+              driver.removeCachedOldGmailThreadIdFromSyncThreadId(syncThreadID);
+
               return {
                 eventName: 'sent',
                 data: {
@@ -172,9 +175,6 @@ class GmailComposeView {
                       if (event.oldThreadID) {
                         return event.oldThreadID;
                       }
-                      driver.removeCachedOldGmailThreadIdFromSyncThreadId(
-                        syncMessageID
-                      );
                       return await driver.getOldGmailThreadIdFromSyncThreadId(
                         syncThreadID
                       );
@@ -185,9 +185,6 @@ class GmailComposeView {
                       if (event.oldMessageID) {
                         return event.oldMessageID;
                       }
-                      driver.removeCachedGmailMessageIdForSyncMessageId(
-                        syncMessageID
-                      );
                       return await driver.getGmailMessageIdForSyncMessageId(
                         syncMessageID
                       );
