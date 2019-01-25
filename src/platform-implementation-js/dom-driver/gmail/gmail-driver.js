@@ -128,6 +128,7 @@ class GmailDriver {
   getOldGmailThreadIdFromSyncThreadId: (threadId: string) => Promise<string>;
   removeCachedOldGmailThreadIdFromSyncThreadId: (threadId: string) => void;
 
+  getGmailMessageIdForSyncDraftId: (syncDraftId: string) => Promise<string>;
   getGmailMessageIdForSyncMessageId: (syncMessageId: string) => Promise<string>;
   removeCachedGmailMessageIdForSyncMessageId: (syncMessageID: string) => void;
 
@@ -205,6 +206,12 @@ class GmailDriver {
         gmailMessageIdForSyncMessageIdCache.getAfromB(syncMessageId);
       this.removeCachedGmailMessageIdForSyncMessageId = syncMessageId =>
         gmailMessageIdForSyncMessageIdCache.removeBfromCache(syncMessageId);
+
+      // It's important that this doesn't use the same cache for looking up
+      // sync message IDs, because the legacy ID of a draft changes when it's
+      // sent. It doesn't really need to be cached so it's not here.
+      this.getGmailMessageIdForSyncDraftId = syncDraftId =>
+        getGmailMessageIdForSyncMessageId(this, syncDraftId);
     }
 
     this._gmailRouteProcessor = new GmailRouteProcessor();

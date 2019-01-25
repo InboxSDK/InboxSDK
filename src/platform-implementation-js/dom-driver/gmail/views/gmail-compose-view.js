@@ -607,7 +607,7 @@ class GmailComposeView {
       const syncMessageId = this._getMessageIDfromForm();
       if (syncMessageId) {
         this._driver
-          .getGmailMessageIdForSyncMessageId(syncMessageId)
+          .getGmailMessageIdForSyncDraftId(syncMessageId)
           .then(gmailMessageId => {
             this._initialMessageId = gmailMessageId;
             this._messageId = gmailMessageId;
@@ -1380,7 +1380,7 @@ class GmailComposeView {
           try {
             // If this succeeds, then the draft must exist on the server and we
             // can safely return the draft id we know.
-            const gmailMessageId = await this._driver.getGmailMessageIdForSyncMessageId(
+            const gmailMessageId = await this._driver.getGmailMessageIdForSyncDraftId(
               syncMessageId
             );
           } catch (e) {
