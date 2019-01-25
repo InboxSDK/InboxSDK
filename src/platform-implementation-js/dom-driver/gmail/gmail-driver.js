@@ -194,8 +194,18 @@ class GmailDriver {
 
     // mapping between sync message ids and old message ids
     {
+      try {
+        // TODO remove sometime after March 24 2019 to give time for this to
+        // run for most users.
+        localStorage.removeItem(
+          'inboxsdk__cached_gmail_and_inbox_message_ids_2'
+        );
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(err);
+      }
       const gmailMessageIdForSyncMessageIdCache = new BiMapCache({
-        key: 'inboxsdk__cached_gmail_and_inbox_message_ids_2',
+        key: 'inboxsdk__cached_gmail_and_inbox_message_ids_3',
         getAfromB: (sync: string) =>
           getGmailMessageIdForSyncMessageId(this, sync),
         getBfromA() {
