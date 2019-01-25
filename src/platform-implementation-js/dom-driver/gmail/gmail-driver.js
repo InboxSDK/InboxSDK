@@ -914,6 +914,41 @@ class GmailDriver {
   ): Promise<GetDraftIdResult> {
     return getDraftIDForMessageID(this, messageID, skipCache);
   }
+
+  _recentSyncDraftIds = new Map<string, number>();
+
+  reportRecentSyncDraftId(syncDraftId: string) {
+    const count: ?number = this._recentSyncDraftIds.get(syncDraftId);
+    const newCount = (count ?? 0) + 1;
+    this._recentSyncDraftIds.set(syncDraftId, newCount);
+  }
+  reportDraftClosed(syncDraftId: string) {
+    Kefir.later(30 * 1000)
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        const count: ?number = this._recentSyncDraftIds.get(syncDraftId);
+        let newCount;
+        if (count == null || count < 1) {
+          newCount = 0;
+          this._logger.error(
+            new Error('_recentSyncDraftIds count had unexpected value'),
+            {
+              count
+            }
+          );
+        } else {
+          newCount = count - 1;
+        }
+        if (newCount === 0) {
+          this._recentSyncDraftIds.delete(syncDraftId);
+        } else {
+          this._recentSyncDraftIds.set(syncDraftId, newCount);
+        }
+      });
+  }
+  isRecentSyncDraftId(syncMessageId: string): boolean {
+    return this._recentSyncDraftIds.has(syncMessageId);
+  }
 }
 
 export default defn(module, GmailDriver);

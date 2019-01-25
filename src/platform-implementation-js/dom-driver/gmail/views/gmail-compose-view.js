@@ -615,6 +615,15 @@ class GmailComposeView {
           .catch(() => {
             //do nothing because this means the message hasn't been saved yet
           });
+
+        this._driver.reportRecentSyncDraftId(syncMessageId);
+        this._stopper.onValue(() => {
+          this._driver.reportDraftClosed(syncMessageId);
+        });
+      } else {
+        this._driver
+          .getLogger()
+          .error(new Error('Draft is missing sync draft id'));
       }
 
       const legacyThreadIdElement: ?HTMLInputElement = (this._element.querySelector(

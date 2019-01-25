@@ -94,7 +94,13 @@ class GmailMessageView {
         if (!syncMessageId)
           throw new Error('data-message-id attribute has no value');
 
-        if (messageIdElement.hasAttribute('data-legacy-message-id')) {
+        // Only respect data-legacy-message-id if data-message-id is not the id
+        // of a draft we've seen recently, in order to work around a Gmail bug.
+        // https://github.com/StreakYC/GmailSDK/issues/515#issuecomment-457420619
+        if (
+          messageIdElement.hasAttribute('data-legacy-message-id') &&
+          !this._driver.isRecentSyncDraftId(syncMessageId.replace('#', ''))
+        ) {
           partialReadyStream = Kefir.constant(null);
         } else {
           // we have a data message id, but not the legacy message id. So now we have to poll for the gmail message id
