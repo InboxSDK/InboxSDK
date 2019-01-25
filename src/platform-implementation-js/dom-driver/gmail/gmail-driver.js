@@ -128,6 +128,7 @@ class GmailDriver {
   getOldGmailThreadIdFromSyncThreadId: (threadId: string) => Promise<string>;
   removeCachedOldGmailThreadIdFromSyncThreadId: (threadId: string) => void;
 
+  getGmailMessageIdForSyncDraftId: (syncDraftId: string) => Promise<string>;
   getGmailMessageIdForSyncMessageId: (syncMessageId: string) => Promise<string>;
   removeCachedGmailMessageIdForSyncMessageId: (syncMessageID: string) => void;
 
@@ -193,8 +194,18 @@ class GmailDriver {
 
     // mapping between sync message ids and old message ids
     {
+      try {
+        // TODO remove sometime after March 24 2019 to give time for this to
+        // run for most users.
+        localStorage.removeItem(
+          'inboxsdk__cached_gmail_and_inbox_message_ids_2'
+        );
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error(err);
+      }
       const gmailMessageIdForSyncMessageIdCache = new BiMapCache({
-        key: 'inboxsdk__cached_gmail_and_inbox_message_ids_2',
+        key: 'inboxsdk__cached_gmail_and_inbox_message_ids_3',
         getAfromB: (sync: string) =>
           getGmailMessageIdForSyncMessageId(this, sync),
         getBfromA() {
@@ -205,6 +216,12 @@ class GmailDriver {
         gmailMessageIdForSyncMessageIdCache.getAfromB(syncMessageId);
       this.removeCachedGmailMessageIdForSyncMessageId = syncMessageId =>
         gmailMessageIdForSyncMessageIdCache.removeBfromCache(syncMessageId);
+
+      // It's important that this doesn't use the same cache for looking up
+      // sync message IDs, because the legacy ID of a draft changes when it's
+      // sent. It doesn't really need to be cached so it's not here.
+      this.getGmailMessageIdForSyncDraftId = syncDraftId =>
+        getGmailMessageIdForSyncMessageId(this, syncDraftId);
     }
 
     this._gmailRouteProcessor = new GmailRouteProcessor();
@@ -896,6 +913,41 @@ class GmailDriver {
     skipCache: boolean = false
   ): Promise<GetDraftIdResult> {
     return getDraftIDForMessageID(this, messageID, skipCache);
+  }
+
+  _recentSyncDraftIds = new Map<string, number>();
+
+  reportRecentSyncDraftId(syncDraftId: string) {
+    const count: ?number = this._recentSyncDraftIds.get(syncDraftId);
+    const newCount = (count ?? 0) + 1;
+    this._recentSyncDraftIds.set(syncDraftId, newCount);
+  }
+  reportDraftClosed(syncDraftId: string) {
+    Kefir.later(30 * 1000)
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        const count: ?number = this._recentSyncDraftIds.get(syncDraftId);
+        let newCount;
+        if (count == null || count < 1) {
+          newCount = 0;
+          this._logger.error(
+            new Error('_recentSyncDraftIds count had unexpected value'),
+            {
+              count
+            }
+          );
+        } else {
+          newCount = count - 1;
+        }
+        if (newCount === 0) {
+          this._recentSyncDraftIds.delete(syncDraftId);
+        } else {
+          this._recentSyncDraftIds.set(syncDraftId, newCount);
+        }
+      });
+  }
+  isRecentSyncDraftId(syncMessageId: string): boolean {
+    return this._recentSyncDraftIds.has(syncMessageId);
   }
 }
 

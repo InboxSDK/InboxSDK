@@ -164,6 +164,9 @@ class GmailComposeView {
               if (event.oldMessageID) this._messageId = event.oldMessageID;
               if (event.oldThreadID) this._threadID = event.oldThreadID;
 
+              driver.removeCachedGmailMessageIdForSyncMessageId(syncMessageID);
+              driver.removeCachedOldGmailThreadIdFromSyncThreadId(syncThreadID);
+
               return {
                 eventName: 'sent',
                 data: {
@@ -172,9 +175,6 @@ class GmailComposeView {
                       if (event.oldThreadID) {
                         return event.oldThreadID;
                       }
-                      driver.removeCachedOldGmailThreadIdFromSyncThreadId(
-                        syncMessageID
-                      );
                       return await driver.getOldGmailThreadIdFromSyncThreadId(
                         syncThreadID
                       );
@@ -185,9 +185,6 @@ class GmailComposeView {
                       if (event.oldMessageID) {
                         return event.oldMessageID;
                       }
-                      driver.removeCachedGmailMessageIdForSyncMessageId(
-                        syncMessageID
-                      );
                       return await driver.getGmailMessageIdForSyncMessageId(
                         syncMessageID
                       );
@@ -610,7 +607,7 @@ class GmailComposeView {
       const syncMessageId = this._getMessageIDfromForm();
       if (syncMessageId) {
         this._driver
-          .getGmailMessageIdForSyncMessageId(syncMessageId)
+          .getGmailMessageIdForSyncDraftId(syncMessageId)
           .then(gmailMessageId => {
             this._initialMessageId = gmailMessageId;
             this._messageId = gmailMessageId;
@@ -618,6 +615,15 @@ class GmailComposeView {
           .catch(() => {
             //do nothing because this means the message hasn't been saved yet
           });
+
+        this._driver.reportRecentSyncDraftId(syncMessageId);
+        this._stopper.onValue(() => {
+          this._driver.reportDraftClosed(syncMessageId);
+        });
+      } else {
+        this._driver
+          .getLogger()
+          .error(new Error('Draft is missing sync draft id'));
       }
 
       const legacyThreadIdElement: ?HTMLInputElement = (this._element.querySelector(
@@ -1383,7 +1389,7 @@ class GmailComposeView {
           try {
             // If this succeeds, then the draft must exist on the server and we
             // can safely return the draft id we know.
-            const gmailMessageId = await this._driver.getGmailMessageIdForSyncMessageId(
+            const gmailMessageId = await this._driver.getGmailMessageIdForSyncDraftId(
               syncMessageId
             );
           } catch (e) {
