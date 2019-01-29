@@ -97,7 +97,7 @@ class Logger {
 
     if (this._isMaster && global.document) {
       document.addEventListener('inboxSDKinjectedError', (event: any) => {
-        var detail = event.detail;
+        const detail = event.detail;
         this.error(
           Object.assign(new Error(detail.message), { stack: detail.stack }),
           detail.details
@@ -107,7 +107,7 @@ class Logger {
       document.addEventListener(
         'inboxSDKinjectedEventSdkPassive',
         (event: any) => {
-          var detail = event.detail;
+          const detail = event.detail;
           this.eventSdkPassive(detail.name, detail.details);
         }
       );
@@ -257,7 +257,7 @@ function _extensionLoggerSetup(
   _extensionAppIds.push(
     Object.freeze({
       appId: appId,
-      version: opts.appVersion || undefined
+      version: opts.appVersion ?? undefined
     })
   );
   ((document.documentElement: any): HTMLElement).setAttribute(
@@ -266,7 +266,7 @@ function _extensionLoggerSetup(
       getAllAppIds().concat([
         {
           appId: appId,
-          version: opts.appVersion || undefined
+          version: opts.appVersion ?? undefined
         }
       ])
     )
@@ -316,9 +316,7 @@ function _extensionLoggerSetup(
       };
     });
 
-    var ETp = window.EventTarget
-      ? window.EventTarget.prototype
-      : window.Node.prototype;
+    const ETp = window.EventTarget?.prototype ?? window.Node.prototype;
     replaceFunction(ETp, 'addEventListener', function(original) {
       return function wrappedAddEventListener(...args) {
         if (typeof args[1] == 'function') {
@@ -327,7 +325,7 @@ function _extensionLoggerSetup(
             // otherwise attach it as a property to the original function.
             // This is necessary so that removeEventListener is called with
             // the right function.
-            var loggedFn = args[1].__inboxsdk_logged;
+            let loggedFn = args[1].__inboxsdk_logged;
             if (!loggedFn) {
               loggedFn = makeLoggedFunction(args[1], 'event listener');
               args[1].__inboxsdk_logged = loggedFn;
@@ -543,7 +541,7 @@ if (_extensionIsLoggerMaster && global.document && global.MutationObserver) {
     .map(() => null)
     .throttle(120 * 1000)
     .onValue(function() {
-      var events: any[] = _trackedEventsQueue.removeAll();
+      const events: any[] = _trackedEventsQueue.removeAll();
 
       // The trackedEventsQueue is in localStorage, which is shared between
       // multiple tabs. A different tab could have flushed it already recently.

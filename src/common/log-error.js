@@ -54,7 +54,7 @@ export default function logError(
       err = new Error('Logger.error called with non-error: ' + err);
       markErrorAsSeen(err);
     }
-    var {
+    const {
       appId,
       appIds,
       implVersion,
@@ -85,43 +85,29 @@ export default function logError(
     // our own current stack just in case.
     const nowStack = getStackTrace();
 
-    let stuffToLog: any[] = ['Error logged:', err];
-    if (err && err.stack) {
-      stuffToLog = stuffToLog.concat([
-        '\n\nOriginal error stack:\n' + err.stack
-      ]);
+    const stuffToLog: any[] = ['Error logged:', err];
+    if (err?.stack) {
+      stuffToLog.push('\n\nOriginal error stack:\n' + err.stack);
     }
-    stuffToLog = stuffToLog.concat(['\n\nError logged from:\n' + nowStack]);
+    stuffToLog.push('\n\nError logged from:\n' + nowStack);
     if (details) {
-      stuffToLog = stuffToLog.concat(['\n\nError details:', details]);
+      stuffToLog.push('\n\nError details:', details);
     }
-    stuffToLog = stuffToLog.concat([
-      '\n\nExtension App Ids:',
-      JSON.stringify(appIds, null, 2)
-    ]);
-    stuffToLog = stuffToLog.concat(['\nSent by App:', sentByApp]);
-    stuffToLog = stuffToLog.concat(['\nSession Id:', sessionId]);
-    stuffToLog = stuffToLog.concat(['\nExtension Id:', getExtensionId()]);
-    stuffToLog = stuffToLog.concat([
-      '\nInboxSDK Loader Version:',
-      loaderVersion
-    ]);
-    stuffToLog = stuffToLog.concat([
-      '\nInboxSDK Implementation Version:',
-      implVersion
-    ]);
-    stuffToLog = stuffToLog.concat(['\nIs Using Sync API:', isUsingSyncAPI]);
-    stuffToLog = stuffToLog.concat([
-      '\nIs Using Material Gmail UI:',
-      isUsingMaterialGmailUI
-    ]);
+    stuffToLog.push('\n\nExtension App Ids:', JSON.stringify(appIds, null, 2));
+    stuffToLog.push('\nSent by App:', sentByApp);
+    stuffToLog.push('\nSession Id:', sessionId);
+    stuffToLog.push('\nExtension Id:', getExtensionId());
+    stuffToLog.push('\nInboxSDK Loader Version:', loaderVersion);
+    stuffToLog.push('\nInboxSDK Implementation Version:', implVersion);
+    stuffToLog.push('\nIs Using Sync API:', isUsingSyncAPI);
+    stuffToLog.push('\nIs Using Material Gmail UI:', isUsingMaterialGmailUI);
 
     // eslint-disable-next-line no-console
-    console.error.apply(console, stuffToLog);
+    console.error(...stuffToLog);
 
     const report = {
-      message: (err && err.message) || err,
-      stack: err && err.stack,
+      message: err?.message ?? err,
+      stack: err?.stack,
       loggedFrom: nowStack,
       details,
       appIds,
@@ -149,8 +135,8 @@ export default function logError(
           bubbles: false,
           cancelable: false,
           detail: {
-            message: (err && err.message) || err,
-            stack: err && err.stack,
+            message: err?.message ?? err,
+            stack: err?.stack,
             loggedFrom: nowStack,
             details,
             sentByApp
@@ -189,16 +175,10 @@ const _extensionSeenErrors: {
       }
     },
     add(e: Error) {
-      if (
-        global.__inboxsdk_extensionSeenErrors &&
-        global.__inboxsdk_extensionSeenErrors.set
-      ) {
+      if (global.__inboxsdk_extensionSeenErrors?.set) {
         // It's a WeakMap.
         global.__inboxsdk_extensionSeenErrors.set(e, true);
-      } else if (
-        global.__inboxsdk_extensionSeenErrors &&
-        global.__inboxsdk_extensionSeenErrors.add
-      ) {
+      } else if (global.__inboxsdk_extensionSeenErrors?.add) {
         // Older versions of inboxsdk.js initialized it as a WeakSet instead,
         // so handle that too.
         global.__inboxsdk_extensionSeenErrors.add(e);
