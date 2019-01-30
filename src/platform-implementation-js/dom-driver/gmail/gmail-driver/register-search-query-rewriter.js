@@ -1,7 +1,5 @@
 /* @flow */
 
-import RSVP from 'rsvp';
-
 import type PageCommunicator from '../gmail-page-communicator';
 
 export default function registerSearchQueryRewriter(
@@ -11,20 +9,20 @@ export default function registerSearchQueryRewriter(
   pageCommunicator.createCustomSearchTerm(obj.term);
 
   pageCommunicator.ajaxInterceptStream
-    .filter(function(event) {
+    .filter(event => {
       return (
         event.type === 'searchQueryForReplacement' && event.term === obj.term
       );
     })
-    .onValue(function(event) {
-      RSVP.Promise.resolve(obj.termReplacer({})).then(function(result) {
+    .onValue(event => {
+      Promise.resolve(obj.termReplacer({})).then(result => {
         if (typeof result != 'string') {
           throw new Error('termReplacer response must be a string');
         }
-        var newTerm = '(' + result + ')';
-        var newQuery = event.query.replace(
+        const newTerm = '(' + result + ')';
+        const newQuery = event.query.replace(
           obj.term,
-          newTerm.replace(/\$/g, '$$$$')
+          () => newTerm // Callback used so $ escapes aren't interpreted
         );
         pageCommunicator.setSearchQueryReplacement(event.query, newQuery);
       });
