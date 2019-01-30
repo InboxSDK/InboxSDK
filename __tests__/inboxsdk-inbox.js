@@ -1,6 +1,5 @@
 /* @flow */
 
-import RSVP from '../test/lib/rsvp';
 import MockMutationObserver from '../test/lib/mock-mutation-observer';
 
 process.env.VERSION = 'beep';

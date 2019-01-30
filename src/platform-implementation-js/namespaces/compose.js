@@ -1,7 +1,6 @@
 /* @flow */
 
 import * as ud from 'ud';
-import RSVP from 'rsvp';
 import Kefir from 'kefir';
 import get from '../../common/get-or-fail';
 import ComposeView from '../views/compose-view';
@@ -66,7 +65,7 @@ class Compose {
           ? Kefir.constant(view)
           : Kefir.constantError(new Error('draft did not open'));
       })
-      .toPromise(RSVP.Promise);
+      .toPromise();
     members.driver.openDraftByMessageID(messageID);
     return newComposePromise;
   }

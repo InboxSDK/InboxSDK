@@ -1,9 +1,9 @@
 /* @flow */
 
-import RSVP from 'rsvp';
 import EventEmitter from '../lib/safe-event-emitter';
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
+import defer from '../../common/defer';
 import get from '../../common/get-or-fail';
 import NavItemView from './nav-item-view';
 
@@ -19,7 +19,7 @@ export default class NativeNavItemView extends EventEmitter {
       appId,
       driver,
       labelName,
-      deferred: RSVP.defer(),
+      deferred: defer(),
       navItemViews: [],
       navItemViewDriver: (null: ?Object)
     };

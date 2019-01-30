@@ -1,6 +1,5 @@
 /* @flow */
 
-import RSVP from 'rsvp';
 import Kefir from 'kefir';
 
 import GmailComposeButtonView from './gmail-compose-button-view';
@@ -16,8 +15,8 @@ export default function addButton(
   buttonDescriptorStream: Kefir.Observable<?Object>,
   groupOrderHint: string,
   extraOnClickOptions: Object
-) {
-  return new RSVP.Promise(function(resolve, reject) {
+): Promise<?Object> {
+  return new Promise((resolve, reject) => {
     let buttonViewController;
 
     buttonDescriptorStream

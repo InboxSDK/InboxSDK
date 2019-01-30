@@ -3,7 +3,6 @@
 
 import Sha256 from 'sha.js/sha256';
 import ajax from '../../common/ajax';
-import RSVP from 'rsvp';
 import getStackTrace from '../../common/get-stack-trace';
 import getExtensionId from '../../common/get-extension-id';
 import getSessionId from '../../common/get-session-id';
@@ -285,10 +284,6 @@ function _extensionLoggerSetup(
       (Error: any).stackTraceLimit = 40;
     }
 
-    RSVP.on('error', function(err) {
-      Logger.error(err, 'Possibly uncaught promise rejection');
-    });
-
     window.addEventListener('error', function(event) {
       // Ugh, currently Chrome makes this pretty useless. Once Chrome fixes
       // this, we can remove the logged function wrappers around setTimeout and
@@ -375,14 +370,6 @@ function _extensionLoggerSetup(
       WrappedMutationObserver.prototype = Original.prototype;
 
       return WrappedMutationObserver;
-    });
-  } else {
-    // Even if we're set not to log errors, we should still avoid letting RSVP
-    // swallow errors entirely.
-    RSVP.on('error', function(err) {
-      setTimeout(() => {
-        throw err;
-      }, 0);
     });
   }
 }

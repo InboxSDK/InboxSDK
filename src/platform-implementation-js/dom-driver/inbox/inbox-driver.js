@@ -4,7 +4,6 @@ import once from 'lodash/once';
 import constant from 'lodash/constant';
 import includes from 'lodash/includes';
 import autoHtml from 'auto-html';
-import RSVP from 'rsvp';
 
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';

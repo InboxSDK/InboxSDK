@@ -101,7 +101,7 @@ function setupExamples() {
 gulp.task('noop', _.noop);
 
 function getVersion(): Promise<string> {
-  return RSVP.Promise.all([
+  return Promise.all([
     exec('git rev-list HEAD --max-count=1'),
     exec('git status --porcelain')
   ]).then(function(results) {
@@ -204,8 +204,8 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
         )
         .pipe(destAtomic('./dist/'));
 
-      return new RSVP.Promise(function(resolve, reject) {
-        var errCb = _.once(function(err) {
+      return new Promise((resolve, reject) => {
+        var errCb = _.once(err => {
           reject(err);
           result.end();
         });

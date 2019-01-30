@@ -16,10 +16,9 @@ if (!global.__InboxSDKImpLoader) {
     }
     // TODO check error logs to see if we need to re-enable safari-fix-map.
     // require('safari-fix-map');
-    var RSVP = require('rsvp');
     var Kefir = require('kefir');
 
-    var onready = new RSVP.Promise((resolve, reject) => {
+    var onready = new Promise((resolve, reject) => {
       if (
         document.readyState === 'complete' ||
         document.readyState === 'interactive'
@@ -33,7 +32,7 @@ if (!global.__InboxSDKImpLoader) {
           ])
             .take(1)
             .map(() => null)
-            .toPromise(RSVP.Promise)
+            .toPromise()
         );
       }
     });

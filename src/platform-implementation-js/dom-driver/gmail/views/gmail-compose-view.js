@@ -8,7 +8,6 @@ import constant from 'lodash/constant';
 import find from 'lodash/find';
 import asap from 'asap';
 import delay from 'pdelay';
-import RSVP from 'rsvp';
 import * as Kefir from 'kefir';
 import * as ud from 'ud';
 import closest from 'closest-ng';

@@ -5,7 +5,6 @@ import _ from 'lodash';
 import noop from 'lodash/noop';
 import sinon from 'sinon';
 import delay from 'pdelay';
-import RSVP from '../../test/lib/rsvp';
 import MockServer from '../../test/lib/MockServer';
 
 const testError = new Error('TEST');
@@ -92,10 +91,10 @@ constructors['XHRProxy with changers'] = XHRProxyFactory(
     {
       isRelevantTo: () => true,
       requestChanger(connection, request) {
-        return RSVP.Promise.resolve(request);
+        return Promise.resolve(request);
       },
       responseTextChanger(connection, response) {
-        return RSVP.Promise.resolve(response);
+        return Promise.resolve(response);
       }
     }
   ],
@@ -1155,7 +1154,7 @@ describe('XHRProxyFactory', () => {
         {
           isRelevantTo: () => true,
           requestChanger(connection, request) {
-            return RSVP.Promise.resolve({
+            return Promise.resolve({
               method: request.method + 'a',
               url: request.url + 'A',
               body: request.body + '1'
@@ -1195,8 +1194,8 @@ describe('XHRProxyFactory', () => {
       const wrappers = [
         {
           isRelevantTo: () => true,
-          requestChanger(connection, request) {
-            return RSVP.Promise.resolve({
+          requestChanger(connection, request): any {
+            return Promise.resolve({
               method: request.method + 'a',
               url: request.url + 'A',
               _MISSPELL_body: request.body + '1'

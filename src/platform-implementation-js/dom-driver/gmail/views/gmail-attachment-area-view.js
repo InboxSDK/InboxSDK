@@ -1,6 +1,5 @@
 /* @flow */
 
-import RSVP from 'rsvp';
 import { defn } from 'ud';
 import type GmailDriver from '../gmail-driver';
 import type GmailMessageView from './gmail-message-view';
