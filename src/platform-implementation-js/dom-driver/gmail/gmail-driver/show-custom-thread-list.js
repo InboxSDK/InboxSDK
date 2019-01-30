@@ -2,7 +2,6 @@
 
 import find from 'lodash/find';
 import Kefir from 'kefir';
-import RSVP from 'rsvp';
 import GmailElementGetter from '../gmail-element-getter';
 import * as GRP from '../gmail-response-processor';
 import * as SyncGRP from '../gmail-sync-response-processor';
@@ -17,11 +16,12 @@ type ThreadDescriptor =
       rfcMessageId?: ?string
     };
 
-type InitialIDPairs = Array<
-  { rfcId: string } | { gtid: string } | { rfcId: string, gtid: string }
->;
-type IDPairsWithRFC = Array<{ rfcId: string, gtid?: string }>;
-type CompletedIDPairs = Array<{ rfcId: string, gtid: string }>;
+type InitialIDPair =
+  | { rfcId: string }
+  | { gtid: string }
+  | { rfcId: string, gtid: string };
+type IDPairWithRFC = { rfcId: string, gtid?: string };
+type CompletedIDPair = { rfcId: string, gtid: string };
 
 type HandlerResult = {
   total?: number,
@@ -128,7 +128,7 @@ const setupSearchReplacing = (
       driver.signalCustomThreadListActivity(customRouteID);
       try {
         return Kefir.fromPromise(
-          RSVP.Promise.resolve(onActivate(start, MAX_THREADS_PER_PAGE)).then(
+          Promise.resolve(onActivate(start, MAX_THREADS_PER_PAGE)).then(
             (result: HandlerResult) => ({ start, result })
           )
         );
@@ -248,30 +248,34 @@ const setupSearchReplacing = (
       })
     )
     // Figure out any rfc ids we don't know yet
-    .map(({ start, total, threads }: NormalizedHandlerResult<InitialIDPairs>) =>
-      RSVP.Promise.all(
-        threads.map(pair => {
-          if (pair.rfcId) {
-            return pair;
-          } else if (typeof pair.gtid === 'string') {
-            const gtid = pair.gtid;
-            return driver
-              .getRfcMessageIdForGmailThreadId(gtid)
-              .then(
-                rfcId => ({ gtid, rfcId }),
-                err => findIdFailure(gtid, err)
-              );
-          }
-        })
-      ).then((pairs: IDPairsWithRFC) => ({
-        start,
-        total,
-        threads: pairs.filter(Boolean)
-      }))
+    .map(
+      ({ start, total, threads }: NormalizedHandlerResult<InitialIDPair[]>) =>
+        Promise.all(
+          threads.map(
+            (pair: InitialIDPair): Promise<?IDPairWithRFC> => {
+              if (pair.rfcId) {
+                return Promise.resolve(((pair: any): IDPairWithRFC));
+              } else if (typeof pair.gtid === 'string') {
+                const gtid = pair.gtid;
+                return driver
+                  .getRfcMessageIdForGmailThreadId(gtid)
+                  .then(
+                    rfcId => ({ gtid, rfcId }),
+                    err => findIdFailure(gtid, err)
+                  );
+              }
+              return Promise.resolve(null);
+            }
+          )
+        ).then((pairs: Array<?IDPairWithRFC>) => ({
+          start,
+          total,
+          threads: pairs.filter(Boolean)
+        }))
     )
     .flatMap(Kefir.fromPromise)
     .onValue(
-      ({ start, total, threads }: NormalizedHandlerResult<IDPairsWithRFC>) => {
+      ({ start, total, threads }: NormalizedHandlerResult<IDPairWithRFC[]>) => {
         const messageIDQuery: string =
           threads.length > 0
             ? threads.map(({ rfcId }) => 'rfc822msgid:' + rfcId).join(' OR ')
@@ -287,34 +291,37 @@ const setupSearchReplacing = (
           query: newQuery,
           start
         });
-        Kefir.combine([
-          // Figure out any gmail thread ids we don't know yet
-          Kefir.fromPromise(
-            RSVP.Promise.all(
-              threads.map(pair =>
-                pair.gtid
-                  ? pair
-                  : driver
-                      .getGmailThreadIdForRfcMessageId(pair.rfcId)
-                      .then(
-                        gtid => ({ gtid, rfcId: pair.rfcId }),
-                        err => findIdFailure(pair.rfcId, err)
-                      )
+        Kefir.combine(
+          [
+            // Figure out any gmail thread ids we don't know yet
+            Kefir.fromPromise(
+              Promise.all(
+                threads.map(pair =>
+                  pair.gtid
+                    ? pair
+                    : driver
+                        .getGmailThreadIdForRfcMessageId(pair.rfcId)
+                        .then(
+                          gtid => ({ gtid, rfcId: pair.rfcId }),
+                          err => findIdFailure(pair.rfcId, err)
+                        )
+                )
               )
-            )
-          ).map(list => list.filter(Boolean)),
+            ).map(list => list.filter(Boolean)),
 
-          driver
-            .getPageCommunicator()
-            .ajaxInterceptStream.filter(
-              e =>
-                e.type === 'searchResultsResponse' &&
-                e.query === newQuery &&
-                e.start === start
-            )
-            .map(x => x.response)
-            .take(1)
-        ]).onValue(([idPairs, response]: [CompletedIDPairs, string]) => {
+            driver
+              .getPageCommunicator()
+              .ajaxInterceptStream.filter(
+                e =>
+                  e.type === 'searchResultsResponse' &&
+                  e.query === newQuery &&
+                  e.start === start
+              )
+              .map(x => x.response)
+              .take(1)
+          ],
+          (idPairs: any, response: any) => [idPairs, response]
+        ).onValue(([idPairs, response]: [CompletedIDPair[], string]) => {
           // override thread list response so that we show results in the same
           // order that user passed in
           driver.signalCustomThreadListActivity(customRouteID);
