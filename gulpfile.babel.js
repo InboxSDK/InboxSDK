@@ -75,50 +75,44 @@ process.env.IMPLEMENTATION_URL = args.production
   ? 'https://www.inboxsdk.com/build/platform-implementation.js'
   : 'http://localhost:4567/platform-implementation.js';
 
-function setupExamples() {
+async function setupExamples() {
   // Copy inboxsdk.js (and .map) to all subdirs under examples/
-  return fg(['examples/*'], { onlyDirectories: true })
-    .then(dirs => {
-      if (args.copy) {
-        dirs.push('../MailFoo/extensions/devBuilds/chrome/');
-      }
-      return dirs;
-    })
-    .then(function(dirs) {
-      return dirs.reduce(function(stream, dir) {
-        return stream.pipe(destAtomic(dir));
-      }, gulp.src('./dist/' + sdkFilename).pipe(rename('inboxsdk.js')));
-    })
-    .then(streamToPromise)
-    .then(function() {
-      if (args.reloader) {
-        return extReloader();
-      }
-    });
+  const dirs: string[] = await fg(['examples/*'], { onlyDirectories: true });
+  if (args.copy) {
+    dirs.push('../MailFoo/extensions/devBuilds/chrome/');
+  }
+
+  let stream = gulp.src('./dist/' + sdkFilename).pipe(rename('inboxsdk.js'));
+  for (const dir of dirs) {
+    stream = stream.pipe(destAtomic(dir));
+  }
+  await streamToPromise(stream);
+  if (args.reloader) {
+    await extReloader();
+  }
 }
 
-gulp.task('noop', _.noop);
+gulp.task('noop', () => {});
 
-function getVersion(): Promise<string> {
-  return Promise.all([
+async function getVersion(): Promise<string> {
+  const results = await Promise.all([
     exec('git rev-list HEAD --max-count=1'),
     exec('git status --porcelain')
-  ]).then(function(results) {
-    var commit = results[0]
-      .toString()
-      .trim()
-      .slice(0, 16);
-    var isModified = /^\s*M/m.test(results[1].toString());
+  ]);
+  const commit = results[0]
+    .toString()
+    .trim()
+    .slice(0, 16);
+  const isModified = /^\s*M/m.test(results[1].toString());
 
-    var version = `${packageJson.version}-${Date.now()}-${commit}`;
-    if (isModified) {
-      version += '-MODIFIED';
-    }
-    if (args.watch) {
-      version += '-WATCH';
-    }
-    return version;
-  });
+  let version = `${packageJson.version}-${Date.now()}-${commit}`;
+  if (isModified) {
+    version += '-MODIFIED';
+  }
+  if (args.watch) {
+    version += '-WATCH';
+  }
+  return version;
 }
 
 async function getBrowserifyHmrOptions(port: number) {
@@ -168,8 +162,8 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
       bundler.plugin(require('browserify-hmr'), browserifyHmrOptions);
     }
 
-    function buildBundle() {
-      var sourcemapPipeline = lazyPipe()
+    function buildBundle(): Promise<void> {
+      const sourcemapPipeline = lazyPipe()
         .pipe(
           addsrc.prepend,
           willMinify || args.production ? ['./src/inboxsdk-js/header.js'] : []
@@ -195,8 +189,8 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
           }
         );
 
-      var bundle = bundler.bundle();
-      var result = bundle
+      const bundle = bundler.bundle();
+      const result = bundle
         .pipe(source(destname))
         .pipe(
           gulpif(willMinify || args.production, streamify(sourcemapPipeline()))
@@ -204,7 +198,7 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
         .pipe(destAtomic('./dist/'));
 
       return new Promise((resolve, reject) => {
-        var errCb = _.once(err => {
+        const errCb = _.once(err => {
           reject(err);
           result.end();
         });
@@ -218,30 +212,27 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
       bundler = watchify(bundler);
       Kefir.fromEvents(bundler, 'update')
         .throttle(10)
-        .onValue(function() {
-          gutil.log("Rebuilding '" + gutil.colors.cyan(name) + "'");
-          buildBundle()
-            .then(function() {
+        .onValue(() => {
+          (async () => {
+            try {
+              gutil.log("Rebuilding '" + gutil.colors.cyan(name) + "'");
+              await buildBundle();
               if (name === 'sdk') {
-                return setupExamples();
+                await setupExamples();
               }
-            })
-            .then(
-              function() {
-                gutil.log(
-                  "Finished rebuild of '" + gutil.colors.cyan(name) + "'"
-                );
-              },
-              function(err) {
-                gutil.log(
-                  gutil.colors.red('Error') +
-                    " rebuilding '" +
-                    gutil.colors.cyan(name) +
-                    "':",
-                  err.message
-                );
-              }
-            );
+              gutil.log(
+                "Finished rebuild of '" + gutil.colors.cyan(name) + "'"
+              );
+            } catch (err) {
+              gutil.log(
+                gutil.colors.red('Error') +
+                  " rebuilding '" +
+                  gutil.colors.cyan(name) +
+                  "':",
+                err.message
+              );
+            }
+          })();
         });
     }
 
@@ -258,7 +249,7 @@ if (args.singleBundle) {
     sdkFilename,
     3140
   );
-  gulp.task('imp', function() {
+  gulp.task('imp', () => {
     throw new Error('No separate imp bundle in singleBundle bundle mode');
   });
 } else {
@@ -283,11 +274,11 @@ browserifyTask(
 
 gulp.task('examples', ['sdk'], setupExamples);
 
-gulp.task('server', [args.singleBundle ? 'sdk' : 'imp'], function() {
+gulp.task('server', [args.singleBundle ? 'sdk' : 'imp'], () => {
   return require('./live/app').run();
 });
 
-gulp.task('clean', function(cb) {
+gulp.task('clean', cb => {
   rimraf('./dist/', cb);
 });
 

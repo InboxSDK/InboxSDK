@@ -1,6 +1,7 @@
 /* @flow */
 
-import _ from 'lodash';
+import once from 'lodash/once';
+import memoize from 'lodash/memoize';
 import cproc from 'child_process';
 import fg from 'fast-glob';
 
@@ -19,40 +20,37 @@ function getUserHome(): string {
 // Returns null if no Chrome profiles have the extension installed. If it the
 // extension is installed, it returns the name of Chrome name suffix (such as
 // "", " Canary", etc).
-const getchromeSuffixWithReloaderExtension = _.once(() => {
-  const path =
-    getUserHome() +
-    '/Library/Application Support/Google/Chrome*/*/Extensions/fimgfedafeadlieiabdeeaodndnlbhid';
-  return fg([path], { onlyDirectories: true }).then(results => {
-    const path = results[0];
-    if (path) {
-      return path.match(/Chrome([^/]*)\//)[1];
+const getchromeSuffixWithReloaderExtension = once(
+  async (): Promise<?string> => {
+    const path =
+      getUserHome() +
+      '/Library/Application Support/Google/Chrome*/*/Extensions/fimgfedafeadlieiabdeeaodndnlbhid';
+    const results = await fg([path], { onlyDirectories: true });
+    const firstResult = results[0];
+    if (firstResult) {
+      return firstResult.match(/Chrome([^/]*)\//)[1];
     }
     return null;
-  });
-});
-
-const getChromeLocation = _.memoize(chromeSuffix => {
-  if (!chromeSuffix) {
-    chromeSuffix = '';
   }
-  const path =
-    '/Applications/Google Chrome' +
-    chromeSuffix +
-    '.app/Contents/MacOS/Google Chrome*';
-  return fg([path]).then(function(results) {
-    return results[0];
-  });
-});
+);
 
-export default function extensionReload() {
-  return getchromeSuffixWithReloaderExtension().then(function(chromeSuffix) {
-    if (chromeSuffix != null) {
-      return getChromeLocation(chromeSuffix).then(function(chrome) {
-        if (chrome) {
-          cproc.spawn(chrome, ['http://reload.extensions']);
-        }
-      });
+const getChromeLocation = memoize(
+  async (chromeSuffix: string): Promise<?string> => {
+    const path =
+      '/Applications/Google Chrome' +
+      chromeSuffix +
+      '.app/Contents/MacOS/Google Chrome*';
+    const results = await fg([path]);
+    return results[0];
+  }
+);
+
+export default async function extensionReload(): Promise<void> {
+  const chromeSuffix = await getchromeSuffixWithReloaderExtension();
+  if (chromeSuffix != null) {
+    const chrome = await getChromeLocation(chromeSuffix);
+    if (chrome) {
+      cproc.spawn(chrome, ['http://reload.extensions']);
     }
-  });
+  }
 }
