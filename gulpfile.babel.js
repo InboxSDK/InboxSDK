@@ -282,52 +282,55 @@ gulp.task('clean', cb => {
   rimraf('./dist/', cb);
 });
 
-gulp.task('docs', function(cb) {
-  dir.paths(__dirname + '/src', function(err, paths) {
-    if (err) throw err;
-
-    Promise.all(
-      _.chain(paths.files)
-        .filter(isFileEligbleForDocs)
-        .sort()
-        .map(parseCommentsInFile)
-        .value()
-    )
-      .then(files => {
-        var classes = _.chain(files)
-          .filter(Boolean)
-          .map(x => x.classes)
-          .flatten()
-          .filter(Boolean)
-          .map(transformClass)
-          .forEach(checkForDocIssues)
-          .value();
-
-        var docsJson = {
-          classes: _.chain(classes)
-            .map(ele => [ele.name, ele])
-            .fromPairs()
-            .value()
-        };
-
-        const outDir = './dist';
-        try {
-          fs.statSync(outDir);
-        } catch (err) {
-          fs.mkdirSync(outDir);
-        }
-
-        fs.writeFile('dist/docs.json', JSON.stringify(docsJson, null, 2), cb);
-      })
-      .catch(err => cb(err));
+gulp.task('docs', async () => {
+  const paths = await new Promise((resolve, reject) => {
+    dir.paths(__dirname + '/src', (err, paths) => {
+      if (err) reject(err);
+      else resolve(paths);
+    });
   });
+
+  const files = await Promise.all(
+    _.chain(paths.files)
+      .filter(isFileEligbleForDocs)
+      .sort()
+      .map(parseCommentsInFile)
+      .value()
+  );
+  const classes = _.chain(files)
+    .filter(Boolean)
+    .map(x => x.classes)
+    .flatten()
+    .filter(Boolean)
+    .map(transformClass)
+    .forEach(checkForDocIssues)
+    .value();
+
+  const docsJson = {
+    classes: _.chain(classes)
+      .map(ele => [ele.name, ele])
+      .fromPairs()
+      .value()
+  };
+
+  const outDir = './dist';
+  try {
+    await fs.promises.stat(outDir);
+  } catch (err) {
+    await fs.promises.mkdir(outDir);
+  }
+
+  await fs.promises.writeFile(
+    'dist/docs.json',
+    JSON.stringify(docsJson, null, 2)
+  );
 });
 
 function checkForDocIssues(c) {
   if (c.functions) {
-    c.functions.forEach(function(func) {
+    for (const func of c.functions) {
       if (!func.returns) {
-        console.error(
+        throw new Error(
           'WARNING: ' +
             func.name +
             ' in ' +
@@ -335,42 +338,31 @@ function checkForDocIssues(c) {
             " doesn't have a return tag"
         );
       }
-    });
+    }
   }
 }
 
-function parseCommentsInFile(file) {
+async function parseCommentsInFile(file: string): Promise<Object> {
   gutil.log('Parsing: ' + gutil.colors.cyan(file));
-  return exec(
+  const { stdout, stderr } = await exec(
     'node_modules/.bin/jsdoc ' +
       escapeShellArg(file) +
       ' -t templates/haruki -d console -q format=json',
     { passStdErr: true }
-  ).then(
-    ({ stdout, stderr }) => {
-      var filteredStderr = stderr.replace(
-        /^WARNING:.*(ArrowFunctionExpression|TemplateLiteral|TemplateElement|ExportDeclaration|ImportSpecifier|ImportDeclaration).*\n?/gm,
-        ''
-      );
-      if (filteredStderr) {
-        process.stderr.write(filteredStderr);
-        throw new Error('Got stderr');
-      }
-      try {
-        var comments = JSON.parse(stdout);
-        comments['filename'] = file;
-        return comments;
-      } catch (err) {
-        console.error('error in file', file, err);
-        console.error('char count:', stdout.length);
-        throw err;
-      }
-    },
-    err => {
-      console.error(err);
-      throw err;
-    }
   );
+  if (stderr) {
+    process.stderr.write(stderr);
+    throw new Error('Got stderr');
+  }
+  try {
+    const comments = JSON.parse(stdout);
+    comments['filename'] = file;
+    return comments;
+  } catch (err) {
+    console.error('error in file', file, err);
+    console.error('char count:', stdout.length);
+    throw err;
+  }
 }
 
 function transformClass(c) {
@@ -405,7 +397,7 @@ function transformClass(c) {
   return c;
 }
 
-function isFileEligbleForDocs(filename) {
+function isFileEligbleForDocs(filename: string): boolean {
   return (
     filename.endsWith('.js') &&
     (filename.includes('src/docs/') ||
