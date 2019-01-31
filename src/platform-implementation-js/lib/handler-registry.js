@@ -38,12 +38,13 @@ export default class HandlerRegistry<T> {
   addTarget(target: T) {
     this._targets.push(target);
 
+    // TODO should we error if an object without an .on method is added?
     if (
       target &&
       typeof target === 'object' &&
       typeof target.on === 'function'
     ) {
-      target.on('destroy', () => {
+      (target: any).on('destroy', () => {
         this.removeTarget(target);
       });
     }

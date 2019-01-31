@@ -2,8 +2,7 @@
 
 import _ from 'lodash';
 import fs from 'fs';
-import RSVP from '../test/lib/rsvp';
-const readFile = RSVP.denodeify((fs: any).readFile.bind(fs));
+const readFile = (fs.promises.readFile: Function); // TODO https://github.com/facebook/flow/issues/7284
 
 import * as GmailResponseProcessor from '../src/platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 

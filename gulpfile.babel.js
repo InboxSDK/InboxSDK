@@ -3,42 +3,41 @@
 
 import 'yarn-deps-check';
 
-var fs = require('fs');
+import fs from 'fs';
 const packageJson = JSON.parse(
   fs.readFileSync(__dirname + '/package.json', 'utf8')
 );
 
-var _ = require('lodash');
-var gulp = require('gulp');
-var destAtomic = require('gulp-dest-atomic');
-var browserify = require('browserify');
-var watchify = require('watchify');
-var source = require('vinyl-source-stream');
-var streamify = require('gulp-streamify');
-var gulpif = require('gulp-if');
-var uglify = require('gulp-uglify');
-var sourcemaps = require('gulp-sourcemaps');
-var stdio = require('stdio');
-var gutil = require('gulp-util');
-var rename = require('gulp-rename');
+import _ from 'lodash';
+import gulp from 'gulp';
+import destAtomic from 'gulp-dest-atomic';
+import browserify from 'browserify';
+import watchify from 'watchify';
+import source from 'vinyl-source-stream';
+import streamify from 'gulp-streamify';
+import gulpif from 'gulp-if';
+import uglify from 'gulp-uglify';
+import sourcemaps from 'gulp-sourcemaps';
+import stdio from 'stdio';
+import gutil from 'gulp-util';
+import rename from 'gulp-rename';
 import extReloader from './live/ext-reloader';
-var rimraf = require('rimraf');
-var Kefir = require('kefir');
-var RSVP = require('rsvp');
-var globp = RSVP.denodeify(require('glob'));
+import rimraf from 'rimraf';
+import Kefir from 'kefir';
+import fg from 'fast-glob';
 import streamToPromise from './src/common/stream-to-promise';
 import exec from './src/build/exec';
 import spawn from './src/build/spawn';
 import escapeShellArg from './src/build/escape-shell-arg';
-var dir = require('node-dir');
-var babelify = require('babelify');
-var lazyPipe = require('lazypipe');
-var concat = require('gulp-concat');
-var addsrc = require('gulp-add-src');
+import dir from 'node-dir';
+import babelify from 'babelify';
+import lazyPipe from 'lazypipe';
+import concat from 'gulp-concat';
+import addsrc from 'gulp-add-src';
 
-var sdkFilename = 'inboxsdk.js';
+const sdkFilename = 'inboxsdk.js';
 
-var args = stdio.getopt({
+const args = stdio.getopt({
   watch: { key: 'w', description: 'Automatic rebuild' },
   reloader: { key: 'r', description: 'Automatic extension reloader' },
   hot: { key: 'h', description: 'hot module replacement' },
@@ -78,8 +77,8 @@ process.env.IMPLEMENTATION_URL = args.production
 
 function setupExamples() {
   // Copy inboxsdk.js (and .map) to all subdirs under examples/
-  return globp('./examples/*/')
-    .then(function(dirs) {
+  return fg(['examples/*'], { onlyDirectories: true })
+    .then(dirs => {
       if (args.copy) {
         dirs.push('../MailFoo/extensions/devBuilds/chrome/');
       }
@@ -129,7 +128,7 @@ async function getBrowserifyHmrOptions(port: number) {
   const certFile = `${HOME}/stunnel/cert.pem`;
 
   let url, tlskey, tlscert;
-  if ((await globp(keyFile)).length && (await globp(certFile)).length) {
+  if ((await fg([keyFile])).length && (await fg([certFile])).length) {
     url = `https://dev.mailfoogae.appspot.com:${port}`;
     tlskey = keyFile;
     tlscert = certFile;
