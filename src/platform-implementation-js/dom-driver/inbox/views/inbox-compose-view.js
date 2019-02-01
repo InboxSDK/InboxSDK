@@ -3,7 +3,6 @@
 import escape from 'lodash/escape';
 import find from 'lodash/find';
 import { defn } from 'ud';
-import RSVP from 'rsvp';
 import closest from 'closest-ng';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -743,7 +742,7 @@ class InboxComposeView {
       groupOrderHint,
       extraOnClickOptions
     );
-    return RSVP.Promise.resolve({
+    return Promise.resolve({
       buttonViewController,
       buttonDescriptor: {}
     });

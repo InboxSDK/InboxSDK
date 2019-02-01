@@ -1,7 +1,6 @@
 /* @flow */
 
 import once from 'lodash/once';
-import RSVP from 'rsvp';
 import Kefir from 'kefir';
 import makeElementChildStream from '../../lib/dom/make-element-child-stream';
 import type { ElementWithLifetime } from '../../lib/dom/make-element-child-stream';
@@ -14,7 +13,7 @@ import getMainContentElementChangedStream from './gmail-element-getter/get-main-
 // TODO Figure out if these functions can and should be able to return null
 const GmailElementGetter = {
   waitForGmailModeToSettle(): Promise<void> {
-    return waitForGmailModeToSettle().toPromise(RSVP.Promise);
+    return waitForGmailModeToSettle().toPromise();
   },
 
   getMainContentElementChangedStream: once(function() {

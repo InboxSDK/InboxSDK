@@ -5,7 +5,7 @@ import escape from 'lodash/escape';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
-import RSVP from 'rsvp';
+import defer from '../../../../common/defer';
 import autoHtml from 'auto-html';
 
 import querySelector from '../../../lib/dom/querySelectorOrFail';
@@ -48,7 +48,7 @@ class GmailCollapsibleSectionView {
     this._isCollapsible = isCollapsible;
     this._eventStream = kefirBus();
 
-    this._isReadyDeferred = new RSVP.defer();
+    this._isReadyDeferred = new defer();
   }
 
   destroy() {

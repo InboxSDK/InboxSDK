@@ -6,7 +6,6 @@ import Kefir from 'kefir';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
-import RSVP from 'rsvp';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import gmailElementGetter from '../gmail-element-getter';
 import copyAndValidateAutocompleteResults from '../../../lib/copyAndValidateAutocompleteResults';
@@ -37,7 +36,7 @@ export default function registerSearchSuggestionsProvider(
   const suggestionsStream = pageCommunicator.ajaxInterceptStream
     .filter(event => event.type === 'suggestionsRequest')
     .flatMapLatest(({ query }) =>
-      Kefir.fromPromise(RSVP.Promise.resolve(handler(query)))
+      Kefir.fromPromise(Promise.resolve(handler(query)))
         .flatMap((results: Array<AutocompleteSearchResult>) => {
           try {
             const validatedResults = copyAndValidateAutocompleteResults(

@@ -3,42 +3,41 @@
 
 import 'yarn-deps-check';
 
-var fs = require('fs');
+import fs from 'fs';
 const packageJson = JSON.parse(
   fs.readFileSync(__dirname + '/package.json', 'utf8')
 );
 
-var _ = require('lodash');
-var gulp = require('gulp');
-var destAtomic = require('gulp-dest-atomic');
-var browserify = require('browserify');
-var watchify = require('watchify');
-var source = require('vinyl-source-stream');
-var streamify = require('gulp-streamify');
-var gulpif = require('gulp-if');
-var uglify = require('gulp-uglify');
-var sourcemaps = require('gulp-sourcemaps');
-var stdio = require('stdio');
-var gutil = require('gulp-util');
-var rename = require('gulp-rename');
+import _ from 'lodash';
+import gulp from 'gulp';
+import destAtomic from 'gulp-dest-atomic';
+import browserify from 'browserify';
+import watchify from 'watchify';
+import source from 'vinyl-source-stream';
+import streamify from 'gulp-streamify';
+import gulpif from 'gulp-if';
+import uglify from 'gulp-uglify';
+import sourcemaps from 'gulp-sourcemaps';
+import stdio from 'stdio';
+import gutil from 'gulp-util';
+import rename from 'gulp-rename';
 import extReloader from './live/ext-reloader';
-var rimraf = require('rimraf');
-var Kefir = require('kefir');
-var RSVP = require('rsvp');
-var globp = RSVP.denodeify(require('glob'));
+import rimraf from 'rimraf';
+import Kefir from 'kefir';
+import fg from 'fast-glob';
 import streamToPromise from './src/common/stream-to-promise';
 import exec from './src/build/exec';
 import spawn from './src/build/spawn';
 import escapeShellArg from './src/build/escape-shell-arg';
-var dir = require('node-dir');
-var babelify = require('babelify');
-var lazyPipe = require('lazypipe');
-var concat = require('gulp-concat');
-var addsrc = require('gulp-add-src');
+import dir from 'node-dir';
+import babelify from 'babelify';
+import lazyPipe from 'lazypipe';
+import concat from 'gulp-concat';
+import addsrc from 'gulp-add-src';
 
-var sdkFilename = 'inboxsdk.js';
+const sdkFilename = 'inboxsdk.js';
 
-var args = stdio.getopt({
+const args = stdio.getopt({
   watch: { key: 'w', description: 'Automatic rebuild' },
   reloader: { key: 'r', description: 'Automatic extension reloader' },
   hot: { key: 'h', description: 'hot module replacement' },
@@ -76,50 +75,44 @@ process.env.IMPLEMENTATION_URL = args.production
   ? 'https://www.inboxsdk.com/build/platform-implementation.js'
   : 'http://localhost:4567/platform-implementation.js';
 
-function setupExamples() {
+async function setupExamples() {
   // Copy inboxsdk.js (and .map) to all subdirs under examples/
-  return globp('./examples/*/')
-    .then(function(dirs) {
-      if (args.copy) {
-        dirs.push('../MailFoo/extensions/devBuilds/chrome/');
-      }
-      return dirs;
-    })
-    .then(function(dirs) {
-      return dirs.reduce(function(stream, dir) {
-        return stream.pipe(destAtomic(dir));
-      }, gulp.src('./dist/' + sdkFilename).pipe(rename('inboxsdk.js')));
-    })
-    .then(streamToPromise)
-    .then(function() {
-      if (args.reloader) {
-        return extReloader();
-      }
-    });
+  const dirs: string[] = await fg(['examples/*'], { onlyDirectories: true });
+  if (args.copy) {
+    dirs.push('../MailFoo/extensions/devBuilds/chrome/');
+  }
+
+  let stream = gulp.src('./dist/' + sdkFilename).pipe(rename('inboxsdk.js'));
+  for (const dir of dirs) {
+    stream = stream.pipe(destAtomic(dir));
+  }
+  await streamToPromise(stream);
+  if (args.reloader) {
+    await extReloader();
+  }
 }
 
-gulp.task('noop', _.noop);
+gulp.task('noop', () => {});
 
-function getVersion(): Promise<string> {
-  return RSVP.Promise.all([
+async function getVersion(): Promise<string> {
+  const results = await Promise.all([
     exec('git rev-list HEAD --max-count=1'),
     exec('git status --porcelain')
-  ]).then(function(results) {
-    var commit = results[0]
-      .toString()
-      .trim()
-      .slice(0, 16);
-    var isModified = /^\s*M/m.test(results[1].toString());
+  ]);
+  const commit = results[0]
+    .toString()
+    .trim()
+    .slice(0, 16);
+  const isModified = /^\s*M/m.test(results[1].toString());
 
-    var version = `${packageJson.version}-${Date.now()}-${commit}`;
-    if (isModified) {
-      version += '-MODIFIED';
-    }
-    if (args.watch) {
-      version += '-WATCH';
-    }
-    return version;
-  });
+  let version = `${packageJson.version}-${Date.now()}-${commit}`;
+  if (isModified) {
+    version += '-MODIFIED';
+  }
+  if (args.watch) {
+    version += '-WATCH';
+  }
+  return version;
 }
 
 async function getBrowserifyHmrOptions(port: number) {
@@ -129,7 +122,7 @@ async function getBrowserifyHmrOptions(port: number) {
   const certFile = `${HOME}/stunnel/cert.pem`;
 
   let url, tlskey, tlscert;
-  if ((await globp(keyFile)).length && (await globp(certFile)).length) {
+  if ((await fg([keyFile])).length && (await fg([certFile])).length) {
     url = `https://dev.mailfoogae.appspot.com:${port}`;
     tlskey = keyFile;
     tlscert = certFile;
@@ -169,8 +162,8 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
       bundler.plugin(require('browserify-hmr'), browserifyHmrOptions);
     }
 
-    function buildBundle() {
-      var sourcemapPipeline = lazyPipe()
+    function buildBundle(): Promise<void> {
+      const sourcemapPipeline = lazyPipe()
         .pipe(
           addsrc.prepend,
           willMinify || args.production ? ['./src/inboxsdk-js/header.js'] : []
@@ -196,16 +189,16 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
           }
         );
 
-      var bundle = bundler.bundle();
-      var result = bundle
+      const bundle = bundler.bundle();
+      const result = bundle
         .pipe(source(destname))
         .pipe(
           gulpif(willMinify || args.production, streamify(sourcemapPipeline()))
         )
         .pipe(destAtomic('./dist/'));
 
-      return new RSVP.Promise(function(resolve, reject) {
-        var errCb = _.once(function(err) {
+      return new Promise((resolve, reject) => {
+        const errCb = _.once(err => {
           reject(err);
           result.end();
         });
@@ -219,30 +212,27 @@ function browserifyTask(name, deps, entry, destname, port: ?number) {
       bundler = watchify(bundler);
       Kefir.fromEvents(bundler, 'update')
         .throttle(10)
-        .onValue(function() {
-          gutil.log("Rebuilding '" + gutil.colors.cyan(name) + "'");
-          buildBundle()
-            .then(function() {
+        .onValue(() => {
+          (async () => {
+            try {
+              gutil.log("Rebuilding '" + gutil.colors.cyan(name) + "'");
+              await buildBundle();
               if (name === 'sdk') {
-                return setupExamples();
+                await setupExamples();
               }
-            })
-            .then(
-              function() {
-                gutil.log(
-                  "Finished rebuild of '" + gutil.colors.cyan(name) + "'"
-                );
-              },
-              function(err) {
-                gutil.log(
-                  gutil.colors.red('Error') +
-                    " rebuilding '" +
-                    gutil.colors.cyan(name) +
-                    "':",
-                  err.message
-                );
-              }
-            );
+              gutil.log(
+                "Finished rebuild of '" + gutil.colors.cyan(name) + "'"
+              );
+            } catch (err) {
+              gutil.log(
+                gutil.colors.red('Error') +
+                  " rebuilding '" +
+                  gutil.colors.cyan(name) +
+                  "':",
+                err.message
+              );
+            }
+          })();
         });
     }
 
@@ -259,7 +249,7 @@ if (args.singleBundle) {
     sdkFilename,
     3140
   );
-  gulp.task('imp', function() {
+  gulp.task('imp', () => {
     throw new Error('No separate imp bundle in singleBundle bundle mode');
   });
 } else {
@@ -284,60 +274,63 @@ browserifyTask(
 
 gulp.task('examples', ['sdk'], setupExamples);
 
-gulp.task('server', [args.singleBundle ? 'sdk' : 'imp'], function() {
+gulp.task('server', [args.singleBundle ? 'sdk' : 'imp'], () => {
   return require('./live/app').run();
 });
 
-gulp.task('clean', function(cb) {
+gulp.task('clean', cb => {
   rimraf('./dist/', cb);
 });
 
-gulp.task('docs', function(cb) {
-  dir.paths(__dirname + '/src', function(err, paths) {
-    if (err) throw err;
-
-    Promise.all(
-      _.chain(paths.files)
-        .filter(isFileEligbleForDocs)
-        .sort()
-        .map(parseCommentsInFile)
-        .value()
-    )
-      .then(files => {
-        var classes = _.chain(files)
-          .filter(Boolean)
-          .map(x => x.classes)
-          .flatten()
-          .filter(Boolean)
-          .map(transformClass)
-          .forEach(checkForDocIssues)
-          .value();
-
-        var docsJson = {
-          classes: _.chain(classes)
-            .map(ele => [ele.name, ele])
-            .fromPairs()
-            .value()
-        };
-
-        const outDir = './dist';
-        try {
-          fs.statSync(outDir);
-        } catch (err) {
-          fs.mkdirSync(outDir);
-        }
-
-        fs.writeFile('dist/docs.json', JSON.stringify(docsJson, null, 2), cb);
-      })
-      .catch(err => cb(err));
+gulp.task('docs', async () => {
+  const paths = await new Promise((resolve, reject) => {
+    dir.paths(__dirname + '/src', (err, paths) => {
+      if (err) reject(err);
+      else resolve(paths);
+    });
   });
+
+  const files = await Promise.all(
+    _.chain(paths.files)
+      .filter(isFileEligbleForDocs)
+      .sort()
+      .map(parseCommentsInFile)
+      .value()
+  );
+  const classes = _.chain(files)
+    .filter(Boolean)
+    .map(x => x.classes)
+    .flatten()
+    .filter(Boolean)
+    .map(transformClass)
+    .forEach(checkForDocIssues)
+    .value();
+
+  const docsJson = {
+    classes: _.chain(classes)
+      .map(ele => [ele.name, ele])
+      .fromPairs()
+      .value()
+  };
+
+  const outDir = './dist';
+  try {
+    await fs.promises.stat(outDir);
+  } catch (err) {
+    await fs.promises.mkdir(outDir);
+  }
+
+  await fs.promises.writeFile(
+    'dist/docs.json',
+    JSON.stringify(docsJson, null, 2)
+  );
 });
 
 function checkForDocIssues(c) {
   if (c.functions) {
-    c.functions.forEach(function(func) {
+    for (const func of c.functions) {
       if (!func.returns) {
-        console.error(
+        throw new Error(
           'WARNING: ' +
             func.name +
             ' in ' +
@@ -345,42 +338,31 @@ function checkForDocIssues(c) {
             " doesn't have a return tag"
         );
       }
-    });
+    }
   }
 }
 
-function parseCommentsInFile(file) {
+async function parseCommentsInFile(file: string): Promise<Object> {
   gutil.log('Parsing: ' + gutil.colors.cyan(file));
-  return exec(
+  const { stdout, stderr } = await exec(
     'node_modules/.bin/jsdoc ' +
       escapeShellArg(file) +
       ' -t templates/haruki -d console -q format=json',
     { passStdErr: true }
-  ).then(
-    ({ stdout, stderr }) => {
-      var filteredStderr = stderr.replace(
-        /^WARNING:.*(ArrowFunctionExpression|TemplateLiteral|TemplateElement|ExportDeclaration|ImportSpecifier|ImportDeclaration).*\n?/gm,
-        ''
-      );
-      if (filteredStderr) {
-        process.stderr.write(filteredStderr);
-        throw new Error('Got stderr');
-      }
-      try {
-        var comments = JSON.parse(stdout);
-        comments['filename'] = file;
-        return comments;
-      } catch (err) {
-        console.error('error in file', file, err);
-        console.error('char count:', stdout.length);
-        throw err;
-      }
-    },
-    err => {
-      console.error(err);
-      throw err;
-    }
   );
+  if (stderr) {
+    process.stderr.write(stderr);
+    throw new Error('Got stderr');
+  }
+  try {
+    const comments = JSON.parse(stdout);
+    comments['filename'] = file;
+    return comments;
+  } catch (err) {
+    console.error('error in file', file, err);
+    console.error('char count:', stdout.length);
+    throw err;
+  }
 }
 
 function transformClass(c) {
@@ -415,7 +397,7 @@ function transformClass(c) {
   return c;
 }
 
-function isFileEligbleForDocs(filename) {
+function isFileEligbleForDocs(filename: string): boolean {
   return (
     filename.endsWith('.js') &&
     (filename.includes('src/docs/') ||

@@ -3,7 +3,7 @@
 // This is a drop-in replacement for RSVP.defer(). New code should avoid using
 // this, and should use the Promise constructor instead!
 
-type Defer<T> = {
+export type Defer<T> = {
   resolve: (value: T) => void,
   reject: (err: any) => void,
   promise: Promise<T>

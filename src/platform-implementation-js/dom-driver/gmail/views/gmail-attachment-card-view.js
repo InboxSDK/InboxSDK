@@ -3,7 +3,6 @@
 import find from 'lodash/find';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import RSVP from 'rsvp';
 import util from 'util';
 import autoHtml from 'auto-html';
 import { defn } from 'ud';

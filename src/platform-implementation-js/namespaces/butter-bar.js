@@ -3,9 +3,9 @@
 import defaults from 'lodash/defaults';
 import sortBy from 'lodash/sortBy';
 import find from 'lodash/find';
-import RSVP from 'rsvp';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import defer from '../../common/defer';
 import getStackTrace from '../../common/get-stack-trace';
 import get from '../../common/get-or-fail';
 import type { Driver } from '../driver-interfaces/driver';
@@ -161,9 +161,9 @@ export default class ButterBar {
     });
     const savingMessage = this.showMessage(options);
 
-    const defer = RSVP.defer();
+    const deferred = defer();
 
-    defer.promise.then(
+    deferred.promise.then(
       () => {
         savingMessage.destroy();
         if (options.showConfirmation) {
@@ -180,7 +180,7 @@ export default class ButterBar {
       }
     );
 
-    return defer;
+    return deferred;
   }
 
   hideMessage(messageKey: Object | string) {

@@ -5,7 +5,6 @@ import CommonPageCommunicator from '../../lib/common-page-communicator';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
 import asap from 'asap';
-import RSVP from 'rsvp';
 import Kefir from 'kefir';
 import Logger from '../../lib/logger';
 
@@ -148,7 +147,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
   }
 
   isConversationViewDisabled(): Promise<boolean> {
-    return new RSVP.Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       Kefir.fromEvents(document, 'inboxSDKgmonkeyResponse')
         .take(1)
         .onValue(event => {

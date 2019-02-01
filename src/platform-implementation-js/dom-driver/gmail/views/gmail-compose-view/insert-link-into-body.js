@@ -1,7 +1,5 @@
 /* @flow */
 
-import RSVP from 'rsvp';
-
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import setValueAndDispatchEvent from '../../../../lib/dom/set-value-and-dispatch-event';
 

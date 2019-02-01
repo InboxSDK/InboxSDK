@@ -2,7 +2,6 @@
 
 import once from 'lodash/once';
 import Kefir from 'kefir';
-import RSVP from 'rsvp';
 import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chunked-stream';
 
 const fs = require('fs');
@@ -57,7 +56,7 @@ const injectScript: () => Promise<null> = once(function() {
     )
     .take(1)
     .map(() => null)
-    .toPromise(RSVP.Promise);
+    .toPromise();
 });
 
 if ((module: any).hot) {

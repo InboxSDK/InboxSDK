@@ -1,7 +1,6 @@
 /* @flow */
 
 import EventEmitter from '../../lib/safe-event-emitter';
-import RSVP from 'rsvp';
 import { defn } from 'ud';
 import get from '../../../common/get-or-fail';
 import type { MinRouteViewDriver } from '../../driver-interfaces/route-view-driver';

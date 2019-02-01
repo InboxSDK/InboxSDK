@@ -3,7 +3,6 @@
 import includes from 'lodash/includes';
 import last from 'lodash/last';
 import once from 'lodash/once';
-import RSVP from 'rsvp';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';

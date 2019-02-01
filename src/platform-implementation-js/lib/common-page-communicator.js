@@ -2,7 +2,6 @@
 
 import once from 'lodash/once';
 import asap from 'asap';
-import RSVP from 'rsvp';
 import Kefir from 'kefir';
 import Logger from './logger';
 import type { AjaxOpts } from '../../common/ajax';
@@ -115,7 +114,7 @@ export default class CommonPageCommunicator {
           });
         }
       })
-      .toPromise(RSVP.Promise);
+      .toPromise();
 
     document.dispatchEvent(
       new CustomEvent('inboxSDKpageAjax', {

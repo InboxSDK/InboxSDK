@@ -4,7 +4,6 @@ entities - BSD-like
 us6-unweak-collections - MIT
 react - BSD
 lodash - MIT
-rsvp - MIT
 browserify - MIT
 envify - MIT
 exec-sync - MIT
