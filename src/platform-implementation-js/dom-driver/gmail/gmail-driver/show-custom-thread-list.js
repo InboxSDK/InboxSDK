@@ -164,7 +164,7 @@ const setupSearchReplacing = (
           if (!Array.isArray(threads)) {
             return Kefir.constantError(
               new Error(
-                'handleCustomListRoute result must contain a "threads" array' +
+                'handleCustomListRoute result must contain a "threads" array ' +
                   '(https://www.inboxsdk.com/docs/#Router).'
               )
             );
