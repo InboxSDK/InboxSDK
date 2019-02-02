@@ -86,10 +86,10 @@ for the search>
 
 */
 
-const copyAndOmitExcessThreads = (
+function copyAndOmitExcessThreads(
   ids: Array<ThreadDescriptor>,
   logger: Logger
-): Array<ThreadDescriptor> => {
+): Array<ThreadDescriptor> {
   if (ids.length > MAX_THREADS_PER_PAGE) {
     // upgrade to deprecationWarning later
     logger.error(
@@ -100,12 +100,71 @@ const copyAndOmitExcessThreads = (
     );
   }
   return ids.slice(0, MAX_THREADS_PER_PAGE);
-};
+}
 
-const findIdFailure = (id, err: Error) => {
+function findIdFailure(id: string, err: Error) {
   console.log('Failed to find id for thread', id, err); //eslint-disable-line no-console
   return null;
-};
+}
+
+function parseOnActivateResult(
+  logger: Logger,
+  start: number,
+  result: HandlerResult | Array<ThreadDescriptor>
+): { total: number | 'MANY', threads: ThreadDescriptor[] } {
+  if (Array.isArray(result)) {
+    logger.deprecationWarning(
+      'Returning an array from a handleCustomListRoute handler',
+      'a CustomListDescriptor object'
+    );
+    const threads = copyAndOmitExcessThreads(result, logger);
+    return {
+      // default to one page since arrays can't be paginated
+      total: threads.length,
+      threads
+    };
+  } else if (typeof result === 'object') {
+    const { total, hasMore, threads } = result;
+
+    if (!Array.isArray(threads)) {
+      throw new Error(
+        'handleCustomListRoute result must contain a "threads" array ' +
+          '(https://www.inboxsdk.com/docs/#Router).'
+      );
+    }
+
+    if (total != null && hasMore != null) {
+      throw new Error(
+        'handleCustomListRoute result must only contain either ' +
+          'a "total" or a "hasMore" property, but not both. ' +
+          '(https://www.inboxsdk.com/docs/#Router).'
+      );
+    }
+
+    if (typeof total === 'number') {
+      return {
+        total,
+        threads: copyAndOmitExcessThreads(threads, logger)
+      };
+    } else if (typeof hasMore === 'boolean') {
+      const threadsWithoutExcess = copyAndOmitExcessThreads(threads, logger);
+      return {
+        total: hasMore ? 'MANY' : start + threads.length,
+        threads: threadsWithoutExcess
+      };
+    } else {
+      throw new Error(
+        'handleCustomListRoute result must contain either a "total" number ' +
+          'or a "hasMore" boolean (https://www.inboxsdk.com/docs/#Router).'
+      );
+    }
+  } else {
+    throw new Error(
+      'handleCustomListRoute result must be an array or an object ' +
+        '(https://www.inboxsdk.com/docs/#Router).'
+    );
+  }
+}
 
 // Returns the search string that will trigger the onActivate function.
 const setupSearchReplacing = (
@@ -144,73 +203,19 @@ const setupSearchReplacing = (
         start: number,
         result: HandlerResult | Array<ThreadDescriptor>
       }) => {
-        if (Array.isArray(result)) {
-          driver
-            .getLogger()
-            .deprecationWarning(
-              'Returning an array from a handleCustomListRoute handler',
-              'a CustomListDescriptor object'
-            );
-          const threads = copyAndOmitExcessThreads(result, driver.getLogger());
-          return Kefir.constant({
-            // default to one page since arrays can't be paginated
+        try {
+          const { total, threads } = parseOnActivateResult(
+            driver.getLogger(),
             start,
-            total: threads.length,
+            result
+          );
+          return Kefir.constant({
+            start,
+            total,
             threads
           });
-        } else if (typeof result === 'object') {
-          const { total, hasMore, threads } = result;
-
-          if (!Array.isArray(threads)) {
-            return Kefir.constantError(
-              new Error(
-                'handleCustomListRoute result must contain a "threads" array ' +
-                  '(https://www.inboxsdk.com/docs/#Router).'
-              )
-            );
-          }
-
-          if (total != null && hasMore != null) {
-            return Kefir.constantError(
-              new Error(
-                'handleCustomListRoute result must only contain either ' +
-                  'a "total" or a "hasMore" property, but not both. ' +
-                  '(https://www.inboxsdk.com/docs/#Router).'
-              )
-            );
-          }
-
-          if (typeof total === 'number') {
-            return Kefir.constant({
-              start,
-              total,
-              threads: copyAndOmitExcessThreads(threads, driver.getLogger())
-            });
-          } else if (typeof hasMore === 'boolean') {
-            const threadsWithoutExcess = copyAndOmitExcessThreads(
-              threads,
-              driver.getLogger()
-            );
-            return Kefir.constant({
-              start,
-              total: hasMore ? 'MANY' : start + threads.length,
-              threads: threadsWithoutExcess
-            });
-          } else {
-            return Kefir.constantError(
-              new Error(
-                'handleCustomListRoute result must contain either a "total" number ' +
-                  'or a "hasMore" boolean (https://www.inboxsdk.com/docs/#Router).'
-              )
-            );
-          }
-        } else {
-          return Kefir.constantError(
-            new Error(
-              'handleCustomListRoute result must be an array or an object ' +
-                '(https://www.inboxsdk.com/docs/#Router).'
-            )
-          );
+        } catch (err) {
+          return Kefir.constantError(err);
         }
       }
     )
