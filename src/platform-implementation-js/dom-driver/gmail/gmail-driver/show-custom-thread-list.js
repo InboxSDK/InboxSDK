@@ -199,6 +199,20 @@ function initialIDPairToIDPairWithRFC(
   throw new Error('Should not happen');
 }
 
+function idPairWithRFCToCompletedIDPair(
+  driver: GmailDriver,
+  pair: IDPairWithRFC
+): Promise<?CompletedIDPair> {
+  return typeof pair.gtid === 'string'
+    ? Promise.resolve(((pair: any): CompletedIDPair))
+    : driver
+        .getGmailThreadIdForRfcMessageId(pair.rfcId)
+        .then(
+          gtid => ({ gtid, rfcId: pair.rfcId }),
+          err => findIdFailure(pair.rfcId, err)
+        );
+}
+
 // Returns the search string that will trigger the onActivate function.
 const setupSearchReplacing = (
   driver: GmailDriver,
@@ -302,14 +316,7 @@ const setupSearchReplacing = (
             Kefir.fromPromise(
               Promise.all(
                 threads.map(pair =>
-                  pair.gtid
-                    ? pair
-                    : driver
-                        .getGmailThreadIdForRfcMessageId(pair.rfcId)
-                        .then(
-                          gtid => ({ gtid, rfcId: pair.rfcId }),
-                          err => findIdFailure(pair.rfcId, err)
-                        )
+                  idPairWithRFCToCompletedIDPair(driver, pair)
                 )
               )
             ).map(list => list.filter(Boolean)),
