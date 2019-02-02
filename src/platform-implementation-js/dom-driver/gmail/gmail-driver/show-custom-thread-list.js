@@ -166,6 +166,24 @@ function parseOnActivateResult(
   }
 }
 
+function threadDescriptorToInitialIDPair(id: ThreadDescriptor): ?InitialIDPair {
+  if (typeof id === 'string') {
+    if (id[0] == '<') {
+      return { rfcId: id };
+    } else {
+      return { gtid: id };
+    }
+  } else if (id) {
+    const obj = {
+      gtid: typeof id.gmailThreadId === 'string' && id.gmailThreadId,
+      rfcId: typeof id.rfcMessageId === 'string' && id.rfcMessageId
+    };
+    if (obj.gtid || obj.rfcId) {
+      return (obj: any);
+    }
+  }
+}
+
 // Returns the search string that will trigger the onActivate function.
 const setupSearchReplacing = (
   driver: GmailDriver,
@@ -231,25 +249,7 @@ const setupSearchReplacing = (
       }: NormalizedHandlerResult<Array<ThreadDescriptor>>) => ({
         start,
         total,
-        threads: threads
-          .map(id => {
-            if (typeof id === 'string') {
-              if (id[0] == '<') {
-                return { rfcId: id };
-              } else {
-                return { gtid: id };
-              }
-            } else if (id) {
-              const obj = {
-                gtid: typeof id.gmailThreadId === 'string' && id.gmailThreadId,
-                rfcId: typeof id.rfcMessageId === 'string' && id.rfcMessageId
-              };
-              if (obj.gtid || obj.rfcId) {
-                return (obj: any);
-              }
-            }
-          })
-          .filter(Boolean)
+        threads: threads.map(threadDescriptorToInitialIDPair).filter(Boolean)
       })
     )
     // Figure out any rfc ids we don't know yet
