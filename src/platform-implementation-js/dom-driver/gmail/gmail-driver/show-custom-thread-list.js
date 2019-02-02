@@ -302,10 +302,10 @@ const setupSearchReplacing = (
 
         const response = await searchResultsResponse_promise;
 
-        // override thread list response so that we show results in the same
-        // order that user passed in
         driver.signalCustomThreadListActivity(customRouteID);
 
+        // override thread list response so that we show results in the same
+        // order that user passed in
         let newResponse;
         try {
           if (driver.isUsingSyncAPI()) {
