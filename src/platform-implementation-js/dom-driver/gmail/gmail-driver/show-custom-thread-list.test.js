@@ -30,6 +30,7 @@ test('works', async () => {
     isUsingSyncAPI: () => true,
     getLogger: once(() => ({
       error(e) {
+        // eslint-disable-next-line no-console
         console.error(e);
         throw e;
       }
