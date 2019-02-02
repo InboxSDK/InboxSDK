@@ -184,6 +184,21 @@ function threadDescriptorToInitialIDPair(id: ThreadDescriptor): ?InitialIDPair {
   }
 }
 
+function initialIDPairToIDPairWithRFC(
+  driver: GmailDriver,
+  pair: InitialIDPair
+): Promise<?IDPairWithRFC> {
+  if (typeof pair.rfcId === 'string') {
+    return Promise.resolve(((pair: any): IDPairWithRFC));
+  } else if (typeof pair.gtid === 'string') {
+    const gtid = pair.gtid;
+    return driver
+      .getRfcMessageIdForGmailThreadId(gtid)
+      .then(rfcId => ({ gtid, rfcId }), err => findIdFailure(gtid, err));
+  }
+  throw new Error('Should not happen');
+}
+
 // Returns the search string that will trigger the onActivate function.
 const setupSearchReplacing = (
   driver: GmailDriver,
@@ -256,22 +271,7 @@ const setupSearchReplacing = (
     .map(
       ({ start, total, threads }: NormalizedHandlerResult<InitialIDPair[]>) =>
         Promise.all(
-          threads.map(
-            (pair: InitialIDPair): Promise<?IDPairWithRFC> => {
-              if (pair.rfcId) {
-                return Promise.resolve(((pair: any): IDPairWithRFC));
-              } else if (typeof pair.gtid === 'string') {
-                const gtid = pair.gtid;
-                return driver
-                  .getRfcMessageIdForGmailThreadId(gtid)
-                  .then(
-                    rfcId => ({ gtid, rfcId }),
-                    err => findIdFailure(gtid, err)
-                  );
-              }
-              return Promise.resolve(null);
-            }
-          )
+          threads.map(pair => initialIDPairToIDPairWithRFC(driver, pair))
         ).then((pairs: Array<?IDPairWithRFC>) => ({
           start,
           total,
