@@ -94,7 +94,7 @@ const copyAndOmitExcessThreads = (
     // upgrade to deprecationWarning later
     logger.error(
       new Error(
-        'Received more than the maximum number of threads specified by handler,' +
+        'Received more than the maximum number of threads specified by handler, ' +
           'ignoring additional threads (https://www.inboxsdk.com/docs/#Router).'
       )
     );
@@ -173,8 +173,8 @@ const setupSearchReplacing = (
           if (total != null && hasMore != null) {
             return Kefir.constantError(
               new Error(
-                'handleCustomListRoute result must only contain either' +
-                  'a "total" or a "hasMore" property, but not both.' +
+                'handleCustomListRoute result must only contain either ' +
+                  'a "total" or a "hasMore" property, but not both. ' +
                   '(https://www.inboxsdk.com/docs/#Router).'
               )
             );
@@ -199,7 +199,7 @@ const setupSearchReplacing = (
           } else {
             return Kefir.constantError(
               new Error(
-                'handleCustomListRoute result must contain either a "total" number' +
+                'handleCustomListRoute result must contain either a "total" number ' +
                   'or a "hasMore" boolean (https://www.inboxsdk.com/docs/#Router).'
               )
             );
@@ -207,7 +207,7 @@ const setupSearchReplacing = (
         } else {
           return Kefir.constantError(
             new Error(
-              'handleCustomListRoute result must be an array or an object' +
+              'handleCustomListRoute result must be an array or an object ' +
                 '(https://www.inboxsdk.com/docs/#Router).'
             )
           );
