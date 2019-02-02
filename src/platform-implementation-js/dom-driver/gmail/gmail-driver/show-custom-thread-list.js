@@ -230,74 +230,44 @@ const setupSearchReplacing = (
     .ajaxInterceptStream.filter(
       e => e.type === 'searchForReplacement' && e.query === newQuery
     )
-    .flatMap(({ start }: { start: number }) => {
-      driver.signalCustomThreadListActivity(customRouteID);
-      try {
-        return Kefir.fromPromise(
-          Promise.resolve(onActivate(start, MAX_THREADS_PER_PAGE)).then(
-            (result: HandlerResult) => ({ start, result })
-          )
-        );
-      } catch (e) {
-        return Kefir.constantError(e);
-      }
-    })
-    .flatMap(
-      ({
-        start,
-        result
-      }: {
-        start: number,
-        result: HandlerResult | Array<ThreadDescriptor>
-      }) => {
+    .onValue(({ start }: { start: number }) => {
+      (async () => {
+        driver.signalCustomThreadListActivity(customRouteID);
+
+        let total: number | 'MANY';
+        let threadDescriptors: ThreadDescriptor[];
         try {
-          const { total, threads } = parseOnActivateResult(
+          const onActivateResult:
+            | HandlerResult
+            | Array<ThreadDescriptor> = await Promise.resolve(
+            onActivate(start, MAX_THREADS_PER_PAGE)
+          );
+          const parsed = parseOnActivateResult(
             driver.getLogger(),
             start,
-            result
+            onActivateResult
           );
-          return Kefir.constant({
-            start,
-            total,
-            threads
-          });
-        } catch (err) {
-          return Kefir.constantError(err);
+          total = parsed.total;
+          threadDescriptors = parsed.threads;
+        } catch (e) {
+          driver.getLogger().error(e);
+          total = 0;
+          threadDescriptors = [];
         }
-      }
-    )
-    .flatMapErrors(e => {
-      driver.getLogger().error(e);
-      return Kefir.constant({ start: 0, total: 0, threads: [] });
-    })
-    .map(
-      ({
-        start,
-        total,
-        threads
-      }: NormalizedHandlerResult<Array<ThreadDescriptor>>) => ({
-        start,
-        total,
-        threads: threads.map(threadDescriptorToInitialIDPair).filter(Boolean)
-      })
-    )
-    // Figure out any rfc ids we don't know yet
-    .map(
-      ({ start, total, threads }: NormalizedHandlerResult<InitialIDPair[]>) =>
-        Promise.all(
-          threads.map(pair => initialIDPairToIDPairWithRFC(driver, pair))
-        ).then((pairs: Array<?IDPairWithRFC>) => ({
-          start,
-          total,
-          threads: pairs.filter(Boolean)
-        }))
-    )
-    .flatMap(Kefir.fromPromise)
-    .onValue(
-      ({ start, total, threads }: NormalizedHandlerResult<IDPairWithRFC[]>) => {
+
+        const initialIDPairs: InitialIDPair[] = threadDescriptors
+          .map(threadDescriptorToInitialIDPair)
+          .filter(Boolean);
+
+        const idPairsWithRFC: IDPairWithRFC[] = (await Promise.all(
+          initialIDPairs.map(pair => initialIDPairToIDPairWithRFC(driver, pair))
+        )).filter(Boolean);
+
         const messageIDQuery: string =
-          threads.length > 0
-            ? threads.map(({ rfcId }) => 'rfc822msgid:' + rfcId).join(' OR ')
+          idPairsWithRFC.length > 0
+            ? idPairsWithRFC
+                .map(({ rfcId }) => 'rfc822msgid:' + rfcId)
+                .join(' OR ')
             : '' + Math.random() + Date.now(); // google doesn't like empty searches
 
         // Outgoing requests for list queries always need to have a `start` of 0,
@@ -310,147 +280,144 @@ const setupSearchReplacing = (
           query: newQuery,
           start
         });
-        Kefir.combine(
-          [
-            // Figure out any gmail thread ids we don't know yet
-            Kefir.fromPromise(
-              Promise.all(
-                threads.map(pair =>
-                  idPairWithRFCToCompletedIDPair(driver, pair)
-                )
-              )
-            ).map(list => list.filter(Boolean)),
 
-            driver
-              .getPageCommunicator()
-              .ajaxInterceptStream.filter(
-                e =>
-                  e.type === 'searchResultsResponse' &&
-                  e.query === newQuery &&
-                  e.start === start
-              )
-              .map(x => x.response)
-              .take(1)
-          ],
-          (idPairs: any, response: any) => [idPairs, response]
-        ).onValue(([idPairs, response]: [CompletedIDPair[], string]) => {
-          // override thread list response so that we show results in the same
-          // order that user passed in
-          driver.signalCustomThreadListActivity(customRouteID);
+        const searchResultsResponse_promise = driver
+          .getPageCommunicator()
+          .ajaxInterceptStream.filter(
+            e =>
+              e.type === 'searchResultsResponse' &&
+              e.query === newQuery &&
+              e.start === start
+          )
+          .map(x => x.response)
+          .take(1)
+          .toPromise();
 
-          let newResponse;
-          try {
-            if (driver.isUsingSyncAPI()) {
-              const extractedThreads = SyncGRP.extractThreadsFromSearchResponse(
-                response
-              );
+        // Figure out any gmail thread ids we don't know yet.
+        const completedIDPairs: Array<CompletedIDPair> = (await Promise.all(
+          idPairsWithRFC.map(pair =>
+            idPairWithRFCToCompletedIDPair(driver, pair)
+          )
+        )).filter(Boolean);
 
-              const doesNeedReorder = idPairs.some(
-                ({ gtid }, index) =>
-                  extractedThreads[index].oldGmailThreadID !== gtid
-              );
+        const response = await searchResultsResponse_promise;
 
-              const reorderedThreads: typeof extractedThreads = doesNeedReorder
-                ? idPairs
-                    .map(({ gtid }) =>
-                      find(extractedThreads, t => t.oldGmailThreadID === gtid)
-                    )
-                    .filter(Boolean)
-                    .map((extractedThread, index) => {
-                      const newTime = String(Date.now() - index);
-                      extractedThread.rawResponse[1][3] = newTime;
-                      extractedThread.rawResponse[1][8] = newTime;
-                      (extractedThread.rawResponse[1][5] || []).forEach(md => {
-                        md[7] = newTime;
-                        md[18] = newTime;
-                        md[31] = newTime;
-                      });
-                      return extractedThread;
-                    })
-                : extractedThreads;
+        // override thread list response so that we show results in the same
+        // order that user passed in
+        driver.signalCustomThreadListActivity(customRouteID);
 
-              newResponse = SyncGRP.replaceThreadsInSearchResponse(
-                response,
-                reorderedThreads,
-                { start, total }
-              );
-            } else {
-              const extractedThreads = GRP.extractThreads(response);
+        let newResponse;
+        try {
+          if (driver.isUsingSyncAPI()) {
+            const extractedThreads = SyncGRP.extractThreadsFromSearchResponse(
+              response
+            );
 
-              const reorderedThreads: typeof extractedThreads = idPairs
-                .map(({ gtid }) =>
-                  find(extractedThreads, t => t.gmailThreadId === gtid)
-                )
-                .filter(Boolean);
+            const doesNeedReorder = completedIDPairs.some(
+              ({ gtid }, index) =>
+                extractedThreads[index].oldGmailThreadID !== gtid
+            );
 
-              newResponse = GRP.replaceThreadsInResponse(
-                response,
-                reorderedThreads,
-                { start, total }
-              );
-            }
-
-            driver
-              .getPageCommunicator()
-              .setCustomListResults(newQuery, newResponse);
-          } catch (e) {
-            driver.getLogger().error(e, {
-              responseReplacementFailure: true,
-              //response: isStreakAppId(driver.getAppId()) ? response : null,
-              idPairsLength: idPairs.length
-            });
-            const butterBar = driver.getButterBar();
-            if (butterBar) {
-              butterBar.showError({
-                text: 'Failed to load custom thread list'
-              });
-            }
-            try {
-              if (driver.isUsingSyncAPI()) {
-                driver.getPageCommunicator().setCustomListResults(
-                  newQuery,
-                  SyncGRP.replaceThreadsInSearchResponse(response, [], {
-                    start,
-                    total
+            const reorderedThreads: typeof extractedThreads = doesNeedReorder
+              ? completedIDPairs
+                  .map(({ gtid }) =>
+                    find(extractedThreads, t => t.oldGmailThreadID === gtid)
+                  )
+                  .filter(Boolean)
+                  .map((extractedThread, index) => {
+                    const newTime = String(Date.now() - index);
+                    extractedThread.rawResponse[1][3] = newTime;
+                    extractedThread.rawResponse[1][8] = newTime;
+                    (extractedThread.rawResponse[1][5] || []).forEach(md => {
+                      md[7] = newTime;
+                      md[18] = newTime;
+                      md[31] = newTime;
+                    });
+                    return extractedThread;
                   })
-                );
-              } else {
-                driver
-                  .getPageCommunicator()
-                  .setCustomListResults(
-                    newQuery,
-                    GRP.replaceThreadsInResponse(response, [], { start, total })
-                  );
-              }
-            } catch (e2) {
-              driver.getLogger().error(e2);
-              // The original response will be used.
-              driver.getPageCommunicator().setCustomListResults(newQuery, null);
-            }
-            return;
+              : extractedThreads;
+
+            newResponse = SyncGRP.replaceThreadsInSearchResponse(
+              response,
+              reorderedThreads,
+              { start, total }
+            );
+          } else {
+            const extractedThreads = GRP.extractThreads(response);
+
+            const reorderedThreads: typeof extractedThreads = completedIDPairs
+              .map(({ gtid }) =>
+                find(extractedThreads, t => t.gmailThreadId === gtid)
+              )
+              .filter(Boolean);
+
+            newResponse = GRP.replaceThreadsInResponse(
+              response,
+              reorderedThreads,
+              { start, total }
+            );
           }
 
-          setTimeout(() => {
-            const errorBar = document.querySelector('.vY .vX.UC');
-            if (
-              errorBar &&
-              errorBar.style.display !== 'none' &&
-              /#\d+/.test(errorBar.textContent)
-            ) {
-              const isStreak = isStreakAppId(driver.getAppId());
+          driver
+            .getPageCommunicator()
+            .setCustomListResults(newQuery, newResponse);
+        } catch (e) {
+          driver.getLogger().error(e, {
+            responseReplacementFailure: true,
+            //response: isStreakAppId(driver.getAppId()) ? response : null,
+            idPairsLength: completedIDPairs.length
+          });
+          const butterBar = driver.getButterBar();
+          if (butterBar) {
+            butterBar.showError({
+              text: 'Failed to load custom thread list'
+            });
+          }
+          try {
+            if (driver.isUsingSyncAPI()) {
+              driver.getPageCommunicator().setCustomListResults(
+                newQuery,
+                SyncGRP.replaceThreadsInSearchResponse(response, [], {
+                  start,
+                  total
+                })
+              );
+            } else {
               driver
-                .getLogger()
-                .error(new Error('Gmail error with custom thread list'), {
-                  message: errorBar.textContent,
-                  idPairsLength: idPairs.length,
-                  response: isStreak ? response : null,
-                  newResponse: isStreak ? newResponse : null
-                });
+                .getPageCommunicator()
+                .setCustomListResults(
+                  newQuery,
+                  GRP.replaceThreadsInResponse(response, [], { start, total })
+                );
             }
-          }, 1000);
-        });
-      }
-    );
+          } catch (e2) {
+            driver.getLogger().error(e2);
+            // The original response will be used.
+            driver.getPageCommunicator().setCustomListResults(newQuery, null);
+          }
+          return;
+        }
+
+        setTimeout(() => {
+          const errorBar = document.querySelector('.vY .vX.UC');
+          if (
+            errorBar &&
+            errorBar.style.display !== 'none' &&
+            /#\d+/.test(errorBar.textContent)
+          ) {
+            const isStreak = isStreakAppId(driver.getAppId());
+            driver
+              .getLogger()
+              .error(new Error('Gmail error with custom thread list'), {
+                message: errorBar.textContent,
+                completedIDPairsLength: completedIDPairs.length,
+                response: isStreak ? response : null,
+                newResponse: isStreak ? newResponse : null
+              });
+          }
+        }, 1000);
+      })().catch(err => driver.getLogger().error(err));
+    });
 
   driver.getCustomListSearchStringsToRouteIds().set(newQuery, customRouteID);
   threadListHandlersToSearchStrings.set(onActivate, newQuery);
