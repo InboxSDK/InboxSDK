@@ -29,12 +29,6 @@ type HandlerResult = {
   threads: Array<ThreadDescriptor>
 };
 
-type NormalizedHandlerResult<T> = {
-  start: number,
-  total: number | 'MANY',
-  threads: T
-};
-
 const threadListHandlersToSearchStrings: Map<Function, string> = new Map();
 
 const MAX_THREADS_PER_PAGE = 50;
