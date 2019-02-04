@@ -13,8 +13,8 @@ describe('extractThreadsFromSearchResponse', () => {
 
     const threads = GSRP.extractThreadsFromSearchResponse(data);
 
-    expect(threads.length).toEqual(12);
-    expect(threads[0]).toMatchObject({
+    expect(threads.length).toBe(12);
+    expect(threads[0]).toEqual({
       subject: 'Introducing Comment Editing and @Mentions',
       snippet:
         '@Mentions, Conversations, and Editing for Comments Happy New Year! In 2017, users added millions of new Comments to Streak - the most pouplar type of content to add. In 2018, Comments are significantly',
@@ -67,8 +67,8 @@ describe('extractThreadsFromSearchResponse', () => {
 
     const threads = GSRP.extractThreadsFromSearchResponse(data);
 
-    expect(threads.length).toEqual(1);
-    expect(threads[0]).toMatchObject({
+    expect(threads.length).toBe(1);
+    expect(threads[0]).toEqual({
       subject: 'mail merge test 22222',
       snippet: 'dsafdsafdsafdsa ᐧ',
       syncThreadID: 'thread-f:1590533107145425147',
@@ -122,7 +122,7 @@ describe('extractThreadsFromThreadResponse', function() {
     );
 
     const threads = GSRP.extractThreadsFromThreadResponse(data);
-    expect(threads.length).toEqual(1);
+    expect(threads.length).toBe(1);
     expect((threads[0]: any).oldGmailThreadID).toBe('16207922dbd860d9');
     expect(threads[0].syncThreadID).toBe('thread-f:1594407458713395417');
     expect(threads[0].extraMetaData).toEqual({
@@ -150,7 +150,7 @@ describe('extractThreadsFromThreadResponse', function() {
       'utf8'
     );
     const threads = GSRP.extractThreadsFromThreadResponse(data);
-    expect(threads.length).toEqual(1);
+    expect(threads.length).toBe(1);
     expect((threads[0]: any).oldGmailThreadID).toBe('1620d2f175a1a6c9');
     expect(threads[0].syncThreadID).toBe('thread-f:1594506202591635145');
     expect(threads[0].extraMetaData).toMatchObject({
@@ -171,7 +171,7 @@ describe('extractThreadsFromThreadResponse', function() {
       'utf8'
     );
     const threads = GSRP.extractThreadsFromThreadResponse(data);
-    expect(threads.length).toEqual(1);
+    expect(threads.length).toBe(1);
     expect((threads[0]: any).oldGmailThreadID).toBe('1636109e7816ac5d');
     expect(threads[0].syncThreadID).toBe('thread-f:1600484990382419037');
     expect(threads[0].extraMetaData).toMatchObject({
@@ -199,13 +199,11 @@ it('replaceThreadsInSearchResponse works', () => {
     )
   );
 
-  const responesShouldLookLike = JSON.stringify(
-    JSON.parse(
-      fs.readFileSync(
-        __dirname +
-          '/../../../../__tests__/gmail-sync-response-processor/replaced-threads-response-example-data-2018-01-25.json',
-        'utf8'
-      )
+  const responesShouldLookLike = JSON.parse(
+    fs.readFileSync(
+      __dirname +
+        '/../../../../__tests__/gmail-sync-response-processor/replaced-threads-response-example-data-2018-01-25.json',
+      'utf8'
     )
   );
 
@@ -214,5 +212,5 @@ it('replaceThreadsInSearchResponse works', () => {
     replacementThreads,
     { start: 0 }
   );
-  expect(newResponse).toBe(responesShouldLookLike);
+  expect(JSON.parse(newResponse)).toEqual(responesShouldLookLike);
 });
