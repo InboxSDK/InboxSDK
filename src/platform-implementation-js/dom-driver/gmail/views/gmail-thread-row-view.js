@@ -283,14 +283,14 @@ class GmailThreadRowView {
 
       if (this._driver.isUsingSyncAPI()) {
         const draftCount = recipientsElement.querySelectorAll('.boq').length;
-        const messageCountMatch = recipientsElement.innerHTML.match(
-          /\((\d+)\)$/
-        );
-        const messageCount = messageCountMatch
-          ? +messageCountMatch[1]
-          : draftCount
-          ? 0
-          : 1;
+        const messageCountMatch = recipientsElement.querySelector('.bx0');
+
+        const messageCount =
+          messageCountMatch && messageCountMatch.innerHTML
+            ? +messageCountMatch.innerHTML
+            : draftCount
+            ? 0
+            : 1;
 
         counts = this._counts = { messageCount, draftCount };
       } else {
