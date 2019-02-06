@@ -45,7 +45,7 @@ var Router = /** @lends Router */ {
    * @param {Object} params - an object containing the parameters that will be encoded in the link and decoded when the user
    * subsequently visits the route. Handlers for the specified routeID will receive a copy of this object. This object must contain
    * only simple key value pairs with no nested arrays/objects.
-   * @return {void}
+   * @return {Promise.<void>}
    */
   goto: function() {},
 
