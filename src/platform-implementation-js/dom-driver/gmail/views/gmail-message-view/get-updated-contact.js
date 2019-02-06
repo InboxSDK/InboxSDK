@@ -24,8 +24,11 @@ export default function getUpdatedContact(
     }
   }
 
+  const menuElement = element.querySelector('.ajA.SK');
+  const isMenuElementHidden =
+    menuElement && menuElement.style.visibility === 'hidden';
   const menuButtonElement = element.querySelector('.ajy[aria-haspopup=true]');
-  if (menuButtonElement) {
+  if (menuButtonElement && isMenuElementHidden) {
     //the modal that contains this email address is not visible, so we need to bring the modal up
     const block = (event: MouseEvent) => {
       event.stopPropagation();

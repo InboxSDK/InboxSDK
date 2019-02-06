@@ -766,10 +766,6 @@ class GmailMessageView {
           return element && element.getAttribute('email');
         })
         .map(function(element) {
-          let addressInformation = self._getUpdatedContact(
-            _extractContactInformation(element)
-          );
-
           let contactType = null;
 
           if (!self._element.classList.contains('h7')) {
@@ -783,9 +779,13 @@ class GmailMessageView {
           }
 
           return {
-            eventName: 'contactHover',
-            contact: addressInformation,
+            get contact() {
+              return self._getUpdatedContact(
+                _extractContactInformation(element)
+              );
+            },
             contactType: contactType,
+            eventName: 'contactHover',
             messageViewDriver: self
           };
         })
