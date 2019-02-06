@@ -529,7 +529,7 @@ class GmailDriver {
     return createLink(this._gmailRouteProcessor, routeID, params);
   }
 
-  goto(routeID: string, params: ?RouteParams | string) {
+  goto(routeID: string, params: ?RouteParams | string): Promise<void> {
     return gotoView(this, routeID, params);
   }
 

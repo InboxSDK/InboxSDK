@@ -72,7 +72,7 @@ class Router {
     return get(memberMap, this).driver.createLink(routeID, params);
   }
 
-  goto(routeID: string, params?: ?RouteParams | string) {
+  goto(routeID: string, params?: ?RouteParams | string): Promise<void> {
     if (typeof routeID !== 'string') {
       throw new Error('routeID must be a string');
     }
@@ -85,7 +85,7 @@ class Router {
           'param object (e.g. {param: value})'
         );
     }
-    driver.goto(routeID, params);
+    return driver.goto(routeID, params);
   }
 
   handleCustomRoute(

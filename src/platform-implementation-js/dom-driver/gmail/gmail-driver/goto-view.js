@@ -13,7 +13,7 @@ const gotoView = ud.defn(module, async function gotoView(
   gmailDriver: GmailDriver,
   viewName: string,
   params: ?RouteParams | string
-) {
+): Promise<void> {
   if (viewName[0] === '#') {
     if (params) {
       throw new Error("params parameter can't be passed with resolved URL");
