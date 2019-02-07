@@ -180,7 +180,8 @@ function threadDescriptorToInitialIDPair(id: ThreadDescriptor): ?InitialIDPair {
 
 function initialIDPairToIDPairWithRFC(
   driver: GmailDriver,
-  pair: InitialIDPair
+  pair: InitialIDPair,
+  findIdFailure
 ): Promise<?IDPairWithRFC> {
   if (typeof pair.rfcId === 'string') {
     return Promise.resolve(((pair: any): IDPairWithRFC));
@@ -195,7 +196,8 @@ function initialIDPairToIDPairWithRFC(
 
 function idPairWithRFCToCompletedIDPair(
   driver: GmailDriver,
-  pair: IDPairWithRFC
+  pair: IDPairWithRFC,
+  findIdFailure
 ): Promise<?CompletedIDPair> {
   return typeof pair.gtid === 'string'
     ? Promise.resolve(((pair: any): CompletedIDPair))
@@ -211,7 +213,8 @@ function idPairWithRFCToCompletedIDPair(
 const setupSearchReplacing = (
   driver: GmailDriver,
   customRouteID: string,
-  onActivate: Function
+  onActivate: Function,
+  findIdFailure
 ): string => {
   const preexistingQuery = threadListHandlersToSearchStrings.get(onActivate);
   if (preexistingQuery) {
@@ -254,7 +257,9 @@ const setupSearchReplacing = (
           .filter(Boolean);
 
         const idPairsWithRFC: IDPairWithRFC[] = (await Promise.all(
-          initialIDPairs.map(pair => initialIDPairToIDPairWithRFC(driver, pair))
+          initialIDPairs.map(pair =>
+            initialIDPairToIDPairWithRFC(driver, pair, findIdFailure)
+          )
         )).filter(Boolean);
 
         const messageIDQuery: string =
@@ -290,7 +295,7 @@ const setupSearchReplacing = (
         // Figure out any gmail thread ids we don't know yet.
         const completedIDPairs: Array<CompletedIDPair> = (await Promise.all(
           idPairsWithRFC.map(pair =>
-            idPairWithRFCToCompletedIDPair(driver, pair)
+            idPairWithRFCToCompletedIDPair(driver, pair, findIdFailure)
           )
         )).filter(Boolean);
 
@@ -422,9 +427,15 @@ export default function showCustomThreadList(
   driver: GmailDriver,
   customRouteID: string,
   onActivate: Function,
-  params: Array<string>
+  params: Array<string>,
+  findIdFailure: typeof findIdFailure = findIdFailure
 ) {
-  const uniqueSearch = setupSearchReplacing(driver, customRouteID, onActivate);
+  const uniqueSearch = setupSearchReplacing(
+    driver,
+    customRouteID,
+    onActivate,
+    findIdFailure
+  );
   const customHash = document.location.hash;
 
   const nextMainContentElementChange = GmailElementGetter.getMainContentElementChangedStream()

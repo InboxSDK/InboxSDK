@@ -48,11 +48,15 @@ class ShowCustomThreadListTester {
     })),
     signalCustomThreadListActivity: jest.fn(),
     getRfcMessageIdForGmailThreadId: jest.fn(async (gmailThreadId: string) => {
-      expect(this._threadIdsToRfcIds.has(gmailThreadId)).toBe(true);
+      if (!this._threadIdsToRfcIds.has(gmailThreadId)) {
+        throw new Error('Failed to find id');
+      }
       return this._threadIdsToRfcIds.get(gmailThreadId);
     }),
     getGmailThreadIdForRfcMessageId: jest.fn(async (rfcId: string) => {
-      expect(this._rfcIdsToThreadIds.has(rfcId)).toBe(true);
+      if (!this._rfcIdsToThreadIds.has(rfcId)) {
+        throw new Error('Failed to find id');
+      }
       await this._allowGmailThreadIdLookup.take(1).toPromise();
       return this._rfcIdsToThreadIds.get(rfcId);
     })
@@ -94,7 +98,8 @@ class ShowCustomThreadListTester {
       this._driver,
       this._customRouteID,
       this._onActivate,
-      this._routeParams
+      this._routeParams,
+      () => null
     );
 
     expect(
@@ -245,6 +250,69 @@ test('can reorder list', async () => {
     ],
     expectedSearchQuery:
       'rfc822msgid:<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com> OR rfc822msgid:<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com>',
+    start: 0,
+    getOriginalSearchResponse
+  });
+  const setCustomListResults = await tester.runAndGetSetCustomListResults();
+
+  function ignoreSomeFields(syncThreads: GSRP.SyncThread[]) {
+    return syncThreads.map(o => ({
+      ...o,
+      rawResponse: 'ignored',
+      extraMetaData: {
+        ...o.extraMetaData,
+        syncMessageData: o.extraMetaData.syncMessageData.map(s => ({
+          ...s,
+          date: 'ignored'
+        }))
+      }
+    }));
+  }
+
+  expect(
+    ignoreSomeFields(
+      GSRP.extractThreadsFromSearchResponse(setCustomListResults)
+    )
+  ).toEqual(
+    ignoreSomeFields(
+      GSRP.extractThreadsFromSearchResponse(await getOriginalSearchResponse())
+    ).reverse()
+  );
+});
+
+test('missing thread id', async () => {
+  const getOriginalSearchResponse = once(() =>
+    readFile(
+      __dirname + '/../../../../../test/data/2019-02-01 search results.json',
+      'utf8'
+    )
+  );
+
+  const tester = new ShowCustomThreadListTester({
+    onActivate() {
+      return {
+        hasMore: false,
+        threads: [
+          '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>',
+          '168ab8987a3b61b3',
+          '1111111111111111',
+          '1111111111111112',
+          '<a@b.com>'
+        ]
+      };
+    },
+    threadAndRfcIds: [
+      [
+        '168ab8987a3b61b3',
+        '<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com>'
+      ],
+      [
+        '168a6018f86576ac',
+        '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>'
+      ]
+    ],
+    expectedSearchQuery:
+      'rfc822msgid:<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com> OR rfc822msgid:<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com> OR rfc822msgid:<a@b.com>',
     start: 0,
     getOriginalSearchResponse
   });
