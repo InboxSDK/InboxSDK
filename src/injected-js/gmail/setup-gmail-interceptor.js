@@ -843,32 +843,100 @@ export function setupGmailInterceptorOnFrames(
       }
     });
 
-    {
-      js_frame_wrappers.push({
-        isRelevantTo: function(connection) {
-          let customSearchQuery;
-          const params = connection.params;
-          if (
-            connection.method === 'POST' &&
-            params.search &&
-            params.view === 'tl' &&
-            connection.url.match(/^\?/) &&
-            params.q &&
-            !params.act &&
-            (customSearchQuery = find(customSearchQueries, x => x === params.q))
-          ) {
-            if (customListJob) {
-              // Resolve the old one with something because no one else is going
-              // to after it's replaced in a moment.
-              customListJob.newRequestParams.resolve({
-                query: customListJob.query,
-                start: customListJob.start
-              });
-              customListJob.newResults.resolve(null);
-            }
+    js_frame_wrappers.push({
+      isRelevantTo: function(connection) {
+        let customSearchQuery;
+        const params = connection.params;
+        if (
+          connection.method === 'POST' &&
+          params.search &&
+          params.view === 'tl' &&
+          connection.url.match(/^\?/) &&
+          params.q &&
+          !params.act &&
+          (customSearchQuery = find(customSearchQueries, x => x === params.q))
+        ) {
+          if (customListJob) {
+            // Resolve the old one with something because no one else is going
+            // to after it's replaced in a moment.
+            customListJob.newRequestParams.resolve({
+              query: customListJob.query,
+              start: customListJob.start
+            });
+            customListJob.newResults.resolve(null);
+          }
+          customListJob = (connection: any)._customListJob = {
+            query: params.q,
+            start: +params.start,
+            newRequestParams: defer(),
+            newResults: defer()
+          };
+          triggerEvent({
+            type: 'searchForReplacement',
+            query: customListJob.query,
+            start: customListJob.start
+          });
+          return true;
+        }
+        return false;
+      },
+      requestChanger: function(connection, request) {
+        return (connection: any)._customListJob.newRequestParams.promise.then(
+          ({ query, start }) => {
+            const newParams = clone(connection.params);
+            newParams.q = query;
+            newParams.start = start;
+            return {
+              method: request.method,
+              url: '?' + stringify(newParams),
+              body: request.body
+            };
+          }
+        );
+      },
+      responseTextChanger: function(connection, response) {
+        triggerEvent({
+          type: 'searchResultsResponse',
+          query: (connection: any)._customListJob.query,
+          start: (connection: any)._customListJob.start,
+          response
+        });
+        return (connection: any)._customListJob.newResults.promise.then(
+          newResults => (newResults === null ? response : newResults)
+        );
+      }
+    });
+
+    // Sync API-based custom thread list interception
+    main_wrappers.push({
+      isRelevantTo: function(connection) {
+        const params = connection.params;
+        if (/sync(?:\/u\/\d+)?\/i\/bv/.test(connection.url)) {
+          if (customListJob) {
+            // Resolve the old one with something because no one else is going
+            // to after it's replaced in a moment.
+            customListJob.newRequestParams.resolve({
+              query: customListJob.query,
+              start: customListJob.start
+            });
+            customListJob.newResults.resolve(null);
+          }
+          return true;
+        }
+        return false;
+      },
+      requestChanger: async function(connection, request) {
+        if (request.body) {
+          const parsedBody = JSON.parse(request.body);
+
+          // we are a search!
+          const searchQuery =
+            (parsedBody && parsedBody[1] && parsedBody[1][4]) || '';
+
+          if (find(customSearchQueries, x => x === searchQuery)) {
             customListJob = (connection: any)._customListJob = {
-              query: params.q,
-              start: +params.start,
+              query: searchQuery,
+              start: parsedBody[1][10],
               newRequestParams: defer(),
               newResults: defer()
             };
@@ -877,113 +945,41 @@ export function setupGmailInterceptorOnFrames(
               query: customListJob.query,
               start: customListJob.start
             });
-            return true;
+
+            return (connection: any)._customListJob.newRequestParams.promise.then(
+              ({ query, start }) => {
+                parsedBody[1][4] = query;
+                parsedBody[1][10] = start;
+
+                return {
+                  method: request.method,
+                  url: request.url,
+                  body: JSON.stringify(parsedBody)
+                };
+              }
+            );
           }
-          return false;
-        },
-        requestChanger: function(connection, request) {
-          return (connection: any)._customListJob.newRequestParams.promise.then(
-            ({ query, start }) => {
-              const newParams = clone(connection.params);
-              newParams.q = query;
-              newParams.start = start;
-              return {
-                method: request.method,
-                url: '?' + stringify(newParams),
-                body: request.body
-              };
-            }
-          );
-        },
-        responseTextChanger: function(connection, response) {
+        }
+
+        return request;
+      },
+      responseTextChanger: async function(connection, response) {
+        if ((connection: any)._customListJob) {
           triggerEvent({
             type: 'searchResultsResponse',
             query: (connection: any)._customListJob.query,
             start: (connection: any)._customListJob.start,
             response
           });
+
           return (connection: any)._customListJob.newResults.promise.then(
             newResults => (newResults === null ? response : newResults)
           );
+        } else {
+          return response;
         }
-      });
-
-      {
-        // Sync API-based custom thread list interception
-        main_wrappers.push({
-          isRelevantTo: function(connection) {
-            const params = connection.params;
-            if (/sync(?:\/u\/\d+)?\/i\/bv/.test(connection.url)) {
-              if (customListJob) {
-                // Resolve the old one with something because no one else is going
-                // to after it's replaced in a moment.
-                customListJob.newRequestParams.resolve({
-                  query: customListJob.query,
-                  start: customListJob.start
-                });
-                customListJob.newResults.resolve(null);
-              }
-              return true;
-            }
-            return false;
-          },
-          requestChanger: async function(connection, request) {
-            if (request.body) {
-              const parsedBody = JSON.parse(request.body);
-
-              // we are a search!
-              const searchQuery =
-                (parsedBody && parsedBody[1] && parsedBody[1][4]) || '';
-
-              if (find(customSearchQueries, x => x === searchQuery)) {
-                customListJob = (connection: any)._customListJob = {
-                  query: searchQuery,
-                  start: parsedBody[1][10],
-                  newRequestParams: defer(),
-                  newResults: defer()
-                };
-                triggerEvent({
-                  type: 'searchForReplacement',
-                  query: customListJob.query,
-                  start: customListJob.start
-                });
-
-                return (connection: any)._customListJob.newRequestParams.promise.then(
-                  ({ query, start }) => {
-                    parsedBody[1][4] = query;
-                    parsedBody[1][10] = start;
-
-                    return {
-                      method: request.method,
-                      url: request.url,
-                      body: JSON.stringify(parsedBody)
-                    };
-                  }
-                );
-              }
-            }
-
-            return request;
-          },
-          responseTextChanger: async function(connection, response) {
-            if ((connection: any)._customListJob) {
-              triggerEvent({
-                type: 'searchResultsResponse',
-                query: (connection: any)._customListJob.query,
-                start: (connection: any)._customListJob.start,
-                response
-              });
-
-              return (connection: any)._customListJob.newResults.promise.then(
-                newResults => (newResults === null ? response : newResults)
-              );
-            } else {
-              return response;
-            }
-          }
-        });
       }
-    }
+    });
   }
 
   // sync token savers
