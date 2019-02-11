@@ -910,7 +910,6 @@ export function setupGmailInterceptorOnFrames(
     // Sync API-based custom thread list interception
     main_wrappers.push({
       isRelevantTo: function(connection) {
-        const params = connection.params;
         if (/sync(?:\/u\/\d+)?\/i\/bv/.test(connection.url)) {
           if (customListJob) {
             // Resolve the old one with something because no one else is going
