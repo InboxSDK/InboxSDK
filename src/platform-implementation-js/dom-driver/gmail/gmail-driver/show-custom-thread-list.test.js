@@ -342,3 +342,62 @@ test('missing thread id', async () => {
     ).reverse()
   );
 });
+
+test('missing threads in response', async () => {
+  const getOriginalSearchResponse = once(() =>
+    readFile(
+      __dirname + '/../../../../../test/data/2019-02-01 search results.json',
+      'utf8'
+    )
+  );
+
+  const tester = new ShowCustomThreadListTester({
+    onActivate() {
+      return {
+        hasMore: false,
+        threads: [
+          '168ab8987a3b61b3',
+          '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>',
+          '1111111111111111',
+          '1111111111111112',
+          '<a@b.com>'
+        ]
+      };
+    },
+    threadAndRfcIds: [
+      [
+        '168ab8987a3b61b3',
+        '<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com>'
+      ],
+      [
+        '168a6018f86576ac',
+        '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>'
+      ],
+      ['1111111111111111', '<ones@example.com>'],
+      ['1111111111111112', '<onesandatwo@example.com>'],
+      ['abab111111111111', '<a@b.com>']
+    ],
+    expectedSearchQuery:
+      'rfc822msgid:<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com> OR rfc822msgid:<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com> OR rfc822msgid:<ones@example.com> OR rfc822msgid:<onesandatwo@example.com> OR rfc822msgid:<a@b.com>',
+    start: 0,
+    getOriginalSearchResponse
+  });
+  const setCustomListResults = await tester.runAndGetSetCustomListResults();
+
+  function ignoreRawResponses(syncThreads: GSRP.SyncThread[]) {
+    return syncThreads.map(o => ({
+      ...o,
+      rawResponse: 'ignored'
+    }));
+  }
+
+  expect(
+    ignoreRawResponses(
+      GSRP.extractThreadsFromSearchResponse(setCustomListResults)
+    )
+  ).toEqual(
+    ignoreRawResponses(
+      GSRP.extractThreadsFromSearchResponse(await getOriginalSearchResponse())
+    )
+  );
+});
