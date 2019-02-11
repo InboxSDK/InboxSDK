@@ -184,16 +184,22 @@ export function replaceThreadsInSearchResponse(
 ): string {
   const parsedResponse = JSON.parse(response);
 
-  parsedResponse[3] = replacementThreads.map(({ rawResponse }, index) => ({
-    ...rawResponse,
-    '2': index
-  }));
-  parsedResponse[15][1] = replacementThreads.map(
-    ({ extraMetaData }) => extraMetaData.snippet
-  );
-  parsedResponse[15][2] = replacementThreads.map(({ extraMetaData }) =>
-    extraMetaData.syncMessageData.map(({ syncMessageID }) => syncMessageID)
-  );
+  if (parsedResponse[3] || replacementThreads.length) {
+    parsedResponse[3] = replacementThreads.map(({ rawResponse }, index) => ({
+      ...rawResponse,
+      '2': index
+    }));
+  }
+
+  if (parsedResponse[15] || replacementThreads.length) {
+    parsedResponse[15] = {
+      ...parsedResponse[15],
+      '1': replacementThreads.map(({ extraMetaData }) => extraMetaData.snippet),
+      '2': replacementThreads.map(({ extraMetaData }) =>
+        extraMetaData.syncMessageData.map(({ syncMessageID }) => syncMessageID)
+      )
+    };
+  }
 
   return JSON.stringify(parsedResponse);
 }
