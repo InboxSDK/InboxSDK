@@ -317,24 +317,28 @@ const setupSearchReplacing = (
                 extractedThreads[index].oldGmailThreadID !== gtid
             );
 
-            const reorderedThreads: typeof extractedThreads = doesNeedReorder
-              ? completedIDPairs
-                  .map(({ gtid }) =>
-                    find(extractedThreads, t => t.oldGmailThreadID === gtid)
-                  )
-                  .filter(Boolean)
-                  .map((extractedThread, index) => {
-                    const newTime = String(Date.now() - index);
-                    extractedThread.rawResponse[1][3] = newTime;
-                    extractedThread.rawResponse[1][8] = newTime;
-                    (extractedThread.rawResponse[1][5] || []).forEach(md => {
-                      md[7] = newTime;
-                      md[18] = newTime;
-                      md[31] = newTime;
-                    });
-                    return extractedThread;
-                  })
-              : extractedThreads;
+            let reorderedThreads: typeof extractedThreads;
+            if (doesNeedReorder) {
+              const now = Date.now();
+              reorderedThreads = completedIDPairs
+                .map(({ gtid }) =>
+                  find(extractedThreads, t => t.oldGmailThreadID === gtid)
+                )
+                .filter(Boolean)
+                .map((extractedThread, index) => {
+                  const newTime = String(now - index);
+                  extractedThread.rawResponse[1][3] = newTime;
+                  extractedThread.rawResponse[1][8] = newTime;
+                  (extractedThread.rawResponse[1][5] || []).forEach(md => {
+                    md[7] = newTime;
+                    md[18] = newTime;
+                    md[31] = newTime;
+                  });
+                  return extractedThread;
+                });
+            } else {
+              reorderedThreads = extractedThreads;
+            }
 
             newResponse = SyncGRP.replaceThreadsInSearchResponse(
               response,
