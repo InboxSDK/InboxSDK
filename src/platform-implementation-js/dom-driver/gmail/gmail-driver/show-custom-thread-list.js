@@ -8,6 +8,7 @@ import * as SyncGRP from '../gmail-sync-response-processor';
 import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
 import isStreakAppId from '../../../lib/isStreakAppId';
+import update from 'immutability-helper';
 
 type ThreadDescriptor =
   | string
@@ -180,7 +181,8 @@ function threadDescriptorToInitialIDPair(id: ThreadDescriptor): ?InitialIDPair {
 
 function initialIDPairToIDPairWithRFC(
   driver: GmailDriver,
-  pair: InitialIDPair
+  pair: InitialIDPair,
+  findIdFailure
 ): Promise<?IDPairWithRFC> {
   if (typeof pair.rfcId === 'string') {
     return Promise.resolve(((pair: any): IDPairWithRFC));
@@ -195,7 +197,8 @@ function initialIDPairToIDPairWithRFC(
 
 function idPairWithRFCToCompletedIDPair(
   driver: GmailDriver,
-  pair: IDPairWithRFC
+  pair: IDPairWithRFC,
+  findIdFailure
 ): Promise<?CompletedIDPair> {
   return typeof pair.gtid === 'string'
     ? Promise.resolve(((pair: any): CompletedIDPair))
@@ -211,7 +214,8 @@ function idPairWithRFCToCompletedIDPair(
 const setupSearchReplacing = (
   driver: GmailDriver,
   customRouteID: string,
-  onActivate: Function
+  onActivate: Function,
+  findIdFailure
 ): string => {
   const preexistingQuery = threadListHandlersToSearchStrings.get(onActivate);
   if (preexistingQuery) {
@@ -254,7 +258,9 @@ const setupSearchReplacing = (
           .filter(Boolean);
 
         const idPairsWithRFC: IDPairWithRFC[] = (await Promise.all(
-          initialIDPairs.map(pair => initialIDPairToIDPairWithRFC(driver, pair))
+          initialIDPairs.map(pair =>
+            initialIDPairToIDPairWithRFC(driver, pair, findIdFailure)
+          )
         )).filter(Boolean);
 
         const messageIDQuery: string =
@@ -290,7 +296,7 @@ const setupSearchReplacing = (
         // Figure out any gmail thread ids we don't know yet.
         const completedIDPairs: Array<CompletedIDPair> = (await Promise.all(
           idPairsWithRFC.map(pair =>
-            idPairWithRFCToCompletedIDPair(driver, pair)
+            idPairWithRFCToCompletedIDPair(driver, pair, findIdFailure)
           )
         )).filter(Boolean);
 
@@ -307,29 +313,56 @@ const setupSearchReplacing = (
               response
             );
 
-            const doesNeedReorder = completedIDPairs.some(
-              ({ gtid }, index) =>
-                extractedThreads[index].oldGmailThreadID !== gtid
-            );
+            const extractedThreadsInCompletedIDPairsOrder = completedIDPairs
+              .map(({ gtid }) =>
+                find(extractedThreads, t => t.oldGmailThreadID === gtid)
+              )
+              .filter(Boolean);
 
-            const reorderedThreads: typeof extractedThreads = doesNeedReorder
-              ? completedIDPairs
-                  .map(({ gtid }) =>
-                    find(extractedThreads, t => t.oldGmailThreadID === gtid)
-                  )
-                  .filter(Boolean)
-                  .map((extractedThread, index) => {
-                    const newTime = String(Date.now() - index);
-                    extractedThread.rawResponse[1][3] = newTime;
-                    extractedThread.rawResponse[1][8] = newTime;
-                    (extractedThread.rawResponse[1][5] || []).forEach(md => {
-                      md[7] = newTime;
-                      md[18] = newTime;
-                      md[31] = newTime;
+            const doesNeedReorder =
+              extractedThreads.length !==
+                extractedThreadsInCompletedIDPairsOrder.length ||
+              extractedThreads.some(
+                (extractedThread, index) =>
+                  extractedThread !==
+                  extractedThreadsInCompletedIDPairsOrder[index]
+              );
+
+            let reorderedThreads: typeof extractedThreads;
+            if (doesNeedReorder) {
+              const now = Date.now();
+              reorderedThreads = extractedThreadsInCompletedIDPairsOrder.map(
+                (extractedThread, index) => {
+                  const newTime = String(now - index);
+                  let newThread = update(extractedThread, {
+                    rawResponse: {
+                      '1': {
+                        '3': { $set: newTime },
+                        '8': { $set: newTime }
+                      }
+                    }
+                  });
+                  if (extractedThread.rawResponse[1][5]) {
+                    newThread = update(newThread, {
+                      rawResponse: {
+                        '1': {
+                          '5': oldVal =>
+                            oldVal.map(md => ({
+                              ...md,
+                              '7': newTime,
+                              '18': newTime,
+                              '31': newTime
+                            }))
+                        }
+                      }
                     });
-                    return extractedThread;
-                  })
-              : extractedThreads;
+                  }
+                  return newThread;
+                }
+              );
+            } else {
+              reorderedThreads = extractedThreads;
+            }
 
             newResponse = SyncGRP.replaceThreadsInSearchResponse(
               response,
@@ -422,9 +455,15 @@ export default function showCustomThreadList(
   driver: GmailDriver,
   customRouteID: string,
   onActivate: Function,
-  params: Array<string>
+  params: Array<string>,
+  findIdFailure: typeof findIdFailure = findIdFailure
 ) {
-  const uniqueSearch = setupSearchReplacing(driver, customRouteID, onActivate);
+  const uniqueSearch = setupSearchReplacing(
+    driver,
+    customRouteID,
+    onActivate,
+    findIdFailure
+  );
   const customHash = document.location.hash;
 
   const nextMainContentElementChange = GmailElementGetter.getMainContentElementChangedStream()
