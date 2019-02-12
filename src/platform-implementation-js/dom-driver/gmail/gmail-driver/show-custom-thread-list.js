@@ -8,6 +8,7 @@ import * as SyncGRP from '../gmail-sync-response-processor';
 import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
 import isStreakAppId from '../../../lib/isStreakAppId';
+import update from 'immutability-helper';
 
 type ThreadDescriptor =
   | string
@@ -333,14 +334,30 @@ const setupSearchReplacing = (
               reorderedThreads = extractedThreadsInCompletedIDPairsOrder.map(
                 (extractedThread, index) => {
                   const newTime = String(now - index);
-                  extractedThread.rawResponse[1][3] = newTime;
-                  extractedThread.rawResponse[1][8] = newTime;
-                  (extractedThread.rawResponse[1][5] || []).forEach(md => {
-                    md[7] = newTime;
-                    md[18] = newTime;
-                    md[31] = newTime;
+                  let newThread = update(extractedThread, {
+                    rawResponse: {
+                      '1': {
+                        '3': { $set: newTime },
+                        '8': { $set: newTime }
+                      }
+                    }
                   });
-                  return extractedThread;
+                  if (extractedThread.rawResponse[1][5]) {
+                    newThread = update(newThread, {
+                      rawResponse: {
+                        '1': {
+                          '5': oldVal =>
+                            oldVal.map(md => ({
+                              ...md,
+                              '7': newTime,
+                              '18': newTime,
+                              '31': newTime
+                            }))
+                        }
+                      }
+                    });
+                  }
+                  return newThread;
                 }
               );
             } else {
