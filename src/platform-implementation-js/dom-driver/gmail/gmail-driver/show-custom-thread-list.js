@@ -312,20 +312,26 @@ const setupSearchReplacing = (
               response
             );
 
-            const doesNeedReorder = completedIDPairs.some(
-              ({ gtid }, index) =>
-                extractedThreads[index].oldGmailThreadID !== gtid
-            );
+            const extractedThreadsInCompletedIDPairsOrder = completedIDPairs
+              .map(({ gtid }) =>
+                find(extractedThreads, t => t.oldGmailThreadID === gtid)
+              )
+              .filter(Boolean);
+
+            const doesNeedReorder =
+              extractedThreads.length !==
+                extractedThreadsInCompletedIDPairsOrder.length ||
+              extractedThreads.some(
+                (extractedThread, index) =>
+                  extractedThread !==
+                  extractedThreadsInCompletedIDPairsOrder[index]
+              );
 
             let reorderedThreads: typeof extractedThreads;
             if (doesNeedReorder) {
               const now = Date.now();
-              reorderedThreads = completedIDPairs
-                .map(({ gtid }) =>
-                  find(extractedThreads, t => t.oldGmailThreadID === gtid)
-                )
-                .filter(Boolean)
-                .map((extractedThread, index) => {
+              reorderedThreads = extractedThreadsInCompletedIDPairsOrder.map(
+                (extractedThread, index) => {
                   const newTime = String(now - index);
                   extractedThread.rawResponse[1][3] = newTime;
                   extractedThread.rawResponse[1][8] = newTime;
@@ -335,7 +341,8 @@ const setupSearchReplacing = (
                     md[31] = newTime;
                   });
                   return extractedThread;
-                });
+                }
+              );
             } else {
               reorderedThreads = extractedThreads;
             }
