@@ -97,7 +97,7 @@ function copyAndOmitExcessThreads(
   return ids.slice(0, MAX_THREADS_PER_PAGE);
 }
 
-function findIdFailure(id: string, err: Error) {
+function _findIdFailure(id: string, err: Error) {
   console.log('Failed to find id for thread', id, err); //eslint-disable-line no-console
   return null;
 }
@@ -456,7 +456,7 @@ export default function showCustomThreadList(
   customRouteID: string,
   onActivate: Function,
   params: Array<string>,
-  findIdFailure: typeof findIdFailure = findIdFailure
+  findIdFailure: typeof _findIdFailure = _findIdFailure
 ) {
   const uniqueSearch = setupSearchReplacing(
     driver,
