@@ -70,7 +70,7 @@ const renderResultsList = ({
       result.description || result.descriptionHTML
         ? autoHtml`
       <span class="inboxsdk__search_suggestion_desc">
-        ${result.description || { __html: result.descriptionHTML }}
+        ${result.description || { __html: (result.descriptionHTML: any) }}
       </span>
     `
         : '';
@@ -80,7 +80,7 @@ const renderResultsList = ({
       <img src="${result.iconUrl || DEFAULT_RESULT_ICON}">
       <span>
         <span class="inboxsdk__search_suggestion_name" role="option">
-          ${result.name || { __html: result.nameHTML }}
+          ${result.name || { __html: (result.nameHTML: any) }}
         </span>
         ${{ __html: description }}
       </span>

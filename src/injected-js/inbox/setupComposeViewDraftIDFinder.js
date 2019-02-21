@@ -38,7 +38,7 @@ const findDraftID = target => {
 export default function setupComposeViewDraftIDFinder() {
   document.addEventListener(
     'inboxSDKgetDraftIDforComposeView',
-    ({ target }) => {
+    ({ target }: Event) => {
       const draftID = findDraftID((target: any));
 
       if (!draftID)

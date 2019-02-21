@@ -20,7 +20,9 @@ export default function setupGmonkeyHandler() {
     }
   );
 
-  document.addEventListener('inboxSDKtellMeCurrentThreadId', function(event) {
+  document.addEventListener('inboxSDKtellMeCurrentThreadId', function(
+    event: Object
+  ) {
     let threadId;
 
     if ((event: any).detail.isPreviewedThread) {

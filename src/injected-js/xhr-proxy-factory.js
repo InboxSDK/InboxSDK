@@ -324,7 +324,7 @@ export default function XHRProxyFactory(
 
     this._realxhr.addEventListener(
       'readystatechange',
-      event => {
+      (event: Object) => {
         if (!this._connection) {
           return;
         }

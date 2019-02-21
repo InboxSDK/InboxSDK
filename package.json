@@ -74,7 +74,7 @@
     "eslint-plugin-react": "^7.1.0",
     "event-listener-with-options": "^1.0.3",
     "fast-glob": "^2.2.6",
-    "flow-bin": "^0.91.0",
+    "flow-bin": "^0.93.0",
     "gulp": "^3.9.0",
     "gulp-add-src": "^0.2.0",
     "gulp-concat": "^2.5.2",

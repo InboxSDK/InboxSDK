@@ -121,7 +121,7 @@ beforeEach(() => {
           it('should call all states and work on re-used object', done => {
             const calledForState = { '1': 0, '2': 0, '3': 0, '4': 0 };
             let runCount = 0;
-            const listener = function(event) {
+            const listener = function(event: Object) {
               assert.strictEqual(this, xhr, 'check for correct this binding');
               assert.strictEqual(
                 event.target,
@@ -199,10 +199,10 @@ beforeEach(() => {
           xhr.onreadystatechange = function(event) {
             simpleFired = true;
           };
-          xhr.addEventListener('readystatechange', function(event) {
+          xhr.addEventListener('readystatechange', function(event: Object) {
             addedFired = true;
           });
-          xhr.addEventListener('readystatechange', function(event) {
+          xhr.addEventListener('readystatechange', function(event: Object) {
             if (this.readyState == 4) {
               assert(
                 simpleFired && addedFired,
@@ -218,11 +218,11 @@ beforeEach(() => {
 
       describe('removeEventListener', () => {
         it('should work', done => {
-          const badListener = function(event) {
+          const badListener = function(event: Object) {
             throw new Error('this listener should have been removed');
           };
           xhr.addEventListener('readystatechange', badListener);
-          xhr.addEventListener('readystatechange', function(event) {
+          xhr.addEventListener('readystatechange', function(event: Object) {
             if (this.readyState == 4) {
               done();
             }
@@ -328,7 +328,7 @@ beforeEach(() => {
               step();
             }
           };
-          xhr.addEventListener('readystatechange', function(event) {
+          xhr.addEventListener('readystatechange', function(event: Object) {
             if (this.readyState == 4) {
               step();
             }
