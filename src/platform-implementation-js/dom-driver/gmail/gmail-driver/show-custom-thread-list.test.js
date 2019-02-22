@@ -9,7 +9,7 @@ import once from 'lodash/once';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 
-const readFile = (fs.promises.readFile: Function);
+const readFile = fs.promises.readFile;
 
 beforeAll(() => {
   (document.body: any).innerHTML = `

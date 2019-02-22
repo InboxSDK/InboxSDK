@@ -56,7 +56,7 @@
     "babel-plugin-add-module-exports": "^1.0.0",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "babelify": "^10.0.0",
-    "bignumber.js": "^4.0.0",
+    "bignumber.js": "^8.0.2",
     "bimapcache": "^2.0.0",
     "brfs": "^2.0.1",
     "browserify": "^16.2.2",
@@ -74,7 +74,7 @@
     "eslint-plugin-react": "^7.1.0",
     "event-listener-with-options": "^1.0.3",
     "fast-glob": "^2.2.6",
-    "flow-bin": "^0.91.0",
+    "flow-bin": "^0.93.0",
     "gulp": "^3.9.0",
     "gulp-add-src": "^0.2.0",
     "gulp-concat": "^2.5.2",
@@ -132,7 +132,7 @@
     "transducers.js": "^0.3.2",
     "ud": "^3.1.1",
     "ud-kefir": "^2.0.1",
-    "vinyl-source-stream": "^1.1.0",
+    "vinyl-source-stream": "^2.0.0",
     "watchify": "^3.4.0",
     "yarn-deps-check": "^1.0.0"
   }

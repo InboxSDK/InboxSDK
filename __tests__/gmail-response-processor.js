@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 import fs from 'fs';
-const readFile = (fs.promises.readFile: Function); // TODO https://github.com/facebook/flow/issues/7284
+const readFile = fs.promises.readFile;
 
 import * as GmailResponseProcessor from '../src/platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 

@@ -7,7 +7,7 @@ export default function setupInboxCustomViewLinkFixer() {
 
   document.addEventListener(
     'inboxSDKregisterAllowedHashLinkStartTerm',
-    function(event) {
+    function(event: Event) {
       const term = (event: any).detail.term;
       allowedStartTerms.add(term);
     }
