@@ -332,7 +332,7 @@ class GmailRouteView {
     const SCROLL_DEBOUNCE_MS = 100;
     const scrollContainer = GmailElementGetter.getScrollContainer();
     const { scrollTop: cachedScrollTop } = this._cachedRouteData;
-    if (scrollContainer) {
+    if (scrollContainer && this._hasAddedCollapsibleSection) {
       scrollContainer.scrollTop = cachedScrollTop;
       Kefir.fromEvents(scrollContainer, 'scroll')
         .debounce(SCROLL_DEBOUNCE_MS)
