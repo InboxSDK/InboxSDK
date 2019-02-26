@@ -45,7 +45,7 @@ class GmailRouteView {
   _sectionsContainer: ?HTMLElement;
 
   constructor(
-    { urlObject, type, routeID, cachedRouteData = {} }: Object,
+    { urlObject, type, routeID, cachedRouteData }: Object,
     gmailRouteProcessor: GmailRouteProcessor,
     driver: GmailDriver
   ) {
