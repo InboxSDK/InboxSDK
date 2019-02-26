@@ -339,7 +339,6 @@ class GmailRouteView {
         .map(e => e.target.scrollTop)
         .takeUntilBy(this._stopper)
         .onValue(scrollTop => {
-          scrollContainer.scrollTop = scrollTop;
           this._cachedRouteData.scrollTop = scrollTop;
         });
     }
