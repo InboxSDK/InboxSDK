@@ -31,10 +31,7 @@ export default function setupRouteViewDriverStream(
   let lastHash = lastNativeHash;
 
   let sameRouteData = {
-    CUSTOM: {},
-    CUSTOM_LIST_TRIGGEr: {},
-    NATIVE: {},
-    OTHER_APP_CUSTOM: {}
+    [lastNativeHash]: {}
   };
 
   const eligibleHashChanges = Kefir.fromEvents(window, 'hashchange')
@@ -130,7 +127,18 @@ export default function setupRouteViewDriverStream(
           }
         }
       }
-      return { ...options, cachedRouteData: sameRouteData[type] };
+      return options;
+    })
+    .map(options => {
+      const MAX_KEY_CACHE = 50;
+      const { urlObject } = options;
+      if (!sameRouteData[urlObject.hash]) {
+        sameRouteData[urlObject.hash] = {};
+      }
+      if (Object.keys(sameRouteData).length > MAX_KEY_CACHE) {
+        delete sameRouteData[lastHash];
+      }
+      return { ...options, cachedRouteData: sameRouteData[urlObject.hash] };
     })
     .map(options => {
       if (options.type === 'NATIVE' || options.type === 'CUSTOM_LIST') {

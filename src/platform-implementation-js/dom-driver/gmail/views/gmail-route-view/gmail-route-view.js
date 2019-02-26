@@ -97,11 +97,6 @@ class GmailRouteView {
   }
 
   destroy() {
-    if (this._type === 'NATIVE') {
-      this._cachedRouteData.scrollTop =
-        GmailElementGetter.getScrollContainer() &&
-        GmailElementGetter.getScrollContainer().scrollTop;
-    }
     this._stopper.destroy();
     this._eventStream.end();
     if (this._customViewElement) {
@@ -199,6 +194,8 @@ class GmailRouteView {
     groupOrderHint: any,
     isCollapsible: boolean
   ): GmailCollapsibleSectionView {
+    this._hasAddedCollapsibleSection = true;
+
     var gmailResultsSectionView = new GmailCollapsibleSectionView(
       this._driver,
       groupOrderHint,
@@ -276,7 +273,7 @@ class GmailRouteView {
 
       this._setupRowListViews();
       this._setupContentAndSidebarView();
-      this._restoreScrollPosition();
+      this._setupScrollStream();
     });
   }
 
@@ -331,13 +328,20 @@ class GmailRouteView {
     }
   }
 
-  _restoreScrollPosition() {
-    const { scrollTop } = this._cachedRouteData;
-    if (scrollTop) {
-      const scrollContainer = GmailElementGetter.getScrollContainer();
-      if (scrollContainer) {
-        scrollContainer.scrollTop = scrollTop;
-      }
+  _setupScrollStream() {
+    const SCROLL_DEBOUNCE_MS = 100;
+    const scrollContainer = GmailElementGetter.getScrollContainer();
+    const { scrollTop: cachedScrollTop } = this._cachedRouteData;
+    if (scrollContainer) {
+      scrollContainer.scrollTop = cachedScrollTop;
+      Kefir.fromEvents(scrollContainer, 'scroll')
+        .debounce(SCROLL_DEBOUNCE_MS)
+        .map(e => e.target.scrollTop)
+        .takeUntilBy(this._stopper)
+        .onValue(scrollTop => {
+          scrollContainer.scrollTop = scrollTop;
+          this._cachedRouteData.scrollTop = scrollTop;
+        });
     }
   }
 
