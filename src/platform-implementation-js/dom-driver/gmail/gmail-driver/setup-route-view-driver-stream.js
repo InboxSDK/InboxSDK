@@ -122,7 +122,7 @@ export default function setupRouteViewDriverStream(
               type: 'CUSTOM_LIST',
               urlObject,
               routeID: customListRouteId,
-              cachedRouteData: sameRouteData['CUSTOM_LIST']
+              cachedRouteData: sameRouteData[urlObject.hash]
             };
           }
         }
