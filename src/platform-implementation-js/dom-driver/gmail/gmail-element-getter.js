@@ -82,6 +82,10 @@ const GmailElementGetter = {
     return document.querySelector('div.aeF > div.nH');
   },
 
+  getScrollContainer(): ?HTMLElement {
+    return document.querySelector('div.Tm.aeJ');
+  },
+
   getMoleParent(): ?HTMLElement {
     return ((document.body: any): HTMLElement).querySelector(
       '.dw .nH > .nH > .no'

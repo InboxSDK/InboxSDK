@@ -45,7 +45,7 @@ class GmailRouteView {
   _sectionsContainer: ?HTMLElement;
 
   constructor(
-    { urlObject, type, routeID }: Object,
+    { urlObject, type, routeID, cachedRouteData = {} }: Object,
     gmailRouteProcessor: GmailRouteProcessor,
     driver: GmailDriver
   ) {
@@ -57,6 +57,7 @@ class GmailRouteView {
     this._name = urlObject.name;
     this._paramsArray = urlObject.params;
     this._customRouteID = routeID;
+    this._cachedRouteData = cachedRouteData;
 
     this._stopper = kefirStopper();
     this._rowListViews = [];
@@ -96,6 +97,11 @@ class GmailRouteView {
   }
 
   destroy() {
+    if (this._type === 'NATIVE') {
+      this._cachedRouteData.scrollTop =
+        GmailElementGetter.getScrollContainer() &&
+        GmailElementGetter.getScrollContainer().scrollTop;
+    }
     this._stopper.destroy();
     this._eventStream.end();
     if (this._customViewElement) {
@@ -270,6 +276,7 @@ class GmailRouteView {
 
       this._setupRowListViews();
       this._setupContentAndSidebarView();
+      this._restoreScrollPosition();
     });
   }
 
@@ -324,6 +331,16 @@ class GmailRouteView {
     }
   }
 
+  _restoreScrollPosition() {
+    const { scrollTop } = this._cachedRouteData;
+    if (scrollTop) {
+      const scrollContainer = GmailElementGetter.getScrollContainer();
+      if (scrollContainer) {
+        scrollContainer.scrollTop = scrollTop;
+      }
+    }
+  }
+
   _startMonitoringPreviewPaneRowListForThread(rowListElement: HTMLElement) {
     const threadContainerTableElement = querySelector(
       rowListElement,
@@ -353,7 +370,7 @@ class GmailRouteView {
   }
 
   _getSectionsContainer(): HTMLElement {
-    const main = GmailElementGetter.getMainContentContainer();
+    const main = document.querySelector("div[role='main']");
     if (!main) throw new Error('should not happen');
     let sectionsContainer = main.querySelector('.inboxsdk__custom_sections');
     if (!sectionsContainer) {

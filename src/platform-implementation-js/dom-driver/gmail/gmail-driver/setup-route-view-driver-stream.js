@@ -30,6 +30,13 @@ export default function setupRouteViewDriverStream(
 
   let lastHash = lastNativeHash;
 
+  let sameRouteData = {
+    CUSTOM: {},
+    CUSTOM_LIST_TRIGGEr: {},
+    NATIVE: {},
+    OTHER_APP_CUSTOM: {}
+  };
+
   const eligibleHashChanges = Kefir.fromEvents(window, 'hashchange')
     .filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
     .map(event => ({
@@ -117,12 +124,13 @@ export default function setupRouteViewDriverStream(
             return {
               type: 'CUSTOM_LIST',
               urlObject,
-              routeID: customListRouteId
+              routeID: customListRouteId,
+              cachedRouteData: sameRouteData['CUSTOM_LIST']
             };
           }
         }
       }
-      return options;
+      return { ...options, cachedRouteData: sameRouteData[type] };
     })
     .map(options => {
       if (options.type === 'NATIVE' || options.type === 'CUSTOM_LIST') {
