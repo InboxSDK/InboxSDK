@@ -43,6 +43,8 @@ class GmailRouteView {
   _customViewElement: ?HTMLElement;
   _threadView: ?GmailThreadView;
   _sectionsContainer: ?HTMLElement;
+  _hasAddedCollapsibleSection: boolean;
+  _cachedRouteData: Object;
 
   constructor(
     { urlObject, type, routeID, cachedRouteData }: Object,
@@ -66,6 +68,8 @@ class GmailRouteView {
     this._driver = driver;
 
     this._eventStream = kefirBus();
+
+    this._hasAddedCollapsibleSection = false;
 
     if (this._type === 'CUSTOM') {
       this._setupCustomViewElement();
