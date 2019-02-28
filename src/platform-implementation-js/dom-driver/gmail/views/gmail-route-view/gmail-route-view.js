@@ -43,9 +43,11 @@ class GmailRouteView {
   _customViewElement: ?HTMLElement;
   _threadView: ?GmailThreadView;
   _sectionsContainer: ?HTMLElement;
+  _hasAddedCollapsibleSection: boolean;
+  _cachedRouteData: Object;
 
   constructor(
-    { urlObject, type, routeID }: Object,
+    { urlObject, type, routeID, cachedRouteData }: Object,
     gmailRouteProcessor: GmailRouteProcessor,
     driver: GmailDriver
   ) {
@@ -57,6 +59,7 @@ class GmailRouteView {
     this._name = urlObject.name;
     this._paramsArray = urlObject.params;
     this._customRouteID = routeID;
+    this._cachedRouteData = cachedRouteData;
 
     this._stopper = kefirStopper();
     this._rowListViews = [];
@@ -65,6 +68,8 @@ class GmailRouteView {
     this._driver = driver;
 
     this._eventStream = kefirBus();
+
+    this._hasAddedCollapsibleSection = false;
 
     if (this._type === 'CUSTOM') {
       this._setupCustomViewElement();
@@ -193,6 +198,8 @@ class GmailRouteView {
     groupOrderHint: any,
     isCollapsible: boolean
   ): GmailCollapsibleSectionView {
+    this._hasAddedCollapsibleSection = true;
+
     var gmailResultsSectionView = new GmailCollapsibleSectionView(
       this._driver,
       groupOrderHint,
@@ -270,6 +277,7 @@ class GmailRouteView {
 
       this._setupRowListViews();
       this._setupContentAndSidebarView();
+      this._setupScrollStream();
     });
   }
 
@@ -324,6 +332,24 @@ class GmailRouteView {
     }
   }
 
+  _setupScrollStream() {
+    const SCROLL_DEBOUNCE_MS = 100;
+    const scrollContainer = GmailElementGetter.getScrollContainer();
+    const { scrollTop: cachedScrollTop } = this._cachedRouteData;
+    if (scrollContainer && this._hasAddedCollapsibleSection) {
+      if (cachedScrollTop) {
+        scrollContainer.scrollTop = cachedScrollTop;
+      }
+      Kefir.fromEvents(scrollContainer, 'scroll')
+        .throttle(SCROLL_DEBOUNCE_MS)
+        .map(e => e.target.scrollTop)
+        .takeUntilBy(this._stopper)
+        .onValue(scrollTop => {
+          this._cachedRouteData.scrollTop = scrollTop;
+        });
+    }
+  }
+
   _startMonitoringPreviewPaneRowListForThread(rowListElement: HTMLElement) {
     const threadContainerTableElement = querySelector(
       rowListElement,
@@ -353,7 +379,7 @@ class GmailRouteView {
   }
 
   _getSectionsContainer(): HTMLElement {
-    const main = GmailElementGetter.getMainContentContainer();
+    const main = document.querySelector("div[role='main']");
     if (!main) throw new Error('should not happen');
     let sectionsContainer = main.querySelector('.inboxsdk__custom_sections');
     if (!sectionsContainer) {
