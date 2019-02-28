@@ -30,12 +30,7 @@ export default function setupRouteViewDriverStream(
 
   let lastHash = lastNativeHash;
 
-  let sameRouteData = {
-    [lastNativeHash]: {
-      data: {},
-      lastUsedTimestamp: Date.now()
-    }
-  };
+  let sameRouteData = {};
 
   const eligibleHashChanges = Kefir.fromEvents(window, 'hashchange')
     .filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
@@ -153,7 +148,10 @@ export default function setupRouteViewDriverStream(
           .reduce((acc, hash) => ({ ...acc, [hash]: sameRouteData[hash] }), {});
       }
 
-      return { ...options, cachedRouteData: sameRouteData[urlObject.hash] };
+      return {
+        ...options,
+        cachedRouteData: sameRouteData[urlObject.hash].data
+      };
     })
     .map(options => {
       if (options.type === 'NATIVE' || options.type === 'CUSTOM_LIST') {
