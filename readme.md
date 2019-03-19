@@ -28,9 +28,6 @@ use the `yarn flow` command from within the repo to do type checking. You
 should run this frequently (or install an editor plugin) while developing in
 order to check your code for type safety.
 
-Some tools like editor plugins may rely on Flow to be installed globally. On
-MacOS, you can install flow through brew: `brew install flow`.
-
 ## Fixing Unreproducible Bugs
 
 Gmail frequently delivers rolling updates to users, so that a small percent of
