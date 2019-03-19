@@ -234,7 +234,7 @@ CSS child and sibling selectors are useful to use.
 
 You can use the `./tools/serialize.js` and `./tools/deserialize.js` executables
 to (de)serialize Gmail messages from the command line. You need to have
-babel-cli installed globally (`npm i -g babel-cli`) for them to work. Each one
+babel-cli installed globally (`yarn global add babel-cli`) for them to work. Each one
 reads from stdin and writes to stdout.
 
 If you have a file of JSON containing the Gmail response, you can use `jq`
