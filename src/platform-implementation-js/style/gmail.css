@@ -2689,11 +2689,11 @@ body.inboxsdk__gmailv1css .inboxsdk__butterbar .a8k {
   background-color: #c53929 !important;
 }
 
-.inboxsdk__butterbar.inboxsdk__butterbar_error .a8k {
+.inboxsdk__butterbar.inboxsdk__butterbar_error [role='button'] {
   color: #fff;
 }
 
-.inboxsdk__butterbar.inboxsdk__butterbar_error .a8k::before {
+.inboxsdk__butterbar.inboxsdk__butterbar_error [role='button']::before {
   background: #fff;
 }
 
