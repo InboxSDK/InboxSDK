@@ -119,6 +119,38 @@ export default class CustomMessageView extends SafeEventEmitter {
     this.emit('collapsed');
   }
 
+  getViewState(): VIEW_STATE {
+    return this._viewState;
+  }
+
+  setViewState(newState: VIEW_STATE) {
+    // Remove the current view state
+    const currentViewState = this._viewState;
+    switch (currentViewState) {
+      case 'HIDDEN':
+        break;
+      case 'COLLAPSED':
+        break;
+      case 'EXPANDED':
+        break;
+      default:
+        this._viewState = 'HIDDEN';
+        throw new Error(`Unknown message view state "${currentViewState}"`);
+    }
+
+    switch (newState) {
+      case 'HIDDEN':
+        break;
+      case 'COLLAPSED':
+        break;
+      case 'EXPANDED':
+        break;
+      default:
+        throw new Error(`Unknown message view state "${newState}"`);
+    }
+    this._viewState = newState;
+  }
+
   getElement() {
     return this._el;
   }
