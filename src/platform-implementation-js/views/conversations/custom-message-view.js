@@ -6,6 +6,8 @@ import once from 'lodash/once';
 
 import SafeEventEmitter from '../../lib/safe-event-emitter';
 
+import type { VIEW_STATE } from '../../driver-interfaces/message-view-driver';
+
 export type CustomMessageDescriptor = {
   collapsedEl: HTMLElement,
   headerEl: HTMLElement,
@@ -22,8 +24,8 @@ export default class CustomMessageView extends SafeEventEmitter {
   _contentBodyEl: HTMLElement;
   _destroyed: boolean = false;
   _stopper = kefirStopper();
-  _isCollapsed: boolean = true;
   _lastDescriptor: ?CustomMessageDescriptor;
+  _viewState: VIEW_STATE = 'COLLAPSED';
 
   constructor(
     descriptorStream: Kefir.Observable<CustomMessageDescriptor>,
@@ -57,7 +59,7 @@ export default class CustomMessageView extends SafeEventEmitter {
         if (
           (!previousDescriptor ||
             previousDescriptor.collapsedEl !== descriptor.collapsedEl) &&
-          this._isCollapsed
+          this._viewState === 'COLLAPSED'
         ) {
           if (previousDescriptor) previousDescriptor.collapsedEl.remove();
           this._contentEl.appendChild(descriptor.collapsedEl);
@@ -91,34 +93,6 @@ export default class CustomMessageView extends SafeEventEmitter {
     this._el.remove();
   }
 
-  expand() {
-    this._isCollapsed = false;
-    const descriptor = this._lastDescriptor;
-
-    if (descriptor) descriptor.collapsedEl.remove();
-
-    this._contentEl.appendChild(this._contentHeaderEl);
-    this._contentEl.appendChild(this._contentBodyEl);
-
-    this._el.classList.remove('inboxsdk__custom_message_view_collapsed');
-    this.emit('expanded');
-  }
-
-  collapse() {
-    this._isCollapsed = true;
-    this._contentHeaderEl.remove();
-    this._contentBodyEl.remove();
-
-    const descriptor = this._lastDescriptor;
-
-    if (descriptor) {
-      this._contentEl.appendChild(descriptor.collapsedEl);
-    }
-
-    this._el.classList.add('inboxsdk__custom_message_view_collapsed');
-    this.emit('collapsed');
-  }
-
   getViewState(): VIEW_STATE {
     return this._viewState;
   }
@@ -128,8 +102,10 @@ export default class CustomMessageView extends SafeEventEmitter {
     const currentViewState = this._viewState;
     switch (currentViewState) {
       case 'HIDDEN':
+        this._el.classList.remove('inboxsdk__custom_message_view_hidden');
         break;
       case 'COLLAPSED':
+        this._el.classList.remove('inboxsdk__custom_message_view_collapsed');
         break;
       case 'EXPANDED':
         break;
@@ -140,10 +116,26 @@ export default class CustomMessageView extends SafeEventEmitter {
 
     switch (newState) {
       case 'HIDDEN':
+        this._el.classList.add('inboxsdk__custom_message_view_hidden');
         break;
       case 'COLLAPSED':
+        this._contentHeaderEl.remove();
+        this._contentBodyEl.remove();
+
+        if (this._lastDescriptor) {
+          this._contentEl.appendChild(this._lastDescriptor.collapsedEl);
+        }
+
+        this._el.classList.add('inboxsdk__custom_message_view_collapsed');
+        this.emit('collapsed');
         break;
       case 'EXPANDED':
+        if (this._lastDescriptor) {
+          this._lastDescriptor.collapsedEl.remove();
+        }
+        this._contentEl.appendChild(this._contentHeaderEl);
+        this._contentEl.appendChild(this._contentBodyEl);
+        this.emit('expanded');
         break;
       default:
         throw new Error(`Unknown message view state "${newState}"`);
@@ -181,15 +173,15 @@ export default class CustomMessageView extends SafeEventEmitter {
     this._el.appendChild(this._contentEl);
 
     this._el.addEventListener('click', (e: MouseEvent) => {
-      if (this._isCollapsed) {
-        this.expand();
+      if (this.getViewState() === 'COLLAPSED') {
+        this.setViewState('EXPANDED');
         e.preventDefault();
         e.stopPropagation();
       }
     });
 
     this._contentHeaderEl.addEventListener('click', (e: MouseEvent) => {
-      this.collapse();
+      this.setViewState('COLLAPSED');
       e.preventDefault();
       e.stopPropagation();
     });
