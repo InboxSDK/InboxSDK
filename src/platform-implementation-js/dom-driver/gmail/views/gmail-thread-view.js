@@ -301,11 +301,12 @@ class GmailThreadView {
               'beforebegin',
               customMessageView.getElement()
             );
-          else
+          else {
             messageContainer.insertAdjacentElement(
               'beforeend',
               customMessageView.getElement()
             );
+          }
 
           if (isInHidden) {
             this._setupHiddenCustomMessage(customMessageView);
