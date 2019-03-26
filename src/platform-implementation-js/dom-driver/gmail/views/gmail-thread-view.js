@@ -250,40 +250,67 @@ class GmailThreadView {
 
           let isInHidden = false;
 
-          const messages = [
-            ...(await Promise.all(
-              this._messageViewDrivers.map(async messageView => ({
-                sortDatetime: (await messageView.getDate()) || 0,
-                isHidden: messageView.getViewState() === 'HIDDEN',
-                element: messageView.getElement()
-              }))
-            )),
-            ...Array.from(this._customMessageViews)
-              .filter(
-                cmv =>
-                  cmv !== customMessageView &&
-                  cmv.getElement()
-                    .parentElement /* it has been inserted into dom */
-              )
-              .map(cmv => {
-                const date = cmv.getSortDate();
-                const datetime = date ? date.getTime() : null;
+          // All messages are hideable, except for:
+          // 1. The first message (of any persuasion)
+          // 2. The last native message
+          // 3. The message immediately before the last native message
 
-                return {
-                  sortDatetime: datetime || 0,
-                  isHidden: cmv
-                    .getElement()
-                    .classList.contains('inboxsdk__custom_message_view_hidden'),
-                  element: cmv.getElement()
-                };
-              })
-          ].sort((a, b) => a.sortDatetime - b.sortDatetime);
+          const nativeMessages = (await Promise.all(
+            this._messageViewDrivers.map(async messageView => ({
+              sortDatetime: (await messageView.getDate()) || 0,
+              viewState: messageView.getViewState(),
+              element: messageView.getElement()
+            }))
+          ))
+            .sort((a, b) => a.sortDatetime - b.sortDatetime)
+            .map((message, index) => ({
+              ...message,
+              hideable: index !== this._messageViewDrivers.length - 1 // Case 2
+            }));
+
+          const customMessages = Array.from(this._customMessageViews)
+            .filter(
+              cmv =>
+                cmv !== customMessageView &&
+                cmv.getElement()
+                  .parentElement /* it has been inserted into dom */
+            )
+            .map(cmv => {
+              const date = cmv.getSortDate();
+              const datetime = date ? date.getTime() : null;
+
+              return {
+                sortDatetime: datetime || 0,
+                viewState: cmv.getViewState(),
+                element: cmv.getElement(),
+                hideable: true
+              };
+            });
+
+          const messages = [...nativeMessages, ...customMessages].sort(
+            (a, b) => a.sortDatetime - b.sortDatetime
+          );
+
+          messages[0].hideable = false; // Case 1
 
           const messageDate = customMessageView.getSortDate();
           if (!messageDate) return;
 
-          for (let message of messages) {
-            isInHidden = message.isHidden;
+          let candidatesToHide = 0;
+
+          for (let i = 0; i < messages.length; i++) {
+            const message = messages[i];
+            // Case 3
+            if (i > 0 && i < messages.length - 1 && !messages[i + 1].hideable) {
+              message.hideable = false;
+            }
+
+            isInHidden = message.viewState === 'HIDDEN';
+
+            candidatesToHide =
+              message.viewState !== 'EXPANDED' && message.hideable
+                ? candidatesToHide + 1
+                : 0;
 
             if (
               messageDate.getTime() >= mostRecentDate &&
@@ -296,12 +323,12 @@ class GmailThreadView {
             mostRecentDate = message.sortDatetime;
           }
 
-          if (insertBeforeMessage)
+          if (insertBeforeMessage) {
             insertBeforeMessage.insertAdjacentElement(
               'beforebegin',
               customMessageView.getElement()
             );
-          else {
+          } else {
             messageContainer.insertAdjacentElement(
               'beforeend',
               customMessageView.getElement()
@@ -310,6 +337,7 @@ class GmailThreadView {
 
           if (isInHidden) {
             this._setupHiddenCustomMessage(customMessageView);
+          } else if (candidatesToHide > 0) {
           }
 
           parentElement.classList.add('inboxsdk__thread_view_with_custom_view');
@@ -335,9 +363,7 @@ class GmailThreadView {
     this._hiddenCustomMessageViews.add(customMessageView);
 
     // hide the element
-    customMessageView
-      .getElement()
-      .classList.add('inboxsdk__custom_message_view_hidden');
+    customMessageView.setViewState('HIDDEN');
 
     // get the message element that contains the hidden messages notice
     let hiddenNoticeMessageElement = this._element.querySelector('.adv');
@@ -369,9 +395,7 @@ class GmailThreadView {
           !hiddenNoticeMessageElement.classList.contains('kQ')
       ) //when kQ is gone, message is visible
       .onValue(() => {
-        customMessageView
-          .getElement()
-          .classList.remove('inboxsdk__custom_message_view_hidden');
+        customMessageView.setViewState('COLLAPSED');
         if (this._hiddenCustomMessageNoticeElement)
           this._hiddenCustomMessageNoticeElement.remove();
         this._hiddenCustomMessageNoticeElement = null;
