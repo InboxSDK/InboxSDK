@@ -209,57 +209,71 @@ export default class CustomMessageView extends SafeEventEmitter {
   // 1. Am hidden next to gmail native hidden indicator
   // 2. Am hidden next to sdk hidden indicator
   // 3. Am hidden next to no indicator, one must be made
-  _findContiguousHiddenIndicator(currentMessageIndex: number): ?HTMLElement {
+  _findContiguousHiddenIndicator(
+    currentMessageIndex: number,
+    ignoreHiddenMessages = true
+  ): ?HTMLElement {
     if (currentMessageIndex < 0) {
       return null;
     }
 
-    if (!this._el.parentElement) {
+    let indicator = this._scanForHiddenIndicator(
+      currentMessageIndex,
+      true,
+      ignoreHiddenMessages
+    );
+    if (!indicator) {
+      indicator = this._scanForHiddenIndicator(
+        currentMessageIndex,
+        false,
+        ignoreHiddenMessages
+      );
+    }
+
+    return indicator;
+  }
+
+  _scanForHiddenIndicator(
+    currentMessageIndex: number,
+    isForward: boolean,
+    ignoreHiddenMessages: boolean
+  ) {
+    let i = 1;
+
+    const parent = this._el.parentElement;
+    if (!parent) {
       return null;
     }
 
-    // Check below
-    for (
-      let i = currentMessageIndex;
-      i <= this._el.parentElement.childElementCount;
-      i++
+    while (
+      0 <= currentMessageIndex + (isForward ? 1 : -1) * i &&
+      currentMessageIndex + (isForward ? 1 : -1) * i < parent.childElementCount
     ) {
-      const below = this._el.parentElement.children[i];
+      const candidate = parent.children[currentMessageIndex + i];
 
-      if (!below) {
+      if (!candidate) {
         break;
       }
 
-      // Native indicator or SDK indicator
-      if (below.classList.contains('adv') || false) {
-        return below;
+      if (ignoreHiddenMessages) {
+        // Native indicator or SDK indicator
+        if (candidate.classList.contains('adv') || false) {
+          return candidate;
+        }
+      } else {
+        if (candidate.classList.contains('kQ')) {
+          return candidate;
+        }
       }
 
       // Native message (collapsed or expanded)
-      if (below.classList.contains('kv') || below.classList.contains('h7')) {
-        break;
-      }
-    }
-
-    for (let i = currentMessageIndex; 0 <= i; i--) {
-      const above = this._el.parentElement.children[i];
-
-      if (!above) {
-        break;
-      }
-
-      // Native indicator, native hidden messages, or SDK indicator
       if (
-        above.classList.contains('adv') /*|| above.classList.contains('kQ')*/ ||
-        false
+        candidate.classList.contains('kv') ||
+        candidate.classList.contains('h7')
       ) {
-        return above;
-      }
-
-      // Native message (collapsed or expanded)
-      if (above.classList.contains('kv') || above.classList.contains('h7')) {
         break;
       }
+      i++;
     }
     return null;
   }
@@ -272,10 +286,18 @@ export default class CustomMessageView extends SafeEventEmitter {
       this._el.parentElement.children
     ).indexOf(this._el);
 
-    const hiddenIndicatorElement = this._findContiguousHiddenIndicator(
-      currentMessageIndex
+    let hiddenIndicatorElement = this._findContiguousHiddenIndicator(
+      currentMessageIndex,
+      true
     );
 
+    const ignoreHiddenMessages = !!hiddenIndicatorElement;
+    if (!hiddenIndicatorElement) {
+      hiddenIndicatorElement = this._findContiguousHiddenIndicator(
+        currentMessageIndex,
+        false
+      );
+    }
     if (!hiddenIndicatorElement) {
       // need to make an indicator
     } else if (false) {
