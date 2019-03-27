@@ -6,6 +6,7 @@ import BigNumber from 'bignumber.js';
 import getSyncThreadsForSearch from '../../../driver-common/getSyncThreadsForSearch';
 
 import gmailAjax from '../../../driver-common/gmailAjax';
+import isStreakAppId from '../../../lib/isStreakAppId';
 
 import { extractThreadsFromSearchResponse } from '../gmail-sync-response-processor';
 
@@ -23,7 +24,14 @@ export default async function getSyncThreadForOldGmailThreadId(
   const firstThread = threadDescriptors[0];
   if (firstThread == null) {
     console.error(`Thread with ID ${oldGmailThreadId} not found by Gmail`); //eslint-disable-line
-    throw new Error('Thread not found by getSyncThreadForOldGmailThreadId');
+    const isStreak = isStreakAppId(driver.getAppId());
+    const err = new Error(
+      'Thread not found by getSyncThreadForOldGmailThreadId'
+    );
+    driver.getLogger().error(err, {
+      oldGmailThreadId: isStreak ? oldGmailThreadId : null
+    });
+    throw err;
   }
   return firstThread;
 }
