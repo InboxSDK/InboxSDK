@@ -5,6 +5,8 @@ import kefirStopper from 'kefir-stopper';
 import once from 'lodash/once';
 
 import SafeEventEmitter from '../../lib/safe-event-emitter';
+import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
+import querySelector from '../../lib/dom/querySelectorOrFail';
 
 import type { VIEW_STATE } from '../../driver-interfaces/message-view-driver';
 
@@ -27,13 +29,24 @@ export default class CustomMessageView extends SafeEventEmitter {
   _lastDescriptor: ?CustomMessageDescriptor;
   _viewState: VIEW_STATE = 'COLLAPSED';
 
+  _hiddenCustomMessageNoticeProvider: ?(
+    numberCustomMessagesHidden: number,
+    numberNativeMessagesHidden: ?number
+  ) => ?HTMLElement;
+  _hiddenCustomMessageNoticeElement: ?HTMLElement;
+
   constructor(
     descriptorStream: Kefir.Observable<CustomMessageDescriptor>,
+    hiddenCustomMessageNoticeProvider: ?(
+      numberCustomMessagesHidden: number,
+      numberNativeMessagesHidden: ?number
+    ) => ?HTMLElement,
     onReady: () => any
   ) {
     super();
 
     this._setupElement();
+    this._hiddenCustomMessageNoticeProvider = hiddenCustomMessageNoticeProvider;
 
     descriptorStream
       .takeUntilBy(this._stopper)
@@ -82,7 +95,7 @@ export default class CustomMessageView extends SafeEventEmitter {
         }
       })
       .take(1)
-      .onValue(onReady);
+      .onValue(() => onReady(this));
   }
 
   destroy() {
@@ -98,6 +111,10 @@ export default class CustomMessageView extends SafeEventEmitter {
   }
 
   setViewState(newState: VIEW_STATE) {
+    if (newState === this._viewState) {
+      return;
+    }
+
     // Remove the current view state
     const currentViewState = this._viewState;
     switch (currentViewState) {
@@ -117,6 +134,7 @@ export default class CustomMessageView extends SafeEventEmitter {
     switch (newState) {
       case 'HIDDEN':
         this._el.classList.add('inboxsdk__custom_message_view_hidden');
+        this._setupHidden();
         break;
       case 'COLLAPSED':
         this._contentHeaderEl.remove();
@@ -185,5 +203,182 @@ export default class CustomMessageView extends SafeEventEmitter {
       e.preventDefault();
       e.stopPropagation();
     });
+  }
+
+  // Three cases:
+  // 1. Am hidden next to gmail native hidden indicator
+  // 2. Am hidden next to sdk hidden indicator
+  // 3. Am hidden next to no indicator, one must be made
+  _findContiguousHiddenIndicator(currentMessageIndex: number): ?HTMLElement {
+    if (currentMessageIndex < 0) {
+      return null;
+    }
+
+    if (!this._el.parentElement) {
+      return null;
+    }
+
+    // Check below
+    for (
+      let i = currentMessageIndex;
+      i <= this._el.parentElement.childElementCount;
+      i++
+    ) {
+      const below = this._el.parentElement.children[i];
+
+      if (!below) {
+        break;
+      }
+
+      // Native indicator or SDK indicator
+      if (below.classList.contains('adv') || false) {
+        return below;
+      }
+
+      // Native message (collapsed or expanded)
+      if (below.classList.contains('kv') || below.classList.contains('h7')) {
+        break;
+      }
+    }
+
+    for (let i = currentMessageIndex; 0 <= i; i--) {
+      const above = this._el.parentElement.children[i];
+
+      if (!above) {
+        break;
+      }
+
+      // Native indicator, native hidden messages, or SDK indicator
+      if (
+        above.classList.contains('adv') /*|| above.classList.contains('kQ')*/ ||
+        false
+      ) {
+        return above;
+      }
+
+      // Native message (collapsed or expanded)
+      if (above.classList.contains('kv') || above.classList.contains('h7')) {
+        break;
+      }
+    }
+    return null;
+  }
+
+  _setupHidden() {
+    if (!this._el.parentElement) {
+      return;
+    }
+    const currentMessageIndex = Array.from(
+      this._el.parentElement.children
+    ).indexOf(this._el);
+
+    const hiddenIndicatorElement = this._findContiguousHiddenIndicator(
+      currentMessageIndex
+    );
+
+    if (!hiddenIndicatorElement) {
+      // need to make an indicator
+    } else if (false) {
+      // add on to custom indicator
+    } else {
+      // add on to native indicator
+      // listen for a class change on that message which occurs when it becomes visible
+      makeMutationObserverChunkedStream(hiddenIndicatorElement, {
+        attributes: true,
+        attributeFilter: ['class']
+      })
+        .takeUntilBy(this._stopper)
+        .filter(
+          () =>
+            hiddenIndicatorElement &&
+            !hiddenIndicatorElement.classList.contains('kQ')
+        ) //when kQ is gone, message is visible
+        .onValue(() => {
+          this.setViewState('COLLAPSED');
+          if (this._hiddenCustomMessageNoticeElement)
+            this._hiddenCustomMessageNoticeElement.remove();
+          this._hiddenCustomMessageNoticeElement = null;
+        });
+    }
+
+    if (hiddenIndicatorElement) {
+      this._updateHiddenNotice(hiddenIndicatorElement, true);
+    }
+
+    //  this._stopper
+    //   .take(1)
+    //   .onValue(() => {
+    //     this._hiddenCustomMessageViews.delete(customMessageView);
+    //     if (hiddenNoticeMessageElement)
+    //       this._updateHiddenNotice(
+    //         hiddenNoticeMessageElement,
+    //         nativeHiddenNoticePresent
+    //       );
+    //   });
+  }
+
+  _updateHiddenNotice(
+    hiddenNoticeMessageElement: HTMLElement,
+    nativeHiddenNoticePresent: boolean
+  ) {
+    const existingAppNoticeElement = this._hiddenCustomMessageNoticeElement;
+    if (existingAppNoticeElement) {
+      existingAppNoticeElement.remove();
+      this._hiddenCustomMessageNoticeElement = null;
+    }
+
+    const noticeProvider = this._hiddenCustomMessageNoticeProvider;
+    if (!noticeProvider) return;
+
+    const appNoticeContainerElement = (this._hiddenCustomMessageNoticeElement = document.createElement(
+      'span'
+    ));
+    appNoticeContainerElement.classList.add(
+      'inboxsdk__custom_message_view_app_notice_content'
+    );
+
+    const numberCustomHiddenMessages = 1;
+
+    let numberNativeHiddenMessages = null;
+    if (nativeHiddenNoticePresent) {
+      const nativeHiddenNoticeCountSpan = querySelector(
+        hiddenNoticeMessageElement,
+        '.adx span'
+      );
+      numberNativeHiddenMessages = Number(
+        nativeHiddenNoticeCountSpan.innerHTML
+      );
+      if (isNaN(numberNativeHiddenMessages)) {
+        throw new Error(
+          "Couldn't find number of native hidden messages in dom structure"
+        );
+      }
+    }
+
+    const appNoticeElement = noticeProvider(
+      numberCustomHiddenMessages,
+      numberNativeHiddenMessages
+    );
+    if (!appNoticeElement) {
+      return;
+    }
+    appNoticeContainerElement.appendChild(appNoticeElement);
+
+    if (!nativeHiddenNoticePresent) {
+      const fakeAppNoticeElement = document.createElement('span');
+      fakeAppNoticeElement.classList.add('adx');
+
+      const insertionPoint = querySelector(hiddenNoticeMessageElement, '.G3');
+      insertionPoint.appendChild(fakeAppNoticeElement);
+    }
+
+    const hiddenNoticeElement = querySelector(
+      hiddenNoticeMessageElement,
+      '.adx'
+    );
+    hiddenNoticeElement.classList.add(
+      'inboxsdk__custom_message_view_app_notice_container'
+    );
+    hiddenNoticeElement.appendChild(appNoticeContainerElement);
   }
 }

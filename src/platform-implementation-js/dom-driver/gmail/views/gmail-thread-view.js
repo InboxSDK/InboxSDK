@@ -30,6 +30,7 @@ import WidthManager from './gmail-thread-view/width-manager';
 import type { CustomMessageDescriptor } from '../../../views/conversations/custom-message-view';
 
 let hasLoggedAddonInfo = false;
+const MIN_CONSECUTIVE_HIDDEN = 2;
 
 class GmailThreadView {
   _element: HTMLElement;
@@ -53,7 +54,6 @@ class GmailThreadView {
     numberCustomMessagesHidden: number,
     numberNativeMessagesHidden: ?number
   ) => ?HTMLElement;
-  _hiddenCustomMessageNoticeElement: ?HTMLElement;
 
   constructor(
     element: HTMLElement,
@@ -239,111 +239,104 @@ class GmailThreadView {
   ): CustomMessageView {
     const parentElement = this._element.parentElement;
     if (!parentElement) throw new Error('missing parent element');
-    const customMessageView = new CustomMessageView(descriptorStream, () => {
-      this._readyStream.onValue(
-        async (): any => {
-          const messageContainer = this._element.querySelector('[role=list]');
-          if (!messageContainer) return;
+    const customMessageView = new CustomMessageView(
+      descriptorStream,
+      this._hiddenCustomMessageNoticeProvider,
+      newCustomMessageView => {
+        this._readyStream.onValue(
+          async (): any => {
+            const messageContainer = this._element.querySelector('[role=list]');
+            if (!messageContainer) return;
 
-          let mostRecentDate = Number.MIN_SAFE_INTEGER;
-          let insertBeforeMessage;
+            let isInHidden = false;
 
-          let isInHidden = false;
+            const nativeMessages = await Promise.all(
+              this._messageViewDrivers.map(async messageView => ({
+                sortDatetime: (await messageView.getDate()) || 0,
+                getViewState: () => messageView.getViewState(),
+                isNativeMessage: true,
+                element: messageView.getElement()
+              }))
+            );
 
-          // All messages are hideable, except for:
-          // 1. The first message (of any persuasion)
-          // 2. The last native message
-          // 3. The message immediately before the last native message
+            const customMessages = Array.from(this._customMessageViews)
+              .filter(
+                cmv =>
+                  cmv !== newCustomMessageView &&
+                  cmv.getElement()
+                    .parentElement /* it has been inserted into dom */
+              )
+              .map(this._messageDescriptorFromCustomMessage);
 
-          const nativeMessages = (await Promise.all(
-            this._messageViewDrivers.map(async messageView => ({
-              sortDatetime: (await messageView.getDate()) || 0,
-              viewState: messageView.getViewState(),
-              element: messageView.getElement()
-            }))
-          ))
-            .sort((a, b) => a.sortDatetime - b.sortDatetime)
-            .map((message, index) => ({
-              ...message,
-              hideable: index !== this._messageViewDrivers.length - 1 // Case 2
-            }));
+            const messages = [...nativeMessages, ...customMessages].sort(
+              (a, b) => a.sortDatetime - b.sortDatetime
+            );
 
-          const customMessages = Array.from(this._customMessageViews)
-            .filter(
-              cmv =>
-                cmv !== customMessageView &&
-                cmv.getElement()
-                  .parentElement /* it has been inserted into dom */
-            )
-            .map(cmv => {
-              const date = cmv.getSortDate();
-              const datetime = date ? date.getTime() : null;
+            const messageDate = customMessageView.getSortDate();
+            if (!messageDate) return;
 
-              return {
-                sortDatetime: datetime || 0,
-                viewState: cmv.getViewState(),
-                element: cmv.getElement(),
-                hideable: true
-              };
-            });
+            const insertBeforeIndex = messages.findIndex(
+              message => message.sortDatetime >= messageDate.getTime()
+            );
 
-          const messages = [...nativeMessages, ...customMessages].sort(
-            (a, b) => a.sortDatetime - b.sortDatetime
-          );
-
-          messages[0].hideable = false; // Case 1
-
-          const messageDate = customMessageView.getSortDate();
-          if (!messageDate) return;
-
-          let candidatesToHide = 0;
-
-          for (let i = 0; i < messages.length; i++) {
-            const message = messages[i];
-            // Case 3
-            if (i > 0 && i < messages.length - 1 && !messages[i + 1].hideable) {
-              message.hideable = false;
+            if (insertBeforeIndex >= 0) {
+              messages[insertBeforeIndex].element.insertAdjacentElement(
+                'beforebegin',
+                customMessageView.getElement()
+              );
+            } else {
+              messageContainer.insertAdjacentElement(
+                'beforeend',
+                customMessageView.getElement()
+              );
             }
 
-            isInHidden = message.viewState === 'HIDDEN';
+            messages.splice(
+              insertBeforeIndex || messages.length,
+              0,
+              this._messageDescriptorFromCustomMessage(newCustomMessageView)
+            );
 
-            candidatesToHide =
-              message.viewState !== 'EXPANDED' && message.hideable
-                ? candidatesToHide + 1
-                : 0;
+            // Go through and toggle view states as needed
+            let firstCandidateIndex = 0;
+            let candidatesToHide = 0;
+            for (let i = 0; i < messages.length; i++) {
+              const currentMessage = messages[i];
 
-            if (
-              messageDate.getTime() >= mostRecentDate &&
-              messageDate.getTime() <= message.sortDatetime
-            ) {
-              insertBeforeMessage = message.element;
-              break;
+              if (currentMessage.isNativeMessage) {
+                continue;
+              }
+
+              // The first or last message, if custom, is always collapsed (which it is by default)
+              if (i === 0 || i === messages.length - 1) {
+                continue;
+              }
+
+              // If next to something hidden
+              if (
+                messages[i - 1].getViewState() === 'HIDDEN' ||
+                messages[i + 1].getViewState() === 'HIDDEN'
+              ) {
+                currentMessage.setViewState('HIDDEN');
+              }
+
+              // Or the first of MIN_CONSECUTIVE_HIDDEN applicable custom messages
+              const candidates = messages.slice(
+                i,
+                Math.min(i + MIN_CONSECUTIVE_HIDDEN, messages.length - 1)
+              );
+              if (candidates.every(candidate => !candidate.isNativeMessage)) {
+                currentMessage.setViewState('HIDDEN');
+              }
             }
 
-            mostRecentDate = message.sortDatetime;
-          }
-
-          if (insertBeforeMessage) {
-            insertBeforeMessage.insertAdjacentElement(
-              'beforebegin',
-              customMessageView.getElement()
-            );
-          } else {
-            messageContainer.insertAdjacentElement(
-              'beforeend',
-              customMessageView.getElement()
+            parentElement.classList.add(
+              'inboxsdk__thread_view_with_custom_view'
             );
           }
-
-          if (isInHidden) {
-            this._setupHiddenCustomMessage(customMessageView);
-          } else if (candidatesToHide > 0) {
-          }
-
-          parentElement.classList.add('inboxsdk__thread_view_with_custom_view');
-        }
-      );
-    });
+        );
+      }
+    );
 
     this._customMessageViews.add(customMessageView);
     customMessageView.on('destroy', () => {
@@ -359,130 +352,48 @@ class GmailThreadView {
     return customMessageView;
   }
 
-  _setupHiddenCustomMessage(customMessageView: CustomMessageView) {
-    this._hiddenCustomMessageViews.add(customMessageView);
+  _messageDescriptorFromCustomMessage(cmv: CustomMessageView) {
+    const date = cmv.getSortDate();
+    const datetime = date ? date.getTime() : null;
 
-    // hide the element
-    customMessageView.setViewState('HIDDEN');
-
-    // get the message element that contains the hidden messages notice
-    let hiddenNoticeMessageElement = this._element.querySelector('.adv');
-    let nativeHiddenNoticePresent = true;
-    if (!hiddenNoticeMessageElement) {
-      nativeHiddenNoticePresent = false;
-      const superCollapsedMessageElements = Array.from(
-        this._element.querySelectorAll('.kQ')
-      );
-      if (superCollapsedMessageElements.length < 2) return;
-
-      hiddenNoticeMessageElement = superCollapsedMessageElements[1];
-    }
-
-    // listen for a class change on that message which occurs when it becomes visible
-    makeMutationObserverChunkedStream(hiddenNoticeMessageElement, {
-      attributes: true,
-      attributeFilter: ['class']
-    })
-      .takeUntilBy(
-        Kefir.merge([
-          this._stopper,
-          Kefir.fromEvents(customMessageView, 'destroy')
-        ])
-      )
-      .filter(
-        () =>
-          hiddenNoticeMessageElement &&
-          !hiddenNoticeMessageElement.classList.contains('kQ')
-      ) //when kQ is gone, message is visible
-      .onValue(() => {
-        customMessageView.setViewState('COLLAPSED');
-        if (this._hiddenCustomMessageNoticeElement)
-          this._hiddenCustomMessageNoticeElement.remove();
-        this._hiddenCustomMessageNoticeElement = null;
-      });
-
-    this._updateHiddenNotice(
-      hiddenNoticeMessageElement,
-      nativeHiddenNoticePresent
-    );
-
-    Kefir.fromEvents(customMessageView, 'destroy')
-      .takeUntilBy(this._stopper)
-      .take(1)
-      .onValue(() => {
-        this._hiddenCustomMessageViews.delete(customMessageView);
-        if (hiddenNoticeMessageElement)
-          this._updateHiddenNotice(
-            hiddenNoticeMessageElement,
-            nativeHiddenNoticePresent
-          );
-      });
+    return {
+      sortDatetime: datetime || 0,
+      getViewState: () => cmv.getViewState(),
+      setViewState: newState => cmv.setViewState(newState),
+      isNativeMessage: false,
+      element: cmv.getElement()
+    };
   }
 
-  _updateHiddenNotice(
-    hiddenNoticeMessageElement: HTMLElement,
-    nativeHiddenNoticePresent: boolean
-  ) {
-    const existingAppNoticeElement = this._hiddenCustomMessageNoticeElement;
-    if (existingAppNoticeElement) {
-      existingAppNoticeElement.remove();
-      this._hiddenCustomMessageNoticeElement = null;
-    }
+  // _setupHiddenCustomMessage(customMessageView: CustomMessageView) {
+  //   this._hiddenCustomMessageViews.add(customMessageView);
+  //   // hide the element
+  //   customMessageView.setViewState('HIDDEN');
+  // }
 
-    const noticeProvider = this._hiddenCustomMessageNoticeProvider;
-    if (!noticeProvider) return;
+  // _setupHiddenNotice(messagesToHide: Array<Object>) {
+  //   const firstMessage = messagesToHide[0].element;
 
-    const appNoticeContainerElement = (this._hiddenCustomMessageNoticeElement = document.createElement(
-      'span'
-    ));
-    appNoticeContainerElement.classList.add(
-      'inboxsdk__custom_message_view_app_notice_content'
-    );
+  //   const newNotice = document.createElement('div');
+  //   newNotice.classList.add('kQ', 'bg', 'adv');
 
-    const numberCustomHiddenMessages = this._hiddenCustomMessageViews.size;
+  //   const noticeChild = document.createElement('div');
+  //   noticeChild.classList.add('Bk');
+  //   newNotice.appendChild(noticeChild);
 
-    let numberNativeHiddenMessages = null;
-    if (nativeHiddenNoticePresent) {
-      const nativeHiddenNoticeCountSpan = querySelector(
-        hiddenNoticeMessageElement,
-        '.adx span'
-      );
-      numberNativeHiddenMessages = Number(
-        nativeHiddenNoticeCountSpan.innerHTML
-      );
-      if (isNaN(numberNativeHiddenMessages)) {
-        throw new Error(
-          "Couldn't find number of native hidden messages in dom structure"
-        );
-      }
-    }
+  //   const noticeGrandChild = document.createElement('div');
+  //   noticeGrandChild.classList.add('G3', 'G2');
+  //   noticeChild.appendChild(noticeGrandChild);
 
-    const appNoticeElement = noticeProvider(
-      numberCustomHiddenMessages,
-      numberNativeHiddenMessages
-    );
-    if (!appNoticeElement) {
-      return;
-    }
-    appNoticeContainerElement.appendChild(appNoticeElement);
+  //   firstMessage.insertAdjacentElement(
+  //     'beforebegin',
+  //     newNotice
+  //   );
 
-    if (!nativeHiddenNoticePresent) {
-      const fakeAppNoticeElement = document.createElement('span');
-      fakeAppNoticeElement.classList.add('adx');
-
-      const insertionPoint = querySelector(hiddenNoticeMessageElement, '.G3');
-      insertionPoint.appendChild(fakeAppNoticeElement);
-    }
-
-    const hiddenNoticeElement = querySelector(
-      hiddenNoticeMessageElement,
-      '.adx'
-    );
-    hiddenNoticeElement.classList.add(
-      'inboxsdk__custom_message_view_app_notice_container'
-    );
-    hiddenNoticeElement.appendChild(appNoticeContainerElement);
-  }
+  //   messagesToHide.map(message => {
+  //     message.setViewState('HIDDEN');
+  //   })
+  // }
 
   getSubject(): string {
     var subjectElement = this._element.querySelector('.ha h2');
