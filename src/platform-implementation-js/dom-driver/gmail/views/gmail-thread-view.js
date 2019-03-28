@@ -365,36 +365,6 @@ class GmailThreadView {
     };
   }
 
-  // _setupHiddenCustomMessage(customMessageView: CustomMessageView) {
-  //   this._hiddenCustomMessageViews.add(customMessageView);
-  //   // hide the element
-  //   customMessageView.setViewState('HIDDEN');
-  // }
-
-  // _setupHiddenNotice(messagesToHide: Array<Object>) {
-  //   const firstMessage = messagesToHide[0].element;
-
-  //   const newNotice = document.createElement('div');
-  //   newNotice.classList.add('kQ', 'bg', 'adv');
-
-  //   const noticeChild = document.createElement('div');
-  //   noticeChild.classList.add('Bk');
-  //   newNotice.appendChild(noticeChild);
-
-  //   const noticeGrandChild = document.createElement('div');
-  //   noticeGrandChild.classList.add('G3', 'G2');
-  //   noticeChild.appendChild(noticeGrandChild);
-
-  //   firstMessage.insertAdjacentElement(
-  //     'beforebegin',
-  //     newNotice
-  //   );
-
-  //   messagesToHide.map(message => {
-  //     message.setViewState('HIDDEN');
-  //   })
-  // }
-
   getSubject(): string {
     var subjectElement = this._element.querySelector('.ha h2');
     if (!subjectElement) {

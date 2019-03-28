@@ -2583,6 +2583,56 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton + .inboxsdk__appButton {
   top: 0;
 }
 
+.inboxsdk__custom_hidden_message_view_notice {
+  cursor: pointer;
+  height: 32px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.inboxsdk__custom_hidden_message_view_notice::after {
+  border-top: 1px solid rgba(100, 121, 143, 0.122);
+  border-bottom: 1px solid rgba(100, 121, 143, 0.122);
+  content: '';
+  height: 4px;
+  width: 100%;
+}
+
+.inboxsdk__custom_hidden_message_view_notice_indicator {
+  display: flex;
+  font-weight: 500;
+  color: rgb(95, 99, 104);
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 16px;
+  top: 0px;
+  width: 32px;
+  height: 32px;
+  border-radius: 16px;
+  border: 1px solid rgba(100, 121, 143, 0.122);
+  background-color: white;
+}
+
+.inboxsdk__custom_hidden_message_view_notice_indicator:hover {
+  background-color: #f2f2f2;
+  font-size: 0;
+}
+
+.inboxsdk__custom_hidden_message_view_notice_indicator:hover::before {
+  background-image: url(https://www.gstatic.com/images/icons/material/system/2x/expand_all_black_20dp.png);
+  height: 20px;
+  opacity: 0.54;
+  width: 20px;
+  content: '';
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 20px;
+}
+
 .adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container:hover::before {
   content: none !important;
 }

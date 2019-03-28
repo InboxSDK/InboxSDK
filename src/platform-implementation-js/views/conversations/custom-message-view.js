@@ -245,11 +245,13 @@ export default class CustomMessageView extends SafeEventEmitter {
       return null;
     }
 
+    const direction = isForward ? 1 : -1;
+
     while (
-      0 <= currentMessageIndex + (isForward ? 1 : -1) * i &&
-      currentMessageIndex + (isForward ? 1 : -1) * i < parent.childElementCount
+      0 <= currentMessageIndex + direction * i &&
+      currentMessageIndex + direction * i < parent.childElementCount
     ) {
-      const candidate = parent.children[currentMessageIndex + i];
+      const candidate = parent.children[currentMessageIndex + direction * i];
 
       if (!candidate) {
         break;
@@ -257,10 +259,16 @@ export default class CustomMessageView extends SafeEventEmitter {
 
       if (ignoreHiddenMessages) {
         // Native indicator or SDK indicator
-        if (candidate.classList.contains('adv') || false) {
+        if (
+          candidate.classList.contains('adv') ||
+          candidate.classList.contains(
+            'inboxsdk__custom_hidden_message_view_notice'
+          )
+        ) {
           return candidate;
         }
       } else {
+        // Native hidden message
         if (candidate.classList.contains('kQ')) {
           return candidate;
         }
@@ -299,8 +307,35 @@ export default class CustomMessageView extends SafeEventEmitter {
       );
     }
     if (!hiddenIndicatorElement) {
-      // need to make an indicator
-    } else if (false) {
+      // Create a new custom indicator
+      const newNotice = document.createElement('div');
+      newNotice.classList.add('inboxsdk__custom_hidden_message_view_notice');
+
+      const noticeChild = document.createElement('div');
+
+      const noticeGrandChild = document.createElement('div');
+      noticeGrandChild.classList.add(
+        'inboxsdk__custom_hidden_message_view_notice_indicator'
+      );
+
+      const numberHidden = document.createTextNode('1');
+
+      noticeGrandChild.appendChild(numberHidden);
+      noticeChild.appendChild(noticeGrandChild);
+      newNotice.appendChild(noticeChild);
+
+      this._el.insertAdjacentElement('beforebegin', newNotice);
+    } else if (
+      hiddenIndicatorElement.classList.contains(
+        'inboxsdk__custom_hidden_message_view_notice'
+      )
+    ) {
+      const sdkNoticeIndicator = querySelector(
+        hiddenIndicatorElement,
+        '.inboxsdk__custom_hidden_message_view_notice_indicator'
+      );
+      sdkNoticeIndicator.textContent =
+        parseInt(sdkNoticeIndicator.textContent) + 1;
       // add on to custom indicator
     } else {
       // add on to native indicator
@@ -321,22 +356,18 @@ export default class CustomMessageView extends SafeEventEmitter {
             this._hiddenCustomMessageNoticeElement.remove();
           this._hiddenCustomMessageNoticeElement = null;
         });
-    }
-
-    if (hiddenIndicatorElement) {
       this._updateHiddenNotice(hiddenIndicatorElement, true);
+      //  this._stopper
+      //   .take(1)
+      //   .onValue(() => {
+      //     this._hiddenCustomMessageViews.delete(customMessageView);
+      //     if (hiddenNoticeMessageElement)
+      //       this._updateHiddenNotice(
+      //         hiddenNoticeMessageElement,
+      //         nativeHiddenNoticePresent
+      //       );
+      //   });
     }
-
-    //  this._stopper
-    //   .take(1)
-    //   .onValue(() => {
-    //     this._hiddenCustomMessageViews.delete(customMessageView);
-    //     if (hiddenNoticeMessageElement)
-    //       this._updateHiddenNotice(
-    //         hiddenNoticeMessageElement,
-    //         nativeHiddenNoticePresent
-    //       );
-    //   });
   }
 
   _updateHiddenNotice(
