@@ -6,6 +6,7 @@ import { extractThreadsFromSearchResponse } from '../dom-driver/gmail/gmail-sync
 import gmailAjax from './gmailAjax';
 import getAccountUrlPart from './getAccountUrlPart';
 import type { Driver } from '../driver-interfaces/driver';
+import isStreakAppId from '../lib/isStreakAppId';
 
 import type { SyncThread } from '../dom-driver/gmail/gmail-sync-response-processor';
 
@@ -32,7 +33,16 @@ async function getSyncThreadsForSearch(
     })
   });
 
-  return extractThreadsFromSearchResponse(text);
+  const threads = extractThreadsFromSearchResponse(text);
+  if (threads.length === 0 && text.length > 0) {
+    const isStreak = isStreakAppId(driver.getAppId());
+    driver
+      .getLogger()
+      .error(new Error('Could not parse response for sync threads.'), {
+        syncResponse: isStreak ? text : null
+      });
+  }
+  return threads;
 }
 
 export default defn(module, getSyncThreadsForSearch);
