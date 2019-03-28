@@ -299,7 +299,7 @@ export default class CustomMessageView extends SafeEventEmitter {
       true
     );
 
-    const ignoreHiddenMessages = !!hiddenIndicatorElement;
+    const ignoredHiddenMessages = !!hiddenIndicatorElement;
     if (!hiddenIndicatorElement) {
       hiddenIndicatorElement = this._findContiguousHiddenIndicator(
         currentMessageIndex,
@@ -308,23 +308,15 @@ export default class CustomMessageView extends SafeEventEmitter {
     }
     if (!hiddenIndicatorElement) {
       // Create a new custom indicator
-      const newNotice = document.createElement('div');
-      newNotice.classList.add('inboxsdk__custom_hidden_message_view_notice');
-
-      const noticeChild = document.createElement('div');
-      noticeChild.classList.add(
-        'inboxsdk__custom_hidden_message_view_notice_indicator'
-      );
-
-      const numberHidden = document.createTextNode('1');
-
-      noticeChild.appendChild(numberHidden);
-      newNotice.appendChild(noticeChild);
-
+      const newNotice = this._createNewCustomHiddenIndicator();
       this._el.insertAdjacentElement('beforebegin', newNotice);
-      this._updateCustomHiddenNotice(newNotice);
 
-      // remove the indicator if this message is removed
+      newNotice.onclick = e => {
+        newNotice.remove();
+      };
+
+      this._unHideMessageOnDestroy(newNotice);
+      this._updateCustomHiddenNotice(newNotice);
     } else if (
       hiddenIndicatorElement.classList.contains(
         'inboxsdk__custom_hidden_message_view_notice'
@@ -337,38 +329,33 @@ export default class CustomMessageView extends SafeEventEmitter {
       );
       sdkNoticeIndicator.textContent =
         parseInt(sdkNoticeIndicator.textContent) + 1;
+
+      this._setupCustomMessageUnHideOnDestroy(hiddenIndicatorElement);
       this._updateCustomHiddenNotice(hiddenIndicatorElement);
     } else {
       // add on to native indicator
-      // listen for a class change on that message which occurs when it becomes visible
-      makeMutationObserverChunkedStream(hiddenIndicatorElement, {
-        attributes: true,
-        attributeFilter: ['class']
-      })
-        .takeUntilBy(this._stopper)
-        .filter(
-          () =>
-            hiddenIndicatorElement &&
-            !hiddenIndicatorElement.classList.contains('kQ')
-        ) //when kQ is gone, message is visible
-        .onValue(() => {
-          this.setViewState('COLLAPSED');
-          if (this._hiddenCustomMessageNoticeElement)
-            this._hiddenCustomMessageNoticeElement.remove();
-          this._hiddenCustomMessageNoticeElement = null;
-        });
-      this._updateNativeHiddenNotice(hiddenIndicatorElement, true);
-      //  this._stopper
-      //   .take(1)
-      //   .onValue(() => {
-      //     this._hiddenCustomMessageViews.delete(customMessageView);
-      //     if (hiddenNoticeMessageElement)
-      //       this._updateNativeHiddenNotice(
-      //         hiddenNoticeMessageElement,
-      //         nativeHiddenNoticePresent
-      //       );
-      //   });
+      this._setupNativeMessageUnhideOnDestroy(hiddenIndicatorElement);
+      this._updateNativeHiddenNotice(
+        hiddenIndicatorElement,
+        ignoredHiddenMessages
+      );
     }
+  }
+
+  _createNewCustomHiddenIndicator() {
+    const newNotice = document.createElement('div');
+    newNotice.classList.add('inboxsdk__custom_hidden_message_view_notice');
+
+    const noticeChild = document.createElement('div');
+    noticeChild.classList.add(
+      'inboxsdk__custom_hidden_message_view_notice_indicator'
+    );
+
+    const numberHidden = document.createTextNode('1');
+
+    noticeChild.appendChild(numberHidden);
+    newNotice.appendChild(noticeChild);
+    return newNotice;
   }
 
   _updateNativeHiddenNotice(
@@ -391,7 +378,22 @@ export default class CustomMessageView extends SafeEventEmitter {
       'inboxsdk__custom_message_view_app_notice_content'
     );
 
-    const numberCustomHiddenMessages = 1;
+    let numberCustomHiddenMessages = 1;
+    if (
+      hiddenNoticeMessageElement.hasAttribute(
+        'data-inboxsdk-custommessagecount'
+      )
+    ) {
+      numberCustomHiddenMessages += parseInt(
+        hiddenNoticeMessageElement.getAttribute(
+          'data-inboxsdk-custommessagecount'
+        )
+      );
+    }
+    hiddenNoticeMessageElement.setAttribute(
+      'data-inboxsdk-custommessagecount',
+      String(numberCustomHiddenMessages)
+    );
 
     let numberNativeHiddenMessages = null;
     if (nativeHiddenNoticePresent) {
@@ -436,21 +438,58 @@ export default class CustomMessageView extends SafeEventEmitter {
     hiddenNoticeElement.appendChild(appNoticeContainerElement);
   }
 
-  _updateCustomHiddenNotice(hiddenNoticeMessageElement: HTMLElement) {
+  _setupNativeMessageUnhideOnDestroy(hiddenIndicatorElement) {
+    // listen for a class change on that message which occurs when it becomes visible
+    makeMutationObserverChunkedStream(hiddenIndicatorElement, {
+      attributes: true,
+      attributeFilter: ['class']
+    })
+      .takeUntilBy(this._stopper)
+      .filter(
+        () =>
+          hiddenIndicatorElement &&
+          !hiddenIndicatorElement.classList.contains('kQ')
+      ) //when kQ is gone, message is visible
+      .onValue(() => {
+        this.setViewState('COLLAPSED');
+        if (this._hiddenCustomMessageNoticeElement)
+          this._hiddenCustomMessageNoticeElement.remove();
+        this._hiddenCustomMessageNoticeElement = null;
+      });
+  }
+  _setupCustomMessageUnHideOnDestroy(hiddenNoticeElement: HTMLElement) {
+    makeMutationObserverChunkedStream(this._el.parentElement, {
+      childList: true
+    })
+      .takeUntilBy(this._stopper)
+      .filter(
+        () =>
+          Array.from(this._el.parentElement.children).indexOf(
+            hiddenNoticeElement
+          ) < 0
+      )
+      .take(1)
+      .onValue(() => {
+        this.setViewState('COLLAPSED');
+      });
+  }
+
+  _updateCustomHiddenNotice(hiddenNoticeElement: HTMLElement) {
     const noticeProvider = this._hiddenCustomMessageNoticeProvider;
     if (!noticeProvider) return;
 
-    hiddenNoticeMessageElement.classList.add(
+    hiddenNoticeElement.classList.add(
       'inboxsdk__custom_message_view_app_notice_hide_default_content'
     );
 
     const appNoticeContainerElement = document.createElement('span');
+    // call a user-defined unmount function?
     appNoticeContainerElement.classList.add(
       'inboxsdk__custom_message_view_app_notice_content'
     );
 
     const sdkNoticeIndicator = querySelector(
-      hiddenNoticeMessageElement,
+      hiddenNoticeElement,
       '.inboxsdk__custom_hidden_message_view_notice_indicator'
     );
     const numberCustomHiddenMessages = parseInt(sdkNoticeIndicator.textContent);
