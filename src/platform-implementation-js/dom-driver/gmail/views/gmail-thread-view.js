@@ -292,7 +292,7 @@ class GmailThreadView {
             }
 
             messages.splice(
-              insertBeforeIndex || messages.length,
+              insertBeforeIndex > 0 ? insertBeforeIndex : messages.length,
               0,
               this._messageDescriptorFromCustomMessage(newCustomMessageView)
             );
@@ -325,7 +325,10 @@ class GmailThreadView {
                 i,
                 Math.min(i + MIN_CONSECUTIVE_HIDDEN, messages.length - 1)
               );
-              if (candidates.every(candidate => !candidate.isNativeMessage)) {
+              if (
+                candidates.every(candidate => !candidate.isNativeMessage) &&
+                candidates.length >= MIN_CONSECUTIVE_HIDDEN
+              ) {
                 currentMessage.setViewState('HIDDEN');
               }
             }

@@ -41,7 +41,7 @@ export default class CustomMessageView extends SafeEventEmitter {
       numberCustomMessagesHidden: number,
       numberNativeMessagesHidden: ?number
     ) => ?HTMLElement,
-    onReady: () => any
+    onReady: CustomMessageView => any
   ) {
     super();
 
