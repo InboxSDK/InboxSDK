@@ -312,31 +312,32 @@ export default class CustomMessageView extends SafeEventEmitter {
       newNotice.classList.add('inboxsdk__custom_hidden_message_view_notice');
 
       const noticeChild = document.createElement('div');
-
-      const noticeGrandChild = document.createElement('div');
-      noticeGrandChild.classList.add(
+      noticeChild.classList.add(
         'inboxsdk__custom_hidden_message_view_notice_indicator'
       );
 
       const numberHidden = document.createTextNode('1');
 
-      noticeGrandChild.appendChild(numberHidden);
-      noticeChild.appendChild(noticeGrandChild);
+      noticeChild.appendChild(numberHidden);
       newNotice.appendChild(noticeChild);
 
       this._el.insertAdjacentElement('beforebegin', newNotice);
+      this._updateCustomHiddenNotice(newNotice);
+
+      // remove the indicator if this message is removed
     } else if (
       hiddenIndicatorElement.classList.contains(
         'inboxsdk__custom_hidden_message_view_notice'
       )
     ) {
+      // add on to custom indicator
       const sdkNoticeIndicator = querySelector(
         hiddenIndicatorElement,
         '.inboxsdk__custom_hidden_message_view_notice_indicator'
       );
       sdkNoticeIndicator.textContent =
         parseInt(sdkNoticeIndicator.textContent) + 1;
-      // add on to custom indicator
+      this._updateCustomHiddenNotice(hiddenIndicatorElement);
     } else {
       // add on to native indicator
       // listen for a class change on that message which occurs when it becomes visible
@@ -356,13 +357,13 @@ export default class CustomMessageView extends SafeEventEmitter {
             this._hiddenCustomMessageNoticeElement.remove();
           this._hiddenCustomMessageNoticeElement = null;
         });
-      this._updateHiddenNotice(hiddenIndicatorElement, true);
+      this._updateNativeHiddenNotice(hiddenIndicatorElement, true);
       //  this._stopper
       //   .take(1)
       //   .onValue(() => {
       //     this._hiddenCustomMessageViews.delete(customMessageView);
       //     if (hiddenNoticeMessageElement)
-      //       this._updateHiddenNotice(
+      //       this._updateNativeHiddenNotice(
       //         hiddenNoticeMessageElement,
       //         nativeHiddenNoticePresent
       //       );
@@ -370,7 +371,7 @@ export default class CustomMessageView extends SafeEventEmitter {
     }
   }
 
-  _updateHiddenNotice(
+  _updateNativeHiddenNotice(
     hiddenNoticeMessageElement: HTMLElement,
     nativeHiddenNoticePresent: boolean
   ) {
@@ -433,5 +434,29 @@ export default class CustomMessageView extends SafeEventEmitter {
       'inboxsdk__custom_message_view_app_notice_container'
     );
     hiddenNoticeElement.appendChild(appNoticeContainerElement);
+  }
+
+  _updateCustomHiddenNotice(hiddenNoticeMessageElement: HTMLElement) {
+    const noticeProvider = this._hiddenCustomMessageNoticeProvider;
+    if (!noticeProvider) return;
+
+    hiddenNoticeMessageElement.classList.add(
+      'inboxsdk__custom_message_view_app_notice_hide_default_content'
+    );
+
+    const appNoticeContainerElement = document.createElement('span');
+    appNoticeContainerElement.classList.add(
+      'inboxsdk__custom_message_view_app_notice_content'
+    );
+
+    const sdkNoticeIndicator = querySelector(
+      hiddenNoticeMessageElement,
+      '.inboxsdk__custom_hidden_message_view_notice_indicator'
+    );
+    const numberCustomHiddenMessages = parseInt(sdkNoticeIndicator.textContent);
+    const appNoticeElement = noticeProvider(numberCustomHiddenMessages, 0);
+
+    appNoticeContainerElement.appendChild(appNoticeElement);
+    sdkNoticeIndicator.appendChild(appNoticeContainerElement);
   }
 }

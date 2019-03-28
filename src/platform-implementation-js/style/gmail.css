@@ -2610,11 +2610,16 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton + .inboxsdk__appButton {
   position: absolute;
   left: 16px;
   top: 0px;
-  width: 32px;
+  min-width: 32px;
   height: 32px;
   border-radius: 16px;
   border: 1px solid rgba(100, 121, 143, 0.122);
   background-color: white;
+}
+
+.inboxsdk__custom_message_view_hidden
+  + .inboxsdk__custom_message_view_collapsed {
+  border-top: none;
 }
 
 .inboxsdk__custom_hidden_message_view_notice_indicator:hover {
@@ -2640,6 +2645,15 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton + .inboxsdk__appButton {
 .adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container
   > span:first-child {
   display: none;
+}
+
+.inboxsdk__custom_message_view_app_notice_hide_default_content
+  .inboxsdk__custom_hidden_message_view_notice_indicator:hover::before {
+  content: none !important;
+}
+
+.inboxsdk__custom_message_view_app_notice_hide_default_content {
+  font-size: 0;
 }
 
 .inboxsdk__custom_message_view_app_notice_container::before {
