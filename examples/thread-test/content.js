@@ -31,10 +31,16 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 				console.log('threadView destroy');
 			});
 
-			threadView.registerHiddenCustomMessageNoticeProvider((customHiddenCount, nativeHiddenCount) => {
+			threadView.registerHiddenCustomMessageNoticeProvider((customHiddenCount, nativeHiddenCount, removePromise) => {
 				const span = document.createElement('span');
-				span.textContent = `${nativeHiddenCount != null ? nativeHiddenCount+', ' : ''}${customHiddenCount} custom hides`;
+				span.textContent = `${!!nativeHiddenCount ? nativeHiddenCount+', ' : ''}${customHiddenCount} custom hides`;
 				console.log('args', customHiddenCount, nativeHiddenCount);
+
+				if (removePromise) {
+					removePromise.then(() => {
+						span.remove();
+					})
+				}
 				return span;
 			});
 
