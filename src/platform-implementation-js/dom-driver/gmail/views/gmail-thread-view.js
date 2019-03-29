@@ -54,6 +54,7 @@ class GmailThreadView {
     numberNativeMessagesHidden: ?number
   ) => ?HTMLElement;
   _hiddenCustomMessageNoticeElement: ?HTMLElement;
+  _unmountHiddenNoticePromise: Promise<void>;
 
   constructor(
     element: HTMLElement,
@@ -72,6 +73,10 @@ class GmailThreadView {
     this._logAddonElementInfo().catch(err =>
       this._driver.getLogger().error(err)
     );
+
+    this._unmountHiddenNoticePromise = new Promise(resolve => {
+      this._stopper.take(1).onValue(() => resolve());
+    });
 
     const waitForSidebarReady = (this._driver.isUsingMaterialUI()
       ? this._driver.waitForGlobalSidebarReady()
@@ -228,7 +233,8 @@ class GmailThreadView {
   registerHiddenCustomMessageNoticeProvider(
     provider: (
       numberCustomMessagesHidden: number,
-      numberNativeMessagesHidden: ?number
+      numberNativeMessagesHidden: ?number,
+      unmountPromise: Promise<void>
     ) => HTMLElement
   ) {
     this._hiddenCustomMessageNoticeProvider = provider;
@@ -434,7 +440,8 @@ class GmailThreadView {
 
     const appNoticeElement = noticeProvider(
       numberCustomHiddenMessages,
-      numberNativeHiddenMessages
+      numberNativeHiddenMessages,
+      this._unmountHiddenNoticePromise
     );
     if (!appNoticeElement) {
       return;

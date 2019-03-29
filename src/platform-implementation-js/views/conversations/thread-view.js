@@ -64,7 +64,8 @@ class ThreadView extends EventEmitter {
   registerHiddenCustomMessageNoticeProvider(
     provider: (
       numberCustomMessagesHidden: number,
-      numberNativeMessagesHidden: ?number
+      numberNativeMessagesHidden: ?number,
+      unmountPromise: Promise<void>
     ) => HTMLElement
   ) {
     const members = get(memberMap, this);

@@ -150,7 +150,8 @@ class InboxThreadView {
   registerHiddenCustomMessageNoticeProvider(
     provider: (
       numberCustomMessagesHidden: number,
-      numberNativeMessagesHidden: ?number
+      numberNativeMessagesHidden: ?number,
+      unmountPromise: Promise<void>
     ) => HTMLElement
   ) {
     throw new Error('not supported');
