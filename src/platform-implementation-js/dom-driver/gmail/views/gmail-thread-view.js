@@ -118,6 +118,12 @@ class GmailThreadView {
       .toProperty();
 
     this._listenToExpandCollapseAll();
+
+    this._stopper.take(1).onValue(() => {
+      if (this._resolveUnmountHiddenNoticePromise) {
+        this._resolveUnmountHiddenNoticePromise();
+      }
+    });
   }
 
   // TODO use livesets eventually
