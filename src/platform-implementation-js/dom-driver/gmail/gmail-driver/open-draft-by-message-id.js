@@ -16,7 +16,7 @@ export default async function openDraftByMessageID(
     const rfcMessageID = await driver.getRfcMessageIdForGmailThreadId(
       messageID
     );
-    const threads = await getSyncThreadsForSearch(
+    const { threads } = await getSyncThreadsForSearch(
       driver,
       'rfc822msgid:' + rfcMessageID
     );

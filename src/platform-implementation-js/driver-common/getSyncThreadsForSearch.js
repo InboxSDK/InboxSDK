@@ -12,7 +12,7 @@ import type { SyncThread } from '../dom-driver/gmail/gmail-sync-response-process
 async function getSyncThreadsForSearch(
   driver: Driver,
   searchTerm: string
-): Promise<SyncThread[]> {
+): Promise<{ threads: SyncThread[], _text: string }> {
   const { text } = await gmailAjax({
     method: 'POST',
     url: `https://mail.google.com/sync${getAccountUrlPart()}/i/bv`,
@@ -32,7 +32,7 @@ async function getSyncThreadsForSearch(
     })
   });
 
-  return extractThreadsFromSearchResponse(text);
+  return { threads: extractThreadsFromSearchResponse(text), _text: text };
 }
 
 export default defn(module, getSyncThreadsForSearch);
