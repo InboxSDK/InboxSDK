@@ -34,6 +34,7 @@ export default class CustomMessageView extends SafeEventEmitter {
     numberNativeMessagesHidden: ?number
   ) => ?HTMLElement;
   _hiddenCustomMessageNoticeElement: ?HTMLElement;
+  _cleanupCustomHiddenMessage: () => void;
 
   constructor(
     descriptorStream: Kefir.Observable<CustomMessageDescriptor>,
@@ -100,6 +101,7 @@ export default class CustomMessageView extends SafeEventEmitter {
 
   destroy() {
     if (this._destroyed) return;
+    if (this._cleanupCustomHiddenMessage) this._cleanupCustomHiddenMessage();
     this._destroyed = true;
     this._stopper.destroy();
     this.emit('destroy');
@@ -352,21 +354,37 @@ export default class CustomMessageView extends SafeEventEmitter {
     hiddenNoticeMessageElement: HTMLElement,
     nativeHiddenNoticePresent: boolean
   ) {
-    const existingAppNoticeElement = this._hiddenCustomMessageNoticeElement;
-    if (existingAppNoticeElement) {
-      existingAppNoticeElement.remove();
-      this._hiddenCustomMessageNoticeElement = null;
-    }
-
     const noticeProvider = this._hiddenCustomMessageNoticeProvider;
     if (!noticeProvider) return;
+
+    const oldHiddenNotices = Array.from(
+      hiddenNoticeMessageElement.querySelectorAll(
+        '.inboxsdk__custom_message_view_app_notice_content'
+      )
+    );
+    oldHiddenNotices.forEach(oldHiddenNotice => {
+      oldHiddenNotice.dispatchEvent(
+        new CustomEvent('inboxsdk-outdated', {
+          bubbles: false,
+          cancelable: false,
+          detail: null
+        })
+      );
+    });
 
     const appNoticeContainerElement = (this._hiddenCustomMessageNoticeElement = document.createElement(
       'span'
     ));
+
     appNoticeContainerElement.classList.add(
       'inboxsdk__custom_message_view_app_notice_content'
     );
+
+    appNoticeContainerElement.addEventListener('inboxsdk-outdated', e => {
+      e.preventDefault();
+      this._cleanupCustomHiddenMessage();
+      appNoticeContainerElement.remove();
+    });
 
     let numberCustomHiddenMessages = 1;
     if (
@@ -401,10 +419,19 @@ export default class CustomMessageView extends SafeEventEmitter {
       }
     }
 
+    if (this._cleanupCustomHiddenMessage) {
+      appNoticeContainerElement.remove();
+      this._cleanupCustomHiddenMessage();
+    }
+
     const appNoticeElement = noticeProvider(
       numberCustomHiddenMessages,
-      numberNativeHiddenMessages
+      numberNativeHiddenMessages,
+      new Promise(resolve => {
+        this._cleanupCustomHiddenMessage = resolve;
+      })
     );
+
     if (!appNoticeElement) {
       return;
     }
@@ -442,8 +469,13 @@ export default class CustomMessageView extends SafeEventEmitter {
       ) //when kQ is gone, message is visible
       .onValue(() => {
         this.setViewState('COLLAPSED');
-        if (this._hiddenCustomMessageNoticeElement)
+        if (this._hiddenCustomMessageNoticeElement) {
           this._hiddenCustomMessageNoticeElement.remove();
+        }
+        if (this._cleanupCustomHiddenMessage) {
+          this._cleanupCustomHiddenMessage();
+        }
+
         this._hiddenCustomMessageNoticeElement = null;
       });
   }
@@ -461,6 +493,9 @@ export default class CustomMessageView extends SafeEventEmitter {
       .take(1)
       .onValue(() => {
         this.setViewState('COLLAPSED');
+        if (this._cleanupCustomHiddenMessage) {
+          this._cleanupCustomHiddenMessage();
+        }
       });
   }
 
@@ -487,7 +522,17 @@ export default class CustomMessageView extends SafeEventEmitter {
       hiddenNoticeElement,
       '.inboxsdk__custom_hidden_message_view_notice_indicator'
     );
-    const appNoticeElement = noticeProvider(numberCustomHiddenMessages, 0);
+
+    if (this._cleanupCustomHiddenMessage) {
+      this._cleanupCustomHiddenMessage();
+    }
+    const appNoticeElement = noticeProvider(
+      numberCustomHiddenMessages,
+      0,
+      new Promise(resolve => {
+        this._cleanupCustomHiddenMessage = resolve;
+      })
+    );
 
     if (
       Array.from(
@@ -500,8 +545,13 @@ export default class CustomMessageView extends SafeEventEmitter {
         sdkNoticeIndicator,
         '.inboxsdk__custom_message_view_app_notice_content'
       );
-      // call a user-defined unmount function?
-      oldContent.remove();
+      oldContent.dispatchEvent(
+        new CustomEvent('inboxsdk-outdated', {
+          bubbles: false,
+          cancelable: false,
+          detail: null
+        })
+      );
     }
     const appNoticeContainerElement = document.createElement('span');
     appNoticeContainerElement.classList.add(
@@ -509,5 +559,11 @@ export default class CustomMessageView extends SafeEventEmitter {
     );
     appNoticeContainerElement.appendChild(appNoticeElement);
     sdkNoticeIndicator.appendChild(appNoticeContainerElement);
+
+    appNoticeContainerElement.addEventListener('inboxsdk-outdated', e => {
+      e.preventDefault();
+      this._cleanupCustomHiddenMessage();
+      appNoticeContainerElement.remove();
+    });
   }
 }
