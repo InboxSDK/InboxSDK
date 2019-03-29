@@ -661,7 +661,7 @@ class GmailThreadView {
           .takeUntilBy(this._stopper)
           .onValue(() => {
             for (let customMessageView of this._customMessageViews) {
-              customMessageView.expand();
+              customMessageView.setViewState('EXPANDED');
             }
           });
       }
@@ -684,7 +684,7 @@ class GmailThreadView {
           .takeUntilBy(this._stopper)
           .onValue(() => {
             for (let customMessageView of this._customMessageViews) {
-              customMessageView.collapse();
+              customMessageView.setViewState('COLLAPSED');
             }
           });
       }

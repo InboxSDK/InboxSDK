@@ -4,7 +4,7 @@ import Kefir from 'kefir';
 
 // Creates a mutation observer watching the given element and emits the events in a stream.
 export default function makeMutationObserverChunkedStream(
-  element: HTMLElement,
+  element: HTMLElement | Element,
   options: *
 ): Kefir.Observable<MutationRecord[]> {
   return Kefir.stream(emitter => {

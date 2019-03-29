@@ -31,7 +31,8 @@ export default class CustomMessageView extends SafeEventEmitter {
 
   _hiddenCustomMessageNoticeProvider: ?(
     numberCustomMessagesHidden: number,
-    numberNativeMessagesHidden: ?number
+    numberNativeMessagesHidden: ?number,
+    unmountPromise: Promise<void>
   ) => ?HTMLElement;
   _hiddenCustomMessageNoticeElement: ?HTMLElement;
   _cleanupCustomHiddenMessage: () => void;
@@ -381,8 +382,7 @@ export default class CustomMessageView extends SafeEventEmitter {
       'inboxsdk__custom_message_view_app_notice_content'
     );
 
-    appNoticeContainerElement.addEventListener('inboxsdk-outdated', e => {
-      e.preventDefault();
+    appNoticeContainerElement.addEventListener('inboxsdk-outdated', () => {
       this._cleanupCustomHiddenMessage();
       appNoticeContainerElement.remove();
     });
@@ -456,7 +456,7 @@ export default class CustomMessageView extends SafeEventEmitter {
     hiddenNoticeElement.appendChild(appNoticeContainerElement);
   }
 
-  _setupNativeMessageUnhideOnDestroy(hiddenIndicatorElement) {
+  _setupNativeMessageUnhideOnDestroy(hiddenIndicatorElement: HTMLElement) {
     // listen for a class change on that message which occurs when it becomes visible
     makeMutationObserverChunkedStream(hiddenIndicatorElement, {
       attributes: true,
@@ -481,15 +481,18 @@ export default class CustomMessageView extends SafeEventEmitter {
       });
   }
   _setupCustomMessageUnHideOnDestroy(hiddenNoticeElement: HTMLElement) {
-    makeMutationObserverChunkedStream(this._el.parentElement, {
+    const parent = this._el.parentElement;
+
+    if (!parent) {
+      return;
+    }
+
+    makeMutationObserverChunkedStream(parent, {
       childList: true
     })
       .takeUntilBy(this._stopper)
       .filter(
-        () =>
-          Array.from(this._el.parentElement.children).indexOf(
-            hiddenNoticeElement
-          ) < 0
+        () => Array.from(parent.children).indexOf(hiddenNoticeElement) < 0
       )
       .take(1)
       .onValue(() => {
@@ -535,6 +538,10 @@ export default class CustomMessageView extends SafeEventEmitter {
       })
     );
 
+    if (!appNoticeElement) {
+      return;
+    }
+
     if (
       Array.from(
         sdkNoticeIndicator.querySelectorAll(
@@ -561,8 +568,7 @@ export default class CustomMessageView extends SafeEventEmitter {
     appNoticeContainerElement.appendChild(appNoticeElement);
     sdkNoticeIndicator.appendChild(appNoticeContainerElement);
 
-    appNoticeContainerElement.addEventListener('inboxsdk-outdated', e => {
-      e.preventDefault();
+    appNoticeContainerElement.addEventListener('inboxsdk-outdated', () => {
       this._cleanupCustomHiddenMessage();
       appNoticeContainerElement.remove();
     });
