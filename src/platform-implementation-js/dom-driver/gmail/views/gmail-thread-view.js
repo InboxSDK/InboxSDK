@@ -55,7 +55,7 @@ class GmailThreadView {
     unmountPromise: Promise<void>
   ) => ?HTMLElement;
   _hiddenCustomMessageNoticeElement: ?HTMLElement;
-  _unmountHiddenNoticePromise: Promise<void>;
+  _resolveUnmountHiddenNoticePromise: () => void;
 
   constructor(
     element: HTMLElement,
@@ -405,6 +405,9 @@ class GmailThreadView {
     if (existingAppNoticeElement) {
       existingAppNoticeElement.remove();
       this._hiddenCustomMessageNoticeElement = null;
+
+      if (this._resolveUnmountHiddenNoticePromise)
+        this._resolveUnmountHiddenNoticePromise();
     }
 
     const noticeProvider = this._hiddenCustomMessageNoticeProvider;
@@ -438,7 +441,9 @@ class GmailThreadView {
     const appNoticeElement = noticeProvider(
       numberCustomHiddenMessages,
       numberNativeHiddenMessages,
-      this._unmountHiddenNoticePromise
+      new Promise(resolve => {
+        this._resolveUnmountHiddenNoticePromise = resolve;
+      })
     );
     if (!appNoticeElement) {
       return;
