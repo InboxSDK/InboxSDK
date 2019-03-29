@@ -2617,6 +2617,14 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton + .inboxsdk__appButton {
   background-color: white;
 }
 
+.inboxsdk__custom_message_view_hidden + .kv .G3.G2 {
+  border-top: none;
+}
+
+.inboxsdk__custom_message_view_hidden + .h7 .G3.G2 {
+  border-top: none;
+}
+
 .inboxsdk__custom_message_view_hidden
   + .inboxsdk__custom_message_view_collapsed {
   border-top: none;
