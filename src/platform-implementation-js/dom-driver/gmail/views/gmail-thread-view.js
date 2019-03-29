@@ -52,7 +52,8 @@ class GmailThreadView {
   _hiddenCustomMessageViews: Set<CustomMessageView> = new Set();
   _hiddenCustomMessageNoticeProvider: ?(
     numberCustomMessagesHidden: number,
-    numberNativeMessagesHidden: ?number
+    numberNativeMessagesHidden: ?number,
+    unmountPromise: Promise<void>
   ) => ?HTMLElement;
 
   constructor(
@@ -228,7 +229,8 @@ class GmailThreadView {
   registerHiddenCustomMessageNoticeProvider(
     provider: (
       numberCustomMessagesHidden: number,
-      numberNativeMessagesHidden: ?number
+      numberNativeMessagesHidden: ?number,
+      unmountPromise: Promise<void>
     ) => HTMLElement
   ) {
     this._hiddenCustomMessageNoticeProvider = provider;
