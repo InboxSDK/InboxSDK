@@ -40,7 +40,8 @@ export default class CustomMessageView extends SafeEventEmitter {
     descriptorStream: Kefir.Observable<CustomMessageDescriptor>,
     hiddenCustomMessageNoticeProvider: ?(
       numberCustomMessagesHidden: number,
-      numberNativeMessagesHidden: ?number
+      numberNativeMessagesHidden: ?number,
+      unmountPromise: Promise<void>
     ) => ?HTMLElement,
     onReady: CustomMessageView => any
   ) {
