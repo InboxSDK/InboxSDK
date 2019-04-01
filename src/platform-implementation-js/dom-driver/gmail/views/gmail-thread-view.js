@@ -48,8 +48,6 @@ class GmailThreadView {
   _readyStream: Kefir.Observable<any>;
   _threadID: ?string;
   _syncThreadID: ?string;
-  _customMessageViews: Set<CustomMessageView> = new Set();
-  _hiddenCustomMessageViews: Set<CustomMessageView> = new Set();
   _hiddenCustomMessageNoticeProvider: ?(
     numberCustomMessagesHidden: number,
     numberNativeMessagesHidden: ?number,
@@ -172,8 +170,19 @@ class GmailThreadView {
       this._newMessageMutationObserver.disconnect();
     }
 
-    for (let customMessageView of this._customMessageViews) {
-      customMessageView.destroy();
+    const customMessageViews = Array.from(
+      this._element.parentElement.querySelectorAll(
+        '.inboxsdk__custom_message_view'
+      )
+    );
+    for (let customMessageView of customMessageViews) {
+      customMessageView.dispatchEvent(
+        new CustomEvent('inboxsdk-shoulddestroy', {
+          bubbles: false,
+          cancelable: false,
+          detail: null
+        })
+      );
     }
   }
 
@@ -261,14 +270,47 @@ class GmailThreadView {
               }))
             );
 
-            const customMessages = Array.from(this._customMessageViews)
-              .filter(
-                cmv =>
-                  cmv !== newCustomMessageView &&
-                  cmv.getElement()
-                    .parentElement /* it has been inserted into dom */
+            const customMessageElements = Array.from(
+              this._element.parentElement.querySelectorAll(
+                '.inboxsdk__custom_message_view'
               )
-              .map(this._messageDescriptorFromCustomMessage);
+            );
+            const customMessages = customMessageElements.map(
+              customMessageElement => ({
+                sortDateTime:
+                  customMessageElement.getAttribute('data-inboxsdk-sortdate') ||
+                  0,
+                getViewState: () => {
+                  if (
+                    customMessageElement.classList.contains(
+                      'inboxsdk__custom_message_view_hidden'
+                    )
+                  ) {
+                    return 'HIDDEN';
+                  } else if (
+                    customMessageElement.classList.contains(
+                      'inboxsdk__custom_message_view_collapsed'
+                    )
+                  ) {
+                    return 'COLLAPSED';
+                  }
+                  return 'EXPANDED';
+                },
+                setViewState: newViewState => {
+                  customMessageElement.dispatchEvent(
+                    new CustomEvent('inboxsdk-setViewState', {
+                      bubbles: false,
+                      cancelable: false,
+                      detail: {
+                        newViewState
+                      }
+                    })
+                  );
+                },
+                isNativeMessage: false,
+                element: customMessageElement
+              })
+            );
 
             const messages = [...nativeMessages, ...customMessages].sort(
               (a, b) => a.sortDatetime - b.sortDatetime
@@ -343,15 +385,22 @@ class GmailThreadView {
       }
     );
 
-    this._customMessageViews.add(customMessageView);
     customMessageView.on('destroy', () => {
-      this._customMessageViews.delete(customMessageView);
-      if (this._customMessageViews.size > 0)
-        parentElement.classList.add('inboxsdk__thread_view_with_custom_view');
-      else
-        parentElement.classList.remove(
+      const remainingCustomMessageViews = Array.from(
+        this._element.parentElement.querySelectorAll(
+          '.inboxsdk__custom_message_view'
+        )
+      );
+
+      if (remainingCustomMessageViews.length > 0) {
+        this._element.parentElement.classList.add(
           'inboxsdk__thread_view_with_custom_view'
         );
+      } else {
+        this._element.parentElement.classList.remove(
+          'inboxsdk__thread_view_with_custom_view'
+        );
+      }
     });
 
     return customMessageView;
@@ -660,8 +709,21 @@ class GmailThreadView {
         ])
           .takeUntilBy(this._stopper)
           .onValue(() => {
-            for (let customMessageView of this._customMessageViews) {
-              customMessageView.setViewState('EXPANDED');
+            const customMessageViews = Array.from(
+              this._element.parentElement.querySelectorAll(
+                '.inboxsdk__custom_message_view'
+              )
+            );
+            for (let customMessageView of customMessageViews) {
+              customMessageView.dispatchEvent(
+                new CustomEvent('inboxsdk-setViewState', {
+                  bubbles: false,
+                  cancelable: false,
+                  detail: {
+                    newViewState: 'EXPANDED'
+                  }
+                })
+              );
             }
           });
       }
@@ -683,8 +745,21 @@ class GmailThreadView {
         ])
           .takeUntilBy(this._stopper)
           .onValue(() => {
-            for (let customMessageView of this._customMessageViews) {
-              customMessageView.setViewState('COLLAPSED');
+            const customMessageViews = Array.from(
+              this._element.parentElement.querySelectorAll(
+                '.inboxsdk__custom_message_view'
+              )
+            );
+            for (let customMessageView of customMessageViews) {
+              customMessageView.dispatchEvent(
+                new CustomEvent('inboxsdk-setViewState', {
+                  bubbles: false,
+                  cancelable: false,
+                  detail: {
+                    newViewState: 'COLLAPSED'
+                  }
+                })
+              );
             }
           });
       }
