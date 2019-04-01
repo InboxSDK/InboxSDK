@@ -274,8 +274,12 @@ class GmailThreadView {
               )
             );
 
-            const customMessages = customMessageElements.map(
-              customMessageElement => ({
+            const customMessages = customMessageElements
+              .filter(
+                customMessageElement =>
+                  customMessageElement !== newCustomMessageView.getElemnt()
+              )
+              .map(customMessageElement => ({
                 sortDateTime:
                   customMessageElement.getAttribute('data-inboxsdk-sortdate') ||
                   0,
@@ -308,23 +312,7 @@ class GmailThreadView {
                 },
                 isNativeMessage: false,
                 element: customMessageElement
-              })
-            );
-
-            // Dedupe messages by timestamp
-            if (
-              customMessages
-                .map(({ sortDateTime }) => sortDateTime)
-                .includes(
-                  newCustomMessageView
-                    .getSortDate()
-                    .getTime()
-                    .toString()
-                )
-            ) {
-              newCustomMessageView.destroy();
-              return;
-            }
+              }));
 
             const messages = [...nativeMessages, ...customMessages].sort(
               (a, b) => a.sortDatetime - b.sortDatetime
