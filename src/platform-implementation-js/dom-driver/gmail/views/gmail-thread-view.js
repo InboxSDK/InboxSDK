@@ -51,9 +51,11 @@ class GmailThreadView {
   _hiddenCustomMessageViews: Set<CustomMessageView> = new Set();
   _hiddenCustomMessageNoticeProvider: ?(
     numberCustomMessagesHidden: number,
-    numberNativeMessagesHidden: ?number
+    numberNativeMessagesHidden: ?number,
+    unmountPromise: Promise<void>
   ) => ?HTMLElement;
   _hiddenCustomMessageNoticeElement: ?HTMLElement;
+  _resolveUnmountHiddenNoticePromise: ?() => void;
 
   constructor(
     element: HTMLElement,
@@ -116,6 +118,12 @@ class GmailThreadView {
       .toProperty();
 
     this._listenToExpandCollapseAll();
+
+    this._stopper.take(1).onValue(() => {
+      if (this._resolveUnmountHiddenNoticePromise) {
+        this._resolveUnmountHiddenNoticePromise();
+      }
+    });
   }
 
   // TODO use livesets eventually
@@ -228,7 +236,8 @@ class GmailThreadView {
   registerHiddenCustomMessageNoticeProvider(
     provider: (
       numberCustomMessagesHidden: number,
-      numberNativeMessagesHidden: ?number
+      numberNativeMessagesHidden: ?number,
+      unmountPromise: Promise<void>
     ) => HTMLElement
   ) {
     this._hiddenCustomMessageNoticeProvider = provider;
@@ -402,6 +411,9 @@ class GmailThreadView {
     if (existingAppNoticeElement) {
       existingAppNoticeElement.remove();
       this._hiddenCustomMessageNoticeElement = null;
+
+      if (this._resolveUnmountHiddenNoticePromise)
+        this._resolveUnmountHiddenNoticePromise();
     }
 
     const noticeProvider = this._hiddenCustomMessageNoticeProvider;
@@ -434,7 +446,10 @@ class GmailThreadView {
 
     const appNoticeElement = noticeProvider(
       numberCustomHiddenMessages,
-      numberNativeHiddenMessages
+      numberNativeHiddenMessages,
+      new Promise(resolve => {
+        this._resolveUnmountHiddenNoticePromise = resolve;
+      })
     );
     if (!appNoticeElement) {
       return;
