@@ -55,7 +55,7 @@ class GmailThreadView {
     unmountPromise: Promise<void>
   ) => ?HTMLElement;
   _hiddenCustomMessageNoticeElement: ?HTMLElement;
-  _resolveUnmountHiddenNoticePromise: () => void;
+  _resolveUnmountHiddenNoticePromise: ?() => void;
 
   constructor(
     element: HTMLElement,
