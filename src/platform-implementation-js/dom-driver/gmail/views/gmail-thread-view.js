@@ -248,8 +248,8 @@ class GmailThreadView {
   addCustomMessage(
     descriptorStream: Kefir.Observable<CustomMessageDescriptor>
   ): CustomMessageView {
-    const parentElement = this._element.parentElement;
-    if (!parentElement) throw new Error('missing parent element');
+    if (!this._element.parentElement) throw new Error('missing parent element');
+
     const customMessageView = new CustomMessageView(
       descriptorStream,
       this._hiddenCustomMessageNoticeProvider,
@@ -258,8 +258,6 @@ class GmailThreadView {
           async (): any => {
             const messageContainer = this._element.querySelector('[role=list]');
             if (!messageContainer) return;
-
-            let isInHidden = false;
 
             const nativeMessages = await Promise.all(
               this._messageViewDrivers.map(async messageView => ({
@@ -275,6 +273,7 @@ class GmailThreadView {
                 '.inboxsdk__custom_message_view'
               )
             );
+
             const customMessages = customMessageElements.map(
               customMessageElement => ({
                 sortDateTime:
@@ -311,6 +310,21 @@ class GmailThreadView {
                 element: customMessageElement
               })
             );
+
+            // Dedupe messages by timestamp
+            if (
+              customMessages
+                .map(({ sortDateTime }) => sortDateTime)
+                .includes(
+                  newCustomMessageView
+                    .getSortDate()
+                    .getTime()
+                    .toString()
+                )
+            ) {
+              newCustomMessageView.destroy();
+              return;
+            }
 
             const messages = [...nativeMessages, ...customMessages].sort(
               (a, b) => a.sortDatetime - b.sortDatetime
@@ -377,7 +391,7 @@ class GmailThreadView {
               }
             }
 
-            parentElement.classList.add(
+            this._element.parentElement.classList.add(
               'inboxsdk__thread_view_with_custom_view'
             );
           }
