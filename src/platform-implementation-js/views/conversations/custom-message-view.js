@@ -207,6 +207,24 @@ export default class CustomMessageView extends SafeEventEmitter {
       e.preventDefault();
       e.stopPropagation();
     });
+
+    this._el.addEventListener('inboxsdk-setViewState', (e: CustomEvent) => {
+      const { newViewState } = e.detail;
+
+      switch (newViewState) {
+        case 'EXPANDED':
+        case 'COLLAPSED':
+        case 'HIDDEN':
+          this.setViewState(newViewState);
+          break;
+        default:
+          throw new Error(`Unrecognized view state "${newViewState}"`);
+      }
+    });
+
+    this._el.addEventListener('inboxsdk-shoulddestroy', () => {
+      this.destroy();
+    });
   }
 
   // Three cases:
