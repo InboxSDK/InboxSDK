@@ -2655,12 +2655,12 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton + .inboxsdk__appButton {
   display: none;
 }
 
-.inboxsdk__custom_message_view_app_notice_hide_default_content
+.inboxsdk__custom_hidden_message_view_notice
   .inboxsdk__custom_hidden_message_view_notice_indicator:hover::before {
   content: none !important;
 }
 
-.inboxsdk__custom_message_view_app_notice_hide_default_content {
+.inboxsdk__custom_hidden_message_view_notice {
   font-size: 0;
 }
 

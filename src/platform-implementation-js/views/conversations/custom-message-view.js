@@ -35,7 +35,7 @@ export default class CustomMessageView extends SafeEventEmitter {
     unmountPromise: Promise<void>
   ) => ?HTMLElement;
   _hiddenCustomMessageNoticeElement: ?HTMLElement;
-  _cleanupCustomHiddenMessage: () => void;
+  _cleanupCustomHiddenMessage: boolean => void;
 
   constructor(
     descriptorStream: Kefir.Observable<CustomMessageDescriptor>,
@@ -103,7 +103,8 @@ export default class CustomMessageView extends SafeEventEmitter {
 
   destroy() {
     if (this._destroyed) return;
-    if (this._cleanupCustomHiddenMessage) this._cleanupCustomHiddenMessage();
+    if (this._cleanupCustomHiddenMessage)
+      this._cleanupCustomHiddenMessage(true);
     this._destroyed = true;
     this._stopper.destroy();
     this.emit('destroy');
@@ -401,8 +402,7 @@ export default class CustomMessageView extends SafeEventEmitter {
     );
 
     appNoticeContainerElement.addEventListener('inboxsdk-outdated', () => {
-      this._cleanupCustomHiddenMessage();
-      appNoticeContainerElement.remove();
+      this._cleanupCustomHiddenMessage(false);
     });
 
     let numberCustomHiddenMessages = 1;
@@ -439,15 +439,23 @@ export default class CustomMessageView extends SafeEventEmitter {
     }
 
     if (this._cleanupCustomHiddenMessage) {
-      appNoticeContainerElement.remove();
-      this._cleanupCustomHiddenMessage();
+      this._cleanupCustomHiddenMessage(false);
     }
 
     const appNoticeElement = noticeProvider(
       numberCustomHiddenMessages,
       numberNativeHiddenMessages,
       new Promise(resolve => {
-        this._cleanupCustomHiddenMessage = resolve;
+        this._cleanupCustomHiddenMessage = (resetCount: boolean) => {
+          if (resetCount) {
+            hiddenNoticeMessageElement.setAttribute(
+              'data-inboxsdk-custommessagecount',
+              '0'
+            );
+          }
+          appNoticeContainerElement.remove();
+          resolve();
+        };
       })
     );
 
@@ -492,7 +500,7 @@ export default class CustomMessageView extends SafeEventEmitter {
           this._hiddenCustomMessageNoticeElement.remove();
         }
         if (this._cleanupCustomHiddenMessage) {
-          this._cleanupCustomHiddenMessage();
+          this._cleanupCustomHiddenMessage(false);
         }
 
         this._hiddenCustomMessageNoticeElement = null;
@@ -516,7 +524,7 @@ export default class CustomMessageView extends SafeEventEmitter {
       .onValue(() => {
         this.setViewState('COLLAPSED');
         if (this._cleanupCustomHiddenMessage) {
-          this._cleanupCustomHiddenMessage();
+          this._cleanupCustomHiddenMessage(false);
         }
       });
   }
@@ -536,23 +544,30 @@ export default class CustomMessageView extends SafeEventEmitter {
       String(numberCustomHiddenMessages)
     );
 
-    hiddenNoticeElement.classList.add(
-      'inboxsdk__custom_message_view_app_notice_hide_default_content'
-    );
-
     const sdkNoticeIndicator = querySelector(
       hiddenNoticeElement,
       '.inboxsdk__custom_hidden_message_view_notice_indicator'
     );
 
     if (this._cleanupCustomHiddenMessage) {
-      this._cleanupCustomHiddenMessage();
+      this._cleanupCustomHiddenMessage(false);
     }
+
+    const appNoticeContainerElement = document.createElement('span');
     const appNoticeElement = noticeProvider(
       numberCustomHiddenMessages,
       0,
       new Promise(resolve => {
-        this._cleanupCustomHiddenMessage = resolve;
+        this._cleanupCustomHiddenMessage = (resetCount: boolean) => {
+          if (resetCount) {
+            hiddenNoticeElement.setAttribute(
+              'data-inboxsdk-custommessagecount',
+              '0'
+            );
+          }
+          appNoticeContainerElement.remove();
+          resolve();
+        };
       })
     );
 
@@ -560,26 +575,22 @@ export default class CustomMessageView extends SafeEventEmitter {
       return;
     }
 
-    if (
-      Array.from(
-        sdkNoticeIndicator.querySelectorAll(
-          '.inboxsdk__custom_message_view_app_notice_content'
-        )
-      ).length > 0
-    ) {
-      const oldContent = querySelector(
-        sdkNoticeIndicator,
+    const oldContents = Array.from(
+      sdkNoticeIndicator.querySelectorAll(
         '.inboxsdk__custom_message_view_app_notice_content'
-      );
-      oldContent.dispatchEvent(
-        new CustomEvent('inboxsdk-outdated', {
-          bubbles: false,
-          cancelable: false,
-          detail: null
-        })
-      );
+      )
+    );
+    if (oldContents.length > 0) {
+      oldContents.forEach(element => {
+        element.dispatchEvent(
+          new CustomEvent('inboxsdk-outdated', {
+            bubbles: false,
+            cancelable: false,
+            detail: null
+          })
+        );
+      });
     }
-    const appNoticeContainerElement = document.createElement('span');
     appNoticeContainerElement.classList.add(
       'inboxsdk__custom_message_view_app_notice_content'
     );
@@ -587,8 +598,7 @@ export default class CustomMessageView extends SafeEventEmitter {
     sdkNoticeIndicator.appendChild(appNoticeContainerElement);
 
     appNoticeContainerElement.addEventListener('inboxsdk-outdated', () => {
-      this._cleanupCustomHiddenMessage();
-      appNoticeContainerElement.remove();
+      this._cleanupCustomHiddenMessage(false);
     });
   }
 }

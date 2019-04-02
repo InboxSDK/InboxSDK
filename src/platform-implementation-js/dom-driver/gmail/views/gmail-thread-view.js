@@ -277,7 +277,7 @@ class GmailThreadView {
             const customMessages = customMessageElements
               .filter(
                 customMessageElement =>
-                  customMessageElement !== newCustomMessageView.getElemnt()
+                  customMessageElement !== newCustomMessageView.getElement()
               )
               .map(customMessageElement => ({
                 sortDateTime:
