@@ -1239,14 +1239,14 @@ class GmailComposeView {
   getSendButton(): HTMLElement {
     return querySelector(
       this._element,
-      '.IZ .Up > div > [role=button]:not([class*=inboxsdk])'
+      '.IZ .Up div > [role=button]:not([aria-haspopup=true]):not([class^=inboxsdk_])'
     );
   }
 
   // When schedule send is available, this returns the element that contains both buttons.
   getSendButtonGroup(): HTMLElement {
     const scheduleSend = this._element.querySelector(
-      '.IZ .Up div > [role=button][aria-haspopup=true]:not([class*=inboxsdk])'
+      '.IZ .Up div > [role=button][aria-haspopup=true]:not([class^=inboxsdk_])'
     );
     if (scheduleSend) {
       return (scheduleSend: any).parentElement;
