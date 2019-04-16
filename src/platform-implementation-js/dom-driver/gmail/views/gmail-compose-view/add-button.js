@@ -119,7 +119,7 @@ function _addButtonToModifierArea(
 }
 
 function _addButtonToSendActionArea(gmailComposeView, buttonDescriptor) {
-  var buttonViewController = _getButtonViewController(buttonDescriptor);
+  const buttonViewController = _getButtonViewController(buttonDescriptor);
   buttonViewController.getView().removeClass('inboxsdk__composeButton');
   buttonViewController.getView().addClass('inboxsdk__compose_sendButton');
   buttonViewController
@@ -127,11 +127,13 @@ function _addButtonToSendActionArea(gmailComposeView, buttonDescriptor) {
     .getElement()
     .setAttribute('tabindex', '1');
 
-  var sendButtonElement = gmailComposeView.getSendButton();
+  const sendButtonGroupElement = gmailComposeView.getSendButtonGroup();
 
-  var buttonElement: HTMLElement = buttonViewController.getView().getElement();
-  var parent: HTMLElement = (sendButtonElement.parentElement: any);
-  parent.insertBefore(buttonElement, sendButtonElement.nextSibling);
+  const buttonElement: HTMLElement = buttonViewController
+    .getView()
+    .getElement();
+  const parent: HTMLElement = (sendButtonGroupElement.parentElement: any);
+  parent.insertBefore(buttonElement, sendButtonGroupElement.nextSibling);
 
   gmailComposeView.addManagedViewController(buttonViewController);
 
