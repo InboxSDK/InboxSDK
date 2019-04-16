@@ -1249,7 +1249,7 @@ class GmailComposeView {
       '.IZ .Up div > [role=button][aria-haspopup=true]:not([class*=inboxsdk])'
     );
     if (scheduleSend) {
-      return scheduleSend.parentElement;
+      return (scheduleSend: any).parentElement;
     }
     return this.getSendButton();
   }
