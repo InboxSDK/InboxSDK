@@ -1243,6 +1243,17 @@ class GmailComposeView {
     );
   }
 
+  // When schedule send is available, this returns the element that contains both buttons.
+  getSendButtonGroup(): HTMLElement {
+    const scheduleSend = this._element.querySelector(
+      '.IZ .Up div > [role=button][aria-haspopup=true]:not([class*=inboxsdk])'
+    );
+    if (scheduleSend) {
+      return (scheduleSend: any).parentElement;
+    }
+    return this.getSendButton();
+  }
+
   getSendAndArchiveButton(): ?HTMLElement {
     if (!this.isReply()) {
       return null;
