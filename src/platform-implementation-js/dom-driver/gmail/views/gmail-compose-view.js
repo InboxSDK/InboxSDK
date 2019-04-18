@@ -1259,6 +1259,13 @@ class GmailComposeView {
       return null;
     }
 
+    const sendAndArchiveButton = this._element.querySelector(
+      '.IZ .Up div > div[role=button].Uo:not([aria-haspopup=true]):not([class^=inboxsdk_])'
+    );
+    if (sendAndArchiveButton) {
+      return sendAndArchiveButton;
+    }
+
     const sendButton = this.getSendButton();
     const parent = sendButton.parentElement;
     if (!(parent instanceof HTMLElement)) throw new Error('should not happen');
