@@ -1239,7 +1239,7 @@ class GmailComposeView {
   getSendButton(): HTMLElement {
     return querySelector(
       this._element,
-      '.IZ .Up div > [role=button]:not([aria-haspopup=true]):not([class^=inboxsdk_])'
+      '.IZ .Up div > div[role=button]:not(.Uo):not([aria-haspopup=true]):not([class^=inboxsdk_])'
     );
   }
 
