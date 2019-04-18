@@ -1266,10 +1266,17 @@ class GmailComposeView {
       return sendAndArchiveButton;
     }
 
+    // TODO is the rest of this function necessary?
+
     const sendButton = this.getSendButton();
     const parent = sendButton.parentElement;
     if (!(parent instanceof HTMLElement)) throw new Error('should not happen');
     if (parent.childElementCount <= 1) {
+      this._driver
+        .getLogger()
+        .eventSdkPassive(
+          'getSendAndArchiveButton - old method - failed to find, childElementCount <= 1'
+        );
       return null;
     }
 
@@ -1277,9 +1284,21 @@ class GmailComposeView {
       parent.children[0] !== sendButton
         ? parent.children[0]
         : parent.children[1];
-    return !firstNotSendElement
+    const result = !firstNotSendElement
       ? null
       : firstNotSendElement.querySelector('[role=button]');
+    if (result) {
+      this._driver
+        .getLogger()
+        .eventSdkPassive('getSendAndArchiveButton - old method - found');
+    } else {
+      this._driver
+        .getLogger()
+        .eventSdkPassive(
+          'getSendAndArchiveButton - old method - failed to find'
+        );
+    }
+    return result;
   }
 
   getCloseButton(): HTMLElement {
