@@ -209,8 +209,8 @@ export default class CustomMessageView extends SafeEventEmitter {
       e.stopPropagation();
     });
 
-    this._el.addEventListener('inboxsdk-setViewState', (e: CustomEvent) => {
-      const { newViewState } = e.detail;
+    this._el.addEventListener('inboxsdk-setViewState', (e: any) => {
+      const { newViewState } = (e: CustomEvent).detail;
 
       switch (newViewState) {
         case 'EXPANDED':
