@@ -170,6 +170,10 @@ class GmailThreadView {
       this._newMessageMutationObserver.disconnect();
     }
 
+    if (!this._element.parentElement) {
+      throw new Error('Parent must be defined.');
+    }
+
     const customMessageViews = Array.from(
       this._element.parentElement.querySelectorAll(
         '.inboxsdk__custom_message_view'
@@ -256,6 +260,10 @@ class GmailThreadView {
       newCustomMessageView => {
         this._readyStream.onValue(
           async (): any => {
+            const parentElement = this._element.parentElement;
+            if (!parentElement) {
+              throw new Error('Parent must be defined.');
+            }
             const messageContainer = this._element.querySelector('[role=list]');
             if (!messageContainer) return;
 
@@ -269,9 +277,7 @@ class GmailThreadView {
             );
 
             const customMessageElements = Array.from(
-              this._element.parentElement.querySelectorAll(
-                '.inboxsdk__custom_message_view'
-              )
+              parentElement.querySelectorAll('.inboxsdk__custom_message_view')
             );
 
             const customMessages = customMessageElements
@@ -280,9 +286,10 @@ class GmailThreadView {
                   customMessageElement !== newCustomMessageView.getElement()
               )
               .map(customMessageElement => ({
-                sortDateTime:
-                  customMessageElement.getAttribute('data-inboxsdk-sortdate') ||
-                  0,
+                sortDatetime:
+                  parseInt(
+                    customMessageElement.getAttribute('data-inboxsdk-sortdate')
+                  ) || 0,
                 getViewState: () => {
                   if (
                     customMessageElement.classList.contains(
@@ -379,7 +386,7 @@ class GmailThreadView {
               }
             }
 
-            this._element.parentElement.classList.add(
+            parentElement.classList.add(
               'inboxsdk__thread_view_with_custom_view'
             );
           }
@@ -388,18 +395,19 @@ class GmailThreadView {
     );
 
     customMessageView.on('destroy', () => {
+      const parentElement = this._element.parentElement;
+      if (!parentElement) {
+        throw new Error('Parent must be defined.');
+      }
+
       const remainingCustomMessageViews = Array.from(
-        this._element.parentElement.querySelectorAll(
-          '.inboxsdk__custom_message_view'
-        )
+        parentElement.querySelectorAll('.inboxsdk__custom_message_view')
       );
 
       if (remainingCustomMessageViews.length > 0) {
-        this._element.parentElement.classList.add(
-          'inboxsdk__thread_view_with_custom_view'
-        );
+        parentElement.classList.add('inboxsdk__thread_view_with_custom_view');
       } else {
-        this._element.parentElement.classList.remove(
+        parentElement.classList.remove(
           'inboxsdk__thread_view_with_custom_view'
         );
       }
@@ -711,6 +719,10 @@ class GmailThreadView {
         ])
           .takeUntilBy(this._stopper)
           .onValue(() => {
+            if (!this._element.parentElement) {
+              throw new Error('Parent must be defined.');
+            }
+
             const customMessageViews = Array.from(
               this._element.parentElement.querySelectorAll(
                 '.inboxsdk__custom_message_view'
@@ -747,6 +759,10 @@ class GmailThreadView {
         ])
           .takeUntilBy(this._stopper)
           .onValue(() => {
+            if (!this._element.parentElement) {
+              throw new Error('Parent must be defined.');
+            }
+
             const customMessageViews = Array.from(
               this._element.parentElement.querySelectorAll(
                 '.inboxsdk__custom_message_view'
