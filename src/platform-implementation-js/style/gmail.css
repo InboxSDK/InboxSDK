@@ -2568,7 +2568,6 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton + .inboxsdk__appButton {
 }
 
 .adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container {
-  position: relative;
   width: auto !important;
   min-width: 32px;
 }
