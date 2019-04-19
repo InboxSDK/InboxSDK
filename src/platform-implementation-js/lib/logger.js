@@ -540,6 +540,7 @@ if (_extensionIsLoggerMaster && global.document && global.MutationObserver) {
         const { oauthToken } = await getEventsAccessToken();
         const apiKey = 'AIzaSyAwlvUR2x3OnCeas8hW8NDzVMswL5hZGg8';
 
+        // TODO change to use CommonPageCommunicator.pageAjax()
         await ajax({
           url: `https://pubsub.googleapis.com/v1/projects/mailfoogae/topics/events:publish?key=${encodeURIComponent(
             apiKey

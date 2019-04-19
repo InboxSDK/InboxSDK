@@ -1239,8 +1239,19 @@ class GmailComposeView {
   getSendButton(): HTMLElement {
     return querySelector(
       this._element,
-      '.IZ .Up > div > [role=button]:not([class*=inboxsdk])'
+      '.IZ .Up div > div[role=button]:not(.Uo):not([aria-haspopup=true]):not([class^=inboxsdk_])'
     );
+  }
+
+  // When schedule send is available, this returns the element that contains both buttons.
+  getSendButtonGroup(): HTMLElement {
+    const scheduleSend = this._element.querySelector(
+      '.IZ .Up div > [role=button][aria-haspopup=true]:not([class^=inboxsdk_])'
+    );
+    if (scheduleSend) {
+      return (scheduleSend: any).parentElement;
+    }
+    return this.getSendButton();
   }
 
   getSendAndArchiveButton(): ?HTMLElement {
@@ -1248,10 +1259,24 @@ class GmailComposeView {
       return null;
     }
 
+    const sendAndArchiveButton = this._element.querySelector(
+      '.IZ .Up div > div[role=button].Uo:not([aria-haspopup=true]):not([class^=inboxsdk_])'
+    );
+    if (sendAndArchiveButton) {
+      return sendAndArchiveButton;
+    }
+
+    // TODO is the rest of this function necessary?
+
     const sendButton = this.getSendButton();
     const parent = sendButton.parentElement;
     if (!(parent instanceof HTMLElement)) throw new Error('should not happen');
     if (parent.childElementCount <= 1) {
+      this._driver
+        .getLogger()
+        .eventSdkPassive(
+          'getSendAndArchiveButton - old method - failed to find, childElementCount <= 1'
+        );
       return null;
     }
 
@@ -1259,9 +1284,21 @@ class GmailComposeView {
       parent.children[0] !== sendButton
         ? parent.children[0]
         : parent.children[1];
-    return !firstNotSendElement
+    const result = !firstNotSendElement
       ? null
       : firstNotSendElement.querySelector('[role=button]');
+    if (result) {
+      this._driver
+        .getLogger()
+        .eventSdkPassive('getSendAndArchiveButton - old method - found');
+    } else {
+      this._driver
+        .getLogger()
+        .eventSdkPassive(
+          'getSendAndArchiveButton - old method - failed to find'
+        );
+    }
+    return result;
   }
 
   getCloseButton(): HTMLElement {
