@@ -186,7 +186,7 @@ const GmailElementGetter = {
   getTopAccountContainer(): ?HTMLElement {
     if (this.isUsingMaterialUI()) {
       return document.querySelector(
-        'header[role="banner"] > div:nth-child(2) > div:nth-child(3)'
+        'header[role="banner"] > div:nth-child(2) > div:nth-child(2)'
       );
     }
 
