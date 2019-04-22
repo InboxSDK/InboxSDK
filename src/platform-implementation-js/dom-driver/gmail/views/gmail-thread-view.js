@@ -559,6 +559,14 @@ class GmailThreadView {
     else throw new Error('Failed to get id for thread');
   }
 
+  getLabelContainer(): HTMLElement {
+    const labelContainer = this._element.querySelector('.ha .J-J5-Ji');
+    if (!labelContainer) {
+      throw new Error('Thread view label container not found');
+    }
+    return labelContainer;
+  }
+
   _setupToolbarView() {
     const toolbarElement = this._findToolbarElement();
     if (!toolbarElement) throw new Error('No toolbar element found');

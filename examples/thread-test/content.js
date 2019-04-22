@@ -37,7 +37,8 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 				console.log('args', customHiddenCount, nativeHiddenCount);
 				return span;
 			});
-
+			
+			console.log(threadView.getLabelContainer());
 		})();
 	});
 
