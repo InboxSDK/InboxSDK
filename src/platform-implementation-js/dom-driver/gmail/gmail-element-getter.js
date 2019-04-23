@@ -133,6 +133,14 @@ const GmailElementGetter = {
     return toolbarElement.querySelector('.lS');
   },
 
+  getViewActionsContainer(): ??HTMLElement {
+    const threadViewContainer = GmailElementGetter.getThreadContainerElement();
+    if (!threadViewContainer) {
+      return null;
+    }
+    return threadViewContainer.querySelector('.hj > .ade');
+  },
+
   getSidebarContainerElement(): ?HTMLElement {
     return document.querySelector('[role=main] table.Bs > tr .y3');
   },

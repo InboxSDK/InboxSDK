@@ -233,6 +233,28 @@ class GmailThreadView {
     return view;
   }
 
+  addViewActionButton(button: HTMLElement): SimpleElementView {
+    const viewActionsContainer = GmailElementGetter.getViewActionsContainer();
+    if (!viewActionsContainer)
+      throw new Error('Failed to find view actions container.');
+
+    if (viewActionsContainer.firstElementChild) {
+      viewActionsContainer.firstElementChild.insertAdjacentElement(
+        'beforebegin',
+        button
+      );
+    } else {
+      viewActionsContainer.appendChild(button);
+    }
+
+    const view = new SimpleElementView(button);
+    this._stopper
+      .takeUntilBy(Kefir.fromEvents(view, 'destory'))
+      .onValue(() => view.destroy());
+
+    return view;
+  }
+
   registerHiddenCustomMessageNoticeProvider(
     provider: (
       numberCustomMessagesHidden: number,

@@ -61,6 +61,11 @@ class ThreadView extends EventEmitter {
     return members.threadViewImplementation.addNoticeBar();
   }
 
+  addViewActionButton(button: HTMLElement): SimpleElementView {
+    const members = get(memberMap, this);
+    return members.threadViewImplementation.addViewActionButton(button);
+  }
+
   registerHiddenCustomMessageNoticeProvider(
     provider: (
       numberCustomMessagesHidden: number,

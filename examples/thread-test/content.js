@@ -28,7 +28,7 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 				threadView.getMessageViewsAll().length
 			);
 			threadView.on('destroy', () => {
-				console.log('threadView destroy');
+        console.log('threadView destroy');
 			});
 
 			threadView.registerHiddenCustomMessageNoticeProvider((customHiddenCount, nativeHiddenCount) => {
@@ -38,6 +38,13 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 				return span;
 			});
 
+      const btn = document.createElement('button');
+      btn.innerHTML = "Click me!";
+      btn.onclick = (e) => {
+        alert('Button Clicked');
+      }
+      
+      threadView.addViewActionButton(btn);
 		})();
 	});
 
