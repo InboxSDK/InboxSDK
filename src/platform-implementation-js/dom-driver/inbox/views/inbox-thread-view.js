@@ -289,6 +289,10 @@ class InboxThreadView {
     return view;
   }
 
+  addViewActionButton(button: HTMLElement) {
+    throw new Error('Not supported');
+  }
+
   getReadyStream() {
     return this._ready;
   }
