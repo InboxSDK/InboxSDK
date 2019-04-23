@@ -866,6 +866,10 @@ class InboxComposeView {
     return this._els.subject;
   }
 
+  getMetadataForm(): ?HTMLElement {
+    throw new Error('Not supported in Inbox.');
+  }
+
   getToRow(): HTMLElement {
     const { toRow } = this._els;
     if (!toRow) throw new Error('Could not locate To row');
