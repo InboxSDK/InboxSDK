@@ -289,7 +289,7 @@ class InboxThreadView {
     return view;
   }
 
-  getLabelContainer(): HTMLElement {
+  addElementToLabelContainer(newElement: HTMLElement): Function {
     throw new Error('not supported');
   }
 

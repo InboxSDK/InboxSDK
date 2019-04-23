@@ -559,12 +559,35 @@ class GmailThreadView {
     else throw new Error('Failed to get id for thread');
   }
 
-  getLabelContainer(): HTMLElement {
-    const labelContainer = this._element.querySelector('.ha .J-J5-Ji');
-    if (!labelContainer) {
+  addElementToLabelContainer(newElement: HTMLElement): Function {
+    let container = this._element.querySelector('.ha .J-J5-Ji');
+    if (!container) {
       throw new Error('Thread view label container not found');
     }
-    return labelContainer;
+
+    container.appendChild(newElement);
+
+    const observer = new MutationObserver(mutationsList => {
+      if (
+        mutationsList.some(
+          mutation =>
+            mutation.type === 'childList' &&
+            (mutation.removedNodes &&
+              mutation.removedNodes.length &&
+              mutation.removedNodes.length > 0)
+        )
+      ) {
+        if (!container.contains(newElement)) {
+          container.appendChild(newElement);
+        }
+      }
+    });
+    observer.observe(container, { childList: true });
+
+    return () => {
+      observer.disconnect();
+      newElement.remove();
+    };
   }
 
   _setupToolbarView() {
