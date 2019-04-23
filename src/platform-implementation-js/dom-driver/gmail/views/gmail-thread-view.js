@@ -559,7 +559,7 @@ class GmailThreadView {
     else throw new Error('Failed to get id for thread');
   }
 
-  addElementToLabelContainer(newElement: HTMLElement): Function {
+  addElementToLabelContainer(newElement: HTMLElement): { destroy(): void } {
     let container = this._element.querySelector('.ha .J-J5-Ji');
     if (!container) {
       throw new Error('Thread view label container not found');
@@ -584,9 +584,11 @@ class GmailThreadView {
     });
     observer.observe(container, { childList: true });
 
-    return () => {
-      observer.disconnect();
-      newElement.remove();
+    return {
+      destroy: () => {
+        observer.disconnect();
+        newElement.remove();
+      }
     };
   }
 

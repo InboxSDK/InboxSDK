@@ -40,11 +40,11 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 			
 			const newLabel = document.createElement('div');
 			newLabel.textContent = 'some text';
-			const remove = threadView.addElementToLabelContainer(newLabel);
+			const stopper = threadView.addElementToLabelContainer(newLabel);
 			console.log('label added');
 			setTimeout(() => {
 				console.log('label removed');
-				remove();
+				stopper.destroy();
 			}, 5000);
 
 		})();
