@@ -238,15 +238,7 @@ class GmailThreadView {
     if (!viewActionsContainer)
       throw new Error('Failed to find view actions container.');
 
-    if (viewActionsContainer.firstElementChild) {
-      viewActionsContainer.firstElementChild.insertAdjacentElement(
-        'beforebegin',
-        button
-      );
-    } else {
-      viewActionsContainer.appendChild(button);
-    }
-
+    viewActionsContainer.insertBefore(button, viewActionsContainer.firstChild);
     const view = new SimpleElementView(button);
     this._stopper
       .takeUntilBy(Kefir.fromEvents(view, 'destory'))
