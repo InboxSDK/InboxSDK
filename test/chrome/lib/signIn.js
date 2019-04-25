@@ -5,7 +5,7 @@ import googleTotp from '../../lib/googleTotp';
 import readAuthInfo from './readAuthInfo';
 
 export default function signIn() {
-  const authInfo = readAuthInfo();
+  const authInfo: any = readAuthInfo();
 
   browser.url('https://inbox.google.com');
   browser.waitForVisible('input[type=email], input[name=Email]');
