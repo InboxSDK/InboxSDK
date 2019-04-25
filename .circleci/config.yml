@@ -25,7 +25,8 @@ jobs:
             - node_modules/
             - ~/.yarn/bin/
             - ~/.config/yarn/global/
-            - ~/.cache/yarn
+            - ~/.cache
+            - /tmp/jest_puppeteer_userDataDir
       - run:
           name: Unit Tests
           command: yarn test
