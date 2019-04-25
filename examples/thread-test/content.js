@@ -40,6 +40,12 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 			
 			console.log('enter the selection state');
 			threadView.enterSelectionState();
+			threadView.getMessageViews().map((mv) => {
+				mv.on('checkboxToggled', (e) => {
+					console.log(e)
+					console.log('checkboxtoggled');
+				})
+			})
 		})();
 	});
 

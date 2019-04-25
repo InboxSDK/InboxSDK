@@ -279,6 +279,14 @@ function _bindToEventStream(messageView, members, stream) {
         messageView: messageView
       });
     });
+
+  stream
+    .filter(({ eventName }) => eventName === 'checkboxToggled')
+    .onValue(event =>
+      messageView.emit('checkboxToggled', {
+        isSelected: event.isSelected
+      })
+    );
 }
 
 export default defn(module, MessageView);

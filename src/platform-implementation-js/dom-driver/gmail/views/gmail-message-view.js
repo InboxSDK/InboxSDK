@@ -318,15 +318,12 @@ class GmailMessageView {
           checkbox.classList.add('inboxsdk__checkbox_checked');
         }
 
-        this._element.dispatchEvent(
-          new CustomEvent('checkboxToggled', {
-            bubbles: false,
-            cancelable: false,
-            detail: {
-              isSelected: !isSelected
-            }
-          })
-        );
+        console.log('attempting to emit: ' + !isSelected);
+
+        this._eventStream.emit({
+          eventName: 'checkboxToggled',
+          isSelected: !isSelected
+        });
       },
       true
     );
