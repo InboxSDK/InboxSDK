@@ -2698,3 +2698,39 @@ body.inboxsdk__gmailv1css .inboxsdk__butterbar .a8k {
 }
 
 /* end butter/snack bar */
+
+/* start checkbox */
+
+.inboxsdk__checkbox {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  background-image: url(https://www.gstatic.com/images/icons/material/system/2x/check_box_outline_blank_black_20dp.png);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 20px;
+  opacity: 0.16;
+  margin: 30px;
+}
+
+.inboxsdk__checkbox:hover {
+  opacity: 1;
+}
+
+.inboxsdk__checkbox_checked {
+  opacity: 0.54;
+  background-image: url(https://www.gstatic.com/images/icons/material/system/2x/check_box_black_20dp.png);
+}
+
+.inboxsdk__checkbox:hover::before {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  background-color: rgba(32, 33, 36, 0.059);
+  border-radius: 50%;
+  top: -10px;
+  left: -12px;
+  content: '';
+}
+
+/* end checkbox */

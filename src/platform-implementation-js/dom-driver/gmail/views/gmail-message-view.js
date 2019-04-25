@@ -300,6 +300,44 @@ class GmailMessageView {
     this._updateMoreMenu();
   }
 
+  enterSelectionState() {
+    const checkbox = document.createElement('div');
+    checkbox.classList.add('inboxsdk__checkbox');
+    checkbox.addEventListener(
+      'click',
+      e => {
+        // We don't want the message to expand/collapse when the checkbox is ticked
+        e.stopPropagation();
+
+        const isSelected = checkbox.classList.contains(
+          'inboxsdk__checkbox_checked'
+        );
+        if (isSelected) {
+          checkbox.classList.remove('inboxsdk__checkbox_checked');
+        } else {
+          checkbox.classList.add('inboxsdk__checkbox_checked');
+        }
+
+        this._element.dispatchEvent(
+          new CustomEvent('checkboxToggled', {
+            bubbles: false,
+            cancelable: false,
+            detail: {
+              isSelected: !isSelected
+            }
+          })
+        );
+      },
+      true
+    );
+
+    this._element.querySelector('.ads').prepend(checkbox);
+  }
+
+  exitSelectionState() {
+    this._element.querySelector('.inboxsdk__checkbox').remove();
+  }
+
   _setupMoreMenuWatching() {
     // At the start, and whenever the view state changes, watch the
     // 'aria-expanded' property of the more button, and when that changes,

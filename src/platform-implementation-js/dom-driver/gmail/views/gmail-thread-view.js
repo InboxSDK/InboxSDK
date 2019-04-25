@@ -339,6 +339,26 @@ class GmailThreadView {
     return customMessageView;
   }
 
+  enterSelectionState() {
+    this._messageViewDrivers.map(messageView =>
+      messageView.enterSelectionState()
+    );
+  }
+
+  exitSelectionState() {
+    this._messageViewDrivers.map(messageView =>
+      messageView.exitSelectionState()
+    );
+  }
+
+  showCustomMessages() {
+    throw new Error('todo -- implement');
+  }
+
+  hideCustomMessages() {
+    throw new Error('todo -- implement');
+  }
+
   _setupHiddenCustomMessage(customMessageView: CustomMessageView) {
     this._hiddenCustomMessageViews.add(customMessageView);
 

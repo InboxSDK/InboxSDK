@@ -74,6 +74,16 @@ class ThreadView extends EventEmitter {
     );
   }
 
+  enterSelectionState() {
+    const members = get(memberMap, this);
+    return members.threadViewImplementation.enterSelectionState();
+  }
+
+  exitSelectionState() {
+    const members = get(memberMap, this);
+    return members.threadViewImplementation.exitSelectionState();
+  }
+
   addCustomMessage(descriptor: Object): CustomMessageView {
     const descriptorPropertyStream = kefirCast(
       (Kefir: any),

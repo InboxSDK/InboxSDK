@@ -128,6 +128,14 @@ export default class CustomMessageView extends SafeEventEmitter {
     else return null;
   }
 
+  hide() {
+    throw new Error('not implemented yet');
+  }
+
+  unhide() {
+    throw new Error('not implemented yet');
+  }
+
   _setupElement() {
     this._el = document.createElement('div');
     this._el.classList.add('inboxsdk__custom_message_view');

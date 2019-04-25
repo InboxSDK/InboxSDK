@@ -289,6 +289,14 @@ class InboxThreadView {
     return view;
   }
 
+  enterSelectionState() {
+    throw new Error('Not implemented');
+  }
+
+  exitSelectionState() {
+    throw new Error('Not implemented');
+  }
+
   getReadyStream() {
     return this._ready;
   }
