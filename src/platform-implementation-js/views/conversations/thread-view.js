@@ -74,6 +74,16 @@ class ThreadView extends EventEmitter {
     );
   }
 
+  unhideCustomMessages() {
+    const members = get(memberMap, this);
+    return members.threadViewImplementation.unhideCustomMessages();
+  }
+
+  hideCustomMessages() {
+    const members = get(memberMap, this);
+    return members.threadViewImplementation.hideCustomMessages();
+  }
+
   enterSelectionState() {
     const members = get(memberMap, this);
     return members.threadViewImplementation.enterSelectionState();

@@ -289,6 +289,14 @@ class InboxThreadView {
     return view;
   }
 
+  unhideCustomMessages() {
+    throw new Error('Not implemented');
+  }
+
+  hideCustomMessages() {
+    throw new Error('Not implemented');
+  }
+
   enterSelectionState() {
     throw new Error('Not implemented');
   }

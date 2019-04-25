@@ -351,12 +351,16 @@ class GmailThreadView {
     );
   }
 
-  showCustomMessages() {
-    throw new Error('todo -- implement');
+  unhideCustomMessages() {
+    this._customMessageViews.forEach(cmv => {
+      cmv.unhide();
+    });
   }
 
   hideCustomMessages() {
-    throw new Error('todo -- implement');
+    this._customMessageViews.forEach(cmv => {
+      cmv.hide();
+    });
   }
 
   _setupHiddenCustomMessage(customMessageView: CustomMessageView) {
