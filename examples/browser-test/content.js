@@ -25,7 +25,8 @@ function rethrow(err) {
 }
 
 InboxSDK.load(2, 'simple-example').then(sdk => {
-	window.__sdk = sdk;
+  window.__sdk = sdk;
+  incrementStat('data-sdk-load');
 
 	sdk.Compose.registerComposeViewHandler(composeView => {
 		const button = composeView.addButton({

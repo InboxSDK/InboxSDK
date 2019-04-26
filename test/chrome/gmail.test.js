@@ -50,5 +50,10 @@ it('works', async () => {
   await waitFor(() => page.url().startsWith('https://mail.google.com/mail/'));
   await waitFor(() => page.url().endsWith('#inbox'));
 
+  await delay(1000);
+  console.log(
+    'head data-sdk-load',
+    await page.$eval('head', head => head.getAttribute('data-sdk-load'))
+  );
   // await jestPuppeteer.debug();
 });

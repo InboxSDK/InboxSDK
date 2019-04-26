@@ -5,20 +5,17 @@ jobs:
     parallelism: 1
     docker:
       - image: circleci/node:jessie-browsers
-        auth:
-          username: $DOCKER_HUB_USERNAME
-          password: $DOCKER_HUB_PASSWORD
     steps:
       - checkout
       - restore_cache:
           keys:
-            - v1-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - v1-dep-{{ .Branch }}-
-            - v1-dep-master-
-            - v1-dep-
+            - v2-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - v2-dep-{{ .Branch }}-
+            - v2-dep-master-
+            - v2-dep-
       - run: yarn
       - save_cache:
-          key: v1-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: v2-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules/
             - ~/.yarn/bin/
@@ -32,17 +29,14 @@ jobs:
     parallelism: 1
     docker:
       - image: circleci/node:jessie-browsers
-        auth:
-          username: $DOCKER_HUB_USERNAME
-          password: $DOCKER_HUB_PASSWORD
     steps:
       - checkout
       - restore_cache:
           keys:
-            - v1-integration-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - v1-integration-{{ .Branch }}-
-            - v1-integration-master-
-            - v1-integration-
+            - v2-integration-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - v2-integration-{{ .Branch }}-
+            - v2-integration-master-
+            - v2-integration-
       - run: yarn
       - run:
           name: Build
@@ -50,18 +44,12 @@ jobs:
             if ! [ -n "$INBOXSDK_TEST_SECRET" ]; then exit; fi
             yarn gulp -s
       - run:
-          name: xvfb
-          background: true
-          command: |
-            if ! [ -n "$INBOXSDK_TEST_SECRET" ]; then exit; fi
-            xvfb
-      - run:
           name: Integration Test
           command: |
             if ! [ -n "$INBOXSDK_TEST_SECRET" ]; then exit; fi
             yarn puppeteer
       - save_cache:
-          key: v1-integration-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: v2-integration-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules/
             - ~/.yarn/bin/
