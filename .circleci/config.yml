@@ -4,7 +4,7 @@ jobs:
     working_directory: ~/StreakYC/GmailSDK
     parallelism: 1
     docker:
-      - image: streak/circleci:1
+      - image: circleci/node:jessie-browsers
         auth:
           username: $DOCKER_HUB_USERNAME
           password: $DOCKER_HUB_PASSWORD
@@ -31,7 +31,7 @@ jobs:
     working_directory: ~/StreakYC/GmailSDK
     parallelism: 1
     docker:
-      - image: streak/circleci:1
+      - image: circleci/node:jessie-browsers
         auth:
           username: $DOCKER_HUB_USERNAME
           password: $DOCKER_HUB_PASSWORD
@@ -49,6 +49,12 @@ jobs:
           command: |
             if ! [ -n "$INBOXSDK_TEST_SECRET" ]; then exit; fi
             yarn gulp -s
+      - run:
+          name: xvfb
+          background: true
+          command: |
+            if ! [ -n "$INBOXSDK_TEST_SECRET" ]; then exit; fi
+            xvfb
       - run:
           name: Integration Test
           command: |
