@@ -7,8 +7,6 @@
 var ButterBar = /** @lends ButterBar */ {
   /**
    * Spawns a new message. The returned object contains a {destroy} method that can be called to remove the message.
-   * ^gmail
-   * ^inbox
    * @param {MessageDescriptor} options - message options
    * @return {Object}
    */
@@ -17,8 +15,6 @@ var ButterBar = /** @lends ButterBar */ {
   /**
    * Spawns a "Loading..." message that stays until it's destroyed. The returned object has a
    * {destroy} method that can be called to remove the message.
-   * ^gmail
-   * ^inbox
    * @param {LoadingMessageDescriptor} options - message options
    * @return {Object}
    */
@@ -29,8 +25,6 @@ var ButterBar = /** @lends ButterBar */ {
    * called to remove the message. Error messages might have a slightly different appearance than
    * {ButterBar.showMessage} depending on whether the user is using Inbox or Gmail. Error messages
    * also have a default priority of 100 instead of 0 (as in the case of {ButterBar.showMessage}).
-   * ^gmail
-   * ^inbox
    * @param {MessageDescriptor} options - message options
    * @return {Object}
    */
@@ -41,8 +35,6 @@ var ButterBar = /** @lends ButterBar */ {
    * {resolve} method that can be called to show a "Saved" confirmation message, and
    * a {reject} method that can be called to remove the message immediately with no
    * confirmation.
-   * ^gmail
-   * ^inbox
    * @param {SavingMessageDescriptor} options - message options
    * @return {Object}
    */
@@ -50,8 +42,6 @@ var ButterBar = /** @lends ButterBar */ {
 
   /**
    * Hides all messages created by the same app with the given messageKey.
-   * ^gmail
-   * ^inbox
    * @param {Object} messageKey - the key of the message to hide
    * @return {void}
    */
@@ -61,7 +51,6 @@ var ButterBar = /** @lends ButterBar */ {
    * Hides any messages currently displayed by Gmail. This method is not
    * implemented in Inbox; the InboxSDK does not interact with Inbox's own
    * notifications.
-   * ^gmail
    * @return {void}
    */
   hideGmailMessage: function() {}

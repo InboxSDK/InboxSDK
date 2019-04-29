@@ -17,8 +17,6 @@ var MessageView = /** @lends MessageView */ {
   /**
    * Adds an {AttachmentCardView} to the message. Each message has an area where attachments of that message are shown as a set of
    * preview cards. These may be for file attachments or even inline YouTube links. This method allows you to add your own.
-   * ^gmail
-   * ^inbox
    * @param {AttachmentCardOptions|AttachmentCardNoPreviewOptions} cardOptions - The configuration of the AttachmentCardView to create.
    * @return {AttachmentCardView}
    */
@@ -27,7 +25,6 @@ var MessageView = /** @lends MessageView */ {
   /**
    * Adds a button to the download all area of the attachments tray. This function
    * will not be implemented in Inbox.
-   * ^gmail
    * @param {AttachmentsToolbarButtonDescriptor} buttonOptions - The configuration of the button to create.
    * @return {void}
    */
@@ -35,7 +32,6 @@ var MessageView = /** @lends MessageView */ {
 
   /**
    * Adds a button to the message.
-   * ^gmail
    * @param {MessageViewToolbarButtonDescriptor} options - The configuration of the button to create.
    * @return {void}
    */
@@ -45,8 +41,6 @@ var MessageView = /** @lends MessageView */ {
    * Returns the body element of the message as displayed to the user. This element includes any qouted areas.
    * Use this method when you want to decorate the body of the message,
    * i.e. if you wanted to linkify all dates you found in a message for scheduling purposes
-   * ^gmail
-   * ^inbox
    * @return {HTMLElement}
    */
   getBodyElement: function() {},
@@ -54,8 +48,6 @@ var MessageView = /** @lends MessageView */ {
   /**
    * Gets the ID of the message and returns it as a Promise. The promise will
    * reject with an error if this is called on a message that isn't loaded yet.
-   * ^gmail
-   * ^inbox
    * @return {Promise.<string>}
    */
   getMessageIDAsync: function() {},
@@ -65,8 +57,6 @@ var MessageView = /** @lends MessageView */ {
   // attachment cards.
   /**
    * Returns all the attachment card views of type FILE currently visible for this message.
-   * ^gmail
-   * ^inbox
    * @return {AttachmentCardView[]}
    */
   getFileAttachmentCardViews: function() {},
@@ -75,8 +65,6 @@ var MessageView = /** @lends MessageView */ {
    * Returns whether the element you provided or not is contained within the qouted area of the MessageView. This is useful
    * when you want to parse through the contents of the {HTMLElement} returned by {MessageView.getBodyElement()}
    * and test whether one if its children is in the qouted area (because you'll usually ignore those elements).
-   * ^gmail
-   * ^inbox
    * @return {boolean}
    */
   isElementInQuotedArea: function() {},
@@ -84,8 +72,6 @@ var MessageView = /** @lends MessageView */ {
   /**
    * Returns whether this message has been loaded yet. If the message has not been loaded, some of the data related methods on
    * this object may return empty results. The message may be loaded once the user clicks on the message stub.
-   * ^gmail
-   * ^inbox
    * @return {boolean}
    */
   isLoaded: function() {},
@@ -95,16 +81,12 @@ var MessageView = /** @lends MessageView */ {
    * This is useful when you want to parse links in a message and take some action on them, this takes care of detecting whether
    * the link is in the qouted area or not and parsing out the url/anchor text of the link.
    * i.e. if you wanted to linkify all dates you found in a message for scheduling purposes
-   * ^gmail
-   * ^inbox
    * @return {MessageViewLinkDescriptor[]}
    */
   getLinksInBody: function() {},
 
   /**
    * Get the contact of the sender of this message.
-   * ^gmail
-   * ^inbox
    * @return {Contact}
    */
   getSender: function() {},
@@ -114,24 +96,18 @@ var MessageView = /** @lends MessageView */ {
    * only reads the values directly present in the page, which may be truncated if
    * there are many items. The asynchronous method getRecipientsFull() should be used
    * instead if the full list is desired.
-   * ^gmail
-   * ^inbox
    * @return {string[]}
    */
   getRecipientEmailAddresses: function() {},
 
   /**
    * Get all the recipients of this message (to, cc, bcc). Returns a promise for an array of contact objects.
-   * ^gmail
-   * ^inbox
    * @return {Promise.<Contact[]>}
    */
   getRecipientsFull: function() {},
 
   /**
    * Get the {ThreadView} that this MessageView is in.
-   * ^gmail
-   * ^inbox
    * @return {ThreadView}
    */
   getThreadView: function() {},
@@ -140,14 +116,12 @@ var MessageView = /** @lends MessageView */ {
    * Gets Gmail's representation of the timestamp of the message.
    * Note: this returns a string representation because timezone information is not available,
    * the accuracy is limited to minutes, and it is formatted to the user's language.
-   * ^gmail
    * @return {string}
    */
   getDateString: function() {},
 
   /**
    * Adds an attachment message's top line near the date.
-   * ^gmail
    * @param {MessageAttachmentIconDescriptor|Stream.<MessageAttachmentIconDescriptor>} iconDescriptor - The options for the icon to add.
    * @return {void}
    */
@@ -158,16 +132,12 @@ var MessageView = /** @lends MessageView */ {
    * {MessageViewViewStates.HIDDEN} (no information visible),
    * {MessageViewViewStates.COLLAPSED} (partial information visible) or
    * {MessageViewViewStates.EXPANDED}
-   * ^gmail
-   * ^inbox
    * @return {MessageViewViewStates}
    */
   getViewState: function() {},
 
   /**
    * Fires when message viewState is changed
-   * ^gmail
-   * ^inbox
    * @event MessageView#viewStateChange
    * @param {MessageViewViewStates} newViewState - the new state the message view is in
    * @param {MessageViewViewStates} oldViewState - the old state the message view was in
@@ -176,8 +146,6 @@ var MessageView = /** @lends MessageView */ {
 
   /**
    * Fires when the user hovers over a contact.
-   * ^gmail
-   * ^inbox
    * @event MessageView#contactHover
    * @param {Contact} contact - the contact that was hovered over
    * @param {string} contactType - whether the hovered contact was a 'sender' or 'recipient'
@@ -188,8 +156,6 @@ var MessageView = /** @lends MessageView */ {
   /**
    * Fires when the data for a message is loaded. This can happen when the message view is
    * first presented or later when the user chooses to expand its view state.
-   * ^gmail
-   * ^inbox
    * @event MessageView#load
    */
 

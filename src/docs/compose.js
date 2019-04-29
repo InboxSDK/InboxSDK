@@ -16,8 +16,6 @@ var Compose = /** @lends Compose */ {
    * that may come into existence. This method is the preferred way to add your application to every compose
    * area such as a new compose window or inline reply compose areas.
    * This function returns a function which removes the handler registration.
-   * ^gmail
-   * ^inbox
    * @param {func(ComposeView)} handler - The function to be called.
    * @return {function}
    */
@@ -26,8 +24,6 @@ var Compose = /** @lends Compose */ {
   /**
    * Opens a new compose view. Any handlers you've registered for ComposeViews will be called as well. Returns
    * a promise which will resolve with the new ComposeView once it has opened.
-   * ^gmail
-   * ^inbox
    * @return {Promise.<ComposeView>}
    */
   openNewComposeView: function() {},

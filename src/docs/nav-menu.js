@@ -27,8 +27,6 @@ var NavMenu = /** @lends NavMenu */ {
   /**
    * Adds a navigation item to the root of the navigation menu. Navigation items from your app are grouped together
    * where possible but ultimately the SDK optimizes for the best user experience when displaying navigation items.
-   * ^gmail
-   * ^inbox
    * @param {NavItemDescriptor} navItemDescriptor - A single descriptor for the nav item or stream of NavItemDescriptors.
    * @return {NavItemView}
    */

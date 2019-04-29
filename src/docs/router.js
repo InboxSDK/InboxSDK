@@ -22,8 +22,6 @@ var Router = /** @lends Router */ {
   /**
    * Get a URL that can be used to navigate to a view. You'll typically want to use this to set the href of an <a> element or similar.
    * Returns the encoded URL string.
-   * ^gmail
-   * ^inbox
    * @param {string} routeID - A route specifying where the link should navigate the user to. This should
    * either be a routeID registered with Router.handleCustomRoute or Router.handleCustomListRoute, or a value
    * from Router.{NativeRouteIDs}.
@@ -36,8 +34,6 @@ var Router = /** @lends Router */ {
 
   /**
    * Change the route to be the one with the given ID and have the given parameters.
-   * ^gmail
-   * ^inbox
    * @param {string} routeID - A route specifying where the link should navigate the user to. This should
    * either be a routeID registered with Router.handleCustomRoute or Router.handleCustomListRoute, a value
    * from Router.{NativeRouteIDs}, or a value previously returned by Router.createLink. If it's a value
@@ -54,8 +50,6 @@ var Router = /** @lends Router */ {
    * Use this to create your own routes (pages) with your own custom content. Your callback will be passed an instance of a
    * {CustomRouteView} whose contents you may modify.
    * This function returns a function which removes the handler registration.
-   * ^gmail
-   * ^inbox
    * @param {string} routeID - which route this handler is registering for
    * @param {func(CustomRouteView)} handler - The callback to call when the route changes to a custom route matching
    * the provided routeID
@@ -68,7 +62,6 @@ var Router = /** @lends Router */ {
    * Because this can apply to any route, your callback will be given only a generic {RouteView}. This is typically used
    * when you want to monitor for page changes but don't necessarily need to modify the page.
    * This function returns a function which removes the handler registration.
-   * ^gmail
    * @param {func(RouteView)} handler - The callback to call when the route changes
    * @return {function}
    */
@@ -101,7 +94,6 @@ InboxSDK.load('1', 'MY_APP_ID').then(function(sdk) {
    * It must return a {CustomListDescriptor}, or a promise which resolves to one.
    *
    * This function returns a function which removes the handler registration.
-   * ^gmail
    * @param {string} routeID - Which route this handler is registering for.
    * @param {func(offset, max)} handler - Passed a page offset and a maximum
    * number of threads to return. Must return a {CustomListDescriptor}, or a promise which resolves to one.
@@ -111,7 +103,6 @@ InboxSDK.load('1', 'MY_APP_ID').then(function(sdk) {
 
   /**
    * Gets the current route view
-   * ^gmail
    * @return {RouteView}
    */
   getCurrentRouteView: function() {}
