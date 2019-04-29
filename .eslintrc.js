@@ -58,6 +58,8 @@ module.exports = {
       },
       globals: {
         page: 'readonly',
+        browser: 'readonly',
+        context: 'readonly',
         jestPuppeteer: 'readonly'
       }
     },
