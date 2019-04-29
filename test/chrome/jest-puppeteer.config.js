@@ -3,7 +3,7 @@
 const path = require('path');
 const os = require('os');
 
-const pathToExtension = path.resolve(__dirname, 'examples/browser-test');
+const pathToExtension = path.resolve(__dirname, '../../examples/browser-test');
 
 const userDataDir = path.join(os.tmpdir(), 'jest_puppeteer_userDataDir');
 
