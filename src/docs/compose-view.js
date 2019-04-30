@@ -218,10 +218,10 @@ var ComposeView = /** @lends ComposeView */ {
   insertLinkIntoBodyAtCursor: function() {},
 
   /**
-   * Whether or not this compose view is initially of type forward as denoted
-   * by Gmail's "Type of response." Note, type of response can be changed
-   * at any time by the user. Listen to changes via the "responseTypeChanged"
-   * event.
+   * Returns true if the compose view is in "forward" mode. A compose view may
+   * be started in forward mode if it was opened by Gmail's Forward button, and
+   * a compose view's mode may be changed while it is active. Changes to this
+   * value will be reported by the "responseTypeChanged" event.
    * @return {boolean}
    */
   isForward: function() {},
