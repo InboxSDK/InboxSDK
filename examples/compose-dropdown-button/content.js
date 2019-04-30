@@ -29,21 +29,31 @@ InboxSDK.load(1, 'simple-example', {
       }
     });
 
-    var composeNotice;
+    var composeNotices = [];
+    var orderHint = 2
 
     composeView.addButton({
-      title: 'Compose Notice',
+      title: 'Add Compose Notice',
       iconUrl: chrome.runtime.getURL('monkey.png'),
       onClick: function(event) {
-        if (!composeNotice) {
-          composeNotice = composeView.addComposeNotice();
-          composeNotice.el.innerHTML = 's1 foo <b>bar</b>';
-          composeNotice.on('destroy', function() {
-            console.log('composeNotice destroyed');
-          });
-        } else {
+        const composeNotice = composeView.addComposeNotice({orderHint});
+        composeNotice.el.innerHTML = '<b>compose notice</b>' + orderHint.toString();
+        orderHint--;
+        composeNotice.on('destroy', function() {
+          console.log('composeNotice destroyed');
+        });
+
+        composeNotices.push(composeNotice)
+      }
+    });
+
+    composeView.addButton({
+      title: 'Remove Compose Notice',
+      iconUrl: chrome.runtime.getURL('monkey.png'),
+      onClick: function(event) {
+        const composeNotice = composeNotices.pop();
+        if (composeNotice) {
           composeNotice.destroy();
-          composeNotice = null;
         }
       }
     });

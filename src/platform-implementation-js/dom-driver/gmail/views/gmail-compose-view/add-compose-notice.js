@@ -34,6 +34,7 @@ export default function addComposeNotice(
 
 class ComposeNotice extends SimpleElementView {
   _gmailComposeView: GmailComposeView;
+  _orderHint: number;
   _stopper = kefirStopper();
 
   constructor(gmailComposeView: GmailComposeView, orderHint: number) {
@@ -43,6 +44,7 @@ class ComposeNotice extends SimpleElementView {
 
     super(el);
     this._gmailComposeView = gmailComposeView;
+    this._orderHint = orderHint;
 
     el.className = 'inboxsdk__compose_notice';
     el.setAttribute('data-order-hint', String(orderHint));
@@ -66,12 +68,7 @@ class ComposeNotice extends SimpleElementView {
         '.iN'
       );
 
-      const parentContainer = querySelector(
-        this._gmailComposeView.getElement(),
-        '.I5'
-      );
-
-      parentContainer.insertBefore(this.el, composeTable);
+      insertElementInOrder(composeTable, this.el, ['data-order-hint'], true);
     } catch (err) {
       Logger.error(err);
     }
