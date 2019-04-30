@@ -8,8 +8,6 @@ var ThreadView = /** @lends ThreadView */ {
    * defaults to having a yellow background color and specific padding to make
    * it look like a warning on the thread, but your code may override these
    * styles of the element.
-   * ^gmail
-   * ^inbox
    * @return {SimpleElementView}
    */
   addNoticeBar: function() {},
@@ -19,8 +17,6 @@ var ThreadView = /** @lends ThreadView */ {
    * simply displays your content to the user, typically in the form of a
    * sidebar. ThreadViews can have multiple content panels added to them and
    * the SDK will handle creating a tabbed interface if needed.
-   * ^gmail
-   * ^inbox
    * @param  {ContentPanelDescriptor} contentPanelDescriptor - The details of the content panel to add to the thread's sidebar.
    * @return {ContentPanelView}
    */
@@ -31,8 +27,6 @@ var ThreadView = /** @lends ThreadView */ {
    * See MessageView for more information on what "loaded" means.
    * Note that more messages may load into the thread later! If it's important
    * to get future messages, use {Conversations.registerMessageViewHandler} instead.
-   * ^gmail
-   * ^inbox
    * @return {MessageView[]}
    */
   getMessageViews: function() {},
@@ -41,32 +35,24 @@ var ThreadView = /** @lends ThreadView */ {
    * Gets an Array of all the {MessageView} objects in the thread
    * regardless of their load state. See {MessageView} for more information
    * on what "loaded" means.
-   * ^gmail
-   * ^inbox
    * @return {MessageView[]}
    */
   getMessageViewsAll: function() {},
 
   /**
    * Gets the subject of this thread.
-   * ^gmail
-   * ^inbox
    * @return {string}
    */
   getSubject: function() {},
 
   /**
    * Gets the Gmail Thread ID of the thread and returns it as a Promise.
-   * ^gmail
-   * ^inbox
    * @return {Promise.<string>}
    */
   getThreadIDAsync: function() {},
 
   /**
    * Fires when the user hovers over a contact on any message in the thread {ContactHoverEvent}.
-   * ^gmail
-   * ^inbox
    * @event ThreadView#contactHover
    * @param {Contact} contact - the contact that was hovered over
    * @param {string} contactType - whether the hovered contact was a 'sender' or 'recipient'

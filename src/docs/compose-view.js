@@ -7,8 +7,6 @@
 var ComposeView = /** @lends ComposeView */ {
   /**
    * Inserts a button into the compose bar. This method also accepts a stream of {ComposeButtonDescriptor}s so that you can change the appearance of your button after you've added it.
-   * ^gmail
-   * ^inbox
    * @param {ComposeButtonDescriptor|Stream.<ComposeButtonDescriptor>} buttonDescriptor - The details of the button to add to the compose bar.
    * @return {void}
    */
@@ -16,7 +14,6 @@ var ComposeView = /** @lends ComposeView */ {
 
   /**
    * Adds a horizontal bar underneath the control section of the ComposeView. This is useful to add more complex UI interactions but should be used sparingly.
-   * ^gmail
    * @param {StatusBarDescriptor} statusBarDescriptor - The details of the status bar to add to the compose view.
    * @return {StatusBarView}
    */
@@ -27,16 +24,12 @@ var ComposeView = /** @lends ComposeView */ {
 
   /**
    * Closes the compose window.
-   * ^gmail
-   * ^inbox
    * @return {void}
    */
   close: function() {},
 
   /**
    * Simulates clicking the compose's send button.
-   * ^gmail
-   * ^inbox
    * @param {SendOptions} sendOptions - An optional configuration object for the send.
    * @return {void}
    */
@@ -44,8 +37,6 @@ var ComposeView = /** @lends ComposeView */ {
 
   /**
    * Returns the HTMLElement of the body of the compose view.
-   * ^gmail
-   * ^inbox
    * @return {HTMLElement}
    */
   getBodyElement: function() {},
@@ -56,7 +47,6 @@ var ComposeView = /** @lends ComposeView */ {
    * returns the message ID of the draft when it was first opened.
    * The use of the getDraftID() method is recommended over this method. This method
    * will not be implemented in Inbox.
-   * ^gmail
    * @return {string}
    */
   getInitialMessageID: function() {},
@@ -64,7 +54,6 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Returns the thread ID of the draft. If the draft is not a reply, then this
    * will be null.
-   * ^gmail
    * @return {string}
    */
   getThreadID: function() {},
@@ -75,8 +64,6 @@ var ComposeView = /** @lends ComposeView */ {
    * won't resolve until the draft gets assigned an ID, or the promise may
    * resolve to null if the draft remains empty and is closed before being
    * assigned an ID.
-   * ^gmail
-   * ^inbox
    * @return {Promise.<string>}
    */
   getDraftID: function() {},
@@ -85,16 +72,12 @@ var ComposeView = /** @lends ComposeView */ {
    * Acts the same as {ComposeView.getDraftID()}, except that if the ComposeView
    * does not yet have a draft ID assigned, then the returned Promise resolves
    * to null immediately instead of waiting.
-   * ^gmail
-   * ^inbox
    * @return {Promise.<string>}
    */
   getCurrentDraftID: function() {},
 
   /**
    * Returns an html string of the contents of the body of the compose view.
-   * ^gmail
-   * ^inbox
    * @return {string}
    */
   getHTMLContent: function() {},
@@ -102,8 +85,6 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Returns a string of HTML containing any text and elements highlighted by
    * the user inside the email body.
-   * ^gmail
-   * ^inbox
    * @return {string}
    */
   getSelectedBodyHTML: function() {},
@@ -111,24 +92,18 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Returns a plain string containing any text highlighted by the user inside
    * the email body.
-   * ^gmail
-   * ^inbox
    * @return {string}
    */
   getSelectedBodyText: function() {},
 
   /**
    * Returns a plain string containing the subject of the email.
-   * ^gmail
-   * ^inbox
    * @return {string}
    */
   getSubject: function() {},
 
   /**
    * Returns a plain text string containing all the text of the email body.
-   * ^gmail
-   * ^inbox
    * @return {string}
    */
   getTextContent: function() {},
@@ -136,8 +111,6 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Returns an array of objects containing the name and email address of all
    * recipients on the TO line.
-   * ^gmail
-   * ^inbox
    * @return {Contact[]}
    */
   getToRecipients: function() {},
@@ -145,8 +118,6 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Returns an array of objects containing the name and email address of all
    * recipients on the CC line.
-   * ^gmail
-   * ^inbox
    * @return {Contact[]}
    */
   getCcRecipients: function() {},
@@ -154,8 +125,6 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Returns an array of objects containing the name and email address of all
    * recipients on the BCC line.
-   * ^gmail
-   * ^inbox
    * @return {Contact[]}
    */
   getBccRecipients: function() {},
@@ -163,8 +132,6 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Places text inside the body of the message at the cursor or at the beginning of the message if the cursor is not
    * in the body of the message. If anything inside the body is selected, it will be replaced.
-   * ^gmail
-   * ^inbox
    * @param {string} text - The text to insert.
    * @return {void}
    */
@@ -174,8 +141,6 @@ var ComposeView = /** @lends ComposeView */ {
    * Places HTML inside the body of the message at the cursor or at the beginning of the message if the cursor is not in the body of the message.
    * If anything inside the body is selected, it will be replaced.
    * Returns the root HTMLElement of the inserted link.
-   * ^gmail
-   * ^inbox
    * @param {string | HTMLElement} html - The HTML to insert. You can provide an HTML string or a DOM element.
    * @return {HTMLElement}
    */
@@ -186,8 +151,6 @@ var ComposeView = /** @lends ComposeView */ {
    * the cursor is not in the body of the message. If anything inside the body is selected, it will be replaced.
    * A link chip is an enhanced link with an icon and a callout. These are typically used by Gmail when inserting
    * a Google Drive link.
-   * ^gmail
-   * ^inbox
    * @param {string} text - The anchor text of the link to insert.
    * @param {string} url - The URL of the link to insert.
    * @param {string} iconUrl - The URL of the icon that will be shown in the chip.
@@ -202,8 +165,6 @@ var ComposeView = /** @lends ComposeView */ {
    * Places a link inside the body of the message at the cursor or at the beginning of the message
    * if the cursor is not in the body of the message. If anything inside the body is selected, it will be replaced.
    * Returns the HTMLElement of the inserted link.
-   * ^gmail
-   * ^inbox
    * @param {string} text - The anchor text of the link to insert.
    * @param {string} url - The URL of the link to insert.
    * @return {HTMLElement}
@@ -213,24 +174,18 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Whether or not this compose view is an inline reply. Inline replies are used by Gmail and Inbox when responding
    * to a message right underneath the original message. You typically will not need to use this.
-   * ^gmail
-   * ^inbox
    * @return {boolean}
    */
   isInlineReplyForm: function() {},
 
   /**
    * Whether or not this compose view is in full-screen mode.
-   * ^gmail
-   * ^inbox
    * @return {boolean}
    */
   isFullscreen: function() {},
 
   /**
    * This allows the fullscreen state to be changed.
-   * ^gmail
-   * ^inbox
    * @param  {boolean} minimized - If true, the compose view will be made fullscreen.
    * @return {void}
    */
@@ -238,16 +193,12 @@ var ComposeView = /** @lends ComposeView */ {
 
   /**
    * Whether or not this compose view is minimized.
-   * ^gmail
-   * ^inbox
    * @return {boolean}
    */
   isMinimized: function() {},
 
   /**
    * This allows the minimize state to be changed.
-   * ^gmail
-   * ^inbox
    * @param  {boolean} minimized - If true, the compose view will be minimized.
    * @return {void}
    */
@@ -258,8 +209,6 @@ var ComposeView = /** @lends ComposeView */ {
    * to a full compose view. Note that the current ComposeView object will emit
    * its destroy event, and a new ComposeView object will be created. This
    * function returns a promise for the new ComposeView.
-   * ^gmail
-   * ^inbox
    * @return {Promise.<ComposeView>}
    */
   popOut: function() {},
@@ -269,8 +218,6 @@ var ComposeView = /** @lends ComposeView */ {
    * Will not work for inline compose views (you can check for this via
    * {ComposeView.isInlineReplyForm()}). Returns a function which removes
    * the custom title bar color when called.
-   * ^gmail
-   * ^inbox
    * @param  {string} color - A valid CSS color string (rgba, hex, hsla, etc.)
    * @return {function}
    */
@@ -279,15 +226,12 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Whether or not this compose view is a reply. Replies can be inline or in a seperate pop out window.
    * You typically will not need to use this.
-   * ^gmail
    * @return {boolean}
    */
   isReply: function() {},
 
   /**
    * Sets the "To" field of the draft, replacing the existing values.
-   * ^gmail
-   * ^inbox
    * @param {string[]} emails - Array of email addresses to set.
    * @return {void}
    */
@@ -295,8 +239,6 @@ var ComposeView = /** @lends ComposeView */ {
 
   /**
    * Sets the "CC" field of the draft, replacing the existing values.
-   * ^gmail
-   * ^inbox
    * @param {string[]} emails - Array of email addresses to set.
    * @return {void}
    */
@@ -304,8 +246,6 @@ var ComposeView = /** @lends ComposeView */ {
 
   /**
    * Sets the "BCC" field of the draft, replacing the existing values.
-   * ^gmail
-   * ^inbox
    * @param {string[]} emails - Array of email addresses to set.
    * @return {void}
    */
@@ -314,16 +254,12 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Gets the contact info of the value selection in the "From" field. Gives
    * information about the user even if the From field isn't visible.
-   * ^gmail
-   * ^inbox
    * @return {Contact}
    */
   getFromContact: function() {},
 
   /**
    * Gets all of the options available in the "From" field.
-   * ^gmail
-   * ^inbox
    * @return {Contact[]}
    */
   getFromContactChoices: function() {},
@@ -332,8 +268,6 @@ var ComposeView = /** @lends ComposeView */ {
    * Changes the email address picked in the from field. Throws an exception if
    * the requested choice isn't available. No error is thrown if the From field
    * is not visible if the user's own email address is chosen.
-   * ^gmail
-   * ^inbox
    * @param {string} email - Address to set the from field to use.
    * @return {void}
    */
@@ -342,8 +276,6 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Replaces the entirety of the current subject of the compose
    * and replaces the subject with the passed in text
-   * ^gmail
-   * ^inbox
    * @param {string} text - text to use for the subject
    * @return {void}
    */
@@ -352,8 +284,6 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Replaces the entirety of the compose's email body with the html
    * value passed in.
-   * ^gmail
-   * ^inbox
    * @param {string} html - html to use for the body
    * @return {void}
    */
@@ -362,8 +292,6 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Replaces the entirety of the compose's email body with the text
    * value passed in.
-   * ^gmail
-   * ^inbox
    * @param {string} text - text to use for the body
    * @return {void}
    */
@@ -375,7 +303,6 @@ var ComposeView = /** @lends ComposeView */ {
    * This function's implementation is asynchronous, and the function returns a
    * Promise that resolves after the InboxSDK has handed the files to the page
    * to be uploaded and the file has begun uploading.
-   * ^gmail
    * @param {Blob[]} files
    * @return {Promise.<void>}
    */
@@ -388,7 +315,6 @@ var ComposeView = /** @lends ComposeView */ {
    * This function's implementation is asynchronous, and the function returns a
    * Promise that resolves after the InboxSDK has handed the files to the page
    * to be uploaded and the file has begun uploading.
-   * ^gmail
    * @param {Blob[]} files
    * @return {Promise.<void>}
    */
@@ -406,8 +332,6 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Fires when the compose view is closed. This can be triggered by the .close method, the user
    * clicking the close or discard buttons, the message being sent, etc.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#destroy
    * @param {string} messageID - If the composeView was closed without being sent and the draft
    * was saved, then this property will have the draft's message ID after it saved. Otherwise it
@@ -421,15 +345,11 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Fires when the compose view is discarded (deleted). 'discard' event
    * handlers will always be called before 'destroy' handlers.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#discard
    */
 
   /**
    * Fires when the From value is changed.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#fullscreenChanged
    * @param {boolean} fullscreen - tells whether the compose is now fullscreen
    */
@@ -439,8 +359,6 @@ var ComposeView = /** @lends ComposeView */ {
    * you can modify the {ComposeView} before the message actually starts sending. Note that multiple
    * applications may modify the message. This event is the only one which allows you to modify or
    * cancel the sent message. This event may be emitted multiple times for one message.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#presending
    * @param {function} cancel - a function you can call to cancel the sending of this message. This
    * will prevent the message from being sent.
@@ -451,8 +369,6 @@ var ComposeView = /** @lends ComposeView */ {
    * Because multiple extensions may choose to cancel the send, your extension
    * may receive a 'sendCanceled' event even if it did not initiate the cancellation.
    * This event may be emitted multiple times for one message.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#sendCanceled
    */
 
@@ -461,8 +377,6 @@ var ComposeView = /** @lends ComposeView */ {
    * received. Any modifications you make to the {ComposeView} at this point will not have an effect
    * as the AJAX request has already been sent. You'd typically use this event to record stats about
    * what messages are being sent.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#sending
    */
 
@@ -470,8 +384,6 @@ var ComposeView = /** @lends ComposeView */ {
    * Fires when the Gmail server has confirmed receiving the message. An event
    * object containing properties about the sent message will be passed to the
    * event listeners.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#sent
    * @param {Promise.<string>} getThreadID() - retrieves the thread ID of the message that was just sent
    * @param {Promise.<string>} getMessageID() - retrieves the message ID of the message that was just sent
@@ -479,23 +391,17 @@ var ComposeView = /** @lends ComposeView */ {
 
   /**
    * Fires whenever the message body's contents change.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#bodyChanged
    */
 
   /**
    * Fires when the From value is changed.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#fromContactChanged
    * @param {Contact} contact - the contact that was added to the "To" recipients
    */
 
   /**
    * Fires when any of the To/Cc/Bcc fields are changed.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#recipientsChanged
    * @param {Contact[]} to.added - a list of contacts that were added to the "To" recipients
    * @param {Contact[]} to.removed - a list of contacts that were removed from the "To" recipients
@@ -507,63 +413,47 @@ var ComposeView = /** @lends ComposeView */ {
 
   /**
    * Fires when a to contact is added.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#toContactAdded
    * @param {Contact} contact - the contact that was added to the "To" recipients
    */
 
   /**
    * Fires when a to contact is removed.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#toContactRemoved
    * @param {Contact} contact - the contact that was removed from the "To" recipients
    */
 
   /**
    * Fires when a CC contact is added.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#ccContactAdded
    * @param {Contact} contact - the contact that was added to the "CC" recipients
    */
 
   /**
    * Fires when a CC contact is removed.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#ccContactRemoved
    * @param {Contact} contact - the contact that was removed from the "CC" recipients
    */
 
   /**
    * Fires when BCC to contact is added.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#bccContactAdded
    * @param {Contact} contact - the contact that was added to the "BCC" recipients
    */
 
   /**
    * Fires when a BCC contact is removed.
-   * ^gmail
-   * ^inbox
    * @event ComposeView#bccContactRemoved
    * @param {Contact} contact - the contact that was removed from the "BCC" recipients
    */
 
   /**
    * Fires when the compose view is minimized
-   * ^gmail
-   * ^inbox
    * @event ComposeView#minimized
    */
 
   /**
    * Fires when the compose view is restored
-   * ^gmail
-   * ^inbox
    * @event ComposeView#restored
    */
 };

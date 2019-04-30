@@ -15,8 +15,6 @@ var Toolbars = /** @lends Toolbars */ {
    * Registers a toolbar button to appear on thread rows, above the thread list when some rows
    * are checked, and above threads.
    * This function returns a function which removes the button registration.
-   * ^gmail
-   * ^inbox
    * @param {ToolbarButtonDescriptor} toolbarButtonDescriptor - The options for the button.
    * @return {Function}
    */
@@ -26,8 +24,6 @@ var Toolbars = /** @lends Toolbars */ {
    * (This function is deprecated in favor of registerThreadButton.)
    * Registers a toolbar button to appear above any list page such as the Inbox or Sent Mail.
    * This function returns a function which removes the button registration.
-   * ^gmail
-   * ^inbox
    * @param {LegacyToolbarButtonDescriptor} toolbarButtonDescriptor - The options for the button.
    * @return {Function}
    */
@@ -37,8 +33,6 @@ var Toolbars = /** @lends Toolbars */ {
    * (This function is deprecated in favor of registerThreadButton.)
    * Registers a toolbar button to appear when viewing a thread.
    * This function returns a function which removes the button registration.
-   * ^gmail
-   * ^inbox
    * @param {LegacyToolbarButtonDescriptor} toolbarButtonDescriptor - The options for the button.
    * @return {Function}
    */
@@ -48,8 +42,6 @@ var Toolbars = /** @lends Toolbars */ {
    * Adds a button and dropdown to the "Global Toolbar". This is typically used to show a dropdown with general information
    * about your application. In Gmail this refers to the navigation area at the top right of the window and in
    *  Inbox it refers to the top level toolbar.
-   * ^gmail
-   * ^inbox
    * @param {AppToolbarButtonDescriptor} appToolbarButtonDescriptor - The options for the app toolbar button
    * @return {AppToolbarButtonView}
    */
