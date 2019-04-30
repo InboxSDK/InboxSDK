@@ -27,7 +27,27 @@ InboxSDK.load(1, 'simple-example', {
 				}
 				event.dropdown.el.textContent = 'hello world!';
 			}
-		});
+    });
+
+
+    var composeNotice;
+
+    composeView.addButton({
+			title: 'Compose Notice',
+			iconUrl: chrome.runtime.getURL('monkey.png'),
+			onClick: function(event) {
+				if (!composeNotice) {
+          composeNotice = composeView.addComposeNotice();
+          composeNotice.el.innerHTML = 's1 foo <b>bar</b>';
+          composeNotice.on('destroy', function() {
+            console.log('composeNotice destroyed');
+          });
+        } else {
+          composeNotice.destroy();
+          composeNotice = null;
+        }
+			}
+    });
 
 		var s1 = window._s1 = composeView.addStatusBar({height:20});
 		s1.el.innerHTML = 's1 foo <b>bar</b>';
@@ -56,7 +76,7 @@ InboxSDK.load(1, 'simple-example', {
 		s2.el.innerHTML = 's2 foo <b>bar</b>';
 		s2.on('destroy', function() {
 			console.log('s2 destroyed');
-		});
+    });
 
 		composeView.addButton({
 			title: 's2',

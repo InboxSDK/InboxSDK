@@ -181,7 +181,9 @@ InboxSDK.load(2, 'compose-stream-example').then(inboxSDK => {
 		composeView.on('bccContactAdded', console.log.bind(console, 'bccContactAdded'));
 		composeView.on('bccContactRemoved', console.log.bind(console, 'bccContactRemoved'));
 		composeView.on('recipientsChanged', console.log.bind(console, 'recipientsChanged'));
-		composeView.on('fromContactChanged', console.log.bind(console, 'fromContactChanged'));
+    composeView.on('fromContactChanged', console.log.bind(console, 'fromContactChanged'));
+    
+    composeView.on('responseTypeChanged', console.log.bind(console, 'responseTypeChanged'));
 
 		composeView.on('fullscreenChanged', console.log.bind(console, 'fullscreenChanged'));
 		composeView.on('minimized', console.log.bind(console, 'minimized'));
