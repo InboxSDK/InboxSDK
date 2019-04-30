@@ -15,6 +15,13 @@ var ComposeView = /** @lends ComposeView */ {
   addButton: function() {},
 
   /**
+   * Adds a notice bar above the compose area of an email.
+   * @param {ComposeNoticeDescriptor} composeNoticeDescriptor - The details of the compose notice to add to the compose view.
+   * @return {ComposeNoticeView}
+   */
+  addComposeNotice: function() {},
+
+  /**
    * Adds a horizontal bar underneath the control section of the ComposeView. This is useful to add more complex UI interactions but should be used sparingly.
    * ^gmail
    * @param {StatusBarDescriptor} statusBarDescriptor - The details of the status bar to add to the compose view.
@@ -209,6 +216,15 @@ var ComposeView = /** @lends ComposeView */ {
    * @return {HTMLElement}
    */
   insertLinkIntoBodyAtCursor: function() {},
+
+  /**
+   * Whether or not this compose view is initially of type forward as denoted
+   * by Gmail's "Type of response." Note, type of response can be changed
+   * at any time by the user. Listen to changes via the "responseTypeChanged"
+   * event.
+   * @return {boolean}
+   */
+  isForward: function() {},
 
   /**
    * Whether or not this compose view is an inline reply. Inline replies are used by Gmail and Inbox when responding
@@ -565,6 +581,12 @@ var ComposeView = /** @lends ComposeView */ {
    * ^gmail
    * ^inbox
    * @event ComposeView#restored
+   */
+
+  /**
+   * Fires when the compose view's response type is changed.
+   * @event ComposeView#responseTypeChanged
+   * @param {boolean} isForward
    */
 };
 
