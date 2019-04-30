@@ -103,6 +103,15 @@ class ComposeView extends EventEmitter {
 	}
 	*/
 
+  addComposeNotice(composeNoticeDescriptor?: {
+    height?: number,
+    orderHint?: number
+  }) {
+    return get(memberMap, this).composeViewImplementation.addComposeNotice(
+      composeNoticeDescriptor
+    );
+  }
+
   addStatusBar(statusBarDescriptor?: {
     height?: number,
     orderHint?: number,
@@ -279,6 +288,10 @@ class ComposeView extends EventEmitter {
       text,
       url
     );
+  }
+
+  isForward() {
+    return get(memberMap, this).composeViewImplementation.isForward();
   }
 
   isInlineReplyForm() {
