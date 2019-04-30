@@ -7,8 +7,7 @@ import type { TooltipDescriptor } from '../views/compose-button-view';
 export type ComposeNotice = EventEmitter & {
   destroy(): void,
   destroyed: boolean,
-  el: HTMLElement,
-  setHeight(height: number): void
+  el: HTMLElement
 };
 
 export type StatusBar = EventEmitter & {
@@ -79,10 +78,7 @@ export type ComposeViewDriver = {
   ensureAppButtonToolbarsAreClosed(): void,
   // addOuterSidebar(options: {title: string, el: HTMLElement}): void;
   // addInnerSidebar(options: {el: HTMLElement}): void;
-  addComposeNotice(options?: {
-    height?: number,
-    orderHint?: number
-  }): ComposeNotice,
+  addComposeNotice(options?: { orderHint?: number }): ComposeNotice,
   addStatusBar(options?: {
     height?: number,
     orderHint?: number,

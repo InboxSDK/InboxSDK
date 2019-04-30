@@ -830,7 +830,6 @@ class GmailComposeView {
 
   addComposeNotice(
     options: {
-      height?: number,
       orderHint?: number
     } = {}
   ): ComposeNotice {

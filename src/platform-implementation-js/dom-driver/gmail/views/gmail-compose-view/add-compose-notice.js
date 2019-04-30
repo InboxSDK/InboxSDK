@@ -14,16 +14,15 @@ import type { Stopper } from 'kefir-stopper';
 export default function addComposeNotice(
   gmailComposeView: GmailComposeView,
   options: {
-    height?: number,
     orderHint?: number
   }
 ) {
-  const { height, orderHint } = {
+  const { orderHint } = {
     orderHint: 0,
     ...options
   };
 
-  const composeNotice = new ComposeNotice(gmailComposeView, height, orderHint);
+  const composeNotice = new ComposeNotice(gmailComposeView, orderHint);
 
   gmailComposeView
     .getStopper()
@@ -37,11 +36,7 @@ class ComposeNotice extends SimpleElementView {
   _gmailComposeView: GmailComposeView;
   _stopper = kefirStopper();
 
-  constructor(
-    gmailComposeView: GmailComposeView,
-    height: number,
-    orderHint: number
-  ) {
+  constructor(gmailComposeView: GmailComposeView, orderHint: number) {
     let el = document.createElement('div');
     el.style.fontFamily = 'Roboto,RobotoDraft,Helvetica,Arial,sans-serif';
     el.style.fontSize = '14px';
@@ -51,10 +46,6 @@ class ComposeNotice extends SimpleElementView {
 
     el.className = 'inboxsdk__compose_notice';
     el.setAttribute('data-order-hint', String(orderHint));
-
-    if (height) {
-      this.setHeight(height);
-    }
 
     this._setComposeNotice();
   }
@@ -66,12 +57,6 @@ class ComposeNotice extends SimpleElementView {
 
     super.destroy();
     this._stopper.destroy();
-  }
-
-  isForward() {}
-
-  setHeight(height: number) {
-    this.el.style.height = height + 'px';
   }
 
   _setComposeNotice() {

@@ -820,10 +820,7 @@ class InboxComposeView {
   addInnerSidebar(options: { el: HTMLElement }): void {
     throw new Error('Not implemented');
   }
-  addComposeNotice(composeNoticeDescriptor?: {
-    height?: number,
-    orderHint?: number
-  }) {
+  addComposeNotice(composeNoticeDescriptor?: { orderHint?: number }) {
     throw new Error('Not implemented');
   }
   addStatusBar(options?: {
