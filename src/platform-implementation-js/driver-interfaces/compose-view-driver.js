@@ -4,10 +4,16 @@ import type Kefir from 'kefir';
 import type EventEmitter from 'events';
 import type { TooltipDescriptor } from '../views/compose-button-view';
 
-export type StatusBar = EventEmitter & {
-  el: HTMLElement,
-  destroyed: boolean,
+export type ComposeNotice = EventEmitter & {
   destroy(): void,
+  destroyed: boolean,
+  el: HTMLElement
+};
+
+export type StatusBar = EventEmitter & {
+  destroy(): void,
+  destroyed: boolean,
+  el: HTMLElement,
   setHeight(height: number): void
 };
 
@@ -72,12 +78,14 @@ export type ComposeViewDriver = {
   ensureAppButtonToolbarsAreClosed(): void,
   // addOuterSidebar(options: {title: string, el: HTMLElement}): void;
   // addInnerSidebar(options: {el: HTMLElement}): void;
+  addComposeNotice(options?: { orderHint?: number }): ComposeNotice,
   addStatusBar(options?: {
     height?: number,
     orderHint?: number,
     addAboveNativeStatusBar?: boolean
   }): StatusBar,
   hideNativeStatusBar(): () => void,
+  isForward(): boolean,
   isReply(): boolean,
   isInlineReplyForm(): boolean,
   getBodyElement(): HTMLElement,

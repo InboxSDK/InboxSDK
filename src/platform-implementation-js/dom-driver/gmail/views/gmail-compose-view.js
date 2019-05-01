@@ -36,6 +36,7 @@ import streamWaitFor from '../../../lib/stream-wait-for';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
 import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
+import addComposeNotice from './gmail-compose-view/add-compose-notice';
 import addStatusBar from './gmail-compose-view/add-status-bar';
 import insertHTMLatCursor from '../../../lib/dom/insert-html-at-cursor';
 import ensureGroupingIsOpen from './gmail-compose-view/ensure-grouping-is-open';
@@ -61,6 +62,7 @@ import insertLinkIntoBody from './gmail-compose-view/insert-link-into-body';
 import getAddressChangesStream from './gmail-compose-view/get-address-changes-stream';
 import getBodyChangesStream from './gmail-compose-view/get-body-changes-stream';
 import getRecipients from './gmail-compose-view/get-recipients';
+import getResponseTypeChangesStream from './gmail-compose-view/get-response-type-changes-stream';
 import getPresendingStream from '../../../driver-common/compose/getPresendingStream';
 import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
 import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
@@ -70,6 +72,7 @@ import overrideEditSubject from './gmail-compose-view/override-edit-subject';
 import * as fromManager from './gmail-compose-view/from-manager';
 
 import type {
+  ComposeNotice,
   ComposeViewDriver,
   StatusBar
 } from '../../../driver-interfaces/compose-view-driver';
@@ -117,14 +120,18 @@ class GmailComposeView {
     element: HTMLElement,
     xhrInterceptorStream: Kefir.Observable<*>,
     driver: GmailDriver,
-    options: { isInlineReplyForm: boolean, isStandalone: boolean }
+    options: {
+      isInlineReplyForm: boolean,
+      isStandalone: boolean
+    }
   ) {
     (this: ComposeViewDriver);
     this._element = element;
     this._element.classList.add('inboxsdk__compose');
 
-    if (options.isInlineReplyForm)
+    if (options.isInlineReplyForm) {
       this._element.classList.add('inboxsdk__compose_inlineReply');
+    }
 
     this._isInlineReplyForm = options.isInlineReplyForm;
     this._isStandalone = options.isStandalone;
@@ -525,8 +532,9 @@ class GmailComposeView {
   }
 
   _setupStreams() {
-    this._eventStream.plug(getBodyChangesStream(this));
     this._eventStream.plug(getAddressChangesStream(this));
+    this._eventStream.plug(getBodyChangesStream(this));
+    this._eventStream.plug(getResponseTypeChangesStream(this));
     this._eventStream.plug(
       getPresendingStream({
         element: this.getElement(),
@@ -820,6 +828,37 @@ class GmailComposeView {
     }
   }
 
+  addComposeNotice(
+    options: {
+      orderHint?: number
+    } = {}
+  ): ComposeNotice {
+    const composeNotice = addComposeNotice(this, options);
+
+    this._element.dispatchEvent(
+      new CustomEvent('resize', {
+        bubbles: false,
+        cancelable: false,
+        detail: null
+      })
+    );
+
+    Kefir.fromEvents(composeNotice, 'destroy')
+      .flatMap(delayAsap)
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        this._element.dispatchEvent(
+          new CustomEvent('resize', {
+            bubbles: false,
+            cancelable: false,
+            detail: null
+          })
+        );
+      });
+
+    return composeNotice;
+  }
+
   addStatusBar(
     options: {
       height?: number,
@@ -1100,6 +1139,10 @@ class GmailComposeView {
 
   attachInlineFiles(files: Blob[]): Promise<void> {
     return this._attachFiles(files, true);
+  }
+
+  isForward(): boolean {
+    return Boolean(this._element.querySelector('.Un.J-JN-M-I .mI'));
   }
 
   isReply(): boolean {

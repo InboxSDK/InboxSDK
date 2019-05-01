@@ -980,6 +980,13 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__recipient_row {
   display: flex;
 }
 
+.inboxsdk__compose_notice {
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  margin: 10px;
+  padding: 10px 16px;
+}
+
 .inboxsdk__recipient_row td.ok {
   height: 20px;
   padding: 0px !important;
