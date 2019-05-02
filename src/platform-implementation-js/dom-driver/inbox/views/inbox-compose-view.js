@@ -866,7 +866,7 @@ class InboxComposeView {
     return this._els.subject;
   }
 
-  getMetadataForm(): ?HTMLElement {
+  getMetadataFormElement(): HTMLElement {
     throw new Error('Not supported in Inbox.');
   }
 

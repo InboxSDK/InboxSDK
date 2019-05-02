@@ -22,7 +22,7 @@ InboxSDK.load(2, 'Hello World!').then(function(sdk){
 			},
 		});
 
-    const metaForm = composeView.getMetadataForm();
+    const metaForm = composeView.getMetadataFormElement();
     if (metaForm) {
       const bb = metaForm.getBoundingClientRect();
       const div = document.createElement('div');

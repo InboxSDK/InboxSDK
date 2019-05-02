@@ -158,7 +158,10 @@ class ComposeView extends EventEmitter {
   }
 
   getMetadataForm() {
-    return get(memberMap, this).composeViewImplementation.getMetadataForm();
+    return get(
+      memberMap,
+      this
+    ).composeViewImplementation.getMetadataFormElement();
   }
 
   getSubjectInput() {
