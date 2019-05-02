@@ -51,6 +51,14 @@ var ComposeView = /** @lends ComposeView */ {
   getBodyElement: function() {},
 
   /**
+   * Returns the HTMLElement of the metadata form of the compose view. This is
+   * the form that holds the To, CC, BCC, elements.
+   * ^gmail
+   * @return {HTMLElement}
+   */
+  getMetadataFormElement: function() {},
+
+  /**
    * Returns the initial message ID of the draft. If this is a new compose then the
    * message ID will be null. If the user has opened an existing draft then this function
    * returns the message ID of the draft when it was first opened.
