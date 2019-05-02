@@ -53,7 +53,6 @@ var ComposeView = /** @lends ComposeView */ {
   /**
    * Returns the HTMLElement of the metadata form of the compose view. This is
    * the form that holds the To, CC, BCC, elements.
-   * ^gmail
    * @return {HTMLElement}
    */
   getMetadataFormElement: function() {},
