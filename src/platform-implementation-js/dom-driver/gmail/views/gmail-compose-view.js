@@ -1197,6 +1197,12 @@ class GmailComposeView {
     return (this._element: any).querySelector('input[name=subjectbox]');
   }
 
+  getMetadataFormElement(): HTMLElement {
+    const container = this.getBodyElement().closest('.aoP.aoC');
+    if (!container) throw new Error('Could not find compose container');
+    return querySelector(container, 'form.bAs');
+  }
+
   getToRecipients(): Contact[] {
     return getRecipients(this, 'to');
   }
