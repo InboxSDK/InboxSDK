@@ -1,19 +1,25 @@
 'use strict';
 
-const script = document.createElement('script');
-script.textContent = `
-window._errors = [];
-document.documentElement.addEventListener('inboxSDKerror', event => {
-	window._errors.push(event.detail);
-});
-`;
-document.documentElement.appendChild(script).remove();
-document.documentElement.setAttribute('inboxsdk-emit-error-event', 'true');
+function setupErrorTracking() {
+  // Make a "_errors" global in the page's execution context that puppeteer can access.
+  const script = document.createElement('script');
+  script.textContent = `
+    window._errors = [];
+    document.documentElement.addEventListener('inboxSDKerror', event => {
+      window._errors.push(event.detail);
+    });
+  `;
+  document.documentElement.appendChild(script).remove();
+  document.documentElement.setAttribute('inboxsdk-emit-error-event', 'true');
+}
 
-function incrementStat(name) {
+setupErrorTracking();
+
+// Used to increment a counter that puppeteer can read.
+function incrementStat(attribute) {
 	document.head.setAttribute(
-		name,
-		Number(document.head.getAttribute(name))+1
+		attribute,
+		Number(document.head.getAttribute(attribute))+1
 	);
 }
 
