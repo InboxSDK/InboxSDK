@@ -12,8 +12,7 @@ module.exports = {
     headless: false,
     args: [
       `--disable-extensions-except=${pathToExtension}`,
-      `--load-extension=${pathToExtension}`,
-      '--window-size=1024,700'
+      `--load-extension=${pathToExtension}`
     ],
     userDataDir
   }
