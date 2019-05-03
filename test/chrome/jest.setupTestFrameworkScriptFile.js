@@ -12,7 +12,7 @@ if (process.env.DISABLE_FAIL_PAUSE !== 'true' && process.env.CI !== 'true') {
         return await fn.apply(this, arguments);
       } catch (err) {
         console.error(
-          'Pausing on error. Disable this by setting env variable DISABLE_FAIL_PAUSE=true'
+          'Pausing on error. Disable this by setting env variable DISABLE_FAIL_PAUSE=true.'
         );
         console.log(err);
         await jestPuppeteer.debug();
