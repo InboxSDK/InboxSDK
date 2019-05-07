@@ -24,13 +24,17 @@ it('works', async () => {
     console.log('need to sign in');
     const authInfo = await readAuthInfo();
 
-    await page.waitForSelector('input[type=email]');
-    await page.type('input[type=email]', testEmail, {
-      delay: 10 + Math.random() * 10
-    });
-    await page.click('div[role=button]#identifierNext');
-    await page.waitForSelector('input[type=password]');
-    await delay(1000);
+    await page.waitForSelector(
+      'input[type=email]:not([aria-hidden=true]), input[type=password]'
+    );
+    if (await page.$('input[type=email]:not([aria-hidden=true])')) {
+      await page.type('input[type=email]:not([aria-hidden=true])', testEmail, {
+        delay: 10 + Math.random() * 10
+      });
+      await page.click('div[role=button]#identifierNext');
+      await page.waitForSelector('input[type=password]');
+      await delay(1000);
+    }
     await page.type('input[type=password]', authInfo[testEmail].password, {
       delay: 10 + Math.random() * 10
     });
