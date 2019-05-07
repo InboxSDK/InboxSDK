@@ -3,6 +3,11 @@
 // TODO this should be unnecessary, but https://github.com/smooth-code/jest-puppeteer/issues/106
 jest.setTimeout(4 * 24 * 60 * 60 * 1000);
 
+// Gmail emits nonsense page errors from time to time.
+// jest-puppeteer catches these and re-emits as uncaughtException in the node process, which
+// we don't want.
+page.removeAllListeners('pageerror');
+
 if (process.env.DISABLE_FAIL_PAUSE !== 'true' && process.env.CI !== 'true') {
   const originalIt = global.jasmine.getEnv().it;
 
