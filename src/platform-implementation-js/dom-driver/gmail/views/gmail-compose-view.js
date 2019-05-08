@@ -915,7 +915,7 @@ class GmailComposeView {
   }
 
   replaceSendButton(el: HTMLElement): () => void {
-    const sendButton = this.getSendButton();
+    const sendButton = this.getSendButtonGroup();
     const sendAndArchive = this.getSendAndArchiveButton();
 
     sendButton.style.display = 'none';
