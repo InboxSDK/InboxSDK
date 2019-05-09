@@ -3,6 +3,7 @@
 import signIn from './lib/signIn';
 import delay from 'pdelay';
 import waitFor from '../../src/platform-implementation-js/lib/wait-for';
+import pexpect from 'expect-puppeteer';
 
 const testEmail = 'inboxsdktest@gmail.com';
 
@@ -64,16 +65,16 @@ for (const mode of ['full', 'reply']) {
       // Open a compose at the start
       switch (mode) {
         case 'reply': {
-          await page.click('tr.zA[id] span.bog');
+          await pexpect(page).toClick('tr.zA[id] span.bog');
           await page.waitForFunction(() => document.location.hash !== '#inbox');
           await page.waitForSelector('span.ams.bkH[role=link]', {
             visible: true
           });
-          await page.click('span.ams.bkH[role=link]'); // reply button
+          await pexpect(page).toClick('span.ams.bkH[role=link]'); // reply button
           break;
         }
         case 'full': {
-          await page.click('[gh=cm]');
+          await pexpect(page).toClick('[gh=cm]');
           await page.waitForSelector('.inboxsdk__compose');
           break;
         }
