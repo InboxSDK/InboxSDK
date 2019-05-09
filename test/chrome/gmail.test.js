@@ -14,6 +14,16 @@ beforeAll(async () => {
 });
 
 beforeEach(async () => {
+  // close any open composeviews
+  while (await page.$('.inboxsdk__compose')) {
+    await page.click('.inboxsdk__compose [role=button][aria-label^="Discard"]');
+  }
+  // go to inbox if necessary
+  if (!page.url().endsWith('#inbox')) {
+    await page.evaluate(() => {
+      document.location.hash = '#inbox';
+    });
+  }
   // reset all counters
   await page.$eval('head', head => {
     head
