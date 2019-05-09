@@ -92,6 +92,7 @@
     "immutability-helper": "^2.0.0",
     "isnumber": "^1.0.0",
     "jest": "^24.8.0",
+    "jest-circus": "^24.8.0",
     "jest-puppeteer": "^4.1.1",
     "jsdoc": "~3.4.3",
     "kefir": "^3.8.3",
