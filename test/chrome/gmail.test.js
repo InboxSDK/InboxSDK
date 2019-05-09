@@ -1,69 +1,62 @@
 /* @flow */
 
-import readAuthInfo from './lib/readAuthInfo';
-import googleTotp from '../lib/googleTotp';
+import signIn from './lib/signIn';
 import delay from 'pdelay';
 import waitFor from '../../src/platform-implementation-js/lib/wait-for';
+
+const testEmail = 'inboxsdktest@gmail.com';
 
 // https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md
 
 beforeAll(async () => {
   await page.setViewport({ width: 1024, height: 768 });
+  await signIn();
 });
 
-const testEmail = 'inboxsdktest@gmail.com';
-
-it('works', async () => {
-  await page.goto('https://mail.google.com');
-  if (page.url().startsWith('https://www.google.com/gmail/about/')) {
-    await page.goto(
-      'https://accounts.google.com/AccountChooser?service=mail&continue=https://mail.google.com/mail/'
-    );
-  }
-  if (page.url().startsWith('https://accounts.google.com/')) {
-    console.log('need to sign in');
-    const authInfo = await readAuthInfo();
-
-    await page.waitForSelector(
-      'input[type=email]:not([aria-hidden=true]), input[type=password]'
-    );
-    if (await page.$('input[type=email]:not([aria-hidden=true])')) {
-      await page.type('input[type=email]:not([aria-hidden=true])', testEmail, {
-        delay: 10 + Math.random() * 10
+beforeEach(async () => {
+  // reset all counters
+  await page.$eval('head', head => {
+    head
+      .getAttributeNames()
+      .filter(name => name.startsWith('data-test-'))
+      .forEach(name => {
+        head.removeAttribute(name);
       });
-      await page.click('div[role=button]#identifierNext');
-      await page.waitForSelector('input[type=password]');
-      await delay(1000);
-    }
-    await page.type('input[type=password]', authInfo[testEmail].password, {
-      delay: 10 + Math.random() * 10
-    });
-    await page.click('div[role=button]#passwordNext');
+  });
+});
 
-    await delay(1000);
-    if (
-      page
-        .url()
-        .startsWith('https://accounts.google.com/signin/v2/challenge/totp')
-    ) {
-      await page.waitForSelector('input[type=tel]#totpPin');
+function waitForCounter(attribute: string, goal: number): Promise<number> {
+  return page.waitForFunction(
+    (attribute, goal) => {
+      const value = Number((document.head: any).getAttribute(attribute));
+      if (value >= goal) {
+        return value;
+      }
+      return null;
+    },
+    { polling: 100 },
+    attribute,
+    goal
+  );
+}
 
-      const twoFACode = googleTotp(authInfo[testEmail].twofactor);
-      await page.type('input[type=tel]#totpPin', twoFACode, {
-        delay: 10 + Math.random() * 10
-      });
-      await page.click('div[role=button]#totpNext');
-    }
-  }
-  await waitFor(() => page.url().startsWith('https://mail.google.com/mail/'));
-  await waitFor(() => page.url().endsWith('#inbox'));
+function getCounter(attribute: string): Promise<number> {
+  return page.$eval(
+    'head',
+    (head, attribute) => Number(head.getAttribute(attribute)),
+    attribute
+  );
+}
 
-  await page.waitForSelector('.inboxsdk__appid_warning');
-  await page.click('.inboxsdk__appid_warning .inboxsdk__x_close_button');
+async function openCompose() {
+  await page.click('[gh=cm]');
+  await page.waitForSelector('.inboxsdk__compose');
+}
 
-  // Test a regular compose
+test('compose button, discard', async () => {
   await openCompose();
 
+  await page.waitForSelector('.test__tooltipButton');
   expect(await page.$eval('.test__tooltipButton', el => el.textContent)).toBe(
     'Counter: 0'
   );
@@ -78,27 +71,46 @@ it('works', async () => {
 
   await page.click('.inboxsdk__compose [role=button][aria-label^="Discard"]');
 
-  // expect(
-  //   await page.$eval('head', head => Number(head.getAttribute('data-test-composeDiscardEmitted')))
-  // ).toBe(1);
-  // expect(
-  //   await page.$eval('head', head => Number(head.getAttribute('data-test-composeDestroyEmitted')))
-  // ).toBe(1);
-
-  // Test presending/sending/sent events
-  // await openCompose();
-  // await page.type('.inboxsdk__compose textarea[aria-label="To"]', testEmail);
-  // await page.type('.inboxsdk__compose input[aria-label="Subject"]', `InboxSDK Inbox ComposeView events test @ ${Date.now()}`);
-  // await page.type('.inboxsdk__compose div[contenteditable=true][aria-label="Message Body"]', 'Test message!');
-
-  // // console.log(
-  // //   'head data-sdk-load',
-  // //   await page.$eval('head', head => head.getAttribute('data-sdk-load'))
-  // // );
-  // await jestPuppeteer.debug();
+  expect(await getCounter('data-test-composeDiscardEmitted')).toBe(1);
+  expect(await getCounter('data-test-composeDestroyEmitted')).toBe(1);
 });
 
-async function openCompose() {
-  await page.click('[gh=cm]');
-  await page.waitForSelector('.inboxsdk__compose');
-}
+test('compose presending, sending, sent', async () => {
+  await openCompose();
+  await page.type('.inboxsdk__compose textarea[aria-label="To"]', testEmail);
+  await page.type(
+    '.inboxsdk__compose input[aria-label="Subject"]',
+    'cancel send'
+  );
+  await page.type(
+    '.inboxsdk__compose div[contenteditable=true][aria-label="Message Body"]',
+    'Test message!'
+  );
+  await page.click('.inboxsdk__compose div[role=button][aria-label^="Send"]');
+
+  expect(await getCounter('data-test-composePresendingEmitted')).toBe(1);
+  expect(await getCounter('data-test-composeSendCanceledEmitted')).toBe(1);
+  expect(await getCounter('data-test-composeSendingEmitted')).toBe(0);
+  expect(await getCounter('data-test-composeSentEmitted')).toBe(0);
+  expect(await getCounter('data-test-composeDiscardEmitted')).toBe(0);
+  expect(await getCounter('data-test-composeDestroyEmitted')).toBe(0);
+
+  await page.$eval('.inboxsdk__compose input[aria-label="Subject"]', input => {
+    input.value = '';
+  });
+  await page.type(
+    '.inboxsdk__compose input[aria-label="Subject"]',
+    `InboxSDK Inbox ComposeView events test @ ${Date.now()}`
+  );
+
+  await page.click('.inboxsdk__compose div[role=button][aria-label^="Send"]');
+
+  await waitForCounter('data-test-composeSentEmitted', 1);
+
+  expect(await getCounter('data-test-composePresendingEmitted')).toBe(2);
+  expect(await getCounter('data-test-composeSendCanceledEmitted')).toBe(1);
+  expect(await getCounter('data-test-composeSendingEmitted')).toBe(1);
+  expect(await getCounter('data-test-composeSentEmitted')).toBe(1);
+  expect(await getCounter('data-test-composeDiscardEmitted')).toBe(0);
+  expect(await getCounter('data-test-composeDestroyEmitted')).toBe(1);
+});
