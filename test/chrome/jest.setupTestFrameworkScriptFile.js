@@ -9,21 +9,23 @@ jest.setTimeout(4 * 24 * 60 * 60 * 1000);
 page.removeAllListeners('pageerror');
 
 if (process.env.DISABLE_FAIL_PAUSE !== 'true' && process.env.CI !== 'true') {
-  const originalIt = global.jasmine.getEnv().it;
+  for (const name of ['it', 'fit']) {
+    const originalMethod = global.jasmine.getEnv()[name];
 
-  global.jasmine.getEnv().it = function(name, fn, timeout) {
-    const newFn = async function() {
-      try {
-        return await fn.apply(this, arguments);
-      } catch (err) {
-        console.error(
-          'Pausing on error. Disable this by setting env variable DISABLE_FAIL_PAUSE=true.'
-        );
-        console.log(err);
-        await jestPuppeteer.debug();
-        throw err;
-      }
+    global.jasmine.getEnv()[name] = function(name, fn, timeout) {
+      const newFn = async function() {
+        try {
+          return await fn.apply(this, arguments);
+        } catch (err) {
+          console.error(
+            'Pausing on error. Disable this by setting env variable DISABLE_FAIL_PAUSE=true.'
+          );
+          console.log(err);
+          await jestPuppeteer.debug();
+          throw err;
+        }
+      };
+      return originalMethod.call(this, name, newFn, timeout);
     };
-    return originalIt.call(this, name, newFn, timeout);
-  };
+  }
 }
