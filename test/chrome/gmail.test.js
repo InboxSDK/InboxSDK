@@ -66,7 +66,9 @@ for (const mode of ['full', 'reply']) {
         case 'reply': {
           await page.click('tr.zA[id] span.bog');
           await page.waitForFunction(() => document.location.hash !== '#inbox');
-          await page.waitForSelector('span.ams.bkH[role=link]');
+          await page.waitForSelector('span.ams.bkH[role=link]', {
+            visible: true
+          });
           await page.click('span.ams.bkH[role=link]'); // reply button
           break;
         }
@@ -102,6 +104,7 @@ for (const mode of ['full', 'reply']) {
 
     test('compose presending, sending, sent', async () => {
       if (mode === 'reply') {
+        await page.waitForSelector('.inboxsdk__compose div.aoD.hl[tabindex]');
         await page.click('.inboxsdk__compose div.aoD.hl[tabindex]');
         while (await page.$('.inboxsdk__compose .wO.nr span.vN.bfK[email]')) {
           await page.keyboard.press('Backspace');
