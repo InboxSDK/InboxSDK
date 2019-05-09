@@ -38,7 +38,7 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 
 				if (removePromise) {
 					removePromise.then(() => {
-						span.remove();
+						console.log('thread removed -- time to do any necessary clean up!')
 					})
 				}
 				return span;
