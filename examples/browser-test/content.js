@@ -73,7 +73,7 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 			incrementStat('data-test-composeDiscardEmitted')
 		));
 		composeView.on('presending', ({cancel}) => {
-			if(composeView.getSubject().indexOf('cancel send') > -1) {
+			if (composeView.getBodyElement().textContent.indexOf('cancel send') > -1) {
 				cancel();
 			}
 			incrementStat('data-test-composePresendingEmitted');

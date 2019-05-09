@@ -63,64 +63,102 @@ async function openCompose() {
   await page.waitForSelector('.inboxsdk__compose');
 }
 
-test('compose button, discard', async () => {
-  await openCompose();
+for (const mode of ['full', 'reply']) {
+  describe(`${mode} compose`, () => {
+    beforeEach(async () => {
+      switch (mode) {
+        case 'reply': {
+          await page.click('tr.zA[id] span.bog');
+          await page.waitForFunction(() => document.location.hash !== '#inbox');
+          do {
+            await page.click('span.ams.bkH[role=link]'); // reply button
+          } while (await page.$('span.ams.bkH[role=link]'));
+          break;
+        }
+        case 'full': {
+          await openCompose();
+          break;
+        }
+      }
+    });
 
-  await page.waitForSelector('.test__tooltipButton');
-  expect(await page.$eval('.test__tooltipButton', el => el.textContent)).toBe(
-    'Counter: 0'
-  );
-  await page.click('.test__tooltipButton');
-  expect(await page.$eval('.test__tooltipButton', el => el.textContent)).toBe(
-    'Counter: 1'
-  );
+    test('compose button, discard', async () => {
+      await page.waitForSelector('.test__tooltipButton');
+      expect(
+        await page.$eval('.test__tooltipButton', el => el.textContent)
+      ).toBe('Counter: 0');
+      await page.click('.test__tooltipButton');
+      expect(
+        await page.$eval('.test__tooltipButton', el => el.textContent)
+      ).toBe('Counter: 1');
 
-  await page.click('.inboxsdk__composeButton[aria-label="Monkeys!"]');
-  expect(await page.$('.test__tooltipButton')).toBe(null);
-  expect(await page.$('div.test__dropdownContent')).not.toBe(null);
+      await page.click('.inboxsdk__composeButton[aria-label="Monkeys!"]');
+      expect(await page.$('.test__tooltipButton')).toBe(null);
+      expect(await page.$('div.test__dropdownContent')).not.toBe(null);
 
-  await page.click('.inboxsdk__compose [role=button][aria-label^="Discard"]');
+      await page.click(
+        '.inboxsdk__compose [role=button][aria-label^="Discard"]'
+      );
 
-  expect(await getCounter('data-test-composeDiscardEmitted')).toBe(1);
-  expect(await getCounter('data-test-composeDestroyEmitted')).toBe(1);
-});
+      expect(await getCounter('data-test-composeDiscardEmitted')).toBe(1);
+      expect(await getCounter('data-test-composeDestroyEmitted')).toBe(1);
+    });
 
-test('compose presending, sending, sent', async () => {
-  await openCompose();
-  await page.type('.inboxsdk__compose textarea[aria-label="To"]', testEmail);
-  await page.type(
-    '.inboxsdk__compose input[aria-label="Subject"]',
-    'cancel send'
-  );
-  await page.type(
-    '.inboxsdk__compose div[contenteditable=true][aria-label="Message Body"]',
-    'Test message!'
-  );
-  await page.click('.inboxsdk__compose div[role=button][aria-label^="Send"]');
+    test('compose presending, sending, sent', async () => {
+      if (mode === 'reply') {
+        await page.click('.inboxsdk__compose div.aoD.hl[tabindex]');
+        while (await page.$('.inboxsdk__compose .wO.nr span.vN.bfK[email]')) {
+          await page.keyboard.press('Backspace');
+        }
+      }
+      await page.type(
+        '.inboxsdk__compose textarea[aria-label="To"]',
+        testEmail
+      );
+      if (mode === 'full') {
+        await page.type(
+          '.inboxsdk__compose input[aria-label="Subject"]',
+          `InboxSDK Inbox ComposeView events test @ ${Date.now()}`
+        );
+      }
+      await page.type(
+        '.inboxsdk__compose div[contenteditable=true][aria-label="Message Body"]',
+        'Test message! cancel send'
+      );
+      await page.click(
+        '.inboxsdk__compose div[role=button][aria-label^="Send"]'
+      );
 
-  expect(await getCounter('data-test-composePresendingEmitted')).toBe(1);
-  expect(await getCounter('data-test-composeSendCanceledEmitted')).toBe(1);
-  expect(await getCounter('data-test-composeSendingEmitted')).toBe(0);
-  expect(await getCounter('data-test-composeSentEmitted')).toBe(0);
-  expect(await getCounter('data-test-composeDiscardEmitted')).toBe(0);
-  expect(await getCounter('data-test-composeDestroyEmitted')).toBe(0);
+      expect(await getCounter('data-test-composePresendingEmitted')).toBe(1);
+      expect(await getCounter('data-test-composeSendCanceledEmitted')).toBe(1);
+      expect(await getCounter('data-test-composeSendingEmitted')).toBe(0);
+      expect(await getCounter('data-test-composeSentEmitted')).toBe(0);
+      expect(await getCounter('data-test-composeDiscardEmitted')).toBe(0);
+      expect(await getCounter('data-test-composeDestroyEmitted')).toBe(0);
 
-  await page.$eval('.inboxsdk__compose input[aria-label="Subject"]', input => {
-    input.value = '';
+      await page.$eval(
+        '.inboxsdk__compose div[contenteditable=true][aria-label="Message Body"]',
+        input => {
+          input.textContent = '';
+        }
+      );
+      await page.type(
+        '.inboxsdk__compose div[contenteditable=true][aria-label="Message Body"]',
+        'Test message!'
+      );
+
+      await page.click(
+        '.inboxsdk__compose div[role=button][aria-label^="Send"]'
+      );
+
+      await waitForCounter('data-test-composeSentEmitted', 1);
+
+      expect(await getCounter('data-test-composePresendingEmitted')).toBe(2);
+      expect(await getCounter('data-test-composeSendCanceledEmitted')).toBe(1);
+      expect(await getCounter('data-test-composeSendingEmitted')).toBe(1);
+      expect(await getCounter('data-test-composeSentEmitted')).toBe(1);
+      expect(await getCounter('data-test-composeDiscardEmitted')).toBe(0);
+      expect(await getCounter('data-test-composeDestroyEmitted')).toBe(1);
+    });
   });
-  await page.type(
-    '.inboxsdk__compose input[aria-label="Subject"]',
-    `InboxSDK Inbox ComposeView events test @ ${Date.now()}`
-  );
-
-  await page.click('.inboxsdk__compose div[role=button][aria-label^="Send"]');
-
-  await waitForCounter('data-test-composeSentEmitted', 1);
-
-  expect(await getCounter('data-test-composePresendingEmitted')).toBe(2);
-  expect(await getCounter('data-test-composeSendCanceledEmitted')).toBe(1);
-  expect(await getCounter('data-test-composeSendingEmitted')).toBe(1);
-  expect(await getCounter('data-test-composeSentEmitted')).toBe(1);
-  expect(await getCounter('data-test-composeDiscardEmitted')).toBe(0);
-  expect(await getCounter('data-test-composeDestroyEmitted')).toBe(1);
-});
+}
