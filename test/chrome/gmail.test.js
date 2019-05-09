@@ -66,9 +66,8 @@ for (const mode of ['full', 'reply']) {
         case 'reply': {
           await page.click('tr.zA[id] span.bog');
           await page.waitForFunction(() => document.location.hash !== '#inbox');
-          do {
-            await page.click('span.ams.bkH[role=link]'); // reply button
-          } while (await page.$('span.ams.bkH[role=link]'));
+          await page.waitForSelector('span.ams.bkH[role=link]');
+          await page.click('span.ams.bkH[role=link]'); // reply button
           break;
         }
         case 'full': {
