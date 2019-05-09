@@ -58,14 +58,10 @@ function getCounter(attribute: string): Promise<number> {
   );
 }
 
-async function openCompose() {
-  await page.click('[gh=cm]');
-  await page.waitForSelector('.inboxsdk__compose');
-}
-
 for (const mode of ['full', 'reply']) {
   describe(`${mode} compose`, () => {
     beforeEach(async () => {
+      // Open a compose at the start
       switch (mode) {
         case 'reply': {
           await page.click('tr.zA[id] span.bog');
@@ -76,7 +72,8 @@ for (const mode of ['full', 'reply']) {
           break;
         }
         case 'full': {
-          await openCompose();
+          await page.click('[gh=cm]');
+          await page.waitForSelector('.inboxsdk__compose');
           break;
         }
       }
