@@ -24,6 +24,6 @@ test('timeout', async () => {
   await expect(waitForAsync(fn, 50, 10)).rejects.toThrowError(
     'waitForAsync timeout'
   );
-  expect(fn.mock.calls.length).toBeGreaterThan(2);
+  expect(fn.mock.calls.length).toBeGreaterThanOrEqual(1);
   expect(fn.mock.calls.length).toBeLessThanOrEqual(6);
 });
