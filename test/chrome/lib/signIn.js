@@ -25,19 +25,26 @@ export default async function signIn() {
       });
       await page.click('div[role=button]#identifierNext');
       await page.waitForSelector('input[type=password]');
-      await delay(1000);
+      await delay(1000); // wait for animation to finish
     }
     await page.type('input[type=password]', authInfo[testEmail].password, {
       delay: 10 + Math.random() * 10
     });
     await page.click('div[role=button]#passwordNext');
 
-    await delay(1000);
+    await page.waitForFunction(
+      () =>
+        !document.location.href.startsWith(
+          'https://accounts.google.com/signin/v2/sl/pwd'
+        )
+    );
+    await delay(1500); // wait for animation to finish
     if (
       page
         .url()
         .startsWith('https://accounts.google.com/signin/v2/challenge/totp')
     ) {
+      console.log('needs 2fa');
       await page.waitForSelector('input[type=tel]#totpPin');
 
       const twoFACode = googleTotp(authInfo[testEmail].twofactor);
