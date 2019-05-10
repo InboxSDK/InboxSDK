@@ -8,7 +8,13 @@ const testEmail = 'inboxsdktest@gmail.com';
 
 export default async function signIn() {
   const authInfo = await readAuthInfo();
-  await page.goto('https://mail.google.com');
+  try {
+    await page.goto('https://mail.google.com', { waitUntil: 'networkidle2' });
+  } catch (err) {
+    console.error('Gmail load timed out. Trying again...');
+    console.log(err);
+    await page.goto('https://mail.google.com', { waitUntil: 'networkidle2' });
+  }
   if (page.url().startsWith('https://www.google.com/gmail/about/')) {
     await page.goto(
       'https://accounts.google.com/AccountChooser?service=mail&continue=https://mail.google.com/mail/'
