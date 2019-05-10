@@ -12,6 +12,17 @@ const testEmail = 'inboxsdktest@gmail.com';
 beforeAll(async () => {
   await page.setViewport({ width: 1024, height: 768 });
   await signIn();
+  expect(await getCounter('data-sdk-load')).toBe(1);
+});
+
+afterEach(async () => {
+  const errors = await page.evaluate(() => {
+    const errors = window._errors;
+    window._errors = [];
+    return errors;
+  });
+  expect(Array.isArray(errors)).toBe(true);
+  expect(errors).toEqual([]);
 });
 
 beforeEach(async () => {
@@ -143,6 +154,9 @@ describe('compose', () => {
         expect(await getCounter('data-test-composeSentEmitted')).toBe(0);
         expect(await getCounter('data-test-composeDiscardEmitted')).toBe(0);
         expect(await getCounter('data-test-composeDestroyEmitted')).toBe(0);
+
+        await waitForCounter('data-test-compose-getDraftID', 1);
+        expect(await getCounter('data-test-compose-getDraftID')).toBe(1);
 
         await page.$eval(
           '.inboxsdk__compose div[contenteditable=true][aria-label="Message Body"]',
