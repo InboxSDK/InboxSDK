@@ -222,10 +222,6 @@ export default class CustomMessageView extends SafeEventEmitter {
           throw new Error(`Unrecognized view state "${newViewState}"`);
       }
     });
-
-    this._el.addEventListener('inboxsdk-shoulddestroy', () => {
-      this.destroy();
-    });
   }
 
   // Three cases:

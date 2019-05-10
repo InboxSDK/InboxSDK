@@ -53,7 +53,7 @@ class GmailThreadView {
     numberNativeMessagesHidden: ?number,
     unmountPromise: Promise<void>
   ) => ?HTMLElement;
-  _customMessages: Array<CustomMessageView>;
+  _customMessageViews: Array<CustomMessageView>;
 
   constructor(
     element: HTMLElement,
@@ -68,7 +68,7 @@ class GmailThreadView {
 
     this._eventStream = kefirBus();
     this._messageViewDrivers = [];
-    this._customMessages = [];
+    this._customMessageViews = [];
 
     this._logAddonElementInfo().catch(err =>
       this._driver.getLogger().error(err)
@@ -176,20 +176,9 @@ class GmailThreadView {
       throw new Error('Parent must be defined.');
     }
 
-    const customMessageViews = Array.from(
-      this._element.parentElement.querySelectorAll(
-        '.inboxsdk__custom_message_view'
-      )
+    this._customMessageViews.map(customMessageView =>
+      customMessageView.destroy()
     );
-    for (let customMessageView of customMessageViews) {
-      customMessageView.dispatchEvent(
-        new CustomEvent('inboxsdk-shoulddestroy', {
-          bubbles: false,
-          cancelable: false,
-          detail: null
-        })
-      );
-    }
   }
 
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
@@ -258,7 +247,7 @@ class GmailThreadView {
       descriptorStream,
       this._hiddenCustomMessageNoticeProvider,
       newCustomMessageView => {
-        this._customMessages.push(newCustomMessageView);
+        this._customMessageViews.push(newCustomMessageView);
         this._readyStream.onValue(
           async (): any => {
             const parentElement = this._element.parentElement;
@@ -721,17 +710,9 @@ class GmailThreadView {
                 '.inboxsdk__custom_message_view'
               )
             );
-            for (let customMessageView of customMessageViews) {
-              customMessageView.dispatchEvent(
-                new CustomEvent('inboxsdk-setViewState', {
-                  bubbles: false,
-                  cancelable: false,
-                  detail: {
-                    newViewState: 'EXPANDED'
-                  }
-                })
-              );
-            }
+            this._customMessageViews.map(customMessageView =>
+              customMessageView.setViewState('EXPANDED')
+            );
           });
       }
     }
@@ -761,17 +742,10 @@ class GmailThreadView {
                 '.inboxsdk__custom_message_view'
               )
             );
-            for (let customMessageView of customMessageViews) {
-              customMessageView.dispatchEvent(
-                new CustomEvent('inboxsdk-setViewState', {
-                  bubbles: false,
-                  cancelable: false,
-                  detail: {
-                    newViewState: 'COLLAPSED'
-                  }
-                })
-              );
-            }
+
+            this._customMessageViews.map(customMessageView =>
+              customMessageView.setViewState('COLLAPSED')
+            );
           });
       }
     }
