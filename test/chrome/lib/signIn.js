@@ -1,59 +1,71 @@
 /* @flow */
-declare var browser;
 
 import googleTotp from '../../lib/googleTotp';
 import readAuthInfo from './readAuthInfo';
+import delay from 'pdelay';
 
-export default function signIn() {
-  const authInfo = readAuthInfo();
+const testEmail = 'inboxsdktest@gmail.com';
 
-  browser.url('https://inbox.google.com');
-  browser.waitForVisible('input[type=email], input[name=Email]');
-  browser.pause(700);
-  browser.setValue(
-    'input[type=email], input[name=Email]',
-    'inboxsdktest@gmail.com'
-  );
-  browser.click('div[role=button]#identifierNext, input#next');
-  browser.waitForVisible('input[type=password], input[name=Passwd]');
-  browser.pause(700);
-  browser.setValue(
-    'input[type=password], input[name=Passwd]',
-    authInfo['inboxsdktest@gmail.com'].password
-  );
-  browser.click('div[role=button]#passwordNext, input#signIn');
-  browser.waitForVisible('input[name=totpPin], input[name=Pin]');
-  browser.pause(700);
-  browser.setValue(
-    'input[name=totpPin], input[name=Pin]',
-    googleTotp(authInfo['inboxsdktest@gmail.com'].twofactor)
-  );
-
-  const oldTitle = browser.getTitle();
-  browser.click('div[role=button]#totpNext, input#submit');
-  browser.waitUntil(() => {
-    try {
-      return browser.getTitle() !== oldTitle;
-    } catch (err) {
-      // The first call to getTitle() seems prone to throwing a timeout error
-      console.error('caught getTitle error', err);
-      return false;
-    }
-  });
-
-  // Deal with an interstitial page.
-  if (!browser.getTitle().startsWith('Inbox ')) {
-    const scrolldownBtn = browser.element(
-      'div[role=button][aria-label="Scroll to agree"] img[src*="_arrow_down_"]'
-    );
-    if (scrolldownBtn.state === 'success') {
-      scrolldownBtn.click();
-    }
-    browser.pause(500);
-    browser.click(
-      'div[role=button]:not([aria-label]):not([title]), input[type="submit"]#smsauth-interstitial-confirmbutton'
+export default async function signIn() {
+  const authInfo = await readAuthInfo();
+  try {
+    await page.goto('https://mail.google.com', { waitUntil: 'networkidle2' });
+  } catch (err) {
+    console.error('Gmail load timed out. Trying again...');
+    console.log(err);
+    await page.goto('https://mail.google.com', { waitUntil: 'networkidle2' });
+  }
+  if (page.url().startsWith('https://www.google.com/gmail/about/')) {
+    await page.goto(
+      'https://accounts.google.com/AccountChooser?service=mail&continue=https://mail.google.com/mail/'
     );
   }
+  if (page.url().startsWith('https://accounts.google.com/')) {
+    console.log('need to sign in');
+    await page.waitForSelector(
+      'input[type=email]:not([aria-hidden=true]), input[type=password]'
+    );
+    if (await page.$('input[type=email]:not([aria-hidden=true])')) {
+      await page.type('input[type=email]:not([aria-hidden=true])', testEmail, {
+        delay: 10 + Math.random() * 10
+      });
+      await page.click('div[role=button]#identifierNext');
+      await page.waitForSelector('input[type=password]');
+      await delay(1000); // wait for animation to finish
+    }
+    await page.type('input[type=password]', authInfo[testEmail].password, {
+      delay: 10 + Math.random() * 10
+    });
+    await page.click('div[role=button]#passwordNext');
 
-  browser.waitUntil(() => browser.getTitle().startsWith('Inbox '));
+    await page.waitForFunction(
+      () =>
+        !document.location.href.startsWith(
+          'https://accounts.google.com/signin/v2/sl/pwd'
+        )
+    );
+    await delay(1500); // wait for animation to finish
+    if (
+      page
+        .url()
+        .startsWith('https://accounts.google.com/signin/v2/challenge/totp')
+    ) {
+      console.log('needs 2fa');
+      await page.waitForSelector('input[type=tel]#totpPin');
+
+      const twoFACode = googleTotp(authInfo[testEmail].twofactor);
+      await page.type('input[type=tel]#totpPin', twoFACode, {
+        delay: 10 + Math.random() * 10
+      });
+      await page.click('div[role=button]#totpNext');
+    }
+  }
+  await page.waitForFunction(
+    () =>
+      document.location.href.startsWith('https://mail.google.com/mail/') &&
+      document.location.href.endsWith('#inbox'),
+    { polling: 100 }
+  );
+  await page.waitForSelector('.inboxsdk__appid_warning');
+  await page.click('.inboxsdk__appid_warning .inboxsdk__x_close_button');
 }

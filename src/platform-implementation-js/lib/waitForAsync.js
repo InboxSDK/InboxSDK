@@ -1,0 +1,27 @@
+/* @flow */
+
+import delay from 'pdelay';
+
+export default async function waitForAsync<T>(
+  condition: () => Promise<?T>,
+  timeout: number = 120 * 1000,
+  steptime: number = 250
+): Promise<T> {
+  // make this error here so we have a sensible stack.
+  const timeoutError = new Error('waitForAsync timeout');
+  const timeoutTime = Date.now() + timeout;
+
+  // eslint-disable-next-line no-constant-condition
+  while (true) {
+    const result: ?T = await condition();
+    if (result) {
+      return result;
+    }
+    await delay(steptime);
+    if (Date.now() > timeoutTime) {
+      throw timeoutError;
+    }
+  }
+  // eslint-disable-next-line no-unreachable
+  throw new Error();
+}

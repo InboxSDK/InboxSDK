@@ -150,16 +150,16 @@ platform-implementation bundle, you'll need to run Chrome with the
 This project has different kinds of unit tests and integration tests.
 
 All .js files under `__tests__` and all `*.test.js` files are tests executed by
-Jest. All new (non-integration) tests should be Jest tests.
+Jest. All new tests should be Jest tests.
 
-There are (presently inactive) Selenium-based browser integration tests in `test/chrome/*.js` files.
-These are the only tests which test the InboxSDK against the live Gmail and
-Inbox sites. These tests are primarily about checking whether Gmail or Inbox
-have broken support with us, and our CI system runs these for us. These tests
-require that the InboxSDK has been built first and that the
+The `*.test.js` files inside of `test/chrome` are Puppeteer-based integration tests.
+These tests open a browser with a test InboxSDK extension and test that various
+InboxSDK features work correctly in Gmail. These tests are primarily about checking
+whether Gmail has broken support with us, and our CI system runs these for us. These
+tests require that the InboxSDK has been built first and that the
 ".inboxsdk_test_secret" file or the INBOXSDK_TEST_SECRET environment variable
 contains the decryption key for the Google test account credentials. These
-tests can be run with `yarn run test-browser`.
+tests can be run with `yarn puppeteer`.
 
 # Implementation Notes
 
@@ -222,7 +222,10 @@ elements.
 The account switcher widget in Gmail is built a bit differently, and the notes
 about Inbox should be referred to instead for it.
 
-### Inbox
+### ~~Inbox~~ Modern Google
+
+(Inbox support is no more, but this knowledge is true of some newer Google web
+app code and parts of Gmail.)
 
 Like Gmail, Inbox uses a lot of randomly generated class names, but the class
 names appear to be regenerated every few weeks. CSS class names, id values,

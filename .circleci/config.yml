@@ -1,45 +1,65 @@
 version: 2
 jobs:
-  build:
+  unit_tests:
     working_directory: ~/StreakYC/GmailSDK
     parallelism: 1
-    shell: /bin/bash --login
-
     docker:
-      - image: streak/circleci:1
-        auth:
-          username: $DOCKER_HUB_USERNAME
-          password: $DOCKER_HUB_PASSWORD
+      - image: circleci/node:jessie-browsers
     steps:
       - checkout
       - restore_cache:
           keys:
-            - v1-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - v1-dep-{{ .Branch }}-
-            - v1-dep-master-
-            - v1-dep-
+            - v2-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - v2-dep-{{ .Branch }}-
+            - v2-dep-master-
+            - v2-dep-
       - run: yarn
       - save_cache:
-          key: v1-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: v2-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules/
             - ~/.yarn/bin/
             - ~/.config/yarn/global/
-            - ~/.cache/yarn
+            - ~/.cache
       - run:
           name: Unit Tests
           command: yarn test
-
-      # TODO fix and re-enable
-      # - run:
-      #     name: Integration Test
-      #     command: if [ -n "$INBOXSDK_TEST_SECRET" ]; then ./node_modules/.bin/gulp -s && ./node_modules/.bin/wdio; fi
-
-      - store_artifacts:
-          path: chromeTestOutput
+  integration:
+    working_directory: ~/StreakYC/GmailSDK
+    parallelism: 1
+    docker:
+      - image: circleci/node:jessie-browsers
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v2-integration-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - v2-integration-{{ .Branch }}-
+            - v2-integration-master-
+            - v2-integration-
+      - run: yarn
+      - run:
+          name: Build
+          command: |
+            if ! [ -n "$INBOXSDK_TEST_SECRET" ]; then exit; fi
+            yarn gulp -s
+      - run:
+          name: Integration Test
+          command: |
+            if ! [ -n "$INBOXSDK_TEST_SECRET" ]; then exit; fi
+            yarn puppeteer
+      - save_cache:
+          key: v2-integration-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          paths:
+            - node_modules/
+            - ~/.yarn/bin/
+            - ~/.config/yarn/global/
+            - ~/.cache
+            - /tmp/jest_puppeteer_userDataDir
 
 workflows:
   version: 2
   all_workflow:
     jobs:
-      - build
+      - unit_tests
+      - integration
