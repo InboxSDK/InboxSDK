@@ -255,3 +255,16 @@ describe('sidebar', () => {
     ).toBe('Counter: 2');
   });
 });
+
+describe('custom view', () => {
+  it('works', async () => {
+    expect(await page.$('.test__customRouteElement')).toBe(null);
+
+    await page.click(
+      '.inboxsdk__navItem .inboxsdk__navItem_name[title="custom view"]'
+    );
+    expect(
+      await page.$eval('.test__customRouteElement', el => el.textContent)
+    ).toBe('beep 123');
+  });
+});

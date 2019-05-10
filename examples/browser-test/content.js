@@ -255,5 +255,27 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 				}
 			}
 		];
-	});
+  });
+
+  sdk.NavMenu.addNavItem({
+    name: 'custom view',
+    iconUrl: chrome.runtime.getURL('monkey.png'),
+    routeID: 'example/123',
+    subtitle: 'subtitle',
+    accessory: {
+      type: 'DROPDOWN_BUTTON',
+      buttonBackgroundColor: 'red',
+      onClick: function(event) {
+        event.dropdown.el.innerHTML = 'Hello world!';
+      }
+    }
+  });
+
+  sdk.Router.handleCustomRoute('example/:id', customRouteView => {
+    const div = document.createElement('div');
+    div.className = 'test__customRouteElement';
+    div.textContent = 'beep ' + customRouteView.getParams().id;
+
+    customRouteView.getElement().appendChild(div);
+  });
 }).catch(rethrow);
