@@ -222,7 +222,10 @@ elements.
 The account switcher widget in Gmail is built a bit differently, and the notes
 about Inbox should be referred to instead for it.
 
-### Inbox
+### ~~Inbox~~ Modern Google
+
+(Inbox support is no more, but this knowledge is true of some newer Google web
+app code and parts of Gmail.)
 
 Like Gmail, Inbox uses a lot of randomly generated class names, but the class
 names appear to be regenerated every few weeks. CSS class names, id values,
