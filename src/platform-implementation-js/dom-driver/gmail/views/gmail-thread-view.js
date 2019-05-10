@@ -252,8 +252,6 @@ class GmailThreadView {
   addCustomMessage(
     descriptorStream: Kefir.Observable<CustomMessageDescriptor>
   ): CustomMessageView {
-    if (!this._element.parentElement) throw new Error('missing parent element');
-
     const customMessageView = new CustomMessageView(
       descriptorStream,
       this._hiddenCustomMessageNoticeProvider,
