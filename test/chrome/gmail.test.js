@@ -65,6 +65,7 @@ for (const mode of ['full', 'reply']) {
       // Open a compose at the start
       switch (mode) {
         case 'reply': {
+          await page.waitForSelector('tr.zA[id] span.bog');
           await pexpect(page).toClick('tr.zA[id] span.bog');
           await page.waitForFunction(() => document.location.hash !== '#inbox');
           await page.waitForSelector('span.ams.bkH[role=link]', {
