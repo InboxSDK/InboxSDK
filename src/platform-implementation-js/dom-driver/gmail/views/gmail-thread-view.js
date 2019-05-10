@@ -53,6 +53,7 @@ class GmailThreadView {
     numberNativeMessagesHidden: ?number,
     unmountPromise: Promise<void>
   ) => ?HTMLElement;
+  _customMessages: Array<CustomMessageView>;
 
   constructor(
     element: HTMLElement,
@@ -67,6 +68,7 @@ class GmailThreadView {
 
     this._eventStream = kefirBus();
     this._messageViewDrivers = [];
+    this._customMessages = [];
 
     this._logAddonElementInfo().catch(err =>
       this._driver.getLogger().error(err)
@@ -256,6 +258,7 @@ class GmailThreadView {
       descriptorStream,
       this._hiddenCustomMessageNoticeProvider,
       newCustomMessageView => {
+        this._customMessages.push(newCustomMessageView);
         this._readyStream.onValue(
           async (): any => {
             const parentElement = this._element.parentElement;
@@ -283,41 +286,7 @@ class GmailThreadView {
                 customMessageElement =>
                   customMessageElement !== newCustomMessageView.getElement()
               )
-              .map(customMessageElement => ({
-                sortDatetime:
-                  parseInt(
-                    customMessageElement.getAttribute('data-inboxsdk-sortdate')
-                  ) || 0,
-                getViewState: () => {
-                  if (
-                    customMessageElement.classList.contains(
-                      'inboxsdk__custom_message_view_hidden'
-                    )
-                  ) {
-                    return 'HIDDEN';
-                  } else if (
-                    customMessageElement.classList.contains(
-                      'inboxsdk__custom_message_view_collapsed'
-                    )
-                  ) {
-                    return 'COLLAPSED';
-                  }
-                  return 'EXPANDED';
-                },
-                setViewState: newViewState => {
-                  customMessageElement.dispatchEvent(
-                    new CustomEvent('inboxsdk-setViewState', {
-                      bubbles: false,
-                      cancelable: false,
-                      detail: {
-                        newViewState
-                      }
-                    })
-                  );
-                },
-                isNativeMessage: false,
-                element: customMessageElement
-              }));
+              .map(this._messageDescriptorFromCustomMessage);
 
             const messages = [...nativeMessages, ...customMessages].sort(
               (a, b) => a.sortDatetime - b.sortDatetime
@@ -345,7 +314,9 @@ class GmailThreadView {
             messages.splice(
               insertBeforeIndex > 0 ? insertBeforeIndex : messages.length,
               0,
-              this._messageDescriptorFromCustomMessage(newCustomMessageView)
+              this._messageDescriptorFromCustomMessage(
+                newCustomMessageView.getElement()
+              )
             );
 
             // Go through and toggle view states as needed
@@ -414,16 +385,40 @@ class GmailThreadView {
     return customMessageView;
   }
 
-  _messageDescriptorFromCustomMessage(cmv: CustomMessageView) {
-    const date = cmv.getSortDate();
-    const datetime = date ? date.getTime() : null;
-
+  _messageDescriptorFromCustomMessage(customMessageElement: HTMLElement) {
     return {
-      sortDatetime: datetime || 0,
-      getViewState: () => cmv.getViewState(),
-      setViewState: newState => cmv.setViewState(newState),
+      sortDatetime:
+        parseInt(customMessageElement.getAttribute('data-inboxsdk-sortdate')) ||
+        0,
+      getViewState: () => {
+        if (
+          customMessageElement.classList.contains(
+            'inboxsdk__custom_message_view_hidden'
+          )
+        ) {
+          return 'HIDDEN';
+        } else if (
+          customMessageElement.classList.contains(
+            'inboxsdk__custom_message_view_collapsed'
+          )
+        ) {
+          return 'COLLAPSED';
+        }
+        return 'EXPANDED';
+      },
+      setViewState: newViewState => {
+        customMessageElement.dispatchEvent(
+          new CustomEvent('inboxsdk-setViewState', {
+            bubbles: false,
+            cancelable: false,
+            detail: {
+              newViewState
+            }
+          })
+        );
+      },
       isNativeMessage: false,
-      element: cmv.getElement()
+      element: customMessageElement
     };
   }
 
