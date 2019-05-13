@@ -4,9 +4,7 @@ import googleTotp from '../../lib/googleTotp';
 import readAuthInfo from './readAuthInfo';
 import delay from 'pdelay';
 
-const testEmail = 'inboxsdktest@gmail.com';
-
-export default async function signIn() {
+export default async function signIn(testEmail: string) {
   const authInfo = await readAuthInfo();
   try {
     await page.goto('https://mail.google.com', { waitUntil: 'networkidle2' });
@@ -58,13 +56,15 @@ export default async function signIn() {
         delay: 10 + Math.random() * 10
       });
       await page.click('div[role=button]#totpNext');
+      await page.waitForFunction(
+        () =>
+          !document.location.href.startsWith(
+            'https://accounts.google.com/signin/v2/challenge/totp'
+          )
+      );
     }
     await delay(1500); // wait for animation to finish
-    if (
-      page
-        .url()
-        .startsWith('https://accounts.google.com/b/0/SmsAuthInterstitial')
-    ) {
+    if (page.url().includes('SmsAuthInterstitial')) {
       console.log('got sms interstitial screen');
       await page.click('#smsauth-interstitial-remindbutton');
     }
@@ -75,6 +75,4 @@ export default async function signIn() {
       document.location.href.endsWith('#inbox'),
     { polling: 100 }
   );
-  await page.waitForSelector('.inboxsdk__appid_warning');
-  await page.click('.inboxsdk__appid_warning .inboxsdk__x_close_button');
 }
