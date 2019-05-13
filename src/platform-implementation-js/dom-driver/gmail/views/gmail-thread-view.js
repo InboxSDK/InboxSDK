@@ -176,7 +176,7 @@ class GmailThreadView {
       throw new Error('Parent must be defined.');
     }
 
-    this._customMessageViews.map(customMessageView =>
+    this._customMessageViews.forEach(customMessageView =>
       customMessageView.destroy()
     );
   }
