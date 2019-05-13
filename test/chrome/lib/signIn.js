@@ -59,6 +59,15 @@ export default async function signIn() {
       });
       await page.click('div[role=button]#totpNext');
     }
+    await delay(1500); // wait for animation to finish
+    if (
+      page
+        .url()
+        .startsWith('https://accounts.google.com/b/0/SmsAuthInterstitial')
+    ) {
+      console.log('got sms interstitial screen');
+      await page.click('#smsauth-interstitial-remindbutton');
+    }
   }
   await page.waitForFunction(
     () =>
