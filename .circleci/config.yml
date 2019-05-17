@@ -9,13 +9,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v2-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - v2-dep-{{ .Branch }}-
-            - v2-dep-master-
-            - v2-dep-
+            - v3-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - v3-dep-{{ .Branch }}-
+            - v3-dep-master-
+            - v3-dep-
       - run: yarn
       - save_cache:
-          key: v2-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: v3-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules/
             - ~/.yarn/bin/
@@ -33,10 +33,10 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v2-integration-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - v2-integration-{{ .Branch }}-
-            - v2-integration-master-
-            - v2-integration-
+            - v3-integration-{{ .Branch }}-{{ checksum "yarn.lock" }}
+            - v3-integration-{{ .Branch }}-
+            - v3-integration-master-
+            - v3-integration-
       - run: yarn
       - run:
           name: Build
@@ -49,7 +49,7 @@ jobs:
             if ! [ -n "$INBOXSDK_TEST_SECRET" ]; then exit; fi
             yarn puppeteer
       - save_cache:
-          key: v2-integration-{{ .Branch }}-{{ checksum "yarn.lock" }}
+          key: v3-integration-{{ .Branch }}-{{ checksum "yarn.lock" }}
           paths:
             - node_modules/
             - ~/.yarn/bin/
