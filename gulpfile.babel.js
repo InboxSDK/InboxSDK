@@ -143,7 +143,7 @@ type BrowserifyTaskOptions = {|
 async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
   const { entry, destName, hotPort, disableMinification } = options;
 
-  var willMinify = args.minify && !disableMinification;
+  const willMinify = args.minify && !disableMinification;
 
   process.env.VERSION = await getVersion();
   const browserifyHmrOptions =
@@ -176,9 +176,11 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
 
   async function buildBundle(): Promise<void> {
     const sourcemapPipeline = lazyPipe()
-      .pipe(
-        addsrc.prepend,
-        willMinify || args.production ? ['./src/inboxsdk-js/header.js'] : []
+      .pipe(() =>
+        gulpif(
+          Boolean(willMinify || args.production),
+          addsrc.prepend('./src/inboxsdk-js/header.js')
+        )
       )
       .pipe(
         sourcemaps.init,
@@ -204,7 +206,10 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
     const result = bundle
       .pipe(source(destName))
       .pipe(
-        gulpif(willMinify || args.production, streamify(sourcemapPipeline()))
+        gulpif(
+          Boolean(willMinify || args.production),
+          streamify(sourcemapPipeline())
+        )
       )
       .pipe(destAtomic('./dist/'));
 
