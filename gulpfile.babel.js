@@ -130,152 +130,149 @@ async function getBrowserifyHmrOptions(port: number) {
   return { url, tlskey, tlscert, port };
 }
 
-function browserifyTask(name, deps, entry, destname, port: ?number) {
-  var willMinify = args.minify && (args.singleBundle || name !== 'sdk');
+type BrowserifyTaskOptions = {|
+  entry: string,
+  destName: string,
+  hotPort?: number,
+  disableMinification?: boolean,
+  afterBuild?: () => Promise<void>,
+  noSourceMapComment?: boolean,
+  sourceMappingURLPrefix?: string
+|};
 
-  gulp.task(name, deps, async function() {
-    process.env.VERSION = await getVersion();
-    const browserifyHmrOptions = port && (await getBrowserifyHmrOptions(port));
+async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
+  const { entry, destName, hotPort, disableMinification } = options;
 
-    let bundler = browserify({
-      entries: entry,
-      debug: true,
-      fullPaths: args.fullPaths,
-      cache: {},
-      packageCache: {}
-    })
-      .transform(
-        babelify.configure({
-          plugins: [
-            [
-              'transform-inline-environment-variables',
-              {
-                include: ['NODE_ENV', 'IMPLEMENTATION_URL', 'VERSION']
-              }
-            ]
-          ]
-        })
-      )
-      .transform('redirectify', { global: true });
+  const willMinify = args.minify && !disableMinification;
 
-    if (args.hot && port) {
-      bundler.plugin(require('browserify-hmr'), browserifyHmrOptions);
-    }
+  process.env.VERSION = await getVersion();
+  const browserifyHmrOptions =
+    hotPort && (await getBrowserifyHmrOptions(hotPort));
 
-    function buildBundle(): Promise<void> {
-      const sourcemapPipeline = lazyPipe()
-        .pipe(
-          addsrc.prepend,
-          willMinify || args.production ? ['./src/inboxsdk-js/header.js'] : []
-        )
-        .pipe(
-          sourcemaps.init,
-          { loadMaps: true }
-        )
-        .pipe(
-          concat,
-          destname
-        )
-        .pipe(() => gulpif(willMinify, uglify({ preserveComments: 'some' })))
-        .pipe(
-          sourcemaps.write,
-          args.production ? '.' : null,
-          {
-            // don't include sourcemap comment in the inboxsdk.js file that we
-            // distribute to developers since it'd always be broken.
-            addComment: !args.production || name != 'sdk',
-            sourceMappingURLPrefix:
-              name == 'injected' ? 'https://www.inboxsdk.com/build/' : null
-          }
-        );
-
-      const bundle = bundler.bundle();
-      const result = bundle
-        .pipe(source(destname))
-        .pipe(
-          gulpif(willMinify || args.production, streamify(sourcemapPipeline()))
-        )
-        .pipe(destAtomic('./dist/'));
-
-      return new Promise((resolve, reject) => {
-        const errCb = _.once(err => {
-          reject(err);
-          result.end();
-        });
-        bundle.on('error', errCb);
-        result.on('error', errCb);
-        result.on('finish', resolve);
-      });
-    }
-
-    if (args.watch) {
-      bundler = watchify(bundler);
-      Kefir.fromEvents(bundler, 'update')
-        .throttle(10)
-        .onValue(() => {
-          (async () => {
-            try {
-              gutil.log("Rebuilding '" + gutil.colors.cyan(name) + "'");
-              await buildBundle();
-              if (name === 'sdk') {
-                await setupExamples();
-              }
-              gutil.log(
-                "Finished rebuild of '" + gutil.colors.cyan(name) + "'"
-              );
-            } catch (err) {
-              gutil.log(
-                gutil.colors.red('Error') +
-                  " rebuilding '" +
-                  gutil.colors.cyan(name) +
-                  "':",
-                err.message
-              );
+  let bundler = browserify({
+    entries: entry,
+    debug: true,
+    fullPaths: args.fullPaths,
+    cache: {},
+    packageCache: {}
+  })
+    .transform(
+      babelify.configure({
+        plugins: [
+          [
+            'transform-inline-environment-variables',
+            {
+              include: ['NODE_ENV', 'IMPLEMENTATION_URL', 'VERSION']
             }
-          })();
-        });
+          ]
+        ]
+      })
+    )
+    .transform('redirectify', { global: true });
+
+  if (args.hot && hotPort) {
+    bundler.plugin(require('browserify-hmr'), browserifyHmrOptions);
+  }
+
+  async function buildBundle(): Promise<void> {
+    const sourcemapPipeline = lazyPipe()
+      .pipe(() =>
+        gulpif(
+          Boolean(willMinify || args.production),
+          addsrc.prepend('./src/inboxsdk-js/header.js')
+        )
+      )
+      .pipe(
+        sourcemaps.init,
+        { loadMaps: true }
+      )
+      .pipe(
+        concat,
+        destName
+      )
+      .pipe(() =>
+        gulpif(
+          willMinify,
+          uglify({
+            preserveComments: 'some',
+            mangle: {
+              except: ['Generator', 'GeneratorFunction']
+            }
+          })
+        )
+      )
+      .pipe(
+        sourcemaps.write,
+        args.production ? '.' : null,
+        {
+          // don't include sourcemap comment in the inboxsdk.js file that we
+          // distribute to developers since it'd always be broken.
+          addComment: !options.noSourceMapComment,
+          sourceMappingURLPrefix: options.sourceMappingURLPrefix
+        }
+      );
+
+    const bundle = bundler.bundle();
+    const result = bundle
+      .pipe(source(destName))
+      .pipe(
+        gulpif(
+          Boolean(willMinify || args.production),
+          streamify(sourcemapPipeline())
+        )
+      )
+      .pipe(destAtomic('./dist/'));
+
+    await new Promise((resolve, reject) => {
+      const errCb = _.once(err => {
+        reject(err);
+        result.end();
+      });
+      bundle.on('error', errCb);
+      result.on('error', errCb);
+      result.on('finish', resolve);
+    });
+
+    if (options.afterBuild) {
+      await options.afterBuild();
     }
+  }
 
-    return buildBundle();
-  });
+  if (args.watch) {
+    bundler = watchify(bundler);
+    Kefir.fromEvents(bundler, 'update')
+      .throttle(10)
+      .onValue(() => {
+        (async () => {
+          try {
+            gutil.log("Rebuilding '" + gutil.colors.cyan(destName) + "'");
+            await buildBundle();
+            gutil.log(
+              "Finished rebuild of '" + gutil.colors.cyan(destName) + "'"
+            );
+          } catch (err) {
+            gutil.log(
+              gutil.colors.red('Error') +
+                " rebuilding '" +
+                gutil.colors.cyan(destName) +
+                "':",
+              err.message
+            );
+          }
+        })();
+      });
+  }
+
+  return buildBundle();
 }
 
-if (args.singleBundle) {
-  gulp.task('default', ['sdk', 'examples']);
-  browserifyTask(
-    'sdk',
-    ['injected'],
-    './src/inboxsdk-js/main-DEV.js',
-    sdkFilename,
-    3140
-  );
-  gulp.task('imp', () => {
-    throw new Error('No separate imp bundle in singleBundle bundle mode');
+gulp.task('injected', () => {
+  return browserifyTask({
+    entry: './src/injected-js/main.js',
+    destName: 'injected.js',
+    hotPort: 3142,
+    sourceMappingURLPrefix: 'https://www.inboxsdk.com/build/'
   });
-} else {
-  gulp.task('default', ['sdk', 'imp', 'examples']);
-  browserifyTask('sdk', [], './src/inboxsdk-js/main.js', sdkFilename);
-  browserifyTask(
-    'imp',
-    ['injected'],
-    './src/platform-implementation-js/main.js',
-    'platform-implementation.js',
-    3141
-  );
-}
-
-browserifyTask(
-  'injected',
-  [],
-  './src/injected-js/main.js',
-  'injected.js',
-  3142
-);
-
-gulp.task('examples', ['sdk'], setupExamples);
-
-gulp.task('server', [args.singleBundle ? 'sdk' : 'imp'], () => {
-  return require('./live/app').run();
 });
 
 gulp.task('clean', cb => {
@@ -406,3 +403,49 @@ function isFileEligbleForDocs(filename: string): boolean {
       ))
   );
 }
+
+if (args.singleBundle) {
+  gulp.task(
+    'sdk',
+    gulp.series('injected', function sdkBundle() {
+      return browserifyTask({
+        entry: './src/inboxsdk-js/main-DEV.js',
+        destName: sdkFilename,
+        hotPort: 3140,
+        afterBuild: setupExamples
+      });
+    })
+  );
+  gulp.task('imp', () => {
+    throw new Error('No separate imp bundle in singleBundle bundle mode');
+  });
+  gulp.task('default', gulp.parallel('sdk'));
+} else {
+  gulp.task('sdk', () => {
+    return browserifyTask({
+      entry: './src/inboxsdk-js/main.js',
+      destName: sdkFilename,
+      disableMinification: true,
+      afterBuild: setupExamples,
+      noSourceMapComment: true
+    });
+  });
+  gulp.task(
+    'imp',
+    gulp.series('injected', function impBundle() {
+      return browserifyTask({
+        entry: './src/platform-implementation-js/main.js',
+        destName: 'platform-implementation.js',
+        hotPort: 3141
+      });
+    })
+  );
+  gulp.task('default', gulp.parallel('sdk', 'imp'));
+}
+
+gulp.task(
+  'server',
+  gulp.series(args.singleBundle ? 'sdk' : 'imp', function serverRun() {
+    return require('./live/app').run();
+  })
+);
