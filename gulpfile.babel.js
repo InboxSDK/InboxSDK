@@ -190,7 +190,17 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
         concat,
         destName
       )
-      .pipe(() => gulpif(willMinify, uglify({ preserveComments: 'some' })))
+      .pipe(() =>
+        gulpif(
+          willMinify,
+          uglify({
+            preserveComments: 'some',
+            mangle: {
+              except: ['Generator', 'GeneratorFunction']
+            }
+          })
+        )
+      )
       .pipe(
         sourcemaps.write,
         args.production ? '.' : null,
