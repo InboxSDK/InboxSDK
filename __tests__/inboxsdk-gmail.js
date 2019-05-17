@@ -44,7 +44,8 @@ test('loads in gmail mock', () => {
         'inboxsdk__style',
         'inboxsdk__shared_style',
         '__inboxsdk_extensionSeenErrors',
-        '__coverage__'
+        '__coverage__',
+        'regeneratorRuntime'
       ]
     ).map(x => `window.${x}`);
     expect(newGlobals).toEqual([]);
