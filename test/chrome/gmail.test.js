@@ -3,7 +3,6 @@
 import signIn from './lib/signIn';
 import delay from 'pdelay';
 import waitFor from '../../src/platform-implementation-js/lib/wait-for';
-import pexpect from 'expect-puppeteer';
 
 const testEmail = 'inboxsdktest@gmail.com';
 
@@ -72,7 +71,7 @@ function getCounter(attribute: string): Promise<number> {
 
 async function openThread() {
   await page.waitForSelector('tr.zA[id] span.bog', { visible: true });
-  await pexpect(page).toClick('tr.zA[id] span.bog');
+  await page.click('tr.zA[id] span.bog');
   await page.waitForFunction(() => document.location.hash !== '#inbox');
 }
 
@@ -87,11 +86,11 @@ describe('compose', () => {
             await page.waitForSelector('span.ams.bkH[role=link]', {
               visible: true
             });
-            await pexpect(page).toClick('span.ams.bkH[role=link]'); // reply button
+            await page.click('span.ams.bkH[role=link]'); // reply button
             break;
           }
           case 'full': {
-            await pexpect(page).toClick('[gh=cm]');
+            await page.click('[gh=cm]');
             await page.waitForSelector('.inboxsdk__compose');
             break;
           }
