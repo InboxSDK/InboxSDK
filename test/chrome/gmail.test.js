@@ -70,8 +70,9 @@ function getCounter(attribute: string): Promise<number> {
 }
 
 async function openThread() {
-  await page.waitForSelector('tr.zA[id] span.bog', { visible: true });
-  await page.click('tr.zA[id] span.bog');
+  await page
+    .waitForSelector('tr.zA[id] span.bog', { visible: true })
+    .then(el => el.click());
   await page.waitForFunction(() => document.location.hash !== '#inbox');
 }
 
@@ -83,10 +84,12 @@ describe('compose', () => {
         switch (mode) {
           case 'reply': {
             await openThread();
-            await page.waitForSelector('span.ams.bkH[role=link]', {
-              visible: true
-            });
-            await page.click('span.ams.bkH[role=link]'); // reply button
+            // reply button
+            await page
+              .waitForSelector('span.ams.bkH[role=link]', {
+                visible: true
+              })
+              .then(el => el.click());
             break;
           }
           case 'full': {
