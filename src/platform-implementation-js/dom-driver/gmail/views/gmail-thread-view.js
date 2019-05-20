@@ -695,15 +695,6 @@ class GmailThreadView {
         ])
           .takeUntilBy(this._stopper)
           .onValue(() => {
-            if (!this._element.parentElement) {
-              throw new Error('Parent must be defined.');
-            }
-
-            const customMessageViews = Array.from(
-              this._element.parentElement.querySelectorAll(
-                '.inboxsdk__custom_message_view'
-              )
-            );
             this._customMessageViews.forEach(customMessageView =>
               customMessageView.setViewState('EXPANDED')
             );
@@ -727,16 +718,6 @@ class GmailThreadView {
         ])
           .takeUntilBy(this._stopper)
           .onValue(() => {
-            if (!this._element.parentElement) {
-              throw new Error('Parent must be defined.');
-            }
-
-            const customMessageViews = Array.from(
-              this._element.parentElement.querySelectorAll(
-                '.inboxsdk__custom_message_view'
-              )
-            );
-
             this._customMessageViews.forEach(customMessageView =>
               customMessageView.setViewState('COLLAPSED')
             );
