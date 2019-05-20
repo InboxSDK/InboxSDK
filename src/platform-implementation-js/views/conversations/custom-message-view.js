@@ -316,7 +316,7 @@ export default class CustomMessageView extends SafeEventEmitter {
       true
     );
 
-    const ignoredHiddenMessages = !!hiddenIndicatorElement;
+    const nativeHiddenNoticePresent = !!hiddenIndicatorElement;
     if (!hiddenIndicatorElement) {
       hiddenIndicatorElement = this._findContiguousHiddenIndicator(
         currentMessageIndex,
@@ -347,7 +347,7 @@ export default class CustomMessageView extends SafeEventEmitter {
       this._setupNativeMessageUnhideOnDestroy(hiddenIndicatorElement);
       this._updateNativeHiddenNotice(
         hiddenIndicatorElement,
-        ignoredHiddenMessages
+        nativeHiddenNoticePresent
       );
     }
   }
