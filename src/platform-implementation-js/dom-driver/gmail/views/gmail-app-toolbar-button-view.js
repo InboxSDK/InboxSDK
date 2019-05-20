@@ -195,7 +195,7 @@ function _createAppButtonElement(
       element.classList.add('inboxsdk__appButton_noGPlus');
     }
 
-    insertionElement.insertBefore(element, insertionElement.firstElementChild);
+    insertionElement.insertBefore(element, insertionElement.lastElementChild);
     return element;
   } catch (err) {
     driver.getLogger().error(err, {

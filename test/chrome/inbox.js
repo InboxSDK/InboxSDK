@@ -1,4 +1,6 @@
-/* @flow */
+/* eslint-disable */
+// TODO remove file
+
 declare var browser;
 declare var $;
 

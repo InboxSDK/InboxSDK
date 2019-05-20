@@ -55,6 +55,18 @@ module.exports = {
       files: ['test/chrome/**'],
       rules: {
         'no-console': ['off']
+      },
+      globals: {
+        page: 'readonly',
+        browser: 'readonly',
+        context: 'readonly',
+        jestPuppeteer: 'readonly'
+      }
+    },
+    {
+      files: ['jest.config.js', 'jest-puppeteer.config.js'],
+      rules: {
+        'flowtype/require-valid-file-annotation': ['off']
       }
     }
   ],

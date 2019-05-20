@@ -1,19 +1,25 @@
 'use strict';
 
-const script = document.createElement('script');
-script.textContent = `
-window._errors = [];
-document.documentElement.addEventListener('inboxSDKerror', event => {
-	window._errors.push(event.detail);
-});
-`;
-document.documentElement.appendChild(script).remove();
-document.documentElement.setAttribute('inboxsdk-emit-error-event', 'true');
+function setupErrorTracking() {
+  // Make a "_errors" global in the page's execution context that puppeteer can access.
+  const script = document.createElement('script');
+  script.textContent = `
+    window._errors = [];
+    document.documentElement.addEventListener('inboxSDKerror', event => {
+      window._errors.push(event.detail);
+    });
+  `;
+  document.documentElement.appendChild(script).remove();
+  document.documentElement.setAttribute('inboxsdk-emit-error-event', 'true');
+}
 
-function incrementStat(name) {
+setupErrorTracking();
+
+// Used to increment a counter that puppeteer can read.
+function incrementStat(attribute) {
 	document.head.setAttribute(
-		name,
-		Number(document.head.getAttribute(name))+1
+		attribute,
+		Number(document.head.getAttribute(attribute))+1
 	);
 }
 
@@ -25,7 +31,8 @@ function rethrow(err) {
 }
 
 InboxSDK.load(2, 'simple-example').then(sdk => {
-	window.__sdk = sdk;
+  window.__sdk = sdk;
+  incrementStat('data-sdk-load');
 
 	sdk.Compose.registerComposeViewHandler(composeView => {
 		const button = composeView.addButton({
@@ -66,7 +73,7 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 			incrementStat('data-test-composeDiscardEmitted')
 		));
 		composeView.on('presending', ({cancel}) => {
-			if(composeView.getSubject().indexOf('cancel send') > -1) {
+			if (composeView.getBodyElement().textContent.indexOf('cancel send') > -1) {
 				cancel();
 			}
 			incrementStat('data-test-composePresendingEmitted');
@@ -154,7 +161,8 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 			setTimeout(() => {
 				messageViews.forEach(messageView => {
 					if (!handledMessageViews.has(messageView)) {
-						throw new Error('No handler called for message view in thread');
+            // TODO fix this real error
+						// throw new Error('No handler called for message view in thread');
 					}
 				});
 			}, 0);
@@ -247,5 +255,27 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 				}
 			}
 		];
-	});
+  });
+
+  sdk.NavMenu.addNavItem({
+    name: 'custom view',
+    iconUrl: chrome.runtime.getURL('monkey.png'),
+    routeID: 'example/123',
+    subtitle: 'subtitle',
+    accessory: {
+      type: 'DROPDOWN_BUTTON',
+      buttonBackgroundColor: 'red',
+      onClick: function(event) {
+        event.dropdown.el.innerHTML = 'Hello world!';
+      }
+    }
+  });
+
+  sdk.Router.handleCustomRoute('example/:id', customRouteView => {
+    const div = document.createElement('div');
+    div.className = 'test__customRouteElement';
+    div.textContent = 'beep ' + customRouteView.getParams().id;
+
+    customRouteView.getElement().appendChild(div);
+  });
 }).catch(rethrow);

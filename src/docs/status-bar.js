@@ -5,7 +5,7 @@
  */
 var StatusBarView = /** @lends StatusBarView */ {
   /**
-   * sets the height of the status bar
+   * Sets the height of the status bar.
    * @param {number} height - Desired height for status bar in pixels.
    * @return {void}
    */
