@@ -38,8 +38,8 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 
 				if (removePromise) {
 					removePromise.then(() => {
-						console.log('thread removed -- time to do any necessary clean up!')
-					})
+						console.log('custom message notice removed');
+					});
 				}
 				return span;
 			});
