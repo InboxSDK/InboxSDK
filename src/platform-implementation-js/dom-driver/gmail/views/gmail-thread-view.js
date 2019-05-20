@@ -706,7 +706,7 @@ class GmailThreadView {
                 '.inboxsdk__custom_message_view'
               )
             );
-            this._customMessageViews.map(customMessageView =>
+            this._customMessageViews.forEach(customMessageView =>
               customMessageView.setViewState('EXPANDED')
             );
           });
@@ -739,7 +739,7 @@ class GmailThreadView {
               )
             );
 
-            this._customMessageViews.map(customMessageView =>
+            this._customMessageViews.forEach(customMessageView =>
               customMessageView.setViewState('COLLAPSED')
             );
           });
