@@ -227,79 +227,52 @@ export default class CustomMessageView extends SafeEventEmitter {
   // 1. Am hidden next to gmail native hidden indicator
   // 2. Am hidden next to sdk hidden indicator
   // 3. Am hidden next to no indicator, one must be made
-  _findContiguousHiddenIndicator(
-    currentMessageIndex: number,
-    ignoreHiddenMessages
-  ): ?HTMLElement {
-    if (currentMessageIndex < 0) {
-      return null;
-    }
-
-    let indicator = this._scanForHiddenIndicator(
-      currentMessageIndex,
-      true,
-      ignoreHiddenMessages
-    );
-    if (!indicator) {
-      indicator = this._scanForHiddenIndicator(
-        currentMessageIndex,
-        false,
-        ignoreHiddenMessages
-      );
-    }
-
-    return indicator;
-  }
-
-  _scanForHiddenIndicator(
-    currentMessageIndex: number,
-    scanForward: boolean,
-    ignoreHiddenMessages: boolean
-  ) {
-    let i = 1;
-
+  _findContiguousHiddenIndicator(ignoreHiddenMessages: boolean): ?HTMLElement {
     const parent = this._el.parentElement;
     if (!parent) {
       return null;
     }
+    const currentMessageIndex = Array.from(parent.children).indexOf(this._el);
 
-    const direction = scanForward ? 1 : -1;
-
-    while (
-      0 <= currentMessageIndex + direction * i &&
-      currentMessageIndex + direction * i < parent.childElementCount
-    ) {
-      const candidate = parent.children[currentMessageIndex + direction * i];
-      if (!candidate) {
-        throw new Error('Should not happen: candidate was null');
-      }
-
-      if (ignoreHiddenMessages) {
-        // Native indicator or SDK indicator
-        if (
-          candidate.classList.contains('adv') ||
-          candidate.classList.contains(
-            'inboxsdk__custom_hidden_message_view_notice'
-          )
-        ) {
-          return candidate;
-        }
-      } else {
-        // Native hidden message
-        if (candidate.classList.contains('kQ')) {
-          return candidate;
-        }
-      }
-
-      // Native message (collapsed or expanded)
-      if (
-        candidate.classList.contains('kv') ||
-        candidate.classList.contains('h7')
+    for (const direction of [1, -1]) {
+      let i = 1;
+      while (
+        0 <= currentMessageIndex + direction * i &&
+        currentMessageIndex + direction * i < parent.childElementCount
       ) {
-        break;
+        const candidate = parent.children[currentMessageIndex + direction * i];
+        if (!candidate) {
+          throw new Error('Should not happen: candidate was null');
+        }
+
+        if (ignoreHiddenMessages) {
+          // Native indicator or SDK indicator
+          if (
+            candidate.classList.contains('adv') ||
+            candidate.classList.contains(
+              'inboxsdk__custom_hidden_message_view_notice'
+            )
+          ) {
+            return candidate;
+          }
+        } else {
+          // Native hidden message
+          if (candidate.classList.contains('kQ')) {
+            return candidate;
+          }
+        }
+
+        // Native message (collapsed or expanded)
+        if (
+          candidate.classList.contains('kv') ||
+          candidate.classList.contains('h7')
+        ) {
+          break;
+        }
+        i++;
       }
-      i++;
     }
+
     return null;
   }
 
@@ -307,21 +280,11 @@ export default class CustomMessageView extends SafeEventEmitter {
     if (!this._el.parentElement) {
       return;
     }
-    const currentMessageIndex = Array.from(
-      this._el.parentElement.children
-    ).indexOf(this._el);
-
-    let hiddenIndicatorElement = this._findContiguousHiddenIndicator(
-      currentMessageIndex,
-      true
-    );
+    let hiddenIndicatorElement = this._findContiguousHiddenIndicator(true);
 
     const nativeHiddenNoticePresent = !!hiddenIndicatorElement;
     if (!hiddenIndicatorElement) {
-      hiddenIndicatorElement = this._findContiguousHiddenIndicator(
-        currentMessageIndex,
-        false
-      );
+      hiddenIndicatorElement = this._findContiguousHiddenIndicator(false);
     }
     if (!hiddenIndicatorElement) {
       // Create a new custom indicator
