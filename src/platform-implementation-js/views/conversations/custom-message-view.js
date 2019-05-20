@@ -132,10 +132,10 @@ export default class CustomMessageView extends SafeEventEmitter {
       case 'EXPANDED':
         break;
       default:
-        this._viewState = 'HIDDEN';
         throw new Error(`Unknown message view state "${currentViewState}"`);
     }
 
+    this._viewState = newState;
     switch (newState) {
       case 'HIDDEN':
         this._el.classList.add('inboxsdk__custom_message_view_hidden');
@@ -163,7 +163,6 @@ export default class CustomMessageView extends SafeEventEmitter {
       default:
         throw new Error(`Unknown message view state "${newState}"`);
     }
-    this._viewState = newState;
   }
 
   getElement() {
