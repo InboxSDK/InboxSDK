@@ -358,9 +358,7 @@ class GmailThreadView {
         parentElement.querySelectorAll('.inboxsdk__custom_message_view')
       );
 
-      if (remainingCustomMessageViews.length > 0) {
-        parentElement.classList.add('inboxsdk__thread_view_with_custom_view');
-      } else {
+      if (remainingCustomMessageViews.length === 0) {
         parentElement.classList.remove(
           'inboxsdk__thread_view_with_custom_view'
         );
