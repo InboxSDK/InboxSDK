@@ -37,13 +37,13 @@ class GmailThreadView {
   _routeViewDriver: any;
   _driver: GmailDriver;
   _isPreviewedThread: boolean;
-  _eventStream: Bus<any>;
+  _eventStream: Bus<any> = kefirBus();
   _stopper = kefirStopper();
   _threadSidebar: ?GmailThreadSidebarView = null;
   _widthManager: ?WidthManager = null;
 
   _toolbarView: any;
-  _messageViewDrivers: any[];
+  _messageViewDrivers: any[] = [];
   _newMessageMutationObserver: ?MutationObserver;
   _readyStream: Kefir.Observable<any>;
   _threadID: ?string;
@@ -53,7 +53,7 @@ class GmailThreadView {
     numberNativeMessagesHidden: ?number,
     unmountPromise: Promise<void>
   ) => ?HTMLElement;
-  _customMessageViews: Array<CustomMessageView>;
+  _customMessageViews: Array<CustomMessageView> = [];
 
   constructor(
     element: HTMLElement,
@@ -65,10 +65,6 @@ class GmailThreadView {
     this._routeViewDriver = routeViewDriver;
     this._driver = driver;
     this._isPreviewedThread = isPreviewedThread;
-
-    this._eventStream = kefirBus();
-    this._messageViewDrivers = [];
-    this._customMessageViews = [];
 
     this._logAddonElementInfo().catch(err =>
       this._driver.getLogger().error(err)
