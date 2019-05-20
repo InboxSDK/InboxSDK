@@ -229,7 +229,7 @@ export default class CustomMessageView extends SafeEventEmitter {
   // 3. Am hidden next to no indicator, one must be made
   _findContiguousHiddenIndicator(
     currentMessageIndex: number,
-    ignoreHiddenMessages = true
+    ignoreHiddenMessages
   ): ?HTMLElement {
     if (currentMessageIndex < 0) {
       return null;
@@ -253,7 +253,7 @@ export default class CustomMessageView extends SafeEventEmitter {
 
   _scanForHiddenIndicator(
     currentMessageIndex: number,
-    isForward: boolean,
+    scanForward: boolean,
     ignoreHiddenMessages: boolean
   ) {
     let i = 1;
@@ -263,16 +263,15 @@ export default class CustomMessageView extends SafeEventEmitter {
       return null;
     }
 
-    const direction = isForward ? 1 : -1;
+    const direction = scanForward ? 1 : -1;
 
     while (
       0 <= currentMessageIndex + direction * i &&
       currentMessageIndex + direction * i < parent.childElementCount
     ) {
       const candidate = parent.children[currentMessageIndex + direction * i];
-
       if (!candidate) {
-        break;
+        throw new Error('Should not happen: candidate was null');
       }
 
       if (ignoreHiddenMessages) {
