@@ -168,10 +168,6 @@ class GmailThreadView {
       this._newMessageMutationObserver.disconnect();
     }
 
-    if (!this._element.parentElement) {
-      throw new Error('Parent must be defined.');
-    }
-
     this._customMessageViews.forEach(customMessageView =>
       customMessageView.destroy()
     );
