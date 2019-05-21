@@ -289,12 +289,6 @@ export default class CustomMessageView extends SafeEventEmitter {
     if (!hiddenIndicatorElement) {
       // Create a new custom indicator
       const newNotice = this._createNewCustomHiddenIndicator();
-      this._el.insertAdjacentElement('beforebegin', newNotice);
-
-      newNotice.onclick = e => {
-        newNotice.remove();
-      };
-
       this._setupCustomMessageUnHideOnDestroy(newNotice);
       this._updateCustomHiddenNotice(newNotice);
     } else if (
@@ -323,8 +317,15 @@ export default class CustomMessageView extends SafeEventEmitter {
     noticeChild.classList.add(
       'inboxsdk__custom_hidden_message_view_notice_indicator'
     );
+    noticeChild.setAttribute('role', 'button');
+    noticeChild.setAttribute('aria-expanded', 'false');
 
     newNotice.appendChild(noticeChild);
+    newNotice.onclick = e => {
+      newNotice.remove();
+      e.preventDefault();
+    };
+    this._el.insertAdjacentElement('beforebegin', newNotice);
     return newNotice;
   }
 
