@@ -446,21 +446,16 @@ export default class CustomMessageView extends SafeEventEmitter {
       attributeFilter: ['class']
     })
       .takeUntilBy(this._stopper)
-      .filter(
-        () =>
-          hiddenIndicatorElement &&
-          !hiddenIndicatorElement.classList.contains('kQ')
-      ) //when kQ is gone, message is visible
+      .filter(() => !hiddenIndicatorElement.classList.contains('kQ')) //when kQ is gone, message is visible
       .onValue(() => {
         this.setViewState('COLLAPSED');
         if (this._hiddenCustomMessageNoticeElement) {
           this._hiddenCustomMessageNoticeElement.remove();
+          this._hiddenCustomMessageNoticeElement = null;
         }
         if (this._cleanupCustomHiddenMessage) {
           this._cleanupCustomHiddenMessage(false);
         }
-
-        this._hiddenCustomMessageNoticeElement = null;
       });
   }
   _setupCustomMessageUnHideOnDestroy(hiddenNoticeElement: HTMLElement) {
