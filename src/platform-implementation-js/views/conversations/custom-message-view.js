@@ -223,10 +223,6 @@ export default class CustomMessageView extends SafeEventEmitter {
     });
   }
 
-  // Three cases:
-  // 1. Am hidden next to gmail native hidden indicator
-  // 2. Am hidden next to sdk hidden indicator
-  // 3. Am hidden next to no indicator, one must be made
   _findContiguousHiddenIndicator(ignoreHiddenMessages: boolean): ?HTMLElement {
     const parent = this._el.parentElement;
     if (!parent) {
@@ -276,6 +272,10 @@ export default class CustomMessageView extends SafeEventEmitter {
     return null;
   }
 
+  // Three cases:
+  // 1. Am hidden next to no indicator, one must be made
+  // 2. Am hidden next to sdk hidden indicator
+  // 3. Am hidden next to gmail native hidden indicator
   _setupHidden() {
     if (!this._el.parentElement) {
       return;
