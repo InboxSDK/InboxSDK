@@ -300,18 +300,13 @@ class GmailThreadView {
               )
             );
 
-            // Go through and toggle view states as needed
-            let firstCandidateIndex = 0;
-            let candidatesToHide = 0;
-            for (let i = 0; i < messages.length; i++) {
+            // Go through and toggle view states as needed.
+            // The first or last message, if custom, is always collapsed (which it is by default),
+            // so start at the second message and end at the second to last.
+            for (let i = 1; i < messages.length - 1; i++) {
               const currentMessage = messages[i];
 
               if (currentMessage.isNativeMessage) {
-                continue;
-              }
-
-              // The first or last message, if custom, is always collapsed (which it is by default)
-              if (i === 0 || i === messages.length - 1) {
                 continue;
               }
 
