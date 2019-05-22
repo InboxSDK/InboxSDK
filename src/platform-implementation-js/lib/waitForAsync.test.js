@@ -15,7 +15,7 @@ test('multiple calls', async () => {
       return counter;
     }
   });
-  expect(await waitForAsync(fn, 100, 10)).toBe(6);
+  expect(await waitForAsync(fn, 30 * 1000, 10)).toBe(6);
   expect(fn.mock.calls.length).toBe(6);
 });
 
