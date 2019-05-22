@@ -3,6 +3,7 @@
 import signIn from './lib/signIn';
 import delay from 'pdelay';
 import waitFor from '../../src/platform-implementation-js/lib/wait-for';
+import attemptWithRetries from '../../src/platform-implementation-js/lib/attemptWithRetries';
 
 const testEmail = 'inboxsdktest@gmail.com';
 
@@ -70,9 +71,11 @@ function getCounter(attribute: string): Promise<number> {
 }
 
 async function openThread() {
-  await page
-    .waitForSelector('tr.zA[id] span.bog', { visible: true })
-    .then(el => el.click());
+  await attemptWithRetries(async () => {
+    await page
+      .waitForSelector('tr.zA[id] span.bog', { visible: true })
+      .then(el => el.click());
+  }, 3);
   await page.waitForFunction(() => document.location.hash !== '#inbox');
 }
 
