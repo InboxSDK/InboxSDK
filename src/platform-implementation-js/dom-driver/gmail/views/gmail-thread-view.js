@@ -312,10 +312,8 @@ class GmailThreadView {
                 messages[i + 1].getViewState() === 'HIDDEN'
               ) {
                 currentMessage.setViewState('HIDDEN');
-              }
-
-              // Or the first of MIN_CONSECUTIVE_HIDDEN applicable custom messages. (ignore last message)
-              if (i + MIN_CONSECUTIVE_HIDDEN <= messages.length - 1) {
+              } else if (i + MIN_CONSECUTIVE_HIDDEN <= messages.length - 1) {
+                // Or the first of MIN_CONSECUTIVE_HIDDEN applicable custom messages. (ignore last message)
                 const candidates = messages.slice(
                   i,
                   i + MIN_CONSECUTIVE_HIDDEN
