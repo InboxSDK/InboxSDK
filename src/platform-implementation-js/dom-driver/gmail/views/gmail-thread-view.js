@@ -272,8 +272,11 @@ class GmailThreadView {
             );
 
             const messageDate = customMessageView.getSortDate();
-            if (!messageDate) return;
+            if (!messageDate) {
+              throw new Error('Should not happen');
+            }
 
+            // will be -1 if message should be added at end.
             const insertBeforeIndex = messages.findIndex(
               message => message.sortDatetime >= messageDate.getTime()
             );
@@ -311,16 +314,15 @@ class GmailThreadView {
                 currentMessage.setViewState('HIDDEN');
               }
 
-              // Or the first of MIN_CONSECUTIVE_HIDDEN applicable custom messages
-              const candidates = messages.slice(
-                i,
-                Math.min(i + MIN_CONSECUTIVE_HIDDEN, messages.length - 1)
-              );
-              if (
-                candidates.every(candidate => !candidate.isNativeMessage) &&
-                candidates.length >= MIN_CONSECUTIVE_HIDDEN
-              ) {
-                currentMessage.setViewState('HIDDEN');
+              // Or the first of MIN_CONSECUTIVE_HIDDEN applicable custom messages. (ignore last message)
+              if (i + MIN_CONSECUTIVE_HIDDEN <= messages.length - 1) {
+                const candidates = messages.slice(
+                  i,
+                  i + MIN_CONSECUTIVE_HIDDEN
+                );
+                if (candidates.every(candidate => !candidate.isNativeMessage)) {
+                  currentMessage.setViewState('HIDDEN');
+                }
               }
             }
 
