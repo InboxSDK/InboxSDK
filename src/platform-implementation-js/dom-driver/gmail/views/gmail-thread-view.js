@@ -258,11 +258,9 @@ class GmailThreadView {
               }))
             );
 
-            const customMessageElements = Array.from(
+            const customMessages = Array.from(
               parentElement.querySelectorAll('.inboxsdk__custom_message_view')
-            );
-
-            const customMessages = customMessageElements
+            )
               .filter(
                 customMessageElement =>
                   customMessageElement !== newCustomMessageView.getElement()
@@ -280,20 +278,15 @@ class GmailThreadView {
               message => message.sortDatetime >= messageDate.getTime()
             );
 
-            if (insertBeforeIndex >= 0) {
-              messages[insertBeforeIndex].element.insertAdjacentElement(
-                'beforebegin',
-                customMessageView.getElement()
-              );
-            } else {
-              messageContainer.insertAdjacentElement(
-                'beforeend',
-                customMessageView.getElement()
-              );
-            }
+            messageContainer.insertBefore(
+              customMessageView.getElement(),
+              insertBeforeIndex >= 0
+                ? messages[insertBeforeIndex].element
+                : null
+            );
 
             messages.splice(
-              insertBeforeIndex > 0 ? insertBeforeIndex : messages.length,
+              insertBeforeIndex >= 0 ? insertBeforeIndex : messages.length,
               0,
               this._messageDescriptorFromCustomMessage(
                 newCustomMessageView.getElement()
