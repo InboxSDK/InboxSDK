@@ -302,7 +302,10 @@ class GmailThreadView {
             for (let i = 1; i < messages.length - 1; i++) {
               const currentMessage = messages[i];
 
-              if (currentMessage.isNativeMessage) {
+              if (
+                currentMessage.isNativeMessage ||
+                currentMessage.getViewState() === 'HIDDEN'
+              ) {
                 continue;
               }
 
