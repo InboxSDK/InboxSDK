@@ -1,9 +1,7 @@
-/* @flow */
-
 import delay from 'pdelay';
 
 export default async function waitForAsync<T>(
-  condition: () => Promise<?T>,
+  condition: () => Promise<T | null | undefined>,
   timeout: number = 120 * 1000,
   steptime: number = 250
 ): Promise<T> {
@@ -13,7 +11,7 @@ export default async function waitForAsync<T>(
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
-    const result: ?T = await condition();
+    const result: T | null | undefined = await condition();
     if (result) {
       return result;
     }

@@ -13,5 +13,13 @@
     "@babel/plugin-proposal-export-default-from",
     "@babel/plugin-proposal-optional-chaining",
     "@babel/plugin-proposal-nullish-coalescing-operator"
+  ],
+  "overrides": [
+    {
+      "test": ["**/*.{ts,tsx}"],
+      "presets": [
+        "@babel/preset-typescript"
+      ]
+    }
   ]
 }

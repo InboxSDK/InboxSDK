@@ -152,6 +152,7 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
   let bundler = browserify({
     entries: entry,
     debug: true,
+    extensions: ['.ts', '.tsx'],
     fullPaths: args.fullPaths,
     cache: {},
     packageCache: {}
@@ -166,7 +167,8 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
             }
           ]
         ]
-      })
+      }),
+      { extensions: ['.js', '.tsx', '.ts'] }
     )
     .transform('redirectify', { global: true });
 
