@@ -1,7 +1,7 @@
 /* @flow */
 
-const assert = require('assert');
-const EventEmitter = require('events').EventEmitter;
+import assert from 'assert';
+import EventEmitter from 'events';
 
 // Mock element suitable for use with MockMutationObserver
 class MockElementParent extends EventEmitter {

@@ -1,6 +1,6 @@
 /* @flow */
 
-const { EventEmitter } = require('events');
+import EventEmitter from 'events';
 
 type InjectedMutationEvent = {
   attributeName?: ?string,

@@ -43,7 +43,7 @@ function getContext() {
   return context;
 }
 
-module.exports = function() {
+export default function setupDataExposer() {
   let context;
   waitFor(() => {
     context = getContext();
@@ -188,4 +188,4 @@ module.exports = function() {
       throw err;
     })
     .catch(logger.error);
-};
+}

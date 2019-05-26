@@ -12,21 +12,28 @@ if (!global.__InboxSDKInjected) {
       oldDefine = define;
       define = null;
     }
-    const xhrHelper = require('./xhr-helper');
-    const setupDataExposer = require('./setup-data-exposer');
-    const setupEventReemitter = require('./setup-event-reemitter');
-    const setupErrorSilencer = require('./setup-error-silencer');
-    const setupCustomViewEventAssassin = require('./setupCustomViewEventAssassin');
-    const setupPushStateListener = require('./setupPushStateListener');
-    const setupInboxCustomViewLinkFixer = require('./setupInboxCustomViewLinkFixer');
+    const xhrHelper = require('./xhr-helper').default;
+    const setupDataExposer = require('./setup-data-exposer').default;
+    const setupEventReemitter = require('./setup-event-reemitter').default;
+    const setupErrorSilencer = require('./setup-error-silencer').default;
+    const setupCustomViewEventAssassin = require('./setupCustomViewEventAssassin')
+      .default;
+    const setupPushStateListener = require('./setupPushStateListener').default;
+    const setupInboxCustomViewLinkFixer = require('./setupInboxCustomViewLinkFixer')
+      .default;
 
     const gmailInterceptor = require('./gmail/setup-gmail-interceptor').default;
-    const setupGmonkeyHandler = require('./gmail/setup-gmonkey-handler');
+    const setupGmonkeyHandler = require('./gmail/setup-gmonkey-handler')
+      .default;
 
-    const setupClickAndGetNewIframeSrc = require('./inbox/setupClickAndGetNewIframeSrc');
-    const setupInboxFakeWindowResizeListener = require('./inbox/setupInboxFakeWindowResizeListener');
-    const setupComposeViewDraftIDFinder = require('./inbox/setupComposeViewDraftIDFinder');
-    const setupInboxAjaxInterceptor = require('./inbox/setupAjaxInterceptor');
+    const setupClickAndGetNewIframeSrc = require('./inbox/setupClickAndGetNewIframeSrc')
+      .default;
+    const setupInboxFakeWindowResizeListener = require('./inbox/setupInboxFakeWindowResizeListener')
+      .default;
+    const setupComposeViewDraftIDFinder = require('./inbox/setupComposeViewDraftIDFinder')
+      .default;
+    const setupInboxAjaxInterceptor = require('./inbox/setupAjaxInterceptor')
+      .default;
 
     const pageOrigin: string =
       (process.env.NODE_ENV === 'test' && global.__test_origin) ||

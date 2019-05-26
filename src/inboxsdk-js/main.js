@@ -9,7 +9,7 @@ try {
     define = null;
   }
   // exposes main as a global for browsers
-  window.InboxSDK = require('./inboxsdk');
+  window.InboxSDK = require('./inboxsdk').default;
 } finally {
   if (oldDefine) {
     define = oldDefine;

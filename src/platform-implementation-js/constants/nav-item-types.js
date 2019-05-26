@@ -28,4 +28,4 @@ const navItemTypes = Object.freeze(
   }
 );
 
-module.exports = navItemTypes;
+export default navItemTypes;
