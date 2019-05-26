@@ -53,7 +53,7 @@ describe('GmailAppSidebarView Primary', function() {
       el: document.createElement('div')
     });
 
-    const fakeThreadView = {
+    const fakeThreadView: Object = {
       getStopper: _.constant(kefirStopper())
     };
 
@@ -94,7 +94,7 @@ describe('GmailAppSidebarView Primary', function() {
       el: document.createElement('div')
     });
 
-    const fakeThreadView = {
+    const fakeThreadView: Object = {
       getStopper: _.constant(kefirStopper())
     };
 
