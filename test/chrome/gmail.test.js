@@ -11,7 +11,9 @@ const testEmail = 'inboxsdktest@gmail.com';
 
 beforeAll(async () => {
   await page.setViewport({ width: 1024, height: 768 });
-  await signIn();
+  await signIn(testEmail);
+  await page.waitForSelector('.inboxsdk__appid_warning');
+  await page.click('.inboxsdk__appid_warning .inboxsdk__x_close_button');
   expect(await getCounter('data-sdk-load')).toBe(1);
 });
 
