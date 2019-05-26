@@ -1216,7 +1216,7 @@ class GmailComposeView {
   }
 
   getAdditionalActionToolbar(): HTMLElement {
-    return require('./gmail-compose-view/get-additional-action-toolbar')(
+    return require('./gmail-compose-view/get-additional-action-toolbar').default(
       this._driver.isUsingMaterialUI(),
       this
     );
