@@ -1,5 +1,3 @@
-/* @flow */
-
 import ajax from './ajax';
 import rateLimit from './rate-limit';
 import getStackTrace from './get-stack-trace';
@@ -8,16 +6,16 @@ import getSessionId from './get-session-id';
 import { BUILD_VERSION } from './version';
 import isObject from 'lodash/isObject';
 
-export type LogErrorContext = {
-  appId?: ?string,
-  appIds?: ?(any[]),
-  sentByApp?: ?boolean,
-  loaderVersion?: ?string,
-  implVersion?: ?string,
-  userEmailHash?: ?string,
-  isUsingSyncAPI?: ?boolean,
-  isUsingMaterialGmailUI?: ?boolean
-};
+export interface LogErrorContext {
+  appId?: string;
+  appIds?: any[];
+  sentByApp?: boolean;
+  loaderVersion?: string;
+  implVersion?: string;
+  userEmailHash?: string;
+  isUsingSyncAPI?: boolean;
+  isUsingMaterialGmailUI?: boolean;
+}
 
 const sessionId = getSessionId();
 
@@ -28,12 +26,10 @@ export default function logError(
   details: any,
   context: LogErrorContext
 ) {
-  if (!global.document) {
+  if (typeof document === 'undefined') {
     // In tests, just throw the error.
     throw err;
   }
-
-  const args = arguments;
 
   // It's important that we can't throw an error or leave a rejected promise
   // unheard while logging an error in order to make sure to avoid ever
@@ -55,7 +51,6 @@ export default function logError(
       markErrorAsSeen(err);
     }
     const {
-      appId,
       appIds,
       implVersion,
       isUsingSyncAPI,
@@ -65,11 +60,11 @@ export default function logError(
     const loaderVersion = context.loaderVersion || BUILD_VERSION;
     const sentByApp = !!context.sentByApp;
 
-    const errorProperties: Object = {};
-    for (let name in err) {
+    const errorProperties: any = {};
+    for (const name in err) {
       if (Object.prototype.hasOwnProperty.call(err, name)) {
         try {
-          const value = (err: any)[name];
+          const value = (err as any)[name];
           JSON.stringify(value);
           errorProperties[name] = value;
         } catch (err) {
@@ -86,7 +81,7 @@ export default function logError(
     const nowStack = getStackTrace();
 
     const stuffToLog: any[] = ['Error logged:', err];
-    if (err?.stack) {
+    if (err && err.stack) {
       stuffToLog.push('\n\nOriginal error stack:\n' + err.stack);
     }
     stuffToLog.push('\n\nError logged from:\n' + nowStack);
@@ -106,8 +101,8 @@ export default function logError(
     console.error(...stuffToLog);
 
     const report = {
-      message: err?.message ?? err,
-      stack: err?.stack,
+      message: (err && err.message) || err,
+      stack: err && err.stack,
       loggedFrom: nowStack,
       details,
       appIds,
@@ -126,17 +121,16 @@ export default function logError(
     sendError(report);
 
     if (
-      ((document.documentElement: any): HTMLElement).getAttribute(
-        'inboxsdk-emit-error-event'
-      ) === 'true'
+      document.documentElement.getAttribute('inboxsdk-emit-error-event') ===
+      'true'
     ) {
-      ((document.documentElement: any): HTMLElement).dispatchEvent(
+      document.documentElement.dispatchEvent(
         new CustomEvent('inboxSDKerror', {
           bubbles: false,
           cancelable: false,
           detail: {
-            message: err?.message ?? err,
-            stack: err?.stack,
+            message: (err && err.message) || err,
+            stack: err && err.stack,
             loggedFrom: nowStack,
             details,
             sentByApp
@@ -145,28 +139,28 @@ export default function logError(
       );
     }
   } catch (err2) {
-    tooManyErrors(err2, args);
+    tooManyErrors(err2, [err, details, context]);
   }
 }
 
 const _extensionSeenErrors: {
-  has(e: Error): boolean,
-  add(e: Error): void
+  has(e: Error): boolean;
+  add(e: Error): void;
 } = (() => {
   // Safari <9 doesn't have WeakSet and we don't want to pull in the polyfill,
   // so we make one out of a WeakMap.
-  if (!global.__inboxsdk_extensionSeenErrors && global.WeakMap) {
+  if (!(global as any).__inboxsdk_extensionSeenErrors && global.WeakMap) {
     Object.defineProperty(global, '__inboxsdk_extensionSeenErrors', {
       value: new global.WeakMap()
     });
   }
   return {
     has(e: Error): boolean {
-      if (global.__inboxsdk_extensionSeenErrors) {
-        return global.__inboxsdk_extensionSeenErrors.has(e);
+      if ((global as any).__inboxsdk_extensionSeenErrors) {
+        return (global as any).__inboxsdk_extensionSeenErrors.has(e);
       } else {
         try {
-          return !!(e: any).__inboxsdk_extensionHasSeenError;
+          return !!(e as any).__inboxsdk_extensionHasSeenError;
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error(err);
@@ -175,16 +169,22 @@ const _extensionSeenErrors: {
       }
     },
     add(e: Error) {
-      if (global.__inboxsdk_extensionSeenErrors?.set) {
+      if (
+        (global as any).__inboxsdk_extensionSeenErrors &&
+        (global as any).__inboxsdk_extensionSeenErrors.set
+      ) {
         // It's a WeakMap.
-        global.__inboxsdk_extensionSeenErrors.set(e, true);
-      } else if (global.__inboxsdk_extensionSeenErrors?.add) {
+        (global as any).__inboxsdk_extensionSeenErrors.set(e, true);
+      } else if (
+        (global as any).__inboxsdk_extensionSeenErrors &&
+        (global as any).__inboxsdk_extensionSeenErrors.add
+      ) {
         // Older versions of inboxsdk.js initialized it as a WeakSet instead,
         // so handle that too.
-        global.__inboxsdk_extensionSeenErrors.add(e);
+        (global as any).__inboxsdk_extensionSeenErrors.add(e);
       } else {
         try {
-          Object.defineProperty((e: any), '__inboxsdk_extensionHasSeenError', {
+          Object.defineProperty(e as any, '__inboxsdk_extensionHasSeenError', {
             value: true
           });
         } catch (err) {
@@ -211,9 +211,7 @@ function markErrorAsSeen(error: Error) {
 
 // Only let 10 errors be sent per minute.
 const sendError = rateLimit(
-  function(report: Object) {
-    const args = arguments;
-
+  function(report: object) {
     try {
       ajax({
         url: 'https://www.inboxsdk.com/api/v2/errors',
@@ -223,10 +221,10 @@ const sendError = rateLimit(
         },
         data: JSON.stringify(report)
       }).catch(err2 => {
-        tooManyErrors(err2, args);
+        tooManyErrors(err2, [report]);
       });
     } catch (err2) {
-      tooManyErrors(err2, args);
+      tooManyErrors(err2, [report]);
     }
   },
   60 * 1000,
