@@ -1,13 +1,14 @@
+import once from 'lodash/once';
 import isStreakAppId from '../platform-implementation-js/lib/isStreakAppId';
 
-const hasStreakInstalled = () => {
+const hasStreakInstalled = once(() => {
   const appIds = JSON.parse(
     (typeof document !== 'undefined' &&
       document.documentElement.getAttribute('data-inboxsdk-active-app-ids')) ||
       '[]'
   );
   return appIds.find(({ appId }: any) => isStreakAppId(appId));
-};
+});
 
 export default function censorJSONTree(object: any): string {
   return JSON.stringify(object, (key, value) => {
