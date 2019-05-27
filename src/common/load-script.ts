@@ -1,14 +1,12 @@
-/* @flow */
-
-const once = require('lodash/once');
+import once from 'lodash/once';
 import connectivityTest from './connectivity-test';
 import logError from './log-error';
 import ajax from './ajax';
 import delay from 'pdelay';
 
 const isContentScript: () => boolean = once(function() {
-  if (global.chrome && global.chrome.extension) return true;
-  if (global.safari && global.safari.extension) return true;
+  if ((global as any).chrome && (global as any).chrome.extension) return true;
+  if ((global as any).safari && (global as any).safari.extension) return true;
   return false;
 });
 
@@ -19,13 +17,13 @@ function addScriptToPage(url: string, cors: boolean): Promise<void> {
     script.crossOrigin = 'anonymous';
   }
 
-  const promise = new Promise(function(resolve, reject) {
+  const promise: Promise<void> = new Promise((resolve, reject) => {
     script.addEventListener(
       'error',
       function(event: any) {
         reject(
           event.error ||
-            new (Error: any)(
+            new (Error as any)(
               event.message || 'Load failure: ' + url,
               event.filename,
               event.lineno,
@@ -52,13 +50,13 @@ function addScriptToPage(url: string, cors: boolean): Promise<void> {
   return promise;
 }
 
-export type LoadScriptOptions = {
+export interface LoadScriptOptions {
   // By default, the script is executed within a function, so that top-level
   // variables defined in it don't become global variables. Setting nowrap to
   // true disables this behavior.
-  nowrap?: boolean,
-  disableSourceMappingURL?: boolean
-};
+  nowrap?: boolean;
+  disableSourceMappingURL?: boolean;
+}
 
 export default function loadScript(
   url: string,
@@ -66,7 +64,10 @@ export default function loadScript(
 ): Promise<void> {
   let pr;
   if (isContentScript()) {
-    const attempt = function(retryNum: number, lastErr: ?Error): Promise<void> {
+    const attempt = function(
+      retryNum: number,
+      lastErr: Error | null
+    ): Promise<void> {
       if (retryNum > 3) {
         throw lastErr ||
           new Error('Ran out of loadScript attempts for unknown reason');
@@ -90,7 +91,7 @@ export default function loadScript(
         const originalCode = response.text;
         const indirectEval = eval;
 
-        let codeParts = [];
+        const codeParts: string[] = [];
         if (opts && opts.disableSourceMappingURL) {
           // Don't remove a data: URI sourcemap (used in dev)
           codeParts.push(
