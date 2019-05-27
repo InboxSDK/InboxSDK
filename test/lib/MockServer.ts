@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 
-function makeEvent(self, isProgressEvent) {
+function makeEvent(self: any, isProgressEvent?: boolean) {
   const props = {
     currentTarget: { value: self },
     target: { value: self },
@@ -21,12 +21,12 @@ function makeEvent(self, isProgressEvent) {
 }
 
 function checkResponderFilter(
-  filter,
-  method,
-  path,
-  responseType,
-  requestHeaders,
-  body
+  filter: any,
+  method: string,
+  path: string,
+  responseType: string,
+  requestHeaders: { [name: string]: any },
+  body: string | undefined
 ) {
   if (filter.method && filter.method != method) {
     return false;
@@ -60,23 +60,23 @@ const defaultResponder = {
   status: 404,
   headers: { 'Content-Type': 'text/plain' },
   response: 'Content not found',
-  delay: (null: ?number),
+  delay: null as null | number,
   noDelay: false
 };
 
-const statusTextCodes = {
+const statusTextCodes: { [status: string]: string } = {
   '0': 'unknown',
   '200': 'OK',
   '404': 'not found'
 };
 
 function selectResponder(
-  responders,
-  method,
-  path,
-  responseType,
-  requestHeaders,
-  body
+  responders: any[],
+  method: string,
+  path: string,
+  responseType: string,
+  requestHeaders: { [name: string]: any },
+  body: string | undefined
 ) {
   const foundPair = _.find(responders, pair =>
     checkResponderFilter(
@@ -95,8 +95,8 @@ function selectResponder(
   }
 }
 
-function lowercaseHeaderNames(headers) {
-  const newHeaders = {};
+function lowercaseHeaderNames(headers: { [name: string]: string }) {
+  const newHeaders: { [name: string]: string } = {};
   _.each(headers, (value, name) => {
     newHeaders[name.toLowerCase()] = value;
   });
@@ -104,38 +104,38 @@ function lowercaseHeaderNames(headers) {
 }
 
 export default class MockServer {
-  _verbose: boolean = false;
-  _responders: Array<Object> = [];
-  XMLHttpRequest: typeof XMLHttpRequest;
+  private _verbose: boolean = false;
+  private _responders: Array<any> = [];
+  public XMLHttpRequest: typeof XMLHttpRequest;
 
-  constructor() {
+  public constructor() {
     const server = this;
 
-    (this: any).XMLHttpRequest = class XMLHttpRequest {
-      _server: MockServer = server;
-      _readyState: number = 0;
-      _listeners: Object = {};
-      _requestHeaders: Object = {};
-      _sendFlag: boolean = false;
+    this.XMLHttpRequest = class XMLHttpRequest {
+      private _server: MockServer = server;
+      private _readyState: number = 0;
+      private _listeners: { [name: string]: any } = {};
+      private _requestHeaders: { [name: string]: any } = {};
+      private _sendFlag: boolean = false;
 
-      _response: ?string = undefined;
-      _responseXML = undefined;
-      _status: ?number = undefined;
-      _statusText: ?string = undefined;
+      private _response: string | undefined = undefined;
+      private _responseXML: any = undefined;
+      private _status: number | undefined = undefined;
+      private _statusText: string | undefined = undefined;
 
-      _responder: Object;
-      _timer: ?TimeoutID = undefined;
-      _method: string;
-      _path: string;
-      _async: boolean;
-      _body: string;
-      _loaded: number = 0;
-      _total: number = 0;
-      _lengthComputable: boolean;
+      private _responder: any;
+      private _timer: any = undefined;
+      private _method: string | undefined;
+      private _path: string | undefined;
+      private _async: boolean | undefined;
+      private _body: string | undefined;
+      private _loaded: number = 0;
+      private _total: number = 0;
+      private _lengthComputable: boolean | undefined;
 
-      responseType: ?string;
+      public responseType: string | null | undefined;
 
-      constructor() {
+      public constructor() {
         [
           'readyState',
           'response',
@@ -166,16 +166,20 @@ export default class MockServer {
                 }
                 return this._response;
               }
-              return (this: any)['_' + prop];
+              return (this as any)['_' + prop];
             },
-            set(v) {
+            set() {
               throw new Error('Can not modify read-only property ' + prop);
             }
           });
         });
       }
 
-      open(method: string, path: string, async: ?boolean = undefined) {
+      public open(
+        method: string,
+        path: string,
+        async: boolean | undefined = undefined
+      ) {
         if (this._server._verbose) {
           console.log('Connection opened', method, path); //eslint-disable-line no-console
         }
@@ -194,11 +198,11 @@ export default class MockServer {
         }
       }
 
-      _terminate() {
+      public _terminate() {
         if (this._timer != null) clearTimeout(this._timer);
       }
 
-      abort() {
+      public abort() {
         this._terminate();
         if (this._readyState !== 0 && this._readyState !== 4) {
           this._readyState = 4;
@@ -206,7 +210,7 @@ export default class MockServer {
           this._statusText = 'aborted';
           if (this._responder.partialResponse != null) {
             this._response = this._responder.partialResponse;
-            this._loaded = this._response.length || 0;
+            this._loaded = this._response!.length || 0;
           } else {
             this._response = '';
           }
@@ -220,7 +224,7 @@ export default class MockServer {
         }
       }
 
-      send(body) {
+      public send(body: any) {
         this._body = body;
         this._sendFlag = true;
         if (this._readyState != 1)
@@ -228,8 +232,8 @@ export default class MockServer {
 
         this._responder = selectResponder(
           this._server._responders,
-          this._method,
-          this._path,
+          this._method!,
+          this._path!,
           this.responseType || 'text',
           this._requestHeaders,
           body
@@ -238,7 +242,7 @@ export default class MockServer {
         const delay = this._responder.delay;
         const noDelay = this._responder.noDelay;
 
-        const step = fn => {
+        const step = (fn: () => void) => {
           if (this._async) {
             if (delay != null) {
               return setTimeout(fn, delay);
@@ -256,7 +260,7 @@ export default class MockServer {
           this._readyState = 2;
           this._status = this._responder.status;
           this._statusText =
-            this._responder.statusText || statusTextCodes[this._status];
+            this._responder.statusText || statusTextCodes[this._status!];
           if (this._responder.total !== false && this._responder.response) {
             this._lengthComputable = true;
             this._total = this._responder.response.length;
@@ -268,7 +272,7 @@ export default class MockServer {
           this._readyState = 3;
           if (this._responder.partialResponse != null) {
             this._response = this._responder.partialResponse;
-            this._loaded = this._response.length || 0;
+            this._loaded = this._response!.length || 0;
           } else {
             this._response = '';
           }
@@ -303,15 +307,15 @@ export default class MockServer {
         this._timer = step(headers);
       }
 
-      _callListeners(name: string, event: Object) {
-        if ((this: any)['on' + name]) (this: any)['on' + name](event);
+      private _callListeners(name: string, event: any) {
+        if ((this as any)['on' + name]) (this as any)['on' + name](event);
 
         _.each(this._listeners[name], listener => {
           listener.call(this, event);
         });
       }
 
-      setRequestHeader(header: string, value: string) {
+      public setRequestHeader(header: string, value: string) {
         if (this._readyState != 1 || this._sendFlag) {
           throw new Error(
             "Can't set headers now at readyState " + this._readyState
@@ -320,7 +324,7 @@ export default class MockServer {
         this._requestHeaders[header.toLowerCase()] = value;
       }
 
-      getResponseHeader(header: string) {
+      public getResponseHeader(header: string) {
         if (this._readyState < 2) {
           return null;
         }
@@ -330,7 +334,7 @@ export default class MockServer {
         return null;
       }
 
-      getAllResponseHeaders() {
+      public getAllResponseHeaders() {
         if (this._readyState < 2) {
           return null;
         }
@@ -340,20 +344,20 @@ export default class MockServer {
         ).join('');
       }
 
-      addEventListener(name, listener) {
+      public addEventListener(name: string, listener: Function) {
         if (!this._listeners[name]) this._listeners[name] = [];
         if (!_.includes(this._listeners[name], listener))
           this._listeners[name].push(listener);
       }
 
-      removeEventListener(name, listener) {
+      public removeEventListener(name: string, listener: Function) {
         if (this._listeners[name])
           this._listeners[name] = _.without(this._listeners[name], listener);
       }
-    };
+    } as any;
 
     [this.XMLHttpRequest, this.XMLHttpRequest.prototype].forEach(obj => {
-      Object.assign((obj: any), {
+      Object.assign(obj, {
         UNSENT: 0,
         OPENED: 1,
         HEADERS_RECEIVED: 2,
@@ -363,14 +367,14 @@ export default class MockServer {
     });
   }
 
-  respondWith(filter: Object, responder: Object) {
+  public respondWith(filter: any, responder: any) {
     filter.headers = lowercaseHeaderNames(filter.headers);
     responder.headers = lowercaseHeaderNames(responder.headers);
 
     this._responders.push({ filter: filter, responder: responder });
   }
 
-  setVerbose(verbose: boolean) {
+  public setVerbose(verbose: boolean) {
     this._verbose = verbose;
   }
 }
