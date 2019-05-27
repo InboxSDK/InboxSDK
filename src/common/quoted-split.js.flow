@@ -1,0 +1,5 @@
+/* @flow */
+
+// Splits a string on spaces, but ignores spaces inside quotes.
+
+declare export default function quotedSplit(s: string): string[];

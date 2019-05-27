@@ -1,5 +1,3 @@
-/* @flow */
-
 import cachebustUrl from './cachebust-url';
 
 it('works on a new url', () => {

@@ -1,8 +1,6 @@
-/* @flow */
-
 interface Get {
   <K, V>(map: Map<K, V>, key: K): V;
-  <K: {}, V>(map: WeakMap<K, V>, key: K): V;
+  <K extends object, V>(map: WeakMap<K, V>, key: K): V;
 }
 
 const get: Get = function get<K, V>(

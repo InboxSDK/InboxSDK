@@ -1,12 +1,12 @@
-/* @flow */
-
 export default function findParent(
   el: HTMLElement,
   cb: (el: Element) => boolean
-): ?HTMLElement {
+): HTMLElement | null {
   let candidate = el.parentElement;
   while (candidate) {
-    if (cb(candidate)) return ((candidate: any): HTMLElement);
+    if (cb(candidate)) {
+      return candidate;
+    }
     candidate = candidate.parentElement;
   }
   return null;

@@ -1,5 +1,3 @@
-/* @flow */
-
 import quotedSplit from './quoted-split';
 
 it('should split basic strings on spaces', () => {

@@ -1,5 +1,3 @@
-/* @flow */
-
 import cachebustUrl from './cachebust-url';
 import fromPairs from 'lodash/fromPairs';
 
@@ -10,12 +8,12 @@ const URLS = [
 ];
 
 function imageTest(url: string): Promise<boolean> {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     const img = document.createElement('img');
     img.onload = function() {
       resolve(true);
     };
-    (img: any).onloadend = img.onerror = function() {
+    img.onloadend = img.onerror = function() {
       resolve(false);
     };
     img.src = cachebustUrl(url);
@@ -23,7 +21,7 @@ function imageTest(url: string): Promise<boolean> {
 }
 
 export default function connectivityTest(): Promise<{
-  [url: string]: boolean
+  [url: string]: boolean;
 }> {
   return Promise.all(
     URLS.map(url => imageTest(url).then(success => [url, success]))

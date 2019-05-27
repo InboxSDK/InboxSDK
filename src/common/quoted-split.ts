@@ -1,5 +1,3 @@
-/* @flow */
-
 // Splits a string on spaces, but ignores spaces inside quotes.
 
 export default function quotedSplit(s: string): string[] {
