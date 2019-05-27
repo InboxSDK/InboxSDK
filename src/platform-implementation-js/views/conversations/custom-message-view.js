@@ -103,8 +103,9 @@ export default class CustomMessageView extends SafeEventEmitter {
 
   destroy() {
     if (this._destroyed) return;
-    if (this._cleanupCustomHiddenMessage)
+    if (this._cleanupCustomHiddenMessage) {
       this._cleanupCustomHiddenMessage(true);
+    }
     this._destroyed = true;
     this._stopper.destroy();
     this.emit('destroy');
