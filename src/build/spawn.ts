@@ -11,9 +11,7 @@ export default function spawn(
       if (code === 0) {
         resolve();
       } else {
-        const err: Error & Object = new Error(
-          'Process exited with code ' + code
-        );
+        const err = new Error('Process exited with code ' + code);
         (err as any).code = code;
         reject(err);
       }

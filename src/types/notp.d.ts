@@ -1,5 +1,5 @@
 declare module 'notp' {
-  var Notp: {
+  const Notp: {
     totp: {
       gen(code: string): string;
     };

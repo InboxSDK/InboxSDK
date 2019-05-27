@@ -1,11 +1,11 @@
 import { Page, Browser, BrowserContext } from 'puppeteer';
 
 declare global {
-  var jestPuppeteer: {
+  const jestPuppeteer: {
     debug(): Promise<void>;
   };
 
-  var page: Page;
-  var browser: Browser;
-  var context: BrowserContext;
+  const page: Page;
+  const browser: Browser;
+  const context: BrowserContext;
 }

@@ -1,3 +1,4 @@
 declare module 'gulp-dest-atomic' {
-  export default function destAtomic(dir: string): any;
+  function destAtomic(dir: string): any;
+  export = destAtomic;
 }

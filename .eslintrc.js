@@ -53,6 +53,7 @@ module.exports = {
     {
       files: ['*.ts', '*.tsx'],
       rules: {
+        'no-undef': ['error'],
         '@typescript-eslint/indent': ['off'],
         '@typescript-eslint/explicit-function-return-type': ['off'],
         '@typescript-eslint/no-explicit-any': ['off'],
@@ -64,13 +65,13 @@ module.exports = {
 
     {
       files: ['src/**'],
-      excludedFiles: '*.test.js',
+      excludedFiles: '*.test.*',
       rules: {
         'deprecate/import': ['error', 'lodash', 'crypto']
       }
     },
     {
-      files: ['__tests__/**', '**/*.test.js', 'test/**'],
+      files: ['__tests__/**', '**/*.test.*', 'test/**'],
       env: {
         jest: true
       }

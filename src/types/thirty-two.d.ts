@@ -1,5 +1,5 @@
 declare module 'thirty-two' {
-  var main: {
+  const main: {
     decode(str: string): string;
   };
   export = main;

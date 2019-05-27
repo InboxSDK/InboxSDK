@@ -33,7 +33,6 @@ test('retries', async () => {
 });
 
 test('retries can fail', async () => {
-  let i = 0;
   const fn = jest.fn(async () => {
     throw new Error('test: i too low');
   });

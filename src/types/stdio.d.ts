@@ -1,6 +1,6 @@
 declare module 'stdio' {
-  var Stdio: {
+  const Stdio: {
     getopt(options: any): any;
   };
-  export default Stdio;
+  export = Stdio;
 }

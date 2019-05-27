@@ -134,7 +134,7 @@ async function getBrowserifyHmrOptions(port: number) {
   return { url, tlskey, tlscert, port };
 }
 
-type BrowserifyTaskOptions = {
+interface BrowserifyTaskOptions {
   entry: string;
   destName: string;
   hotPort?: number;
@@ -142,7 +142,7 @@ type BrowserifyTaskOptions = {
   afterBuild?: () => Promise<void>;
   noSourceMapComment?: boolean;
   sourceMappingURLPrefix?: string;
-};
+}
 
 async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
   const { entry, destName, hotPort, disableMinification } = options;
@@ -347,7 +347,7 @@ function checkForDocIssues(c: any) {
   }
 }
 
-async function parseCommentsInFile(file: string): Promise<Object> {
+async function parseCommentsInFile(file: string): Promise<any> {
   gutil.log('Parsing: ' + gutil.colors.cyan(file));
   const { stdout, stderr } = await exec(
     'node_modules/.bin/jsdoc ' +
