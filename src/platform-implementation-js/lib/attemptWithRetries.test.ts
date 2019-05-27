@@ -1,5 +1,3 @@
-/* @flow */
-
 import attemptWithRetries from './attemptWithRetries';
 
 test('works', async () => {

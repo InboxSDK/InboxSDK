@@ -1,5 +1,3 @@
-/* @flow */
-
 import signIn from './lib/signIn';
 import delay from 'pdelay';
 import waitFor from '../../src/platform-implementation-js/lib/wait-for';
@@ -19,8 +17,8 @@ beforeAll(async () => {
 
 afterEach(async () => {
   const errors = await page.evaluate(() => {
-    const errors = window._errors;
-    window._errors = [];
+    const errors = (window as any)._errors;
+    (window as any)._errors = [];
     return errors;
   });
   expect(Array.isArray(errors)).toBe(true);
@@ -52,7 +50,7 @@ beforeEach(async () => {
 function waitForCounter(attribute: string, goal: number): Promise<number> {
   return page.waitForFunction(
     (attribute, goal) => {
-      const value = Number((document.head: any).getAttribute(attribute));
+      const value = Number(document.head.getAttribute(attribute));
       if (value >= goal) {
         return value;
       }
@@ -61,7 +59,7 @@ function waitForCounter(attribute: string, goal: number): Promise<number> {
     { polling: 100 },
     attribute,
     goal
-  );
+  ) as any;
 }
 
 function getCounter(attribute: string): Promise<number> {
@@ -208,7 +206,7 @@ describe('sidebar', () => {
     const sidebarIsOpen =
       (await (await page.$(
         'button.test__sidebarCounterButton'
-      )).boundingBox()) != null;
+      ))!.boundingBox()) != null;
     if (!sidebarIsOpen) {
       await page.click(
         'button.inboxsdk__button_icon[data-tooltip="Test Sidebar"]'

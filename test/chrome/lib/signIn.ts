@@ -1,5 +1,3 @@
-/* @flow */
-
 import googleTotp from '../../lib/googleTotp';
 import readAuthInfo from './readAuthInfo';
 import delay from 'pdelay';

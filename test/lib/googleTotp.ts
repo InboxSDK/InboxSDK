@@ -1,5 +1,3 @@
-/* @flow */
-
 import notp from 'notp';
 import base32 from 'thirty-two';
 

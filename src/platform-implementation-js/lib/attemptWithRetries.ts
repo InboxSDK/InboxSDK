@@ -1,5 +1,3 @@
-/* @flow */
-
 export default async function attemptWithRetries<T>(
   fn: () => Promise<T>,
   attemptCount: number,
