@@ -1,5 +1,3 @@
-/* @flow */
-
 import isValidEmail from './is-valid-email';
 
 it('should reject invalid email addresses', () => {

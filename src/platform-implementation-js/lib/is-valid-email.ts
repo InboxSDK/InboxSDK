@@ -1,5 +1,3 @@
-/* @flow */
-
 const re = /^([^<>()[\]\\,;:\s"]+|".+")@[^\s<>]+$/;
 
 // This function is supposed to be pretty forgiving because emails can have
@@ -9,7 +7,7 @@ const re = /^([^<>()[\]\\,;:\s"]+|".+")@[^\s<>]+$/;
 // symbols. We might want to make it even less strict and allow more symbols if
 // it turns out people are legitimately receiving emails with these in the From
 // or other recipient headers.
-export default function isValidEmail(candidate: ?string): boolean {
+export default function isValidEmail(candidate: string | null | void): boolean {
   if (candidate == null) {
     return false;
   }

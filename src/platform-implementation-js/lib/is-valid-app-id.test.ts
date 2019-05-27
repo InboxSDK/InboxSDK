@@ -1,13 +1,11 @@
-/* @flow */
-
 import isValidAppId from './is-valid-app-id';
 
-function shouldPass(description, appId) {
+function shouldPass(description: string, appId: string) {
   it(description, () => {
     expect(isValidAppId(appId)).toBe(true);
   });
 }
-function shouldFail(description, appId) {
+function shouldFail(description: string, appId: string) {
   it(description, () => {
     expect(isValidAppId(appId)).toBe(false);
   });

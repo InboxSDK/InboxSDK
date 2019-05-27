@@ -1,5 +1,3 @@
-/* @flow */
-
 import incrementName from './incrementName';
 
 test('works multiple times', () => {

@@ -1,8 +1,6 @@
-/* @flow */
-
 import Sha1 from 'sha.js/sha1';
 
-function grandfatherHash(x) {
+function grandfatherHash(x: string) {
   const hasher = new Sha1();
   hasher.update('YlEHtGl72+c' + x);
   return hasher.digest('hex');

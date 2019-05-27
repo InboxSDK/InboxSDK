@@ -1,5 +1,3 @@
-/* @flow */
-
 export default function incrementName(name: string): string {
   const m = / (\d+)$/.exec(name);
   if (m) {

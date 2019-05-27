@@ -26,3 +26,11 @@ declare module 'sha.js/sha256' {
   };
   export = SHA;
 }
+
+declare module 'sha.js/sha1' {
+  import { Hash } from 'crypto';
+  const SHA: {
+    new (): Hash;
+  };
+  export = SHA;
+}

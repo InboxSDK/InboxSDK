@@ -1,19 +1,18 @@
-/* @flow */
-
 import sinon from 'sinon';
 
-import Membrane from './Membrane';
+import Membrane, { Mapper } from './Membrane';
 
 class FooDriver {}
 class Foo {
-  fooDriver: FooDriver;
-  constructor(fooDriver) {
+  public fooDriver: FooDriver;
+  public constructor(fooDriver: FooDriver) {
     this.fooDriver = fooDriver;
   }
 }
 
 it('works', () => {
-  const mappers = [[FooDriver, sinon.spy(fooDriver => new Foo(fooDriver))]];
+  const fn = sinon.spy((fooDriver: FooDriver) => new Foo(fooDriver));
+  const mappers: Mapper<typeof FooDriver>[] = [[FooDriver, fn]];
   const membrane = new Membrane(mappers);
 
   const fd = new FooDriver();
@@ -21,5 +20,5 @@ it('works', () => {
   expect(f1).toBeInstanceOf(Foo);
   const f2 = membrane.get(fd);
   expect(f2).toBe(f1);
-  expect(mappers[0][1].callCount).toBe(1);
+  expect(fn.callCount).toBe(1);
 });
