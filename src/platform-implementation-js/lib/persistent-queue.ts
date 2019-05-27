@@ -1,40 +1,37 @@
-/* @flow */
-
 // Queue which tries to persist its data into localStorage so its contents
 // aren't wiped when the page is closed. It handles localStorage not being
 // present or not working (such as if we're running into quota issues).
 // Safe for use in multiple tabs on the same domain at once.
 
-class PersistentQueue<T> {
-  _fallbackQueue: T[];
-  _sid: string;
+export default class PersistentQueue<T> {
+  private _fallbackQueue: T[] = [];
+  private _sid: string;
 
-  constructor(id: string) {
-    this._fallbackQueue = [];
+  public constructor(id: string) {
     this._sid = 'inboxsdk__persistentqueue_' + id;
   }
 
-  _getSavedQueue(): T[] {
-    var queue = JSON.parse((localStorage.getItem(this._sid): any));
+  private _getSavedQueue(): T[] {
+    let queue = JSON.parse(localStorage.getItem(this._sid) as any);
     if (queue == null) {
       queue = [];
     }
     return queue;
   }
 
-  _putSavedQueue(queue: T[]) {
+  private _putSavedQueue(queue: T[]) {
     localStorage.setItem(this._sid, JSON.stringify(queue));
   }
 
-  _clearSavedQueue() {
+  private _clearSavedQueue() {
     localStorage.removeItem(this._sid);
   }
 
-  add(val: T) {
-    var success = false;
-    if (global.localStorage) {
+  public add(val: T) {
+    let success = false;
+    if (typeof localStorage !== 'undefined') {
       try {
-        var queue = this._getSavedQueue();
+        const queue = this._getSavedQueue();
         queue.push(val);
         this._putSavedQueue(queue);
         success = true;
@@ -47,12 +44,12 @@ class PersistentQueue<T> {
     }
   }
 
-  remove(): T {
-    var ret;
-    if (global.localStorage) {
+  public remove(): T | undefined {
+    let ret;
+    if (typeof localStorage !== 'undefined') {
       try {
-        var queue = this._getSavedQueue();
-        var tmpRet = queue.shift();
+        const queue = this._getSavedQueue();
+        const tmpRet = queue.shift();
         this._putSavedQueue(queue);
         ret = tmpRet;
       } catch (e) {
@@ -67,11 +64,11 @@ class PersistentQueue<T> {
     return ret;
   }
 
-  removeAll(): T[] {
-    var ret;
-    if (global.localStorage) {
+  public removeAll(): T[] {
+    let ret: any[] | void = undefined;
+    if (typeof localStorage !== 'undefined') {
       try {
-        var queue = this._getSavedQueue();
+        const queue = this._getSavedQueue();
         this._clearSavedQueue();
         ret = queue;
       } catch (e) {
@@ -86,9 +83,9 @@ class PersistentQueue<T> {
     return ret;
   }
 
-  peekAll(): T[] {
-    var ret;
-    if (global.localStorage) {
+  public peekAll(): T[] {
+    let ret: any[] | void = undefined;
+    if (typeof localStorage !== 'undefined') {
       try {
         ret = this._getSavedQueue();
       } catch (e) {
@@ -102,8 +99,8 @@ class PersistentQueue<T> {
     return ret;
   }
 
-  clear() {
-    if (global.localStorage) {
+  public clear() {
+    if (typeof localStorage !== 'undefined') {
       try {
         this._clearSavedQueue();
       } catch (e) {
@@ -113,5 +110,3 @@ class PersistentQueue<T> {
     this._fallbackQueue.length = 0;
   }
 }
-
-export default PersistentQueue;

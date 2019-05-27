@@ -1,10 +1,8 @@
-/* @flow */
-
 import Sha256 from 'sha.js/sha256';
 
 const cache: Map<string, string> = new Map();
-let seed: ?string = null;
-let useDevMode: boolean = false;
+let seed: string | null = null;
+let useDevMode = false;
 
 // Pass a name and you'll get a unique identifier associated with that name.
 // The returned identifier will only contain alphabetic characters.
@@ -13,9 +11,7 @@ export default function idMap(name: string): string {
   if (id != null) return id;
 
   if (seed == null) {
-    seed = ((document.documentElement: any): HTMLElement).getAttribute(
-      'data-map-id'
-    );
+    seed = document.documentElement.getAttribute('data-map-id');
     if (seed == null) {
       // Make the seed change every hour: the seed is based on a hash of the
       // current timestamp in hour resolution.
@@ -26,10 +22,7 @@ export default function idMap(name: string): string {
       seed =
         hasher.digest('hex').slice(0, 16) +
         (process.env.NODE_ENV === 'development' ? 'x' : '');
-      ((document.documentElement: any): HTMLElement).setAttribute(
-        'data-map-id',
-        seed
-      );
+      document.documentElement.setAttribute('data-map-id', seed);
     }
     useDevMode = /x$/.test(seed);
   }

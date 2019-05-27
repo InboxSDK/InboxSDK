@@ -1,0 +1,8 @@
+/* @flow */
+
+// Pass a name and you'll get a unique identifier associated with that name.
+// The returned identifier will only contain alphabetic characters.
+declare export default function idMap(name: string): string;
+
+// Only exposed for tests!
+declare export function _reset(): void;

@@ -1,30 +1,26 @@
-/* @flow */
-
 import idMap, { _reset } from './idMap';
 
 // Babel replaces calls to Date.now which makes mocking it awkward, so undo that.
 jest.mock('core-js/library/fn/date/now', () => {
-  return () => (Date: any).now();
+  return () => global.Date.now();
 });
 
-const original_Date_now = (Date: any).now;
+const originalDateNow = global.Date.now;
 afterEach(() => {
   _reset();
-  (Date: any).now = original_Date_now;
+  global.Date.now = originalDateNow;
 });
 
-for (let env of ['test', 'development']) {
+for (const env of ['test', 'development']) {
   describe(`NODE_ENV: ${env}`, () => {
-    let original_NODE_ENV;
+    let originalNodeEnv: string;
     beforeAll(() => {
-      original_NODE_ENV = process.env.NODE_ENV;
+      originalNodeEnv = process.env.NODE_ENV!;
       process.env.NODE_ENV = env;
     });
     afterAll(() => {
-      process.env.NODE_ENV = original_NODE_ENV;
-      ((document.documentElement: any): HTMLElement).removeAttribute(
-        'data-map-id'
-      );
+      process.env.NODE_ENV = originalNodeEnv;
+      document.documentElement.removeAttribute('data-map-id');
     });
 
     describe('common', () => {
@@ -72,10 +68,8 @@ for (let env of ['test', 'development']) {
           const a2 = idMap('foo');
           expect(a2).toBe(a1);
 
-          (Date: any).now = () => original_Date_now() + 1000 * 60 * 60;
-          ((document.documentElement: any): HTMLElement).removeAttribute(
-            'data-map-id'
-          );
+          global.Date.now = () => originalDateNow() + 1000 * 60 * 60;
+          document.documentElement.removeAttribute('data-map-id');
           _reset();
 
           const b1 = idMap('foo');
