@@ -1,5 +1,3 @@
-/* @flow */
-
 import censorHTMLstring from './censorHTMLstring';
 
 it('works', () => {

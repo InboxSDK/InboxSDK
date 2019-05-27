@@ -1,8 +1,6 @@
-/* @flow */
-
 import censorHTMLtree from './censorHTMLtree';
 
-(document.documentElement: any).innerHTML = `
+document.documentElement.innerHTML = `
 <head><title>foo</title></head>
 <body>
   <div id="canvas" role="foo&amp;" data-blah="foo">
@@ -14,7 +12,7 @@ import censorHTMLtree from './censorHTMLtree';
 </body>
 `;
 
-it('works', function() {
+it('works', () => {
   const divB = document.getElementById('b');
   if (!divB) throw new Error();
   expect(censorHTMLtree(divB)).toBe(

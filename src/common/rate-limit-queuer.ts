@@ -1,18 +1,14 @@
-/* @flow */
-
 // Returns a wrapped version of the function which queues up callTimestamps to the
 // function if it is called more than count times within period amount of time.
-export default function rateLimitQueuer<T: (...args: any) => Promise<any>>(
-  fn: T,
-  period: number,
-  count: number
-): T {
+export default function rateLimitQueuer<
+  T extends (...args: any) => Promise<any>
+>(fn: T, period: number, count: number): T {
   let callTimestamps: Array<number> = [];
-  let queue: Array<() => void> = [];
+  const queue: Array<() => void> = [];
   let runningQueue = false;
 
   function runJob() {
-    const job = queue.shift();
+    const job = queue.shift()!;
     job();
     if (queue.length) {
       runQueue();
@@ -43,13 +39,13 @@ export default function rateLimitQueuer<T: (...args: any) => Promise<any>>(
     return -1;
   }
 
-  return (function attempt() {
+  return function attempt(this: any, ...args: any[]) {
     let job;
     const promise = new Promise((resolve, reject) => {
       job = () => {
         callTimestamps.push(Date.now());
         try {
-          resolve(fn.apply(this, arguments));
+          resolve(fn.apply(this, args));
         } catch (err) {
           reject(err);
         }
@@ -63,5 +59,5 @@ export default function rateLimitQueuer<T: (...args: any) => Promise<any>>(
     }
 
     return promise;
-  }: any);
+  } as any;
 }

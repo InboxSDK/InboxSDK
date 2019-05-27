@@ -1,16 +1,12 @@
-/* @flow */
-
 import isStreakAppId from '../platform-implementation-js/lib/isStreakAppId';
 
 const hasStreakInstalled = () => {
   const appIds = JSON.parse(
-    (global.document &&
-      ((document.documentElement: any): HTMLElement).getAttribute(
-        'data-inboxsdk-active-app-ids'
-      )) ||
+    (typeof document !== 'undefined' &&
+      document.documentElement.getAttribute('data-inboxsdk-active-app-ids')) ||
       '[]'
   );
-  return appIds.find(({ appId }) => isStreakAppId(appId));
+  return appIds.find(({ appId }: any) => isStreakAppId(appId));
 };
 
 export default function censorJSONTree(object: any): string {

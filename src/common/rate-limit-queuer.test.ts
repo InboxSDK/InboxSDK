@@ -1,5 +1,3 @@
-/* @flow */
-
 import delay from 'pdelay';
 
 import rateLimitQueuer from './rate-limit-queuer';
@@ -8,14 +6,14 @@ jest.useFakeTimers();
 
 // Babel replaces calls to Date.now which makes mocking it awkward, so undo that.
 jest.mock('core-js/library/fn/date/now', () => {
-  return () => (Date: any).now();
+  return () => global.Date.now();
 });
 
-const _originalDateNow = (Date: any).now;
+const _originalDateNow = global.Date.now;
 
 beforeEach(() => {
   const start = _originalDateNow.call(Date);
-  (Date: any).now = () => start;
+  global.Date.now = () => start;
 });
 
 function advancePromises(): Promise<void> {
@@ -24,7 +22,7 @@ function advancePromises(): Promise<void> {
 
 function advanceTimers(time: number) {
   const newTime = Date.now() + time;
-  (Date: any).now = () => newTime;
+  global.Date.now = () => newTime;
   jest.advanceTimersByTime(time);
 }
 

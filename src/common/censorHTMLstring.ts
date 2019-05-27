@@ -1,5 +1,3 @@
-/* @flow */
-
 export const ATTRIBUTE_WHITELIST: Set<string> = new Set([
   // standard html props
   'class',
@@ -36,12 +34,10 @@ export default function censorHTMLstring(html: string): string {
   return html
     .replace(
       /(^|>)([^<]+)/g,
-      ((match: string, start: string, text: string) =>
-        start + (text.trim().length ? '...' : ''): Function)
+      (match: string, start: string, text: string) =>
+        start + (text.trim().length ? '...' : '')
     )
-    .replace(
-      /\s([^\s=]+)\s*=\s*"[^"]+"/g,
-      ((match: string, attr: string) =>
-        ATTRIBUTE_WHITELIST.has(attr) ? match : ` ${attr}="..."`: Function)
+    .replace(/\s([^\s=]+)\s*=\s*"[^"]+"/g, (match: string, attr: string) =>
+      ATTRIBUTE_WHITELIST.has(attr) ? match : ` ${attr}="..."`
     );
 }

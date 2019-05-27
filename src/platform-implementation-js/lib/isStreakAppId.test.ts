@@ -1,5 +1,3 @@
-/* @flow */
-
 import isStreakAppId from './isStreakAppId';
 
 it('works', () => {

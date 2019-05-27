@@ -1,5 +1,3 @@
-/* @flow */
-
 import htmlToText from './html-to-text';
 
 test('works', () => {

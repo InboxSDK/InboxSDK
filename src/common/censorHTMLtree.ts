@@ -1,12 +1,10 @@
-/* @flow */
-
 import autoHtml from 'auto-html';
 import censorHTMLstring, { ATTRIBUTE_WHITELIST } from './censorHTMLstring';
 
 export default function censorHTMLtree(target: HTMLElement): string {
   const openers: string[] = [];
   const closers: string[] = [];
-  let parent = target;
+  let parent: HTMLElement | null = target;
   let lastIndex = 0;
   while (parent) {
     const attrHtml: string = Array.from(parent.attributes)

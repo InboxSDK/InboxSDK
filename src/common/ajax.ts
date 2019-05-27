@@ -1,12 +1,10 @@
-/* @flow */
-
 import querystring from 'querystring';
 import delay from 'pdelay';
 import cachebustUrl from './cachebust-url';
 
 const MAX_TIMEOUT = 64 * 1000; //64 seconds
 const MAX_RETRIES = 5;
-const serversToIgnore = {};
+const serversToIgnore: { [domain: string]: boolean } = {};
 
 // Simple ajax helper.
 // opts:
@@ -16,21 +14,21 @@ const serversToIgnore = {};
 // * [headers] - object
 // * [xhrFields] - object
 // * [data]
-export type AjaxOpts = {
-  url: string,
-  method?: ?string,
-  cachebust?: ?boolean,
-  headers?: ?{ [index: string]: string },
-  xhrFields?: ?Object,
-  data?: ?{ [index: string]: string } | string,
-  canRetry?: ?boolean,
-  retryNum?: number
-};
+export interface AjaxOpts {
+  url: string;
+  method?: string;
+  cachebust?: boolean;
+  headers?: { [index: string]: string };
+  xhrFields?: object;
+  data?: { [index: string]: string } | string;
+  canRetry?: boolean;
+  retryNum?: number;
+}
 
-export type AjaxResponse = {
-  text: string,
-  xhr: XMLHttpRequest
-};
+export interface AjaxResponse {
+  text: string;
+  xhr: XMLHttpRequest;
+}
 
 export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
   if (!opts || typeof opts.url !== 'string') {
@@ -39,7 +37,7 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
   return new Promise(function(resolve, reject) {
     const method = opts.method ? opts.method : 'GET';
     let url = opts.url;
-    let stringData: ?string = undefined;
+    let stringData: string | null = null;
     if (opts.data) {
       stringData =
         typeof opts.data === 'string'
@@ -82,7 +80,7 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
         }
       }
 
-      const err = Object.assign((new Error(`Failed to load ${url}`): any), {
+      const err = Object.assign(new Error(`Failed to load ${url}`) as any, {
         event,
         xhr,
         status: xhr.status
@@ -102,7 +100,7 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
           text: xhr.responseText
         });
       } else {
-        xhr.onerror(event);
+        xhr.onerror!(event);
       }
     };
     xhr.open(method, url, true);
