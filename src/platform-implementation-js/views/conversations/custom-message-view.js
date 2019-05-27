@@ -533,17 +533,15 @@ export default class CustomMessageView extends SafeEventEmitter {
         '.inboxsdk__custom_message_view_app_notice_content'
       )
     );
-    if (oldContents.length > 0) {
-      oldContents.forEach(element => {
-        element.dispatchEvent(
-          new CustomEvent('inboxsdk-outdated', {
-            bubbles: false,
-            cancelable: false,
-            detail: null
-          })
-        );
-      });
-    }
+    oldContents.forEach(element => {
+      element.dispatchEvent(
+        new CustomEvent('inboxsdk-outdated', {
+          bubbles: false,
+          cancelable: false,
+          detail: null
+        })
+      );
+    });
     appNoticeContainerElement.classList.add(
       'inboxsdk__custom_message_view_app_notice_content'
     );
