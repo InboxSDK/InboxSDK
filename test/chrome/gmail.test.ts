@@ -1,6 +1,4 @@
 import signIn from './lib/signIn';
-import delay from 'pdelay';
-import waitFor from '../../src/platform-implementation-js/lib/wait-for';
 import attemptWithRetries from '../../src/platform-implementation-js/lib/attemptWithRetries';
 
 const testEmail = 'inboxsdktest@gmail.com';

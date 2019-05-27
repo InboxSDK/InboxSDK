@@ -18,15 +18,9 @@ module.exports = {
     },
     sourceType: 'module'
   },
-  plugins: ['flowtype', 'deprecate'],
+  plugins: ['deprecate'],
   rules: {
-    'flowtype/define-flow-type': 1,
-    'flowtype/require-valid-file-annotation': ['error', 'always'],
-
-    'no-unused-vars': ['off'],
-    // "indent": ["error", 2],
     'linebreak-style': ['error', 'unix'],
-    // "quotes": ["error", "single", "avoid-escape"],
     semi: ['error', 'always'],
     'no-var': ['off'], //["error"],
     'brace-style': ['off'], //["error"],
@@ -38,6 +32,36 @@ module.exports = {
     'keyword-spacing': ['off'] //["error"],
   },
   overrides: [
+    // Flow config
+    {
+      files: ['*.js'],
+      plugins: ['flowtype'],
+      rules: {
+        'flowtype/define-flow-type': 1,
+        'flowtype/require-valid-file-annotation': ['error', 'always'],
+        'no-unused-vars': ['off']
+      }
+    },
+
+    // Start typescript config
+    ...require('@typescript-eslint/eslint-plugin/dist/configs/eslint-recommended')
+      .default.overrides,
+    {
+      files: ['*.ts', '*.tsx'],
+      ...require('@typescript-eslint/eslint-plugin/dist/configs/recommended.json')
+    },
+    {
+      files: ['*.ts', '*.tsx'],
+      rules: {
+        '@typescript-eslint/indent': ['off'],
+        '@typescript-eslint/explicit-function-return-type': ['off'],
+        '@typescript-eslint/no-explicit-any': ['off'],
+        '@typescript-eslint/no-use-before-define': ['off'],
+        '@typescript-eslint/no-non-null-assertion': ['off']
+      }
+    },
+    // End typescript config
+
     {
       files: ['src/**'],
       excludedFiles: '*.test.js',
