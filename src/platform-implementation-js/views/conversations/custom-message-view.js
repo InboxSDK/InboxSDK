@@ -35,7 +35,7 @@ export default class CustomMessageView extends SafeEventEmitter {
     unmountPromise: Promise<void>
   ) => ?HTMLElement;
   _hiddenCustomMessageNoticeElement: ?HTMLElement;
-  _cleanupCustomHiddenMessage: boolean => void;
+  _cleanupCustomHiddenMessage: ?(boolean) => void;
 
   constructor(
     descriptorStream: Kefir.Observable<CustomMessageDescriptor>,
@@ -360,7 +360,9 @@ export default class CustomMessageView extends SafeEventEmitter {
     );
 
     appNoticeContainerElement.addEventListener('inboxsdk-outdated', () => {
-      this._cleanupCustomHiddenMessage(false);
+      if (this._cleanupCustomHiddenMessage) {
+        this._cleanupCustomHiddenMessage(false);
+      }
     });
 
     let numberCustomHiddenMessages = 1;
@@ -405,6 +407,7 @@ export default class CustomMessageView extends SafeEventEmitter {
       numberNativeHiddenMessages,
       new Promise(resolve => {
         this._cleanupCustomHiddenMessage = (resetCount: boolean) => {
+          this._cleanupCustomHiddenMessage = null;
           if (resetCount) {
             hiddenNoticeMessageElement.setAttribute(
               'data-inboxsdk-custommessagecount',
@@ -512,6 +515,7 @@ export default class CustomMessageView extends SafeEventEmitter {
       0,
       new Promise(resolve => {
         this._cleanupCustomHiddenMessage = (resetCount: boolean) => {
+          this._cleanupCustomHiddenMessage = null;
           if (resetCount) {
             hiddenNoticeElement.setAttribute(
               'data-inboxsdk-custommessagecount',
@@ -549,7 +553,9 @@ export default class CustomMessageView extends SafeEventEmitter {
     sdkNoticeIndicator.appendChild(appNoticeContainerElement);
 
     appNoticeContainerElement.addEventListener('inboxsdk-outdated', () => {
-      this._cleanupCustomHiddenMessage(false);
+      if (this._cleanupCustomHiddenMessage) {
+        this._cleanupCustomHiddenMessage(false);
+      }
     });
   }
 }
