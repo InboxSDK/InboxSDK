@@ -9,12 +9,4 @@ export type Defer<T> = {
   promise: Promise<T>
 };
 
-export default function defer<T>(): Defer<T> {
-  let resolve: any = undefined;
-  let reject: any = undefined;
-  const promise = new Promise((_resolve, _reject) => {
-    resolve = _resolve;
-    reject = _reject;
-  });
-  return { resolve, reject, promise };
-}
+declare export default function defer<T>(): Defer<T>;

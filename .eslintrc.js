@@ -34,7 +34,7 @@ module.exports = {
   overrides: [
     // Flow config
     {
-      files: ['*.js'],
+      files: ['*.js', '*.js.flow'],
       plugins: ['flowtype'],
       rules: {
         'flowtype/define-flow-type': 1,
