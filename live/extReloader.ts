@@ -1,5 +1,3 @@
-/* @flow */
-
 import once from 'lodash/once';
 import memoize from 'lodash/memoize';
 import cproc from 'child_process';
@@ -21,26 +19,26 @@ function getUserHome(): string {
 // extension is installed, it returns the name of Chrome name suffix (such as
 // "", " Canary", etc).
 const getchromeSuffixWithReloaderExtension = once(
-  async (): Promise<?string> => {
+  async (): Promise<string | void> => {
     const path =
       getUserHome() +
       '/Library/Application Support/Google/Chrome*/*/Extensions/fimgfedafeadlieiabdeeaodndnlbhid';
-    const results = await fg([path], { onlyDirectories: true });
+    const results = await fg<string>([path], { onlyDirectories: true });
     const firstResult = results[0];
     if (firstResult) {
-      return firstResult.match(/Chrome([^/]*)\//)[1];
+      return firstResult.match(/Chrome([^/]*)\//)![1];
     }
-    return null;
+    return undefined;
   }
 );
 
 const getChromeLocation = memoize(
-  async (chromeSuffix: string): Promise<?string> => {
+  async (chromeSuffix: string): Promise<string | void> => {
     const path =
       '/Applications/Google Chrome' +
       chromeSuffix +
       '.app/Contents/MacOS/Google Chrome*';
-    const results = await fg([path]);
+    const results = await fg<string>([path]);
     return results[0];
   }
 );

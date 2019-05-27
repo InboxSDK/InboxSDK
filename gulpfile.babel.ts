@@ -1,4 +1,3 @@
-/* @flow */
 /* eslint-disable no-console */
 
 import 'yarn-deps-check';
@@ -21,14 +20,12 @@ import sourcemaps from 'gulp-sourcemaps';
 import stdio from 'stdio';
 import gutil from 'gulp-util';
 import rename from 'gulp-rename';
-import extReloader from './live/ext-reloader';
+import extReloader from './live/extReloader';
 import rimraf from 'rimraf';
 import Kefir from 'kefir';
 import fg from 'fast-glob';
-import streamToPromise from './src/common/stream-to-promise';
 import exec from './src/build/exec';
-import spawn from './src/build/spawn';
-import escapeShellArg from './src/build/escape-shell-arg';
+import escapeShellArg from './src/build/escapeShellArg';
 import dir from 'node-dir';
 import babelify from 'babelify';
 import lazyPipe from 'lazypipe';
@@ -86,7 +83,14 @@ async function setupExamples() {
   for (const dir of dirs) {
     stream = stream.pipe(destAtomic(dir));
   }
-  await streamToPromise(stream);
+  await new Promise((resolve, reject) => {
+    stream.on('error', (err: any) => {
+      reject(err);
+    });
+    stream.on('finish', () => {
+      resolve();
+    });
+  });
   if (args.reloader) {
     await extReloader();
   }
@@ -130,15 +134,15 @@ async function getBrowserifyHmrOptions(port: number) {
   return { url, tlskey, tlscert, port };
 }
 
-type BrowserifyTaskOptions = {|
-  entry: string,
-  destName: string,
-  hotPort?: number,
-  disableMinification?: boolean,
-  afterBuild?: () => Promise<void>,
-  noSourceMapComment?: boolean,
-  sourceMappingURLPrefix?: string
-|};
+type BrowserifyTaskOptions = {
+  entry: string;
+  destName: string;
+  hotPort?: number;
+  disableMinification?: boolean;
+  afterBuild?: () => Promise<void>;
+  noSourceMapComment?: boolean;
+  sourceMappingURLPrefix?: string;
+};
 
 async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
   const { entry, destName, hotPort, disableMinification } = options;
@@ -146,8 +150,9 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
   const willMinify = args.minify && !disableMinification;
 
   process.env.VERSION = await getVersion();
-  const browserifyHmrOptions =
-    hotPort && (await getBrowserifyHmrOptions(hotPort));
+  const browserifyHmrOptions = hotPort
+    ? await getBrowserifyHmrOptions(hotPort)
+    : null;
 
   let bundler = browserify({
     entries: entry,
@@ -173,7 +178,7 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
     .transform('redirectify', { global: true });
 
   if (args.hot && hotPort) {
-    bundler.plugin(require('browserify-hmr'), browserifyHmrOptions);
+    bundler.plugin(require('browserify-hmr'), browserifyHmrOptions!);
   }
 
   async function buildBundle(): Promise<void> {
@@ -196,9 +201,10 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
         gulpif(
           willMinify,
           uglify({
-            preserveComments: 'some',
+            // TODO check
+            // preserveComments: 'some',
             mangle: {
-              except: ['Generator', 'GeneratorFunction']
+              reserved: ['Generator', 'GeneratorFunction']
             }
           })
         )
@@ -282,7 +288,7 @@ gulp.task('clean', cb => {
 });
 
 gulp.task('docs', async () => {
-  const paths = await new Promise((resolve, reject) => {
+  const paths: dir.PathsResult = await new Promise((resolve, reject) => {
     dir.paths(__dirname + '/src', (err, paths) => {
       if (err) reject(err);
       else resolve(paths);
@@ -298,7 +304,7 @@ gulp.task('docs', async () => {
   );
   const classes = _.chain(files)
     .filter(Boolean)
-    .map(x => x.classes)
+    .map((x: any) => x.classes)
     .flatten()
     .filter(Boolean)
     .map(transformClass)
@@ -325,7 +331,7 @@ gulp.task('docs', async () => {
   );
 });
 
-function checkForDocIssues(c) {
+function checkForDocIssues(c: any) {
   if (c.functions) {
     for (const func of c.functions) {
       if (!func.returns) {
@@ -364,33 +370,39 @@ async function parseCommentsInFile(file: string): Promise<Object> {
   }
 }
 
-function transformClass(c) {
-  (c.functions || []).forEach(func => {
-    func.description = func.description.replace(/\n\^(\S+)/g, (m, rule) => {
-      if (rule === 'gmail' || rule === 'inbox') {
-        if (!func.environments) func.environments = [];
-        func.environments.push(rule);
-        return '';
+function transformClass(c: any) {
+  (c.functions || []).forEach((func: any) => {
+    func.description = (func.description as string).replace(
+      /\n\^(\S+)/g,
+      (m, rule) => {
+        if (rule === 'gmail' || rule === 'inbox') {
+          if (!func.environments) func.environments = [];
+          func.environments.push(rule);
+          return '';
+        }
+        throw new Error(`Unknown rule ^${rule}`);
       }
-      throw new Error(`Unknown rule ^${rule}`);
-    });
+    );
   });
 
-  (c.properties || []).forEach(prop => {
+  (c.properties || []).forEach((prop: any) => {
     prop.optional = false;
 
-    prop.description = prop.description.replace(/\n\^(\S+)/g, (m, rule) => {
-      if (rule === 'optional') {
-        prop.optional = true;
-        return '';
+    prop.description = (prop.description as string).replace(
+      /\n\^(\S+)/g,
+      (m, rule) => {
+        if (rule === 'optional') {
+          prop.optional = true;
+          return '';
+        }
+        const defaultM = /^default=(.*)$/.exec(rule);
+        if (defaultM) {
+          prop.default = defaultM[1];
+          return '';
+        }
+        throw new Error(`Unknown property rule ^${rule}`);
       }
-      const defaultM = /^default=(.*)$/.exec(rule);
-      if (defaultM) {
-        prop.default = defaultM[1];
-        return '';
-      }
-      throw new Error(`Unknown property rule ^${rule}`);
-    });
+    );
   });
 
   return c;

@@ -7,6 +7,13 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "target": "ES2018",
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "baseUrl": ".",
+    "paths": {
+      "gulp-add-src": ["src/types/gulp-add-src.d.ts"],
+      "gulp-dest-atomic": ["src/types/gulp-dest-atomic.d.ts"],
+      "gulp-streamify": ["src/types/gulp-streamify.d.ts"],
+      "stdio": ["src/types/stdio.d.ts"]
+    }
   }
 }

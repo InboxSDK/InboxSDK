@@ -1,6 +1,4 @@
-/* @flow */
-
-const cproc = require('child_process');
+import cproc from 'child_process';
 
 // Spawns a process and passes stdout and stderr through.
 export default function spawn(
@@ -16,7 +14,7 @@ export default function spawn(
         const err: Error & Object = new Error(
           'Process exited with code ' + code
         );
-        err.code = code;
+        (err as any).code = code;
         reject(err);
       }
     });
