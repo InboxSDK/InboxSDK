@@ -223,7 +223,7 @@ export default class CustomMessageView extends SafeEventEmitter {
     });
   }
 
-  _findContiguousHiddenIndicator(ignoreHiddenMessages: boolean): ?HTMLElement {
+  _findContiguousHiddenMessage(filter: HTMLElement => boolean): ?HTMLElement {
     const parent = this._el.parentElement;
     if (!parent) {
       return null;
@@ -240,25 +240,10 @@ export default class CustomMessageView extends SafeEventEmitter {
         if (!candidate) {
           throw new Error('Should not happen: candidate was null');
         }
-
-        if (ignoreHiddenMessages) {
-          // Native indicator or SDK indicator
-          if (
-            candidate.classList.contains('adv') ||
-            candidate.classList.contains(
-              'inboxsdk__custom_hidden_message_view_notice'
-            )
-          ) {
-            return candidate;
-          }
-        } else {
-          // Native hidden message
-          if (candidate.classList.contains('kQ')) {
-            return candidate;
-          }
+        if (filter(candidate)) {
+          return candidate;
         }
-
-        // Native message (collapsed or expanded)
+        // Non-hidden native message (collapsed or expanded)
         if (
           candidate.classList.contains('kv') ||
           candidate.classList.contains('h7')
@@ -280,11 +265,20 @@ export default class CustomMessageView extends SafeEventEmitter {
     if (!this._el.parentElement) {
       return;
     }
-    let hiddenIndicatorElement = this._findContiguousHiddenIndicator(true);
+
+    let hiddenIndicatorElement = this._findContiguousHiddenMessage(
+      el =>
+        // Native indicator or SDK indicator
+        el.classList.contains('adv') ||
+        el.classList.contains('inboxsdk__custom_hidden_message_view_notice')
+    );
 
     const nativeHiddenNoticePresent = !!hiddenIndicatorElement;
     if (!hiddenIndicatorElement) {
-      hiddenIndicatorElement = this._findContiguousHiddenIndicator(false);
+      hiddenIndicatorElement = this._findContiguousHiddenMessage(el =>
+        // Native hidden message with no indicator
+        el.classList.contains('kQ')
+      );
     }
     if (!hiddenIndicatorElement) {
       // Create a new custom indicator
