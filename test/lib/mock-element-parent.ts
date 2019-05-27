@@ -1,21 +1,21 @@
-/* @flow */
-
 import assert from 'assert';
 import EventEmitter from 'events';
 
 // Mock element suitable for use with MockMutationObserver
-class MockElementParent extends EventEmitter {
-  children: Object[];
+export default class MockElementParent extends EventEmitter {
+  public children: any[];
+  public _emitsMutations = true;
+  public nodeType = 1;
 
-  constructor(children: Object[] = []) {
+  public constructor(children: any[] = []) {
     super();
     assert(Array.isArray(children), 'children must be array');
     this.children = children;
   }
 
-  appendAndRemoveChildren(toAdd: Object[] = [], toRemove: Object[] = []) {
+  public appendAndRemoveChildren(toAdd: any[] = [], toRemove: any[] = []) {
     const presentTargets = [];
-    for (let target of toRemove) {
+    for (const target of toRemove) {
       const ix = this.children.indexOf(target);
       if (ix >= 0) {
         target.parentElement = null;
@@ -25,7 +25,7 @@ class MockElementParent extends EventEmitter {
         throw new Error("Tried to remove child that wasn't present");
       }
     }
-    for (let target of toAdd) {
+    for (const target of toAdd) {
       target.parentElement = this;
       this.children.push(target);
     }
@@ -35,24 +35,19 @@ class MockElementParent extends EventEmitter {
     });
   }
 
-  appendChildren(targets: Object[]) {
+  public appendChildren(targets: any[]) {
     return this.appendAndRemoveChildren(targets, undefined);
   }
 
-  removeChildren(targets: Object[]) {
+  public removeChildren(targets: any[]) {
     return this.appendAndRemoveChildren(undefined, targets);
   }
 
-  appendChild(target: Object) {
+  public appendChild(target: any) {
     return this.appendChildren([target]);
   }
 
-  removeChild(target: Object) {
+  public removeChild(target: any) {
     return this.removeChildren([target]);
   }
 }
-
-(MockElementParent: any).prototype._emitsMutations = true;
-(MockElementParent: any).prototype.nodeType = 1;
-
-export default MockElementParent;

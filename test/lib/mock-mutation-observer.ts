@@ -4,35 +4,35 @@ import assert from 'assert';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 
-class MockMutationObserver {
-  _callback: (mutations: MutationRecord[]) => void;
-  _records: MutationRecord[] = [];
-  _updateQueued: boolean = false;
-  _stopper = kefirBus();
+export default class MockMutationObserver {
+  private _callback: (mutations: MutationRecord[]) => void;
+  private _records: MutationRecord[] = [];
+  private _updateQueued: boolean = false;
+  private _stopper = kefirBus();
 
-  constructor(callback: (mutations: MutationRecord[]) => void) {
+  public constructor(callback: (mutations: MutationRecord[]) => void) {
     this._callback = callback;
   }
 
-  observe(element: Node, options: MutationObserverInit) {
+  public observe(element: Node, options: MutationObserverInit) {
     assert(element);
     assert(options);
 
-    if ((element: any)._emitsMutations) {
+    if ((element as any)._emitsMutations) {
       Kefir.fromEvents(element, 'mutation')
         .takeUntilBy(Kefir.fromEvents(element, 'removed'))
         .takeUntilBy(this._stopper)
-        .map(event => {
-          const newEvent: Object = { target: event.target };
-          if ((options: any).childList && event.addedNodes) {
+        .map((event: any) => {
+          const newEvent: any = { target: event.target };
+          if ((options as any).childList && event.addedNodes) {
             newEvent.addedNodes = event.addedNodes;
             newEvent.removedNodes = event.removedNodes;
           }
           if (
-            (options: any).attributes &&
+            (options as any).attributes &&
             event.attributeName &&
-            (!(options: any).attributeFilter ||
-              (options: any).attributeFilter.includes(event.attributeName))
+            (!(options as any).attributeFilter ||
+              (options as any).attributeFilter.includes(event.attributeName))
           ) {
             newEvent.attributeName = event.attributeName;
           }
@@ -43,18 +43,18 @@ class MockMutationObserver {
     }
   }
 
-  disconnect() {
+  public disconnect() {
     this._stopper.emit('stop');
     this.takeRecords();
   }
 
-  takeRecords() {
+  public takeRecords() {
     const records = this._records;
     this._records = [];
     return records;
   }
 
-  _queueMutation(mutation: MutationRecord) {
+  public _queueMutation(mutation: MutationRecord) {
     this._records.push(mutation);
     if (!this._updateQueued) {
       this._updateQueued = true;
@@ -67,5 +67,3 @@ class MockMutationObserver {
     }
   }
 }
-
-export default ((MockMutationObserver: any): Class<MutationObserver>);

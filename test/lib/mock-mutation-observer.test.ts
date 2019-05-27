@@ -4,12 +4,12 @@ import EventEmitter from 'events';
 
 import MutationObserver from './mock-mutation-observer';
 
-function fakeEl(name: string): Object {
+function fakeEl(name: string): any {
   return { name, nodeType: 1 };
 }
 
 it('should work', () => {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     const c1 = fakeEl('c1'),
       c2 = fakeEl('c2'),
       c3 = fakeEl('c3');
@@ -23,7 +23,7 @@ it('should work', () => {
       resolve();
     });
 
-    const el: Object = new EventEmitter();
+    const el: any = new EventEmitter();
     el._emitsMutations = true;
     obs.observe(el, { childList: true });
 
@@ -33,7 +33,7 @@ it('should work', () => {
 });
 
 it('can disconnect', () => {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     const c1 = fakeEl('c1'),
       c2 = fakeEl('c2'),
       c3 = fakeEl('c3');
@@ -45,7 +45,7 @@ it('can disconnect', () => {
       resolve();
     });
 
-    const elBad: Object = new EventEmitter();
+    const elBad: any = new EventEmitter();
     elBad._emitsMutations = true;
     obs.observe(elBad, { childList: true });
     elBad.emit('mutation', { addedNodes: [c2], removedNodes: [c3] });
@@ -53,7 +53,7 @@ it('can disconnect', () => {
     obs.disconnect();
     elBad.emit('mutation', { addedNodes: [c2], removedNodes: [c3] });
 
-    const elGood: Object = new EventEmitter();
+    const elGood: any = new EventEmitter();
     elGood._emitsMutations = true;
     obs.observe(elGood, { childList: true });
     elGood.emit('mutation', { addedNodes: [c1], removedNodes: [] });
