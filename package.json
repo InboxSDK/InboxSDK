@@ -154,7 +154,6 @@
     "tag-tree": "^0.4.0",
     "thirty-two": "^1.0.1",
     "transducers.js": "^0.3.2",
-    "ts-node": "^8.2.0",
     "typescript": "^3.4.5",
     "ud": "^3.1.1",
     "ud-kefir": "^2.0.1",
