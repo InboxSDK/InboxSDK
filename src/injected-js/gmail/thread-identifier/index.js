@@ -6,8 +6,6 @@ import { parse } from 'querystring';
 import * as logger from '../../injected-logger';
 import * as threadRowParser from './thread-row-parser';
 import clickAndGetPopupUrl from './click-and-get-popup-url';
-import Marker from '../../../common/marker';
-import type { MarkerObj } from '../../../common/marker';
 import findParent from '../../../common/find-parent';
 
 export function setup() {
@@ -52,8 +50,10 @@ function processThreads(threads: GmailResponseProcessor.Thread[]) {
   threads.forEach(storeThreadMetadata);
 }
 
-const AMBIGUOUS = Marker('AMBIGUOUS');
-const threadIdsByKey: Map<string, string | MarkerObj> = new Map();
+type AmbiguousMarker = { name: 'AMBIGUOUS' };
+
+const AMBIGUOUS: AmbiguousMarker = { name: 'AMBIGUOUS' };
+const threadIdsByKey: Map<string, string | AmbiguousMarker> = new Map();
 function storeThreadMetadata(threadMetadata: GmailResponseProcessor.Thread) {
   var key = threadMetadataKey(threadMetadata);
   if (threadIdsByKey.has(key)) {
