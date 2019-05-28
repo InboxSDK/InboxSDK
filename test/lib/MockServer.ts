@@ -1,5 +1,3 @@
-/* @flow */
-
 import _ from 'lodash';
 
 function makeEvent(self: any, isProgressEvent?: boolean) {

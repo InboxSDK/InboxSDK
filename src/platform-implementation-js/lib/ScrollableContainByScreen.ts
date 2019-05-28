@@ -1,5 +1,3 @@
-/* @flow */
-
 import containByScreen, { Options } from 'contain-by-screen';
 
 import Kefir from 'kefir';

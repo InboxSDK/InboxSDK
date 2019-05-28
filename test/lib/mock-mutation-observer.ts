@@ -1,5 +1,3 @@
-/* @flow */
-
 import assert from 'assert';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';

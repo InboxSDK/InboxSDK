@@ -1,5 +1,3 @@
-/* @flow */
-
 interface InjectedMutationEvent {
   attributeName?: string | undefined;
   addedNodes?: HTMLElement[] | NodeListOf<HTMLElement>;

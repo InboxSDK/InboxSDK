@@ -1,5 +1,3 @@
-/* @flow */
-
 import EventEmitter from 'events';
 
 import MutationObserver from './mock-mutation-observer';
