@@ -1,5 +1,3 @@
-/* @flow */
-
 import delay from 'pdelay';
 
 import HandlerRegistry from './handler-registry';
@@ -8,7 +6,7 @@ it('handler called on existing targets asynchronously', async () => {
   const target1 = ['target1'];
   const target2 = ['target2'];
 
-  const reg = new HandlerRegistry();
+  const reg = new HandlerRegistry<any>();
   reg.addTarget(target1);
   reg.addTarget(target2);
 
@@ -85,7 +83,7 @@ it('handler can unsubscribe', async () => {
   const reg = new HandlerRegistry();
   reg.addTarget(target1);
 
-  const unsub = reg.registerHandler(target => {
+  const unsub = reg.registerHandler(() => {
     throw new Error('Should not happen');
   });
   unsub();
@@ -103,13 +101,13 @@ it('dumpHandlers works', async () => {
   const reg = new HandlerRegistry();
   reg.addTarget(target1);
 
-  reg.registerHandler(target => {
+  reg.registerHandler(() => {
     if (i++ !== 0) throw new Error('Should not happen');
   });
 
   await delay(2);
 
-  reg.registerHandler(target => {
+  reg.registerHandler(() => {
     throw new Error('Should not happen');
   });
   reg.dumpHandlers();

@@ -1,5 +1,3 @@
-/* @flow */
-
 import remove from 'lodash/remove';
 import asap from 'asap';
 import Logger from './logger';
@@ -7,11 +5,11 @@ import Logger from './logger';
 export type Handler<T> = (target: T) => void;
 
 export default class HandlerRegistry<T> {
-  _targets: Array<T> = [];
-  _pendingHandlers: Array<Handler<T>> = [];
-  _handlers: Array<Handler<T>> = [];
+  private _targets: Array<T> = [];
+  private _pendingHandlers: Array<Handler<T>> = [];
+  private _handlers: Array<Handler<T>> = [];
 
-  registerHandler(handler: Handler<T>): () => void {
+  public registerHandler(handler: Handler<T>): () => void {
     if (this._pendingHandlers.indexOf(handler) === -1) {
       this._pendingHandlers.push(handler);
 
@@ -35,16 +33,16 @@ export default class HandlerRegistry<T> {
     };
   }
 
-  addTarget(target: T) {
+  public addTarget(target: T) {
     this._targets.push(target);
 
     // TODO should we error if an object without an .on method is added?
     if (
       target &&
       typeof target === 'object' &&
-      typeof target.on === 'function'
+      typeof (target as any).on === 'function'
     ) {
-      (target: any).on('destroy', () => {
+      (target as any).on('destroy', () => {
         this.removeTarget(target);
       });
     }
@@ -52,23 +50,23 @@ export default class HandlerRegistry<T> {
     this._informHandlersOfTarget(target);
   }
 
-  removeTarget(target: T) {
+  public removeTarget(target: T) {
     remove(this._targets, t => t === target);
   }
 
-  dumpHandlers() {
+  public dumpHandlers() {
     this._pendingHandlers = [];
     this._handlers = [];
   }
 
-  _informHandlerOfTargets(handler: Handler<T>) {
+  private _informHandlerOfTargets(handler: Handler<T>) {
     const targets = this._targets.slice();
     for (let ii = 0; ii < targets.length; ii++) {
       _tryCatch(handler, targets[ii]);
     }
   }
 
-  _informHandlersOfTarget(target: T) {
+  private _informHandlersOfTarget(target: T) {
     const handlers = this._handlers.slice();
     for (let ii = 0; ii < handlers.length; ii++) {
       _tryCatch(handlers[ii], target);
