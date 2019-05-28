@@ -1,0 +1,15 @@
+/* @flow */
+
+import Kefir from 'kefir';
+
+// An StopperPool is created from a stopper stream, and can have more stopper
+// streams added to it. It has a stream property which is a stopper stream which
+// emits a stop event and ends only after all of its input stopper streams have
+// stopped.
+declare export default class StopperPool {
+  stream: Kefir.Observable<any>;
+
+  constructor(streams: Kefir.Observable<any> | Kefir.Observable<any>[]): StopperPool;
+  add(newStreams: Kefir.Observable<any> | Kefir.Observable<any>[]): void;
+  getSize(): number;
+}

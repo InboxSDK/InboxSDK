@@ -1,21 +1,21 @@
-/* @flow */
-
 import Logger from './logger';
 
-export default class ErrorCollector {
-  _name: string;
-  _runCount: number = 0;
-  _errorLogs: Array<{
-    name: string,
-    message: string
-  }> = [];
-  _hasReported: boolean = false;
+interface ErrorLog {
+  name: string;
+  message: string;
+}
 
-  constructor(name: string) {
+export default class ErrorCollector {
+  private _name: string;
+  private _runCount: number = 0;
+  private _errorLogs: Array<ErrorLog> = [];
+  private _hasReported: boolean = false;
+
+  public constructor(name: string) {
     this._name = name;
   }
 
-  run<T>(name: string, cb: () => T): ?T {
+  public run<T>(name: string, cb: () => T): T | null {
     if (this._hasReported) {
       throw new Error('Has already reported');
     }
@@ -31,7 +31,7 @@ export default class ErrorCollector {
     }
   }
 
-  report(errorDataCb: () => any) {
+  public report(errorDataCb: () => any) {
     if (this._hasReported) {
       throw new Error('Has already reported');
     }
@@ -44,15 +44,15 @@ export default class ErrorCollector {
     }
   }
 
-  getErrorLogs() {
+  public getErrorLogs(): ReadonlyArray<ErrorLog> {
     return this._errorLogs;
   }
 
-  runCount(): number {
+  public runCount(): number {
     return this._runCount;
   }
 
-  errorCount(): number {
+  public errorCount(): number {
     return this._errorLogs.length;
   }
 }

@@ -1,5 +1,3 @@
-/* @flow */
-
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 
@@ -8,7 +6,7 @@ import StopperPool from './stopper-pool';
 it('should work with one stream', done => {
   let hasReachedEnd = false;
   let i = 0;
-  const b1 = kefirBus();
+  const b1 = kefirBus<any, any>();
   const ender = new StopperPool(b1);
   ender.stream.onAny(event => {
     switch (++i) {
@@ -34,7 +32,7 @@ it('should work with one stream', done => {
 it('should work with two streams', done => {
   let hasReachedEnd = false;
   let i = 0;
-  const b1 = kefirBus();
+  const b1 = kefirBus<any, any>();
   const ender = new StopperPool(b1);
   ender.stream.onAny(event => {
     switch (++i) {
@@ -52,7 +50,7 @@ it('should work with two streams', done => {
     }
   });
 
-  const b2 = kefirBus();
+  const b2 = kefirBus<any, any>();
   ender.add(b2);
   b1.emit(null);
   b1.end();

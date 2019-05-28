@@ -1,0 +1,13 @@
+/* @flow */
+
+declare export default class ErrorCollector {
+  constructor(name: string): ErrorCollector;
+  run<T>(name: string, cb: () => T): T | null;
+  report(errorDataCb: () => any): void;
+  getErrorLogs(): $ReadOnlyArray<{
+    name: string,
+    message: string
+  }>;
+  runCount(): number;
+  errorCount(): number;
+}
