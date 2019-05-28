@@ -1,5 +1,3 @@
-/* @flow */
-
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 
@@ -42,13 +40,10 @@ it('should work in simple case', done => {
 });
 
 it('works with bufferBy', done => {
-  const item1 = ['item1'],
-    item2 = ['item2'],
-    item3 = ['item3'];
   const emitter = kefirBus();
   let step = 0;
   emitter
-    .bufferBy(emitter.flatMap(x => delayAsap()))
+    .bufferBy(emitter.flatMap(() => delayAsap(null)))
     .filter(x => x.length > 0)
     .onValue(x => {
       switch (step) {

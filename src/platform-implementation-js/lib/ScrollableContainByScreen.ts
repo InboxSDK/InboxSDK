@@ -1,19 +1,17 @@
 /* @flow */
 
-import containByScreen from 'contain-by-screen';
-import type { Options } from 'contain-by-screen';
+import containByScreen, { Options } from 'contain-by-screen';
 
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
-import type { Bus } from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import fromEventsWithOptions from './fromEventsWithOptions';
 
 export default class ScrollableContainByScreen {
-  _manualRepositions: Bus<null> = kefirBus();
-  _stopper: Kefir.Observable<null> & { destroy(): void } = kefirStopper();
+  private _manualRepositions = kefirBus<null, any>();
+  private _stopper = kefirStopper();
 
-  constructor(
+  public constructor(
     element: HTMLElement,
     anchorPoint: HTMLElement,
     options: Options
@@ -33,11 +31,11 @@ export default class ScrollableContainByScreen {
       });
   }
 
-  reposition() {
+  public reposition() {
     this._manualRepositions.emit(null);
   }
 
-  destroy() {
+  public destroy() {
     this._stopper.destroy();
   }
 }
