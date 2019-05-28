@@ -4,7 +4,6 @@ import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
-import eventNameFilter from '../../../lib/event-name-filter';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
 import InboxDropdownView from './inbox-dropdown-view';
@@ -82,7 +81,7 @@ export default class InboxNavItemView {
 
     childNavItemView
       .getEventStream()
-      .filter(eventNameFilter('orderChanged'))
+      .filter(event => event.eventName === 'orderChanged')
       .onValue(() =>
         insertElementInOrder(
           this._elements.subNavInner,

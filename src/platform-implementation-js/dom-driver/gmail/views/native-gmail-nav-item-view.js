@@ -5,7 +5,6 @@ import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
 
 import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
-import eventNameFilter from '../../../lib/event-name-filter';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
@@ -99,7 +98,9 @@ export default class NativeGmailNavItemView {
     const gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, 1);
 
     Kefir.merge([
-      gmailNavItemView.getEventStream().filter(eventNameFilter('orderChanged')),
+      gmailNavItemView
+        .getEventStream()
+        .filter(event => event.eventName === 'orderChanged'),
 
       this._elementStream
     ]).onValue(() => this._addNavItemElement(gmailNavItemView));
