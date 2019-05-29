@@ -836,7 +836,7 @@
     core-js "^2.6.5"
     regenerator-runtime "^0.13.2"
 
-"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.2.0":
+"@babel/runtime@^7.0.0", "@babel/runtime@^7.1.2", "@babel/runtime@^7.2.0", "@babel/runtime@^7.4.5":
   version "7.4.5"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.4.5.tgz#582bb531f5f9dc67d2fcb682979894f75e253f12"
   integrity sha512-TuI4qpWZP6lGOGIuGWtp9sPluqYICmbk8T/1vpSysqJxRPkudh/ofFWyqdcMsDf2s7KvDL4/YHgKyvcS3g9CJQ==
@@ -1464,6 +1464,11 @@
   resolved "https://registry.yarnpkg.com/@types/yargs/-/yargs-12.0.12.tgz#45dd1d0638e8c8f153e87d296907659296873916"
   integrity sha512-SOhuU4wNBxhhTHxYaiG5NY4HBhDIDnJF60GU+2LqHAdKKer86//e4yg69aENCtQ04n0ovz+tq2YPME5t5yp4pw==
 
+"@types/zen-observable@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@types/zen-observable/-/zen-observable-0.8.0.tgz#8b63ab7f1aa5321248aad5ac890a485656dcea4d"
+  integrity sha512-te5lMAWii1uEJ4FwLjzdlbw3+n0FZNOvFXHxQDKeT0dilh7HOzdMzV2TrJVUzq8ep7J4Na8OUYPRLSQkJHAlrg==
+
 "@typescript-eslint/eslint-plugin@^1.9.0":
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/eslint-plugin/-/eslint-plugin-1.9.0.tgz#29d73006811bf2563b88891ceeff1c5ea9c8d9c6"
@@ -2020,7 +2025,7 @@ babel-preset-jest@^24.6.0:
     "@babel/plugin-syntax-object-rest-spread" "^7.0.0"
     babel-plugin-jest-hoist "^24.6.0"
 
-babel-runtime@^6.18.0, babel-runtime@^6.22.0:
+babel-runtime@^6.18.0:
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/babel-runtime/-/babel-runtime-6.26.0.tgz#965c7058668e82b55d7bfe04ff2337bc8b5647fe"
   integrity sha1-llxwWGaOgrVde/4E/yM3vItWR/4=
@@ -6178,16 +6183,18 @@ liftoff@^3.1.0:
     rechoir "^0.6.2"
     resolve "^1.1.7"
 
-live-set@^0.4.0, live-set@^0.4.1:
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/live-set/-/live-set-0.4.4.tgz#4817cf91e7970145a62763d341f853f267ece922"
-  integrity sha512-QoxSHp++3laldT9ymX8Wd5ITsjNYA1avhIDOkCpyzfXdPkhRSs4vzCJgQfFwKCHFbb8iTfiuEPXz3bxGXxLXPQ==
+live-set@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/live-set/-/live-set-1.0.0.tgz#8535fa243d59e1d673580063dea170b67b6910e3"
+  integrity sha512-zNGPekAhiHsaS7AFYwNXMzZhlWCaoBOSR/7ChaVWvZX3uj/EoPq2i+qzmvJt43GJT4EUzfsK7Zp3O+sBbQ8NEg==
   dependencies:
+    "@babel/runtime" "^7.0.0"
+    "@types/transducers.js" "^0.3.0"
+    "@types/zen-observable" "^0.8.0"
     asap "^2.0.5"
-    babel-runtime "^6.22.0"
     envify "^4.0.0"
     symbol-observable "^1.0.4"
-    zen-observable "^0.6.0"
+    zen-observable "^0.8.9"
 
 load-json-file@^1.0.0:
   version "1.1.0"
@@ -7283,15 +7290,15 @@ p-try@^2.0.0:
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-2.2.0.tgz#cb2868540e313d61de58fafbe35ce9004d5540e6"
   integrity sha512-R4nPAVTAU0B9D35/Gk3uJf/7XYbQcyohSKdvAxIRSNghFl4e71hVoGnBNQz9cWaXxO2I10KTC+3jMdvvoKw6dQ==
 
-page-parser-tree@^0.3.3:
-  version "0.3.5"
-  resolved "https://registry.yarnpkg.com/page-parser-tree/-/page-parser-tree-0.3.5.tgz#5cbf36a8906c7aaa507170388c2e8eaa0dc23c23"
-  integrity sha512-4Pn0sJ56t7SMuSROlH1l8HsX/SZ00+3WJdXGlo83lmglrLT/QVOHBvlD9+FNrfwVEMU0M5vPUnXG/fFXkWhvcQ==
+page-parser-tree@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/page-parser-tree/-/page-parser-tree-0.4.0.tgz#16096d80564ea8f32aeefa1f641158b2d8800223"
+  integrity sha512-Cjg7FBDADHmOxFWqWMJWR7jRXMVDe7QfFFVv9PkHqG3Jaq0CSxpOTWmWJJ71VmcC1H/9+aJwwJQUAqnU1nmF/w==
   dependencies:
-    babel-runtime "^6.22.0"
-    live-set "^0.4.1"
+    "@babel/runtime" "^7.4.5"
+    live-set "^1.0.0"
     matches-selector-ng "^1.0.0"
-    tag-tree "^0.4.0"
+    tag-tree "^1.0.0"
     transducers.js "^0.3.2"
 
 pako@~1.0.5:
@@ -9154,13 +9161,13 @@ taffydb@2.6.2:
   resolved "https://registry.yarnpkg.com/taffydb/-/taffydb-2.6.2.tgz#7cbcb64b5a141b6a2efc2c5d2c67b4e150b2a268"
   integrity sha1-fLy2S1oUG2ou/CxdLGe04VCyomg=
 
-tag-tree@^0.4.0:
-  version "0.4.1"
-  resolved "https://registry.yarnpkg.com/tag-tree/-/tag-tree-0.4.1.tgz#0717a55e33022b2ba9a681c479dc8e33d021b1b6"
-  integrity sha1-BxelXjMCKyuppoHEedyOM9AhsbY=
+tag-tree@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/tag-tree/-/tag-tree-1.0.0.tgz#bd8caea7129a770a5284455adb729eb5c7d13b57"
+  integrity sha512-o+G3FpZtDYmkLKjQ4Wkj1G8KLSPR3BOu9s0t8VHq4yjCyyyAf+vvV+0VteTatTaHFh2bNazujICdH7UAUN9fug==
   dependencies:
-    babel-runtime "^6.22.0"
-    live-set "^0.4.0"
+    "@babel/runtime" "^7.0.0"
+    live-set "^1.0.0"
 
 tar@^4:
   version "4.4.8"
@@ -10102,10 +10109,10 @@ yeast@0.1.2:
   resolved "https://registry.yarnpkg.com/yeast/-/yeast-0.1.2.tgz#008e06d8094320c372dbc2f8ed76a0ca6c8ac419"
   integrity sha1-AI4G2AlDIMNy28L47XagymyKxBk=
 
-zen-observable@^0.6.0:
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/zen-observable/-/zen-observable-0.6.1.tgz#01dbed3bc8d02cbe9ee1112c83e04c807f647244"
-  integrity sha512-DKjFTL7siVLIUMZOFZ0alqMEdTsXPUxoCZzrvB2tdWEVN/6606Qh1nCfSTCAOZMrtcPzzFI3BXmwBKLAew52NA==
+zen-observable@^0.8.9:
+  version "0.8.14"
+  resolved "https://registry.yarnpkg.com/zen-observable/-/zen-observable-0.8.14.tgz#d33058359d335bc0db1f0af66158b32872af3bf7"
+  integrity sha512-kQz39uonEjEESwh+qCi83kcC3rZJGh4mrZW7xjkSQYXkq//JZHTtKo+6yuVloTgMtzsIWOJrjIrKvk/dqm0L5g==
 
 zip-object@^0.1.0:
   version "0.1.0"
