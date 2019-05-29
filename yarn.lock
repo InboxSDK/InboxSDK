@@ -8605,10 +8605,10 @@ simple-concat@^1.0.0:
   resolved "https://registry.yarnpkg.com/simple-concat/-/simple-concat-1.0.0.tgz#7344cbb8b6e26fb27d66b2fc86f9f6d5997521c6"
   integrity sha1-c0TLuLbib7J9ZrL8hvn21Zl1IcY=
 
-simple-encryptor@^1.1.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/simple-encryptor/-/simple-encryptor-1.4.0.tgz#60bfd1665011a7c0f50fe12a8b51b57b94dd1bc4"
-  integrity sha512-g7UhXQ6flzimqzoaDqjGl5hBh4/+tJ4dtAIHaWhO9gtt+GkLRb3F/Xjv//XORFstkNxA+CFVzZJCLhs24NmrSQ==
+simple-encryptor@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/simple-encryptor/-/simple-encryptor-3.0.0.tgz#c88df52e336037e276e731cbe89c75846c1a89c9"
+  integrity sha512-xRgj9pU3Gfkl+6iBYRoXM4BdEwY4bLdL1W0tp7AjGTA7Hytv5iwmB5tvJh6K2iVszvPPYimQjLFV8jRZz3fJ1g==
   dependencies:
     scmp "2.0.0"
 
