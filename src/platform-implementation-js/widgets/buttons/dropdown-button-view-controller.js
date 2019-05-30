@@ -3,7 +3,7 @@
 import { defn } from 'ud';
 import type Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import type ButtonView from '../../dom-driver/gmail/widgets/buttons/button-view.js';
+import type ButtonView from '../../dom-driver/gmail/widgets/buttons/button-view';
 import DropdownView from './dropdown-view';
 
 class DropdownButtonViewController {

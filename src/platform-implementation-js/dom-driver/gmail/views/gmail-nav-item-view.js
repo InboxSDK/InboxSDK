@@ -9,7 +9,6 @@ import GmailElementGetter from '../gmail-element-getter';
 
 import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
-import eventNameFilter from '../../../lib/event-name-filter';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 
 import ButtonView from '../widgets/buttons/button-view';
@@ -119,7 +118,7 @@ export default class GmailNavItemView {
 
     gmailNavItemView
       .getEventStream()
-      .filter(eventNameFilter('orderChanged'))
+      .filter(event => event.eventName === 'orderChanged')
       .onValue(() => this._addNavItemElement(gmailNavItemView));
 
     gmailNavItemView.setNavItemDescriptor(navItemDescriptor);

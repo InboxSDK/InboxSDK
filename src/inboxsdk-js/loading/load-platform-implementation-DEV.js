@@ -8,7 +8,7 @@ module.exports = function(delay: number): () => Promise<void> {
       new Promise((resolve, reject) => {
         setTimeout(() => {
           try {
-            require('../../platform-implementation-js/main.js');
+            require('../../platform-implementation-js/main');
             resolve();
           } catch (e) {
             reject(e);

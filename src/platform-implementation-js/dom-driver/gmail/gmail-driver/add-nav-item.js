@@ -5,7 +5,6 @@ import GmailElementGetter from '../gmail-element-getter';
 import GmailNavItemView from '../views/gmail-nav-item-view';
 import Logger from '../../../lib/logger';
 import waitFor from '../../../lib/wait-for';
-import eventNameFilter from '../../../lib/event-name-filter';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
@@ -29,7 +28,7 @@ export default function addNavItem(
 
         gmailNavItemView
           .getEventStream()
-          .filter(eventNameFilter('orderChanged'))
+          .filter(event => event.eventName === 'orderChanged')
           .takeWhile(
             () => !!GmailElementGetter.getNavItemMenuInjectionContainer()
           )

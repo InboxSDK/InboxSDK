@@ -4,4 +4,4 @@ require('./loading/platform-implementation-loader').default._loadScript = requir
   0
 );
 
-module.exports = require('./inboxsdk.js');
+module.exports = require('./inboxsdk');

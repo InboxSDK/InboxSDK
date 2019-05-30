@@ -1,0 +1,20 @@
+/* @flow */
+
+export type LogErrorContext = {
+  appId?: ?string,
+  appIds?: ?(any[]),
+  sentByApp?: ?boolean,
+  loaderVersion?: ?string,
+  implVersion?: ?string,
+  userEmailHash?: ?string,
+  isUsingSyncAPI?: ?boolean,
+  isUsingMaterialGmailUI?: ?boolean
+};
+
+// code inside the platform-implementation should use logger.js instead of
+// interacting with this directly!
+declare export default function logError(
+  err: Error,
+  details: any,
+  context: LogErrorContext
+): void;
