@@ -192,8 +192,20 @@ describe('compose', () => {
 });
 
 describe('sidebar', () => {
+  beforeAll(async () => {
+    await page.evaluate(() => {
+      document.head.setAttribute('data-flag-enable-sidebar', 'true');
+    });
+  });
+
   beforeEach(async () => {
     await openThread();
+  });
+
+  afterAll(async () => {
+    await page.evaluate(() => {
+      document.head.setAttribute('data-flag-enable-sidebar', 'false');
+    });
   });
 
   it('opens and closes', async () => {
