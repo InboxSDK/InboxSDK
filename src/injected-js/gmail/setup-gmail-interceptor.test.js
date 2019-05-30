@@ -124,6 +124,42 @@ describe('sync api', () => {
   });
 
   mainServer.respondWith(
+    { method: 'POST', path: 'https://mail.google.com/sync/u/0/i/s?hl=en&c=76' },
+    {
+      status: 200,
+      response: JSON.stringify(
+        require('../../../test/data/2019-05-29-cvOnDraftSave.json')
+      )
+    }
+  );
+
+  test('cv:on draft save', async () => {
+    const response = await ajax(mainFrame, {
+      method: 'POST',
+      url: 'https://mail.google.com/sync/u/0/i/s?hl=en&c=76',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      data: raw`{"2":{"1":[{"1":"23","2":{"1":"thread-a:r-5923235777735080743","2":{"3":{"1":{"1":"","3":"1559183445219","4":"thread-a:r-5923235777735080743","5":[{"1":"msg-a:r4410172531046441555","2":{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"},"7":"1559183445219","8":"","9":{"2":[{"1":0,"2":"<div dir=\"ltr\">a</div>"}],"7":1},"11":["^all","^r","^r_bt"],"18":"1559183445219","42":0,"43":{"1":0,"2":0,"3":1,"4":0},"52":"s:116405b570aeb88e|#msg-a:r4410172531046441555|0"}]}}}}}]},"3":{"1":1,"2":"24043806","5":{"2":0},"7":1},"4":{"2":1,"3":"1559183445223","4":0,"5":83},"5":2}`
+    });
+    expect(JSON.parse(response.text)).toEqual(
+      require('../../../test/data/2019-05-29-cvOnDraftSave.json')
+    );
+    expect(ajaxInterceptEvents).toEqual([
+      {
+        draftID: 'r4410172531046441555',
+        messageID: 'msg-a:r4410172531046441555',
+        oldMessageID: '16b069351bf08519',
+        oldThreadID: '16b069351bf08519',
+        rfcID:
+          '<CAL_Ays9Vr38qeL9=MsYHm069xbzkf5qyAsPd+PDF6cOH6UHgWw@mail.gmail.com>',
+        threadID: 'thread-a:r-5923235777735080743',
+        type: 'emailDraftReceived'
+      }
+    ]);
+  });
+
+  mainServer.respondWith(
     { method: 'POST', path: 'https://mail.google.com/sync/u/0/i/s?hl=en&c=84' },
     {
       status: 200,
@@ -179,8 +215,15 @@ describe('sync api', () => {
       require('../../../test/data/2019-01-18-cvOffDraftSave.json')
     );
     expect(ajaxInterceptEvents).toEqual([
-      // TODO
-      // #thread-a:r-6484824435222735158|msg-a:r1172851975112249697
+      {
+        draftID: 'r1172851975112249697',
+        messageID: 'msg-f:1622952667964122704',
+        oldMessageID: '1685e2da4d462650',
+        oldThreadID: '1685e2da4d462650',
+        rfcID: '<1547768275469.7c3cd5014f32a@Nodemailer>',
+        threadID: 'thread-f:1622952667964122704',
+        type: 'emailDraftReceived'
+      }
     ]);
   });
 

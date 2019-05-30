@@ -24,6 +24,7 @@ export default function makeXhrInterceptor(): {
         if (detail.draftID) {
           return detail;
         } else {
+          // TODO is this block dead code?
           var body = parse(detail.body);
           return {
             type: 'emailSending',
@@ -40,6 +41,7 @@ export default function makeXhrInterceptor(): {
         if (detail.draftID) {
           return detail;
         } else {
+          // TODO is this block dead code?
           var body = parse(detail.originalSendBody);
           var response = detail.responseText;
           return {
@@ -58,6 +60,7 @@ export default function makeXhrInterceptor(): {
         if (detail.draftID) {
           return detail;
         } else {
+          // TODO is this block dead code?
           var body = parse(detail.body);
           return {
             type: 'emailDraftSaveSending',
@@ -74,6 +77,7 @@ export default function makeXhrInterceptor(): {
         if (detail.draftID) {
           return detail;
         } else {
+          // TODO is this block dead code?
           var body = parse(detail.originalSendBody);
           var response = detail.responseText;
           return {

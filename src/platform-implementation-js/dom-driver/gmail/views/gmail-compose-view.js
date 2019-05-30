@@ -1441,7 +1441,29 @@ class GmailComposeView {
 
   async getCurrentDraftID(): Promise<?string> {
     if (this._driver.isUsingSyncAPI()) {
-      return this._getDraftIDfromForm();
+      // This function is mostly a mirror of _getDraftIDimplementation, but
+      // instead of waiting when finding out it's not saved, just returns null.
+
+      const draftID = this._getDraftIDfromForm();
+      if (this._messageId) {
+        return draftID;
+      } else {
+        const syncMessageId = this._getMessageIDfromForm();
+        if (syncMessageId) {
+          try {
+            // If this succeeds, then the draft must exist on the server and we
+            // can safely return the draft id we know.
+            const gmailMessageId = await this._driver.getGmailMessageIdForSyncDraftId(
+              syncMessageId
+            );
+          } catch (e) {
+            // ignore error, it's probably that the draft isn't saved yet.
+            return null;
+          }
+
+          return draftID;
+        }
+      }
     } else {
       if (!this.getMessageID()) {
         return null;
