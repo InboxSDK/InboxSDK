@@ -345,9 +345,12 @@ export function setupGmailInterceptorOnFrames(
                     oldMessageID: messageUpdate[56],
                     oldThreadID: threadUpdate[20]
                   });
+                } else {
+                  logger.error(new Error('Could not parse draft save'));
                 }
               } else {
                 // pre-2019-05-29 handling
+                logger.eventSdkPassive('old compose draft id handling hit');
                 const oldWrapper =
                   originalResponse[2] &&
                   originalResponse[2][6] &&
