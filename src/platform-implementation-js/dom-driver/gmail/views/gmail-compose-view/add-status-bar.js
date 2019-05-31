@@ -81,6 +81,8 @@ class StatusBar extends SimpleElementView {
       attributeFilter: ['class'],
       attributes: true
     })
+      .map(() => this._nativeStatusContainer.classList.contains('aDi'))
+      .skipDuplicates()
       .takeUntilBy(this._stopper)
       .onValue(() => this._setStatusBar());
   }
