@@ -1,7 +1,4 @@
-/* @flow */
-
 import t from 'transducers.js';
-import isNumber from 'isnumber';
 
 const DEFAULT_ORDER_ATTRS = [
   'data-group-order-hint',
@@ -16,18 +13,18 @@ export default function insertElementInOrder(
   insertBeforeNonSdk: boolean = false
 ) {
   // get the first element with higher order hints
-  const insertBeforeElement: ?HTMLElement = t.toArray(
+  const insertBeforeElement = t.toArray(
     Array.prototype.slice.call(container.children),
     t.compose(
       t.filter((cel: HTMLElement) => {
         let hadAnyOrderAttrs = false;
-        for (let name of orderAttrs) {
+        for (const name of orderAttrs) {
           const attr = el.getAttribute(name);
           const cattr = cel.getAttribute(name);
           if (attr == null || cattr == null) continue;
           hadAnyOrderAttrs = true;
           let comparison;
-          if (isNumber(attr) && isNumber(cattr)) {
+          if (!isNaN(parseFloat(attr)) && !isNaN(parseFloat(cattr))) {
             comparison = parseFloat(cattr) - parseFloat(attr);
           } else {
             comparison = cattr.localeCompare(attr);
@@ -44,7 +41,7 @@ export default function insertElementInOrder(
       }),
       t.take(1)
     )
-  )[0];
+  )[0] as null | HTMLElement;
 
   container.insertBefore(el, insertBeforeElement);
 }

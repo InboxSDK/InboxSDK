@@ -10,7 +10,7 @@ import {
   TooltipDescriptor
 } from '../../../driver-interfaces/compose-view-driver';
 
-declare class GmailComposeView implements ComposeViewDriver {
+export default class GmailComposeView implements ComposeViewDriver {
   public constructor(
     element: HTMLElement,
     xhrInterceptorStream: Kefir.Observable<any, any>,
@@ -20,6 +20,8 @@ declare class GmailComposeView implements ComposeViewDriver {
       isStandalone: boolean;
     }
   );
+  public getGmailDriver(): GmailDriver;
+  public getStatusArea(): HTMLElement;
 
   // interface methods
   public getEventStream(): Kefir.Observable<object, any>;

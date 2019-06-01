@@ -1,8 +1,5 @@
-/* @flow */
-
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import once from 'lodash/once';
 
 import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 import Logger from '../../../../lib/logger';
@@ -10,17 +7,18 @@ import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import SimpleElementView from '../../../../views/SimpleElementView';
 
-import type GmailComposeView from '../gmail-compose-view';
-import type { Stopper } from 'kefir-stopper';
+import GmailComposeView from '../gmail-compose-view';
+
+import { StatusBar as IStatusBar } from '../../../../driver-interfaces/compose-view-driver';
 
 export default function addStatusBar(
   gmailComposeView: GmailComposeView,
   options: {
-    height?: number,
-    orderHint?: number,
-    addAboveNativeStatusBar?: boolean
+    height?: number;
+    orderHint?: number;
+    addAboveNativeStatusBar?: boolean;
   }
-) {
+): StatusBar {
   const { height, orderHint, addAboveNativeStatusBar } = {
     height: 40,
     orderHint: 0,
@@ -43,26 +41,29 @@ export default function addStatusBar(
   return statusbar;
 }
 
-class StatusBar extends SimpleElementView {
-  _addAboveNativeStatusBar: boolean;
-  _currentHeight: number;
-  _gmailComposeView: GmailComposeView;
-  _nativeStatusContainer: HTMLElement;
-  _orderHint: number;
-  _prependContainer: ?HTMLElement = null;
-  _stopper = kefirStopper();
+function createElement() {
+  const el = document.createElement('div');
+  el.style.fontFamily = 'Roboto,RobotoDraft,Helvetica,Arial,sans-serif';
+  el.style.fontSize = '15.6px';
+  return el;
+}
 
-  constructor(
+class StatusBar extends SimpleElementView implements IStatusBar {
+  private _addAboveNativeStatusBar: boolean;
+  private _currentHeight: number;
+  private _gmailComposeView: GmailComposeView;
+  private _nativeStatusContainer: HTMLElement;
+  private _orderHint: number;
+  private _prependContainer: null | undefined | HTMLElement = null;
+  private _stopper = kefirStopper();
+
+  public constructor(
     gmailComposeView: GmailComposeView,
     height: number,
     orderHint: number,
     addAboveNativeStatusBar: boolean
   ) {
-    let el = document.createElement('div');
-    el.style.fontFamily = 'Roboto,RobotoDraft,Helvetica,Arial,sans-serif';
-    el.style.fontSize = '15.6px';
-
-    super(el);
+    super(createElement());
     this._addAboveNativeStatusBar = addAboveNativeStatusBar;
     this._currentHeight = 0;
     this._gmailComposeView = gmailComposeView;
@@ -72,8 +73,8 @@ class StatusBar extends SimpleElementView {
     );
     this._orderHint = orderHint;
 
-    el.className = 'aDh inboxsdk__compose_statusbar';
-    el.setAttribute('data-order-hint', String(orderHint));
+    this.el.className = 'aDh inboxsdk__compose_statusbar';
+    this.el.setAttribute('data-order-hint', String(orderHint));
 
     this.setHeight(height);
 
@@ -87,7 +88,7 @@ class StatusBar extends SimpleElementView {
       .onValue(() => this._setStatusBar());
   }
 
-  destroy() {
+  public destroy() {
     if (this.destroyed) {
       return;
     }
@@ -105,15 +106,17 @@ class StatusBar extends SimpleElementView {
     this._undoStatusContainerHeightChange();
   }
 
-  _undoStatusContainerHeightChange() {
+  private _undoStatusContainerHeightChange() {
     if (this._currentHeight == 0) return;
     if (
       !this._gmailComposeView.getGmailDriver().isUsingMaterialUI() &&
       this._gmailComposeView.isInlineReplyForm()
     ) {
       const currentPad =
-        parseInt(this._gmailComposeView.getElement().style.paddingBottom, 10) ||
-        0;
+        parseInt(
+          this._gmailComposeView.getElement().style.paddingBottom!,
+          10
+        ) || 0;
       this._gmailComposeView.getElement().style.paddingBottom =
         currentPad - this._currentHeight + 'px';
     } else if (
@@ -122,7 +125,7 @@ class StatusBar extends SimpleElementView {
     ) {
       if (this._nativeStatusContainer.classList.contains('aDi')) {
         const nativeStatusContainerHeight = parseInt(
-          window.getComputedStyle(this._nativeStatusContainer).height,
+          window.getComputedStyle(this._nativeStatusContainer).height!,
           10
         );
         const nativeStatusContainerPaddingBottom = 16;
@@ -134,7 +137,7 @@ class StatusBar extends SimpleElementView {
     }
   }
 
-  setHeight(newHeight: number) {
+  public setHeight(newHeight: number) {
     this._undoStatusContainerHeightChange();
 
     this.el.style.height = newHeight + 'px';
@@ -144,8 +147,10 @@ class StatusBar extends SimpleElementView {
       this._gmailComposeView.isInlineReplyForm()
     ) {
       const currentPad =
-        parseInt(this._gmailComposeView.getElement().style.paddingBottom, 10) ||
-        0;
+        parseInt(
+          this._gmailComposeView.getElement().style.paddingBottom!,
+          10
+        ) || 0;
       this._gmailComposeView.getElement().style.paddingBottom =
         currentPad - this._currentHeight + newHeight + 'px';
     }
@@ -154,7 +159,7 @@ class StatusBar extends SimpleElementView {
     this._setStatusBar();
   }
 
-  _setStatusBar() {
+  private _setStatusBar() {
     try {
       const statusArea = this._gmailComposeView.getStatusArea();
       this._gmailComposeView
@@ -163,9 +168,9 @@ class StatusBar extends SimpleElementView {
 
       if (this._addAboveNativeStatusBar) {
         const prependContainer = (this._prependContainer =
-          statusArea.querySelector(
+          (statusArea.querySelector(
             '.inboxsdk__compose_statusBarPrependContainer'
-          ) || document.createElement('div'));
+          ) as HTMLElement) || document.createElement('div'));
         prependContainer.classList.add(
           'inboxsdk__compose_statusBarPrependContainer'
         );
@@ -194,12 +199,12 @@ class StatusBar extends SimpleElementView {
                 '.iN > tbody .Ap'
               );
               const replyBodyHeight = parseInt(
-                window.getComputedStyle(replyBody).height,
+                window.getComputedStyle(replyBody).height!,
                 10
               );
 
               nativeStatusContainerHeight = parseInt(
-                window.getComputedStyle(this._nativeStatusContainer).height,
+                window.getComputedStyle(this._nativeStatusContainer).height!,
                 10
               );
               this._nativeStatusContainer.style.bottom = `${replyBodyHeight -
@@ -208,7 +213,7 @@ class StatusBar extends SimpleElementView {
             }
 
             nativeStatusContainerHeight = parseInt(
-              window.getComputedStyle(this._nativeStatusContainer).height,
+              window.getComputedStyle(this._nativeStatusContainer).height!,
               10
             );
             const newHeight =
