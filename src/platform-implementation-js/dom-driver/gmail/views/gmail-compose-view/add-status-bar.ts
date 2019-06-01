@@ -1,9 +1,10 @@
+import { defn } from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import cx from 'classnames';
 
 import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 import Logger from '../../../../lib/logger';
-import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import SimpleElementView from '../../../../views/SimpleElementView';
 
@@ -11,7 +12,9 @@ import GmailComposeView from '../gmail-compose-view';
 
 import { StatusBar as IStatusBar } from '../../../../driver-interfaces/compose-view-driver';
 
-export default function addStatusBar(
+export default defn(module, addStatusBar);
+
+function addStatusBar(
   gmailComposeView: GmailComposeView,
   options: {
     height?: number;
@@ -41,19 +44,21 @@ export default function addStatusBar(
   return statusbar;
 }
 
-function createElement() {
+function createElement(orderHint: number, addAboveNativeStatusBar: boolean) {
   const el = document.createElement('div');
+  el.className = cx('aDh', 'inboxsdk__compose_statusbar', {
+    inboxsdk__addAboveNative: addAboveNativeStatusBar
+  });
   el.style.fontFamily = 'Roboto,RobotoDraft,Helvetica,Arial,sans-serif';
   el.style.fontSize = '15.6px';
+  el.setAttribute('data-order-hint', String(orderHint));
   return el;
 }
 
 class StatusBar extends SimpleElementView implements IStatusBar {
   private _addAboveNativeStatusBar: boolean;
-  private _currentHeight: number;
   private _gmailComposeView: GmailComposeView;
   private _nativeStatusContainer: HTMLElement;
-  private _orderHint: number;
   private _prependContainer: null | undefined | HTMLElement = null;
   private _stopper = kefirStopper();
 
@@ -63,29 +68,16 @@ class StatusBar extends SimpleElementView implements IStatusBar {
     orderHint: number,
     addAboveNativeStatusBar: boolean
   ) {
-    super(createElement());
+    super(createElement(orderHint, addAboveNativeStatusBar));
     this._addAboveNativeStatusBar = addAboveNativeStatusBar;
-    this._currentHeight = 0;
     this._gmailComposeView = gmailComposeView;
     this._nativeStatusContainer = querySelector(
       gmailComposeView.getElement(),
       '.iN > tbody .aDj'
     );
-    this._orderHint = orderHint;
 
-    this.el.className = 'aDh inboxsdk__compose_statusbar';
-    this.el.setAttribute('data-order-hint', String(orderHint));
-
+    this._setStatusBar();
     this.setHeight(height);
-
-    makeMutationObserverChunkedStream(this._nativeStatusContainer, {
-      attributeFilter: ['class'],
-      attributes: true
-    })
-      .map(() => this._nativeStatusContainer.classList.contains('aDi'))
-      .skipDuplicates()
-      .takeUntilBy(this._stopper)
-      .onValue(() => this._setStatusBar());
   }
 
   public destroy() {
@@ -102,61 +94,29 @@ class StatusBar extends SimpleElementView implements IStatusBar {
     ) {
       this._prependContainer.remove();
     }
-
-    this._undoStatusContainerHeightChange();
-  }
-
-  private _undoStatusContainerHeightChange() {
-    if (this._currentHeight == 0) return;
-    if (
-      !this._gmailComposeView.getGmailDriver().isUsingMaterialUI() &&
-      this._gmailComposeView.isInlineReplyForm()
-    ) {
-      const currentPad =
-        parseInt(
-          this._gmailComposeView.getElement().style.paddingBottom!,
-          10
-        ) || 0;
-      this._gmailComposeView.getElement().style.paddingBottom =
-        currentPad - this._currentHeight + 'px';
-    } else if (
-      this._gmailComposeView.getGmailDriver().isUsingMaterialUI() &&
-      this._gmailComposeView.isInlineReplyForm()
-    ) {
-      if (this._nativeStatusContainer.classList.contains('aDi')) {
-        const nativeStatusContainerHeight = parseInt(
-          window.getComputedStyle(this._nativeStatusContainer).height!,
-          10
-        );
-        const nativeStatusContainerPaddingBottom = 16;
-
-        this._nativeStatusContainer.style.height = `${nativeStatusContainerHeight -
-          this._currentHeight -
-          nativeStatusContainerPaddingBottom}px`;
-      }
-    }
+    this._updateTotalHeight();
   }
 
   public setHeight(newHeight: number) {
-    this._undoStatusContainerHeightChange();
-
     this.el.style.height = newHeight + 'px';
+    this._updateTotalHeight();
+  }
 
-    if (
-      !this._gmailComposeView.getGmailDriver().isUsingMaterialUI() &&
-      this._gmailComposeView.isInlineReplyForm()
-    ) {
-      const currentPad =
-        parseInt(
-          this._gmailComposeView.getElement().style.paddingBottom!,
-          10
-        ) || 0;
-      this._gmailComposeView.getElement().style.paddingBottom =
-        currentPad - this._currentHeight + newHeight + 'px';
-    }
+  private _updateTotalHeight() {
+    const totalAddedStatusBarHeight = Array.from(
+      this._gmailComposeView
+        .getElement()
+        .querySelectorAll<HTMLElement>('.inboxsdk__compose_statusbar')
+    )
+      .map(el => el.getBoundingClientRect().height)
+      .reduce((a, b) => a + b, 0);
 
-    this._currentHeight = newHeight;
-    this._setStatusBar();
+    this._gmailComposeView
+      .getElement()
+      .style.setProperty(
+        '--inboxsdk-total-added-statusbar-height',
+        totalAddedStatusBarHeight + 'px'
+      );
   }
 
   private _setStatusBar() {
@@ -182,87 +142,11 @@ class StatusBar extends SimpleElementView implements IStatusBar {
           this._gmailComposeView.getGmailDriver().isUsingMaterialUI() &&
           this._gmailComposeView.isInlineReplyForm()
         ) {
-          const messageSpacer = querySelector(
+          const nativeStatusBar = querySelector(
             this._gmailComposeView.getElement(),
-            '.iN > tbody .aC4'
+            '.iN > tbody .aDj .aDh .IZ'
           );
-          const messageSpacerHeight = 60;
-
-          // 'aDi' is added to the to the nativeStatusContainer when it is position: fixed or position: absolute
-          if (this._nativeStatusContainer.classList.contains('aDi')) {
-            const nativeStatusContainerPaddingBottom = 16;
-            let nativeStatusContainerHeight;
-
-            if (this._nativeStatusContainer.style.position === 'absolute') {
-              const replyBody = querySelector(
-                this._gmailComposeView.getElement(),
-                '.iN > tbody .Ap'
-              );
-              const replyBodyHeight = parseInt(
-                window.getComputedStyle(replyBody).height!,
-                10
-              );
-
-              nativeStatusContainerHeight = parseInt(
-                window.getComputedStyle(this._nativeStatusContainer).height!,
-                10
-              );
-              this._nativeStatusContainer.style.bottom = `${replyBodyHeight -
-                64 -
-                nativeStatusContainerHeight}px`;
-            }
-
-            nativeStatusContainerHeight = parseInt(
-              window.getComputedStyle(this._nativeStatusContainer).height!,
-              10
-            );
-            const newHeight =
-              nativeStatusContainerHeight +
-              nativeStatusContainerPaddingBottom +
-              this._currentHeight;
-            this._nativeStatusContainer.style.height = `${newHeight}px`;
-
-            // when the _nativeStatusContainer is position: fixed, adjust the
-            // clip style to take into account the added status bars(s)
-            if (this._nativeStatusContainer.style.clip) {
-              const clip = this._nativeStatusContainer.style.clip.split(',');
-              // default height of the space between emails in a thread
-              const emailSpacerHeight = 40;
-
-              // index 2 is the clip's bottom value
-              // add 2 for border and hover styling
-              clip[2] = `${newHeight + emailSpacerHeight + 2}px`;
-              this._nativeStatusContainer.style.clip = clip.join(', ');
-
-              // gmail changes the height of this on scroll, keep it the
-              // default height so long messages don't "peek through"
-              // when status bar is fixed
-              querySelector(
-                this._gmailComposeView.getElement(),
-                '.iN > tbody .aDj.aDi .aC3'
-              ).style.height = `${emailSpacerHeight}px`;
-              messageSpacer.style.height = `${messageSpacerHeight +
-                newHeight}px`;
-            } else {
-              messageSpacer.style.height = `${messageSpacerHeight}px`;
-            }
-
-            const nativeStatusBar = querySelector(
-              this._gmailComposeView.getElement(),
-              '.iN > tbody .aDj.aDi .aDh .IZ'
-            );
-            insertElementInOrder(nativeStatusBar, this.el);
-          } else {
-            //append to body
-            const composeTable = querySelector(
-              this._gmailComposeView.getElement(),
-              '.iN > tbody'
-            );
-            insertElementInOrder(composeTable, this.el);
-
-            // change back to the default height when not fixed
-            messageSpacer.style.height = `${messageSpacerHeight}px`;
-          }
+          insertElementInOrder(nativeStatusBar, this.el);
         } else {
           insertElementInOrder(statusArea, this.el);
         }
