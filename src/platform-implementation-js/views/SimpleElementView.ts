@@ -1,17 +1,15 @@
-/* @flow */
-
 import SafeEventEmitter from '../lib/safe-event-emitter';
 
 export default class SimpleElementView extends SafeEventEmitter {
-  el: HTMLElement;
-  destroyed: boolean = false;
+  public el: HTMLElement;
+  public destroyed: boolean = false;
 
-  constructor(el: HTMLElement) {
+  public constructor(el: HTMLElement) {
     super();
     this.el = el;
   }
 
-  destroy() {
+  public destroy() {
     if (this.destroyed) return;
     this.destroyed = true;
     this.emit('destroy');

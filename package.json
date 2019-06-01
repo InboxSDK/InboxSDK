@@ -57,6 +57,7 @@
     "@types/asap": "^2.0.0",
     "@types/babelify": "^7.3.6",
     "@types/browserify": "^12.0.36",
+    "@types/classnames": "^2.2.8",
     "@types/gulp": "^4.0.6",
     "@types/gulp-concat": "^0.0.32",
     "@types/gulp-if": "^0.0.33",

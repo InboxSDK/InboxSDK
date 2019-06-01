@@ -1,0 +1,10 @@
+/* @flow */
+
+import SafeEventEmitter from '../lib/safe-event-emitter';
+
+declare export default class SimpleElementView extends SafeEventEmitter {
+  el: HTMLElement;
+  destroyed: boolean;
+  constructor(el: HTMLElement): SimpleElementView;
+  destroy(): void;
+}

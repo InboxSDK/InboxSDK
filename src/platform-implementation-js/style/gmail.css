@@ -971,9 +971,20 @@ body:not(.inboxsdk__gmailv1css) table + .inboxsdk__compose_statusbar {
   position: static !important;
 }
 
-.inboxsdk__compose_statusbarActive .aDj > .aDh {
+.inboxsdk__compose_inlineReply.inboxsdk__compose_statusbarActive .HM .I5 {
+  padding-bottom: var(--inboxsdk-total-added-statusbar-height, 0px);
+}
+/* Extend the message foreground outline downwards to contain our added status bars */
+.inboxsdk__compose_inlineReply.inboxsdk__compose_statusbarActive .aDj::before {
+  height: calc(100% + var(--inboxsdk-total-added-statusbar-height, 0px));
+}
+/* When we have a status bar added and the reply status is in position absolute or fixed mode (.aDi),
+use a background color on the element containing our added status bars so the message background outline
+isn't visible behind it. */
+.inboxsdk__compose_inlineReply.inboxsdk__compose_statusbarActive
+  .aDj.aDi
+  > .aDh {
   background-color: white;
-  height: auto;
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__recipient_row {
