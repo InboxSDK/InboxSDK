@@ -136,7 +136,7 @@ export default function loadScript(
           throw err;
         }
         if (!opts || !opts.nowrap) {
-          program();
+          program.call(global);
         }
       });
     };
