@@ -1,5 +1,3 @@
-/* @flow */
-
 import includes from 'lodash/includes';
 import * as Kefir from 'kefir';
 import kefirBus, { Bus } from 'kefir-bus';

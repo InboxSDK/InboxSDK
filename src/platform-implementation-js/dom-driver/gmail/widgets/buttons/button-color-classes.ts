@@ -1,5 +1,3 @@
-/* @flow */
-
 interface ButtonColors {
   INACTIVE_CLASS: string;
   HOVER_CLASS: string;
