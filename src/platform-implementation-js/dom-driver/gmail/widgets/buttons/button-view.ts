@@ -1,49 +1,47 @@
 /* @flow */
 
 import includes from 'lodash/includes';
-import Kefir from 'kefir';
-import kefirBus from 'kefir-bus';
-import type { Bus } from 'kefir-bus';
+import * as Kefir from 'kefir';
+import kefirBus, { Bus } from 'kefir-bus';
 import Logger from '../../../../lib/logger';
-import { defn } from 'ud';
 import { simulateHover } from '../../../../lib/dom/simulate-mouse-event';
 import keyboardShortcutStream from '../../../../lib/dom/keyboard-shortcut-stream';
-import type KeyboardShortcutHandle from '../../../../views/keyboard-shortcut-handle';
+import KeyboardShortcutHandle from '../../../../views/keyboard-shortcut-handle';
 
 import BUTTON_COLOR_CLASSES from './button-color-classes';
 
-export type ButtonViewOptions = {
-  hasButtonToLeft?: ?boolean,
-  hasButtonToRight?: ?boolean,
-  iconClass?: ?string,
-  iconUrl?: ?string,
-  text?: ?string,
-  title?: ?string,
-  tooltip?: ?string,
-  enabled?: ?boolean,
-  hasDropdown?: ?boolean,
-  buttonColor?: ?string,
-  keyboardShortcutHandle?: ?KeyboardShortcutHandle,
-  noArrow?: ?boolean
-};
+export interface ButtonViewOptions {
+  hasButtonToLeft?: boolean | null;
+  hasButtonToRight?: boolean | null;
+  iconClass?: string | null;
+  iconUrl?: string | null;
+  text?: string | null;
+  title?: string | null;
+  tooltip?: string | null;
+  enabled?: boolean | null;
+  hasDropdown?: boolean | null;
+  buttonColor?: string | null;
+  keyboardShortcutHandle?: KeyboardShortcutHandle | null;
+  noArrow?: boolean | null;
+}
 
-class ButtonView {
-  _element: HTMLElement;
-  _innerElement: any;
-  _textElement: any;
-  _iconElement: ?HTMLElement;
-  _iconImgElement: ?HTMLImageElement;
-  _iconClass: ?string;
-  _iconUrl: ?string;
-  _title: ?string;
-  _tooltip: ?string;
-  _hasDropdown: boolean;
-  _buttonColor: string;
-  _isEnabled: boolean;
-  _keyboardShortcutHandle: ?KeyboardShortcutHandle;
-  _eventStream: Bus<any>;
+export default class ButtonView {
+  private _element: HTMLElement = document.createElement('div');
+  private _innerElement: HTMLElement = document.createElement('div');
+  private _textElement: HTMLElement | undefined;
+  private _iconElement: HTMLElement | undefined;
+  private _iconImgElement: HTMLImageElement | undefined;
+  private _iconClass: string | null | undefined;
+  private _iconUrl: string | null | undefined;
+  private _title: string | null | undefined;
+  private _tooltip: string | null | undefined;
+  private _hasDropdown: boolean;
+  private _buttonColor: string;
+  private _isEnabled: boolean;
+  private _keyboardShortcutHandle: KeyboardShortcutHandle | null | undefined;
+  private _eventStream: Bus<any, any>;
 
-  constructor(options: ButtonViewOptions) {
+  public constructor(options: ButtonViewOptions) {
     this._hasDropdown = false;
     this._isEnabled = options.enabled !== false;
 
@@ -69,49 +67,49 @@ class ButtonView {
     }
   }
 
-  destroy() {
-    (this._element: Object).remove();
+  public destroy() {
+    this._element.remove();
     this._eventStream.end();
   }
 
-  getElement(): HTMLElement {
+  public getElement(): HTMLElement {
     return this._element;
   }
-  getEventStream(): Kefir.Observable<Object> {
+  public getEventStream(): Kefir.Observable<object, any> {
     return this._eventStream;
   }
 
-  activate() {
+  public activate() {
     this.addClass(BUTTON_COLOR_CLASSES[this._buttonColor].ACTIVE_CLASS);
     this.addClass(BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS);
   }
 
-  deactivate() {
+  public deactivate() {
     this.removeClass(BUTTON_COLOR_CLASSES[this._buttonColor].ACTIVE_CLASS);
     this.removeClass(BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS);
   }
 
-  addClass(className: string) {
+  public addClass(className: string) {
     this._element.classList.add(className);
   }
 
-  removeClass(className: string) {
+  public removeClass(className: string) {
     this._element.classList.remove(className);
   }
 
-  simulateHover() {
+  public simulateHover() {
     simulateHover(this._element);
   }
 
-  setEnabled(value: boolean) {
+  public setEnabled(value: boolean) {
     this._setEnabled(value);
   }
 
-  isEnabled(): boolean {
+  public isEnabled(): boolean {
     return this._isEnabled;
   }
 
-  update(options: ?Object) {
+  public update(options: any) {
     if (!options) {
       this._element.style.display = 'none';
       return;
@@ -144,17 +142,15 @@ class ButtonView {
     }
   }
 
-  _createElement(options: ButtonViewOptions) {
-    this._createMainElement(options);
-
-    this._createInnerElement(options);
+  private _createElement(options: ButtonViewOptions) {
+    this._setupMainElement(options);
+    this._setupInnerElement(options);
 
     this._createTextElement();
     this._createIconElement();
   }
 
-  _createMainElement(options: ButtonViewOptions) {
-    this._element = document.createElement('div');
+  private _setupMainElement(options: ButtonViewOptions) {
     this._element.setAttribute(
       'class',
       'T-I J-J5-Ji ar7 L3 inboxsdk__button ' +
@@ -186,8 +182,7 @@ class ButtonView {
     }
   }
 
-  _createInnerElement(options: ButtonViewOptions) {
-    this._innerElement = document.createElement('div');
+  private _setupInnerElement(options: ButtonViewOptions) {
     this._innerElement.classList.add('asa');
 
     if (this._hasDropdown && !options.noArrow) {
@@ -198,7 +193,7 @@ class ButtonView {
     this._element.appendChild(this._innerElement);
   }
 
-  _createTextElement() {
+  private _createTextElement() {
     if (!this._title) {
       return;
     }
@@ -219,7 +214,7 @@ class ButtonView {
     }
   }
 
-  _createIconElement() {
+  private _createIconElement() {
     if (!this._iconClass && !this._iconUrl) {
       return;
     }
@@ -245,7 +240,7 @@ class ButtonView {
     );
   }
 
-  _createIconImgElement() {
+  private _createIconImgElement() {
     if (!this._iconElement) {
       this._createIconElement();
     }
@@ -273,7 +268,7 @@ class ButtonView {
     iconElement.appendChild(iconImgElement);
   }
 
-  _updateButtonColor(newButtonColor: string) {
+  private _updateButtonColor(newButtonColor: string) {
     this._element.classList.remove(
       BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS
     );
@@ -284,21 +279,21 @@ class ButtonView {
     );
   }
 
-  _updateTitle(newTitle: ?string) {
+  private _updateTitle(newTitle: string | null | undefined) {
     if (!this._title && newTitle) {
       this._title = newTitle;
       this._createTextElement();
     } else if (this._title && !newTitle && this._textElement) {
-      (this._textElement: Object).remove();
-      this._textElement = null;
+      this._textElement.remove();
+      this._textElement = undefined;
       this._title = newTitle;
     } else if (this._textElement) {
-      this._textElement.textContent = newTitle;
+      this._textElement.textContent = newTitle as string;
       this._title = newTitle;
     }
   }
 
-  _updateTooltip(newTooltip: ?string) {
+  private _updateTooltip(newTooltip: string | null | undefined) {
     this._tooltip = newTooltip;
 
     if (newTooltip) {
@@ -308,11 +303,11 @@ class ButtonView {
     }
   }
 
-  _updateIconUrl(newIconUrl: ?string) {
+  private _updateIconUrl(newIconUrl: string | null | undefined) {
     this._iconUrl = newIconUrl;
     if (this._iconImgElement && !newIconUrl) {
-      (this._iconImgElement: Object).remove();
-      this._iconImgElement = null;
+      this._iconImgElement.remove();
+      this._iconImgElement = undefined;
     } else if (!this._iconImgElement && newIconUrl) {
       this._createIconImgElement();
     }
@@ -321,10 +316,10 @@ class ButtonView {
     }
   }
 
-  _updateIconClass(newIconClass: ?string) {
+  private _updateIconClass(newIconClass: string | null | undefined) {
     if (this._iconElement && !newIconClass && !this._iconUrl) {
-      (this._iconElement: Object).remove();
-      this._iconElement = null;
+      this._iconElement.remove();
+      this._iconElement = undefined;
     } else if (!this._iconElement && newIconClass) {
       this._createIconElement();
     }
@@ -337,7 +332,7 @@ class ButtonView {
     }
   }
 
-  _setEnabled(value: boolean) {
+  private _setEnabled(value: boolean) {
     if (this._isEnabled === value) {
       return;
     }
@@ -359,8 +354,11 @@ class ButtonView {
     }
   }
 
-  _setupEventStream() {
-    const clickEventStream = Kefir.fromEvents(this._element, 'click');
+  private _setupEventStream() {
+    const clickEventStream = Kefir.fromEvents<any, never>(
+      this._element,
+      'click'
+    );
 
     clickEventStream.onValue(function(event) {
       event.stopPropagation();
@@ -378,9 +376,9 @@ class ButtonView {
         })
     );
 
-    const isEnterOrSpace = event =>
+    const isEnterOrSpace = (event: any) =>
       includes([32 /* space */, 13 /* enter */], event.which);
-    const keydownEventStream = Kefir.fromEvents(
+    const keydownEventStream = Kefir.fromEvents<any, never>(
       this._element,
       'keydown'
     ).filter(() => this.isEnabled());
@@ -401,7 +399,7 @@ class ButtonView {
     });
   }
 
-  _setupKeyboardShortcutEvent() {
+  private _setupKeyboardShortcutEvent() {
     const keyboardShortcutHandle = this._keyboardShortcutHandle;
     if (keyboardShortcutHandle) {
       this._eventStream.plug(
@@ -424,31 +422,29 @@ class ButtonView {
     }
   }
 
-  _setupAestheticEvents() {
+  private _setupAestheticEvents() {
     Kefir.fromEvents(this._element, 'mouseenter')
       .filter(() => this.isEnabled())
-      .onValue(event => {
+      .onValue(() => {
         this._element.classList.add(
           BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS
         );
         this._element.classList.add('inboxsdk__button_hover');
       });
 
-    Kefir.fromEvents(this._element, 'mouseleave').onValue(event => {
+    Kefir.fromEvents(this._element, 'mouseleave').onValue(() => {
       this._element.classList.remove(
         BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS
       );
       this._element.classList.remove('inboxsdk__button_hover');
     });
 
-    Kefir.fromEvents(this._element, 'focus').onValue(event => {
+    Kefir.fromEvents(this._element, 'focus').onValue(() => {
       this._element.classList.add('T-I-JO');
     });
 
-    Kefir.fromEvents(this._element, 'blur').onValue(event => {
+    Kefir.fromEvents(this._element, 'blur').onValue(() => {
       this._element.classList.remove('T-I-JO');
     });
   }
 }
-
-export default defn(module, ButtonView);

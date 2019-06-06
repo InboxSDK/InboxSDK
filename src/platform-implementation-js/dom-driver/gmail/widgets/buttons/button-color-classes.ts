@@ -1,10 +1,10 @@
 /* @flow */
 
-type ButtonColors = {
-  INACTIVE_CLASS: string,
-  HOVER_CLASS: string,
-  ACTIVE_CLASS: string
-};
+interface ButtonColors {
+  INACTIVE_CLASS: string;
+  HOVER_CLASS: string;
+  ACTIVE_CLASS: string;
+}
 
 const ButtonColorClasses: { [name: string]: ButtonColors } = {
   default: {

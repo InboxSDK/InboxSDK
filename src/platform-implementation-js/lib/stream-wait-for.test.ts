@@ -1,5 +1,3 @@
-/* @flow */
-
 import sinon from 'sinon';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -40,7 +38,7 @@ it('should work', cb => {
 });
 
 it('should not call condition if not subscribed to', async () => {
-  const s = streamWaitFor(() => {
+  streamWaitFor(() => {
     throw new Error('Should not happen');
   });
 
@@ -71,7 +69,7 @@ it('should stop calling condition when unsubscribed from inside condition', cb =
 
 it('will not timeout if unsubscribed from', async () => {
   streamWaitFor(() => false, 2, 1)
-    .takeUntilBy(Kefir.later(0))
+    .takeUntilBy(Kefir.later(0, null))
     .onValue(() => {
       throw new Error('Should not happen');
     });
@@ -80,7 +78,7 @@ it('will not timeout if unsubscribed from', async () => {
 
 it('will check condition before timeout', async () => {
   const spy = sinon.spy();
-  let x = null;
+  let x: object | null = null;
   streamWaitFor(() => x, 50, 1000).onValue(spy);
   await delay(20);
   x = {};

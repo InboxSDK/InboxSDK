@@ -1,16 +1,10 @@
-/* @flow */
-
 import blockAndReemiteKeyboardEvents from '../../../lib/dom/block-and-reemit-keyboard-events';
 
 export default class GmailDropdownView {
-  _containerElement: HTMLElement;
-  _contentElement: HTMLElement;
+  private _containerElement: HTMLElement;
+  private _contentElement: HTMLElement;
 
-  constructor() {
-    this._setupElement();
-  }
-
-  _setupElement() {
+  public constructor() {
     this._containerElement = document.createElement('div');
     this._containerElement.setAttribute('class', 'inboxsdk__menu');
 
@@ -22,15 +16,15 @@ export default class GmailDropdownView {
     blockAndReemiteKeyboardEvents(this._containerElement);
   }
 
-  destroy() {
+  public destroy() {
     this._containerElement.remove();
   }
 
-  getContainerElement() {
+  public getContainerElement() {
     return this._containerElement;
   }
 
-  getContentElement() {
+  public getContentElement() {
     return this._contentElement;
   }
 }

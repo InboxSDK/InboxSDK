@@ -1,10 +1,8 @@
-/* @flow */
-
 export default function simulateMouseEvent(
   element: HTMLElement,
   mouseEventName: string
 ) {
-  var event: Object = document.createEvent('MouseEvents');
+  const event = document.createEvent('MouseEvents');
   event.initMouseEvent(
     mouseEventName,
     true,

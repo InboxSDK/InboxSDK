@@ -1,5 +1,3 @@
-/* @flow */
-
 import Kefir from 'kefir';
 
 export default function blockAndReemiteKeyboardEvents(element: HTMLElement) {
@@ -30,7 +28,7 @@ export default function blockAndReemiteKeyboardEvents(element: HTMLElement) {
       altKey: { value: event.altKey },
       metaKey: { value: event.metaKey },
       repeat: { value: event.repeat },
-      isComposing: { value: event.isComposing },
+      isComposing: { value: (event as any).isComposing },
       charCode: { value: event.charCode },
       keyCode: { value: event.keyCode },
       which: { value: event.which }

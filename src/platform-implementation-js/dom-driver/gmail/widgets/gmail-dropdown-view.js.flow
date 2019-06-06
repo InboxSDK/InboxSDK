@@ -1,0 +1,8 @@
+/* @flow */
+
+declare export default class GmailDropdownView {
+  constructor(): GmailDropdownView;
+  destroy(): void;
+  getContainerElement(): HTMLElement;
+  getContentElement(): HTMLElement;
+}

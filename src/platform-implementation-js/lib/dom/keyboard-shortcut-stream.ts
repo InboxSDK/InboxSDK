@@ -1,19 +1,18 @@
-/* @flow */
-
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import Combokeys from 'combokeys-capture';
 
-const combokeys = global.document && new Combokeys(document.body, true);
+const combokeys =
+  typeof document !== 'undefined' && new Combokeys(document.body, true);
 
 export default function keyboardShortcutStream(
   chord: string
-): Kefir.Observable<Object> {
-  return Kefir.stream(function(emitter) {
+): Kefir.Observable<object, never> {
+  return Kefir.stream(emitter => {
     return (
       combokeys &&
       combokeys.bind(
         chord,
-        function(domEvent) {
+        function(domEvent: any) {
           emitter.emit(domEvent);
           return false;
         },

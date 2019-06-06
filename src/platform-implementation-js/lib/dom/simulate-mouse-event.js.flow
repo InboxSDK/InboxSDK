@@ -1,0 +1,10 @@
+/* @flow */
+
+declare export default function simulateMouseEvent(
+  element: HTMLElement,
+  mouseEventName: string
+): void;
+
+declare export function simulateHover(element: HTMLElement): void;
+
+declare export function simulateClick(element: HTMLElement): void;

@@ -1,6 +1,4 @@
-/* @flow */
-
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 
 /**
  * Returns a Kefir stream that repeatedly calls the condition callback until it
@@ -10,10 +8,10 @@ import Kefir from 'kefir';
  * get tripped.
  */
 export default function streamWaitFor<T>(
-  condition: () => ?T,
+  condition: () => T | null | undefined,
   timeout: number = 60 * 1000,
   steptime: number = 250
-): Kefir.Observable<T> {
+): Kefir.Observable<T, Error> {
   // make this error here so we have a sensible stack.
   const timeoutError = new Error('waitFor timeout');
 
@@ -28,10 +26,12 @@ export default function streamWaitFor<T>(
     return Kefir.constantError(timeoutError);
   });
 
+  const isTruthy: (x: T | null | undefined) => x is T = Boolean as any;
+
   return Kefir.later(0, null)
     .merge(Kefir.interval(steptime, null))
     .map(() => condition())
-    .filter(Boolean)
+    .filter(isTruthy)
     .merge(timeoutStream)
     .take(1)
     .takeErrors(1);
