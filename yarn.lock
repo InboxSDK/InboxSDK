@@ -1312,10 +1312,10 @@
   dependencies:
     "@types/jest-diff" "*"
 
-"@types/kefir@^3.8.1":
-  version "3.8.1"
-  resolved "https://registry.yarnpkg.com/@types/kefir/-/kefir-3.8.1.tgz#752d18aa630248fbeb423d7d52184cfa50247fe7"
-  integrity sha512-gHrhwB5q1Krd7rsqnNurKzg7/QG5oTdpGKBTQH2kLiQV9HF9yxTuI0DU1wMrgY95l8cX2OKfwD6cjnEUbLZCug==
+"@types/kefir@^3.8.2":
+  version "3.8.2"
+  resolved "https://registry.yarnpkg.com/@types/kefir/-/kefir-3.8.2.tgz#7ecb467b3fde2f4c43f5fec2023066cd2669615f"
+  integrity sha512-mVCo+U18BVMoVpegFRVkyBFbTAt8tYIRqtRfNOB73uUaOt7FiAC91hy1QAXNsfFBM5hWpQPK6fYcUY741jN/9Q==
   dependencies:
     "@types/node" "*"
 

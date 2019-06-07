@@ -65,10 +65,7 @@ export default class DropdownView extends EventEmitter {
 
     outsideClicksAndEscape(elementsToIgnore)
       .takeUntilBy(onDestroy)
-      .filter(_event => {
-        // TODO this cast is necessary because of a Typescript def issue
-        const event = _event as OutsideEvent;
-
+      .filter(event => {
         let isCanceled = false;
         const appEvent = {
           type: event.type,
