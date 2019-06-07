@@ -1,37 +1,37 @@
-/* @flow */
-
 import asap from 'asap';
-import util from 'util';
 import EventEmitter from '../../lib/safe-event-emitter';
-import { defn } from 'ud';
 import Kefir from 'kefir';
 
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
-import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import ScrollableContainByScreen from '../../lib/ScrollableContainByScreen';
-import outsideClicksAndEscape from '../../lib/dom/outsideClicksAndEscape';
-import type { Options as ContainByScreenOptions } from 'contain-by-screen';
+import outsideClicksAndEscape, {
+  OutsideEvent
+} from '../../lib/dom/outsideClicksAndEscape';
+import { Options as ContainByScreenOptions } from 'contain-by-screen';
 
-type Options = {
-  manualPosition?: boolean,
-  extraElementsToIgnore?: HTMLElement[]
-};
+interface Options {
+  manualPosition?: boolean;
+  extraElementsToIgnore?: HTMLElement[];
+}
 
 // documented in src/docs/
-class DropdownView extends EventEmitter {
-  _dropdownViewDriver: Object;
-  destroyed: boolean = false;
-  /*deprecated*/ closed: boolean = false;
-  _options: Options;
-  _userPlacementOptions: ContainByScreenOptions = { hAlign: 'left' };
-  _scrollableContainByScreen: ?ScrollableContainByScreen = null;
-  _didInsertContainerEl: boolean;
-  el: HTMLElement;
+export default class DropdownView extends EventEmitter {
+  private _dropdownViewDriver: any;
+  public destroyed: boolean = false;
+  /*deprecated*/ public closed: boolean = false;
+  private _options: Options;
+  private _userPlacementOptions: ContainByScreenOptions = { hAlign: 'left' };
+  private _scrollableContainByScreen:
+    | ScrollableContainByScreen
+    | null
+    | undefined = null;
+  private _didInsertContainerEl: boolean;
+  public el: HTMLElement;
 
-  constructor(
-    dropdownViewDriver: Object,
+  public constructor(
+    dropdownViewDriver: any,
     anchorElement: HTMLElement,
-    options: ?Options
+    options: Options | null | undefined
   ) {
     super();
 
@@ -47,10 +47,7 @@ class DropdownView extends EventEmitter {
     if (document.contains(containerEl)) {
       this._didInsertContainerEl = false;
     } else {
-      ((document.body: any): HTMLElement).insertBefore(
-        containerEl,
-        ((document.body: any): HTMLElement).firstElementChild
-      );
+      document.body.insertBefore(containerEl, document.body.firstElementChild);
       this._didInsertContainerEl = true;
     }
 
@@ -68,7 +65,10 @@ class DropdownView extends EventEmitter {
 
     outsideClicksAndEscape(elementsToIgnore)
       .takeUntilBy(onDestroy)
-      .filter(event => {
+      .filter(_event => {
+        // TODO this cast is necessary because of a Typescript def issue
+        const event = _event as OutsideEvent;
+
         let isCanceled = false;
         const appEvent = {
           type: event.type,
@@ -115,7 +115,7 @@ class DropdownView extends EventEmitter {
         )
           .throttle(200)
           .takeUntilBy(onDestroy)
-          .onValue(event => this.reposition());
+          .onValue(() => this.reposition());
       });
     }
 
@@ -129,7 +129,7 @@ class DropdownView extends EventEmitter {
     });
   }
 
-  setPlacementOptions(options: ContainByScreenOptions) {
+  public setPlacementOptions(options: ContainByScreenOptions) {
     if (this._options.manualPosition) {
       // eslint-disable-next-line no-console
       console.error(
@@ -141,7 +141,7 @@ class DropdownView extends EventEmitter {
     this.emit('_placementOptionsUpdated');
   }
 
-  close() {
+  public close() {
     if (!this.destroyed) {
       this.destroyed = this.closed = true;
       if (this._scrollableContainByScreen) {
@@ -155,11 +155,9 @@ class DropdownView extends EventEmitter {
     }
   }
 
-  reposition() {
+  public reposition() {
     if (this._scrollableContainByScreen) {
       this._scrollableContainByScreen.reposition();
     }
   }
 }
-
-export default defn(module, DropdownView);

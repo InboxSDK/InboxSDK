@@ -1,0 +1,13 @@
+/* @flow */
+
+import Kefir from 'kefir';
+
+type Emitter = {
+  +addEventListener: Function,
+  +removeEventListener: Function
+};
+
+declare export default function fromEventTargetCapture(
+  target: Emitter,
+  eventName: string
+): Kefir.Observable<any>;
