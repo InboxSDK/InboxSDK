@@ -1,43 +1,48 @@
-/* @flow */
-
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
+import { ButtonViewI } from '../../../../widgets/buttons/basic-button-view-controller';
 
-export default class CreateAccessoryButtonView {
-  _element: HTMLElement;
-  _eventStream: Kefir.Observable<Object>;
-  _stopper = kefirStopper();
+export default class CreateAccessoryButtonView implements ButtonViewI {
+  private _element: HTMLElement = document.createElement('div');
+  private _eventStream = Kefir.pool<any, any>();
+  private _stopper = kefirStopper();
 
-  constructor(options?: Object) {
+  public constructor() {
     this._setupElement();
     this._setupEventStream();
   }
 
-  destroy() {
+  public update() {}
+
+  public setEnabled() {
+    throw new Error('not implemented');
+  }
+
+  public destroy() {
+    (this._eventStream as any).end();
     this._stopper.destroy();
     this._element.remove();
   }
 
-  getElement(): HTMLElement {
+  public getElement(): HTMLElement {
     return this._element;
   }
 
-  getEventStream(): Kefir.Observable<Object> {
+  public getEventStream(): Kefir.Observable<any, any> {
     return this._eventStream;
   }
 
-  activate() {
+  public activate() {
     const innerButtonElement = this._element.firstElementChild;
     if (innerButtonElement) innerButtonElement.classList.add('aj1');
   }
 
-  deactivate() {
+  public deactivate() {
     const innerButtonElement = this._element.firstElementChild;
     if (innerButtonElement) innerButtonElement.classList.remove('aj1');
   }
 
-  _setupElement() {
-    this._element = document.createElement('div');
+  private _setupElement() {
     this._element.setAttribute('class', 'nL aig');
     this._element.setAttribute('style', 'left: 7px');
 
@@ -50,16 +55,19 @@ export default class CreateAccessoryButtonView {
     ].join('');
   }
 
-  _setupEventStream() {
-    const clickEventStream = Kefir.fromEvents(this._element, 'click');
+  private _setupEventStream() {
+    const clickEventStream = Kefir.fromEvents<any, never>(
+      this._element,
+      'click'
+    );
 
     clickEventStream.onValue(event => {
       event.stopPropagation();
       event.preventDefault();
     });
 
-    this._eventStream = clickEventStream
-      .map(event => ({ eventName: 'click', domEvent: event }))
-      .takeUntilBy(this._stopper);
+    this._eventStream.plug(
+      clickEventStream.map(event => ({ eventName: 'click', domEvent: event }))
+    );
   }
 }
