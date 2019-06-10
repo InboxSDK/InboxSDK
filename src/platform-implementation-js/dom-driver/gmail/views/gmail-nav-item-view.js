@@ -372,7 +372,6 @@ export default class GmailNavItemView {
     // render custom icon
     if (navItemDescriptor.iconElement) {
       renderCustomIcon(
-        this._iconSettings,
         iconContainerElement,
         navItemDescriptor.iconElement,
         navItemDescriptor.iconPosition !== 'BEFORE_NAME'

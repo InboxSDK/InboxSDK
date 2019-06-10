@@ -1,20 +1,20 @@
 /* @flow */
 
 export default function renderCustomIcon(
-  iconSettings: Object,
   containerElement: HTMLElement,
   customIconElement: HTMLElement,
   append: boolean,
   insertBeforeEl: ?HTMLElement
 ) {
-  iconSettings.iconElement = customIconElement;
-  iconSettings.iconElement.classList.add('inboxsdk__button_icon');
+  const iconElementWrapper = document.createElement('div');
+  iconElementWrapper.classList.add('inboxsdk__button_icon');
+  iconElementWrapper.appendChild(customIconElement);
 
   if (append) {
-    containerElement.appendChild(iconSettings.iconElement);
+    containerElement.appendChild(iconElementWrapper);
   } else {
     containerElement.insertBefore(
-      iconSettings.iconElement,
+      containerElement,
       insertBeforeEl || (containerElement: any).firstElementChild
     );
   }
