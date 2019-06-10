@@ -393,7 +393,6 @@ export default class GmailNavItemView {
     // children i.e. if no iconUrl or iconClass is defined on navItemDescriptor.
     if (
       this._driver.isUsingMaterialUI() &&
-      !navItemDescriptor.customIconElement &&
       (navItemDescriptor.backgroundColor ||
         (navItemDescriptor.accessory &&
           navItemDescriptor.accessory.buttonBackgroundColor))
