@@ -50,6 +50,24 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     name: 'Sent Monkeys'
   });
 
+  const customIconElement = document.createElement('div');
+  customIconElement.style.background = 'blue';
+  customIconElement.innerHTML = '<div>X</div>';
+
+  sdk.NavMenu.addNavItem({
+    name: 'Custom icon element',
+    iconElement: customIconElement,
+    routeID: 'Custom icon element',
+    subtitle: '123',
+    accessory: {
+      type: 'DROPDOWN_BUTTON',
+      buttonBackgroundColor: 'red',
+      onClick: function(event) {
+        event.dropdown.el.innerHTML = 'Hello world!';
+      }
+    }
+  });
+
   sdk.NavMenu.addNavItem({
     name: 'beep',
     iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
@@ -68,9 +86,15 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     customRouteView.getElement().innerHTML = 'beep';
   });
 
+  const customMonkeyElement = document.createElement('div');
+  customMonkeyElement.style.background = 'green';
+  customMonkeyElement.innerHTML = '<div>M</div>';
+
+  // This example also verifies when customIconElement presents iconUrl is ignored
   var navItem = sdk.NavMenu.addNavItem({
     name: 'Monkeys',
     iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+    iconElement: customMonkeyElement,
     routeID: 'example/:monkeyName',
     routeParams: {monkeyName: 'george {} {} {}'},
     type: sdk.NavMenu.NavItemTypes.LINK,
@@ -125,6 +149,18 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
 
   lion.addNavItem({
     name: 'Lion item',
+    onClick: () => {
+      console.log('LION ITEM WAS CLICKED');
+    }
+  });
+
+  const customLionIcon = document.createElement('div');
+  customLionIcon.style.background = 'yellow';
+  customLionIcon.innerHTML = '<div>L</div>';
+
+  lion.addNavItem({
+    name: 'Custom icon',
+    iconElement: customLionIcon,
     onClick: () => {
       console.log('LION ITEM WAS CLICKED');
     }
