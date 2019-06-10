@@ -6,6 +6,8 @@ export default function renderCustomIcon(
   append: boolean,
   insertBeforeEl: ?HTMLElement
 ) {
+  // Check if icon wrapper exist or not
+  // when renderCustomIcon gets called for updating navItemDescriptor
   let iconElementWrapper = containerElement.querySelector(
     '.inboxsdk__button_icon'
   );
