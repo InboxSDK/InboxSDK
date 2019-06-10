@@ -21,6 +21,7 @@ import DropdownButtonViewController from '../../../widgets/buttons/dropdown-butt
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
 import updateIcon from '../../../driver-common/update-icon';
+import renderCustomIcon from '../../../driver-common/render-custom-icon';
 
 import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 
@@ -368,6 +369,17 @@ export default class GmailNavItemView {
       ? querySelector(this._element, '.qj')
       : querySelector(this._element, '.aio');
 
+    // render custom icon
+    if (navItemDescriptor.customIconElement) {
+      renderCustomIcon(
+        this._iconSettings,
+        iconContainerElement,
+        navItemDescriptor.customIconElement,
+        navItemDescriptor.iconPosition !== 'BEFORE_NAME'
+      );
+      return;
+    }
+
     updateIcon(
       this._iconSettings,
       iconContainerElement,
@@ -381,6 +393,7 @@ export default class GmailNavItemView {
     // children i.e. if no iconUrl or iconClass is defined on navItemDescriptor.
     if (
       this._driver.isUsingMaterialUI() &&
+      !navItemDescriptor.customIconElement &&
       (navItemDescriptor.backgroundColor ||
         (navItemDescriptor.accessory &&
           navItemDescriptor.accessory.buttonBackgroundColor))
@@ -721,6 +734,7 @@ export default class GmailNavItemView {
         : this._level;
 
     const element = gmailNavItemView.getElement();
+
     if (this._driver.isUsingMaterialUI()) {
       querySelector(element, '.TN').style.marginLeft =
         getLeftIndentationPaddingValue(this._driver) * indentationFactor + 'px';
