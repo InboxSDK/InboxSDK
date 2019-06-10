@@ -56,7 +56,7 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
 
   sdk.NavMenu.addNavItem({
     name: 'Custom icon element',
-    customIconElement,
+    iconElement: customIconElement,
     routeID: 'Custom icon element',
     subtitle: '123',
     accessory: {
@@ -94,7 +94,7 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
   var navItem = sdk.NavMenu.addNavItem({
     name: 'Monkeys',
     iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
-    customIconElement: customMonkeyElement,
+    iconElement: customMonkeyElement,
     routeID: 'example/:monkeyName',
     routeParams: {monkeyName: 'george {} {} {}'},
     type: sdk.NavMenu.NavItemTypes.LINK,
@@ -160,7 +160,7 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
 
   lion.addNavItem({
     name: 'Custom icon',
-    customIconElement: customLionIcon,
+    iconElement: customLionIcon,
     onClick: () => {
       console.log('LION ITEM WAS CLICKED');
     }

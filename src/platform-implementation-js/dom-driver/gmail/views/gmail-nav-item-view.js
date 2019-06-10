@@ -370,11 +370,11 @@ export default class GmailNavItemView {
       : querySelector(this._element, '.aio');
 
     // render custom icon
-    if (navItemDescriptor.customIconElement) {
+    if (navItemDescriptor.iconElement) {
       renderCustomIcon(
         this._iconSettings,
         iconContainerElement,
-        navItemDescriptor.customIconElement,
+        navItemDescriptor.iconElement,
         navItemDescriptor.iconPosition !== 'BEFORE_NAME'
       );
       return;
