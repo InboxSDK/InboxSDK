@@ -106,6 +106,14 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
   iconClass: null,
 
   /**
+   * An optional icon element to use as the icon. This property can't be used with iconUrl or iconClass.
+   * ^optional
+   * ^default=null
+   * @type {HTMLElement}
+   */
+  iconElement: null,
+
+  /**
    * In Inbox, providing a {backgroundColor} will add a colored circle indicator
    * on the left of a {NavItemView}, provided that it is either a root NavItem with
    * no children or a {NavItemView} 1 level deep.
