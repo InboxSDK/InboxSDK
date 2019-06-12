@@ -1,17 +1,13 @@
-/* @flow */
-
-import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
-const { EventEmitter } = require('events');
 import MockElementParent from '../../../../test/lib/mock-element-parent';
 import MockMutationObserver from '../../../../test/lib/mock-mutation-observer';
 
 import makeElementViewStream from './make-element-view-stream';
 import makeElementChildStream from './make-element-child-stream';
 
-global.MutationObserver = MockMutationObserver;
+(global as any).MutationObserver = MockMutationObserver;
 
-function fakeEl(name: string): Object {
+function fakeEl(name: string): any {
   return { name, nodeType: 1 };
 }
 
@@ -26,7 +22,7 @@ it('should work with makeElementChildStream', done => {
   const target = new MockElementParent([child1, child2]);
 
   let call = 0;
-  makeElementChildStream((target: Object))
+  makeElementChildStream(target as any)
     .takeUntilBy(stopper)
     .flatMap(
       makeElementViewStream(el => {

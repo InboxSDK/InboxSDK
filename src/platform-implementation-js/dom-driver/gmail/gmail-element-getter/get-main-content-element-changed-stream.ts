@@ -1,17 +1,15 @@
-/* @flow */
-
 import last from 'lodash/last';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 
 import streamWaitFor from '../../../lib/stream-wait-for';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 
-import typeof GmailElementGetter from '../gmail-element-getter';
+import _GmailElementGetter from '../gmail-element-getter';
 
 export default function getMainContentElementChangedStream(
-  GmailElementGetter: GmailElementGetter
-): Kefir.Observable<HTMLElement> {
+  GmailElementGetter: typeof _GmailElementGetter
+): Kefir.Observable<HTMLElement, never> {
   const s = waitForMainContentContainer(GmailElementGetter)
     .flatMap(mainContentContainer =>
       makeElementChildStream(mainContentContainer)
@@ -22,7 +20,7 @@ export default function getMainContentElementChangedStream(
             attributes: true,
             attributeFilter: ['style']
           })
-            .map(last)
+            .map(x => last(x)!)
             .toProperty(() => {
               return { target: el };
             })
@@ -36,17 +34,19 @@ export default function getMainContentElementChangedStream(
   // subscribers and then re-gains some.
   s.onValue(() => {});
 
-  return s;
+  return s as Kefir.Observable<HTMLElement, never>;
 }
 
-function waitForMainContentContainer(GmailElementGetter) {
+function waitForMainContentContainer(
+  GmailElementGetter: typeof _GmailElementGetter
+) {
   if (GmailElementGetter.isStandaloneComposeWindow()) {
     return Kefir.never();
   }
   return streamWaitFor(() => GmailElementGetter.getMainContentContainer());
 }
 
-function _isNowVisible(mutation) {
-  const el = mutation.target;
+function _isNowVisible(mutation: { target: HTMLElement } | MutationRecord) {
+  const el = mutation.target as HTMLElement;
   return el.style.display !== 'none';
 }

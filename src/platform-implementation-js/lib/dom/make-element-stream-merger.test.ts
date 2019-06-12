@@ -1,24 +1,23 @@
-/* @flow */
-
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import sinon from 'sinon';
 const sinonTest = require('sinon-test')(sinon, { useFakeTimers: false });
+import { ItemWithLifetime } from './make-element-child-stream';
 
 import makeElementStreamMerger from './make-element-stream-merger';
 
-function fakeEl(name: string): Object {
+function fakeEl(name: string): any {
   return { name, nodeType: 1 };
 }
 
 it('passes through unrelated events', done => {
   const e1 = {
     el: fakeEl('e1.el'),
-    removalStream: kefirBus()
+    removalStream: kefirBus<null, never>()
   };
   const e2 = {
     el: fakeEl('e2.el'),
-    removalStream: kefirBus()
+    removalStream: kefirBus<null, never>()
   };
   let i = 0;
   Kefir.sequentially(0, [e1, e2])
@@ -54,29 +53,29 @@ it('can persist elements', done => {
   // and should get its own event.
   const e1 = {
     el: fakeEl('e1.el'),
-    removalStream: kefirBus()
+    removalStream: kefirBus<null, never>()
   };
   const e2 = {
     el: fakeEl('e2.el'),
-    removalStream: kefirBus()
+    removalStream: kefirBus<null, never>()
   };
   const e3 = {
     el: e1.el,
-    removalStream: kefirBus()
+    removalStream: kefirBus<null, never>()
   };
   const e4 = {
     el: e1.el,
-    removalStream: kefirBus()
+    removalStream: kefirBus<null, never>()
   };
   const e5 = {
     el: fakeEl('e5.el'),
-    removalStream: kefirBus()
+    removalStream: kefirBus<null, never>()
   };
   const e6 = {
     el: e1.el,
-    removalStream: kefirBus()
+    removalStream: kefirBus<null, never>()
   };
-  const bus = kefirBus();
+  const bus = kefirBus<ItemWithLifetime<any>, never>();
   let i = 0,
     elWasRemoved = false;
   bus.flatMap(makeElementStreamMerger()).onValue(event => {
@@ -129,35 +128,35 @@ it('can persist elements', done => {
 
 it(
   'warns if element stays in multiple streams',
-  sinonTest(async function() {
-    this.stub(console, 'warn');
+  sinonTest(async function(this: any) {
+    const consoleWarnStub = this.stub(console, 'warn');
     const e1 = {
       el: fakeEl('e1.el'),
-      removalStream: kefirBus()
+      removalStream: kefirBus<null, never>()
     };
     const e2 = {
       el: e1.el,
-      removalStream: kefirBus()
+      removalStream: kefirBus<null, never>()
     };
     const e3 = {
       el: e1.el,
-      removalStream: kefirBus()
+      removalStream: kefirBus<null, never>()
     };
     const e4 = {
       el: fakeEl('e4.el'),
-      removalStream: kefirBus()
+      removalStream: kefirBus<null, never>()
     };
     let i = 0;
 
     await new Promise(resolve => {
       Kefir.sequentially(0, [e1, e2, e3, e4])
         .flatMap(makeElementStreamMerger())
-        .onValue(event => {
+        .onValue(() => {
           switch (++i) {
             case 1:
               break;
             case 2:
-              expect(console.warn.callCount).toBeGreaterThan(0); // eslint-disable-line no-console
+              expect(consoleWarnStub.callCount).toBeGreaterThan(0);
               resolve();
               break;
             default:

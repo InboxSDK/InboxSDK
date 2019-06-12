@@ -4,9 +4,7 @@ import Kefir from 'kefir';
 
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 import ScrollableContainByScreen from '../../lib/ScrollableContainByScreen';
-import outsideClicksAndEscape, {
-  OutsideEvent
-} from '../../lib/dom/outsideClicksAndEscape';
+import outsideClicksAndEscape from '../../lib/dom/outsideClicksAndEscape';
 import { Options as ContainByScreenOptions } from 'contain-by-screen';
 
 interface Options {

@@ -2,9 +2,9 @@
 // this, and should use the Promise constructor instead!
 
 export interface Defer<T> {
-  resolve: (value: T) => void;
-  reject: (err: any) => void;
-  promise: Promise<T>;
+  readonly resolve: (value: T) => void;
+  readonly reject: (err: any) => void;
+  readonly promise: Promise<T>;
 }
 
 export default function defer<T>(): Defer<T> {

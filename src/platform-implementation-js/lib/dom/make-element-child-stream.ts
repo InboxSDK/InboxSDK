@@ -1,21 +1,18 @@
-/* @flow */
-
 import asap from 'asap';
-import Kefir from 'kefir';
-import kefirStopper from 'kefir-stopper';
-import type { Stopper } from 'kefir-stopper';
+import * as Kefir from 'kefir';
+import kefirStopper, { Stopper } from 'kefir-stopper';
 
-export type ItemWithLifetime<T> = {
-  el: T,
-  removalStream: Kefir.Observable<null>
-};
+export interface ItemWithLifetime<T> {
+  readonly el: T;
+  readonly removalStream: Kefir.Observable<null, never>;
+}
 export type ElementWithLifetime = ItemWithLifetime<HTMLElement>;
 
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
 export default function makeElementChildStream(
   element: HTMLElement
-): Kefir.Observable<ElementWithLifetime> {
+): Kefir.Observable<ElementWithLifetime, never> {
   if (!element || !element.nodeType) {
     throw new Error('Expected element, got ' + String(element));
   }
@@ -86,7 +83,7 @@ export default function makeElementChildStream(
       ended = true;
       observer.disconnect();
       asap(() => {
-        removalStreams.forEach((removalStream, el) => {
+        removalStreams.forEach(removalStream => {
           removalStream.destroy();
         });
       });
@@ -97,7 +94,7 @@ export default function makeElementChildStream(
 // Throw error at a later time where our error-logger can pick it up. This
 // avoids having this module depend on logger.js which we can't import because
 // this module is used in the injected script too.
-function throwLater(err) {
+function throwLater(err: Error) {
   setTimeout(() => {
     throw err;
   }, 1);

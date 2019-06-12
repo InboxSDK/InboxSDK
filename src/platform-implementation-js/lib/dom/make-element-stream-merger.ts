@@ -1,16 +1,14 @@
-/* @flow */
-
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import StopperPool from '../stopper-pool';
 import delayAsap from '../delay-asap';
-import type { ItemWithLifetime } from './make-element-child-stream';
+import { ItemWithLifetime } from './make-element-child-stream';
 
 export default function makeElementStreamMerger<T>(): (
   event: ItemWithLifetime<T>
-) => Kefir.Observable<ItemWithLifetime<T>> {
-  const knownElementStopperPools: Map<T, StopperPool> = new Map();
+) => Kefir.Observable<ItemWithLifetime<T>, never> {
+  const knownElementStopperPools: Map<T, StopperPool<null, never>> = new Map();
 
-  return function(event) {
+  return event => {
     let stopperPool = knownElementStopperPools.get(event.el);
     if (stopperPool) {
       if (stopperPool.getSize() > 1) {

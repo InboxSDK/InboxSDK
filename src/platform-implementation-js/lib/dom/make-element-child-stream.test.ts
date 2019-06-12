@@ -1,43 +1,21 @@
-/* @flow */
-
 import _ from 'lodash';
-import delay from 'pdelay';
 import sinon from 'sinon';
 const sinonTest = require('sinon-test')(sinon, { useFakeTimers: false });
-import Kefir from 'kefir';
-import events from 'events';
-const { EventEmitter } = events;
 import MockElementParent from '../../../../test/lib/mock-element-parent';
 import MockMutationObserver from '../../../../test/lib/mock-mutation-observer';
+import defer from '../../../common/defer';
 import kefirBus from 'kefir-bus';
 
 import kefirMakeElementChildStream from './make-element-child-stream';
 
-global.MutationObserver = MockMutationObserver;
+(global as any).MutationObserver = MockMutationObserver;
 
-function fakeEl(name: string): Object {
+function fakeEl(name: string): any {
   return { name, nodeType: 1 };
 }
 
-function defer<T>(): {
-  promise: Promise<T>,
-  resolve: (t: T) => void,
-  reject: (err: any) => void
-} {
-  let resolve, reject;
-  const promise = new Promise((_resolve, _reject) => {
-    resolve = _resolve;
-    reject = _reject;
-  });
-  return {
-    resolve: (resolve: any),
-    reject: (reject: any),
-    promise: (promise: any)
-  };
-}
-
 it('should work', done => {
-  let child1 = fakeEl('child1'),
+  const child1 = fakeEl('child1'),
     child2 = fakeEl('child2'),
     child3 = fakeEl('child3');
   const childrenToNames = new Map(
@@ -50,8 +28,8 @@ it('should work', done => {
 
   const target = new MockElementParent([child1, child2]);
 
-  const calls = [];
-  kefirMakeElementChildStream((target: Object)).onValue(event => {
+  const calls: any[][] = [];
+  kefirMakeElementChildStream(target as any).onValue(event => {
     const name = childrenToNames.get(event.el);
     calls.push(['add', name]);
     event.removalStream.onValue(() => {
@@ -92,8 +70,8 @@ it('triggers removals when no longer listened on', done => {
 
   const target = new MockElementParent([child1]);
 
-  const calls = [];
-  const stream = kefirMakeElementChildStream((target: Object)).takeUntilBy(
+  const calls: any[][] = [];
+  const stream = kefirMakeElementChildStream(target as any).takeUntilBy(
     stopper
   );
   stream.onValue(event => {
@@ -118,7 +96,7 @@ it('triggers removals when no longer listened on', done => {
       target.appendChild(child2);
     } else if (event.el === child2) {
       calls.push(['stopper']);
-      stopper.emit();
+      stopper.value(undefined);
     }
   });
 });
@@ -130,7 +108,7 @@ it("doesn't miss children added during initial emits", done => {
   const target = new MockElementParent([child1]);
 
   let i = 0;
-  const stream = kefirMakeElementChildStream((target: Object));
+  const stream = kefirMakeElementChildStream(target as any);
   stream.onValue(event => {
     switch (++i) {
       case 1:
@@ -154,7 +132,7 @@ it("doesn't miss children if some are removed during initial emits", done => {
   const target = new MockElementParent([child1, child2]);
 
   let i = 0;
-  const stream = kefirMakeElementChildStream((target: Object));
+  const stream = kefirMakeElementChildStream(target as any);
   stream.onValue(event => {
     switch (++i) {
       case 1:
@@ -173,30 +151,32 @@ it("doesn't miss children if some are removed during initial emits", done => {
 
 it(
   'is exception-safe while emitting',
-  sinonTest(async function() {
+  sinonTest(async function(this: any) {
     let testErrorCatchCount = 0;
-    let testErrorDefer = defer();
+    const testErrorDefer = defer();
     const testError = new Error('child2 test error');
     {
       const _setTimeout = setTimeout;
-      this.stub(global, 'setTimeout').callsFake((fn, delay, ...args) => {
-        return _setTimeout(
-          function() {
-            try {
-              return fn.apply(this, arguments);
-            } catch (err) {
-              if (err === testError) {
-                testErrorCatchCount++;
-                testErrorDefer.resolve();
-              } else {
-                throw err;
+      this.stub(global, 'setTimeout').callsFake(
+        (fn: Function, delay: number, ...args: any[]) => {
+          return _setTimeout(
+            function(this: any, ...args: any[]) {
+              try {
+                return fn.apply(this, args);
+              } catch (err) {
+                if (err === testError) {
+                  testErrorCatchCount++;
+                  testErrorDefer.resolve(undefined);
+                } else {
+                  throw err;
+                }
               }
-            }
-          },
-          delay,
-          ...args
-        );
-      });
+            },
+            delay,
+            ...args
+          );
+        }
+      );
     }
 
     const child1 = fakeEl('child1'),
@@ -212,8 +192,8 @@ it(
 
     const target = new MockElementParent([child1, child2, child3]);
 
-    const calls = [];
-    const stream = kefirMakeElementChildStream((target: Object));
+    const calls: any[][] = [];
+    const stream = kefirMakeElementChildStream(target as any);
 
     await new Promise(resolve => {
       stream.onValue(event => {

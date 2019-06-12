@@ -73,13 +73,13 @@ it('throws error if you try to add a stream after end', () => {
 });
 
 it('stops listening to streams after first event', done => {
-  const ender = new StopperPool(kefirBus());
+  const ender = new StopperPool<number, never>(kefirBus());
   ender.stream.onAny(() => {
     throw new Error('Should not happen');
   });
   ender.add(
     Kefir.stream(emitter => {
-      emitter.emit(1);
+      emitter.value(1);
       return done;
     })
   );
