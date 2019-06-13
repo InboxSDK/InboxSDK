@@ -6,7 +6,7 @@ const combokeys =
 
 export default function keyboardShortcutStream(
   chord: string
-): Kefir.Observable<object, never> {
+): Kefir.Observable<any, never> {
   return Kefir.stream(emitter => {
     return (
       combokeys &&

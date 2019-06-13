@@ -74,7 +74,7 @@ export default class ButtonView implements ButtonViewI {
   public getElement(): HTMLElement {
     return this._element;
   }
-  public getEventStream(): Kefir.Observable<object, any> {
+  public getEventStream(): Kefir.Observable<any, any> {
     return this._eventStream;
   }
 

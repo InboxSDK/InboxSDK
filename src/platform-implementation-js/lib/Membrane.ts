@@ -9,14 +9,14 @@ export type Mapper<T extends SomeClass> = [T, MapperFn<InstanceType<T>>];
 // sure we return the same *View object back if we've already made one for
 // given *ViewDriver.
 export default class Membrane {
-  private _mappers: Map<object, MapperFn<any>>;
-  private _map: WeakMap<object, object> = new WeakMap();
+  private _mappers: Map<any, MapperFn<any>>;
+  private _map: WeakMap<any, any> = new WeakMap();
 
   public constructor(mappers: Array<Mapper<any>>) {
     this._mappers = new Map(mappers);
   }
 
-  public get(wet: object): object {
+  public get(wet: any): any {
     let dry = this._map.get(wet);
     if (!dry) {
       const mapperFn = this._mappers.get(wet.constructor);
