@@ -173,7 +173,6 @@ class ContentPanelViewDriver {
   }
 
   open() {
-    checkInUserInputEvent();
     ((document.body: any): HTMLElement).dispatchEvent(
       new CustomEvent('inboxsdkSidebarPanelOpen', {
         bubbles: true,
