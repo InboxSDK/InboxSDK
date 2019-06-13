@@ -484,7 +484,7 @@ export default class GmailNavItemView {
 
   _createPlusButtonAccessory(accessoryDescriptor: Object) {
     const buttonOptions = { ...accessoryDescriptor };
-    buttonOptions.buttonView = new CreateAccessoryButtonView(buttonOptions);
+    buttonOptions.buttonView = new CreateAccessoryButtonView();
 
     this._accessoryViewController = new BasicButtonViewController(
       buttonOptions

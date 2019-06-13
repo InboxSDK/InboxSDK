@@ -24,7 +24,7 @@ export default class GmailComposeView implements ComposeViewDriver {
   public getStatusArea(): HTMLElement;
 
   // interface methods
-  public getEventStream(): Kefir.Observable<object, any>;
+  public getEventStream(): Kefir.Observable<any, any>;
   public getStopper(): Kefir.Observable<any, never>;
   public getElement(): HTMLElement;
   public insertBodyTextAtCursor(text: string): null | undefined | HTMLElement;

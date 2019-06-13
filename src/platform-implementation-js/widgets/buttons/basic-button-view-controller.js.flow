@@ -1,0 +1,19 @@
+/* @flow */
+
+import type Kefir from 'kefir';
+
+export type Options = {
+  activateFunction?: ?() => void,
+  onClick?: ?() => void,
+  buttonView: Object
+};
+
+declare export default class BasicButtonViewController {
+  constructor(options: Options): BasicButtonViewController;
+  getStopper(): Kefir.Observable<null>;
+  destroy(): void;
+  update(options: ?Object): void;
+  getView(): Object;
+  setActivateFunction(f: ?(event: Object) => void): void;
+  activate(): void;
+}

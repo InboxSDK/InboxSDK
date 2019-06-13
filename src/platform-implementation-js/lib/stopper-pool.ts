@@ -4,14 +4,14 @@ import * as Kefir from 'kefir';
 // streams added to it. It has a stream property which is a stopper stream which
 // emits a stop event and ends only after all of its input stopper streams have
 // stopped.
-export default class StopperPool {
+export default class StopperPool<V, E> {
   private _streamCount: number = 0;
   private _ended: boolean = false;
-  private _pool = Kefir.pool<any, any>();
-  public stream: Kefir.Observable<any, any>;
+  private _pool = Kefir.pool<V, E>();
+  public stream: Kefir.Observable<V, E>;
 
   public constructor(
-    streams: Kefir.Observable<any, any> | Kefir.Observable<any, any>[]
+    streams: Kefir.Observable<V, E> | Kefir.Observable<V, E>[]
   ) {
     this.stream = this._pool
       .filter(() => {
@@ -32,9 +32,7 @@ export default class StopperPool {
     this.add(streams);
   }
 
-  public add(
-    newStreams: Kefir.Observable<any, any> | Kefir.Observable<any, any>[]
-  ) {
+  public add(newStreams: Kefir.Observable<V, E> | Kefir.Observable<V, E>[]) {
     if (this._ended) {
       throw new Error('Tried to add a stream to a stopped StopperPool');
     }

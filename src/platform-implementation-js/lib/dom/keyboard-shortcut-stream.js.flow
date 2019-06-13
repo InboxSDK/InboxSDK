@@ -1,0 +1,7 @@
+/* @flow */
+
+import Kefir from 'kefir';
+
+declare export default function keyboardShortcutStream(
+  chord: string
+): Kefir.Observable<Object>;

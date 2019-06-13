@@ -39,7 +39,7 @@ export interface ComposeButtonDescriptor {
 }
 
 export interface ComposeViewDriver {
-  getEventStream(): Kefir.Observable<object, any>;
+  getEventStream(): Kefir.Observable<any, any>;
   getStopper(): Kefir.Observable<any, never>;
   getElement(): HTMLElement;
   insertBodyTextAtCursor(text: string): null | undefined | HTMLElement;
