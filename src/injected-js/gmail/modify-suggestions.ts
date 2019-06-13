@@ -1,5 +1,3 @@
-/* @flow */
-
 import escape from 'lodash/escape';
 import autoHtml from 'auto-html';
 import { defn } from 'ud';
@@ -7,26 +5,27 @@ import htmlToText from '../../common/html-to-text';
 import * as GRP from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 
 // This is the type that the user provides.
-export type AutocompleteSearchResult = {
-  name?: ?string,
-  nameHTML?: ?string,
-  description?: ?string,
-  descriptionHTML?: ?string,
-  routeName?: ?string,
-  routeParams?: ?{ [ix: string]: string | number },
-  externalURL?: ?string,
-  searchTerm?: ?string,
-  iconUrl?: ?string,
-  iconClass?: ?string,
-  onClick?: ?() => void
-};
+export interface AutocompleteSearchResult {
+  name?: null | string;
+  nameHTML?: null | string;
+  description?: null | string;
+  descriptionHTML?: null | string;
+  routeName?: null | string;
+  routeParams?: null | { [ix: string]: string | number };
+  externalURL?: null | string;
+  searchTerm?: null | string;
+  iconUrl?: null | string;
+  iconClass?: null | string;
+  onClick?: null | (() => void);
+}
 
 // These ids are part of the object constructed by the SDK used to refer to a
 // suggestion to the injected script.
-export type AutocompleteSearchResultWithId = AutocompleteSearchResult & {
-  id: string,
-  providerId: string
-};
+export interface AutocompleteSearchResultWithId
+  extends AutocompleteSearchResult {
+  id: string;
+  providerId: string;
+}
 
 /*
 Notes about the Gmail suggestions response:
@@ -60,11 +59,11 @@ function modifySuggestions(
 ): string {
   const { value: parsed, options } = GRP.deserialize(responseText);
   const query = parsed[0][1];
-  for (let modification of modifications) {
+  for (const modification of modifications) {
     let name, nameHTML;
     if (typeof modification.name === 'string') {
       name = modification.name;
-      nameHTML = (escape(name): string);
+      nameHTML = escape(name);
     } else if (typeof modification.nameHTML === 'string') {
       nameHTML = modification.nameHTML;
       name = htmlToText(nameHTML);
@@ -75,7 +74,7 @@ function modifySuggestions(
     let description, descriptionHTML;
     if (typeof modification.description === 'string') {
       description = modification.description;
-      descriptionHTML = (escape(description): string);
+      descriptionHTML = escape(description);
     } else if (typeof modification.descriptionHTML === 'string') {
       descriptionHTML = modification.descriptionHTML;
       description = htmlToText(descriptionHTML);
@@ -93,7 +92,15 @@ function modifySuggestions(
       'aso.sug',
       modification.searchTerm || query,
       nameHTML,
-      (null: ?[string, ?string, string, ?string, string]),
+      null as
+        | [
+            string,
+            string | null | undefined,
+            string,
+            string | null | undefined,
+            string
+          ]
+        | null,
       [],
 
       // screen height estimate. Currently Gmail bugs out if the screen height
@@ -101,7 +108,7 @@ function modifySuggestions(
       // issue more likely by telling it our entries are zero-height.
       0,
 
-      (null: ?[string, string]),
+      null as [string, string] | null,
       'asor inboxsdk__custom_suggestion ' +
         modification.providerId +
         ' ' +

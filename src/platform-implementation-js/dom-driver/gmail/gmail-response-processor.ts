@@ -1,5 +1,3 @@
-/* @flow */
-
 import flatten from 'lodash/flatten';
 import last from 'lodash/last';
 import t from 'transducers.js';
@@ -9,7 +7,7 @@ import htmlToText from '../../../common/html-to-text';
 
 export function interpretSentEmailResponse(
   responseString: string
-): { threadID: string, messageID: string } {
+): { threadID: string; messageID: string } {
   const emailSentArray = deserialize(responseString).value;
 
   const gmailMessageId = extractGmailMessageIdFromSentEmail(emailSentArray);
@@ -26,7 +24,7 @@ export function interpretSentEmailResponse(
 
 export function extractGmailMessageIdFromSentEmail(
   emailSentArray: any
-): ?string {
+): string | null {
   const messageIdArrayMarker = 'a';
   const messageIdArray = _searchArray(
     emailSentArray,
@@ -46,7 +44,7 @@ export function extractGmailMessageIdFromSentEmail(
 
 export function extractGmailThreadIdFromSentEmail(
   emailSentArray: any
-): ?string {
+): string | null {
   const threadIdArrayMarker = 'csd';
   const threadIdArray = _searchArray(
     emailSentArray,
@@ -69,7 +67,7 @@ export function extractGmailThreadIdFromSentEmail(
 
 export function extractGmailThreadIdFromMessageIdSearch(
   responseString: string
-): ?string {
+): string | null {
   const threadResponseArray = deserialize(responseString).value;
   const threadIdArrayMarker = 'cs';
   const threadIdArray = _searchArray(
@@ -93,8 +91,8 @@ export function rewriteSingleQuotes(s: string): string {
 
   // i is our position in the input string. result is our result string that
   // we'll copy the parts of the input to as we interpret them.
-  let i = 0,
-    resultParts = [];
+  let i = 0;
+  const resultParts = [];
   // eslint-disable-next-line no-constant-condition
   while (true) {
     // Find the position of the next singly or doubly quoted part.
@@ -166,16 +164,16 @@ function findNextUnescapedCharacter(
   return -1;
 }
 
-export type MessageOptions = {
-  includeLengths: boolean,
-  suggestionMode: boolean,
-  noArrayNewLines: boolean,
-  includeExplicitNulls: boolean
-};
+export interface MessageOptions {
+  includeLengths: boolean;
+  suggestionMode: boolean;
+  noArrayNewLines: boolean;
+  includeExplicitNulls: boolean;
+}
 
 export function deserialize(
   threadResponseString: string
-): { value: any[], options: MessageOptions } {
+): { value: any[]; options: MessageOptions } {
   const options = {
     includeLengths: false,
     suggestionMode: /^5\n/.test(threadResponseString),
@@ -235,17 +233,17 @@ function transformUnquotedSections(
   const parts = [];
   let nextQuote;
   let position = 0;
-  let in_string = false;
+  let inString = false;
   while ((nextQuote = findNextUnescapedCharacter(str, position, '"')) !== -1) {
-    if (in_string) {
+    if (inString) {
       parts.push(str.slice(position, nextQuote + 1));
     } else {
       parts.push(cb(str.slice(position, nextQuote + 1)));
     }
     position = nextQuote + 1;
-    in_string = !in_string;
+    inString = !inString;
   }
-  if (in_string) {
+  if (inString) {
     throw new Error('string ended inside quoted section');
   }
   parts.push(cb(str.slice(position)));
@@ -317,7 +315,6 @@ function threadListSerialize(
       response = firstLines.join('\n');
       response += '\n' + lastLines[0] + lastLines[1].replace(/"/g, "'");
     } else {
-      const prev = response;
       // A 16-digit hexadecimal string is often at the end, but sometimes it
       // has fewer digits.
       response = response.replace(/"([0-9a-f]{8,16})"\]$/, "'$1']");
@@ -380,20 +377,23 @@ function serializeArray(
   return response;
 }
 
-export type Thread = {
-  subject: string,
-  shortDate: string,
-  timeString: string,
-  peopleHtml: string,
-  timestamp: number,
-  isUnread: boolean,
-  lastEmailAddress: ?string,
-  bodyPreviewHtml: string,
-  someGmailMessageIds: string[],
-  gmailThreadId: string
-};
+export interface Thread {
+  subject: string;
+  shortDate: string;
+  timeString: string;
+  peopleHtml: string;
+  timestamp: number;
+  isUnread: boolean;
+  lastEmailAddress: string | null | undefined;
+  bodyPreviewHtml: string;
+  someGmailMessageIds: string[];
+  gmailThreadId: string;
+}
 
-export function readDraftId(response: string, messageID: string): ?string {
+export function readDraftId(
+  response: string,
+  messageID: string
+): string | null {
   const decoded = deserialize(response).value;
 
   const msgA = t.toArray(
@@ -402,11 +402,11 @@ export function readDraftId(response: string, messageID: string): ?string {
       t.cat,
       t.filter(Array.isArray),
       t.cat,
-      t.filter(x => x[0] === 'ms' && x[1] === messageID),
+      t.filter((x: any) => x[0] === 'ms' && x[1] === messageID),
       t.take(1),
-      t.map(x => x[60])
+      t.map((x: any) => x[60])
     )
-  )[0];
+  )[0] as string | null | undefined;
   if (msgA) {
     const match = msgA.match(/^msg-[^:]:(\S+)$/i);
     return match && match[1];
@@ -417,7 +417,7 @@ export function readDraftId(response: string, messageID: string): ?string {
 export function replaceThreadsInResponse(
   response: string,
   replacementThreads: Thread[],
-  { start, total }: { start: number, total?: number | 'MANY' }
+  { start, total }: { start: number; total?: number | 'MANY' }
 ): string {
   const { value, options } = deserialize(response);
 
@@ -425,7 +425,9 @@ export function replaceThreadsInResponse(
     value.length === 1 &&
     value[0].length === 2 &&
     typeof value[0][1] === 'string';
-  const threadValue = actionResponseMode ? value[0][0].map(x => [x]) : value;
+  const threadValue = actionResponseMode
+    ? value[0][0].map((x: any) => [x])
+    : value;
 
   /*
 threadValue looks like this:
@@ -464,17 +466,17 @@ it all back together.
 
 */
 
-  let preTbGroups = [];
-  let postTbGroups = [];
-  let preTbItems = [];
-  let postTbItems = [];
+  const preTbGroups: any[] = [];
+  const postTbGroups: any[] = [];
+  let preTbItems: any[] = [];
+  let postTbItems: any[] = [];
 
   let hasSeenTb = false;
-  threadValue.forEach(group => {
+  threadValue.forEach((group: any) => {
     let tbSeenInThisGroup = false;
-    const preTbGroup = [];
-    const postTbGroup = [];
-    group.forEach(item => {
+    const preTbGroup: any[] = [];
+    const postTbGroup: any[] = [];
+    group.forEach((item: any) => {
       if (total && item[0] === 'ti') {
         if (typeof total === 'number') {
           // does not switch out of 'many'-total mode (we currently never need this).
@@ -558,7 +560,7 @@ export function extractThreadsFromDeserialized(value: any[]): Thread[] {
   }
   return _extractThreadArraysFromResponseArray(value).map(thread =>
     Object.freeze(
-      (Object: any).defineProperty(
+      Object.defineProperty(
         {
           subject: htmlToText(thread[9]),
           shortDate: htmlToText(thread[14]),
@@ -581,8 +583,8 @@ export function extractThreadsFromDeserialized(value: any[]): Thread[] {
 const _extractMessageIdsFromThreadBatchRequestXf = t.compose(
   t.cat,
   t.cat,
-  t.filter(item => item[0] === 'cs'),
-  t.map(item => [item[1], item[2]])
+  t.filter((item: any) => item[0] === 'cs'),
+  t.map((item: any) => [item[1], item[2]])
 );
 export function extractMessageIdsFromThreadBatchRequest(
   response: string
@@ -601,8 +603,8 @@ export function cleanupPeopleLine(peopleHtml: string): string {
 
 const _extractThreadArraysFromResponseArrayXf = t.compose(
   t.cat,
-  t.filter(item => item[0] === 'tb'),
-  t.map(item => item[2]),
+  t.filter((item: any) => item[0] === 'tb'),
+  t.map((item: any) => item[2]),
   t.cat
 );
 function _extractThreadArraysFromResponseArray(
@@ -614,19 +616,19 @@ function _extractThreadArraysFromResponseArray(
   );
 }
 
-export type Message = {
-  date: number,
-  messageID?: string,
+export interface Message {
+  date: number;
+  messageID?: string;
   recipients?: Array<{
-    emailAddress: string,
-    name: ?string
-  }>
-};
+    emailAddress: string;
+    name: string | null | undefined;
+  }>;
+}
 
 const _extractThreadsFromConversationViewResponseArrayXf = t.compose(
   t.cat,
-  t.filter(item => item[0] === 'cs'),
-  t.map(item => ({
+  t.filter((item: any) => item[0] === 'cs'),
+  t.map((item: any) => ({
     threadID: item[1],
     messageIDs: item[8]
   }))
@@ -634,8 +636,8 @@ const _extractThreadsFromConversationViewResponseArrayXf = t.compose(
 
 const _extractMessagesFromResponseArrayXf = t.compose(
   t.cat,
-  t.filter(item => item[0] === 'ms'),
-  t.map(item => ({
+  t.filter((item: any) => item[0] === 'ms'),
+  t.map((item: any) => ({
     messageID: item[1],
     date: item[7]
   }))
@@ -643,21 +645,21 @@ const _extractMessagesFromResponseArrayXf = t.compose(
 
 export function extractMessages(
   response: string
-): Array<{ threadID: string, messages: Message[] }> {
+): Array<{ threadID: string; messages: Message[] }> {
   // regular view=cv requests have a top level array length of 1
   // whereas view=cv requests when you refresh Gmail while looking at a thread
   // have a top level array with more elements
   let { value } = deserialize(response);
   if (value.length === 1) value = value[0];
 
-  const threads = t.toArray(
+  const threads: Array<{ threadID: string; messageIDs: string[] }> = t.toArray(
     value,
     _extractThreadsFromConversationViewResponseArrayXf
   );
   const messages = t.toArray(value, _extractMessagesFromResponseArrayXf);
 
-  const messageMap = {};
-  messages.forEach(message => {
+  const messageMap: Record<string, Message> = {};
+  messages.forEach((message: any) => {
     messageMap[message.messageID] = message;
   });
 
@@ -669,7 +671,7 @@ export function extractMessages(
 
 function _threadsToTbGroups(threads: any[], start: number): Array<Array<any>> {
   const _threadsToTbGroupsXf = t.compose(
-    t.map(thread => thread._originalGmailFormat),
+    t.map((thread: any) => thread._originalGmailFormat),
     t.partition(10),
     mapIndexed((threadsChunk, i) => [['tb', start + i * 10, threadsChunk]])
   );
@@ -696,16 +698,16 @@ function _searchArray(
   }
 }
 
-function _searchObject(element: Object, query: string, maxDepth: number): any {
+function _searchObject(element: any, query: string, maxDepth: number): any {
   const retVal = [];
   const initialNode = {
     el: element,
-    path: []
+    path: [] as string[]
   };
   const nodeList = [initialNode];
 
   while (nodeList.length > 0) {
-    const node = nodeList.pop();
+    const node = nodeList.pop()!;
     if (node.path.length <= maxDepth) {
       if (node.el !== null && typeof node.el === 'object') {
         const keys = Object.keys(node.el);

@@ -1,0 +1,28 @@
+/* @flow */
+
+// This is the type that the user provides.
+export type AutocompleteSearchResult = {
+  name?: ?string,
+  nameHTML?: ?string,
+  description?: ?string,
+  descriptionHTML?: ?string,
+  routeName?: ?string,
+  routeParams?: ?{ [ix: string]: string | number },
+  externalURL?: ?string,
+  searchTerm?: ?string,
+  iconUrl?: ?string,
+  iconClass?: ?string,
+  onClick?: ?() => void
+};
+
+// These ids are part of the object constructed by the SDK used to refer to a
+// suggestion to the injected script.
+export type AutocompleteSearchResultWithId = AutocompleteSearchResult & {
+  id: string,
+  providerId: string
+};
+
+declare export default function modifySuggestions(
+  responseText: string,
+  modifications: AutocompleteSearchResultWithId[]
+): string;
