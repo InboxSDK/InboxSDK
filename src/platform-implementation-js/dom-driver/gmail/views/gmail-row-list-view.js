@@ -65,12 +65,15 @@ class GmailRowListView {
           target.className
         );
         if (wasSelected !== isSelected) {
-          changed = true;
-          const view = get(this._elementsToViews, target);
-          if (isSelected) {
-            this._selectedThreadRowViews.add(view);
-          } else {
-            this._selectedThreadRowViews.delete(view);
+          const view = this._elementsToViews.get(target);
+          if (view) {
+            // we could be processing an element that was already removed
+            changed = true;
+            if (isSelected) {
+              this._selectedThreadRowViews.add(view);
+            } else {
+              this._selectedThreadRowViews.delete(view);
+            }
           }
         }
       }
