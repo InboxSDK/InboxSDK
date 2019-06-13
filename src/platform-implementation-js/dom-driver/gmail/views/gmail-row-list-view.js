@@ -262,7 +262,7 @@ class GmailRowListView {
           this._batchedSignalThreadRowViewSelectionChange();
         }
         event.removalStream.take(1).onValue(() => {
-          if (this._selectedThreadRowViews.has(element)) {
+          if (this._selectedThreadRowViews.has(view)) {
             this._selectedThreadRowViews.delete(view);
             this._batchedSignalThreadRowViewSelectionChange();
           }
