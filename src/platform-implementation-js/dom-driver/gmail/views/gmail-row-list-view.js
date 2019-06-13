@@ -66,8 +66,8 @@ class GmailRowListView {
         );
         if (wasSelected !== isSelected) {
           const view = this._elementsToViews.get(target);
+          // we could be processing an element that was already removed
           if (view) {
-            // we could be processing an element that was already removed
             changed = true;
             if (isSelected) {
               this._selectedThreadRowViews.add(view);

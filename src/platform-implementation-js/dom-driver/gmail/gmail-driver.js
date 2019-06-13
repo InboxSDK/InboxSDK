@@ -10,7 +10,6 @@ import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
 import asap from 'asap';
 import includes from 'lodash/includes';
-import flatMap from 'lodash/flatMap';
 
 import get from '../../../common/get-or-fail';
 import showAppIdWarning from './gmail-driver/show-app-id-warning';
@@ -952,11 +951,8 @@ class GmailDriver {
     return this._recentSyncDraftIds.has(syncMessageId);
   }
 
-  _selectedThreadRows = t.compose(
-    t.map((gmailRowListView: GmailRowListView) =>
-      gmailRowListView.getSelectedThreadRowViewDrivers()
-    ),
-    t.cat
+  _selectedThreadRows = t.mapcat((gmailRowListView: GmailRowListView) =>
+    gmailRowListView.getSelectedThreadRowViewDrivers()
   );
   getSelectedThreadRowViewDrivers(): $ReadOnlyArray<GmailThreadRowView> {
     if (!this._currentRouteViewDriver) {
