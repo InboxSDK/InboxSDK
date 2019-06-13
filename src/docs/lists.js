@@ -15,7 +15,21 @@ var Lists = /** @lends Lists */ {
    * Your function is passed a ThreadRowView.
    * @return {Function}
    */
-  registerThreadRowViewHandler: function() {}
+  registerThreadRowViewHandler: function() {},
+
+  /**
+   * Get all of the currently checkmarked {ThreadRowView}s.
+   * @return {Array.<ThreadRowView>}
+   */
+  getSelectedThreadRowViews: function() {},
+
+  /**
+   * Registers a handler that gets called whenever a user makes a change in the list of selected threads.
+   * This function returns a function which removes the handler registration.
+   * @param {func()} handler - The function to call each time the set of selected thread row views changes.
+   * @return {Function}
+   */
+  registerThreadRowViewSelectionHandler: function() {}
 };
 
 /**
