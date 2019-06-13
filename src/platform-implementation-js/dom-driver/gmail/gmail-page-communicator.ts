@@ -1,5 +1,3 @@
-/* @flow */
-
 import { AutocompleteSearchResultWithId } from '../../../injected-js/gmail/modify-suggestions';
 import CommonPageCommunicator from '../../lib/common-page-communicator';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
