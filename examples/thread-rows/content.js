@@ -13,6 +13,10 @@ InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
     });
   });
 
+  inboxSDK.Lists.registerThreadRowViewSelectionHandler(() => {
+    console.log('selected threads', inboxSDK.Lists.getSelectedThreadRowViews());
+  });
+
   inboxSDK.Lists.registerThreadRowViewHandler(function(threadRowView) {
     var threadId = threadRowView.getThreadID();
     //console.log('threadRowView', threadId, threadRowView.getThreadIDIfStable(), threadRowView.getVisibleDraftCount(), threadRowView.getVisibleMessageCount(), threadRowView.getSubject());

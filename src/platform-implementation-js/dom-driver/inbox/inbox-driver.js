@@ -1156,6 +1156,14 @@ class InboxDriver {
   closeOpenThread() {
     simulateKey((document.body: any), 27, 27);
   }
+
+  getSelectedThreadRowViewDrivers(): $ReadOnlyArray<InboxThreadRowView> {
+    throw new Error('not implemented in Inbox');
+  }
+
+  registerThreadRowViewSelectionHandler(handler: () => any): () => void {
+    return () => {};
+  }
 }
 
 export default defn(module, InboxDriver);

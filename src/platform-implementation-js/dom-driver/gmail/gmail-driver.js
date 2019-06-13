@@ -948,6 +948,14 @@ class GmailDriver {
   isRecentSyncDraftId(syncMessageId: string): boolean {
     return this._recentSyncDraftIds.has(syncMessageId);
   }
+
+  getSelectedThreadRowViewDrivers(): $ReadOnlyArray<GmailThreadRowView> {
+    return [];
+  }
+
+  registerThreadRowViewSelectionHandler(handler: () => any): () => void {
+    return () => {};
+  }
 }
 
 export default defn(module, GmailDriver);
