@@ -952,14 +952,19 @@ class GmailDriver {
     return this._recentSyncDraftIds.has(syncMessageId);
   }
 
+  _selectedThreadRows = t.compose(
+    t.map((gmailRowListView: GmailRowListView) =>
+      gmailRowListView.getSelectedThreadRowViewDrivers()
+    ),
+    t.cat
+  );
   getSelectedThreadRowViewDrivers(): $ReadOnlyArray<GmailThreadRowView> {
     if (!this._currentRouteViewDriver) {
       return [];
     }
-    return flatMap(
+    return t.toArray(
       this._currentRouteViewDriver.getRowListViews(),
-      (gmailRowListView: GmailRowListView) =>
-        gmailRowListView.getSelectedThreadRowViewDrivers()
+      this._selectedThreadRows
     );
   }
 
