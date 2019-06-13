@@ -34,6 +34,7 @@ class GmailRowListView {
   _eventStreamBus: Bus<any>;
   _rowViewDriverStream: Kefir.Observable<GmailThreadRowView>;
   _stopper: Kefir.Observable<any>;
+  _selectionMutationObserver: MutationObserver;
 
   constructor(
     rootElement: HTMLElement,
@@ -48,6 +49,18 @@ class GmailRowListView {
     this._routeViewDriver = routeViewDriver;
     this._threadRowViewDrivers = new Set();
 
+    this._selectionMutationObserver = new MutationObserver(mutations => {
+      for (let i = 0, len = mutations.length; i < len; i++) {
+        const mutation = mutations[i];
+        const wasSelected = /\bx7\b/.test((mutation: any).oldValue);
+        const isSelected = /\bx7\b/.test((mutation.target: any).className);
+        if (wasSelected !== isSelected) {
+          this._gmailDriver.signalThreadRowViewSelectionChange();
+          break;
+        }
+      }
+    });
+
     this._pendingExpansions = new Map();
     this._pendingExpansionsSignal = kefirBus();
     this._pendingExpansionsSignal
@@ -61,6 +74,7 @@ class GmailRowListView {
   }
 
   destroy() {
+    this._selectionMutationObserver.disconnect();
     this._threadRowViewDrivers.forEach(threadRow => threadRow.destroy());
     this._eventStreamBus.end();
     if (this._toolbarView) this._toolbarView.destroy();
@@ -196,9 +210,14 @@ class GmailRowListView {
 
     this._rowViewDriverStream = elementStream
       .map(
-        elementViewMapper(
-          element => new GmailThreadRowView(element, this, this._gmailDriver)
-        )
+        elementViewMapper(element => {
+          this._selectionMutationObserver.observe(element, {
+            attributes: true,
+            attributeFilter: ['class'],
+            attributeOldValue: true
+          });
+          return new GmailThreadRowView(element, this, this._gmailDriver);
+        })
       )
       .flatMap(threadRowView => {
         if (threadRowView.getAlreadyHadModifications()) {
