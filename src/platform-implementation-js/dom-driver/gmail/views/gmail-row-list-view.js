@@ -78,6 +78,10 @@ class GmailRowListView {
     return this._toolbarView;
   }
 
+  getSelectedThreadRowViewDrivers(): $ReadOnlyArray<GmailThreadRowView> {
+    return [];
+  }
+
   getThreadRowViewDrivers(): Set<GmailThreadRowView> {
     return this._threadRowViewDrivers;
   }

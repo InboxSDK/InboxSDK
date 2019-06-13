@@ -10,6 +10,7 @@ import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
 import asap from 'asap';
 import includes from 'lodash/includes';
+import flatMap from 'lodash/flatMap';
 
 import get from '../../../common/get-or-fail';
 import showAppIdWarning from './gmail-driver/show-app-id-warning';
@@ -79,6 +80,7 @@ import type GmailComposeView from './views/gmail-compose-view';
 import type GmailMessageView from './views/gmail-message-view';
 import type GmailThreadView from './views/gmail-thread-view';
 import type GmailToolbarView from './views/gmail-toolbar-view';
+import type GmailRowListView from './views/gmail-row-list-view';
 import type GmailRouteView from './views/gmail-route-view/gmail-route-view';
 import type { PiOpts, EnvData } from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
@@ -246,6 +248,7 @@ class GmailDriver {
   }
 
   destroy() {
+    this._threadRowViewSelectionChanges.end();
     this._keyboardShortcutHelpModifier.destroy();
     this._stopper.destroy();
 
@@ -950,11 +953,27 @@ class GmailDriver {
   }
 
   getSelectedThreadRowViewDrivers(): $ReadOnlyArray<GmailThreadRowView> {
-    return [];
+    if (!this._currentRouteViewDriver) {
+      return [];
+    }
+    return flatMap(
+      this._currentRouteViewDriver.getRowListViews(),
+      (gmailRowListView: GmailRowListView) =>
+        gmailRowListView.getSelectedThreadRowViewDrivers()
+    );
+  }
+
+  _threadRowViewSelectionChanges = kefirBus();
+
+  signalThreadRowViewSelectionChange() {
+    this._threadRowViewSelectionChanges.value(undefined);
   }
 
   registerThreadRowViewSelectionHandler(handler: () => any): () => void {
-    return () => {};
+    this._threadRowViewSelectionChanges.onValue(handler);
+    return () => {
+      this._threadRowViewSelectionChanges.offValue(handler);
+    };
   }
 }
 
