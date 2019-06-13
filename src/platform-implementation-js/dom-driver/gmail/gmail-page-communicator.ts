@@ -1,22 +1,20 @@
 /* @flow */
 
-import type { AutocompleteSearchResultWithId } from '../../../injected-js/gmail/modify-suggestions';
+import { AutocompleteSearchResultWithId } from '../../../injected-js/gmail/modify-suggestions';
 import CommonPageCommunicator from '../../lib/common-page-communicator';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
-import asap from 'asap';
 import Kefir from 'kefir';
-import Logger from '../../lib/logger';
 
 // This is intended to be instantiated from makeXhrInterceptor, since it depends
 // on the injected script, and if it's not instantiated elsewhere, you know that
 // if you have an instance of this, then the injected script is present and this
 // will work.
 export default class GmailPageCommunicator extends CommonPageCommunicator {
-  async getMessageDate(
+  public async getMessageDate(
     threadId: string,
     message: HTMLElement
-  ): Promise<?number> {
+  ): Promise<number | null> {
     return this._getMessageData(
       threadId,
       message,
@@ -25,10 +23,13 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  async getMessageRecipients(
+  public async getMessageRecipients(
     threadId: string,
     message: HTMLElement
-  ): Promise<?Array<{ emailAddress: string, name: ?string }>> {
+  ): Promise<Array<{
+    emailAddress: string;
+    name: string | null | undefined;
+  }> | null> {
     return this._getMessageData(
       threadId,
       message,
@@ -37,12 +38,12 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  async _getMessageData<T>(
+  private async _getMessageData<T>(
     threadId: string,
     message: HTMLElement,
     attribute: string,
     eventName: string
-  ): Promise<?T> {
+  ): Promise<T | null> {
     let data = message.getAttribute(attribute);
     if (!data) {
       const [btaiHeader, xsrfToken] = this.isUsingSyncAPI()
@@ -77,7 +78,9 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     else return null;
   }
 
-  getThreadIdForThreadRowByDatabase(threadRow: HTMLElement): ?string {
+  public getThreadIdForThreadRowByDatabase(
+    threadRow: HTMLElement
+  ): string | null {
     let threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     if (!threadid) {
       threadRow.dispatchEvent(
@@ -92,7 +95,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return threadid;
   }
 
-  getThreadIdForThreadRowByClick(threadRow: HTMLElement): ?string {
+  public getThreadIdForThreadRowByClick(threadRow: HTMLElement): string | null {
     let threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     if (!threadid) {
       threadRow.dispatchEvent(
@@ -107,7 +110,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return threadid;
   }
 
-  getCurrentThreadID(
+  public getCurrentThreadID(
     threadContainerElement: HTMLElement,
     isPreviewedThread: boolean = false
   ): string {
@@ -126,29 +129,25 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return s;
   }
 
-  getUserOriginalPreviewPaneMode(): ?string {
-    return (document.head: any).getAttribute(
-      'data-inboxsdk-user-preview-pane-mode'
-    );
+  public getUserOriginalPreviewPaneMode(): string | null {
+    return document.head.getAttribute('data-inboxsdk-user-preview-pane-mode');
   }
 
-  getActionTokenValue(): string {
-    const s = (document.head: any).getAttribute(
-      'data-inboxsdk-action-token-value'
-    );
+  public getActionTokenValue(): string {
+    const s = document.head.getAttribute('data-inboxsdk-action-token-value');
     if (s == null) throw new Error('Failed to read value');
     return s;
   }
 
-  isUsingSyncAPI(): boolean {
-    const s = (document.head: any).getAttribute('data-inboxsdk-using-sync-api');
+  public isUsingSyncAPI(): boolean {
+    const s = document.head.getAttribute('data-inboxsdk-using-sync-api');
     if (s == null) throw new Error('Failed to read value');
     return s === 'true';
   }
 
-  isConversationViewDisabled(): Promise<boolean> {
-    return new Promise((resolve, reject) => {
-      Kefir.fromEvents(document, 'inboxSDKgmonkeyResponse')
+  public isConversationViewDisabled(): Promise<boolean> {
+    return new Promise(resolve => {
+      Kefir.fromEvents<any, never>(document, 'inboxSDKgmonkeyResponse')
         .take(1)
         .onValue(event => {
           resolve(event.detail);
@@ -164,7 +163,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     });
   }
 
-  registerSuggestionsModifier(providerID: string) {
+  public registerSuggestionsModifier(providerID: string) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKregisterSuggestionsModifier', {
         bubbles: false,
@@ -174,7 +173,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  provideAutocompleteSuggestions(
+  public provideAutocompleteSuggestions(
     providerID: string,
     query: string,
     suggestions: AutocompleteSearchResultWithId[]
@@ -193,7 +192,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  setupCustomListResultsQuery(query: string) {
+  public setupCustomListResultsQuery(query: string) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKcustomListRegisterQuery', {
         bubbles: false,
@@ -203,11 +202,11 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  setCustomListNewQuery(detail: {
-    query: string,
-    start: number,
-    newQuery: string,
-    newStart: number
+  public setCustomListNewQuery(detail: {
+    query: string;
+    start: number;
+    newQuery: string;
+    newStart: number;
   }) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKcustomListNewQuery', {
@@ -218,7 +217,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  setCustomListResults(query: string, newResults: ?string) {
+  public setCustomListResults(query: string, newResults: string | null) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKcustomListResults', {
         bubbles: false,
@@ -228,7 +227,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  createCustomSearchTerm(term: string) {
+  public createCustomSearchTerm(term: string) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKcreateCustomSearchTerm', {
         bubbles: false,
@@ -238,7 +237,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  setSearchQueryReplacement(query: string, newQuery: string) {
+  public setSearchQueryReplacement(query: string, newQuery: string) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKsearchReplacementReady', {
         bubbles: false,
@@ -248,12 +247,15 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  registerComposeRequestModifier(keyId: string, appId: string): string {
+  public registerComposeRequestModifier(keyId: string, appId: string): string {
     const modifierId = new Date().getTime() + '_' + appId + '_' + Math.random();
 
-    const detail: Object = { modifierId };
-    if (this.isUsingSyncAPI()) detail.draftID = keyId;
-    else detail.composeid = keyId;
+    const detail: any = { modifierId };
+    if (this.isUsingSyncAPI()) {
+      detail.draftID = keyId;
+    } else {
+      detail.composeid = keyId;
+    }
 
     document.dispatchEvent(
       new CustomEvent('inboxSDKregisterComposeRequestModifier', {
@@ -266,7 +268,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return modifierId;
   }
 
-  unregisterComposeRequestModifier(keyId: string, modifierId: string) {
+  public unregisterComposeRequestModifier(keyId: string, modifierId: string) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKunregisterComposeRequestModifier', {
         detail: { keyId, modifierId },
@@ -276,12 +278,12 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  modifyComposeRequest(
+  public modifyComposeRequest(
     keyId: string,
     modifierId: string,
-    composeParams: Object
+    composeParams: any
   ) {
-    const detail: Object = { modifierId, composeParams };
+    const detail: any = { modifierId, composeParams };
     if (this.isUsingSyncAPI()) detail.draftID = keyId;
     else detail.composeid = keyId;
 

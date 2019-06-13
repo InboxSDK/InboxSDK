@@ -1,37 +1,33 @@
-/* @flow */
-
-import once from 'lodash/once';
 import asap from 'asap';
-import Kefir from 'kefir';
+import once from 'lodash/once';
+import * as Kefir from 'kefir';
 import Logger from './logger';
-import type { AjaxOpts } from '../../common/ajax';
+import { AjaxOpts } from '../../common/ajax';
 
 export default class CommonPageCommunicator {
-  ajaxInterceptStream: Kefir.Observable<Object>;
+  public ajaxInterceptStream: Kefir.Observable<any, never>;
 
-  constructor() {
-    this.ajaxInterceptStream = Kefir.fromEvents(
+  public constructor() {
+    this.ajaxInterceptStream = Kefir.fromEvents<any, never>(
       document,
       'inboxSDKajaxIntercept'
     ).map(x => x.detail);
   }
 
-  getUserEmailAddress(): string {
-    const s = (document.head: any).getAttribute(
-      'data-inboxsdk-user-email-address'
-    );
+  public getUserEmailAddress(): string {
+    const s = document.head.getAttribute('data-inboxsdk-user-email-address');
     if (typeof s !== 'string') throw new Error('should not happen');
     return s;
   }
 
-  getUserLanguage(): string {
-    const s = (document.head: any).getAttribute('data-inboxsdk-user-language');
+  public getUserLanguage(): string {
+    const s = document.head.getAttribute('data-inboxsdk-user-language');
     if (typeof s !== 'string') throw new Error('should not happen');
     return s;
   }
 
-  getIkValue(): string {
-    const ownIk = (document.head: any).getAttribute('data-inboxsdk-ik-value');
+  public getIkValue(): string {
+    const ownIk = document.head.getAttribute('data-inboxsdk-ik-value');
     if (ownIk) {
       return ownIk;
     }
@@ -42,12 +38,12 @@ export default class CommonPageCommunicator {
     throw new Error("Failed to look up 'ik' value");
   }
 
-  isUsingSyncAPI(): boolean {
+  public isUsingSyncAPI(): boolean {
     return false;
   }
 
-  async getXsrfToken(): Promise<string> {
-    const existingHeader = (document.head: any).getAttribute(
+  public async getXsrfToken(): Promise<string> {
+    const existingHeader = document.head.getAttribute(
       'data-inboxsdk-xsrf-token'
     );
     if (existingHeader) {
@@ -58,16 +54,14 @@ export default class CommonPageCommunicator {
         .take(1)
         .toPromise();
 
-      const newHeader = (document.head: any).getAttribute(
-        'data-inboxsdk-xsrf-token'
-      );
+      const newHeader = document.head.getAttribute('data-inboxsdk-xsrf-token');
       if (!newHeader) throw new Error('Failed to look up XSRF token');
       return newHeader;
     }
   }
 
-  async getBtaiHeader(): Promise<string> {
-    const existingHeader = (document.head: any).getAttribute(
+  public async getBtaiHeader(): Promise<string> {
+    const existingHeader = document.head.getAttribute(
       'data-inboxsdk-btai-header'
     );
     if (existingHeader) {
@@ -78,29 +72,29 @@ export default class CommonPageCommunicator {
         .take(1)
         .toPromise();
 
-      const newHeader = (document.head: any).getAttribute(
-        'data-inboxsdk-btai-header'
-      );
+      const newHeader = document.head.getAttribute('data-inboxsdk-btai-header');
       if (!newHeader) throw new Error('Failed to look up BTAI header');
       return newHeader;
     }
   }
 
-  resolveUrlRedirects(url: string): Promise<string> {
+  public resolveUrlRedirects(url: string): Promise<string> {
     return this.pageAjax({ url, method: 'HEAD' }).then(
       result => result.responseURL
     );
   }
 
-  pageAjax(opts: AjaxOpts): Promise<{ text: string, responseURL: string }> {
-    var id = `${Date.now()}-${Math.random()}`;
-    var promise = Kefir.fromEvents(document, 'inboxSDKpageAjaxDone')
-      .filter(event => event.detail && event.detail.id === id)
+  public pageAjax(
+    opts: AjaxOpts
+  ): Promise<{ text: string; responseURL: string }> {
+    const id = `${Date.now()}-${Math.random()}`;
+    const promise = Kefir.fromEvents(document, 'inboxSDKpageAjaxDone')
+      .filter((event: any) => event.detail && event.detail.id === id)
       .take(1)
-      .flatMap(event => {
+      .flatMap((event: any) => {
         if (event.detail.error) {
-          var err = Object.assign(
-            (new Error(event.detail.message || 'Connection error'): any),
+          const err = Object.assign(
+            new Error(event.detail.message || 'Connection error') as any,
             { status: event.detail.status }
           );
           if (event.detail.stack) {
@@ -127,7 +121,7 @@ export default class CommonPageCommunicator {
     return promise;
   }
 
-  silenceGmailErrorsForAMoment(): () => void {
+  public silenceGmailErrorsForAMoment(): () => void {
     document.dispatchEvent(
       new CustomEvent('inboxSDKsilencePageErrors', {
         bubbles: false,
@@ -136,9 +130,9 @@ export default class CommonPageCommunicator {
       })
     );
     // create error here for stacktrace
-    var error = new Error('Forgot to unsilence page errors');
-    var unsilenced = false;
-    var unsilence = once(() => {
+    const error = new Error('Forgot to unsilence page errors');
+    let unsilenced = false;
+    const unsilence = once(() => {
       unsilenced = true;
       document.dispatchEvent(
         new CustomEvent('inboxSDKunsilencePageErrors', {
@@ -157,7 +151,7 @@ export default class CommonPageCommunicator {
     return unsilence;
   }
 
-  registerAllowedHashLinkStartTerm(term: string) {
+  public registerAllowedHashLinkStartTerm(term: string) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKregisterAllowedHashLinkStartTerm', {
         bubbles: false,
