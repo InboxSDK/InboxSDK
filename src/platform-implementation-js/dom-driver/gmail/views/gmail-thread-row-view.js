@@ -459,10 +459,9 @@ class GmailThreadRowView {
         containerRow.classList.add('inboxsdk__thread_row_image_added');
 
         if (iconDescriptor.tooltip) {
-          iconSettings.iconElement.setAttribute(
-            'data-tooltip',
-            iconDescriptor.tooltip
-          );
+          iconWrapper.setAttribute('data-tooltip', iconDescriptor.tooltip);
+        } else {
+          iconWrapper.removeAttribute('data-tooltip');
         }
 
         const labelParent = this._getLabelParent();
@@ -582,12 +581,7 @@ class GmailThreadRowView {
               focusAndNoPropagation
             );
 
-            iconSettings = {
-              iconUrl: null,
-              iconClass: null,
-              iconElement: null,
-              iconImgElement: null
-            };
+            iconSettings = {};
 
             buttonMod = {
               buttonSpan,
