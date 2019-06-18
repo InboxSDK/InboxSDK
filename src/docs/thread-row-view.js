@@ -151,6 +151,14 @@ var LabelDescriptor = /** @lends LabelDescriptor */ {
   backgroundColor: null,
 
   /**
+   * Html for the icon to show on the label. This property can't be used with iconUrl or iconClass.
+   * @type {string}
+   * ^optional
+   * ^default=null
+   */
+  iconHtml: null,
+
+  /**
    * URL for the icon to show on the label. Should be a local extension file URL or a HTTPS URL.
    * @type {string}
    */

@@ -1,42 +1,45 @@
 /* @flow */
 
 function createIconElement(
-  iconSettings: Object,
   containerElement: HTMLElement,
   append: boolean,
   insertBeforeEl: ?HTMLElement
 ) {
-  iconSettings.iconElement = document.createElement('div');
-  iconSettings.iconElement.classList.add('inboxsdk__button_icon');
-  iconSettings.iconElement.innerHTML = '&nbsp;';
+  const iconElement = document.createElement('div');
+  iconElement.classList.add('inboxsdk__button_icon');
+  iconElement.innerHTML = '&nbsp;';
 
   if (append) {
-    containerElement.appendChild(iconSettings.iconElement);
+    containerElement.appendChild(iconElement);
   } else {
     containerElement.insertBefore(
-      iconSettings.iconElement,
+      iconElement,
       insertBeforeEl || (containerElement: any).firstElementChild
     );
   }
+
+  return iconElement;
 }
 
 function createIconImgElement(
-  iconSettings: Object,
+  iconUrl: string,
   containerElement: HTMLElement,
   append: boolean,
   insertBeforeEl: ?HTMLElement
 ) {
-  if (!iconSettings.iconElement) {
-    createIconElement(iconSettings, containerElement, append, insertBeforeEl);
-  }
+  const iconElement = createIconElement(
+    containerElement,
+    append,
+    insertBeforeEl
+  );
+  iconElement.innerHTML = '';
+  const iconImgElement = document.createElement('img');
+  iconImgElement.classList.add('inboxsdk__button_iconImg');
 
-  iconSettings.iconElement.innerHTML = '';
+  iconImgElement.src = iconUrl;
+  iconElement.appendChild(iconImgElement);
 
-  iconSettings.iconImgElement = document.createElement('img');
-  iconSettings.iconImgElement.classList.add('inboxsdk__button_iconImg');
-
-  iconSettings.iconImgElement.src = iconSettings.iconUrl;
-  iconSettings.iconElement.appendChild(iconSettings.iconImgElement);
+  return iconElement;
 }
 
 // TODO make this return a class instead of taking the iconSettings state object
@@ -46,52 +49,102 @@ export default function updateIcon(
   append: boolean,
   newIconClass: ?string,
   newIconUrl: ?string,
-  insertBeforeEl: ?HTMLElement // Should not be used with append: true — the append flag will override
+  insertBeforeEl: ?HTMLElement, // Should not be used with append: true — the append flag will override
+  newIconHtml?: string
 ) {
   if (append && insertBeforeEl)
     throw new Error('append and insertBeforeEl should not be used together');
 
-  if (!iconSettings.iconUrl && newIconUrl) {
-    iconSettings.iconUrl = newIconUrl;
-    createIconImgElement(
-      iconSettings,
-      containerElement,
-      append,
-      insertBeforeEl
+  // if iconHtml exists, class or url presents just throw error
+  if (newIconHtml && (newIconClass || newIconUrl)) {
+    throw new Error(
+      'iconHtml can not be used together with iconClass or iconUrl'
     );
-  } else if (iconSettings.iconUrl && !newIconUrl) {
-    iconSettings.iconImgElement.remove();
-    iconSettings.iconImgElement = null;
-    if (!iconSettings.iconClass) {
+  }
+
+  if (newIconHtml) {
+    if (!iconSettings.iconHtmlElement) {
+      iconSettings.iconHtmlElement = createIconElement(
+        containerElement,
+        append,
+        insertBeforeEl
+      );
+    }
+
+    iconSettings.iconHtmlElement.innerHTML = newIconHtml;
+
+    if (iconSettings.iconImgElement) {
+      iconSettings.iconImgElement.remove();
+      iconSettings.iconImgElement = null;
+    }
+
+    if (iconSettings.iconElement) {
       iconSettings.iconElement.remove();
       iconSettings.iconElement = null;
-    } else {
-      iconSettings.iconElement.innerHTML = '&nbsp;';
     }
-    iconSettings.iconUrl = newIconUrl;
   } else if (newIconUrl) {
-    iconSettings.iconImgElement.src = newIconUrl;
-    iconSettings.iconUrl = newIconUrl;
-  }
+    if (!iconSettings.iconImgElement) {
+      iconSettings.iconImgElement = createIconImgElement(
+        newIconUrl,
+        containerElement,
+        append,
+        insertBeforeEl
+      );
+    } else {
+      iconSettings.iconImgElement.firstElementChild.src = newIconUrl;
+    }
 
-  if (!iconSettings.iconElement && newIconClass) {
-    createIconElement(iconSettings, containerElement, append, insertBeforeEl);
-  } else if (iconSettings.iconClass && !newIconClass) {
-    if (!iconSettings.iconUrl) {
+    iconSettings.iconImgElement.setAttribute(
+      'class',
+      `inboxsdk__button_icon ${newIconClass || ''}`
+    );
+
+    if (iconSettings.iconHtmlElement) {
+      iconSettings.iconHtmlElement.remove();
+      iconSettings.iconHtmlElement = null;
+    }
+
+    if (iconSettings.iconElement) {
       iconSettings.iconElement.remove();
       iconSettings.iconElement = null;
-      iconSettings.iconClass = newIconClass;
-    } else {
-      iconSettings.iconElement.setAttribute('class', 'inboxsdk__button_icon ');
-      iconSettings.iconClass = newIconClass;
     }
-  }
+  } else if (newIconClass) {
+    if (!iconSettings.iconElement) {
+      iconSettings.iconElement = createIconElement(
+        containerElement,
+        append,
+        insertBeforeEl
+      );
+    }
 
-  if (newIconClass) {
     iconSettings.iconElement.setAttribute(
       'class',
       'inboxsdk__button_icon ' + newIconClass
     );
-    iconSettings.iconClass = newIconClass;
+
+    if (iconSettings.iconHtmlElement) {
+      iconSettings.iconHtmlElement.remove();
+      iconSettings.iconHtmlElement = null;
+    }
+
+    if (iconSettings.iconImgElement) {
+      iconSettings.iconImgElement.remove();
+      iconSettings.iconImgElement = null;
+    }
+  } else {
+    if (iconSettings.iconElement) {
+      iconSettings.iconElement.remove();
+      iconSettings.iconElement = null;
+    }
+
+    if (iconSettings.iconHtmlElement) {
+      iconSettings.iconHtmlElement.remove();
+      iconSettings.iconHtmlElement = null;
+    }
+
+    if (iconSettings.iconImgElement) {
+      iconSettings.iconImgElement.remove();
+      iconSettings.iconImgElement = null;
+    }
   }
 }

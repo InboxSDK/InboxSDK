@@ -56,9 +56,15 @@ class GmailLabelView {
       querySelector(this._element, '.at'),
       false,
       labelDescriptor.iconClass,
-      labelDescriptor.iconUrl
+      labelDescriptor.iconUrl,
+      undefined,
+      labelDescriptor.iconHtml
     );
-    if (labelDescriptor.iconClass || labelDescriptor.iconUrl) {
+    if (
+      labelDescriptor.iconClass ||
+      labelDescriptor.iconUrl ||
+      labelDescriptor.iconHtml
+    ) {
       this._element.classList.add('inboxsdk__label_has_icon');
     } else {
       this._element.classList.remove('inboxsdk__label_has_icon');
