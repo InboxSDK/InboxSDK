@@ -152,9 +152,9 @@ var LabelDescriptor = /** @lends LabelDescriptor */ {
 
   /**
    * Html for the icon to show on the label. This property can't be used with iconUrl or iconClass.
-   * @type {string}
    * ^optional
    * ^default=null
+   * @type {string}
    */
   iconHtml: null,
 
