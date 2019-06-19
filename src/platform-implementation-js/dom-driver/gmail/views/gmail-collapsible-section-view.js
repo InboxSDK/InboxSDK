@@ -894,11 +894,19 @@ function _getLabelHTML(label) {
         <div class="au" style="border-color: ${backgroundColor};">`
   ];
 
-  const styleHtml = label.iconBackgroundColor
+  let styleHtml = label.iconBackgroundColor
     ? autoHtml`style="background-color: ${label.iconBackgroundColor}"`
     : '';
 
-  if (label.iconClass) {
+  if (label.iconHtml != null) {
+    styleHtml = label.iconHtml;
+
+    retArray.push(
+      autoHtml`<div class="inboxsdk__resultsSection_label_icon">
+        ${{ __html: styleHtml }}
+      </div>`
+    );
+  } else if (label.iconClass) {
     retArray.push(
       autoHtml`<div
         class="inboxsdk__resultsSection_label_icon ${label.iconClass || ''}"
