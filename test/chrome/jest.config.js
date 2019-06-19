@@ -7,6 +7,6 @@ process.env.JEST_PUPPETEER_CONFIG = require.resolve(
 
 module.exports = {
   preset: 'jest-puppeteer',
-  setupFilesAfterEnv: ['./jest.setupFilesAfterEnv.js'],
+  setupFilesAfterEnv: ['./jest.setupFilesAfterEnv.ts'],
   testRunner: 'jest-circus/runner'
 };
