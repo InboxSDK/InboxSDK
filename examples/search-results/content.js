@@ -16,6 +16,16 @@ InboxSDK.load(1.0, 'search-example').then(function(inboxSDK){
           }
         },
         {
+          title: 'row uses icon html',
+          body: 'body',
+          shortDetailText: 'extra',
+          isRead: true,
+          iconHtml: '<div>x</div>',
+          onClick: function(){
+            console.log('hi');
+          }
+        },
+        {
           title: 'title',
           body: 'body',
           shortDetailText: 'extra',

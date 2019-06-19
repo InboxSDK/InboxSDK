@@ -834,10 +834,14 @@ function _getTableHTML() {
 
 function _getRowHTML(result) {
   let iconHtml = '';
-  if (result.iconUrl)
+  if (result.iconHtml != null) {
+    iconHtml = autoHtml`<span class="inboxsdk__resultsSection_result_icon">
+        ${{ __html: result.iconHtml }}
+      </span>`;
+  } else if (result.iconUrl) {
     iconHtml = autoHtml`<img class="inboxsdk__resultsSection_result_icon ${result.iconClass ||
       ''}" src="${result.iconUrl}">`;
-  else if (result.iconClass)
+  } else if (result.iconClass)
     iconHtml = autoHtml`<div class="${result.iconClass}"></div>`;
 
   const labelsHtml = Array.isArray(result.labels)
