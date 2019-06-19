@@ -92,6 +92,32 @@ InboxSDK.load(2, 'search-suggestions').then(inboxSDK => {
         "routeParams": {
           "key": "agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICg9NqLCgw"
         }
+      },
+      {
+        "iconHTML": "<div>x</div>",
+        "nameHTML": "<b>He</b>lp and test icon html",
+        "descriptionHTML": "<div class=\"streak__suggestion streak__suggestion_pipeline\">Idea: 4 boxes, Planned: 2 boxes, Implemented: 0 boxes, Reviewed: 0 boxes, Launched: 6 boxes</div>",
+        "routeName": "pipeline/:key",
+        "routeParams": {
+          "key": "agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICg9NqLCgw"
+        }
+      },
+      {
+        "iconHTML": "<div>x</div>",
+        "nameHTML": "<b>He</b>lp and no description html",
+        "routeName": "pipeline/:key",
+        "routeParams": {
+          "key": "agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICg9NqLCgw"
+        }
+      },
+      {
+        "iconHTML": "<div>x</div>",
+        "nameHTML": "<b>He</b>lp and dfsdf",
+        "descriptionHTML": "<div class=\"streak__suggestion streak__suggestion_pipeline\">Idea: 4 boxes, Planned: 2 boxes, Implemented: 0 boxes, Reviewed: 0 boxes, Launched: 6 boxes</div>",
+        "routeName": "pipeline/:key",
+        "routeParams": {
+          "key": "agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICg9NqLCgw"
+        }
       }
     ];
   });

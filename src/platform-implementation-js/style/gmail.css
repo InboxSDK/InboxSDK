@@ -2436,6 +2436,21 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   margin-left: -11px;
 }
 
+.inboxsdk__custom_suggestion_iconHTML {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 8px;
+  height: 32px;
+  width: 43px;
+}
+
+/* Adjust positioning when no description present */
+.gstq_d .inboxsdk__custom_suggestion_iconHTML {
+  margin-top: -8px;
+}
+
 /* end send suggestions */
 
 /* app toolbar */

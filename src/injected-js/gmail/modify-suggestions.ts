@@ -16,6 +16,7 @@ export interface AutocompleteSearchResult {
   searchTerm?: null | string;
   iconUrl?: null | string;
   iconClass?: null | string;
+  iconHTML?: null | string;
   onClick?: null | (() => void);
 }
 
@@ -88,6 +89,13 @@ function modifySuggestions(
     nameHTML += autoHtml` <span style="display:none" data-inboxsdk-suggestion="${JSON.stringify(
       data
     )}"></span>`;
+
+    if (modification.iconHTML != null) {
+      nameHTML = `<div class="inboxsdk__custom_suggestion_iconHTML">${
+        modification.iconHTML
+      }</div>${nameHTML}`;
+    }
+
     const newItem = [
       'aso.sug',
       modification.searchTerm || query,
@@ -118,12 +126,22 @@ function modifySuggestions(
     if (descriptionHTML != null) {
       newItem[3] = ['aso.eme', description, name, descriptionHTML, nameHTML];
     }
-    if (modification.iconUrl) {
+
+    // Allow iconHtml to be passed, and ignore iconUrl if iconHtml is presents
+    if (modification.iconHTML != null) {
+      // set empty image
+      newItem[6] = [
+        'aso.thn',
+        'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+      ];
+      newItem[7] += ' inboxsdk__no_bg';
+    } else if (modification.iconUrl) {
       newItem[6] = ['aso.thn', modification.iconUrl];
       newItem[7] += ' inboxsdk__no_bg';
     } else {
       newItem[7] += ' asor_i4';
     }
+
     parsed[0][3].push(newItem);
   }
   return GRP.serialize(parsed, options);

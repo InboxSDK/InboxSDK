@@ -79,6 +79,14 @@ var AutocompleteSearchResult = /** @lends AutocompleteSearchResult */ {
   iconUrl: null,
 
   /**
+   * HTML to display in the icon area of the result. This property can not be used with iconUrl.
+   * ^optional
+   * ^default=null
+   * @type {string}
+   */
+  iconHTML: null,
+
+  /**
    * The name of the route to navigate to when the autocomplete search result is selected.
    * ^optional
    * ^default=null
