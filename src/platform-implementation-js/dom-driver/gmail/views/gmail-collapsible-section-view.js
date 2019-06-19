@@ -835,9 +835,9 @@ function _getTableHTML() {
 function _getRowHTML(result) {
   let iconHtml = '';
   if (result.iconHtml != null) {
-    iconHtml = autoHtml`<span class="inboxsdk__resultsSection_result_icon">
+    iconHtml = autoHtml`<div class="inboxsdk__resultsSection_result_icon inboxsdk__resultsSection_result_iconHtml">
         ${{ __html: result.iconHtml }}
-      </span>`;
+      </div>`;
   } else if (result.iconUrl) {
     iconHtml = autoHtml`<img class="inboxsdk__resultsSection_result_icon ${result.iconClass ||
       ''}" src="${result.iconUrl}">`;
@@ -906,7 +906,7 @@ function _getLabelHTML(label) {
     styleHtml = label.iconHtml;
 
     retArray.push(
-      autoHtml`<div class="inboxsdk__resultsSection_label_icon">
+      autoHtml`<div class="inboxsdk__resultsSection_label_icon inboxsdk__resultsSection_label_iconHtml">
         ${{ __html: styleHtml }}
       </div>`
     );

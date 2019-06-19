@@ -26,6 +26,16 @@ InboxSDK.load(1.0, 'search-example').then(function(inboxSDK){
           }
         },
         {
+          title: 'row uses icon class',
+          body: 'body',
+          shortDetailText: 'extra',
+          isRead: true,
+          iconClass: 'test',
+          onClick: function(){
+            console.log('hi');
+          }
+        },
+        {
           title: 'title',
           body: 'body',
           shortDetailText: 'extra',

@@ -2172,6 +2172,13 @@ body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title h3 {
   width: 15px;
 }
 
+.inboxsdk__resultsSection_label_iconHtml,
+.inboxsdk__resultsSection_result_iconHtml {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 body:not(.inboxsdk__gmailv1css)
   .inboxsdk__resultsSection
   .inboxsdk__resultsSection_tableRow.zA:hover
@@ -2191,10 +2198,6 @@ body:not(.inboxsdk__gmailv1css)
 .inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow .xT {
   align-items: center;
   -webkit-align-items: center;
-}
-
-.inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow .WA > div {
-  width: 100%;
 }
 
 .inboxsdk__resultsSection .xX {
