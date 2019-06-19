@@ -898,16 +898,16 @@ function _getLabelHTML(label) {
         <div class="au" style="border-color: ${backgroundColor};">`
   ];
 
-  let styleHtml = label.iconBackgroundColor
+  const styleHtml = label.iconBackgroundColor
     ? autoHtml`style="background-color: ${label.iconBackgroundColor}"`
     : '';
 
   if (label.iconHtml != null) {
-    styleHtml = label.iconHtml;
-
     retArray.push(
-      autoHtml`<div class="inboxsdk__resultsSection_label_icon inboxsdk__resultsSection_label_iconHtml">
+      autoHtml`<div class="inboxsdk__resultsSection_label_icon inboxsdk__resultsSection_label_iconHtml"
         ${{ __html: styleHtml }}
+      >
+        ${{ __html: label.iconHtml }}
       </div>`
     );
   } else if (label.iconClass) {
