@@ -1,10 +1,11 @@
 import * as Kefir from 'kefir';
+import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import { ButtonViewI } from '../../../../widgets/buttons/basic-button-view-controller';
 
 export default class CreateAccessoryButtonView implements ButtonViewI {
   private _element: HTMLElement = document.createElement('div');
-  private _eventStream = Kefir.pool<any, any>();
+  private _eventStream = kefirBus<any, any>();
   private _stopper = kefirStopper();
 
   public constructor() {
@@ -19,7 +20,7 @@ export default class CreateAccessoryButtonView implements ButtonViewI {
   }
 
   public destroy() {
-    (this._eventStream as any).end();
+    this._eventStream.end();
     this._stopper.destroy();
     this._element.remove();
   }
