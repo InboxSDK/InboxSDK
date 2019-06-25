@@ -136,7 +136,8 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
 
     messageView.addAttachmentIcon({
       iconHtml: '<div>x</div>',
-      tooltip: 'custom icon html'
+      tooltip: 'custom icon html',
+      onClick: alert.bind(window, 'bar')
     });
 
 		messageView.addAttachmentIcon(Kefir.repeat(function() {
