@@ -3,7 +3,6 @@
 import Kefir from 'kefir';
 import InboxNavItemView from './views/inboxNavItemView';
 import insertElementInOrder from '../../lib/dom/insert-element-in-order';
-import eventNameFilter from '../../lib/event-name-filter';
 import querySelector from '../../lib/dom/querySelectorOrFail';
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 
@@ -23,7 +22,7 @@ export default function addNavItem(
     .onValue(el => {
       inboxNavItemView
         .getEventStream()
-        .filter(eventNameFilter('orderChanged'))
+        .filter(event => event.eventName === 'orderChanged')
         .onValue(() =>
           insertElementInOrder(containerEl, inboxNavItemView.getElement())
         );

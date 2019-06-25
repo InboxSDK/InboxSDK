@@ -820,6 +820,9 @@ class InboxComposeView {
   addInnerSidebar(options: { el: HTMLElement }): void {
     throw new Error('Not implemented');
   }
+  addComposeNotice(composeNoticeDescriptor?: { orderHint?: number }) {
+    throw new Error('Not implemented');
+  }
   addStatusBar(options?: {
     height?: number,
     orderHint?: number,
@@ -828,6 +831,9 @@ class InboxComposeView {
     throw new Error('Not implemented');
   }
   hideNativeStatusBar(): () => void {
+    throw new Error('Not Implemented');
+  }
+  isForward(): boolean {
     throw new Error('Not Implemented');
   }
   isReply(): boolean {
@@ -864,6 +870,10 @@ class InboxComposeView {
 
   getSubjectInput(): ?HTMLInputElement {
     return this._els.subject;
+  }
+
+  getMetadataFormElement(): HTMLElement {
+    throw new Error('Not supported in Inbox.');
   }
 
   getToRow(): HTMLElement {

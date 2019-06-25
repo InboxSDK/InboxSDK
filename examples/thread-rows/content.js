@@ -13,6 +13,10 @@ InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
     });
   });
 
+  inboxSDK.Lists.registerThreadRowViewSelectionHandler(() => {
+    console.log('selected threads', inboxSDK.Lists.getSelectedThreadRowViews());
+  });
+
   inboxSDK.Lists.registerThreadRowViewHandler(function(threadRowView) {
     var threadId = threadRowView.getThreadID();
     //console.log('threadRowView', threadId, threadRowView.getThreadIDIfStable(), threadRowView.getVisibleDraftCount(), threadRowView.getVisibleMessageCount(), threadRowView.getSubject());
@@ -31,7 +35,8 @@ InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
     threadRowView.addLabel(Kefir.repeatedly(5000, [
       {title:'A'},
       {title:'B', foregroundColor: 'blue', iconUrl: 'https://www.streak.com/build/images/pipelineIconMask.png'},
-      {title:'C', foregroundColor: 'red', iconClass: 'test_icon_thing'}
+      {title:'C', foregroundColor: 'red', iconClass: 'test_icon_thing'},
+      {title:'D', iconHtml: '<div>x</div>'}
     ]).toProperty({title:'0'}));
     threadRowView.addLabel({
       title:'a'+(i++),
@@ -40,6 +45,7 @@ InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
       foregroundColor: 'blue',
       iconBackgroundColor: 'green'
     });
+
     threadRowView.addAttachmentIcon(Kefir.repeatedly(2000, [
       {
         iconClass: 'test_icon_thing',

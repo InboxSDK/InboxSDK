@@ -971,13 +971,31 @@ body:not(.inboxsdk__gmailv1css) table + .inboxsdk__compose_statusbar {
   position: static !important;
 }
 
-.inboxsdk__compose_statusbarActive .aDj > .aDh {
+.inboxsdk__compose_inlineReply.inboxsdk__compose_statusbarActive .HM .I5 {
+  padding-bottom: var(--inboxsdk-total-added-statusbar-height, 0px);
+}
+/* Extend the message foreground outline downwards to contain our added status bars */
+.inboxsdk__compose_inlineReply.inboxsdk__compose_statusbarActive .aDj::before {
+  height: calc(100% + var(--inboxsdk-total-added-statusbar-height, 0px));
+}
+/* When we have a status bar added and the reply status is in position absolute or fixed mode (.aDi),
+use a background color on the element containing our added status bars so the message background outline
+isn't visible behind it. */
+.inboxsdk__compose_inlineReply.inboxsdk__compose_statusbarActive
+  .aDj.aDi
+  > .aDh {
   background-color: white;
-  height: auto;
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__recipient_row {
   display: flex;
+}
+
+.inboxsdk__compose_notice {
+  background-color: #f5f5f5;
+  border-radius: 4px;
+  margin: 10px;
+  padding: 10px 16px;
 }
 
 .inboxsdk__recipient_row td.ok {
@@ -2154,6 +2172,13 @@ body.inboxsdk__gmailv1css .inboxsdk__resultsSection_title h3 {
   width: 15px;
 }
 
+.inboxsdk__resultsSection_label_iconHtml,
+.inboxsdk__resultsSection_result_iconHtml {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 body:not(.inboxsdk__gmailv1css)
   .inboxsdk__resultsSection
   .inboxsdk__resultsSection_tableRow.zA:hover
@@ -2173,10 +2198,6 @@ body:not(.inboxsdk__gmailv1css)
 .inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow .xT {
   align-items: center;
   -webkit-align-items: center;
-}
-
-.inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow .WA > div {
-  width: 100%;
 }
 
 .inboxsdk__resultsSection .xX {
@@ -2415,7 +2436,21 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 .inboxsdk__custom_suggestion img {
   max-width: 32px;
   max-height: 32px;
-  margin-left: -11px;
+}
+
+.inboxsdk__custom_suggestion_iconHTML {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 8px;
+  height: 32px;
+  width: 43px;
+}
+
+/* Adjust positioning when no description present */
+.gstq_d .inboxsdk__custom_suggestion_iconHTML {
+  margin-top: -8px;
 }
 
 /* end send suggestions */

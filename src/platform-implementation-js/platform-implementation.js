@@ -37,7 +37,7 @@ import InboxCustomRouteView from './dom-driver/inbox/views/inbox-custom-route-vi
 import ButterBar from './namespaces/butter-bar';
 import Compose from './namespaces/compose';
 import Conversations from './namespaces/conversations';
-import Keyboard from './namespaces/keyboard.js';
+import Keyboard from './namespaces/keyboard';
 import Widgets from './namespaces/widgets';
 import Modal from './namespaces/modal';
 import Lists from './namespaces/lists';

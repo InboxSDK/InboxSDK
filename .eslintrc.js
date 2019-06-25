@@ -18,15 +18,9 @@ module.exports = {
     },
     sourceType: 'module'
   },
-  plugins: ['flowtype', 'deprecate'],
+  plugins: ['deprecate'],
   rules: {
-    'flowtype/define-flow-type': 1,
-    'flowtype/require-valid-file-annotation': ['error', 'always'],
-
-    'no-unused-vars': ['off'],
-    // "indent": ["error", 2],
     'linebreak-style': ['error', 'unix'],
-    // "quotes": ["error", "single", "avoid-escape"],
     semi: ['error', 'always'],
     'no-var': ['off'], //["error"],
     'brace-style': ['off'], //["error"],
@@ -38,15 +32,48 @@ module.exports = {
     'keyword-spacing': ['off'] //["error"],
   },
   overrides: [
+    // Flow config
+    {
+      files: ['*.js', '*.js.flow'],
+      plugins: ['flowtype'],
+      rules: {
+        'flowtype/define-flow-type': 1,
+        'flowtype/require-valid-file-annotation': ['error', 'always'],
+        'no-unused-vars': ['off']
+      }
+    },
+
+    // Start typescript config
+    ...require('@typescript-eslint/eslint-plugin/dist/configs/eslint-recommended')
+      .default.overrides,
+    {
+      files: ['*.ts', '*.tsx'],
+      ...require('@typescript-eslint/eslint-plugin/dist/configs/recommended.json')
+    },
+    {
+      files: ['*.ts', '*.tsx'],
+      rules: {
+        'no-undef': ['error'],
+        '@typescript-eslint/indent': ['off'],
+        '@typescript-eslint/explicit-function-return-type': ['off'],
+        '@typescript-eslint/no-explicit-any': ['off'],
+        '@typescript-eslint/no-use-before-define': ['off'],
+        '@typescript-eslint/no-non-null-assertion': ['off'],
+        '@typescript-eslint/array-type': ['off'],
+        '@typescript-eslint/camelcase': ['error', { properties: 'never' }]
+      }
+    },
+    // End typescript config
+
     {
       files: ['src/**'],
-      excludedFiles: '*.test.js',
+      excludedFiles: ['*.test.*', '*.d.ts'],
       rules: {
         'deprecate/import': ['error', 'lodash', 'crypto']
       }
     },
     {
-      files: ['__tests__/**', '**/*.test.js', 'test/**'],
+      files: ['__tests__/**', '**/*.test.*', 'test/**'],
       env: {
         jest: true
       }
@@ -55,12 +82,24 @@ module.exports = {
       files: ['test/chrome/**'],
       rules: {
         'no-console': ['off']
+      },
+      globals: {
+        page: 'readonly',
+        browser: 'readonly',
+        context: 'readonly',
+        jestPuppeteer: 'readonly'
+      }
+    },
+    {
+      files: ['jest.config.js', 'jest-puppeteer.config.js'],
+      rules: {
+        'flowtype/require-valid-file-annotation': ['off']
       }
     }
   ],
   settings: {
     react: {
-      version: '15.3'
+      version: '16.8'
     }
   }
 };

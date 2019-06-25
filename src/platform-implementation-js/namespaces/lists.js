@@ -34,6 +34,20 @@ export default class Lists {
   registerThreadRowViewHandler(handler: Function) {
     return get(memberMap, this).threadRowViewRegistry.registerHandler(handler);
   }
+
+  getSelectedThreadRowViews() {
+    const members = get(memberMap, this);
+    const threadRowViewDrivers = members.driver.getSelectedThreadRowViewDrivers();
+    const threadRowViews = threadRowViewDrivers.map(d =>
+      members.membrane.get(d)
+    );
+    return threadRowViews;
+  }
+
+  registerThreadRowViewSelectionHandler(handler: () => any) {
+    const members = get(memberMap, this);
+    return members.driver.registerThreadRowViewSelectionHandler(handler);
+  }
 }
 
 const ActionButtonTypes = Object.freeze({

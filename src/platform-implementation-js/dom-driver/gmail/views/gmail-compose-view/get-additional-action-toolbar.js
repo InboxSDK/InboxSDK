@@ -4,7 +4,7 @@ import type GmailComposeView from '../gmail-compose-view';
 
 const composeViewActionToolbars = new WeakMap();
 
-function getAdditionalActionToolbar(
+export default function getAdditionalActionToolbar(
   isUsingMaterialUI: boolean,
   gmailComposeView: GmailComposeView
 ) {
@@ -79,5 +79,3 @@ function _addActionToolbar(
 
   return toolbarDiv;
 }
-
-module.exports = getAdditionalActionToolbar;

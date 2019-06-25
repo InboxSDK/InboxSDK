@@ -1,0 +1,15 @@
+/* @flow */
+
+// Queue which tries to persist its data into localStorage so its contents
+// aren't wiped when the page is closed. It handles localStorage not being
+// present or not working (such as if we're running into quota issues).
+// Safe for use in multiple tabs on the same domain at once.
+
+declare export default class PersistentQueue<T> {
+  constructor<T>(id: string): PersistentQueue<T>;
+  add(val: T): void;
+  remove(): T | void;
+  removeAll(): T[];
+  peekAll(): T[];
+  clear(): void;
+}

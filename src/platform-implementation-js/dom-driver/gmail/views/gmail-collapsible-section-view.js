@@ -834,10 +834,14 @@ function _getTableHTML() {
 
 function _getRowHTML(result) {
   let iconHtml = '';
-  if (result.iconUrl)
+  if (result.iconHtml != null) {
+    iconHtml = autoHtml`<div class="inboxsdk__resultsSection_result_icon inboxsdk__resultsSection_result_iconHtml">
+        ${{ __html: result.iconHtml }}
+      </div>`;
+  } else if (result.iconUrl) {
     iconHtml = autoHtml`<img class="inboxsdk__resultsSection_result_icon ${result.iconClass ||
       ''}" src="${result.iconUrl}">`;
-  else if (result.iconClass)
+  } else if (result.iconClass)
     iconHtml = autoHtml`<div class="${result.iconClass}"></div>`;
 
   const labelsHtml = Array.isArray(result.labels)
@@ -898,7 +902,15 @@ function _getLabelHTML(label) {
     ? autoHtml`style="background-color: ${label.iconBackgroundColor}"`
     : '';
 
-  if (label.iconClass) {
+  if (label.iconHtml != null) {
+    retArray.push(
+      autoHtml`<div class="inboxsdk__resultsSection_label_icon inboxsdk__resultsSection_label_iconHtml"
+        ${{ __html: styleHtml }}
+      >
+        ${{ __html: label.iconHtml }}
+      </div>`
+    );
+  } else if (label.iconClass) {
     retArray.push(
       autoHtml`<div
         class="inboxsdk__resultsSection_label_icon ${label.iconClass || ''}"

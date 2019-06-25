@@ -1,0 +1,13 @@
+/* @flow */
+
+import type { Options } from 'contain-by-screen';
+
+declare export default class ScrollableContainByScreen {
+  constructor(
+    element: HTMLElement,
+    anchorPoint: HTMLElement,
+    options: Options
+  ): ScrollableContainByScreen;
+  reposition(): void;
+  destroy(): void;
+}

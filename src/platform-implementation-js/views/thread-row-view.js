@@ -1,8 +1,8 @@
 /* @flow */
 
 import EventEmitter from '../lib/safe-event-emitter';
-import type GmailThreadRowView from '../dom-driver/gmail/views/gmail-thread-row-view.js';
-import type InboxThreadRowView from '../dom-driver/inbox/views/inbox-thread-row-view.js';
+import type GmailThreadRowView from '../dom-driver/gmail/views/gmail-thread-row-view';
+import type InboxThreadRowView from '../dom-driver/inbox/views/inbox-thread-row-view';
 import get from '../../common/get-or-fail';
 
 const membersMap = new WeakMap();

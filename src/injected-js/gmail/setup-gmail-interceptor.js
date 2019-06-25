@@ -320,28 +320,59 @@ export function setupGmailInterceptorOnFrames(
               connection.originalResponseText
             );
 
+            // TODO this function silently fails way too easily. Need to add better logging for it!
+
             if (currentFirstDraftSaveConnectionIDs.has(connection)) {
               const wrapper =
                 originalResponse[2] &&
                 originalResponse[2][6] &&
-                originalResponse[2][6][1] &&
-                originalResponse[2][6][1][1];
+                originalResponse[2][6][0] &&
+                originalResponse[2][6][0][1];
 
               if (wrapper) {
-                const saveUpdate =
-                  wrapper[3] && wrapper[3][1] && wrapper[3][1][1];
+                const threadUpdate =
+                  wrapper[3] && wrapper[3][7] && wrapper[3][7][1];
 
-                if (saveUpdate) {
+                const messageUpdate =
+                  threadUpdate && threadUpdate[5] && threadUpdate[5][0];
+                if (threadUpdate && messageUpdate) {
                   triggerEvent({
                     draftID: draftID,
                     type: 'emailDraftReceived',
-                    rfcID: saveUpdate[14],
-                    messageID: saveUpdate[1],
-                    oldMessageID: saveUpdate[48]
-                      ? new BigNumber(saveUpdate[48]).toString(16)
-                      : saveUpdate[56],
-                    syncThreadID: wrapper[1]
+                    rfcID: messageUpdate[14],
+                    threadID: threadUpdate[4].split('|')[0],
+                    messageID: messageUpdate[1],
+                    oldMessageID: messageUpdate[56],
+                    oldThreadID: threadUpdate[20]
                   });
+                } else {
+                  logger.error(new Error('Could not parse draft save'));
+                }
+              } else {
+                // pre-2019-05-29 handling
+                logger.eventSdkPassive('old compose draft id handling hit');
+                const oldWrapper =
+                  originalResponse[2] &&
+                  originalResponse[2][6] &&
+                  originalResponse[2][6][1] &&
+                  originalResponse[2][6][1][1];
+
+                if (oldWrapper) {
+                  const saveUpdate =
+                    oldWrapper[3] && oldWrapper[3][1] && oldWrapper[3][1][1];
+
+                  if (saveUpdate) {
+                    triggerEvent({
+                      draftID: draftID,
+                      type: 'emailDraftReceived',
+                      rfcID: saveUpdate[14],
+                      messageID: saveUpdate[1],
+                      oldMessageID: saveUpdate[48]
+                        ? new BigNumber(saveUpdate[48]).toString(16)
+                        : saveUpdate[56],
+                      syncThreadID: oldWrapper[1]
+                    });
+                  }
                 }
               }
             } else {

@@ -27,8 +27,6 @@ var NavMenu = /** @lends NavMenu */ {
   /**
    * Adds a navigation item to the root of the navigation menu. Navigation items from your app are grouped together
    * where possible but ultimately the SDK optimizes for the best user experience when displaying navigation items.
-   * ^gmail
-   * ^inbox
    * @param {NavItemDescriptor} navItemDescriptor - A single descriptor for the nav item or stream of NavItemDescriptors.
    * @return {NavItemView}
    */
@@ -106,6 +104,14 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
    * @type {string}
    */
   iconClass: null,
+
+  /**
+   * An optional icon element to use as the icon. This property can't be used with iconUrl or iconClass.
+   * ^optional
+   * ^default=null
+   * @type {HTMLElement}
+   */
+  iconElement: null,
 
   /**
    * In Inbox, providing a {backgroundColor} will add a colored circle indicator

@@ -1,0 +1,25 @@
+/* @flow */
+
+import EventEmitter from '../../lib/safe-event-emitter';
+
+import type { Options as ContainByScreenOptions } from 'contain-by-screen';
+
+type Options = {
+  manualPosition?: boolean,
+  extraElementsToIgnore?: HTMLElement[]
+};
+
+declare export default class DropdownView extends EventEmitter {
+  destroyed: boolean;
+  el: HTMLElement;
+
+  constructor(
+    dropdownViewDriver: Object,
+    anchorElement: HTMLElement,
+    options: ?Options
+  ): DropdownView;
+
+  setPlacementOptions(options: ContainByScreenOptions): void;
+  close(): void;
+  reposition(): void;
+}

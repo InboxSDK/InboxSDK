@@ -8,10 +8,12 @@ import NativeNavItemView from '../views/native-nav-item-view';
 
 import type { Driver } from '../driver-interfaces/driver';
 
+import NavItemTypes from '../constants/nav-item-types';
+
 const memberMap = new WeakMap();
 
 export default class NavMenu {
-  NavItemTypes: Object;
+  NavItemTypes = NavItemTypes;
   SENT_MAIL: NativeNavItemView;
 
   constructor(appId: string, driver: Driver) {
@@ -19,7 +21,6 @@ export default class NavMenu {
     memberMap.set(this, members);
 
     this.SENT_MAIL = _setupSentMail(appId, driver);
-    this.NavItemTypes = require('../constants/nav-item-types');
   }
 
   addNavItem(navItemDescriptor: Object): NavItemView {

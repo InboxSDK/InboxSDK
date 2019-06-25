@@ -462,11 +462,13 @@ class GmailAppSidebarPrimary {
               } else {
                 if (userClick) this._setShouldThreadAppSidebarOpen(false);
               }
+              //fake a window resize after closing so gmail fixes any heights that are messed up
+              fakeWindowResize();
             };
-          }
 
-          //fake resize to get gmail to fix any heights that are messed up
-          fakeWindowResize();
+            //fake a window resize after opening so gmail fixes any heights that are messed up
+            fakeWindowResize();
+          }
         };
 
         querySelector(buttonContainer, 'button').addEventListener(

@@ -1,6 +1,11 @@
 /* @flow */
 
+jest.mock('regenerator-runtime/runtime.js', () =>
+  require('../overrides/node_modules/regenerator-runtime/runtime.js')
+);
+
 import MockMutationObserver from '../test/lib/mock-mutation-observer';
+import _ from 'lodash';
 
 process.env.VERSION = 'beep';
 
@@ -15,8 +20,6 @@ global.MutationObserver = MockMutationObserver;
 global.__test_origin = 'https://mail.google.com';
 const originalWindowProperties = Object.keys(window);
 
-const _ = require('lodash');
-
 // don't try to inject ajax interceptor
 (document.head: any).setAttribute('data-inboxsdk-script-injected', 'true');
 (document.head: any).setAttribute(
@@ -26,7 +29,7 @@ const _ = require('lodash');
 (document.head: any).setAttribute('data-inboxsdk-using-sync-api', 'false');
 (document.head: any).setAttribute('data-inboxsdk-using-material-ui', 'false');
 
-const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST');
+const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST').default;
 //preload implementation
 require('../src/platform-implementation-js/platform-implementation');
 

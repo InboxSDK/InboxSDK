@@ -8,8 +8,8 @@ import assert from 'assert';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
+import get from '../../../../common/get-or-fail';
 import delayAsap from '../../../lib/delay-asap';
-import elementViewMapper from '../../../lib/dom/element-view-mapper';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 import GmailToolbarView from './gmail-toolbar-view';
@@ -23,6 +23,9 @@ import makeElementViewStream from '../../../lib/dom/make-element-view-stream';
 import type GmailDriver from '../gmail-driver';
 import type GmailRouteView from './gmail-route-view/gmail-route-view';
 
+const THREAD_ROW_SELECTED_CLASSNAME = 'x7';
+const THREAD_ROW_SELECTED_CLASSNAME_REGEX = /\bx7\b/;
+
 class GmailRowListView {
   _element: HTMLElement;
   _gmailDriver: GmailDriver;
@@ -30,10 +33,13 @@ class GmailRowListView {
   _pendingExpansions: Map<string, number>;
   _pendingExpansionsSignal: Bus<any>;
   _toolbarView: ?GmailToolbarView;
-  _threadRowViewDrivers: Set<GmailThreadRowView>;
+  _threadRowViewDrivers: Set<GmailThreadRowView> = new Set();
   _eventStreamBus: Bus<any>;
   _rowViewDriverStream: Kefir.Observable<GmailThreadRowView>;
   _stopper: Kefir.Observable<any>;
+  _elementsToViews: Map<HTMLElement, GmailThreadRowView> = new Map();
+  _selectionMutationObserver: MutationObserver;
+  _selectedThreadRowViews: Set<GmailThreadRowView> = new Set();
 
   constructor(
     rootElement: HTMLElement,
@@ -46,7 +52,35 @@ class GmailRowListView {
 
     this._element = rootElement;
     this._routeViewDriver = routeViewDriver;
-    this._threadRowViewDrivers = new Set();
+
+    this._selectionMutationObserver = new MutationObserver(mutations => {
+      let changed = false;
+      for (let i = 0, len = mutations.length; i < len; i++) {
+        const mutation = mutations[i];
+        const target: any = mutation.target;
+        const wasSelected = THREAD_ROW_SELECTED_CLASSNAME_REGEX.test(
+          (mutation: any).oldValue
+        );
+        const isSelected = THREAD_ROW_SELECTED_CLASSNAME_REGEX.test(
+          target.className
+        );
+        if (wasSelected !== isSelected) {
+          const view = this._elementsToViews.get(target);
+          // we could be processing an element that was already removed
+          if (view) {
+            changed = true;
+            if (isSelected) {
+              this._selectedThreadRowViews.add(view);
+            } else {
+              this._selectedThreadRowViews.delete(view);
+            }
+          }
+        }
+      }
+      if (changed) {
+        this._gmailDriver.signalThreadRowViewSelectionChange();
+      }
+    });
 
     this._pendingExpansions = new Map();
     this._pendingExpansionsSignal = kefirBus();
@@ -61,9 +95,16 @@ class GmailRowListView {
   }
 
   destroy() {
+    this._selectionMutationObserver.disconnect();
     this._threadRowViewDrivers.forEach(threadRow => threadRow.destroy());
     this._eventStreamBus.end();
-    if (this._toolbarView) this._toolbarView.destroy();
+    if (this._toolbarView) {
+      this._toolbarView.destroy();
+    }
+    if (this._selectedThreadRowViews.size) {
+      this._selectedThreadRowViews.clear();
+      this._gmailDriver.signalThreadRowViewSelectionChange();
+    }
   }
 
   getElement(): HTMLElement {
@@ -76,6 +117,10 @@ class GmailRowListView {
 
   getToolbarView(): ?GmailToolbarView {
     return this._toolbarView;
+  }
+
+  getSelectedThreadRowViewDrivers(): Set<GmailThreadRowView> {
+    return this._selectedThreadRowViews;
   }
 
   getThreadRowViewDrivers(): Set<GmailThreadRowView> {
@@ -169,6 +214,20 @@ class GmailRowListView {
     this._pendingExpansions.clear();
   }
 
+  _batchedSignalThreadRowViewSelectionChangeScheduled = false;
+  _batchedSignalThreadRowViewSelectionChange() {
+    if (this._batchedSignalThreadRowViewSelectionChangeScheduled) {
+      return;
+    }
+    this._batchedSignalThreadRowViewSelectionChangeScheduled = true;
+    delayAsap(null)
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        this._batchedSignalThreadRowViewSelectionChangeScheduled = false;
+        this._gmailDriver.signalThreadRowViewSelectionChange();
+      });
+  }
+
   _startWatchingForRowViews() {
     const tableDivParents = Array.from(
       this._element.querySelectorAll('div.Cp')
@@ -191,11 +250,30 @@ class GmailRowListView {
     const laterStream = Kefir.later(2);
 
     this._rowViewDriverStream = elementStream
-      .map(
-        elementViewMapper(
-          element => new GmailThreadRowView(element, this, this._gmailDriver)
-        )
-      )
+      .map(event => {
+        const element = event.el;
+        this._selectionMutationObserver.observe(element, {
+          attributes: true,
+          attributeFilter: ['class'],
+          attributeOldValue: true
+        });
+
+        const view = new GmailThreadRowView(element, this, this._gmailDriver);
+        this._elementsToViews.set(element, view);
+        if (element.classList.contains(THREAD_ROW_SELECTED_CLASSNAME)) {
+          this._selectedThreadRowViews.add(view);
+          this._batchedSignalThreadRowViewSelectionChange();
+        }
+        event.removalStream.take(1).onValue(() => {
+          if (this._selectedThreadRowViews.has(view)) {
+            this._selectedThreadRowViews.delete(view);
+            this._batchedSignalThreadRowViewSelectionChange();
+          }
+          this._elementsToViews.delete(element);
+          view.destroy();
+        });
+        return view;
+      })
       .flatMap(threadRowView => {
         if (threadRowView.getAlreadyHadModifications()) {
           // Performance hack: If the row already has old modifications on it, wait

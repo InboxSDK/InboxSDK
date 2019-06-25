@@ -98,5 +98,8 @@ export type Driver = {
   createDrawerViewDriver(options: DrawerViewOptions): DrawerViewDriver,
   createBackdrop(zIndex?: number, target?: HTMLElement): Backdrop,
   getStopper(): Kefir.Observable<any>,
-  destroy(): void
+  destroy(): void,
+
+  getSelectedThreadRowViewDrivers(): $ReadOnlyArray<ThreadRowViewDriver>,
+  registerThreadRowViewSelectionHandler(handler: () => any): () => void
 };

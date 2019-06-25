@@ -1,0 +1,46 @@
+/* @flow */
+
+export type AppLogger = {
+  error(err: Error, details?: any): void,
+  event(name: string, details?: any): void
+};
+
+declare export default class Logger {
+  constructor(
+    appId: string,
+    opts: any,
+    loaderVersion: string,
+    implVersion: string
+  ): Logger;
+
+  setUserEmailAddress(email: string): void;
+  shouldTrackEverything(): boolean;
+  setIsUsingMaterialGmailUI(isUsing: boolean): void;
+  setIsUsingSyncAPI(isUsing: boolean): void;
+  static run<T>(cb: () => T, details?: any): T;
+  run<T>(cb: () => T, details?: any): T;
+  static error(err: Error, details?: any): void;
+  error(err: Error, details?: any): void;
+  errorApp(err: Error, details?: any): void;
+  errorSite(err: Error, details?: any): void;
+  // Should only be used by the InboxSDK users for their own app events.
+  eventApp(name: string, details?: any): void;
+  // For tracking app events that are possibly triggered by the user. Extensions
+  // can opt out of this with a flag passed to InboxSDK.load().
+  eventSdkActive(name: string, details?: any): void;
+  // Track events unrelated to user activity about how the app uses the SDK.
+  // Examples include the app being initialized, and calls to any of the
+  // register___ViewHandler functions.
+  eventSdkPassive(name: string, details?: any): void;
+  // Track Site events.
+  eventSite(name: string, details?: any): void;
+  deprecationWarning(name: string, suggestion?: ?string): void;
+  getAppLogger(): AppLogger;
+  trackFunctionPerformance(
+    fn: Function,
+    sampleRate: number,
+    details: { type: string }
+  ): void;
+}
+
+declare export function hashEmail(str: string): string;
