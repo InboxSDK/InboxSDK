@@ -559,13 +559,15 @@ class GmailThreadView {
     else throw new Error('Failed to get id for thread');
   }
 
-  addElementToLabelContainer(newElement: HTMLElement): { destroy(): void } {
-    let container = this._element.querySelector('.ha .J-J5-Ji');
-    if (!container) {
+  addLabel(): SimpleElementView {
+    const labelContainer = this._element.querySelector('.ha .J-J5-Ji');
+    if (!labelContainer) {
       throw new Error('Thread view label container not found');
     }
+    const el = document.createElement('span');
 
-    container.appendChild(newElement);
+    labelContainer.appendChild(el);
+    const view = new SimpleElementView(el);
 
     const observer = new MutationObserver(mutationsList => {
       if (
@@ -577,19 +579,24 @@ class GmailThreadView {
               mutation.removedNodes.length > 0)
         )
       ) {
-        if (!container.contains(newElement)) {
-          container.appendChild(newElement);
+        if (!labelContainer.contains(el)) {
+          labelContainer.appendChild(el);
         }
       }
     });
-    observer.observe(container, { childList: true });
+    observer.observe(labelContainer, { childList: true });
 
-    return {
-      destroy: () => {
+    this._stopper
+      .takeUntilBy(Kefir.fromEvents(view, 'destroy'))
+      .onValue(() => view.destroy());
+
+    Kefir.fromEvents(view, 'destroy')
+      .take(1)
+      .onValue(() => {
         observer.disconnect();
-        newElement.remove();
-      }
-    };
+      });
+
+    return view;
   }
 
   _setupToolbarView() {

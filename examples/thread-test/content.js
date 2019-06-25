@@ -38,15 +38,14 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 				return span;
 			});
 			
-			const newLabel = document.createElement('div');
+			const newLabel = document.createElement('span');
 			newLabel.textContent = 'some text';
-			const stopper = threadView.addElementToLabelContainer(newLabel);
-			console.log('label added');
+			const labelView = threadView.addLabel();
+			labelView.el.appendChild(newLabel);
 			setTimeout(() => {
 				console.log('label removed');
-				stopper.destroy();
+				labelView.destroy();
 			}, 5000);
-
 		})();
 	});
 

@@ -123,11 +123,8 @@ class ThreadView extends EventEmitter {
     return get(memberMap, this).threadViewImplementation.getThreadIDAsync();
   }
 
-  addElementToLabelContainer(newElement: HTMLElement): { destroy(): void } {
-    return get(
-      memberMap,
-      this
-    ).threadViewImplementation.addElementToLabelContainer(newElement);
+  addLabel(): SimpleElementView {
+    return get(memberMap, this).threadViewImplementation.addLabel();
   }
 }
 
