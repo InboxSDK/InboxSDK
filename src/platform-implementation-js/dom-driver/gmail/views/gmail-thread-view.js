@@ -559,6 +559,46 @@ class GmailThreadView {
     else throw new Error('Failed to get id for thread');
   }
 
+  addLabel(): SimpleElementView {
+    const labelContainer = this._element.querySelector('.ha .J-J5-Ji');
+    if (!labelContainer) {
+      throw new Error('Thread view label container not found');
+    }
+    const el = document.createElement('span');
+
+    labelContainer.appendChild(el);
+    const view = new SimpleElementView(el);
+
+    const observer = new MutationObserver(mutationsList => {
+      if (
+        mutationsList.some(
+          mutation =>
+            mutation.type === 'childList' &&
+            (mutation.removedNodes &&
+              mutation.removedNodes.length &&
+              mutation.removedNodes.length > 0)
+        )
+      ) {
+        if (!labelContainer.contains(el)) {
+          labelContainer.appendChild(el);
+        }
+      }
+    });
+    observer.observe(labelContainer, { childList: true });
+
+    this._stopper
+      .takeUntilBy(Kefir.fromEvents(view, 'destroy'))
+      .onValue(() => view.destroy());
+
+    Kefir.fromEvents(view, 'destroy')
+      .take(1)
+      .onValue(() => {
+        observer.disconnect();
+      });
+
+    return view;
+  }
+
   _setupToolbarView() {
     const toolbarElement = this._findToolbarElement();
     if (!toolbarElement) throw new Error('No toolbar element found');

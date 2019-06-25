@@ -122,6 +122,10 @@ class ThreadView extends EventEmitter {
   getThreadIDAsync(): Promise<string> {
     return get(memberMap, this).threadViewImplementation.getThreadIDAsync();
   }
+
+  addLabel(): SimpleElementView {
+    return get(memberMap, this).threadViewImplementation.addLabel();
+  }
 }
 
 export default defn(module, ThreadView);

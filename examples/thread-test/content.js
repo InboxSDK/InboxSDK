@@ -37,7 +37,15 @@ InboxSDK.load(2, 'thread-example').then(sdk => {
 				console.log('args', customHiddenCount, nativeHiddenCount);
 				return span;
 			});
-
+			
+			const newLabel = document.createElement('span');
+			newLabel.textContent = 'some text';
+			const labelView = threadView.addLabel();
+			labelView.el.appendChild(newLabel);
+			setTimeout(() => {
+				console.log('label removed');
+				labelView.destroy();
+			}, 5000);
 		})();
 	});
 
