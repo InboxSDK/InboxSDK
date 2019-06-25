@@ -493,11 +493,18 @@ class GmailMessageView {
       return img;
     });
 
+    const getCustomIconWrapper = once(() => {
+      const div = document.createElement('div');
+      div.className = 'inboxsdk__message_attachment_iconWapper';
+      return div;
+    });
+
     let added = false;
     let currentIconUrl = null;
 
     this._stopper.onValue(() => {
       if (added) {
+        getCustomIconWrapper().remove();
         getImgElement().remove();
         added = false;
       }
@@ -512,7 +519,13 @@ class GmailMessageView {
             added = false;
           }
         } else {
+          const attachmentDiv = querySelector(
+            this._element,
+            'td.gH div.gK span'
+          );
+
           const img = getImgElement();
+          const customImg = getCustomIconWrapper();
 
           const onClick = opts.onClick;
           if (onClick) {
@@ -535,17 +548,25 @@ class GmailMessageView {
 
           img.className =
             'inboxsdk__message_attachment_icon ' + (opts.iconClass || '');
-          if (currentIconUrl != opts.iconUrl) {
+
+          if (opts.iconHtml != null) {
+            const emptyImg =
+              'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
+            img.style.background = 'url(' + emptyImg + ') no-repeat 0 0';
+            img.style.display = 'none';
+            attachmentDiv.appendChild(customImg);
+            customImg.innerHTML = opts.iconHtml;
+          } else if (currentIconUrl != opts.iconUrl) {
+            if (attachmentDiv.contains(customImg)) {
+              customImg.remove();
+            }
             img.style.background = opts.iconUrl
               ? 'url(' + opts.iconUrl + ') no-repeat 0 0'
               : '';
+            img.style.display = 'inline-block';
             currentIconUrl = opts.iconUrl;
           }
 
-          const attachmentDiv = querySelector(
-            this._element,
-            'td.gH div.gK span'
-          );
           if (!attachmentDiv.contains(img)) {
             attachmentDiv.appendChild(img);
             added = true;
