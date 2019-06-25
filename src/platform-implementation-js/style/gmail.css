@@ -824,9 +824,10 @@ body.inboxsdk__gmailv1css
 
 td.gH div.gK span:first-child > img {
   margin-right: 3px;
+  margin-left: 3px;
 }
 
-td.gH div.gK span:first-child > img:last-child {
+td.gH div.gK span:first-child > *:last-child {
   margin-right: 6px;
 }
 
