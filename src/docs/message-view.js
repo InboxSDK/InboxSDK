@@ -480,7 +480,7 @@ var MessageAttachmentIconDescriptor = /** @lends MessageAttachmentIconDescriptor
   iconClass: null,
 
   /**
-   * An optional Html for the icon to show. This property can not be used with iconUrl or iconClass.
+   * An optional Html for the icon to show. This property can not be used with iconUrl.
    * ^optional
    * ^default=null
    * @type {string}

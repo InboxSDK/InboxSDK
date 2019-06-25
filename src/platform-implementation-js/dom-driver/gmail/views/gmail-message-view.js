@@ -548,7 +548,7 @@ class GmailMessageView {
 
           img.className =
             opts.iconHtml != null
-              ? `${img.className} ${opts.iconClass}`
+              ? `${img.className} ${opts.iconClass || ''}`
               : 'inboxsdk__message_attachment_icon ' + (opts.iconClass || '');
 
           if (opts.iconHtml != null) {
