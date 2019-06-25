@@ -480,6 +480,14 @@ var MessageAttachmentIconDescriptor = /** @lends MessageAttachmentIconDescriptor
   iconClass: null,
 
   /**
+   * An optional Html for the icon to show. This property can not be used with iconUrl.
+   * ^optional
+   * ^default=null
+   * @type {string}
+   */
+  iconHtml: null,
+
+  /**
    * The tooltip text to show when the user hovers over the icon.
    * @type {string}
    */

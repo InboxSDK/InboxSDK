@@ -9,3 +9,7 @@
   -webkit-mask-position: center;
   background-color: rgb(253,148,39);
 }
+
+.test-custom-class {
+  background-color: red;
+}

@@ -824,9 +824,10 @@ body.inboxsdk__gmailv1css
 
 td.gH div.gK span:first-child > img {
   margin-right: 3px;
+  margin-left: 3px;
 }
 
-td.gH div.gK span:first-child > img:last-child {
+td.gH div.gK span:first-child > *:last-child {
   margin-right: 6px;
 }
 
@@ -834,9 +835,18 @@ body.inboxsdk__gmailv1css .inboxsdk__message_attachment_icon {
   margin-top: -3px;
 }
 
+.inboxsdk__message_attachment_iconWapper,
 .inboxsdk__message_attachment_icon {
   width: 21px;
   height: 21px;
+}
+
+.inboxsdk__message_attachment_iconWapper {
+  margin: auto 3px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  vertical-align: top;
 }
 
 /* Work around issue where clicking "Remove formatting" in Compose causes this

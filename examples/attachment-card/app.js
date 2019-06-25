@@ -132,7 +132,15 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
 		messageView.addAttachmentIcon({
 			iconClass: 'eye_icon',
 			tooltip: '1thing'
-		});
+    });
+
+    messageView.addAttachmentIcon({
+      iconHtml: '<div>x</div>',
+      iconClass: 'test-custom-class',
+      tooltip: 'custom icon html',
+      onClick: alert.bind(window, 'bar')
+    });
+
 		messageView.addAttachmentIcon(Kefir.repeat(function() {
 			return Kefir.sequentially(2000, [
 				{
@@ -143,7 +151,11 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
 				{
 					iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
 					tooltip: '2blah blah'
-				}
+        },
+        {
+          iconHtml: '<div>x</div>',
+          tooltip: 'custom icon html'
+        }
 			]);
 		}));
 	});
