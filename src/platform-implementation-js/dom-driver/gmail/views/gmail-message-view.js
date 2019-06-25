@@ -524,8 +524,8 @@ class GmailMessageView {
             'td.gH div.gK span'
           );
 
-          const img = getImgElement();
-          const customImg = getCustomIconWrapper();
+          const img =
+            opts.iconHtml != null ? getCustomIconWrapper() : getImgElement();
 
           const onClick = opts.onClick;
           if (onClick) {
@@ -547,23 +547,25 @@ class GmailMessageView {
           }
 
           img.className =
-            'inboxsdk__message_attachment_icon ' + (opts.iconClass || '');
+            opts.iconHtml != null
+              ? `${img.className} ${opts.iconClass}`
+              : 'inboxsdk__message_attachment_icon ' + (opts.iconClass || '');
 
           if (opts.iconHtml != null) {
-            const emptyImg =
-              'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==';
-            img.style.background = 'url(' + emptyImg + ') no-repeat 0 0';
-            img.style.display = 'none';
-            attachmentDiv.appendChild(customImg);
-            customImg.innerHTML = opts.iconHtml;
-          } else if (currentIconUrl != opts.iconUrl) {
-            if (attachmentDiv.contains(customImg)) {
-              customImg.remove();
+            if (attachmentDiv.contains(getImgElement())) {
+              getImgElement().remove();
             }
+
+            img.innerHTML = opts.iconHtml;
+          } else if (currentIconUrl != opts.iconUrl) {
+            if (attachmentDiv.contains(getCustomIconWrapper())) {
+              getCustomIconWrapper().remove();
+            }
+
             img.style.background = opts.iconUrl
               ? 'url(' + opts.iconUrl + ') no-repeat 0 0'
               : '';
-            img.style.display = 'inline-block';
+
             currentIconUrl = opts.iconUrl;
           }
 
