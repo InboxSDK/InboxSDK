@@ -495,7 +495,6 @@ class GmailMessageView {
 
     const getCustomIconWrapper = once(() => {
       const div = document.createElement('div');
-      div.className = 'inboxsdk__message_attachment_iconWapper';
       return div;
     });
 
@@ -548,7 +547,8 @@ class GmailMessageView {
 
           img.className =
             opts.iconHtml != null
-              ? `inboxsdk__message_attachment_iconWapper ${opts.iconClass || ''}`
+              ? `inboxsdk__message_attachment_iconWapper ${opts.iconClass ||
+                  ''}`
               : 'inboxsdk__message_attachment_icon ' + (opts.iconClass || '');
 
           if (opts.iconHtml != null) {
