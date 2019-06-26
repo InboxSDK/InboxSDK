@@ -1,3 +1,28 @@
+function kefirStopper() {
+  var emitter = null;
+
+  function end() {
+    stopper.stopped = true;
+
+    if (emitter) {
+      emitter.emit(null);
+      emitter.end();
+    }
+  }
+
+  var stream = Kefir.stream(function (_emitter) {
+    emitter = _emitter;
+
+    if (stopper.stopped) {
+      end();
+    }
+  });
+  var stopper = stream.toProperty();
+  stopper.stopped = false;
+  stopper.destroy = end;
+  return stopper;
+}
+
 InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
 	'use strict';
 
@@ -140,6 +165,20 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
       tooltip: 'custom icon html',
       onClick: alert.bind(window, 'bar')
     });
+
+    const stopper = kefirStopper();
+
+    messageView.addAttachmentIcon(Kefir.constant({
+      iconHtml: '<div>y</div>',
+      iconClass: 'test-remove-icon',
+      tooltip: 'custom icon html',
+      onClick: alert.bind(window, 'bar')
+    }).merge(stopper.map(() => null)));
+
+    setTimeout(() => {
+      stopper.destroy();
+      console.log('destroy')
+    }, 5000);
 
 		messageView.addAttachmentIcon(Kefir.repeat(function() {
 			return Kefir.sequentially(2000, [
