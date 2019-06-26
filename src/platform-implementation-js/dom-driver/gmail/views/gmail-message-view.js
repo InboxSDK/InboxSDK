@@ -514,6 +514,7 @@ class GmailMessageView {
       .onValue(opts => {
         if (!opts) {
           if (added) {
+            getCustomIconWrapper().remove();
             getImgElement().remove();
             added = false;
           }
