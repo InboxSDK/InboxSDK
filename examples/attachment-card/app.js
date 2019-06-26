@@ -169,8 +169,8 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
     const stopper = kefirStopper();
 
     messageView.addAttachmentIcon(Kefir.constant({
-      iconHtml: '<div>x</div>',
-      iconClass: 'test-custom-class',
+      iconHtml: '<div>y</div>',
+      iconClass: 'test-remove-icon',
       tooltip: 'custom icon html',
       onClick: alert.bind(window, 'bar')
     }).merge(stopper.map(() => null)));
