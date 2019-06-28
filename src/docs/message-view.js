@@ -488,8 +488,8 @@ var MessageAttachmentIconDescriptor = /** @lends MessageAttachmentIconDescriptor
   iconHtml: null,
 
   /**
-   * The tooltip text to show when the user hovers over the icon.
-   * @type {string}
+   * The tooltip text or custom tooltip element to show when the user hovers over the icon.
+   * @type {string | HTMLElement}
    */
   tooltip: null,
 
