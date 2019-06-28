@@ -185,6 +185,19 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
       onClick: alert.bind(window, 'bar')
     });
 
+    const tooltip3 = document.createElement('div');
+    tooltip3.innerHTML = 'fsjdfjskdlf';
+    tooltip3.onclick = function (event) {
+      event.stopPropagation();
+      console.log('click on tooltip')
+    }
+
+    messageView.addAttachmentIcon({
+      iconHtml: '<div>Q</div>',
+      iconClass: 'test-custom-tooltip',
+      tooltip: tooltip3
+    });
+
     const stopper = kefirStopper();
 
     messageView.addAttachmentIcon(Kefir.constant({
