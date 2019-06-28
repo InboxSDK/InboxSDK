@@ -166,6 +166,25 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
       onClick: alert.bind(window, 'bar')
     });
 
+    const tooltip1 = document.createElement('div');
+    tooltip1.innerHTML = 'test';
+    tooltip1.style.background = 'aquamarine';
+    tooltip1.style.width = '200px';
+    tooltip1.onclick = function(event) {
+      event.stopPropagation();
+      console.log('click on tooltip')
+    }
+
+    const tooltip2 = document.createElement('div');
+    tooltip2.innerHTML = 'ballfjsdkljf';
+
+    messageView.addAttachmentIcon({
+      iconHtml: '<div>x</div>',
+      iconClass: 'test-custom-tooltip',
+      tooltip: tooltip1,
+      onClick: alert.bind(window, 'bar')
+    });
+
     const stopper = kefirStopper();
 
     messageView.addAttachmentIcon(Kefir.constant({
@@ -194,6 +213,12 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
         {
           iconHtml: '<div>x</div>',
           tooltip: 'custom icon html'
+        },
+        {
+          iconHtml: '<div>x</div>',
+          iconClass: 'test-custom-tooltip',
+          tooltip: tooltip2,
+          onClick: alert.bind(window, 'bar')
         }
 			]);
 		}));

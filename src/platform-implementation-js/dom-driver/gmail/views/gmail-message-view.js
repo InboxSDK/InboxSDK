@@ -498,12 +498,18 @@ class GmailMessageView {
       return div;
     });
 
+    const getTooltipNodeWrapper = once(() => {
+      const div = document.createElement('div');
+      return div;
+    });
+
     let added = false;
     let currentIconUrl = null;
 
     this._stopper.onValue(() => {
       if (added) {
         getCustomIconWrapper().remove();
+        getTooltipNodeWrapper().remove();
         getImgElement().remove();
         added = false;
       }
@@ -516,6 +522,7 @@ class GmailMessageView {
           if (added) {
             getCustomIconWrapper().remove();
             getImgElement().remove();
+            getTooltipNodeWrapper().remove();
             added = false;
           }
         } else {
@@ -540,7 +547,30 @@ class GmailMessageView {
             img.style.cursor = '';
           }
 
-          if (opts.tooltip) {
+          if (
+            opts.tooltip &&
+            (typeof opts.tooltip == 'object' &&
+              opts.tooltip instanceof HTMLElement)
+          ) {
+            const tooltipWrapper = getTooltipNodeWrapper();
+            tooltipWrapper.className =
+              'inboxsdk__message_attachment_tooltipWrapper';
+            tooltipWrapper.appendChild(opts.tooltip);
+
+            img.onmouseenter = function(event) {
+              event.preventDefault();
+              event.stopPropagation();
+              img.appendChild(tooltipWrapper);
+            };
+
+            img.onmouseleave = function(event) {
+              event.preventDefault();
+              event.stopPropagation();
+              img.removeChild(tooltipWrapper);
+            };
+
+            img.removeAttribute('data-tooltip');
+          } else if (opts.tooltip && typeof opts.tooltip == 'string') {
             img.setAttribute('data-tooltip', opts.tooltip);
           } else {
             img.removeAttribute('data-tooltip');
