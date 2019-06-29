@@ -753,6 +753,12 @@ class GmailThreadRowView {
       img.src = 'images/cleardot.gif';
       return img;
     });
+
+    const getCustomIconWrapper = once(() => {
+      const div = document.createElement('div');
+      return div;
+    });
+
     var added = false;
     var currentIconUrl;
 
@@ -764,6 +770,7 @@ class GmailThreadRowView {
         const attachmentDiv = querySelector(this._elements[0], 'td.yf.xY');
         if (!opts) {
           if (added) {
+            getCustomIconWrapper().remove();
             getImgElement().remove();
             added = false;
 
@@ -778,7 +785,8 @@ class GmailThreadRowView {
             }
           }
         } else {
-          const img = getImgElement();
+          const img =
+            opts.iconHtml != null ? getCustomIconWrapper() : getImgElement();
           if (opts.tooltip) {
             img.setAttribute('data-tooltip', opts.tooltip);
           } else {
@@ -786,9 +794,23 @@ class GmailThreadRowView {
           }
 
           img.className =
-            'inboxsdk__thread_row_addition inboxsdk__thread_row_attachment_icon ' +
-            (opts.iconClass || '');
-          if (currentIconUrl != opts.iconUrl) {
+            opts.iconHtml != null
+              ? 'inboxsdk__thread_row_addition inboxsdk__thread_row_attachment_iconWrapper ' +
+                (opts.iconClass || '')
+              : 'inboxsdk__thread_row_addition inboxsdk__thread_row_attachment_icon ' +
+                (opts.iconClass || '');
+
+          if (opts.iconHtml != null) {
+            if (attachmentDiv.contains(getImgElement())) {
+              getImgElement().remove();
+            }
+
+            img.innerHTML = opts.iconHtml;
+          } else if (currentIconUrl != opts.iconUrl) {
+            if (attachmentDiv.contains(getCustomIconWrapper())) {
+              getCustomIconWrapper().remove();
+            }
+
             img.style.background = opts.iconUrl
               ? 'url(' + opts.iconUrl + ') no-repeat 0 0'
               : '';
