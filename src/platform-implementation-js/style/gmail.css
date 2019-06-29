@@ -671,10 +671,18 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
   display: none;
 }
 
+.inboxsdk__thread_row_attachment_iconWrapper,
 .inboxsdk__thread_row_attachment_icon {
   margin-left: 3px;
   width: 16px;
   height: 16px;
+}
+
+.inboxsdk__thread_row_attachment_iconWrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: max-content;
 }
 
 /* .zA td.apU.xy refers to the <td/> element that houses the favorite star in thread row view.

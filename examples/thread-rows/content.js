@@ -46,6 +46,14 @@ InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
       iconBackgroundColor: 'green'
     });
 
+    const iconHtml = "<div style='width: 56px;height: 4px;background: aqua;'></div>"
+
+    threadRowView.addAttachmentIcon({
+      iconHtml,
+      iconClass: 'icon-html-class',
+      title: 'icon html'
+    })
+
     threadRowView.addAttachmentIcon(Kefir.repeatedly(2000, [
       {
         iconClass: 'test_icon_thing',
@@ -54,6 +62,11 @@ InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
       {
         iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
         title: 'blah blah'
+      },
+      {
+        iconHtml: '<div>x</div>',
+        iconClass: 'icon-html-class',
+        title: 'icon html'
       }
     ]));
     threadRowView.replaceDraftLabel(Kefir.repeatedly(1000, [
