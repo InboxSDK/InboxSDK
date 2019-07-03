@@ -537,11 +537,14 @@ class GmailMessageView {
           const onClick = opts.onClick;
           if (onClick) {
             img.onclick = function(event) {
-              if (event.target && event.target.onclick) {
-                event.target.onclick();
-              } else {
-                event.stopPropagation();
-                onClick();
+              if (event) {
+                if (event.target && event.target.onclick) {
+                  event.target.onclick();
+                } else {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  onClick();
+                }
               }
             };
             img.style.cursor = 'pointer';

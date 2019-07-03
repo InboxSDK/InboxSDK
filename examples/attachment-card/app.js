@@ -167,8 +167,17 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
     });
 
     const tooltip1 = document.createElement('div');
-    function Button() {
-      return React.createElement("button", {
+
+    tooltip1.onclick = function(event) {
+      if (event.target && event.target.onclick) {
+        event.target.onclick()
+        return
+      }
+      event.stopPropagation();
+    }
+
+    function Test() {
+      return React.createElement("div", null, "testse ", React.createElement("br", null), React.createElement("button", {
         style: {
           width: '200px',
           height: '400px',
@@ -179,9 +188,10 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
           console.log('===== click button event', event.target);
           event.target.innerHTML = 'clicked me'
         }
-      }, "test");
+      }, "click me"));
     }
-    ReactDOM.render(React.createElement(Button, null), tooltip1);
+
+    ReactDOM.render(React.createElement(Test, null), tooltip1);
 
     const tooltip2 = document.createElement('div');
     tooltip2.innerHTML = 'ballfjsdkljf';
