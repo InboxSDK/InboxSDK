@@ -26,7 +26,7 @@ function kefirStopper() {
 InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
 	'use strict';
 
-	window._sdk = sdk;
+  window._sdk = sdk;
 
 	sdk.Conversations.registerFileAttachmentCardViewHandler(card => {
 		card.addButton({
@@ -167,13 +167,21 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
     });
 
     const tooltip1 = document.createElement('div');
-    tooltip1.innerHTML = 'test';
-    tooltip1.style.background = 'aquamarine';
-    tooltip1.style.width = '200px';
-    tooltip1.onclick = function(event) {
-      event.stopPropagation();
-      console.log('click on tooltip')
+    function Button() {
+      return React.createElement("button", {
+        style: {
+          width: '200px',
+          height: '400px',
+          background: 'aquamarine'
+        },
+        onClick: event => {
+          event.stopPropagation();
+          console.log('===== click button event', event.target);
+          event.target.innerHTML = 'clicked me'
+        }
+      }, "test");
     }
+    ReactDOM.render(React.createElement(Button, null), tooltip1);
 
     const tooltip2 = document.createElement('div');
     tooltip2.innerHTML = 'ballfjsdkljf';
@@ -182,7 +190,7 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
       iconHtml: '<div>x</div>',
       iconClass: 'test-custom-tooltip',
       tooltip: tooltip1,
-      onClick: alert.bind(window, 'bar')
+      onClick: () => {console.log('click on icon html')}
     });
 
     const tooltip3 = document.createElement('div');

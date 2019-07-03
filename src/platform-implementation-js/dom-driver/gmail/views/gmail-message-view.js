@@ -537,9 +537,12 @@ class GmailMessageView {
           const onClick = opts.onClick;
           if (onClick) {
             img.onclick = function(event) {
-              event.preventDefault();
-              event.stopPropagation();
-              onClick();
+              if (event.target && event.target.onclick) {
+                event.target.onclick();
+              } else {
+                event.stopPropagation();
+                onClick();
+              }
             };
             img.style.cursor = 'pointer';
           } else {
@@ -578,7 +581,7 @@ class GmailMessageView {
 
           img.className =
             opts.iconHtml != null
-              ? `inboxsdk__message_attachment_iconWapper ${opts.iconClass ||
+              ? `inboxsdk__message_attachment_iconWrapper ${opts.iconClass ||
                   ''}`
               : 'inboxsdk__message_attachment_icon ' + (opts.iconClass || '');
 
