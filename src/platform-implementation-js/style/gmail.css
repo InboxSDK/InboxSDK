@@ -245,7 +245,6 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton::before {
   right: 0px;
   top: 0px;
   background: none;
-  border-radius: 50%;
   box-sizing: border-box;
   transform: scale(0);
   transition-property: transform, opacity;
