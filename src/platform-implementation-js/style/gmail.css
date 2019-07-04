@@ -264,8 +264,6 @@ body:not(.inboxsdk__gmailv1css)
   .inboxsdk__composeButton.inboxsdk__composeButton_active::before {
   background-color: rgba(32, 33, 36, 0.122);
   border: none;
-  background-color: rgba(32, 33, 36, 0.122);
-  border: none;
   box-shadow: none;
   opacity: 1;
   transform: scale(1);
