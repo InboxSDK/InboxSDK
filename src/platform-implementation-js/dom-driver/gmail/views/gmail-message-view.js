@@ -26,6 +26,7 @@ import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 
 import censorHTMLtree from '../../../../common/censorHTMLtree';
 import findParent from '../../../../common/find-parent';
+import reemitClickEvent from '../../../lib/dom/reemitClickEventForReact';
 
 import type GmailDriver from '../gmail-driver';
 import type GmailThreadView from './gmail-thread-view';
@@ -555,6 +556,10 @@ class GmailMessageView {
             const tooltipWrapper = getTooltipNodeWrapper();
             tooltipWrapper.className =
               'inboxsdk__message_attachment_tooltipWrapper';
+            tooltipWrapper.onclick = function(event) {
+              event.stopPropagation();
+              reemitClickEvent(event);
+            };
             tooltipWrapper.appendChild(opts.tooltip);
 
             img.onmouseenter = function(event) {
@@ -578,7 +583,7 @@ class GmailMessageView {
 
           img.className =
             opts.iconHtml != null
-              ? `inboxsdk__message_attachment_iconWapper ${opts.iconClass ||
+              ? `inboxsdk__message_attachment_iconWrapper ${opts.iconClass ||
                   ''}`
               : 'inboxsdk__message_attachment_icon ' + (opts.iconClass || '');
 
