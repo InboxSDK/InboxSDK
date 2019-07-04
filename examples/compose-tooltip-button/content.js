@@ -41,6 +41,15 @@ InboxSDK.load(2, 'simple-example').then(function(inboxSDK) {
 					setTimeout(function(){button2.closeTooltip();}, 5*1000);
 				}
 			}
-		});
+    });
+
+    var button3 = composeView.addButton({
+      title: 'Monkeys 3',
+      iconClass: 'test',
+      onClick: function (event) {
+      },
+      section: 'TRAY_LEFT'
+    });
+
 	});
 });
