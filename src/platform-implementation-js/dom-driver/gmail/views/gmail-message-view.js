@@ -26,6 +26,7 @@ import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 
 import censorHTMLtree from '../../../../common/censorHTMLtree';
 import findParent from '../../../../common/find-parent';
+import reemitClickEvent from '../../../lib/dom/reemitClickEventForReact';
 
 import type GmailDriver from '../gmail-driver';
 import type GmailThreadView from './gmail-thread-view';
@@ -537,15 +538,9 @@ class GmailMessageView {
           const onClick = opts.onClick;
           if (onClick) {
             img.onclick = function(event) {
-              if (event) {
-                if (event.target && event.target.onclick) {
-                  event.target.onclick();
-                } else {
-                  event.preventDefault();
-                  event.stopPropagation();
-                  onClick();
-                }
-              }
+              event.preventDefault();
+              event.stopPropagation();
+              onClick();
             };
             img.style.cursor = 'pointer';
           } else {
@@ -561,20 +556,22 @@ class GmailMessageView {
             const tooltipWrapper = getTooltipNodeWrapper();
             tooltipWrapper.className =
               'inboxsdk__message_attachment_tooltipWrapper';
+            tooltipWrapper.onclick = function(event) {
+              event.stopPropagation();
+              reemitClickEvent(event);
+            };
             tooltipWrapper.appendChild(opts.tooltip);
 
             img.onmouseenter = function(event) {
               event.preventDefault();
               event.stopPropagation();
               img.appendChild(tooltipWrapper);
-              img.style.zIndex = '10';
             };
 
             img.onmouseleave = function(event) {
               event.preventDefault();
               event.stopPropagation();
               img.removeChild(tooltipWrapper);
-              img.style.zIndex = '0';
             };
 
             img.removeAttribute('data-tooltip');

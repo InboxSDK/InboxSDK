@@ -862,6 +862,7 @@ body.inboxsdk__gmailv1css .inboxsdk__message_attachment_icon {
 .inboxsdk__message_attachment_tooltipWrapper {
   position: absolute;
   top: 19px;
+  z-index: 10;
 }
 
 /* Work around issue where clicking "Remove formatting" in Compose causes this

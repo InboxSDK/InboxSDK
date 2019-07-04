@@ -168,14 +168,6 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
 
     const tooltip1 = document.createElement('div');
 
-    tooltip1.onclick = function(event) {
-      if (event.target && event.target.onclick) {
-        event.target.onclick()
-        return
-      }
-      event.stopPropagation();
-    }
-
     function Test() {
       return React.createElement("div", null, "testse ", React.createElement("br", null), React.createElement("button", {
         style: {
