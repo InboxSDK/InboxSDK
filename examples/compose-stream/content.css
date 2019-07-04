@@ -6,8 +6,6 @@
   -webkit-mask-image: url(https://www.streak.com/build/images/pixelTrackerIcon.png);
   -webkit-mask-size: 20px;
   -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position-x: 3px;
-  -webkit-mask-position-y: 1px;
   width: 26px !important;
   background-color: rgb(253, 148, 39);
 }
