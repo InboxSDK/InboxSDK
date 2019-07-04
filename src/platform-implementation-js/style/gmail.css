@@ -224,7 +224,13 @@ body.inboxsdk__gmailv1css .inboxsdk__composeButton + .inboxsdk__composeButton {
 }
 
 .inboxsdk__composeButton .inboxsdk__button_icon {
-  opacity: 0.9;
+  opacity: 0.55;
+}
+
+.inboxsdk__composeButton:hover .inboxsdk__button_icon,
+.inboxsdk__composeButton:focus .inboxsdk__button_icon,
+.inboxsdk__composeButton.inboxsdk__composeButton_active .inboxsdk__button_icon {
+  opacity: 1;
 }
 
 body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton::before {
