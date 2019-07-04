@@ -567,12 +567,14 @@ class GmailMessageView {
               event.preventDefault();
               event.stopPropagation();
               img.appendChild(tooltipWrapper);
+              img.style.zIndex = '10';
             };
 
             img.onmouseleave = function(event) {
               event.preventDefault();
               event.stopPropagation();
               img.removeChild(tooltipWrapper);
+              img.style.zIndex = '0';
             };
 
             img.removeAttribute('data-tooltip');
