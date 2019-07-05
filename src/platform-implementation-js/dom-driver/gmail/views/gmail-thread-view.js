@@ -487,25 +487,50 @@ class GmailThreadView {
     return this._syncThreadID || this.getThreadID();
   }
 
+  // Follows a similar structure to getThreadIDAsync, but gives up if async work is needed
   getThreadID(): string {
     if (this._threadID) return this._threadID;
 
     let threadID;
-    if (this._isPreviewedThread) {
-      threadID = this._driver
-        .getPageCommunicator()
-        .getCurrentThreadID(this._element, true);
-    } else {
-      const params = this._routeViewDriver
-        ? this._routeViewDriver.getParams()
-        : null;
+    if (this._driver.isUsingSyncAPI()) {
+      const idElement = this._element.querySelector('[data-thread-perm-id]');
+      if (!idElement) throw new Error('threadID element not found');
 
-      if (params && params.threadID) {
-        threadID = params.threadID;
-      } else {
-        const err = new Error('Failed to get id for thread');
+      const syncThreadID = (this._syncThreadID = idElement.getAttribute(
+        'data-thread-perm-id'
+      ));
+      if (!syncThreadID)
+        throw new Error('syncThreadID attribute with no value');
+
+      threadID = idElement.getAttribute('data-legacy-thread-id');
+      if (!threadID) {
+        const err = new Error(
+          'Failed to get id for thread: data-legacy-thread-id attribute missing'
+        );
         this._driver.getLogger().error(err);
-        throw err;
+        // throw err;
+        // Fall back to old behavior instead of throwing. Probably not super sensible, but
+        // this is a deprecated method and preserving the current behavior is
+        // probably an okay choice.
+      }
+    }
+    if (!threadID) {
+      if (this._isPreviewedThread) {
+        threadID = this._driver
+          .getPageCommunicator()
+          .getCurrentThreadID(this._element, true);
+      } else {
+        const params = this._routeViewDriver
+          ? this._routeViewDriver.getParams()
+          : null;
+
+        if (params && params.threadID) {
+          threadID = params.threadID;
+        } else {
+          const err = new Error('Failed to get id for thread');
+          this._driver.getLogger().error(err);
+          throw err;
+        }
       }
     }
 
