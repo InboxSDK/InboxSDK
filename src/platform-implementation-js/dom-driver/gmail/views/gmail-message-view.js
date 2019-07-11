@@ -517,6 +517,12 @@ class GmailMessageView {
     });
 
     kefirCast((Kefir: any), iconDescriptor)
+      .combine(
+        this._eventStream
+          .filter(event => event.eventName === 'viewStateChange')
+          .toProperty(() => null),
+        opts => opts
+      )
       .takeUntilBy(this._stopper)
       .onValue(opts => {
         if (!opts) {
@@ -527,10 +533,13 @@ class GmailMessageView {
             added = false;
           }
         } else {
-          const attachmentDiv = querySelector(
-            this._element,
-            'td.gH div.gK span'
-          );
+          let attachmentDiv;
+
+          if (this.getViewState() === 'COLLAPSED') {
+            attachmentDiv = querySelector(this._element, '.adf.ads td.gH span');
+          } else {
+            attachmentDiv = querySelector(this._element, 'td.gH div.gK span');
+          }
 
           const img =
             opts.iconHtml != null ? getCustomIconWrapper() : getImgElement();
