@@ -488,6 +488,11 @@ class GmailMessageView {
       return;
     }
 
+    this._element.setAttribute(
+      'inboxsdk__message_added_attachment_icon',
+      'true'
+    );
+
     const getImgElement = once(() => {
       const img = document.createElement('img');
       img.src = 'images/cleardot.gif';
