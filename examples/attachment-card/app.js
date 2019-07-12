@@ -153,7 +153,21 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
 					}, err => console.error(err));
 				}
 			}
-		});
+    });
+  });
+
+  sdk.Conversations.registerMessageViewHandlerAll(async function (messageView) {
+    await new Promise((resolve) => {
+      if (messageView.getViewState() === 'HIDDEN') {
+        messageView.on('viewStateChange', (event) =>{
+          if (event.newViewState !== 'HIDDEN') {
+            resolve()
+          }
+        })
+      } else {
+        resolve()
+      }
+    })
 
 		messageView.addAttachmentIcon({
 			iconClass: 'eye_icon',

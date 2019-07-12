@@ -678,7 +678,10 @@ class GmailMessageView {
           let oldValue;
           let newValue;
 
-          if (mutationOldValue.indexOf('kQ') > -1) {
+          if (
+            mutationOldValue.indexOf('kQ') > -1 ||
+            mutationOldValue.indexOf('kx') > -1
+          ) {
             oldValue = 'HIDDEN';
           } else if (
             mutationOldValue.indexOf('kv') > -1 ||
@@ -689,7 +692,10 @@ class GmailMessageView {
             oldValue = 'EXPANDED';
           }
 
-          if (currentClassList.contains('kQ')) {
+          if (
+            currentClassList.contains('kQ') ||
+            currentClassList.contains('kx')
+          ) {
             newValue = 'HIDDEN';
           } else if (
             currentClassList.contains('kv') ||
