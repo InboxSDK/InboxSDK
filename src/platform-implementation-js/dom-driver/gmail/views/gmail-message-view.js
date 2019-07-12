@@ -488,6 +488,11 @@ class GmailMessageView {
       return;
     }
 
+    this._element.setAttribute(
+      'inboxsdk__message_added_attachment_icon',
+      'true'
+    );
+
     const getImgElement = once(() => {
       const img = document.createElement('img');
       img.src = 'images/cleardot.gif';
@@ -517,6 +522,12 @@ class GmailMessageView {
     });
 
     kefirCast((Kefir: any), iconDescriptor)
+      .combine(
+        this._eventStream
+          .filter(event => event.eventName === 'viewStateChange')
+          .toProperty(() => null),
+        opts => opts
+      )
       .takeUntilBy(this._stopper)
       .onValue(opts => {
         if (!opts) {
@@ -527,10 +538,13 @@ class GmailMessageView {
             added = false;
           }
         } else {
-          const attachmentDiv = querySelector(
-            this._element,
-            'td.gH div.gK span'
-          );
+          let attachmentDiv;
+
+          if (this.getViewState() === 'COLLAPSED') {
+            attachmentDiv = querySelector(this._element, '.adf.ads td.gH span');
+          } else {
+            attachmentDiv = querySelector(this._element, 'td.gH div.gK span');
+          }
 
           const img =
             opts.iconHtml != null ? getCustomIconWrapper() : getImgElement();
@@ -669,7 +683,10 @@ class GmailMessageView {
           let oldValue;
           let newValue;
 
-          if (mutationOldValue.indexOf('kQ') > -1) {
+          if (
+            mutationOldValue.indexOf('kQ') > -1 ||
+            mutationOldValue.indexOf('kx') > -1
+          ) {
             oldValue = 'HIDDEN';
           } else if (
             mutationOldValue.indexOf('kv') > -1 ||
@@ -680,7 +697,10 @@ class GmailMessageView {
             oldValue = 'EXPANDED';
           }
 
-          if (currentClassList.contains('kQ')) {
+          if (
+            currentClassList.contains('kQ') ||
+            currentClassList.contains('kx')
+          ) {
             newValue = 'HIDDEN';
           } else if (
             currentClassList.contains('kv') ||
