@@ -15,6 +15,7 @@ import GmailAttachmentAreaView from './gmail-attachment-area-view';
 import GmailAttachmentCardView from './gmail-attachment-card-view';
 
 import getUpdatedContact from './gmail-message-view/get-updated-contact';
+import AttachmentIcon from './gmail-message-view/attachment-icon';
 
 import delayAsap from '../../../lib/delay-asap';
 import waitFor from '../../../lib/wait-for';
