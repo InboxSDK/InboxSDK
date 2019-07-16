@@ -169,12 +169,17 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
       }
     })
 
-		messageView.addAttachmentIcon({
+		const icon1 = messageView.addAttachmentIcon({
 			iconClass: 'eye_icon',
 			tooltip: '1thing'
     });
 
-    messageView.addAttachmentIcon({
+
+    icon1.onHover = function() {
+      console.log('hover!!!!')
+    }
+
+    const icon2 = messageView.addAttachmentIcon({
       iconHtml: '<div>x</div>',
       iconClass: 'test-custom-class',
       tooltip: 'custom icon html',
@@ -203,7 +208,7 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
     const tooltip2 = document.createElement('div');
     tooltip2.innerHTML = 'ballfjsdkljf';
 
-    messageView.addAttachmentIcon({
+    const icon3 =messageView.addAttachmentIcon({
       iconHtml: '<div>x</div>',
       iconClass: 'test-custom-tooltip',
       tooltip: tooltip1,
@@ -217,7 +222,7 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
       console.log('click on tooltip')
     }
 
-    messageView.addAttachmentIcon({
+    const icon4 = messageView.addAttachmentIcon({
       iconHtml: '<div>Q</div>',
       iconClass: 'test-custom-tooltip',
       tooltip: tooltip3
@@ -225,7 +230,7 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
 
     const stopper = kefirStopper();
 
-    messageView.addAttachmentIcon(Kefir.constant({
+    const icon5 = messageView.addAttachmentIcon(Kefir.constant({
       iconHtml: '<div>y</div>',
       iconClass: 'test-remove-icon',
       tooltip: 'custom icon html',
@@ -237,7 +242,7 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
       console.log('destroy')
     }, 5000);
 
-		messageView.addAttachmentIcon(Kefir.repeat(function() {
+    const icon6 = messageView.addAttachmentIcon(Kefir.repeat(function() {
 			return Kefir.sequentially(2000, [
 				{
 					iconClass: 'eye_icon',
@@ -260,6 +265,13 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
         }
 			]);
 		}));
-	});
+  });
+
+  console.log('icon1', icon1)
+  console.log('icon2', icon2)
+  console.log('icon3', icon3)
+  console.log('icon4', icon4)
+  console.log('icon5', icon5)
+  console.log('icon6', icon6)
 
 });

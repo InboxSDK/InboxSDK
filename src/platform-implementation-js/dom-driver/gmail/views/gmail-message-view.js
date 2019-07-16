@@ -484,9 +484,12 @@ class GmailMessageView {
   }
 
   addAttachmentIcon(iconDescriptor: Object) {
+    const attachmentIcon = new AttachmentIcon();
+
     if (!this._element) {
       console.warn('addDateIcon called on destroyed message'); //eslint-disable-line no-console
-      return;
+      attachmentIcon.destroyed = true;
+      return attachmentIcon;
     }
 
     this._element.setAttribute(
@@ -519,6 +522,7 @@ class GmailMessageView {
         getTooltipNodeWrapper().remove();
         getImgElement().remove();
         added = false;
+        attachmentIcon.destroyed = true;
       }
     });
 
@@ -537,6 +541,7 @@ class GmailMessageView {
             getImgElement().remove();
             getTooltipNodeWrapper().remove();
             added = false;
+            attachmentIcon.destroyed = true;
           }
         } else {
           let attachmentDiv;
@@ -605,12 +610,14 @@ class GmailMessageView {
           if (opts.iconHtml != null) {
             if (attachmentDiv.contains(getImgElement())) {
               getImgElement().remove();
+              attachmentIcon.destroyed = true;
             }
 
             img.innerHTML = opts.iconHtml;
           } else if (currentIconUrl != opts.iconUrl) {
             if (attachmentDiv.contains(getCustomIconWrapper())) {
               getCustomIconWrapper().remove();
+              attachmentIcon.destroyed = true;
             }
 
             img.style.background = opts.iconUrl
@@ -626,6 +633,8 @@ class GmailMessageView {
           }
         }
       });
+
+    return attachmentIcon;
   }
 
   getViewState(): VIEW_STATE {
