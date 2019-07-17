@@ -169,17 +169,12 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
       }
     })
 
-		const icon1 = messageView.addAttachmentIcon({
+		messageView.addAttachmentIcon({
 			iconClass: 'eye_icon',
 			tooltip: '1thing'
     });
 
-
-    icon1.onHover = function() {
-      console.log('hover!!!!')
-    }
-
-    const icon2 = messageView.addAttachmentIcon({
+    messageView.addAttachmentIcon({
       iconHtml: '<div>x</div>',
       iconClass: 'test-custom-class',
       tooltip: 'custom icon html',
@@ -208,7 +203,7 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
     const tooltip2 = document.createElement('div');
     tooltip2.innerHTML = 'ballfjsdkljf';
 
-    const icon3 =messageView.addAttachmentIcon({
+    messageView.addAttachmentIcon({
       iconHtml: '<div>x</div>',
       iconClass: 'test-custom-tooltip',
       tooltip: tooltip1,
@@ -222,7 +217,7 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
       console.log('click on tooltip')
     }
 
-    const icon4 = messageView.addAttachmentIcon({
+    messageView.addAttachmentIcon({
       iconHtml: '<div>Q</div>',
       iconClass: 'test-custom-tooltip',
       tooltip: tooltip3
@@ -230,7 +225,7 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
 
     const stopper = kefirStopper();
 
-    const icon5 = messageView.addAttachmentIcon(Kefir.constant({
+    messageView.addAttachmentIcon(Kefir.constant({
       iconHtml: '<div>y</div>',
       iconClass: 'test-remove-icon',
       tooltip: 'custom icon html',
@@ -242,7 +237,7 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
       console.log('destroy')
     }, 5000);
 
-    const icon6 = messageView.addAttachmentIcon(Kefir.repeat(function() {
+    messageView.addAttachmentIcon(Kefir.repeat(function() {
 			return Kefir.sequentially(2000, [
 				{
 					iconClass: 'eye_icon',
@@ -264,14 +259,7 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
           onClick: alert.bind(window, 'bar')
         }
 			]);
-		}));
+    }));
   });
-
-  console.log('icon1', icon1)
-  console.log('icon2', icon2)
-  console.log('icon3', icon3)
-  console.log('icon4', icon4)
-  console.log('icon5', icon5)
-  console.log('icon6', icon6)
 
 });

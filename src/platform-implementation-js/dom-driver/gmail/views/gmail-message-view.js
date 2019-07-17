@@ -488,7 +488,6 @@ class GmailMessageView {
 
     if (!this._element) {
       console.warn('addDateIcon called on destroyed message'); //eslint-disable-line no-console
-      attachmentIcon.destroyed = true;
       return attachmentIcon;
     }
 
@@ -522,7 +521,6 @@ class GmailMessageView {
         getTooltipNodeWrapper().remove();
         getImgElement().remove();
         added = false;
-        attachmentIcon.destroyed = true;
       }
     });
 
@@ -541,7 +539,6 @@ class GmailMessageView {
             getImgElement().remove();
             getTooltipNodeWrapper().remove();
             added = false;
-            attachmentIcon.destroyed = true;
           }
         } else {
           let attachmentDiv;
@@ -586,12 +583,14 @@ class GmailMessageView {
               event.preventDefault();
               event.stopPropagation();
               img.appendChild(tooltipWrapper);
+              attachmentIcon.emit('tooltipShown');
             };
 
             img.onmouseleave = function(event) {
               event.preventDefault();
               event.stopPropagation();
               img.removeChild(tooltipWrapper);
+              attachmentIcon.emit('tooltipHidden');
             };
 
             img.removeAttribute('data-tooltip');
@@ -610,14 +609,12 @@ class GmailMessageView {
           if (opts.iconHtml != null) {
             if (attachmentDiv.contains(getImgElement())) {
               getImgElement().remove();
-              attachmentIcon.destroyed = true;
             }
 
             img.innerHTML = opts.iconHtml;
           } else if (currentIconUrl != opts.iconUrl) {
             if (attachmentDiv.contains(getCustomIconWrapper())) {
               getCustomIconWrapper().remove();
-              attachmentIcon.destroyed = true;
             }
 
             img.style.background = opts.iconUrl
