@@ -122,6 +122,7 @@ var MessageView = /** @lends MessageView */ {
 
   /**
    * Adds an attachment message's top line near the date.
+   * It returns an instance of AttachmentIcon which can subsribe to events 'tooltipShown' and 'tooltipHidden'.
    * @param {MessageAttachmentIconDescriptor|Stream.<MessageAttachmentIconDescriptor>} iconDescriptor - The options for the icon to add.
    * @return {AttachmentIcon}
    */
