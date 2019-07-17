@@ -122,8 +122,9 @@ var MessageView = /** @lends MessageView */ {
 
   /**
    * Adds an attachment message's top line near the date.
+   * It returns an instance of AttachmentIcon which can subsribe to events 'tooltipShown' and 'tooltipHidden'.
    * @param {MessageAttachmentIconDescriptor|Stream.<MessageAttachmentIconDescriptor>} iconDescriptor - The options for the icon to add.
-   * @return {void}
+   * @return {AttachmentIcon}
    */
   addAttachmentIcon: function() {},
 
@@ -544,4 +545,19 @@ var MessageViewToolbarButtonDescriptor = /** @lends MessageViewToolbarButtonDesc
    * @type {number}
    */
   orderHint: null
+};
+
+/**
+ * @class
+ * Object that represents an AttachmentIcon returned by addAttachmentIcon in message view.
+ */
+var AttachmentIcon = /** @lends AttachmentIcon */ {
+  /**
+   * Fires when mouse enters message attachment icon to show custom tooltip html element.
+   * @event AttachmentIcon#tooltipShown
+   */
+  /**
+   * Fires when mouse leaves message attachment icon to hide custom tooltip html element.
+   * @event AttachmentIcon#tooltipHidden
+   */
 };

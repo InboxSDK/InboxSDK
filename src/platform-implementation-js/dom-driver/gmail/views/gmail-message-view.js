@@ -15,6 +15,7 @@ import GmailAttachmentAreaView from './gmail-attachment-area-view';
 import GmailAttachmentCardView from './gmail-attachment-card-view';
 
 import getUpdatedContact from './gmail-message-view/get-updated-contact';
+import AttachmentIcon from './gmail-message-view/attachment-icon';
 
 import delayAsap from '../../../lib/delay-asap';
 import waitFor from '../../../lib/wait-for';
@@ -483,9 +484,11 @@ class GmailMessageView {
   }
 
   addAttachmentIcon(iconDescriptor: Object) {
+    const attachmentIcon = new AttachmentIcon();
+
     if (!this._element) {
       console.warn('addDateIcon called on destroyed message'); //eslint-disable-line no-console
-      return;
+      return attachmentIcon;
     }
 
     this._element.setAttribute(
@@ -580,12 +583,14 @@ class GmailMessageView {
               event.preventDefault();
               event.stopPropagation();
               img.appendChild(tooltipWrapper);
+              attachmentIcon.emit('tooltipShown');
             };
 
             img.onmouseleave = function(event) {
               event.preventDefault();
               event.stopPropagation();
               img.removeChild(tooltipWrapper);
+              attachmentIcon.emit('tooltipHidden');
             };
 
             img.removeAttribute('data-tooltip');
@@ -625,6 +630,8 @@ class GmailMessageView {
           }
         }
       });
+
+    return attachmentIcon;
   }
 
   getViewState(): VIEW_STATE {

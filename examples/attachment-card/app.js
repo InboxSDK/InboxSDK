@@ -169,9 +169,9 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
       }
     })
 
-		messageView.addAttachmentIcon({
-			iconClass: 'eye_icon',
-			tooltip: '1thing'
+    messageView.addAttachmentIcon({
+      iconClass: 'eye_icon',
+      tooltip: '1thing'
     });
 
     messageView.addAttachmentIcon({
@@ -208,7 +208,10 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
       iconClass: 'test-custom-tooltip',
       tooltip: tooltip1,
       onClick: () => {console.log('click on icon html')}
+    }).on('tooltipShown', () => {
+      console.log('!!! hover')
     });
+
 
     const tooltip3 = document.createElement('div');
     tooltip3.innerHTML = 'fsjdfjskdlf';
@@ -237,7 +240,7 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
       console.log('destroy')
     }, 5000);
 
-		messageView.addAttachmentIcon(Kefir.repeat(function() {
+    messageView.addAttachmentIcon(Kefir.repeat(function() {
 			return Kefir.sequentially(2000, [
 				{
 					iconClass: 'eye_icon',
@@ -259,7 +262,7 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
           onClick: alert.bind(window, 'bar')
         }
 			]);
-		}));
-	});
+    }));
+  });
 
 });
