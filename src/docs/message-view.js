@@ -546,3 +546,18 @@ var MessageViewToolbarButtonDescriptor = /** @lends MessageViewToolbarButtonDesc
    */
   orderHint: null
 };
+
+/**
+ * @class
+ * Object that represents an AttachmentIcon returned by addAttachmentIcon in message view.
+ */
+var AttachmentIcon = /** @lends AttachmentIcon */ {
+  /**
+   * Fires when mouse enters message attachment icon to show custom tooltip html element.
+   * @event AttachmentIcon#tooltipShown
+   */
+  /**
+   * Fires when mouse leaves message attachment icon to hide custom tooltip html element.
+   * @event AttachmentIcon#tooltipHidden
+   */
+};
