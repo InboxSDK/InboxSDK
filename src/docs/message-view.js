@@ -123,7 +123,7 @@ var MessageView = /** @lends MessageView */ {
   /**
    * Adds an attachment message's top line near the date.
    * @param {MessageAttachmentIconDescriptor|Stream.<MessageAttachmentIconDescriptor>} iconDescriptor - The options for the icon to add.
-   * @return {void}
+   * @return {AttachmentIcon}
    */
   addAttachmentIcon: function() {},
 
