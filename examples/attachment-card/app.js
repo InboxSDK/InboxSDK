@@ -203,14 +203,15 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
     const tooltip2 = document.createElement('div');
     tooltip2.innerHTML = 'ballfjsdkljf';
 
-    const icon = messageView.addAttachmentIcon({
+    messageView.addAttachmentIcon({
       iconHtml: '<div>x</div>',
       iconClass: 'test-custom-tooltip',
       tooltip: tooltip1,
       onClick: () => {console.log('click on icon html')}
+    }).on('tooltipShown', () => {
+      console.log('!!! hover')
     });
 
-    console.log('==== icon: ', icon)
 
     const tooltip3 = document.createElement('div');
     tooltip3.innerHTML = 'fsjdfjskdlf';
