@@ -169,9 +169,9 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
       }
     })
 
-		messageView.addAttachmentIcon({
-			iconClass: 'eye_icon',
-			tooltip: '1thing'
+    messageView.addAttachmentIcon({
+      iconClass: 'eye_icon',
+      tooltip: '1thing'
     });
 
     messageView.addAttachmentIcon({
@@ -203,12 +203,14 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
     const tooltip2 = document.createElement('div');
     tooltip2.innerHTML = 'ballfjsdkljf';
 
-    messageView.addAttachmentIcon({
+    const icon = messageView.addAttachmentIcon({
       iconHtml: '<div>x</div>',
       iconClass: 'test-custom-tooltip',
       tooltip: tooltip1,
       onClick: () => {console.log('click on icon html')}
     });
+
+    console.log('==== icon: ', icon)
 
     const tooltip3 = document.createElement('div');
     tooltip3.innerHTML = 'fsjdfjskdlf';
