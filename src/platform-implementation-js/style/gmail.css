@@ -1446,6 +1446,10 @@ table.aKk
 
 /* sidebar */
 
+body.inboxsdk__hasTopMessageBar .bq9 {
+  top: var(--inboxsdk__topMessageBar-height);
+}
+
 .IDMAP_app_sidebar_in_use > div[role='complementary'] {
   position: static !important;
   width: 216px !important;
