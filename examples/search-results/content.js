@@ -33,7 +33,17 @@ InboxSDK.load(1.0, 'search-example').then(function(inboxSDK){
           iconClass: 'test',
           onClick: function(){
             console.log('hi');
-          }
+          },
+          labels: [
+            {
+              backgroundColor: 'grey',
+              foregroundColor: 'white',
+              iconBackgroundColor: 'red',
+              iconHtml: '<div>x</div>',
+              title: 'pipeline name \u00b7 stage name \u00b7 box name',
+              maxWidth: '200px'
+            }
+          ],
         },
         {
           title: 'title',
