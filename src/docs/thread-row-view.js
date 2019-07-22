@@ -151,7 +151,7 @@ var LabelDescriptor = /** @lends LabelDescriptor */ {
   backgroundColor: null,
 
   /**
-   * Max width for the label title. The default max label title width is 90px.
+   * Max width for the label title. The default label title max-width is 90px.
    * ^optional
    * ^default=null
    * @type {string}
