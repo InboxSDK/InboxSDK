@@ -1,0 +1,30 @@
+/* @flow */
+
+import EventEmitter from '../lib/safe-event-emitter';
+import type { ComposeViewDriver } from '../driver-interfaces/compose-view-driver';
+import type { Driver } from '../driver-interfaces/driver';
+
+export type TooltipDescriptor = {
+  el?: ?HTMLElement,
+  title?: ?string,
+  subtitle?: ?string,
+  imageUrl?: ?string,
+  button?: ?{ onClick?: Function, title: string }
+};
+
+type Options = {
+  buttonDescriptor: Object,
+  buttonViewController: Object
+};
+
+declare export default class ComposeButtonView extends EventEmitter {
+  destroyed: boolean;
+
+  constructor(
+    optionsPromise: Promise<?Options>,
+    composeViewDriver: ComposeViewDriver,
+    driver: Driver
+  ): ComposeButtonView;
+  showTooltip(tooltipDescriptor: TooltipDescriptor): void;
+  closeTooltip(): void;
+}
