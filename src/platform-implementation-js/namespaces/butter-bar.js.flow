@@ -1,0 +1,15 @@
+/* @flow */
+
+import Kefir from 'kefir';
+import type { Driver, ButterBarMessage } from '../driver-interfaces/driver';
+
+// documented in src/docs/
+declare export default class ButterBar {
+  constructor(appId: string, driver: Driver): void;
+  showMessage(options: any): ButterBarMessage;
+  showLoading(options?: any): ButterBarMessage;
+  showError(options: any): ButterBarMessage;
+  showSaving(options?: any): any;
+  hideMessage(messageKey: any | string): void;
+  hideGmailMessage(): void;
+}

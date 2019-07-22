@@ -1,38 +1,38 @@
-/* @flow */
-
 import defaults from 'lodash/defaults';
 import sortBy from 'lodash/sortBy';
 import find from 'lodash/find';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import defer from '../../common/defer';
-import getStackTrace from '../../common/get-stack-trace';
 import get from '../../common/get-or-fail';
-import type { Driver } from '../driver-interfaces/driver';
+import { Driver, ButterBarMessage } from '../driver-interfaces/driver';
 
 const ancientComplainTime = 2 * 60 * 1000;
 const dummyPacket = Object.freeze({
   destroy: Object.freeze(function() {})
 });
 
-const memberMap = new WeakMap();
-
-type Message = {
-  destroy(): void
-};
+const memberMap = new WeakMap<
+  ButterBar,
+  {
+    driver: Driver;
+    messagesByKey: Map<string, ButterBarMessage>;
+    queuedPackets: any[];
+  }
+>();
 
 // documented in src/docs/
 export default class ButterBar {
-  constructor(appId: string, driver: Driver) {
-    const members = {};
+  public constructor(appId: string, driver: Driver) {
+    const members = {
+      driver,
+      messagesByKey: new Map(),
+      queuedPackets: []
+    };
     memberMap.set(this, members);
-
-    members.driver = driver;
-    members.messagesByKey = new Map();
-    members.queuedPackets = [];
   }
 
-  showMessage(options: Object): Message {
+  public showMessage(options: any): ButterBarMessage {
     defaults(options, {
       priority: 0,
       time: 15 * 1000,
@@ -105,7 +105,7 @@ export default class ButterBar {
       .takeUntilBy(stopper)
       .filter(() => {
         const queue = butterBarDriver.getSharedMessageQueue();
-        if (!queue[0]) stopper.emit();
+        if (!queue[0]) stopper.value(undefined);
         return queue[0] && queue[0].messageId === messageId;
       })
       .onValue(() => {
@@ -117,7 +117,7 @@ export default class ButterBar {
 
     const message = {
       destroy() {
-        stopper.emit();
+        stopper.value(undefined);
       }
     };
     if (options.messageKey) {
@@ -126,7 +126,7 @@ export default class ButterBar {
     return message;
   }
 
-  showLoading(options: Object = {}): Message {
+  public showLoading(options: any = {}): ButterBarMessage {
     defaults(options, {
       text: 'Loading...',
       priority: -3,
@@ -140,7 +140,7 @@ export default class ButterBar {
     return this.showMessage(options);
   }
 
-  showError(options: Object): Message {
+  public showError(options: any): ButterBarMessage {
     defaults(options, {
       priority: 100,
       className: 'inboxsdk__butterbar_error'
@@ -148,7 +148,7 @@ export default class ButterBar {
     return this.showMessage(options);
   }
 
-  showSaving(options: Object = {}): Object {
+  public showSaving(options: any = {}): any {
     defaults(options, {
       text: 'Saving...',
       confirmationText: 'Saved',
@@ -183,7 +183,7 @@ export default class ButterBar {
     return deferred;
   }
 
-  hideMessage(messageKey: Object | string) {
+  public hideMessage(messageKey: any | string) {
     if (messageKey) {
       const members = get(memberMap, this);
       const message = members.messagesByKey.get(messageKey);
@@ -193,7 +193,7 @@ export default class ButterBar {
     }
   }
 
-  hideGmailMessage() {
+  public hideGmailMessage() {
     const members = get(memberMap, this);
     const butterBarDriver = members.driver.getButterBarDriver();
 

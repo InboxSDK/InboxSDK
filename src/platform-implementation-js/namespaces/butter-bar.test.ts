@@ -1,61 +1,49 @@
-/* @flow */
-
 import _ from 'lodash';
-import sinon from 'sinon';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
-import type { Bus } from 'kefir-bus';
-import delay from 'pdelay';
 
 import ButterBar from './butter-bar';
 
 class MockButterBarDriver {
-  _queue: Array<Object>;
-  _openBus: Bus<any>;
-  _showMessageCount: number;
-  _currentMessage: ?Object;
-  _hideGmailMessageCount: number;
+  private _queue: any[] = [];
+  private _openBus = kefirBus<any, any>();
+  private _showMessageCount: number = 0;
+  private _currentMessage: any = null;
+  private _hideGmailMessageCount: number = 0;
 
-  constructor() {
-    this._queue = [];
-    this._openBus = kefirBus();
-    this._showMessageCount = 0;
-    this._currentMessage = null;
-    this._hideGmailMessageCount = 0;
-  }
-  getNoticeAvailableStream() {
+  public getNoticeAvailableStream() {
     return this._openBus;
   }
-  showMessage(options) {
+  public showMessage(options: any) {
     const num = ++this._showMessageCount;
     this._currentMessage = options;
     return {
       destroy: () => {
         if (num === this._showMessageCount) {
           this._currentMessage = null;
-          this._openBus.emit();
+          this._openBus.value(undefined);
         }
       }
     };
   }
-  getSharedMessageQueue() {
+  public getSharedMessageQueue() {
     return _.cloneDeep(this._queue);
   }
-  setSharedMessageQueue(queue) {
+  public setSharedMessageQueue(queue: any[]) {
     this._queue = _.cloneDeep(queue);
   }
-  hideGmailMessage() {
+  public hideGmailMessage() {
     this._hideGmailMessageCount++;
   }
 }
 
 describe('showMessage', () => {
   it("doesn't fail", () => {
-    const driver = {
+    const driver: any = {
       getButterBarDriver: _.constant(new MockButterBarDriver()),
       getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
     };
-    const butterBar = new ButterBar('test', (driver: any));
+    const butterBar = new ButterBar('test', driver);
     const options = { text: 'a' };
     const message = butterBar.showMessage(options);
     expect(driver.getButterBarDriver()._showMessageCount).toBe(1);
@@ -66,12 +54,12 @@ describe('showMessage', () => {
 
   it('destroys on route change', done => {
     const routeViewDriverStream = kefirBus();
-    const driver = {
+    const driver: any = {
       getButterBarDriver: _.constant(new MockButterBarDriver()),
       getRouteViewDriverStream: _.constant(routeViewDriverStream.toProperty())
     };
-    const butterBar = new ButterBar('test', (driver: any));
-    const message = butterBar.showMessage({ text: 'a' });
+    const butterBar = new ButterBar('test', driver);
+    butterBar.showMessage({ text: 'a' });
     // Route view changes shouldn't be listened to immediately by butterbar.
     // This first route view change shouldn't kill things.
     routeViewDriverStream.emit({});
@@ -89,12 +77,12 @@ describe('showMessage', () => {
   });
 
   it('destroys after given time passes', done => {
-    const driver = {
+    const driver: any = {
       getButterBarDriver: _.constant(new MockButterBarDriver()),
       getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
     };
-    const butterBar = new ButterBar('test', (driver: any));
-    const message = butterBar.showMessage({ text: 'a', time: 1 });
+    const butterBar = new ButterBar('test', driver);
+    butterBar.showMessage({ text: 'a', time: 1 });
 
     expect(driver.getButterBarDriver()._showMessageCount).toBe(1);
     expect(driver.getButterBarDriver()._currentMessage).toBeTruthy();
@@ -107,11 +95,11 @@ describe('showMessage', () => {
   });
 
   it("low priority messages don't interrupt higher priority messages", () => {
-    const driver = {
+    const driver: any = {
       getButterBarDriver: _.constant(new MockButterBarDriver()),
       getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
     };
-    const butterBar = new ButterBar('test', (driver: any));
+    const butterBar = new ButterBar('test', driver);
     const options1 = { text: 'a', priority: 2 };
     const message1 = butterBar.showMessage(options1);
     const options2 = { text: 'b', priority: 1 };
@@ -127,11 +115,11 @@ describe('showMessage', () => {
   });
 
   it('low priority persistent messages queue up', () => {
-    const driver = {
+    const driver: any = {
       getButterBarDriver: _.constant(new MockButterBarDriver()),
       getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
     };
-    const butterBar = new ButterBar('test', (driver: any));
+    const butterBar = new ButterBar('test', driver);
     const options1 = { text: 'a', priority: 2 };
     const message1 = butterBar.showMessage(options1);
     const options2 = { text: 'b', priority: 1, persistent: true };
@@ -163,11 +151,11 @@ describe('showMessage', () => {
   });
 
   it('messages of equal or higher priority interrupt others', () => {
-    const driver = {
+    const driver: any = {
       getButterBarDriver: _.constant(new MockButterBarDriver()),
       getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
     };
-    const butterBar = new ButterBar('test', (driver: any));
+    const butterBar = new ButterBar('test', driver);
 
     const options1 = { text: 'a', priority: 2 };
     const message1 = butterBar.showMessage(options1);
@@ -192,11 +180,11 @@ describe('showMessage', () => {
   });
 
   it("interrupted messages come back if they're persistent", () => {
-    const driver = {
+    const driver: any = {
       getButterBarDriver: _.constant(new MockButterBarDriver()),
       getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
     };
-    const butterBar = new ButterBar('test', (driver: any));
+    const butterBar = new ButterBar('test', driver);
 
     const options1 = { text: 'a', priority: 2, persistent: true };
     const message1 = butterBar.showMessage(options1);
@@ -224,11 +212,11 @@ describe('showMessage', () => {
 
 describe('showSaving', () => {
   it('resolves', done => {
-    const driver = {
+    const driver: any = {
       getButterBarDriver: _.constant(new MockButterBarDriver()),
       getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
     };
-    const butterBar = new ButterBar('test', (driver: any));
+    const butterBar = new ButterBar('test', driver);
 
     expect(driver.getButterBarDriver()._showMessageCount).toBe(0);
 
@@ -249,11 +237,11 @@ describe('showSaving', () => {
   });
 
   it('respects showConfirmation', done => {
-    const driver = {
+    const driver: any = {
       getButterBarDriver: _.constant(new MockButterBarDriver()),
       getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
     };
-    const butterBar = new ButterBar('test', (driver: any));
+    const butterBar = new ButterBar('test', driver);
 
     expect(driver.getButterBarDriver()._showMessageCount).toBe(0);
 
@@ -273,11 +261,11 @@ describe('showSaving', () => {
   });
 
   it('rejects', done => {
-    const driver = {
+    const driver: any = {
       getButterBarDriver: _.constant(new MockButterBarDriver()),
       getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
     };
-    const butterBar = new ButterBar('test', (driver: any));
+    const butterBar = new ButterBar('test', driver);
 
     expect(driver.getButterBarDriver()._showMessageCount).toBe(0);
 
@@ -297,11 +285,11 @@ describe('showSaving', () => {
   });
 
   it('has a high priority saved message', done => {
-    const driver = {
+    const driver: any = {
       getButterBarDriver: _.constant(new MockButterBarDriver()),
       getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
     };
-    const butterBar = new ButterBar('test', (driver: any));
+    const butterBar = new ButterBar('test', driver);
 
     expect(driver.getButterBarDriver()._showMessageCount).toBe(0);
 
@@ -332,14 +320,14 @@ describe('showSaving', () => {
 
 describe('hideMessage', () => {
   it('works', () => {
-    const driver = {
+    const driver: any = {
       getButterBarDriver: _.constant(new MockButterBarDriver()),
       getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
     };
-    const butterBar = new ButterBar('test', (driver: any));
+    const butterBar = new ButterBar('test', driver);
 
     const options1 = { text: 'a', messageKey: {}, priority: 100 };
-    const message1 = butterBar.showMessage(options1);
+    butterBar.showMessage(options1);
 
     expect(driver.getButterBarDriver()._showMessageCount).toBe(1);
     expect(driver.getButterBarDriver()._currentMessage).toBe(options1);
@@ -358,11 +346,11 @@ describe('hideMessage', () => {
 
 describe('hideGmailMessage', () => {
   it('calls driver', () => {
-    const driver = {
+    const driver: any = {
       getButterBarDriver: _.constant(new MockButterBarDriver()),
       getRouteViewDriverStream: _.constant(Kefir.never().toProperty())
     };
-    const butterBar = new ButterBar('test', (driver: any));
+    const butterBar = new ButterBar('test', driver);
 
     expect(driver.getButterBarDriver()._hideGmailMessageCount).toBe(0);
     butterBar.hideGmailMessage();
