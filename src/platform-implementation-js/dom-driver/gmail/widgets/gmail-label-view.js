@@ -42,7 +42,8 @@ class GmailLabelView {
     labelDescriptor = Object.assign(
       {
         foregroundColor: 'rgb(102, 102, 102)', //dark grey
-        backgroundColor: 'rgb(221, 221, 221)' //light grey
+        backgroundColor: 'rgb(221, 221, 221)', //light grey
+        maxWidth: '90px'
       },
       labelDescriptor
     );
@@ -73,8 +74,17 @@ class GmailLabelView {
     this._updateForegroundColor(labelDescriptor.foregroundColor);
     this._updateIconBackgroundColor(labelDescriptor.iconBackgroundColor);
     this._updateTitle(labelDescriptor.title);
+    this._updateTextMaxWidth(labelDescriptor.maxWidth);
 
     this._labelDescriptor = labelDescriptor;
+  }
+
+  _updateTextMaxWidth(maxWidth: string) {
+    if (this._labelDescriptor.maxWidth === maxWidth) {
+      return;
+    }
+
+    querySelector(this._element, '.av').style.maxWidth = maxWidth;
   }
 
   _updateBackgroundColor(backgroundColor: string) {

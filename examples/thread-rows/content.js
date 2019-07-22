@@ -36,7 +36,8 @@ InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
       {title:'A'},
       {title:'B', foregroundColor: 'blue', iconUrl: 'https://www.streak.com/build/images/pipelineIconMask.png'},
       {title:'C', foregroundColor: 'red', iconClass: 'test_icon_thing'},
-      {title:'D', iconHtml: '<div>x</div>'}
+      {title:'D', iconHtml: '<div>x</div>'},
+      { title: 'pipeline name \u00b7 stage name \u00b7 box name', foregroundColor: 'red', iconClass: 'test_icon_thing', maxWidth: '200px'},
     ]).toProperty({title:'0'}));
     threadRowView.addLabel({
       title:'a'+(i++),
@@ -51,7 +52,8 @@ InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
       iconUrl: 'https://www.streak.com/build/images/pipelineIconMask.png',
       backgroundColor: 'white',
       foregroundColor: 'blue',
-      iconBackgroundColor: 'green'
+      iconBackgroundColor: 'green',
+      maxWidth: '200px'
     });
 
     const iconHtml = "<div style='width: 56px;height: 4px;background: aqua;'></div>"
