@@ -46,6 +46,14 @@ InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
       iconBackgroundColor: 'green'
     });
 
+    threadRowView.addLabel({
+      title:'pipeline name \u00b7 stage name \u00b7 box name',
+      iconUrl: 'https://www.streak.com/build/images/pipelineIconMask.png',
+      backgroundColor: 'white',
+      foregroundColor: 'blue',
+      iconBackgroundColor: 'green'
+    });
+
     const iconHtml = "<div style='width: 56px;height: 4px;background: aqua;'></div>"
 
     threadRowView.addAttachmentIcon({

@@ -2300,7 +2300,8 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_label_icon {
 
 .inboxsdk__resultsSection .av,
 .inboxsdk__thread_row_label .av {
-  max-width: 90px;
+  /* max width allow about 25 chars to be shown */
+  max-width: 212px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
