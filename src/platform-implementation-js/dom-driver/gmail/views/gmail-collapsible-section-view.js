@@ -891,6 +891,7 @@ function _getRowHTML(result) {
 function _getLabelHTML(label) {
   const backgroundColor = label.backgroundColor || 'rgb(194, 194, 194)'; //grey
   const foregroundColor = label.foregroundColor || 'rgb(255, 255, 255)'; //white
+  const maxWidth = label.maxWidth || '90px';
 
   const retArray = [
     autoHtml`<div class="ar as" data-tooltip="${label.title}">
@@ -929,7 +930,7 @@ function _getLabelHTML(label) {
 
   retArray.push(
     autoHtml`
-          <div class="av" style="color: ${foregroundColor}">
+          <div class="av" style="color: ${foregroundColor}; max-width: ${maxWidth}">
             ${label.title}
           </div>
         </div>
