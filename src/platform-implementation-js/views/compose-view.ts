@@ -1,4 +1,3 @@
-/* @flow */
 /* eslint-disable no-console */
 
 import EventEmitter from '../lib/safe-event-emitter';
@@ -8,17 +7,22 @@ import * as ud from 'ud';
 import get from '../../common/get-or-fail';
 import ComposeButtonView from './compose-button-view';
 
-import type Membrane from '../lib/Membrane';
-import type { Driver } from '../driver-interfaces/driver';
-import type { ComposeViewDriver } from '../driver-interfaces/compose-view-driver';
+import Membrane from '../lib/Membrane';
+import { Driver } from '../driver-interfaces/driver';
+import {
+  ComposeViewDriver,
+  ComposeNotice,
+  StatusBar,
+  Contact
+} from '../driver-interfaces/compose-view-driver';
 
 const memberMap = ud.defonce(module, () => new WeakMap());
 
 // documented in src/docs/
-class ComposeView extends EventEmitter {
-  destroyed: boolean = false;
+export default class ComposeView extends EventEmitter {
+  public destroyed: boolean = false;
 
-  constructor(
+  public constructor(
     driver: Driver,
     composeViewImplementation: ComposeViewDriver,
     membrane: Membrane
@@ -32,7 +36,7 @@ class ComposeView extends EventEmitter {
     };
     memberMap.set(this, members);
 
-    this.on('newListener', function(eventName) {
+    this.on('newListener', eventName => {
       if (eventName === 'close') {
         driver
           .getLogger()
@@ -75,9 +79,9 @@ class ComposeView extends EventEmitter {
     });
   }
 
-  addButton(buttonDescriptor: Object) {
+  public addButton(buttonDescriptor: any) {
     const members = get(memberMap, this);
-    const buttonDescriptorStream = kefirCast((Kefir: any), buttonDescriptor);
+    const buttonDescriptorStream = kefirCast(Kefir, buttonDescriptor);
 
     const optionsPromise = members.composeViewImplementation.addButton(
       buttonDescriptorStream,
@@ -103,30 +107,30 @@ class ComposeView extends EventEmitter {
 	}
 	*/
 
-  addComposeNotice(composeNoticeDescriptor?: {
-    height?: number,
-    orderHint?: number
-  }) {
+  public addComposeNotice(composeNoticeDescriptor?: {
+    height?: number;
+    orderHint?: number;
+  }): ComposeNotice {
     return get(memberMap, this).composeViewImplementation.addComposeNotice(
       composeNoticeDescriptor
     );
   }
 
-  addStatusBar(statusBarDescriptor?: {
-    height?: number,
-    orderHint?: number,
-    addAboveNativeStatusBar?: boolean
-  }) {
+  public addStatusBar(statusBarDescriptor?: {
+    height?: number;
+    orderHint?: number;
+    addAboveNativeStatusBar?: boolean;
+  }): StatusBar {
     return get(memberMap, this).composeViewImplementation.addStatusBar(
       statusBarDescriptor
     );
   }
 
-  hideNativeStatusBar(): () => void {
+  public hideNativeStatusBar(): () => void {
     return get(memberMap, this).composeViewImplementation.hideNativeStatusBar();
   }
 
-  addRecipientRow(options: ?Object) {
+  public addRecipientRow(options: any): { destroy(): void } {
     return {
       destroy: get(memberMap, this).composeViewImplementation.addRecipientRow(
         kefirCast(Kefir, options)
@@ -134,56 +138,56 @@ class ComposeView extends EventEmitter {
     };
   }
 
-  forceRecipientRowsOpen(): () => void {
+  public forceRecipientRowsOpen(): () => void {
     return get(
       memberMap,
       this
     ).composeViewImplementation.forceRecipientRowsOpen();
   }
 
-  hideNativeRecipientRows(): () => void {
+  public hideNativeRecipientRows(): () => void {
     return get(
       memberMap,
       this
     ).composeViewImplementation.hideNativeRecipientRows();
   }
 
-  hideRecipientArea(): () => void {
+  public hideRecipientArea(): () => void {
     return get(memberMap, this).composeViewImplementation.hideRecipientArea();
   }
 
-  close() {
+  public close() {
     get(memberMap, this).composeViewImplementation.close();
   }
 
-  send(
+  public send(
     { sendAndArchive }: { sendAndArchive: boolean } = { sendAndArchive: false }
   ) {
     get(memberMap, this).composeViewImplementation.send({ sendAndArchive });
   }
 
-  discard() {
+  public discard() {
     get(memberMap, this).composeViewImplementation.discard();
   }
 
-  getMetadataForm() {
+  public getMetadataForm(): HTMLElement {
     return get(
       memberMap,
       this
     ).composeViewImplementation.getMetadataFormElement();
   }
 
-  getSubjectInput() {
+  public getSubjectInput(): HTMLInputElement {
     return get(memberMap, this).composeViewImplementation.getSubjectInput();
   }
 
-  getBodyElement() {
+  public getBodyElement(): HTMLElement {
     return get(memberMap, this).composeViewImplementation.getBodyElement();
   }
 
   // NOT DOCUMENTED BECAUSE NOT SURE IF API USERS NEED THIS
   // TODO remove?
-  getComposeID() {
+  public getComposeID(): string {
     const { driver, composeViewImplementation } = get(memberMap, this);
     driver.getLogger().deprecationWarning('composeView.getComposeID');
     if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
@@ -192,12 +196,12 @@ class ComposeView extends EventEmitter {
     return composeViewImplementation.getComposeID();
   }
 
-  getInitialMessageID() {
+  public getInitialMessageID(): string {
     return get(memberMap, this).composeViewImplementation.getInitialMessageID();
   }
 
   /* deprecated */
-  getMessageID() {
+  public getMessageID(): string {
     const { driver, composeViewImplementation } = get(memberMap, this);
     driver
       .getLogger()
@@ -208,69 +212,73 @@ class ComposeView extends EventEmitter {
     return composeViewImplementation.getMessageID();
   }
 
-  getThreadID() {
+  public getThreadID(): string {
     return get(memberMap, this).composeViewImplementation.getThreadID();
   }
 
-  getDraftID() {
+  public getDraftID(): Promise<string | null | void> {
     return get(memberMap, this).composeViewImplementation.getDraftID();
   }
 
-  getCurrentDraftID() {
+  public getCurrentDraftID(): Promise<string | null | void> {
     return get(memberMap, this).composeViewImplementation.getCurrentDraftID();
   }
 
-  getHTMLContent() {
+  public getHTMLContent(): string {
     return get(memberMap, this).composeViewImplementation.getHTMLContent();
   }
 
-  getSelectedBodyHTML() {
+  public getSelectedBodyHTML(): string | null | void {
     return (
       get(memberMap, this).composeViewImplementation.getSelectedBodyHTML() || ''
     );
   }
 
-  getSelectedBodyText() {
+  public getSelectedBodyText(): string | null | void {
     return (
       get(memberMap, this).composeViewImplementation.getSelectedBodyText() || ''
     );
   }
 
-  getSubject() {
+  public getSubject(): string {
     return get(memberMap, this).composeViewImplementation.getSubject();
   }
 
-  getTextContent() {
+  public getTextContent(): string {
     return get(memberMap, this).composeViewImplementation.getTextContent();
   }
 
-  getToRecipients() {
+  public getToRecipients(): Contact[] {
     return get(memberMap, this).composeViewImplementation.getToRecipients();
   }
 
-  getCcRecipients() {
+  public getCcRecipients(): Contact[] {
     return get(memberMap, this).composeViewImplementation.getCcRecipients();
   }
 
-  getBccRecipients() {
+  public getBccRecipients(): Contact[] {
     return get(memberMap, this).composeViewImplementation.getBccRecipients();
   }
 
-  insertTextIntoBodyAtCursor(text: string) {
+  public insertTextIntoBodyAtCursor(text: string): HTMLElement | null | void {
     return get(
       memberMap,
       this
     ).composeViewImplementation.insertBodyTextAtCursor(text);
   }
 
-  insertHTMLIntoBodyAtCursor(html: string) {
+  public insertHTMLIntoBodyAtCursor(html: string): HTMLElement | null | void {
     return get(
       memberMap,
       this
     ).composeViewImplementation.insertBodyHTMLAtCursor(html);
   }
 
-  insertLinkChipIntoBodyAtCursor(text: string, url: string, iconUrl: string) {
+  public insertLinkChipIntoBodyAtCursor(
+    text: string,
+    url: string,
+    iconUrl: string
+  ): HTMLElement | void {
     if (
       !iconUrl ||
       typeof iconUrl !== 'string' ||
@@ -290,48 +298,51 @@ class ComposeView extends EventEmitter {
     });
   }
 
-  insertLinkIntoBodyAtCursor(text: string, url: string) {
+  public insertLinkIntoBodyAtCursor(
+    text: string,
+    url: string
+  ): HTMLElement | null | void {
     return get(memberMap, this).composeViewImplementation.insertLinkIntoBody(
       text,
       url
     );
   }
 
-  isForward() {
+  public isForward(): boolean {
     return get(memberMap, this).composeViewImplementation.isForward();
   }
 
-  isInlineReplyForm() {
+  public isInlineReplyForm(): boolean {
     return get(memberMap, this).composeViewImplementation.isInlineReplyForm();
   }
 
-  isFullscreen() {
+  public isFullscreen(): boolean {
     return get(memberMap, this).composeViewImplementation.isFullscreen();
   }
 
-  setFullscreen(fullscreen: boolean) {
+  public setFullscreen(fullscreen: boolean) {
     get(memberMap, this).composeViewImplementation.setFullscreen(fullscreen);
   }
 
-  isMinimized() {
+  public isMinimized(): boolean {
     return get(memberMap, this).composeViewImplementation.isMinimized();
   }
 
-  setMinimized(minimized: boolean) {
+  public setMinimized(minimized: boolean) {
     get(memberMap, this).composeViewImplementation.setMinimized(minimized);
   }
 
-  setTitleBarColor(color: string): () => void {
+  public setTitleBarColor(color: string): () => void {
     return get(memberMap, this).composeViewImplementation.setTitleBarColor(
       color
     );
   }
 
-  setTitleBarText(text: string): () => void {
+  public setTitleBarText(text: string): () => void {
     return get(memberMap, this).composeViewImplementation.setTitleBarText(text);
   }
 
-  async popOut(): Promise<ComposeView> {
+  public async popOut(): Promise<ComposeView> {
     const nextComposeViewDriverPromise = get(
       memberMap,
       this
@@ -341,54 +352,54 @@ class ComposeView extends EventEmitter {
     return get(memberMap, this).membrane.get(nextComposeViewDriver);
   }
 
-  isReply() {
+  public isReply(): boolean {
     return get(memberMap, this).composeViewImplementation.isReply();
   }
 
-  setToRecipients(emails: string[]) {
+  public setToRecipients(emails: string[]) {
     get(memberMap, this).composeViewImplementation.setToRecipients(emails);
   }
 
-  setCcRecipients(emails: string[]) {
+  public setCcRecipients(emails: string[]) {
     get(memberMap, this).composeViewImplementation.setCcRecipients(emails);
   }
 
-  setBccRecipients(emails: string[]) {
+  public setBccRecipients(emails: string[]) {
     get(memberMap, this).composeViewImplementation.setBccRecipients(emails);
   }
 
-  getFromContact(): Contact {
+  public getFromContact(): Contact {
     return get(memberMap, this).composeViewImplementation.getFromContact();
   }
 
-  getFromContactChoices(): Contact[] {
+  public getFromContactChoices(): Contact[] {
     return get(
       memberMap,
       this
     ).composeViewImplementation.getFromContactChoices();
   }
 
-  setFromEmail(email: string) {
+  public setFromEmail(email: string) {
     get(memberMap, this).composeViewImplementation.setFromEmail(email);
   }
 
-  setSubject(text: string) {
+  public setSubject(text: string) {
     get(memberMap, this).composeViewImplementation.setSubject(text);
   }
 
-  setBodyHTML(html: string) {
+  public setBodyHTML(html: string) {
     get(memberMap, this).composeViewImplementation.setBodyHTML(html);
   }
 
-  setBodyText(text: string) {
+  public setBodyText(text: string) {
     get(memberMap, this).composeViewImplementation.setBodyText(text);
   }
 
-  async attachFiles(files: Blob[]): Promise<void> {
+  public async attachFiles(files: Blob[]): Promise<void> {
     if (files.length === 0) {
       return;
     }
-    if (!(files[0] instanceof global.Blob)) {
+    if (!(files[0] instanceof Blob)) {
       throw new Error('parameter must be an array of Blob objects');
     }
     return get(memberMap, this).composeViewImplementation.attachFiles(
@@ -396,11 +407,11 @@ class ComposeView extends EventEmitter {
     );
   }
 
-  async attachInlineFiles(files: Blob[]): Promise<void> {
+  public async attachInlineFiles(files: Blob[]): Promise<void> {
     if (files.length === 0) {
       return;
     }
-    if (!(files[0] instanceof global.Blob)) {
+    if (!(files[0] instanceof Blob)) {
       throw new Error('parameter must be an array of Blob objects');
     }
     return get(memberMap, this).composeViewImplementation.attachInlineFiles(
@@ -409,7 +420,7 @@ class ComposeView extends EventEmitter {
   }
 
   // Old alias that we should keep around until we're sure no one is using it.
-  dragFilesIntoCompose(files: Blob[]): Promise<void> {
+  public dragFilesIntoCompose(files: Blob[]): Promise<void> {
     const { driver } = get(memberMap, this);
     driver
       .getLogger()
@@ -424,36 +435,36 @@ class ComposeView extends EventEmitter {
   }
 
   //NOT DOCUMENTED BECAUSE STREAK-ONLY FOR NOW
-  getElement() {
+  public getElement(): HTMLElement {
     return get(memberMap, this).composeViewImplementation.getElement();
   }
 
-  registerRequestModifier(
-    modifier: (composeParams: { body: string }) =>
-      | { body: string }
-      | Promise<{ body: string }>
+  public registerRequestModifier(
+    modifier: (composeParams: {
+      body: string;
+    }) => { body: string } | Promise<{ body: string }>
   ) {
     get(memberMap, this).composeViewImplementation.registerRequestModifier(
       modifier
     );
   }
 
-  replaceSendButton({ el }: { el: HTMLElement }): () => void {
+  public replaceSendButton({ el }: { el: HTMLElement }): () => void {
     return get(memberMap, this).composeViewImplementation.replaceSendButton(el);
   }
 
-  hideDiscardButton(): () => void {
+  public hideDiscardButton(): () => void {
     return get(memberMap, this).composeViewImplementation.hideDiscardButton();
   }
 
-  ensureFormattingToolbarIsHidden() {
+  public ensureFormattingToolbarIsHidden() {
     get(
       memberMap,
       this
     ).composeViewImplementation.ensureFormattingToolbarIsHidden();
   }
 
-  ensureAppButtonToolbarsAreClosed() {
+  public ensureAppButtonToolbarsAreClosed() {
     get(
       memberMap,
       this
@@ -461,17 +472,14 @@ class ComposeView extends EventEmitter {
   }
 
   // TODO remove
-  overrideEditSubject() {
+  public overrideEditSubject() {
     const { driver, composeViewImplementation } = get(memberMap, this);
     driver.getLogger().deprecationWarning('composeView.overrideEditSubject');
     if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
       throw new Error('This method was discontinued after API version 1');
     }
-    if (
-      typeof (composeViewImplementation: any).overrideEditSubject === 'function'
-    )
-      (composeViewImplementation: any).overrideEditSubject();
+    if (typeof composeViewImplementation.overrideEditSubject === 'function') {
+      composeViewImplementation.overrideEditSubject();
+    }
   }
 }
-
-export default ud.defn(module, ComposeView);
