@@ -96,7 +96,7 @@
     "jsdoc": "~3.4.3",
     "kefir": "^3.8.3",
     "kefir-bus": "^2.2.0",
-    "kefir-cast": "^3.2.2",
+    "kefir-cast": "^3.3.0",
     "kefir-stopper": "^2.1.0",
     "lazypipe": "^1.0.1",
     "live-set": "^1.0.0",
