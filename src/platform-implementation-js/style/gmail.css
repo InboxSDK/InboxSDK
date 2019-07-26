@@ -1611,11 +1611,11 @@ body.inboxsdk__gmailv1css
 }
 
 .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
-  margin: 16px 16px 8px 16px;
+  margin: 18px 18px 10px 18px;
   border: none;
   background: #fff;
-  height: 24px;
-  width: 24px;
+  height: 20px;
+  width: 20px;
   overflow: hidden;
   padding: 0;
   cursor: pointer;
@@ -1623,7 +1623,7 @@ body.inboxsdk__gmailv1css
 }
 
 .IDMAP_sidebar_iconArea.sidebar_global_iconArea .inboxsdk__button_icon {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 body:not(.inboxsdk__gmailv1css) .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
@@ -1640,10 +1640,10 @@ body:not(.inboxsdk__gmailv1css)
   content: '';
   background: #f1f3f4;
   position: absolute;
-  top: -8px;
-  left: -8px;
-  right: -8px;
-  bottom: -8px;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
   border-radius: 50%;
   z-index: 0;
 }
@@ -1660,8 +1660,8 @@ body.inboxsdk__gmailv1css .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
 }
 
 .IDMAP_sidebar_iconArea .inboxsdk__button_iconImg {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   margin-top: 0px;
 }
 
