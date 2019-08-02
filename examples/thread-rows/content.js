@@ -13,6 +13,10 @@ InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
     });
   });
 
+  inboxSDK.Lists.registerThreadRowViewSelectionHandler(() => {
+    console.log('selected threads', inboxSDK.Lists.getSelectedThreadRowViews());
+  });
+
   inboxSDK.Lists.registerThreadRowViewHandler(function(threadRowView) {
     var threadId = threadRowView.getThreadID();
     //console.log('threadRowView', threadId, threadRowView.getThreadIDIfStable(), threadRowView.getVisibleDraftCount(), threadRowView.getVisibleMessageCount(), threadRowView.getSubject());
@@ -31,7 +35,9 @@ InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
     threadRowView.addLabel(Kefir.repeatedly(5000, [
       {title:'A'},
       {title:'B', foregroundColor: 'blue', iconUrl: 'https://www.streak.com/build/images/pipelineIconMask.png'},
-      {title:'C', foregroundColor: 'red', iconClass: 'test_icon_thing'}
+      {title:'C', foregroundColor: 'red', iconClass: 'test_icon_thing'},
+      {title:'D', iconHtml: '<div>x</div>'},
+      { title: 'pipeline name \u00b7 stage name \u00b7 box name', foregroundColor: 'red', iconClass: 'test_icon_thing', maxWidth: '200px'},
     ]).toProperty({title:'0'}));
     threadRowView.addLabel({
       title:'a'+(i++),
@@ -40,6 +46,24 @@ InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
       foregroundColor: 'blue',
       iconBackgroundColor: 'green'
     });
+
+    threadRowView.addLabel({
+      title:'pipeline name \u00b7 stage name \u00b7 box name',
+      iconUrl: 'https://www.streak.com/build/images/pipelineIconMask.png',
+      backgroundColor: 'white',
+      foregroundColor: 'blue',
+      iconBackgroundColor: 'green',
+      maxWidth: '200px'
+    });
+
+    const iconHtml = "<div style='width: 56px;height: 4px;background: aqua;'></div>"
+
+    threadRowView.addAttachmentIcon({
+      iconHtml,
+      iconClass: 'icon-html-class',
+      title: 'icon html'
+    })
+
     threadRowView.addAttachmentIcon(Kefir.repeatedly(2000, [
       {
         iconClass: 'test_icon_thing',
@@ -48,6 +72,11 @@ InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
       {
         iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
         title: 'blah blah'
+      },
+      {
+        iconHtml: '<div>x</div>',
+        iconClass: 'icon-html-class',
+        title: 'icon html'
       }
     ]));
     threadRowView.replaceDraftLabel(Kefir.repeatedly(1000, [

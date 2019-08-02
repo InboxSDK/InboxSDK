@@ -13,6 +13,13 @@ var ThreadView = /** @lends ThreadView */ {
   addNoticeBar: function() {},
 
   /**
+   * Inserts a "label" element alongside the thread subject and all native labels.
+   * The element has no default styling.  Adding your own is recommended.
+   * @return {SimpleElementView}
+   */
+  addLabel: function() {},
+
+  /**
    * Inserts a content panel into the sidebar of a thread view. A content panel
    * simply displays your content to the user, typically in the form of a
    * sidebar. ThreadViews can have multiple content panels added to them and

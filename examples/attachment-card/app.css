@@ -9,3 +9,15 @@
   -webkit-mask-position: center;
   background-color: rgb(253,148,39);
 }
+
+.test-custom-class {
+  background-color: red;
+}
+
+.test-remove-icon {
+  background-color: blue;
+}
+
+.test-custom-tooltip {
+  background-color: aqua;
+}

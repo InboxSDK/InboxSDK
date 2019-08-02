@@ -1156,6 +1156,10 @@ class InboxDriver {
   closeOpenThread() {
     simulateKey((document.body: any), 27, 27);
   }
+
+  registerThreadRowViewSelectionHandler(handler: () => any): () => void {
+    return () => {};
+  }
 }
 
 export default defn(module, InboxDriver);

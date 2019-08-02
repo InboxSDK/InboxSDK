@@ -151,6 +151,22 @@ var LabelDescriptor = /** @lends LabelDescriptor */ {
   backgroundColor: null,
 
   /**
+   * Max width for the label title. The default label title max-width is 90px.
+   * ^optional
+   * ^default=null
+   * @type {string}
+   */
+  maxWidth: null,
+
+  /**
+   * Html for the icon to show on the label. This property can't be used with iconUrl or iconClass.
+   * ^optional
+   * ^default=null
+   * @type {string}
+   */
+  iconHtml: null,
+
+  /**
    * URL for the icon to show on the label. Should be a local extension file URL or a HTTPS URL.
    * @type {string}
    */
@@ -305,6 +321,14 @@ var ThreadRowAttachmentIconDescriptor = /** @lends ThreadRowAttachmentIconDescri
    * @type {string}
    */
   iconClass: null,
+
+  /**
+   * An optional Html for the icon to show. This property can not be used with iconUrl.
+   * ^optional
+   * ^default=null
+   * @type {string}
+   */
+  iconHtml: null,
 
   /**
    * The tooltip text to show when the user hovers over the icon.

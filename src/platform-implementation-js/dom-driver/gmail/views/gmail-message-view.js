@@ -15,6 +15,7 @@ import GmailAttachmentAreaView from './gmail-attachment-area-view';
 import GmailAttachmentCardView from './gmail-attachment-card-view';
 
 import getUpdatedContact from './gmail-message-view/get-updated-contact';
+import AttachmentIcon from './gmail-message-view/attachment-icon';
 
 import delayAsap from '../../../lib/delay-asap';
 import waitFor from '../../../lib/wait-for';
@@ -26,6 +27,7 @@ import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 
 import censorHTMLtree from '../../../../common/censorHTMLtree';
 import findParent from '../../../../common/find-parent';
+import reemitClickEvent from '../../../lib/dom/reemitClickEventForReact';
 
 import type GmailDriver from '../gmail-driver';
 import type GmailThreadView from './gmail-thread-view';
@@ -482,10 +484,17 @@ class GmailMessageView {
   }
 
   addAttachmentIcon(iconDescriptor: Object) {
+    const attachmentIcon = new AttachmentIcon();
+
     if (!this._element) {
       console.warn('addDateIcon called on destroyed message'); //eslint-disable-line no-console
-      return;
+      return attachmentIcon;
     }
+
+    this._element.setAttribute(
+      'inboxsdk__message_added_attachment_icon',
+      'true'
+    );
 
     const getImgElement = once(() => {
       const img = document.createElement('img');
@@ -493,26 +502,55 @@ class GmailMessageView {
       return img;
     });
 
+    const getCustomIconWrapper = once(() => {
+      const div = document.createElement('div');
+      return div;
+    });
+
+    const getTooltipNodeWrapper = once(() => {
+      const div = document.createElement('div');
+      return div;
+    });
+
     let added = false;
     let currentIconUrl = null;
 
     this._stopper.onValue(() => {
       if (added) {
+        getCustomIconWrapper().remove();
+        getTooltipNodeWrapper().remove();
         getImgElement().remove();
         added = false;
       }
     });
 
     kefirCast((Kefir: any), iconDescriptor)
+      .combine(
+        this._eventStream
+          .filter(event => event.eventName === 'viewStateChange')
+          .toProperty(() => null),
+        opts => opts
+      )
       .takeUntilBy(this._stopper)
       .onValue(opts => {
         if (!opts) {
           if (added) {
+            getCustomIconWrapper().remove();
             getImgElement().remove();
+            getTooltipNodeWrapper().remove();
             added = false;
           }
         } else {
-          const img = getImgElement();
+          let attachmentDiv;
+
+          if (this.getViewState() === 'COLLAPSED') {
+            attachmentDiv = querySelector(this._element, '.adf.ads td.gH span');
+          } else {
+            attachmentDiv = querySelector(this._element, 'td.gH div.gK span');
+          }
+
+          const img =
+            opts.iconHtml != null ? getCustomIconWrapper() : getImgElement();
 
           const onClick = opts.onClick;
           if (onClick) {
@@ -527,31 +565,73 @@ class GmailMessageView {
             img.style.cursor = '';
           }
 
-          if (opts.tooltip) {
+          if (
+            opts.tooltip &&
+            (typeof opts.tooltip == 'object' &&
+              opts.tooltip instanceof HTMLElement)
+          ) {
+            const tooltipWrapper = getTooltipNodeWrapper();
+            tooltipWrapper.className =
+              'inboxsdk__message_attachment_tooltipWrapper';
+            tooltipWrapper.onclick = function(event) {
+              event.stopPropagation();
+              reemitClickEvent(event);
+            };
+            tooltipWrapper.appendChild(opts.tooltip);
+
+            img.onmouseenter = function(event) {
+              event.preventDefault();
+              event.stopPropagation();
+              img.appendChild(tooltipWrapper);
+              attachmentIcon.emit('tooltipShown');
+            };
+
+            img.onmouseleave = function(event) {
+              event.preventDefault();
+              event.stopPropagation();
+              img.removeChild(tooltipWrapper);
+              attachmentIcon.emit('tooltipHidden');
+            };
+
+            img.removeAttribute('data-tooltip');
+          } else if (opts.tooltip && typeof opts.tooltip == 'string') {
             img.setAttribute('data-tooltip', opts.tooltip);
           } else {
             img.removeAttribute('data-tooltip');
           }
 
           img.className =
-            'inboxsdk__message_attachment_icon ' + (opts.iconClass || '');
-          if (currentIconUrl != opts.iconUrl) {
+            opts.iconHtml != null
+              ? `inboxsdk__message_attachment_iconWrapper ${opts.iconClass ||
+                  ''}`
+              : 'inboxsdk__message_attachment_icon ' + (opts.iconClass || '');
+
+          if (opts.iconHtml != null) {
+            if (attachmentDiv.contains(getImgElement())) {
+              getImgElement().remove();
+            }
+
+            img.innerHTML = opts.iconHtml;
+          } else if (currentIconUrl != opts.iconUrl) {
+            if (attachmentDiv.contains(getCustomIconWrapper())) {
+              getCustomIconWrapper().remove();
+            }
+
             img.style.background = opts.iconUrl
               ? 'url(' + opts.iconUrl + ') no-repeat 0 0'
               : '';
+
             currentIconUrl = opts.iconUrl;
           }
 
-          const attachmentDiv = querySelector(
-            this._element,
-            'td.gH div.gK span'
-          );
           if (!attachmentDiv.contains(img)) {
             attachmentDiv.appendChild(img);
             added = true;
           }
         }
       });
+
+    return attachmentIcon;
   }
 
   getViewState(): VIEW_STATE {
@@ -610,7 +690,10 @@ class GmailMessageView {
           let oldValue;
           let newValue;
 
-          if (mutationOldValue.indexOf('kQ') > -1) {
+          if (
+            mutationOldValue.indexOf('kQ') > -1 ||
+            mutationOldValue.indexOf('kx') > -1
+          ) {
             oldValue = 'HIDDEN';
           } else if (
             mutationOldValue.indexOf('kv') > -1 ||
@@ -621,7 +704,10 @@ class GmailMessageView {
             oldValue = 'EXPANDED';
           }
 
-          if (currentClassList.contains('kQ')) {
+          if (
+            currentClassList.contains('kQ') ||
+            currentClassList.contains('kx')
+          ) {
             newValue = 'HIDDEN';
           } else if (
             currentClassList.contains('kv') ||

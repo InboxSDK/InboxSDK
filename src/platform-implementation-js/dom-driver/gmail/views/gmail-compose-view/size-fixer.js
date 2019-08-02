@@ -33,6 +33,45 @@ function byId(id: string): string {
   return '#' + cssSelectorEscape(id);
 }
 
+function getAdjustedHeightRules(scrollBody, unexpectedHeight, minimumHeight) {
+  return ['height', 'min-height', 'max-height']
+    .map(property => {
+      const currentValue = parseInt(
+        scrollBody.style.getPropertyValue(property),
+        10
+      );
+
+      if (Number.isNaN(currentValue)) {
+        return null;
+      }
+
+      // The child message body textbox enforces a minimum height, so ensure the
+      // adjusted minimum height of the scroll body doesn't fall below it.
+      const adjustedValue = Math.max(
+        currentValue - unexpectedHeight,
+        minimumHeight
+      );
+
+      if (adjustedValue === currentValue) {
+        return null;
+      }
+
+      return `${property}: ${adjustedValue}px !important;`;
+    })
+    .filter(Boolean)
+    .join('\n');
+}
+
+function getMinimumBodyHeight(gmailComposeView) {
+  const bodyElement = gmailComposeView.getMaybeBodyElement();
+
+  if (!bodyElement) {
+    return 0;
+  }
+
+  return parseInt(bodyElement.style.minHeight, 10) || 0;
+}
+
 export default function sizeFixer(
   driver: Object,
   gmailComposeView: GmailComposeView
@@ -100,27 +139,26 @@ export default function sizeFixer(
     .merge(makeMutationObserverChunkedStream(scrollBody, { attributes: true }))
     .takeUntilBy(stopper)
     .onValue(() => {
-      var statusUnexpectedHeight = Math.max(
+      const statusUnexpectedHeight = Math.max(
         statusAreaParent.offsetHeight - expectedStatusBarHeight,
         0
       );
-      var topFormUnexpectedHeight = Math.max(
+
+      const topFormUnexpectedHeight = Math.max(
         topForm.offsetHeight - expectedTopFormHeight,
         0
       );
-      var unexpectedHeight = statusUnexpectedHeight + topFormUnexpectedHeight;
 
-      setRuleForSelector(
-        byId(scrollBody.id),
-        `
-max-height: ${parseInt(scrollBody.style.maxHeight, 10) -
-          unexpectedHeight}px !important;
-min-height: ${parseInt(scrollBody.style.minHeight, 10) -
-          unexpectedHeight}px !important;
-height: ${parseInt(scrollBody.style.height, 10) -
-          unexpectedHeight}px !important;
-`
+      const unexpectedHeight = statusUnexpectedHeight + topFormUnexpectedHeight;
+      const minimumHeight = getMinimumBodyHeight(gmailComposeView);
+
+      const adjustedHeightRules = getAdjustedHeightRules(
+        scrollBody,
+        unexpectedHeight,
+        minimumHeight
       );
+
+      setRuleForSelector(byId(scrollBody.id), adjustedHeightRules);
     });
 
   stopper.onValue(() => {

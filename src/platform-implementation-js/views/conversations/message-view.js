@@ -209,7 +209,7 @@ class MessageView extends EventEmitter {
   }
 
   addAttachmentIcon(iconDescriptor: Object) {
-    get(memberMap, this).messageViewImplementation.addAttachmentIcon(
+    return get(memberMap, this).messageViewImplementation.addAttachmentIcon(
       iconDescriptor
     );
   }

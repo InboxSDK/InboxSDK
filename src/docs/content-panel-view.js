@@ -16,7 +16,7 @@ var ContentPanelView = /** @lends ContentPanelView */ {
   isActive: function() {},
 
   /**
-   * Makes the content panel visible, opening the sidebar if necessary. It may only be called in response to a user input event such as a click or key press.
+   * Makes the content panel visible, opening the sidebar if necessary.
    * @return {void}
    */
   open: function() {},

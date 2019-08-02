@@ -68,6 +68,14 @@ var RowDescriptor = /** @lends RowDescriptor */ {
   labels: null,
 
   /**
+   * An optional HTML to an icon to display on the left side of the row
+   * ^optional
+   * ^default=null
+   * @type {string}
+   */
+  iconHtml: null,
+
+  /**
    * An optional url to an icon to display on the left side of the row
    * ^optional
    * ^default=null

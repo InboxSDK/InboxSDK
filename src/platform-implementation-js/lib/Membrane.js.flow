@@ -1,0 +1,12 @@
+/* @flow */
+
+type MapperFn<T> = (t: T) => Object;
+type Mapper<T> = [Class<T>, MapperFn<T>];
+
+// Used to make the *View objects out of our *ViewDriver objects, and to make
+// sure we return the same *View object back if we've already made one for
+// given *ViewDriver.
+declare export default class Membrane {
+  constructor(mappers: Array<Mapper<any>>): Membrane;
+  get(wet: Object): Object;
+}

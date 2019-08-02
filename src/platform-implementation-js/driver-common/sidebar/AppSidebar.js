@@ -264,7 +264,7 @@ type PanelProps = {
     expanded: boolean,
     onExpandedToggle(expanded: boolean): void
   },
-  dragHandle: Function,
+  dragHandleProps: Object,
   itemSelected: number
 };
 class Panel extends React.Component<PanelProps> {
@@ -331,7 +331,7 @@ class Panel extends React.Component<PanelProps> {
   }
   render() {
     const {
-      dragHandle,
+      dragHandleProps,
       itemSelected,
       item: {
         panelDescriptor: { title, appName, iconClass, iconUrl, el },
@@ -363,28 +363,29 @@ class Panel extends React.Component<PanelProps> {
           className={idMap('app_sidebar_content_panel_top_line')}
           data-app-name={appName}
         >
-          {(showControls ? dragHandle : x => x)(
-            <span className={idMap('app_sidebar_content_panel_title')}>
-              <div className={idMap('app_sidebar_content_panel_grip')} />
+          <span
+            className={idMap('app_sidebar_content_panel_title')}
+            {...(showControls ? dragHandleProps : null)}
+          >
+            <div className={idMap('app_sidebar_content_panel_grip')} />
+            <span
+              className={idMap(
+                'app_sidebar_content_panel_title_icon_container'
+              )}
+            >
               <span
-                className={idMap(
-                  'app_sidebar_content_panel_title_icon_container'
+                className={cx(
+                  idMap('app_sidebar_content_panel_title_icon'),
+                  iconClass
                 )}
               >
-                <span
-                  className={cx(
-                    idMap('app_sidebar_content_panel_title_icon'),
-                    iconClass
-                  )}
-                >
-                  {iconUrl && <img src={iconUrl} />}
-                </span>
-              </span>
-              <span className={idMap('app_sidebar_content_panel_title_text')}>
-                {title}
+                {iconUrl && <img src={iconUrl} />}
               </span>
             </span>
-          )}
+            <span className={idMap('app_sidebar_content_panel_title_text')}>
+              {title}
+            </span>
+          </span>
           <span
             className={idMap('app_sidebar_content_panel_toggle')}
             onClick={() => onExpandedToggle(!expanded)}

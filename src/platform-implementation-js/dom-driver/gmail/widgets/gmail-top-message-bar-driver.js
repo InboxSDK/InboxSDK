@@ -6,11 +6,19 @@ import type { Bus } from 'kefir-bus';
 import fakeWindowResize from '../../../lib/fake-window-resize';
 
 export default class GmailTopMessageBarDriver {
-  _eventStream: Bus<any>;
   _element: ?HTMLElement;
+  _eventStream: Bus<any>;
+  _resizeObserver: ?ResizeObserver;
 
   constructor(optionStream: Kefir.Observable<?Object>) {
     this._eventStream = kefirBus();
+
+    const ResizeObserver = global.ResizeObserver;
+    if (ResizeObserver) {
+      this._resizeObserver = new ResizeObserver(() => {
+        this.setTopMessageBarHeight();
+      });
+    }
 
     optionStream
       .takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null))
@@ -30,6 +38,10 @@ export default class GmailTopMessageBarDriver {
               element,
               ((document.body: any): HTMLElement).firstChild
             );
+            ((document.body: any): HTMLElement).classList.add(
+              'inboxsdk__hasTopMessageBar'
+            );
+
             fakeWindowResize();
           }
 
@@ -38,6 +50,12 @@ export default class GmailTopMessageBarDriver {
 
             if (option.el) {
               element.appendChild(option.el);
+
+              if (this._resizeObserver) {
+                this._resizeObserver.observe(element);
+              }
+
+              this.setTopMessageBarHeight();
             }
           }
         }
@@ -50,6 +68,19 @@ export default class GmailTopMessageBarDriver {
       this._element = null;
     }
     this._eventStream.end();
+
+    if (this._resizeObserver) {
+      this._resizeObserver.disconnect();
+    }
+
+    if (document.querySelectorAll('.inboxsdk__topMessageBar').length === 0) {
+      ((document.body: any): HTMLElement).classList.remove(
+        'inboxsdk__hasTopMessageBar'
+      );
+    } else {
+      this.setTopMessageBarHeight();
+    }
+
     fakeWindowResize();
   }
 
@@ -59,5 +90,20 @@ export default class GmailTopMessageBarDriver {
 
   remove() {
     this.destroy();
+  }
+
+  setTopMessageBarHeight() {
+    const topMessageBars = [
+      ...document.querySelectorAll('.inboxsdk__topMessageBar')
+    ];
+    const height = topMessageBars.reduce(
+      (acc, currValue) => acc + currValue.offsetHeight,
+      0
+    );
+
+    ((document.body: any): HTMLElement).style.setProperty(
+      '--inboxsdk__topMessageBar-height',
+      `${height}px`
+    );
   }
 }

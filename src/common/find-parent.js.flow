@@ -1,0 +1,6 @@
+/* @flow */
+
+declare export default function findParent(
+  el: HTMLElement,
+  cb: (el: Element) => boolean
+): ?HTMLElement;

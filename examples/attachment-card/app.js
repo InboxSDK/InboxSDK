@@ -1,7 +1,32 @@
+function kefirStopper() {
+  var emitter = null;
+
+  function end() {
+    stopper.stopped = true;
+
+    if (emitter) {
+      emitter.emit(null);
+      emitter.end();
+    }
+  }
+
+  var stream = Kefir.stream(function (_emitter) {
+    emitter = _emitter;
+
+    if (stopper.stopped) {
+      end();
+    }
+  });
+  var stopper = stream.toProperty();
+  stopper.stopped = false;
+  stopper.destroy = end;
+  return stopper;
+}
+
 InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
 	'use strict';
 
-	window._sdk = sdk;
+  window._sdk = sdk;
 
 	sdk.Conversations.registerFileAttachmentCardViewHandler(card => {
 		card.addButton({
@@ -19,7 +44,8 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
 	const dataUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAPCAIAAABr+ngCAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHVJREFUeNpidNnZwkAuYGKgAFCm2VVKjwxtQF1AxARnkaQTwmBBE9r97BIx2iCAmSFAW5lXHM4HsoHo3ueXmNqQlUGsYYHbhmwqsiswfQR3HQuaEKYRWLWha8ZlBFZt2DVjGoEnCFnwhC3+kB/Y5EmJZoAAAwDdxywx4cg7qwAAAABJRU5ErkJggg==';
 
 	sdk.Conversations.registerMessageViewHandler(function(messageView){
-		console.log('got messageView', messageView.getMessageID());
+    console.log('got messageView', messageView.getMessageID());
+    window._messageView = messageView;
 
 		messageView.addAttachmentCardView({
 
@@ -127,13 +153,94 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
 					}, err => console.error(err));
 				}
 			}
-		});
+    });
+  });
 
-		messageView.addAttachmentIcon({
-			iconClass: 'eye_icon',
-			tooltip: '1thing'
-		});
-		messageView.addAttachmentIcon(Kefir.repeat(function() {
+  sdk.Conversations.registerMessageViewHandlerAll(async function (messageView) {
+    await new Promise((resolve) => {
+      if (messageView.getViewState() === 'HIDDEN') {
+        messageView.on('viewStateChange', (event) =>{
+          if (event.newViewState !== 'HIDDEN') {
+            resolve()
+          }
+        })
+      } else {
+        resolve()
+      }
+    })
+
+    messageView.addAttachmentIcon({
+      iconClass: 'eye_icon',
+      tooltip: '1thing'
+    });
+
+    messageView.addAttachmentIcon({
+      iconHtml: '<div>x</div>',
+      iconClass: 'test-custom-class',
+      tooltip: 'custom icon html',
+      onClick: alert.bind(window, 'bar')
+    });
+
+    const tooltip1 = document.createElement('div');
+
+    function Test() {
+      return React.createElement("div", null, "testse ", React.createElement("br", null), React.createElement("button", {
+        style: {
+          width: '200px',
+          height: '400px',
+          background: 'aquamarine'
+        },
+        onClick: event => {
+          event.stopPropagation();
+          console.log('===== click button event', event.target);
+          event.target.innerHTML = 'clicked me'
+        }
+      }, "click me"));
+    }
+
+    ReactDOM.render(React.createElement(Test, null), tooltip1);
+
+    const tooltip2 = document.createElement('div');
+    tooltip2.innerHTML = 'ballfjsdkljf';
+
+    messageView.addAttachmentIcon({
+      iconHtml: '<div>x</div>',
+      iconClass: 'test-custom-tooltip',
+      tooltip: tooltip1,
+      onClick: () => {console.log('click on icon html')}
+    }).on('tooltipShown', () => {
+      console.log('!!! hover')
+    });
+
+
+    const tooltip3 = document.createElement('div');
+    tooltip3.innerHTML = 'fsjdfjskdlf';
+    tooltip3.onclick = function (event) {
+      event.stopPropagation();
+      console.log('click on tooltip')
+    }
+
+    messageView.addAttachmentIcon({
+      iconHtml: '<div>Q</div>',
+      iconClass: 'test-custom-tooltip',
+      tooltip: tooltip3
+    });
+
+    const stopper = kefirStopper();
+
+    messageView.addAttachmentIcon(Kefir.constant({
+      iconHtml: '<div>y</div>',
+      iconClass: 'test-remove-icon',
+      tooltip: 'custom icon html',
+      onClick: alert.bind(window, 'bar')
+    }).merge(stopper.map(() => null)));
+
+    setTimeout(() => {
+      stopper.destroy();
+      console.log('destroy')
+    }, 5000);
+
+    messageView.addAttachmentIcon(Kefir.repeat(function() {
 			return Kefir.sequentially(2000, [
 				{
 					iconClass: 'eye_icon',
@@ -143,9 +250,19 @@ InboxSDK.load(2, "attachment-card-exmaple").then(function(sdk){
 				{
 					iconUrl: 'https://ssl.gstatic.com/ui/v1/icons/mail/gplus.png',
 					tooltip: '2blah blah'
-				}
+        },
+        {
+          iconHtml: '<div>x</div>',
+          tooltip: 'custom icon html'
+        },
+        {
+          iconHtml: '<div>x</div>',
+          iconClass: 'test-custom-tooltip',
+          tooltip: tooltip2,
+          onClick: alert.bind(window, 'bar')
+        }
 			]);
-		}));
-	});
+    }));
+  });
 
 });

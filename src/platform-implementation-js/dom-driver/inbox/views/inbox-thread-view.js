@@ -289,6 +289,10 @@ class InboxThreadView {
     return view;
   }
 
+  addLabel(): SimpleElementView {
+    throw new Error('not supported');
+  }
+
   getReadyStream() {
     return this._ready;
   }

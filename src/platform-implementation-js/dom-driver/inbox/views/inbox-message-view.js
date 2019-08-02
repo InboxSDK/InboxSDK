@@ -21,6 +21,9 @@ import type {
   MessageViewLinkDescriptor,
   VIEW_STATE
 } from '../../../driver-interfaces/message-view-driver';
+import SafeEventEmitter from '../../../lib/safe-event-emitter';
+
+class AttachmentIcon extends SafeEventEmitter {}
 
 class InboxMessageView {
   _element: HTMLElement;
@@ -250,11 +253,13 @@ class InboxMessageView {
   addMoreMenuItem(options: MessageViewToolbarButtonDescriptor): void {
     throw new Error('not implemented yet');
   }
-  addAttachmentIcon(options: Object): void {
+  addAttachmentIcon(options: Object): SafeEventEmitter & {} {
     // eslint-disable-next-line no-console
     console.warn(
       'MessageView.addAttachmentIcon is not implemented yet in Inbox'
     );
+
+    return new AttachmentIcon();
   }
   getAttachmentCardViewDrivers() {
     return (this._attachmentCardViews: any);

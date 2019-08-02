@@ -2,6 +2,7 @@
 
 import Kefir from 'kefir';
 import type { AttachmentCardViewDriver } from './driver';
+import SafeEventEmitter from '../lib/safe-event-emitter';
 
 export type VIEW_STATE = 'HIDDEN' | 'COLLAPSED' | 'EXPANDED';
 
@@ -22,13 +23,15 @@ export type MessageViewToolbarButtonDescriptor = {
   orderHint?: ?number
 };
 
+export type AttachmentIcon = SafeEventEmitter & {};
+
 export type MessageViewDriver = {
   getMessageID(): string,
   getMessageIDAsync(): Promise<string>,
   getContentsElement(): HTMLElement,
   isElementInQuotedArea(el: HTMLElement): boolean,
   addMoreMenuItem(options: MessageViewToolbarButtonDescriptor): void,
-  addAttachmentIcon(options: Object): void,
+  addAttachmentIcon(options: Object): AttachmentIcon,
   getAttachmentCardViewDrivers(): Array<AttachmentCardViewDriver>,
   addAttachmentCard(options: Object): AttachmentCardViewDriver,
   addButtonToDownloadAllArea(options: Object): void,

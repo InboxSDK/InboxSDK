@@ -140,12 +140,14 @@ InboxSDK.load(2, 'simple-example').then(sdk => {
 			button.addEventListener('click', update);
 			sidebarEl.appendChild(button);
 
-			threadView.addSidebarContentPanel({
-				title: 'Test Sidebar',
-				iconUrl: chrome.runtime.getURL('monkey.png'),
-				el: sidebarEl,
-				orderHint: 1
-			});
+      if (document.head.getAttribute('data-flag-enable-sidebar') === 'true') {
+        threadView.addSidebarContentPanel({
+          title: 'Test Sidebar',
+          iconUrl: chrome.runtime.getURL('monkey.png'),
+          el: sidebarEl,
+          orderHint: 1
+        });
+      }
 		}
 
 		threadView.getThreadIDAsync().then(id => {

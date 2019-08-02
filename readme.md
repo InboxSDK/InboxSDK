@@ -80,32 +80,33 @@ it.)
 # Querying for Error Logs
 
 (Streak Employees) We can use the following BigQuery query to query for the
-details of errors with a specific message. You must update the `20181205` part
-of the query to the date you want to query for, and remove the following
-`@-3600000-` part if you don't want to only query for rows from the last hour.
+details of errors with a specific message. You must update the `20190711` part
+of the query to the date you want to query for.
 
 ```sql
-#legacySQL
 SELECT
-LEFT(errors.message, 60) AS summary,
+TIMESTAMP_MICROS(errors.timestamp) AS timestamp,
+SUBSTR(errors.message, 1, 60) AS summary,
 REGEXP_EXTRACT(headers, r'\n[Rr]eferer:\s+(https://[^/\n]+)') AS domain,
 CONCAT(
   IFNULL(errors.stack, '(no stack)'),
   '\n\nlogged from:\n', IFNULL(errors.loggedFrom, '(none given)'),
   '\n\ndetails:\n', IFNULL(errors.details, '(none given)'),
-  '\n\nappId: ', IFNULL(errors.appIds.appId, '(none given)'),
-  ' (', IF(errors.appIds.causedBy, 'causedBy', 'not cause'), ')',
-  '\nclientVersion: ', IFNULL(errors.appIds.version, '(none given)'),
+  '\n\nappIds: ', IFNULL(TO_JSON_STRING(errors.appIds), '(none given)'),
   '\nsdkVersion: ', IFNULL(errors.loaderVersion, '(none given)'),
   '\nsdkImplVersion: ', IFNULL(errors.implementationVersion, '(none given)')
 ) AS report,
 headers,
-timestamp,
+trace,
 errors.sessionId, requestId, errors.emailHash
-FROM [logs.backend_prod_3950ab_20181205@-3600000-]
+FROM `mailfoogae.logs.backend_prod_3950ab_20190711` AS logs
+CROSS JOIN UNNEST(logs.errors) as errors
 WHERE errors.source = "SDK"
-  AND errors.message = 'error message goes here'
-ORDER BY timestamp DESC
+  --AND errors.appIds.appId = 'sdk_streak_21e9788951'
+  --AND errors.message LIKE '%Timed out waiting for first port message%'
+  --AND errors.emailHash = TO_HEX(SHA256(CONCAT("inboxsdk:", "tesla@streak.com")))
+  --AND errors.sessionId = '1562882411623-0.26325378576101466'
+ORDER BY timestamp ASC
 LIMIT 200
 ```
 
