@@ -411,11 +411,11 @@ function _logError(
   });
 }
 
-function makeLoggedFunction(func: Function, name?: string): Function {
+function makeLoggedFunction<F extends Function>(func: F, name?: string): F {
   const msg = name ? 'Uncaught error in ' + name : 'Uncaught error';
   return function(this: any, ...args: any[]) {
     return Logger.run(() => func.apply(this, args), msg);
-  };
+  } as any;
 }
 
 function replaceFunction(

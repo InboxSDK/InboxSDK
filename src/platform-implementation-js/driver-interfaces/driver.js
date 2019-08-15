@@ -103,3 +103,15 @@ export type Driver = {
   getSelectedThreadRowViewDrivers(): $ReadOnlyArray<ThreadRowViewDriver>,
   registerThreadRowViewSelectionHandler(handler: () => any): () => void
 };
+
+export type ButterBarDriver = {
+  getNoticeAvailableStream(): Kefir.Observable<any, any>,
+  getSharedMessageQueue(): any[],
+  setSharedMessageQueue(queue: any[]): void,
+  showMessage(rawOptions: any): ButterBarMessage,
+  hideGmailMessage(): void
+};
+
+export type ButterBarMessage = {
+  destroy(): void
+};

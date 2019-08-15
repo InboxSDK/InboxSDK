@@ -6035,10 +6035,10 @@ kefir-bus@^2.2.0:
   resolved "https://registry.yarnpkg.com/kefir-bus/-/kefir-bus-2.3.1.tgz#c41473196331bd5d0b4ca13baade319224ddc7a0"
   integrity sha512-wLCQfEw8PddSNeyjDCH2WNgNg3Rb/c+OaG5WEPfEwod+LQfGX4isHcHRWsYNLmdFEw3/KyA+9qDSy+VC4NsifA==
 
-kefir-cast@^3.2.2:
-  version "3.2.2"
-  resolved "https://registry.yarnpkg.com/kefir-cast/-/kefir-cast-3.2.2.tgz#f4ec06ef4301d152097cce31b13a64816afeb05f"
-  integrity sha512-rxfIEOysq9A/o3SCUt3Tiueqb+nWX7H/nyxrg+l1pr0HhG7jYxWgLwePfIFCOWAdLkBLW6iLpKpWb5ONdcK4SA==
+kefir-cast@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/kefir-cast/-/kefir-cast-3.3.0.tgz#c2ddbfa2efabb61a21d5bd58d522c6622f12dfdd"
+  integrity sha512-TJVZcKTxMS0qUOPicLTUi3wQvJ0h6rY6T+URxg2Vg9lClGdJ3VoNknh+zmP9FRRGr+soXMBbmfVZzjmaCGClCQ==
 
 kefir-stopper@^2.1.0:
   version "2.2.0"
