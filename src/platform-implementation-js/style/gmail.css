@@ -1613,7 +1613,7 @@ body.inboxsdk__gmailv1css
 .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
   margin: 18px 18px 10px 18px;
   border: none;
-  background: #fff;
+  background: transparent;
   height: 20px;
   width: 20px;
   overflow: hidden;
