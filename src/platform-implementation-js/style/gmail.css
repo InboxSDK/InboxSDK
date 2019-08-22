@@ -2776,7 +2776,7 @@ body.inboxsdk__gmailv1css .inboxsdk__butterbar .a8k {
 }
 
 .inboxsdk__butterbar.inboxsdk__butterbar_error [role='button']::before {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 /* end butter/snack bar */
