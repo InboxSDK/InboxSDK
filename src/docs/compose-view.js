@@ -555,7 +555,15 @@ var ComposeButtonDescriptor = /** @lends ComposeButtonDescriptor */ {
    * ^default=true
    * @type {boolean}
    */
-  enabled: null
+  enabled: null,
+
+  /**
+   * If true, the button will not move to the responsive overflow menu.
+   * ^optional
+   * ^default=false
+   * @type {boolean}
+   */
+  noOverflow: null
 };
 
 /**
