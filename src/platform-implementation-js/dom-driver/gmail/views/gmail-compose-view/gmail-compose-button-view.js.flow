@@ -11,7 +11,8 @@ export type ButtonViewOptions = {
   tooltip?: ?string,
   enabled?: ?boolean,
   hasDropdown?: ?boolean,
-  keyboardShortcutHandle?: ?KeyboardShortcutHandle
+  keyboardShortcutHandle?: ?KeyboardShortcutHandle,
+  noOverflow?: ?boolean;
 };
 
 declare export default class GmailComposeButtonView {

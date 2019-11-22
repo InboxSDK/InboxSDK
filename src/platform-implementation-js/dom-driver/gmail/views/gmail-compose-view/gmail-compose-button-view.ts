@@ -16,6 +16,7 @@ export interface ButtonViewOptions {
   enabled?: null | boolean;
   hasDropdown?: null | boolean;
   keyboardShortcutHandle?: null | KeyboardShortcutHandle;
+  noOverflow?: null | boolean;
 }
 
 export default class GmailComposeButtonView implements ButtonViewI {
@@ -139,6 +140,10 @@ export default class GmailComposeButtonView implements ButtonViewI {
 
     if (options.enabled === false) {
       this._element.classList.add('inboxsdk__button_disabled');
+    }
+
+    if (options.noOverflow) {
+      this._element.setAttribute('data-no-overflow', '');
     }
   }
 
