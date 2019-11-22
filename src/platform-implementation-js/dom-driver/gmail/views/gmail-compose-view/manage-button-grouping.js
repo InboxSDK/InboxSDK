@@ -6,6 +6,7 @@ import GmailComposeButtonView from './gmail-compose-button-view';
 import BasicButtonViewController from '../../../../widgets/buttons/basic-button-view-controller';
 import DropdownButtonViewController from '../../../../widgets/buttons/dropdown-button-view-controller';
 import GmailDropdownView from '../../widgets/gmail-dropdown-view';
+import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import waitFor from '../../../../lib/wait-for';
 import Logger from '../../../../lib/logger';
@@ -87,8 +88,11 @@ function _ungroupButtons(gmailComposeView) {
   if (members.formattingToolbarMutationObserver)
     members.formattingToolbarMutationObserver.disconnect();
 
-  const buttonToolbar = members.groupedActionToolbarContainer.firstElementChild;
+  const buttonToolbar: HTMLElement = (members.groupedActionToolbarContainer
+    .firstElementChild: any);
+
   if (buttonToolbar) {
+    _moveNoOverflowButtonsToContainer(gmailComposeView, buttonToolbar);
     buttonToolbar.remove();
 
     const composeActionToolbar = querySelector(
@@ -179,7 +183,9 @@ function _doButtonsNeedToGroup(gmailComposeView: GmailComposeView): boolean {
   )
     return false;
   if (
-    gmailComposeView.getElement().querySelectorAll('.inboxsdk__composeButton')
+    gmailComposeView
+      .getElement()
+      .querySelectorAll('.inboxsdk__composeButton:not([data-no-overflow])')
       .length < 2
   )
     return false;
@@ -302,6 +308,30 @@ function _swapToActionToolbar(gmailComposeView, buttonViewController) {
     (groupedActionToolbarContainer.firstElementChild: any)
   );
   actionToolbarContainer.appendChild(groupedActionToolbarContainer);
+
+  _moveNoOverflowButtonsToActionToolbar(gmailComposeView);
+}
+
+function _moveNoOverflowButtonsToActionToolbar(gmailComposeView) {
+  const actionToolbar = querySelector(
+    gmailComposeView.getElement(),
+    '.inboxsdk__compose_actionToolbar > div'
+  );
+
+  _moveNoOverflowButtonsToContainer(gmailComposeView, actionToolbar);
+}
+
+function _moveNoOverflowButtonsToContainer(
+  gmailComposeView,
+  container: HTMLElement
+) {
+  const noOverflowButtons = gmailComposeView
+    .getElement()
+    .querySelectorAll('.inboxsdk__composeButton[data-no-overflow]');
+
+  Array.from(noOverflowButtons).forEach((buttonElement: HTMLElement) =>
+    insertElementInOrder(container, buttonElement, undefined, true)
+  );
 }
 
 function _checkAndSetInitialState(
