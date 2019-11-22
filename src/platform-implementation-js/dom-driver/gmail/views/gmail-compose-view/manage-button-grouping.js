@@ -88,7 +88,7 @@ function _ungroupButtons(gmailComposeView) {
   if (members.formattingToolbarMutationObserver)
     members.formattingToolbarMutationObserver.disconnect();
 
-  const buttonToolbar: HTMLElement = (members.groupedActionToolbarContainer
+  const buttonToolbar: ?HTMLElement = (members.groupedActionToolbarContainer
     .firstElementChild: any);
 
   if (buttonToolbar) {
