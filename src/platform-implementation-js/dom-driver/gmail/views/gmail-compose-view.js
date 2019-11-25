@@ -677,7 +677,7 @@ class GmailComposeView {
     var retVal = insertHTMLatCursor(
       this.getBodyElement(),
       html,
-      this._lastSelectionRange
+      this.getLastSelectionRange()
     );
     this._triggerDraftSave();
 
@@ -1178,14 +1178,14 @@ class GmailComposeView {
   getSelectedBodyHTML(): ?string {
     return getSelectedHTMLInElement(
       this.getBodyElement(),
-      this._lastSelectionRange
+      this.getLastSelectionRange()
     );
   }
 
   getSelectedBodyText(): ?string {
     return getSelectedTextInElement(
       this.getBodyElement(),
-      this._lastSelectionRange
+      this.getLastSelectionRange()
     );
   }
 
@@ -1824,6 +1824,15 @@ class GmailComposeView {
   }
 
   getLastSelectionRange(): ?Range {
+    // The selection range can become invalid if the compose view has become expanded or
+    // minimized since the range was set.
+    const range = this._lastSelectionRange;
+    if (
+      range &&
+      !this.getBodyElement().contains(range.commonAncestorContainer)
+    ) {
+      this._lastSelectionRange = undefined;
+    }
     return this._lastSelectionRange;
   }
 
