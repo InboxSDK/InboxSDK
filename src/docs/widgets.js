@@ -279,5 +279,15 @@ var DrawerOptions = /** @lends ModalOptions */ {
    * ^default=false
    * @type {boolean}
    */
-  closeWithCompose: null
+  closeWithCompose: null,
+
+  /**
+   * When true, uses a slimmer drawer that matches the width of the sidebar
+   * content panel.
+   *
+   * ^optional
+   * ^default=false
+   * @type {boolean}
+   */
+  matchSidebarContentPanelWidth: null
 };

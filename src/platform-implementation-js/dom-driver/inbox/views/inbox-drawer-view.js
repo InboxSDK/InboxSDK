@@ -230,6 +230,11 @@ class InboxDrawerView {
     this._el.setAttribute('role', 'dialog');
     this._el.tabIndex = 0;
     this._el.className = 'inboxsdk__drawer_view';
+
+    if (options.matchSidebarContentPanelWidth) {
+      this._el.classList.add('inboxsdk__match_sidebar_content_panel_width');
+    }
+
     this._containerEl.appendChild(this._el);
 
     if (this._chrome) {

@@ -42,6 +42,7 @@ export interface DrawerViewOptions {
   chrome?: boolean;
   composeView?: ComposeView;
   closeWithCompose?: boolean;
+  matchSidebarContentPanelWidth?: boolean;
 }
 // import InboxDrawerView from '../dom-driver/inbox/views/inbox-drawer-view';
 // export type DrawerViewDriver = InboxDrawerView;
