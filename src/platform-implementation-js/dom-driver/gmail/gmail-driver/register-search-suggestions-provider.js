@@ -45,9 +45,9 @@ export default function registerSearchSuggestionsProvider(
             );
 
             const validatedResultsWithIds = validatedResults.map(result => ({
-              ...result,
+              id: `${Date.now()}-${Math.random()}`,
               providerId,
-              id: `${Date.now()}-${Math.random()}`
+              result
             }));
 
             return Kefir.constant(validatedResultsWithIds);

@@ -6,26 +6,26 @@ import * as GRP from '../../platform-implementation-js/dom-driver/gmail/gmail-re
 
 // This is the type that the user provides.
 export interface AutocompleteSearchResult {
-  name?: null | string;
-  nameHTML?: null | string;
   description?: null | string;
   descriptionHTML?: null | string;
-  routeName?: null | string;
-  routeParams?: null | { [ix: string]: string | number };
   externalURL?: null | string;
-  searchTerm?: null | string;
-  iconUrl?: null | string;
   iconClass?: null | string;
   iconHTML?: null | string;
+  iconUrl?: null | string;
+  name?: null | string;
+  nameHTML?: null | string;
   onClick?: null | (() => void);
+  routeName?: null | string;
+  routeParams?: null | { [ix: string]: string | number };
+  searchTerm?: null | string;
 }
 
 // These ids are part of the object constructed by the SDK used to refer to a
 // suggestion to the injected script.
-export interface AutocompleteSearchResultWithId
-  extends AutocompleteSearchResult {
+export interface AutocompleteSearchResultWithId {
   id: string;
   providerId: string;
+  result: AutocompleteSearchResult;
 }
 
 /*
@@ -61,44 +61,45 @@ function modifySuggestions(
   const { value: parsed, options } = GRP.deserialize(responseText);
   const query = parsed[0][1];
   for (const modification of modifications) {
+    const { result } = modification;
     let name, nameHTML;
-    if (typeof modification.name === 'string') {
-      name = modification.name;
+    if (typeof result.name === 'string') {
+      name = result.name;
       nameHTML = escape(name);
-    } else if (typeof modification.nameHTML === 'string') {
-      nameHTML = modification.nameHTML;
+    } else if (typeof result.nameHTML === 'string') {
+      nameHTML = result.nameHTML;
       name = htmlToText(nameHTML);
     }
     if (name == null || nameHTML == null) {
       throw new Error('name or nameHTML must be provided');
     }
     let description, descriptionHTML;
-    if (typeof modification.description === 'string') {
-      description = modification.description;
+    if (typeof result.description === 'string') {
+      description = result.description;
       descriptionHTML = escape(description);
-    } else if (typeof modification.descriptionHTML === 'string') {
-      descriptionHTML = modification.descriptionHTML;
+    } else if (typeof result.descriptionHTML === 'string') {
+      descriptionHTML = result.descriptionHTML;
       description = htmlToText(descriptionHTML);
     }
     const data = {
       id: modification.id,
-      routeName: modification.routeName,
-      routeParams: modification.routeParams,
-      externalURL: modification.externalURL
+      routeName: result.routeName,
+      routeParams: result.routeParams,
+      externalURL: result.externalURL
     };
     nameHTML += autoHtml` <span style="display:none" data-inboxsdk-suggestion="${JSON.stringify(
       data
     )}"></span>`;
 
-    if (modification.iconHTML != null) {
+    if (result.iconHTML != null) {
       nameHTML = `<div class="inboxsdk__custom_suggestion_iconHTML">${
-        modification.iconHTML
+        result.iconHTML
       }</div>${nameHTML}`;
     }
 
     const newItem = [
       'aso.sug',
-      modification.searchTerm || query,
+      result.searchTerm || query,
       nameHTML,
       null as
         | [
@@ -120,7 +121,7 @@ function modifySuggestions(
       'asor inboxsdk__custom_suggestion ' +
         modification.providerId +
         ' ' +
-        (modification.iconClass || ''),
+        (result.iconClass || ''),
       0
     ];
     if (descriptionHTML != null) {
@@ -128,15 +129,15 @@ function modifySuggestions(
     }
 
     // Allow iconHtml to be passed, and ignore iconUrl if iconHtml is presents
-    if (modification.iconHTML != null) {
+    if (result.iconHTML != null) {
       // set empty image
       newItem[6] = [
         'aso.thn',
         'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
       ];
       newItem[7] += ' inboxsdk__no_bg';
-    } else if (modification.iconUrl) {
-      newItem[6] = ['aso.thn', modification.iconUrl];
+    } else if (result.iconUrl) {
+      newItem[6] = ['aso.thn', result.iconUrl];
       newItem[7] += ' inboxsdk__no_bg';
     } else {
       newItem[7] += ' asor_i4';

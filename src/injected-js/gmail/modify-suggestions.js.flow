@@ -2,24 +2,25 @@
 
 // This is the type that the user provides.
 export type AutocompleteSearchResult = {
-  name?: ?string,
-  nameHTML?: ?string,
   description?: ?string,
   descriptionHTML?: ?string,
+  externalURL?: ?string,
+  iconClass?: ?string,
+  iconUrl?: ?string,
+  name?: ?string,
+  nameHTML?: ?string,
+  onClick?: ?() => void,
   routeName?: ?string,
   routeParams?: ?{ [ix: string]: string | number },
-  externalURL?: ?string,
-  searchTerm?: ?string,
-  iconUrl?: ?string,
-  iconClass?: ?string,
-  onClick?: ?() => void
+  searchTerm?: ?string
 };
 
 // These ids are part of the object constructed by the SDK used to refer to a
 // suggestion to the injected script.
-export type AutocompleteSearchResultWithId = AutocompleteSearchResult & {
+export type AutocompleteSearchResultWithId = {
   id: string,
-  providerId: string
+  providerId: string,
+  result: AutocompleteSearchResult,
 };
 
 declare export default function modifySuggestions(
