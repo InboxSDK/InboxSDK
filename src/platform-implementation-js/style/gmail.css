@@ -550,7 +550,6 @@ input.inboxsdk__x_close_button {
   height: 20px;
   width: 20px;
   border: none;
-  display: inline-block;
   vertical-align: middle;
   cursor: pointer;
 
@@ -1396,7 +1395,7 @@ table.aKk .inboxsdk__contentTabContainer .inboxsdk__tab .aAy[role='tab'] {
   background-position-x: 5px;
   background-position-y: 3px;
   background-size: 16px;
-  bacgkround-repeat: no-repeat;
+  background-repeat: no-repeat;
 }
 
 .inboxsdk__tab_icon img {
