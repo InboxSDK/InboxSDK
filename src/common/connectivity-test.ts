@@ -1,11 +1,7 @@
 import cachebustUrl from './cachebust-url';
 import fromPairs from 'lodash/fromPairs';
 
-const URLS = [
-  'https://mailfoogae.appspot.com/build/images/composeOverflowToggle.png',
-  'https://www.streak.com/build/images/composeOverflowToggle.png',
-  'https://www.inboxsdk.com/images/logo-red.png'
-];
+const URLS = ['https://www.inboxsdk.com/images/logo-red.png'];
 
 function imageTest(url: string): Promise<boolean> {
   return new Promise(resolve => {

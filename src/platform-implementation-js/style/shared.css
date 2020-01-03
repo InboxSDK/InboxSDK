@@ -252,8 +252,8 @@
 .IDMAP_app_sidebar_content_panel_toggle_button {
   margin-top: 12px;
   margin-right: 4px;
-  background: url(https://www.streak.com/build/images/arrowDown.png) center /
-    20px no-repeat;
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGAAAABgCAQAAABIkb+zAAAA30lEQVR4Ae3RO04EMRgE4Q45hlkuxWMPCwdBLNxjZQJPNBkq4U7qm9x/lyb6A0mSJEmSJEmS9NB/iXjKV57DJdd8ZmSzS34yc+cJueaemVvG/vnzSODz596ES77XUZxwzN+b8HjM5wlva/7uhI91DCes+efvPf9u5AYSTvMbfwAm9OfzhNf2fJbQn48S+vNRQn8+SujPRwn9+SjhpT+fJPTno4T+fJTQnw8T+PxyAp/fT+Dz+wl8fj+Bz28n8PnVBD6/msDnVxP4/GoCn99MYPP7xmm+JEmSJEmSJEmSfgG9E96X0mx7vAAAAABJRU5ErkJggg==)
+    center / 20px no-repeat;
   border: none;
   width: 14px;
   height: 14px;
