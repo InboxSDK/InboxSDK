@@ -5,20 +5,25 @@ import htmlToText from '../../common/html-to-text';
 import * as GRP from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 
 // This is the type that the user provides.
-export interface AutocompleteSearchResult {
-  description?: null | string;
-  descriptionHTML?: null | string;
-  externalURL?: null | string;
-  iconClass?: null | string;
-  iconHTML?: null | string;
-  iconUrl?: null | string;
-  name?: null | string;
-  nameHTML?: null | string;
-  onClick?: null | (() => void);
-  routeName?: null | string;
-  routeParams?: null | { [ix: string]: string | number };
-  searchTerm?: null | string;
-}
+export type AutocompleteSearchResult =
+  | {
+      description?: null | string;
+      descriptionHTML?: null | string;
+      externalURL?: null | string;
+      iconClass?: null | string;
+      iconHTML?: null | string;
+      iconUrl?: null | string;
+      name?: null | string;
+      nameHTML?: null | string;
+      onClick?: null | (() => void);
+      routeName?: null | string;
+      routeParams?: null | { [ix: string]: string | number };
+      searchTerm?: null | string;
+    }
+  | {
+      label?: null | string;
+      labelHTML?: null | string;
+    };
 
 // These ids are part of the object constructed by the SDK used to refer to a
 // suggestion to the injected script.
@@ -58,93 +63,134 @@ function modifySuggestions(
   responseText: string,
   modifications: AutocompleteSearchResultWithId[]
 ): string {
+  const modificationGroupLabels = [];
   const { value: parsed, options } = GRP.deserialize(responseText);
   const query = parsed[0][1];
   for (const modification of modifications) {
     const { result } = modification;
-    let name, nameHTML;
-    if (typeof result.name === 'string') {
-      name = result.name;
-      nameHTML = escape(name);
-    } else if (typeof result.nameHTML === 'string') {
-      nameHTML = result.nameHTML;
-      name = htmlToText(nameHTML);
-    }
-    if (name == null || nameHTML == null) {
-      throw new Error('name or nameHTML must be provided');
-    }
-    let description, descriptionHTML;
-    if (typeof result.description === 'string') {
-      description = result.description;
-      descriptionHTML = escape(description);
-    } else if (typeof result.descriptionHTML === 'string') {
-      descriptionHTML = result.descriptionHTML;
-      description = htmlToText(descriptionHTML);
-    }
-    const data = {
-      id: modification.id,
-      routeName: result.routeName,
-      routeParams: result.routeParams,
-      externalURL: result.externalURL
-    };
-    nameHTML += autoHtml` <span style="display:none" data-inboxsdk-suggestion="${JSON.stringify(
-      data
-    )}"></span>`;
 
-    if (result.iconHTML != null) {
-      nameHTML = `<div class="inboxsdk__custom_suggestion_iconHTML">${
-        result.iconHTML
-      }</div>${nameHTML}`;
+    if (
+      !(
+        'label' in result ||
+        'labelHTML' in result ||
+        'name' in result ||
+        'nameHTML' in result
+      )
+    ) {
+      throw new Error(
+        'AutocompleteSearchResult must have name or nameHTML. AutocompleteSearchGroup must have label or labelHTML.'
+      );
     }
 
-    const newItem = [
-      'aso.sug',
-      result.searchTerm || query,
-      nameHTML,
-      null as
-        | [
-            string,
-            string | null | undefined,
-            string,
-            string | null | undefined,
-            string
-          ]
-        | null,
-      [],
+    if ('label' in result || 'labelHTML' in result) {
+      let labelHTML;
+      if (typeof result.label === 'string') {
+        labelHTML = escape(result.label);
+      } else if (typeof result.labelHTML === 'string') {
+        labelHTML = result.labelHTML;
+      }
 
-      // screen height estimate. Currently Gmail bugs out if the screen height
-      // estimates add up to above the screen height, so let's avoid making the
-      // issue more likely by telling it our entries are zero-height.
-      0,
+      if (labelHTML == null) {
+        throw new Error(
+          'AutocompleteSearchGroup must have label or labelHTML.'
+        );
+      }
 
-      null as [string, string] | null,
-      'asor inboxsdk__custom_suggestion ' +
-        modification.providerId +
-        ' ' +
-        (result.iconClass || ''),
-      0
-    ];
-    if (descriptionHTML != null) {
-      newItem[3] = ['aso.eme', description, name, descriptionHTML, nameHTML];
+      modificationGroupLabels.push(labelHTML);
+      continue;
     }
 
-    // Allow iconHtml to be passed, and ignore iconUrl if iconHtml is presents
-    if (result.iconHTML != null) {
-      // set empty image
-      newItem[6] = [
-        'aso.thn',
-        'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+    if ('name' in result || 'nameHTML' in result) {
+      let name, nameHTML;
+      if (typeof result.name === 'string') {
+        name = result.name;
+        nameHTML = escape(name);
+      } else if (typeof result.nameHTML === 'string') {
+        nameHTML = result.nameHTML;
+        name = htmlToText(nameHTML);
+      }
+      if (name == null || nameHTML == null) {
+        throw new Error('AutocompleteSearchResult must have name or nameHTML');
+      }
+
+      let description, descriptionHTML;
+      if (typeof result.description === 'string') {
+        description = result.description;
+        descriptionHTML = escape(description);
+      } else if (typeof result.descriptionHTML === 'string') {
+        descriptionHTML = result.descriptionHTML;
+        description = htmlToText(descriptionHTML);
+      }
+
+      const data = {
+        id: modification.id,
+        routeName: result.routeName,
+        routeParams: result.routeParams,
+        externalURL: result.externalURL,
+        modificationGroupLabels
+      };
+      nameHTML += autoHtml` <span style="display:none" data-inboxsdk-suggestion="${JSON.stringify(
+        data
+      )}"></span>`;
+
+      modificationGroupLabels.length = 0;
+
+      if (result.iconHTML != null) {
+        nameHTML = `<div class="inboxsdk__custom_suggestion_iconHTML">${
+          result.iconHTML
+        }</div>${nameHTML}`;
+      }
+
+      const newItem = [
+        'aso.sug',
+        result.searchTerm || query,
+        nameHTML,
+        null as
+          | [
+              string,
+              string | null | undefined,
+              string,
+              string | null | undefined,
+              string
+            ]
+          | null,
+        [],
+
+        // screen height estimate. Currently Gmail bugs out if the screen height
+        // estimates add up to above the screen height, so let's avoid making the
+        // issue more likely by telling it our entries are zero-height.
+        0,
+
+        null as [string, string] | null,
+        'asor inboxsdk__custom_suggestion ' +
+          modification.providerId +
+          ' ' +
+          (result.iconClass || ''),
+        0
       ];
-      newItem[7] += ' inboxsdk__no_bg';
-    } else if (result.iconUrl) {
-      newItem[6] = ['aso.thn', result.iconUrl];
-      newItem[7] += ' inboxsdk__no_bg';
-    } else {
-      newItem[7] += ' asor_i4';
-    }
+      if (descriptionHTML != null) {
+        newItem[3] = ['aso.eme', description, name, descriptionHTML, nameHTML];
+      }
 
-    parsed[0][3].push(newItem);
+      // Allow iconHtml to be passed, and ignore iconUrl if iconHtml is presents
+      if (result.iconHTML != null) {
+        // set empty image
+        newItem[6] = [
+          'aso.thn',
+          'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+        ];
+        newItem[7] += ' inboxsdk__no_bg';
+      } else if (result.iconUrl) {
+        newItem[6] = ['aso.thn', result.iconUrl];
+        newItem[7] += ' inboxsdk__no_bg';
+      } else {
+        newItem[7] += ' asor_i4';
+      }
+
+      parsed[0][3].push(newItem);
+    }
   }
+
   return GRP.serialize(parsed, options);
 }
 

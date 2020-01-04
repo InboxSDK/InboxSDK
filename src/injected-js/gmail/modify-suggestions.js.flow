@@ -1,7 +1,7 @@
 /* @flow */
 
 // This is the type that the user provides.
-export type AutocompleteSearchResult = {
+export type AutocompleteSearchResult = {|
   description?: ?string,
   descriptionHTML?: ?string,
   externalURL?: ?string,
@@ -13,7 +13,10 @@ export type AutocompleteSearchResult = {
   routeName?: ?string,
   routeParams?: ?{ [ix: string]: string | number },
   searchTerm?: ?string
-};
+|} | {|
+  label?: ?string,
+  labelHTML?: ?string
+|};
 
 // These ids are part of the object constructed by the SDK used to refer to a
 // suggestion to the injected script.

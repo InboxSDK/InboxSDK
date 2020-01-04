@@ -130,6 +130,50 @@ export default function registerSearchSuggestionsProvider(
         firstChild.classList.add('inboxsdk__suggestions_separator_after');
       }
     }
+
+    for (const row of rows) {
+      const itemDataSpan = row.querySelector('span[data-inboxsdk-suggestion]');
+      if (itemDataSpan) {
+        const itemData = JSON.parse(
+          itemDataSpan.getAttribute('data-inboxsdk-suggestion') || 'null'
+        );
+
+        const existingLabelContainer = row.querySelector(
+          '.inboxsdk__suggestions_labelContainer'
+        );
+        if (existingLabelContainer) {
+          existingLabelContainer.remove();
+        }
+        const rowDiv: HTMLDivElement = (row: any).firstElementChild
+          .firstElementChild;
+
+        if (itemData && itemData.modificationGroupLabels.length) {
+          row.setAttribute('data-inboxsdk-suggestions-haslabel', 'true');
+
+          const LABEL_HEIGHT = 20;
+          const totalLabelHeightPx =
+            itemData.modificationGroupLabels.length * LABEL_HEIGHT;
+          rowDiv.style.marginTop = totalLabelHeightPx + 'px';
+
+          const labelContainer = document.createElement('div');
+          labelContainer.className = 'inboxsdk__suggestions_labelContainer';
+          labelContainer.style.height = totalLabelHeightPx + 'px';
+          labelContainer.style.marginTop = -totalLabelHeightPx + 'px';
+          rowDiv.insertBefore(labelContainer, rowDiv.firstChild);
+
+          for (const labelHTML of itemData.modificationGroupLabels) {
+            const el = document.createElement('div');
+            el.className = 'inboxsdk__suggestions_label';
+            el.style.height = LABEL_HEIGHT + 'px';
+            el.innerHTML = labelHTML;
+            labelContainer.appendChild(el);
+          }
+        } else {
+          row.removeAttribute('data-inboxsdk-suggestions-haslabel');
+          rowDiv.style.marginTop = '';
+        }
+      }
+    }
   });
 
   const rowSelectionEvents: Kefir.Observable<{
