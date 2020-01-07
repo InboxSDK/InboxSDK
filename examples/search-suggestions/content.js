@@ -29,6 +29,9 @@ InboxSDK.load(2, 'search-suggestions').then(inboxSDK => {
         label: 'Group 1',
       },
       {
+        label: 'Group 2',
+      },
+      {
         name: 'new window',
         description: 'opens in new window',
         externalURL: 'https://www.xkcd.com'
@@ -46,7 +49,7 @@ InboxSDK.load(2, 'search-suggestions').then(inboxSDK => {
         }
       },
       {
-        label: 'Group 2',
+        label: 'This is a really long group label for you. I hope you enjoy reading it as much as I did writing it. This is a really long group label for you. I hope you enjoy reading it as much as I did writing it.',
       },
       {
         name: 'alert box+link',

@@ -2496,11 +2496,32 @@ td.inboxsdk__suggestions_separator_after .inboxsdk__suggestions_labelContainer {
 }
 
 .inboxsdk__suggestions_labelContainer {
+  align-items: flex-start;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  left: 0;
+  pointer-events: none;
   position: absolute;
   width: 100%;
-  pointer-events: none;
-  background: white;
-  left: 0;
+}
+
+.inboxsdk__suggestions_label {
+  box-sizing: border-box;
+  color: rgba(0, 0, 0, 0.54);
+  font-family: Roboto;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  max-width: 100%;
+  overflow: hidden;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 2px;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 /* Adjust positioning when no description present */

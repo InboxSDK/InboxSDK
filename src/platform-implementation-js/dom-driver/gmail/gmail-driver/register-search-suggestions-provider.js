@@ -151,7 +151,7 @@ export default function registerSearchSuggestionsProvider(
         if (itemData && itemData.modificationGroupLabels.length) {
           row.setAttribute('data-inboxsdk-suggestions-haslabel', 'true');
 
-          const LABEL_HEIGHT = 20;
+          const LABEL_HEIGHT = 28;
           const totalLabelHeightPx =
             itemData.modificationGroupLabels.length * LABEL_HEIGHT;
           rowDiv.style.marginTop = totalLabelHeightPx + 'px';
@@ -165,7 +165,6 @@ export default function registerSearchSuggestionsProvider(
           for (const labelHTML of itemData.modificationGroupLabels) {
             const el = document.createElement('div');
             el.className = 'inboxsdk__suggestions_label';
-            el.style.height = LABEL_HEIGHT + 'px';
             el.innerHTML = labelHTML;
             labelContainer.appendChild(el);
           }
