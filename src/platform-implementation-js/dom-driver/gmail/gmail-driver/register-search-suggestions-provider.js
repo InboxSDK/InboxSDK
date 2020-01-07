@@ -76,6 +76,7 @@ export default function registerSearchSuggestionsProvider(
   const searchBoxStream: Kefir.Observable<HTMLInputElement> = driver
     .getRouteViewDriverStream()
     .toProperty(() => null)
+    .merge(Kefir.interval(5000))
     .map(() => gmailElementGetter.getSearchInput())
     .filter(Boolean)
     .take(1);
