@@ -63,7 +63,7 @@ const renderResultsList = ({
   container.setAttribute('data-order-hint', providerOrder);
   container.classList.add('inboxsdk__search_suggestion_group');
 
-  results.forEach(result => {
+  results.filter(result => {
     if ('label' in result || 'labelHTML' in result) {
       return;
     }
