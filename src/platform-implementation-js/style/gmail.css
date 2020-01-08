@@ -588,6 +588,10 @@ body.inboxsdk__gmailv1css .inboxsdk__thread_row_label .inboxsdk__button_icon {
   padding: 0px;
 }
 
+.inboxsdk__thread_row_button .inboxsdk__button_icon {
+  max-height: 100%;
+}
+
 body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_custom_date_container {
   max-width: inherit;
 }
