@@ -12,44 +12,69 @@ export default function copyAndValidateAutocompleteResults(
   }
 
   return results.map(result => {
-    const resultCopy = { ...result };
-    if (
-      typeof resultCopy.name !== 'string' &&
-      typeof resultCopy.nameHTML !== 'string'
-    ) {
-      throw new Error('suggestion must have name or nameHTML property');
-    }
-    if (
-      typeof resultCopy.routeName !== 'string' &&
-      typeof resultCopy.externalURL !== 'string' &&
-      typeof resultCopy.searchTerm !== 'string' &&
-      typeof resultCopy.onClick !== 'function'
-    ) {
-      throw new Error(
-        'suggestion must have routeName, externalURL, ' +
-          'searchTerm, or onClick property'
-      );
-    }
-    if (typeof (resultCopy: any).iconURL === 'string') {
-      const iconURL = (resultCopy: any).iconURL;
-      driver
-        .getLogger()
-        .deprecationWarning(
-          'AutocompleteSearchResult "iconURL" property',
-          'AutocompleteSearchResult.iconUrl'
+    const resultCopy: AutocompleteSearchResult = { ...result };
+
+    if ('label' in resultCopy || 'labelHTML' in resultCopy) {
+      if (
+        !(
+          typeof resultCopy.label !== 'string' ||
+          typeof resultCopy.labelHTML !== 'string'
+        )
+      ) {
+        throw new Error(
+          'AutocompleteSearchResult must have label or labelHTML.'
         );
-      if (!resultCopy.iconUrl) {
-        if (driver.getOpts().REQUESTED_API_VERSION === 1) {
-          resultCopy.iconUrl = iconURL;
-        } else {
-          // eslint-disable-next-line no-console
-          console.error(
-            'Support for iconURL property was dropped after API version 1'
-          );
-        }
       }
-      delete (resultCopy: any).iconURL;
+      return resultCopy;
+    } else {
+      if (
+        !(
+          typeof resultCopy.name !== 'string' ||
+          typeof resultCopy.nameHTML !== 'string'
+        )
+      ) {
+        throw new Error('AutocompleteSearchResult must have name or nameHTML.');
+      }
+
+      if (
+        typeof resultCopy.label === 'string' ||
+        typeof resultCopy.labelHTML === 'string'
+      ) {
+        return resultCopy;
+      }
+
+      if (
+        typeof resultCopy.routeName !== 'string' &&
+        typeof resultCopy.externalURL !== 'string' &&
+        typeof resultCopy.searchTerm !== 'string' &&
+        typeof resultCopy.onClick !== 'function'
+      ) {
+        throw new Error(
+          'suggestion must have routeName, externalURL, ' +
+            'searchTerm, or onClick property'
+        );
+      }
+      if (typeof (resultCopy: any).iconURL === 'string') {
+        const iconURL = (resultCopy: any).iconURL;
+        driver
+          .getLogger()
+          .deprecationWarning(
+            'AutocompleteSearchResult "iconURL" property',
+            'AutocompleteSearchResult.iconUrl'
+          );
+        if (!resultCopy.iconUrl) {
+          if (driver.getOpts().REQUESTED_API_VERSION === 1) {
+            (resultCopy: any).iconUrl = iconURL;
+          } else {
+            // eslint-disable-next-line no-console
+            console.error(
+              'Support for iconURL property was dropped after API version 1'
+            );
+          }
+        }
+        delete (resultCopy: any).iconURL;
+      }
+      return resultCopy;
     }
-    return resultCopy;
   });
 }

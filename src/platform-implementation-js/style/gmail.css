@@ -1,14 +1,3 @@
-/* suggestions */
-
-.inboxsdk__suggestions_separator_before {
-  padding-bottom: 2px !important;
-}
-
-.inboxsdk__suggestions_separator_after {
-  border-top: 1px solid #e5e5e5;
-  padding-top: 2px !important;
-}
-
 /* buttons */
 
 div.T-I.inboxsdk__button {
@@ -2496,6 +2485,46 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   left: 8px;
   height: 32px;
   width: 43px;
+}
+
+td.inboxsdk__suggestions_separator_before {
+  padding-bottom: 2px !important;
+}
+
+tr:not([data-inboxsdk-suggestions-haslabel])
+  > td.inboxsdk__suggestions_separator_after,
+td.inboxsdk__suggestions_separator_after .inboxsdk__suggestions_labelContainer {
+  border-top: 1px solid #e5e5e5;
+  padding-top: 2px !important;
+}
+
+.inboxsdk__suggestions_labelContainer {
+  align-items: flex-start;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  left: 0;
+  pointer-events: none;
+  position: absolute;
+  width: 100%;
+}
+
+.inboxsdk__suggestions_label {
+  box-sizing: border-box;
+  color: rgba(0, 0, 0, 0.54);
+  font-family: Roboto;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.25px;
+  max-width: 100%;
+  overflow: hidden;
+  padding-left: 12px;
+  padding-right: 12px;
+  padding-top: 2px;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 /* Adjust positioning when no description present */
