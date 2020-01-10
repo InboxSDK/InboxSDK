@@ -63,11 +63,7 @@ const renderResultsList = ({
   container.setAttribute('data-order-hint', providerOrder);
   container.classList.add('inboxsdk__search_suggestion_group');
 
-  results.filter(result => {
-    if ('label' in result || 'labelHTML' in result) {
-      return;
-    }
-
+  results.forEach(result => {
     const listItem = document.createElement('li');
 
     const description =
@@ -84,7 +80,7 @@ const renderResultsList = ({
       <img src="${result.iconUrl || DEFAULT_RESULT_ICON}">
       <span>
         <span class="inboxsdk__search_suggestion_name" role="option">
-          ${result.name || { __html: ((result: any).nameHTML: any) }}
+          ${result.name || { __html: (result.nameHTML: any) }}
         </span>
         ${{ __html: description }}
       </span>
