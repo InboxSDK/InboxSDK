@@ -26,12 +26,6 @@ InboxSDK.load(2, 'search-suggestions').then(inboxSDK => {
     log('search autocompleter', query);
     return delay(0, [
       {
-        label: 'Group 1',
-      },
-      {
-        label: 'Group 2',
-      },
-      {
         name: 'new window',
         description: 'opens in new window',
         externalURL: 'https://www.xkcd.com'
@@ -47,9 +41,6 @@ InboxSDK.load(2, 'search-suggestions').then(inboxSDK => {
         onClick() {
           alert('foo of bar');
         }
-      },
-      {
-        label: 'This is a really long group label for you. I hope you enjoy reading it as much as I did writing it. This is a really long group label for you. I hope you enjoy reading it as much as I did writing it.',
       },
       {
         name: 'alert box+link',
@@ -93,9 +84,6 @@ InboxSDK.load(2, 'search-suggestions').then(inboxSDK => {
 
   inboxSDK.Search.registerSearchSuggestionsProvider(query => {
     return [
-      {
-        label: 'Group foo',
-      },
       {
         "iconUrl": "https://mailfoogae.appspot.com/images/extension/pipeline-icon.png",
         "nameHTML": "<b>He</b>lp and Tours",
