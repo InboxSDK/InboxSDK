@@ -96,7 +96,9 @@ async function setupExamples() {
   }
 }
 
-gulp.task('noop', () => {});
+gulp.task('noop', () => {
+  // noop
+});
 
 async function getVersion(): Promise<string> {
   const results = await Promise.all([
@@ -178,6 +180,7 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
     .transform('redirectify', { global: true });
 
   if (args.hot && hotPort) {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     bundler.plugin(require('browserify-hmr'), browserifyHmrOptions!);
   }
 

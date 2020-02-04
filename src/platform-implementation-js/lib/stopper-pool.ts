@@ -27,7 +27,9 @@ export default class StopperPool<V, E> {
 
     // force stream to be active so this._streamCount, this._ended, and the
     // property's cached value will be kept up-to-date
-    this.stream.onValue(() => {});
+    this.stream.onValue(() => {
+      // ignore
+    });
 
     this.add(streams);
   }

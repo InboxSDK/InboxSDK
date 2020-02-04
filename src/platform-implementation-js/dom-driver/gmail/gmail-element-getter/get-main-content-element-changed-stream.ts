@@ -32,7 +32,9 @@ export default function getMainContentElementChangedStream(
 
   // Make sure we always have a subscriber. The function breaks if it loses all
   // subscribers and then re-gains some.
-  s.onValue(() => {});
+  s.onValue(() => {
+    // ignore, just activate
+  });
 
   return s as Kefir.Observable<HTMLElement, never>;
 }

@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import sinon from 'sinon';
-const sinonTest = require('sinon-test')(sinon, { useFakeTimers: false });
+import sinonTestFactory from 'sinon-test';
+const sinonTest = sinonTestFactory(sinon, { useFakeTimers: false });
 import MockElementParent from '../../../../test/lib/mock-element-parent';
 import MockMutationObserver from '../../../../test/lib/mock-mutation-observer';
 import defer from '../../../common/defer';
