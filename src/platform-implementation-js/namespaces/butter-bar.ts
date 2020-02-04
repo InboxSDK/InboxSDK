@@ -9,7 +9,9 @@ import { Driver, ButterBarMessage } from '../driver-interfaces/driver';
 
 const ancientComplainTime = 2 * 60 * 1000;
 const dummyPacket = Object.freeze({
-  destroy: Object.freeze(function() {})
+  destroy: Object.freeze(function() {
+    // do nothing
+  })
 });
 
 const memberMap = new WeakMap<

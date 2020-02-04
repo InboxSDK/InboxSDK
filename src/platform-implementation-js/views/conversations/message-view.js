@@ -89,7 +89,10 @@ class MessageView extends EventEmitter {
     if (
       typeof buttonOptions.onClick !== 'function' ||
       typeof buttonOptions.title !== 'string' ||
-      !MessageViewToolbarSectionNames.hasOwnProperty(buttonOptions.section)
+      !Object.prototype.hasOwnProperty.call(
+        MessageViewToolbarSectionNames,
+        buttonOptions.section
+      )
     ) {
       throw new Error(
         'Missing required properties on MessageViewToolbarButtonDescriptor object'

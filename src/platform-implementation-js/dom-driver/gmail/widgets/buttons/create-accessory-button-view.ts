@@ -13,7 +13,9 @@ export default class CreateAccessoryButtonView implements ButtonViewI {
     this._setupEventStream();
   }
 
-  public update() {}
+  public update() {
+    // noop
+  }
 
   public setEnabled() {
     throw new Error('not implemented');

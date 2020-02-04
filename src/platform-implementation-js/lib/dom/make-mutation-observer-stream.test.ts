@@ -46,7 +46,9 @@ it("doesn't emit events while current events are processed", done => {
 
   const target = new MockElementParent([child1, child2]);
   const someBus = kefirBus();
-  someBus.onValue(() => {});
+  someBus.onValue(() => {
+    // just activate bus
+  });
 
   let call = 0;
   let criticalSection = false;

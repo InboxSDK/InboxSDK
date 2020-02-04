@@ -48,7 +48,14 @@ module.exports = {
       .default.overrides,
     {
       files: ['*.ts', '*.tsx'],
-      ...require('@typescript-eslint/eslint-plugin/dist/configs/recommended.json')
+      ...(() => {
+        const result = {
+          ...require('@typescript-eslint/eslint-plugin/dist/configs/base.json'),
+          ...require('@typescript-eslint/eslint-plugin/dist/configs/recommended.json')
+        };
+        delete result.extends;
+        return result;
+      })()
     },
     {
       files: ['*.ts', '*.tsx'],
@@ -60,7 +67,11 @@ module.exports = {
         '@typescript-eslint/no-use-before-define': ['off'],
         '@typescript-eslint/no-non-null-assertion': ['off'],
         '@typescript-eslint/array-type': ['off'],
-        '@typescript-eslint/camelcase': ['error', { properties: 'never' }]
+        '@typescript-eslint/camelcase': ['error', { properties: 'never' }],
+
+        // TODO maybe remove these
+        '@typescript-eslint/no-inferrable-types': ['off'],
+        '@typescript-eslint/no-this-alias': ['off']
       }
     },
     // End typescript config

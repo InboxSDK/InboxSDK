@@ -1,7 +1,8 @@
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import sinon from 'sinon';
-const sinonTest = require('sinon-test')(sinon, { useFakeTimers: false });
+import sinonTestFactory from 'sinon-test';
+const sinonTest = sinonTestFactory(sinon, { useFakeTimers: false });
 import { ItemWithLifetime } from './make-element-child-stream';
 
 import makeElementStreamMerger from './make-element-stream-merger';
