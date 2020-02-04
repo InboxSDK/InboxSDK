@@ -63,6 +63,7 @@ var ButterBar = /** @lends ButterBar */ {
 var MessageDescriptor = /** @lends MessageDescriptor */ {
   /**
    * Text to show.
+   * ^optional
    * @type {string}
    */
   text: null,
