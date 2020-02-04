@@ -1,23 +1,21 @@
-/* @flow */
-
 import once from 'lodash/once';
 import loadScript from '../../common/load-script';
 
-import type { PlatformImplementation } from '../../platform-implementation-js/platform-implementation';
+import { PlatformImplementation } from '../../platform-implementation-js/platform-implementation';
 
 const PlatformImplementationLoader = {
-  load(appId: string, opts: Object): Promise<PlatformImplementation> {
+  load(appId: string, opts: object): Promise<PlatformImplementation> {
     return Promise.resolve()
       .then(() => {
-        if (!global.__InboxSDKImpLoader) {
+        if (!(global as any).__InboxSDKImpLoader) {
           return PlatformImplementationLoader._loadScript().then(() => {
-            if (!global.__InboxSDKImpLoader) {
+            if (!(global as any).__InboxSDKImpLoader) {
               throw new Error('Implementation file did not load correctly');
             }
           });
         }
       })
-      .then(() => global.__InboxSDKImpLoader.load('0.1', appId, opts));
+      .then(() => (global as any).__InboxSDKImpLoader.load('0.1', appId, opts));
   },
 
   _loadScript: once(function() {
@@ -31,7 +29,7 @@ const PlatformImplementationLoader = {
       }
     }
 
-    return loadScript((process.env.IMPLEMENTATION_URL: any), {
+    return loadScript(process.env.IMPLEMENTATION_URL!, {
       nowrap: true, // platform-implementation has no top-level vars so no need for function wrapping
       disableSourceMappingURL
     });
@@ -39,7 +37,7 @@ const PlatformImplementationLoader = {
 
   preload() {
     // Prime the load by calling it and letting the promise be memoized.
-    this._loadScript();
+    PlatformImplementationLoader._loadScript();
   }
 };
 

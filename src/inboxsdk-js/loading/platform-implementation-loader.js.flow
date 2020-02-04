@@ -1,0 +1,13 @@
+/* @flow */
+
+import type { PlatformImplementation } from '../../platform-implementation-js/platform-implementation';
+
+declare export var PlatformImplementationLoader: {
+  load(appId: string, opts: Object): Promise<PlatformImplementation>;
+
+  _loadScript: () => Promise<void>;
+
+  preload(): void;
+};
+
+export default PlatformImplementationLoader;
