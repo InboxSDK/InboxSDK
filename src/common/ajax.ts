@@ -23,6 +23,7 @@ export interface AjaxOpts {
   data?: { [index: string]: string } | string;
   canRetry?: boolean;
   retryNum?: number;
+  XMLHttpRequest?: typeof XMLHttpRequest;
 }
 
 export interface AjaxResponse {
@@ -67,6 +68,7 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
       url = cachebustUrl(url);
     }
 
+    const XMLHttpRequest = opts.XMLHttpRequest || window.XMLHttpRequest;
     const xhr = new XMLHttpRequest();
     Object.assign(xhr, opts.xhrFields);
     xhr.onerror = function(event) {
