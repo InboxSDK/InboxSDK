@@ -133,7 +133,7 @@
     "tag-tree": "^1.0.0",
     "thirty-two": "^1.0.1",
     "transducers.js": "^0.3.2",
-    "typescript": "^3.5.1",
+    "typescript": "^3.7.5",
     "ud": "^3.1.1",
     "ud-kefir": "^2.0.1",
     "vinyl-source-stream": "^2.0.0",
