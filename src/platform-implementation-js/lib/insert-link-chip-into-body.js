@@ -42,9 +42,7 @@ function _getChipElement(options: Object): HTMLElement {
 
   var iconHtml: string = options.iconUrl
     ? autoHtml`
-<img style="height:16px; width:16px; vertical-align: bottom; border: none;" height="16px" width="16px" src="${
-        options.iconUrl
-      }">&nbsp;
+<img style="height:16px; width:16px; vertical-align: bottom; border: none;" height="16px" width="16px" src="${options.iconUrl}">&nbsp;
 `
     : '';
   var chipHTML: string = autoHtml`

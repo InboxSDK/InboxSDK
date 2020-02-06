@@ -160,9 +160,7 @@ export default class InboxNavItemView {
       accessory
     } = this._elements;
 
-    wrapper.className = `inboxsdk__navItem_wrapper inboxsdk__navItem_level${
-      this._level
-    }`;
+    wrapper.className = `inboxsdk__navItem_wrapper inboxsdk__navItem_level${this._level}`;
     wrapper.setAttribute('tabindex', '-1');
     wrapper.setAttribute('data-order-hint', String(this._orderHint));
     navItem.setAttribute('role', 'menuitem');

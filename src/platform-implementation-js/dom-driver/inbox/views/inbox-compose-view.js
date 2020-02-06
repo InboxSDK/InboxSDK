@@ -368,9 +368,10 @@ class InboxComposeView {
     );
 
     this._eventStream.plug(
-      Kefir.fromEvents(this.getElement(), 'inboxSDKdiscardCanceled').map(
-        () => ({ eventName: 'discardCanceled' })
-      )
+      Kefir.fromEvents(
+        this.getElement(),
+        'inboxSDKdiscardCanceled'
+      ).map(() => ({ eventName: 'discardCanceled' }))
     );
 
     this._eventStream.plug(

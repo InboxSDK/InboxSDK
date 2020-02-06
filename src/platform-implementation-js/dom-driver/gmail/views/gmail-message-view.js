@@ -567,8 +567,8 @@ class GmailMessageView {
 
           if (
             opts.tooltip &&
-            (typeof opts.tooltip == 'object' &&
-              opts.tooltip instanceof HTMLElement)
+            typeof opts.tooltip == 'object' &&
+            opts.tooltip instanceof HTMLElement
           ) {
             const tooltipWrapper = getTooltipNodeWrapper();
             tooltipWrapper.className =
