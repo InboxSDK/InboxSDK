@@ -249,80 +249,78 @@ class GmailThreadView {
     const parentElement = this._element.parentElement;
     if (!parentElement) throw new Error('missing parent element');
     const customMessageView = new CustomMessageView(descriptorStream, () => {
-      this._readyStream.onValue(
-        async (): any => {
-          const messageContainer = this._element.querySelector('[role=list]');
-          if (!messageContainer) return;
+      this._readyStream.onValue(async (): any => {
+        const messageContainer = this._element.querySelector('[role=list]');
+        if (!messageContainer) return;
 
-          let mostRecentDate = Number.MIN_SAFE_INTEGER;
-          let insertBeforeMessage;
+        let mostRecentDate = Number.MIN_SAFE_INTEGER;
+        let insertBeforeMessage;
 
-          let isInHidden = false;
+        let isInHidden = false;
 
-          const messages = [
-            ...(await Promise.all(
-              this._messageViewDrivers.map(async messageView => ({
-                sortDatetime: (await messageView.getDate()) || 0,
-                isHidden: messageView.getViewState() === 'HIDDEN',
-                element: messageView.getElement()
-              }))
-            )),
-            ...Array.from(this._customMessageViews)
-              .filter(
-                cmv =>
-                  cmv !== customMessageView &&
-                  cmv.getElement()
-                    .parentElement /* it has been inserted into dom */
-              )
-              .map(cmv => {
-                const date = cmv.getSortDate();
-                const datetime = date ? date.getTime() : null;
+        const messages = [
+          ...(await Promise.all(
+            this._messageViewDrivers.map(async messageView => ({
+              sortDatetime: (await messageView.getDate()) || 0,
+              isHidden: messageView.getViewState() === 'HIDDEN',
+              element: messageView.getElement()
+            }))
+          )),
+          ...Array.from(this._customMessageViews)
+            .filter(
+              cmv =>
+                cmv !== customMessageView &&
+                cmv.getElement()
+                  .parentElement /* it has been inserted into dom */
+            )
+            .map(cmv => {
+              const date = cmv.getSortDate();
+              const datetime = date ? date.getTime() : null;
 
-                return {
-                  sortDatetime: datetime || 0,
-                  isHidden: cmv
-                    .getElement()
-                    .classList.contains('inboxsdk__custom_message_view_hidden'),
-                  element: cmv.getElement()
-                };
-              })
-          ].sort((a, b) => a.sortDatetime - b.sortDatetime);
+              return {
+                sortDatetime: datetime || 0,
+                isHidden: cmv
+                  .getElement()
+                  .classList.contains('inboxsdk__custom_message_view_hidden'),
+                element: cmv.getElement()
+              };
+            })
+        ].sort((a, b) => a.sortDatetime - b.sortDatetime);
 
-          const messageDate = customMessageView.getSortDate();
-          if (!messageDate) return;
+        const messageDate = customMessageView.getSortDate();
+        if (!messageDate) return;
 
-          for (let message of messages) {
-            isInHidden = message.isHidden;
+        for (let message of messages) {
+          isInHidden = message.isHidden;
 
-            if (
-              messageDate.getTime() >= mostRecentDate &&
-              messageDate.getTime() <= message.sortDatetime
-            ) {
-              insertBeforeMessage = message.element;
-              break;
-            }
-
-            mostRecentDate = message.sortDatetime;
+          if (
+            messageDate.getTime() >= mostRecentDate &&
+            messageDate.getTime() <= message.sortDatetime
+          ) {
+            insertBeforeMessage = message.element;
+            break;
           }
 
-          if (insertBeforeMessage)
-            insertBeforeMessage.insertAdjacentElement(
-              'beforebegin',
-              customMessageView.getElement()
-            );
-          else
-            messageContainer.insertAdjacentElement(
-              'beforeend',
-              customMessageView.getElement()
-            );
-
-          if (isInHidden) {
-            this._setupHiddenCustomMessage(customMessageView);
-          }
-
-          parentElement.classList.add('inboxsdk__thread_view_with_custom_view');
+          mostRecentDate = message.sortDatetime;
         }
-      );
+
+        if (insertBeforeMessage)
+          insertBeforeMessage.insertAdjacentElement(
+            'beforebegin',
+            customMessageView.getElement()
+          );
+        else
+          messageContainer.insertAdjacentElement(
+            'beforeend',
+            customMessageView.getElement()
+          );
+
+        if (isInHidden) {
+          this._setupHiddenCustomMessage(customMessageView);
+        }
+
+        parentElement.classList.add('inboxsdk__thread_view_with_custom_view');
+      });
     });
 
     this._customMessageViews.add(customMessageView);
@@ -599,9 +597,9 @@ class GmailThreadView {
         mutationsList.some(
           mutation =>
             mutation.type === 'childList' &&
-            (mutation.removedNodes &&
-              mutation.removedNodes.length &&
-              mutation.removedNodes.length > 0)
+            mutation.removedNodes &&
+            mutation.removedNodes.length &&
+            mutation.removedNodes.length > 0
         )
       ) {
         if (!labelContainer.contains(el)) {

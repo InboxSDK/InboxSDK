@@ -192,14 +192,8 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
           addsrc.prepend('./src/inboxsdk-js/header.js')
         )
       )
-      .pipe(
-        sourcemaps.init,
-        { loadMaps: true }
-      )
-      .pipe(
-        concat,
-        destName
-      )
+      .pipe(sourcemaps.init, { loadMaps: true })
+      .pipe(concat, destName)
       .pipe(() =>
         gulpif(
           willMinify,
@@ -212,16 +206,12 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
           })
         )
       )
-      .pipe(
-        sourcemaps.write,
-        args.production ? '.' : null,
-        {
-          // don't include sourcemap comment in the inboxsdk.js file that we
-          // distribute to developers since it'd always be broken.
-          addComment: !options.noSourceMapComment,
-          sourceMappingURLPrefix: options.sourceMappingURLPrefix
-        }
-      );
+      .pipe(sourcemaps.write, args.production ? '.' : null, {
+        // don't include sourcemap comment in the inboxsdk.js file that we
+        // distribute to developers since it'd always be broken.
+        addComment: !options.noSourceMapComment,
+        sourceMappingURLPrefix: options.sourceMappingURLPrefix
+      });
 
     const bundle = bundler.bundle();
     const result = bundle
