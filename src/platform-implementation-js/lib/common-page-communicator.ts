@@ -2,7 +2,7 @@ import asap from 'asap';
 import once from 'lodash/once';
 import * as Kefir from 'kefir';
 import Logger from './logger';
-import { AjaxOpts } from '../../common/ajax';
+import { CommonAjaxOpts } from '../../common/ajax';
 
 export default class CommonPageCommunicator {
   public ajaxInterceptStream: Kefir.Observable<any, never>;
@@ -85,7 +85,7 @@ export default class CommonPageCommunicator {
   }
 
   public pageAjax(
-    opts: AjaxOpts
+    opts: CommonAjaxOpts
   ): Promise<{ text: string; responseURL: string }> {
     const id = `${Date.now()}-${Math.random()}`;
     const promise = Kefir.fromEvents(document, 'inboxSDKpageAjaxDone')
