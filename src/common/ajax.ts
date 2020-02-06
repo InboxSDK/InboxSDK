@@ -14,7 +14,7 @@ const serversToIgnore: { [domain: string]: boolean } = {};
 // * [headers] - object
 // * [xhrFields] - object
 // * [data]
-export interface AjaxOpts {
+export interface CommonAjaxOpts {
   url: string;
   method?: string;
   cachebust?: boolean;
@@ -23,6 +23,10 @@ export interface AjaxOpts {
   data?: { [index: string]: string } | string;
   canRetry?: boolean;
   retryNum?: number;
+}
+
+export interface AjaxOpts extends CommonAjaxOpts {
+  XMLHttpRequest?: typeof XMLHttpRequest;
 }
 
 export interface AjaxResponse {
@@ -67,6 +71,7 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
       url = cachebustUrl(url);
     }
 
+    const XMLHttpRequest = opts.XMLHttpRequest || window.XMLHttpRequest;
     const xhr = new XMLHttpRequest();
     Object.assign(xhr, opts.xhrFields);
     xhr.onerror = function(event) {
