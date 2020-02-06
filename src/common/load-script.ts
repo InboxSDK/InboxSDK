@@ -56,6 +56,7 @@ export interface LoadScriptOptions {
   // true disables this behavior.
   nowrap?: boolean;
   disableSourceMappingURL?: boolean;
+  XMLHttpRequest?: typeof XMLHttpRequest;
 }
 
 export default function loadScript(
@@ -75,7 +76,8 @@ export default function loadScript(
 
       return ajax({
         url,
-        cachebust: retryNum > 0
+        cachebust: retryNum > 0,
+        XMLHttpRequest: opts?.XMLHttpRequest
       }).then(response => {
         // Q: Why put the code into a function before executing it instead of
         //    evaling it immediately?
