@@ -77,7 +77,7 @@ export default function loadScript(
       return ajax({
         url,
         cachebust: retryNum > 0,
-        XMLHttpRequest: opts?.XMLHttpRequest
+        XMLHttpRequest: opts ? opts.XMLHttpRequest : undefined
       }).then(response => {
         // Q: Why put the code into a function before executing it instead of
         //    evaling it immediately?
