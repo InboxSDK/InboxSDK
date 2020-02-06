@@ -7,6 +7,7 @@ import getSessionId from '../../common/get-session-id';
 import logError from '../../common/log-error';
 import PersistentQueue from './persistent-queue';
 import makeMutationObserverStream from './dom/make-mutation-observer-stream';
+import { getXMLHttpRequest } from 'ext-corb-workaround';
 
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
@@ -496,7 +497,9 @@ async function retrieveNewEventsAccessToken(): Promise<{
   expirationDate: number;
 }> {
   const { text } = await ajax({
-    url: 'https://www.inboxsdk.com/api/v2/events/oauth'
+    url: 'https://www.inboxsdk.com/api/v2/events/oauth',
+    // Work around CORB for extensions that have permissions to inboxsdk.com
+    XMLHttpRequest: getXMLHttpRequest()
   });
   const accessToken: any = JSON.parse(text);
   if (isTimestampExpired(accessToken.expirationDate)) {
