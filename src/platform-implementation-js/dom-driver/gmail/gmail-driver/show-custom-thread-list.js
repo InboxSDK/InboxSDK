@@ -188,9 +188,10 @@ function initialIDPairToIDPairWithRFC(
     return Promise.resolve(((pair: any): IDPairWithRFC));
   } else if (typeof pair.gtid === 'string') {
     const gtid = pair.gtid;
-    return driver
-      .getRfcMessageIdForGmailThreadId(gtid)
-      .then(rfcId => ({ gtid, rfcId }), err => findIdFailure(gtid, err));
+    return driver.getRfcMessageIdForGmailThreadId(gtid).then(
+      rfcId => ({ gtid, rfcId }),
+      err => findIdFailure(gtid, err)
+    );
   }
   throw new Error('Should not happen');
 }
@@ -202,12 +203,10 @@ function idPairWithRFCToCompletedIDPair(
 ): Promise<?CompletedIDPair> {
   return typeof pair.gtid === 'string'
     ? Promise.resolve(((pair: any): CompletedIDPair))
-    : driver
-        .getGmailThreadIdForRfcMessageId(pair.rfcId)
-        .then(
-          gtid => ({ gtid, rfcId: pair.rfcId }),
-          err => findIdFailure(pair.rfcId, err)
-        );
+    : driver.getGmailThreadIdForRfcMessageId(pair.rfcId).then(
+        gtid => ({ gtid, rfcId: pair.rfcId }),
+        err => findIdFailure(pair.rfcId, err)
+      );
 }
 
 // Returns the search string that will trigger the onActivate function.
@@ -257,11 +256,13 @@ const setupSearchReplacing = (
           .map(threadDescriptorToInitialIDPair)
           .filter(Boolean);
 
-        const idPairsWithRFC: IDPairWithRFC[] = (await Promise.all(
-          initialIDPairs.map(pair =>
-            initialIDPairToIDPairWithRFC(driver, pair, findIdFailure)
+        const idPairsWithRFC: IDPairWithRFC[] = (
+          await Promise.all(
+            initialIDPairs.map(pair =>
+              initialIDPairToIDPairWithRFC(driver, pair, findIdFailure)
+            )
           )
-        )).filter(Boolean);
+        ).filter(Boolean);
 
         const messageIDQuery: string =
           idPairsWithRFC.length > 0
@@ -294,11 +295,13 @@ const setupSearchReplacing = (
           .toPromise();
 
         // Figure out any gmail thread ids we don't know yet.
-        const completedIDPairs: Array<CompletedIDPair> = (await Promise.all(
-          idPairsWithRFC.map(pair =>
-            idPairWithRFCToCompletedIDPair(driver, pair, findIdFailure)
+        const completedIDPairs: Array<CompletedIDPair> = (
+          await Promise.all(
+            idPairsWithRFC.map(pair =>
+              idPairWithRFCToCompletedIDPair(driver, pair, findIdFailure)
+            )
           )
-        )).filter(Boolean);
+        ).filter(Boolean);
 
         const response = await searchResultsResponse_promise;
 

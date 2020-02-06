@@ -918,9 +918,9 @@ class InboxDriver {
   }
 
   getSelectedThreadRowViewDrivers(): Array<InboxThreadRowView> {
-    return Array.from(this.getThreadRowViewDriverLiveSet().values()).filter(
-      threadRowViewDriver => threadRowViewDriver.isSelected()
-    );
+    return Array.from(
+      this.getThreadRowViewDriverLiveSet().values()
+    ).filter(threadRowViewDriver => threadRowViewDriver.isSelected());
   }
 
   addNavItem(

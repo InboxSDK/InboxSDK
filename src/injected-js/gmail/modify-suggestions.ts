@@ -91,9 +91,7 @@ function modifySuggestions(
     )}"></span>`;
 
     if (modification.iconHTML != null) {
-      nameHTML = `<div class="inboxsdk__custom_suggestion_iconHTML">${
-        modification.iconHTML
-      }</div>${nameHTML}`;
+      nameHTML = `<div class="inboxsdk__custom_suggestion_iconHTML">${modification.iconHTML}</div>${nameHTML}`;
     }
 
     const newItem = [

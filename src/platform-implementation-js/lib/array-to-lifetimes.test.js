@@ -10,7 +10,11 @@ import arrayToLifetimes from './array-to-lifetimes';
 it('works', cb => {
   const events = [];
   arrayToLifetimes(
-    Kefir.sequentially(0, [['a', 'b'], ['b', 'd'], ['a', 'b', 'c']])
+    Kefir.sequentially(0, [
+      ['a', 'b'],
+      ['b', 'd'],
+      ['a', 'b', 'c']
+    ])
   )
     .onValue(({ el, removalStream }) => {
       events.push(['add', el]);
@@ -41,9 +45,19 @@ it('keyFn works', cb => {
   const events = [];
   arrayToLifetimes(
     Kefir.sequentially(0, [
-      [{ v: 'a', k: 1 }, { v: 'b', k: 2 }],
-      [{ v: 'B', k: 2 }, { v: 'd', k: 4 }],
-      [{ v: 'A', k: 1 }, { v: 'b', k: 2 }, { v: 'c', k: 3 }]
+      [
+        { v: 'a', k: 1 },
+        { v: 'b', k: 2 }
+      ],
+      [
+        { v: 'B', k: 2 },
+        { v: 'd', k: 4 }
+      ],
+      [
+        { v: 'A', k: 1 },
+        { v: 'b', k: 2 },
+        { v: 'c', k: 3 }
+      ]
     ]),
     el => el.k
   )

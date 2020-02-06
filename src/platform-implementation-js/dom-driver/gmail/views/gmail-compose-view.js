@@ -176,26 +176,22 @@ class GmailComposeView {
               return {
                 eventName: 'sent',
                 data: {
-                  getThreadID: once(
-                    async (): Promise<string> => {
-                      if (event.oldThreadID) {
-                        return event.oldThreadID;
-                      }
-                      return await driver.getOldGmailThreadIdFromSyncThreadId(
-                        syncThreadID
-                      );
+                  getThreadID: once(async (): Promise<string> => {
+                    if (event.oldThreadID) {
+                      return event.oldThreadID;
                     }
-                  ),
-                  getMessageID: once(
-                    async (): Promise<string> => {
-                      if (event.oldMessageID) {
-                        return event.oldMessageID;
-                      }
-                      return await driver.getGmailMessageIdForSyncMessageId(
-                        syncMessageID
-                      );
+                    return await driver.getOldGmailThreadIdFromSyncThreadId(
+                      syncThreadID
+                    );
+                  }),
+                  getMessageID: once(async (): Promise<string> => {
+                    if (event.oldMessageID) {
+                      return event.oldMessageID;
                     }
-                  )
+                    return await driver.getGmailMessageIdForSyncMessageId(
+                      syncMessageID
+                    );
+                  })
                 }
               };
             }
@@ -556,9 +552,10 @@ class GmailComposeView {
     );
 
     this._eventStream.plug(
-      Kefir.fromEvents(this.getElement(), 'inboxSDKdiscardCanceled').map(
-        () => ({ eventName: 'discardCanceled' })
-      )
+      Kefir.fromEvents(
+        this.getElement(),
+        'inboxSDKdiscardCanceled'
+      ).map(() => ({ eventName: 'discardCanceled' }))
     );
 
     this._eventStream.plug(

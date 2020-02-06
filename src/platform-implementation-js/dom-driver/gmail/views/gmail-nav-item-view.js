@@ -326,9 +326,7 @@ export default class GmailNavItemView {
           querySelector(
             this._element,
             '.nU'
-          ).innerHTML += autoHtml`<span class="inboxsdk__navItem_name">${
-            this._name
-          }</span>`;
+          ).innerHTML += autoHtml`<span class="inboxsdk__navItem_name">${this._name}</span>`;
         }
         break;
       case NAV_ITEM_TYPES.LINK:
@@ -337,9 +335,7 @@ export default class GmailNavItemView {
           querySelector(
             this._element,
             '.nU'
-          ).innerHTML += autoHtml`<a href="#" class="CK inboxsdk__navItem_name">${
-            this._name
-          }</a>`;
+          ).innerHTML += autoHtml`<a href="#" class="CK inboxsdk__navItem_name">${this._name}</a>`;
         }
         break;
     }
