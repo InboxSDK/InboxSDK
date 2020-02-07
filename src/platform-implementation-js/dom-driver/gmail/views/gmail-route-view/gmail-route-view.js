@@ -307,7 +307,7 @@ class GmailRouteView {
   }
 
   _setupContentAndSidebarView() {
-    var previewPaneContainer = document.querySelector('.aia');
+    var previewPaneContainer = document.querySelector('.Nm .aia');
 
     if (previewPaneContainer) {
       this._startMonitoringPreviewPaneForThread(previewPaneContainer);
