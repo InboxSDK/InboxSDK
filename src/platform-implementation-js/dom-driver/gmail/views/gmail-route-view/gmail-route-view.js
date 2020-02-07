@@ -307,10 +307,10 @@ class GmailRouteView {
   }
 
   _setupContentAndSidebarView() {
-    var rowListElements = document.querySelector('.aia[gh=tl]');
+    var previewPaneContainer = document.querySelector('.aia');
 
-    if (rowListElements) {
-      this._startMonitoringPreviewPaneRowListForThread(rowListElements);
+    if (previewPaneContainer) {
+      this._startMonitoringPreviewPaneForThread(previewPaneContainer);
       return;
     }
 
@@ -350,9 +350,9 @@ class GmailRouteView {
     }
   }
 
-  _startMonitoringPreviewPaneRowListForThread(rowListElement: HTMLElement) {
+  _startMonitoringPreviewPaneForThread(previewPaneContainer: HTMLElement) {
     const threadContainerTableElement = querySelector(
-      rowListElement,
+      previewPaneContainer,
       'table.Bs > tr'
     );
 
