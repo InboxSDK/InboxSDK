@@ -307,15 +307,7 @@ class GmailRouteView {
   }
 
   _setupContentAndSidebarView() {
-    var rowListElements = document.querySelector('.aia[gh=tl]');
-
-    if (rowListElements) {
-      this._startMonitoringPreviewPaneRowListForThread(rowListElements);
-      return;
-    }
-
-    var threadContainerElement = this._getThreadContainerElement();
-
+    const threadContainerElement = this._getThreadContainerElement();
     if (threadContainerElement) {
       var gmailThreadView = new GmailThreadView(
         threadContainerElement,
@@ -329,6 +321,16 @@ class GmailRouteView {
         eventName: 'newGmailThreadView',
         view: gmailThreadView
       });
+    } else {
+      // This element is always present in thread lists, but it only has contents
+      // when in preview pane mode. We want to monitor it in either case
+      // because the user could switch into preview pane mode.
+      const previewPaneContainer = document.querySelector(
+        'div[role=main] .aia'
+      );
+      if (previewPaneContainer) {
+        this._startMonitoringPreviewPaneForThread(previewPaneContainer);
+      }
     }
   }
 
@@ -350,9 +352,9 @@ class GmailRouteView {
     }
   }
 
-  _startMonitoringPreviewPaneRowListForThread(rowListElement: HTMLElement) {
+  _startMonitoringPreviewPaneForThread(previewPaneContainer: HTMLElement) {
     const threadContainerTableElement = querySelector(
-      rowListElement,
+      previewPaneContainer,
       'table.Bs > tr'
     );
 
