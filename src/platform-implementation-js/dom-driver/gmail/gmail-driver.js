@@ -8,11 +8,14 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
+import type { TagTree } from 'tag-tree';
+import type PageParserTree from 'page-parser-tree';
 import asap from 'asap';
 import includes from 'lodash/includes';
 
 import get from '../../../common/get-or-fail';
 import showAppIdWarning from './gmail-driver/show-app-id-warning';
+import makePageParserTree from './makePageParserTree';
 
 import GmailElementGetter from './gmail-element-getter';
 import makeXhrInterceptor from './make-xhr-interceptor';
@@ -99,6 +102,7 @@ class GmailDriver {
   _gmailRouteProcessor: GmailRouteProcessor;
   _keyboardShortcutHelpModifier: KeyboardShortcutHelpModifier;
   onready: Promise<void>;
+  _page: PageParserTree;
   _pageCommunicator: PageCommunicator;
   _pageCommunicatorPromise: Promise<PageCommunicator>;
   _butterBar: ?ButterBar;
@@ -147,6 +151,7 @@ class GmailDriver {
     this._logger = logger;
     this._opts = opts;
     this._envData = envData;
+    this._page = makePageParserTree(this, document);
 
     // Manages the mapping between RFC Message Ids and Gmail Message Ids. Caches to
     // localStorage. Used for custom thread lists.
@@ -268,6 +273,9 @@ class GmailDriver {
   }
   getLogger(): Logger {
     return this._logger;
+  }
+  getTagTree(): TagTree<HTMLElement> {
+    return this._page.tree;
   }
   getCustomListSearchStringsToRouteIds(): Map<string, string> {
     return this._customListSearchStringsToRouteIds;
