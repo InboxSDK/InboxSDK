@@ -5,7 +5,7 @@ import GmailDriver from '../gmail-driver';
 export default class GmailSupportItemView {
   _stopper: Stopper;
   _driver: GmailDriver;
-  _supportElement: HTMLElement | null = null;
+  _supportMenuElement: HTMLElement | null = null;
   _insertElement: HTMLElement | null = null;
   _insertPosition: number;
 
@@ -30,15 +30,17 @@ export default class GmailSupportItemView {
   }
 
   setup() {
-    const supportNodes = this._driver.getPageTree().getAllByTag('support');
-    supportNodes.subscribe(changes => {
+    const supportMenuNodes = this._driver
+      .getPageTree()
+      .getAllByTag('supportMenu');
+    supportMenuNodes.subscribe(changes => {
       changes.forEach(change => {
         if (change.type === 'add') {
-          this._supportElement = change.value.getValue();
+          this._supportMenuElement = change.value.getValue();
           this.addSupportElement();
-          console.log('==== support ele ', this._supportElement);
+          console.log('==== support ele ', this._supportMenuElement);
         } else if (change.type === 'remove') {
-          this._supportElement = null;
+          this._supportMenuElement = null;
         }
       });
     });
@@ -46,6 +48,6 @@ export default class GmailSupportItemView {
 
   addSupportElement() {
     console.log('=== addSupportElement');
-    this._supportElement!.append(this._insertElement!);
+    const supportMenu = this._supportMenuElement!.append(this._insertElement!);
   }
 }
