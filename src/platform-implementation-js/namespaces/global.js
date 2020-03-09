@@ -49,7 +49,7 @@ export default class Global {
 
     members.driver.addSupportItem(
       supportItemDescriptor.element,
-      supportItemDescriptor.position
+      supportItemDescriptor.insertAfterIndex
     );
   }
 }

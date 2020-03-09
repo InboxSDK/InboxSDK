@@ -6,7 +6,7 @@ InboxSDK.load(2, 'header support button').then(function(sdk){
 
   sdk.Global.addSupportItem({
     element: testElement,
-    position: 0
+    insertAfterIndex: 2
   }).then(p => window.globalCP = p);
 });
 

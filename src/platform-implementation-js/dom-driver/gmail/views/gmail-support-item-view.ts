@@ -38,7 +38,6 @@ export default class GmailSupportItemView {
         if (change.type === 'add') {
           this._supportMenuElement = change.value.getValue();
           this.addSupportElement();
-          console.log('==== support ele ', this._supportMenuElement);
         } else if (change.type === 'remove') {
           this._supportMenuElement = null;
         }
@@ -47,7 +46,31 @@ export default class GmailSupportItemView {
   }
 
   addSupportElement() {
-    console.log('=== addSupportElement');
-    const supportMenu = this._supportMenuElement!.append(this._insertElement!);
+    const insertElementContainer = document.createElement('div');
+    const menuItemAttributes = this._supportMenuElement!.children.item(0)!
+      .attributes;
+
+    for (const attribute of menuItemAttributes!) {
+      if (attribute.name === 'aria-label') {
+        continue;
+      }
+      if (attribute.name === 'class') {
+        const classes = `${attribute.value} inboxsdk__support_menuItem`;
+        insertElementContainer.setAttribute(attribute.name, classes);
+        continue;
+      }
+      insertElementContainer.setAttribute(attribute.name, attribute.value);
+    }
+
+    // Append to-be-inserted element
+    insertElementContainer.append(this._insertElement!);
+    this._supportMenuElement!.append(insertElementContainer);
+
+    // Adjust insert position
+    if (this._insertPosition !== 0) {
+      this._supportMenuElement!.children.item(this._insertPosition)!.after(
+        insertElementContainer
+      );
+    }
   }
 }
