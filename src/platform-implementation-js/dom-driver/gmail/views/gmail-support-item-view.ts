@@ -5,8 +5,9 @@ import GmailDriver from '../gmail-driver';
 export default class GmailSupportItemView {
   _stopper: Stopper;
   _driver: GmailDriver;
-  _supportElement: HTMLElement | null;
+  _supportElement: HTMLElement | null = null;
   _insertElement: HTMLElement | null = null;
+  _insertPosition: number;
 
   constructor(
     driver: GmailDriver,
@@ -15,18 +16,10 @@ export default class GmailSupportItemView {
   ) {
     this._driver = driver;
     this._stopper = kefirStopper();
+    this._insertElement = supportItemElement;
+    this._insertPosition = insertPosition;
 
-    const supportElement = Array.from(
-      driver
-        .getPageTree()
-        .getAllByTag('support')
-        .values()
-    )[0];
-
-    console.log('=== support element', supportElement);
-
-    // todo: get support element, add supportItemElement into the position
-    this._supportElement = null;
+    this.setup();
   }
 
   destroy() {
@@ -34,5 +27,25 @@ export default class GmailSupportItemView {
     if (this._insertElement) {
       this._insertElement.remove();
     }
+  }
+
+  setup() {
+    const supportNodes = this._driver.getPageTree().getAllByTag('support');
+    supportNodes.subscribe(changes => {
+      changes.forEach(change => {
+        if (change.type === 'add') {
+          this._supportElement = change.value.getValue();
+          this.addSupportElement();
+          console.log('==== support ele ', this._supportElement);
+        } else if (change.type === 'remove') {
+          this._supportElement = null;
+        }
+      });
+    });
+  }
+
+  addSupportElement() {
+    console.log('=== addSupportElement');
+    this._supportElement!.append(this._insertElement!);
   }
 }

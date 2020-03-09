@@ -154,6 +154,7 @@ class GmailDriver {
     this._opts = opts;
     this._envData = envData;
     this._page = makePageParserTree(this, document);
+    this._stopper.onValue(() => this._page.dump());
 
     // Manages the mapping between RFC Message Ids and Gmail Message Ids. Caches to
     // localStorage. Used for custom thread lists.
@@ -234,6 +235,14 @@ class GmailDriver {
     this._gmailRouteProcessor = new GmailRouteProcessor();
     this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
     this._butterBarDriver = new GmailButterBarDriver();
+
+    Kefir.later(30 * 1000)
+      .takeUntilBy(
+        toItemWithLifetimeStream(this._page.tree.getAllByTag('support'))
+      )
+      .onValue(() => {
+        this._logger.errorSite(new Error('Failed to find gmail support'));
+      });
 
     this._setupEventStreams();
 
