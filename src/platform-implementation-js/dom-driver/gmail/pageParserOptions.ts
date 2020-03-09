@@ -19,10 +19,17 @@ const pageParserOptions: PageParserTreeOptions = {
     }
   ],
   finders: {
+    accountContainer: {
+      fn: root =>
+        root.querySelectorAll(
+          'header[role=banner] > div:nth-child(2) > div:nth-child(2)'
+        )
+    },
     support: {
-      fn(root) {
-        return root.querySelectorAll('.gb_se.gb_qe');
-      }
+      fn: root =>
+        root.querySelectorAll(
+          'header[role=banner] > div:nth-child(2) > div:nth-child(2) > div:last-child'
+        )
     }
   }
 };
