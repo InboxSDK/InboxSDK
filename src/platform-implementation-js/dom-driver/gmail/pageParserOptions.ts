@@ -6,18 +6,7 @@ const pageParserOptions: PageParserTreeOptions = {
       ownedBy: ['accountContainer']
     }
   },
-  watchers: [
-    {
-      sources: [null],
-      tag: 'accountContainer',
-      selectors: ['header[role=banner]', 'div:nth-child(2)', 'div:nth-child(2)']
-    },
-    {
-      sources: ['accountContainer'],
-      tag: 'support',
-      selectors: ['*', 'div:last-child']
-    }
-  ],
+  watchers: [],
   finders: {
     accountContainer: {
       fn: root =>
