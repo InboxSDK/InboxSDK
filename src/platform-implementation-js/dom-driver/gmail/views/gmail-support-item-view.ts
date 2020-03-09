@@ -16,7 +16,14 @@ export default class GmailSupportItemView {
     this._driver = driver;
     this._stopper = kefirStopper();
 
-    console.log('=== tag tree', driver);
+    const supportElement = Array.from(
+      driver
+        .getPageTree()
+        .getAllByTag('support')
+        .values()
+    )[0];
+
+    console.log('=== support element', supportElement);
 
     // todo: get support element, add supportItemElement into the position
     this._supportElement = null;

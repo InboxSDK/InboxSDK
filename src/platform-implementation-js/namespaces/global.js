@@ -47,19 +47,9 @@ export default class Global {
     const members = get(memberMap, this);
     members.driver.getLogger().eventSdkPassive('global.addSupportItem');
 
-    const contentPanelImplementation = await members.driver.addSupportItem(
+    members.driver.addSupportItem(
       supportItemDescriptor.element,
       supportItemDescriptor.position
     );
-
-    if (contentPanelImplementation) {
-      return new GmailSupportItemView(
-        contentPanelImplementation,
-        supportItemDescriptor.element,
-        supportItemDescriptor.position
-      );
-    }
-
-    return null;
   }
 }
