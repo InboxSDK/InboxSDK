@@ -44,6 +44,7 @@ import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
 import type { GetDraftIdResult } from './gmail-driver/get-draft-id-for-message-id';
 import addNavItem from './gmail-driver/add-nav-item';
+import addSupportItem from './gmail-driver/add-support-item';
 import gotoView from './gmail-driver/goto-view';
 import showCustomThreadList from './gmail-driver/show-custom-thread-list';
 import showCustomRouteView from './gmail-driver/show-custom-route-view';
@@ -84,6 +85,7 @@ import type GmailThreadView from './views/gmail-thread-view';
 import type GmailToolbarView from './views/gmail-toolbar-view';
 import type GmailRowListView from './views/gmail-row-list-view';
 import type GmailRouteView from './views/gmail-route-view/gmail-route-view';
+import type GmailSupportItemView from './views/gmail-support-item-view';
 import type { PiOpts, EnvData } from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
 
@@ -274,7 +276,7 @@ class GmailDriver {
   getLogger(): Logger {
     return this._logger;
   }
-  getTagTree(): TagTree<HTMLElement> {
+  getPageTree(): TagTree<HTMLElement> {
     return this._page.tree;
   }
   getCustomListSearchStringsToRouteIds(): Map<string, string> {
@@ -623,6 +625,10 @@ class GmailDriver {
     navItemDescriptorPropertyStream: Kefir.Observable<Object>
   ): Object {
     return addNavItem(this, appId, navItemDescriptorPropertyStream);
+  }
+
+  addSupportItem(element: HTMLElement, position: number): GmailSupportItemView {
+    return addSupportItem(this, element, position);
   }
 
   getSentMailNativeNavItem(): Promise<NativeGmailNavItemView> {

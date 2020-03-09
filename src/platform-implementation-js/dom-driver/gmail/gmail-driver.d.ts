@@ -1,4 +1,5 @@
 import * as Kefir from 'kefir';
+import { TagTree } from 'tag-tree';
 import {
   Driver,
   PiOpts,
@@ -42,6 +43,7 @@ export default class GmailDriver implements Driver {
     appName?: string,
     appIconUrl?: string
   ): void;
+  public getPageTree(): TagTree<HTMLElement>;
   public getPageCommunicator(): GmailPageCommunicator;
   public getGmailActionToken(): Promise<string>;
   public getUserEmailAddress(): string;
@@ -56,6 +58,7 @@ export default class GmailDriver implements Driver {
   >;
   public registerThreadButton(options: any): () => void;
   public addNavItem(appId: string, navItemDescriptor: any): any;
+  public addSupportItem(element: HTMLElement, position: number): any;
   public getSentMailNativeNavItem(): Promise<any>;
   public createLink(a: any, b: any): any;
   public goto(routeID: string, params: any): Promise<void>;

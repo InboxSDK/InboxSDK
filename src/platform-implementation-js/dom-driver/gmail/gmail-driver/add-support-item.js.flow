@@ -1,0 +1,10 @@
+/* @flow */
+
+import type GmailDriver from '../gmail-driver';
+import type GmailSupportItemView from '../views/gmail-support-item-view';
+
+declare export default function addSupportItem(
+  driver: GmailDriver,
+  insertElement: HTMLElement,
+  insertPosition: number
+): GmailSupportItemView;

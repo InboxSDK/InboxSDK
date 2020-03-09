@@ -1,0 +1,11 @@
+/* @flow */
+
+import type GmailDriver from '../gmail-driver';
+
+declare export default class GmailSupportItemView {
+  constructor(
+    driver: GmailDriver,
+    supportItemElement: HTMLElement,
+    insertPosition: number
+  ): GmailSupportItemView;
+}

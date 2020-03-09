@@ -73,6 +73,7 @@ export type Driver = {
   getThreadRowViewDriverStream(): Kefir.Observable<ThreadRowViewDriver>,
   registerThreadButton(options: Object): () => void,
   addNavItem(appId: string, navItemDescriptor: Object): Object,
+  addSupportItem(element: HTMLElement, position: number): Object,
   getSentMailNativeNavItem(): Promise<Object>,
   createLink(a: any, b: any): any,
   goto(routeID: string, params: any): Promise<void>,
