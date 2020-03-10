@@ -10,6 +10,7 @@ import type { PiOpts } from '../platform-implementation';
 import type Membrane from '../lib/Membrane';
 import type { Driver } from '../driver-interfaces/driver';
 import GmailSupportItemView from '../dom-driver/gmail/views/gmail-support-item-view';
+import type SupportItemDescriptor from '../dom-driver/gmail/views/gmail-support-item-view';
 
 const memberMap = new WeakMap();
 
@@ -39,13 +40,11 @@ export default class Global {
   }
 
   async addSupportItem(
-    supportItemDescriptor: Object
+    supportItemDescriptor: SupportItemDescriptor
   ): Promise<?GmailSupportItemView> {
     const members = get(memberMap, this);
     members.driver.getLogger().eventSdkPassive('global.addSupportItem');
 
-    const supportItemView = members.driver.addSupportItem(
-      supportItemDescriptor
-    );
+    return members.driver.addSupportItem(supportItemDescriptor);
   }
 }
