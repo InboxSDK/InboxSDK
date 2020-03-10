@@ -3,8 +3,7 @@ import GmailDriver from '../gmail-driver';
 
 export default function addSupportItem(
   driver: GmailDriver,
-  insertElement: HTMLElement,
-  insertPosition: number
+  insertElement: HTMLElement
 ): GmailSupportItemView {
-  return new GmailSupportItemView(driver, insertElement, insertPosition);
+  return new GmailSupportItemView(driver, insertElement);
 }

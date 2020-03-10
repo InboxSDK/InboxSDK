@@ -939,7 +939,7 @@ class InboxDriver {
     );
   }
 
-  addSupportItem(element: HTMLElement, position: number) {}
+  addSupportItem(element: HTMLElement) {}
 
   getSentMailNativeNavItem(): Promise<Object> {
     // stub, never resolve

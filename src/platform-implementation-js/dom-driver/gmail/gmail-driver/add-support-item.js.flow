@@ -5,6 +5,5 @@ import type GmailSupportItemView from '../views/gmail-support-item-view';
 
 declare export default function addSupportItem(
   driver: GmailDriver,
-  insertElement: HTMLElement,
-  insertPosition: number
+  insertElement: HTMLElement
 ): GmailSupportItemView;

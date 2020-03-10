@@ -4,7 +4,6 @@ import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
 
 import ContentPanelView from '../views/content-panel-view';
-import GmailSupportItemView from '../dom-driver/gmail/views/gmail-support-item-view';
 import get from '../../common/get-or-fail';
 
 import type { PiOpts } from '../platform-implementation';
@@ -39,17 +38,9 @@ export default class Global {
   }
 
   async addSupportItem(supportItemDescriptor: Object) {
-    // const descriptorPropertyStream = kefirCast(
-    //   (Kefir: any),
-    //   supportItemDescriptor
-    // ).toProperty();
-
     const members = get(memberMap, this);
     members.driver.getLogger().eventSdkPassive('global.addSupportItem');
 
-    members.driver.addSupportItem(
-      supportItemDescriptor.element,
-      supportItemDescriptor.insertAfterIndex
-    );
+    members.driver.addSupportItem(supportItemDescriptor.element);
   }
 }

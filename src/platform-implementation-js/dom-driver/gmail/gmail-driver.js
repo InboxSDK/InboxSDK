@@ -636,8 +636,8 @@ class GmailDriver {
     return addNavItem(this, appId, navItemDescriptorPropertyStream);
   }
 
-  addSupportItem(element: HTMLElement, position: number): GmailSupportItemView {
-    return addSupportItem(this, element, position);
+  addSupportItem(element: HTMLElement): GmailSupportItemView {
+    return addSupportItem(this, element);
   }
 
   getSentMailNativeNavItem(): Promise<NativeGmailNavItemView> {

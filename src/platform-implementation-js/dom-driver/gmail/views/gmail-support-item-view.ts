@@ -1,4 +1,3 @@
-import * as Kefir from 'kefir';
 import kefirStopper, { Stopper } from 'kefir-stopper';
 import GmailDriver from '../gmail-driver';
 
@@ -7,19 +6,13 @@ export default class GmailSupportItemView {
   _driver: GmailDriver;
   _supportMenuElement: HTMLElement | null = null;
   _insertElement: HTMLElement | null = null;
-  _insertPosition: number;
 
-  constructor(
-    driver: GmailDriver,
-    supportItemElement: HTMLElement,
-    insertPosition: number = 0
-  ) {
+  constructor(driver: GmailDriver, supportItemElement: HTMLElement) {
     this._driver = driver;
     this._stopper = kefirStopper();
     this._insertElement = supportItemElement;
-    this._insertPosition = insertPosition;
 
-    this.setup();
+    this._setup();
   }
 
   destroy() {
@@ -29,23 +22,26 @@ export default class GmailSupportItemView {
     }
   }
 
-  setup() {
+  _setup() {
     const supportMenuNodes = this._driver
       .getPageTree()
       .getAllByTag('supportMenu');
-    supportMenuNodes.subscribe(changes => {
+
+    const subscription = supportMenuNodes.subscribe(changes => {
       changes.forEach(change => {
         if (change.type === 'add') {
           this._supportMenuElement = change.value.getValue();
-          this.addSupportElement();
+          this._addSupportElement();
         } else if (change.type === 'remove') {
           this._supportMenuElement = null;
         }
       });
     });
+
+    this._stopper.onValue(() => subscription.unsubscribe());
   }
 
-  addSupportElement() {
+  _addSupportElement() {
     const insertElementContainer = document.createElement('div');
     const menuItemAttributes = this._supportMenuElement!.children.item(0)!
       .attributes;
@@ -66,11 +62,6 @@ export default class GmailSupportItemView {
     insertElementContainer.append(this._insertElement!);
     this._supportMenuElement!.append(insertElementContainer);
 
-    // Adjust insert position
-    if (this._insertPosition !== 0) {
-      this._supportMenuElement!.children.item(this._insertPosition)!.after(
-        insertElementContainer
-      );
-    }
+    // Adjust insert position to always be the last one before separator
   }
 }

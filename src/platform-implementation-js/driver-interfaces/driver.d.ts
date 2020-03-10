@@ -85,7 +85,7 @@ export interface Driver {
   getThreadRowViewDriverStream(): Kefir.Observable<ThreadRowViewDriver, any>;
   registerThreadButton(options: any): () => void;
   addNavItem(appId: string, navItemDescriptor: any): any;
-  addSupportItem(element: HTMLElement, position: number): any;
+  addSupportItem(element: HTMLElement): any;
   getSentMailNativeNavItem(): Promise<any>;
   createLink(a: any, b: any): any;
   goto(routeID: string, params: any): Promise<void>;
