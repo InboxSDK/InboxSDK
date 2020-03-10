@@ -8,11 +8,14 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
+import type { TagTree } from 'tag-tree';
+import type PageParserTree from 'page-parser-tree';
 import asap from 'asap';
 import includes from 'lodash/includes';
 
 import get from '../../../common/get-or-fail';
 import showAppIdWarning from './gmail-driver/show-app-id-warning';
+import makePageParserTree from './makePageParserTree';
 
 import GmailElementGetter from './gmail-element-getter';
 import makeXhrInterceptor from './make-xhr-interceptor';
@@ -41,6 +44,7 @@ import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
 import type { GetDraftIdResult } from './gmail-driver/get-draft-id-for-message-id';
 import addNavItem from './gmail-driver/add-nav-item';
+import addSupportItem from './gmail-driver/add-support-item';
 import gotoView from './gmail-driver/goto-view';
 import showCustomThreadList from './gmail-driver/show-custom-thread-list';
 import showCustomRouteView from './gmail-driver/show-custom-route-view';
@@ -81,6 +85,8 @@ import type GmailThreadView from './views/gmail-thread-view';
 import type GmailToolbarView from './views/gmail-toolbar-view';
 import type GmailRowListView from './views/gmail-row-list-view';
 import type GmailRouteView from './views/gmail-route-view/gmail-route-view';
+import type GmailSupportItemView from './views/gmail-support-item-view';
+import type SupportItemDescriptor from './views/gmail-support-item-view';
 import type { PiOpts, EnvData } from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
 
@@ -99,6 +105,7 @@ class GmailDriver {
   _gmailRouteProcessor: GmailRouteProcessor;
   _keyboardShortcutHelpModifier: KeyboardShortcutHelpModifier;
   onready: Promise<void>;
+  _page: PageParserTree;
   _pageCommunicator: PageCommunicator;
   _pageCommunicatorPromise: Promise<PageCommunicator>;
   _butterBar: ?ButterBar;
@@ -147,6 +154,8 @@ class GmailDriver {
     this._logger = logger;
     this._opts = opts;
     this._envData = envData;
+    this._page = makePageParserTree(this, document);
+    this._stopper.onValue(() => this._page.dump());
 
     // Manages the mapping between RFC Message Ids and Gmail Message Ids. Caches to
     // localStorage. Used for custom thread lists.
@@ -228,6 +237,14 @@ class GmailDriver {
     this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
     this._butterBarDriver = new GmailButterBarDriver();
 
+    Kefir.later(30 * 1000)
+      .takeUntilBy(
+        toItemWithLifetimeStream(this._page.tree.getAllByTag('supportMenu'))
+      )
+      .onValue(() => {
+        this._logger.errorSite(new Error('Failed to find gmail supportMenu'));
+      });
+
     this._setupEventStreams();
 
     this.onready
@@ -268,6 +285,9 @@ class GmailDriver {
   }
   getLogger(): Logger {
     return this._logger;
+  }
+  getTagTree(): TagTree<HTMLElement> {
+    return this._page.tree;
   }
   getCustomListSearchStringsToRouteIds(): Map<string, string> {
     return this._customListSearchStringsToRouteIds;
@@ -615,6 +635,12 @@ class GmailDriver {
     navItemDescriptorPropertyStream: Kefir.Observable<Object>
   ): Object {
     return addNavItem(this, appId, navItemDescriptorPropertyStream);
+  }
+
+  addSupportItem(
+    supportItemDescriptor: SupportItemDescriptor
+  ): GmailSupportItemView {
+    return addSupportItem(this, supportItemDescriptor);
   }
 
   getSentMailNativeNavItem(): Promise<NativeGmailNavItemView> {

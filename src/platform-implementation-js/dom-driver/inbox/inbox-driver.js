@@ -939,6 +939,8 @@ class InboxDriver {
     );
   }
 
+  addSupportItem(supportItemDescriptor: Object): Object {}
+
   getSentMailNativeNavItem(): Promise<Object> {
     // stub, never resolve
     // console.log('getSentMailNativeNavItem not implemented');

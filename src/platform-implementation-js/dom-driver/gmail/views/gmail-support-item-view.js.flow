@@ -1,0 +1,15 @@
+/* @flow */
+
+import type GmailDriver from '../gmail-driver';
+
+export type SupportItemDescriptor = {
+  element: HTMLElement,
+  onClick: () => void
+};
+
+declare export default class GmailSupportItemView {
+  constructor(
+    driver: GmailDriver,
+    supportItemDescriptor: SupportItemDescriptor
+  ): GmailSupportItemView;
+}
