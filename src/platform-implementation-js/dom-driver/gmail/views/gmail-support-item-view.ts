@@ -106,9 +106,10 @@ export default class GmailSupportItemView {
     };
   }
 
-  // Todo: how to lose focus for .gb_sa .gb_Wc:not(.gb_Qe):focus
   _closeSupportMenu(supportElement: HTMLElement) {
-    supportElement.setAttribute('aria-hidden', 'false');
-    supportElement.style.display = 'none';
+    if (supportElement.getAttribute('aria-hidden') != 'true') {
+      const button = supportElement.previousElementSibling;
+      button && (button as HTMLElement).click();
+    }
   }
 }
