@@ -12,6 +12,9 @@ import GmailComposeView from './views/gmail-compose-view';
 import KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import GmailPageCommunicator from './gmail-page-communicator';
 import { Contact } from '../../driver-interfaces/compose-view-driver';
+import GmailSupportItemView, {
+  SupportItemDescriptor
+} from './views/gmail-support-item-view';
 type GmailRouteView = any;
 type GmailThreadView = any;
 type GmailMessageView = any;
@@ -58,7 +61,9 @@ export default class GmailDriver implements Driver {
   >;
   public registerThreadButton(options: any): () => void;
   public addNavItem(appId: string, navItemDescriptor: any): any;
-  public addSupportItem(element: HTMLElement, position: number): any;
+  public addSupportItem(
+    supportItemDescriptor: SupportItemDescriptor
+  ): GmailSupportItemView;
   public getSentMailNativeNavItem(): Promise<any>;
   public createLink(a: any, b: any): any;
   public goto(routeID: string, params: any): Promise<void>;
