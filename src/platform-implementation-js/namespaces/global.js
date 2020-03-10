@@ -39,9 +39,9 @@ export default class Global {
     return null;
   }
 
-  async addSupportItem(
+  addSupportItem(
     supportItemDescriptor: SupportItemDescriptor
-  ): Promise<?GmailSupportItemView> {
+  ): GmailSupportItemView {
     const members = get(memberMap, this);
     members.driver.getLogger().eventSdkPassive('global.addSupportItem');
 
