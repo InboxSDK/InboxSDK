@@ -98,7 +98,7 @@ export default class GmailSupportItemView {
       this._closeSupportMenu(supportElement);
     };
 
-    insertElementContainer.onkeydown = event => {
+    insertElementContainer.onkeypress = event => {
       if (event.key === 'Enter') {
         supportItemDescriptor.onClick();
         this._closeSupportMenu(supportElement);
