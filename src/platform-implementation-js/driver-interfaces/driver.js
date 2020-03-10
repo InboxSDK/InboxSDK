@@ -41,6 +41,8 @@ import type InboxDrawerView from '../dom-driver/inbox/views/inbox-drawer-view';
 export type DrawerViewDriver = InboxDrawerView;
 
 import type { PiOpts } from '../platform-implementation';
+import type SupportItemDescriptor from '../dom-driver/gmail/views/gmail-support-item-view';
+import type GmailSupportItemView from '../dom-driver/gmail/views/gmail-support-item-view';
 
 // TODO fill in some of these any types
 export type Driver = {
@@ -73,7 +75,9 @@ export type Driver = {
   getThreadRowViewDriverStream(): Kefir.Observable<ThreadRowViewDriver>,
   registerThreadButton(options: Object): () => void,
   addNavItem(appId: string, navItemDescriptor: Object): Object,
-  addSupportItem(element: HTMLElement): Object,
+  addSupportItem(
+    supportItemDescriptor: SupportItemDescriptor
+  ): GmailSupportItemView,
   getSentMailNativeNavItem(): Promise<Object>,
   createLink(a: any, b: any): any,
   goto(routeID: string, params: any): Promise<void>,

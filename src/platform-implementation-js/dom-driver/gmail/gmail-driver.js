@@ -86,6 +86,7 @@ import type GmailToolbarView from './views/gmail-toolbar-view';
 import type GmailRowListView from './views/gmail-row-list-view';
 import type GmailRouteView from './views/gmail-route-view/gmail-route-view';
 import type GmailSupportItemView from './views/gmail-support-item-view';
+import type SupportItemDescriptor from './views/gmail-support-item-view';
 import type { PiOpts, EnvData } from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
 
@@ -636,8 +637,10 @@ class GmailDriver {
     return addNavItem(this, appId, navItemDescriptorPropertyStream);
   }
 
-  addSupportItem(element: HTMLElement): GmailSupportItemView {
-    return addSupportItem(this, element);
+  addSupportItem(
+    supportItemDescriptor: SupportItemDescriptor
+  ): GmailSupportItemView {
+    return addSupportItem(this, supportItemDescriptor);
   }
 
   getSentMailNativeNavItem(): Promise<NativeGmailNavItemView> {

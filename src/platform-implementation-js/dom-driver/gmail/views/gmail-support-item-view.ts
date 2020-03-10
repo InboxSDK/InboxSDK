@@ -1,16 +1,23 @@
 import kefirStopper, { Stopper } from 'kefir-stopper';
 import GmailDriver from '../gmail-driver';
 
+export interface SupportItemDescriptor {
+  element: HTMLElement;
+}
+
 export default class GmailSupportItemView {
   _stopper: Stopper;
   _driver: GmailDriver;
   _supportMenuElement: HTMLElement | null = null;
   _insertElement: HTMLElement | null = null;
 
-  constructor(driver: GmailDriver, supportItemElement: HTMLElement) {
+  constructor(
+    driver: GmailDriver,
+    supportItemDescriptor: SupportItemDescriptor
+  ) {
     this._driver = driver;
     this._stopper = kefirStopper();
-    this._insertElement = supportItemElement;
+    this._insertElement = supportItemDescriptor.element;
 
     this._setup();
   }

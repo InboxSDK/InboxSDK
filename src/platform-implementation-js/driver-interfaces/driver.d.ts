@@ -7,6 +7,9 @@ type ComposeView = any;
 // import { RouteViewDriver } from './route-view-driver';
 type RouteViewDriver = any;
 import CommonPageCommunicator from '../lib/common-page-communicator';
+import GmailSupportItemView, {
+  SupportItemDescriptor
+} from '../dom-driver/gmail/views/gmail-support-item-view';
 
 // import GmailBackdrop from '../dom-driver/gmail/views/gmail-backdrop';
 // import InboxBackdrop from '../dom-driver/inbox/views/inbox-backdrop';
@@ -85,7 +88,9 @@ export interface Driver {
   getThreadRowViewDriverStream(): Kefir.Observable<ThreadRowViewDriver, any>;
   registerThreadButton(options: any): () => void;
   addNavItem(appId: string, navItemDescriptor: any): any;
-  addSupportItem(element: HTMLElement): any;
+  addSupportItem(
+    supportItemDescriptor: SupportItemDescriptor
+  ): GmailSupportItemView;
   getSentMailNativeNavItem(): Promise<any>;
   createLink(a: any, b: any): any;
   goto(routeID: string, params: any): Promise<void>;
