@@ -238,10 +238,10 @@ class GmailDriver {
 
     Kefir.later(30 * 1000)
       .takeUntilBy(
-        toItemWithLifetimeStream(this._page.tree.getAllByTag('support'))
+        toItemWithLifetimeStream(this._page.tree.getAllByTag('supportMenu'))
       )
       .onValue(() => {
-        this._logger.errorSite(new Error('Failed to find gmail support'));
+        this._logger.errorSite(new Error('Failed to find gmail supportMenu'));
       });
 
     this._setupEventStreams();
