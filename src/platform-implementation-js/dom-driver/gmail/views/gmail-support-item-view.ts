@@ -3,6 +3,7 @@ import GmailDriver from '../gmail-driver';
 
 export interface SupportItemDescriptor {
   element: HTMLElement;
+  onClick: () => void;
 }
 
 export default class GmailSupportItemView {
@@ -89,5 +90,25 @@ export default class GmailSupportItemView {
     } else {
       supportElement.append(insertElementContainer);
     }
+
+    insertElementContainer.onclick = event => {
+      event.preventDefault();
+      event.stopPropagation();
+      supportItemDescriptor.onClick();
+      this._closeSupportMenu(supportElement);
+    };
+
+    insertElementContainer.onkeydown = event => {
+      if (event.key === 'Enter') {
+        supportItemDescriptor.onClick();
+        this._closeSupportMenu(supportElement);
+      }
+    };
+  }
+
+  // Todo: how to lose focus for .gb_sa .gb_Wc:not(.gb_Qe):focus
+  _closeSupportMenu(supportElement: HTMLElement) {
+    supportElement.setAttribute('aria-hidden', 'false');
+    supportElement.style.display = 'none';
   }
 }
