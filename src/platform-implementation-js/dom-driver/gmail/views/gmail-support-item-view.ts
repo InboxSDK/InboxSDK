@@ -8,8 +8,7 @@ export interface SupportItemDescriptor {
 export default class GmailSupportItemView {
   _stopper: Stopper;
   _driver: GmailDriver;
-  _supportMenuElement: HTMLElement | null = null;
-  _insertElement: HTMLElement | null = null;
+  _insertElementContainer: HTMLElement | null = null;
 
   constructor(
     driver: GmailDriver,
@@ -17,19 +16,19 @@ export default class GmailSupportItemView {
   ) {
     this._driver = driver;
     this._stopper = kefirStopper();
-    this._insertElement = supportItemDescriptor.element;
 
-    this._setup();
+    this._setup(supportItemDescriptor);
   }
 
   destroy() {
     this._stopper.destroy();
-    if (this._insertElement) {
-      this._insertElement.remove();
+    if (this._insertElementContainer) {
+      this._insertElementContainer.remove();
+      this._insertElementContainer = null;
     }
   }
 
-  _setup() {
+  _setup(supportItemDescriptor: SupportItemDescriptor) {
     const supportMenuNodes = this._driver
       .getPageTree()
       .getAllByTag('supportMenu');
@@ -37,10 +36,15 @@ export default class GmailSupportItemView {
     const subscription = supportMenuNodes.subscribe(changes => {
       changes.forEach(change => {
         if (change.type === 'add') {
-          this._supportMenuElement = change.value.getValue();
-          this._addSupportElement();
+          this._addSupportElement(
+            change.value.getValue(),
+            supportItemDescriptor
+          );
         } else if (change.type === 'remove') {
-          this._supportMenuElement = null;
+          if (this._insertElementContainer) {
+            this._insertElementContainer.remove();
+            this._insertElementContainer = null;
+          }
         }
       });
     });
@@ -48,10 +52,12 @@ export default class GmailSupportItemView {
     this._stopper.onValue(() => subscription.unsubscribe());
   }
 
-  _addSupportElement() {
+  _addSupportElement(
+    supportElement: HTMLElement,
+    supportItemDescriptor: SupportItemDescriptor
+  ) {
     const insertElementContainer = document.createElement('div');
-    const menuItemAttributes = this._supportMenuElement!.children.item(0)!
-      .attributes;
+    const menuItemAttributes = supportElement.children.item(0)!.attributes;
 
     for (const attribute of menuItemAttributes!) {
       if (attribute.name === 'aria-label') {
@@ -66,8 +72,8 @@ export default class GmailSupportItemView {
     }
 
     // Append to-be-inserted element
-    insertElementContainer.append(this._insertElement!);
-    this._supportMenuElement!.append(insertElementContainer);
+    insertElementContainer.append(supportItemDescriptor.element);
+    supportElement.append(insertElementContainer);
 
     // Adjust insert position to always be the last one before separator
   }
