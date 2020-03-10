@@ -77,7 +77,6 @@ export default class GmailSupportItemView {
     // Adjust insert position to always be the last one before separator
     let lastSeparatorItem = null;
     for (const item of supportElement.children) {
-      console.log('=== item', item);
       if (item.getAttribute('role') === 'separator') {
         lastSeparatorItem = item;
       }
