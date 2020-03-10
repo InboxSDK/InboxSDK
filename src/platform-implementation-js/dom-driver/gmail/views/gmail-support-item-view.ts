@@ -29,7 +29,7 @@ export default class GmailSupportItemView {
 
   _setup(supportItemDescriptor: SupportItemDescriptor) {
     const supportMenuNodes = this._driver
-      .getPageTree()
+      .getTagTree()
       .getAllByTag('supportMenu');
 
     const subscription = supportMenuNodes.subscribe(changes => {

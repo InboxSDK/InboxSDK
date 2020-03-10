@@ -46,7 +46,7 @@ export default class GmailDriver implements Driver {
     appName?: string,
     appIconUrl?: string
   ): void;
-  public getPageTree(): TagTree<HTMLElement>;
+  public getTagTree(): TagTree<HTMLElement>;
   public getPageCommunicator(): GmailPageCommunicator;
   public getGmailActionToken(): Promise<string>;
   public getUserEmailAddress(): string;

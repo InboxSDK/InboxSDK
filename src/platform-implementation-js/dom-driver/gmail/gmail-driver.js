@@ -286,7 +286,7 @@ class GmailDriver {
   getLogger(): Logger {
     return this._logger;
   }
-  getPageTree(): TagTree<HTMLElement> {
+  getTagTree(): TagTree<HTMLElement> {
     return this._page.tree;
   }
   getCustomListSearchStringsToRouteIds(): Map<string, string> {
