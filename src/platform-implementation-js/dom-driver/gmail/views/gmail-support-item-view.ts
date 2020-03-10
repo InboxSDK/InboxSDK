@@ -73,8 +73,22 @@ export default class GmailSupportItemView {
 
     // Append to-be-inserted element
     insertElementContainer.append(supportItemDescriptor.element);
-    supportElement.append(insertElementContainer);
 
     // Adjust insert position to always be the last one before separator
+    let lastSeparatorItem = null;
+    for (const item of supportElement.children) {
+      console.log('=== item', item);
+      if (item.getAttribute('role') === 'separator') {
+        lastSeparatorItem = item;
+      }
+    }
+    if (lastSeparatorItem) {
+      lastSeparatorItem.insertAdjacentElement(
+        'beforebegin',
+        insertElementContainer
+      );
+    } else {
+      supportElement.append(insertElementContainer);
+    }
   }
 }
