@@ -26,7 +26,7 @@ const pageParserOptions: PageParserTreeOptions = {
     supportMenu: {
       fn: root =>
         root.querySelectorAll(
-          'header[role=banner] > div:nth-child(2) > div:nth-child(2) > div:last-child > div[role=menu]'
+          'header[role=banner] div:not([aria-label]):not([data-ogsr-up]) > div:not(.inboxsdk__appButton) > div[data-tooltip] + div[role=menu]'
         )
     }
   }
