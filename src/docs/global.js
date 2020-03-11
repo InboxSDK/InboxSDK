@@ -10,5 +10,13 @@ var Global = /** @lends Global */ {
    * @param  {ContentPanelDescriptor} contentPanelDescriptor - The details of the content panel to add to the global sidebar.
    * @return {Promise.<ContentPanelView>}
    */
-  addSidebarContentPanel: function() {}
+  addSidebarContentPanel: function() {},
+
+  /**
+   * Adds an supprt item right before the last separator in the Gmail support menu.
+   * Only works in material Gmail UI.
+   * @param  {SupportItemDescriptor} supportItemDescriptor - The details of the support item to be added to the Gmail support menu.
+   * @return {GmailSupportItemView}
+   */
+  addSupportItem: function() {}
 };
