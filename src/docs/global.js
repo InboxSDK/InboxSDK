@@ -14,9 +14,8 @@ var Global = /** @lends Global */ {
 
   /**
    * Adds an supprt item right before the last separator in the Gmail support menu.
-   * Only works in material Gmail UI.
    * @param  {SupportItemDescriptor} supportItemDescriptor - The details of the support item to be added to the Gmail support menu.
-   * @return {GmailSupportItemView}
+   * @return {SupportItemView}
    */
   addSupportItem: function() {}
 };
