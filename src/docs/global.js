@@ -13,7 +13,7 @@ var Global = /** @lends Global */ {
   addSidebarContentPanel: function() {},
 
   /**
-   * Adds an supprt item right before the last separator in the Gmail support menu.
+   * Adds a support item right in the Gmail support menu.
    * @param  {SupportItemDescriptor} supportItemDescriptor - The details of the support item to be added to the Gmail support menu.
    * @return {SupportItemView}
    */
