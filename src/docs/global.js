@@ -10,5 +10,12 @@ var Global = /** @lends Global */ {
    * @param  {ContentPanelDescriptor} contentPanelDescriptor - The details of the content panel to add to the global sidebar.
    * @return {Promise.<ContentPanelView>}
    */
-  addSidebarContentPanel: function() {}
+  addSidebarContentPanel: function() {},
+
+  /**
+   * Adds a support item right in the Gmail support menu.
+   * @param  {SupportItemDescriptor} supportItemDescriptor - The details of the support item to be added to the Gmail support menu.
+   * @return {SupportItemView}
+   */
+  addSupportItem: function() {}
 };
