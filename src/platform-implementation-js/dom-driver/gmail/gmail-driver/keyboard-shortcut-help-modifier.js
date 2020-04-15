@@ -205,6 +205,10 @@ function _getAngledBracket(chordChar: string): string {
     case 'meta':
     case 'command':
       return '<⌘>';
+    case 'mod':
+      // Operating system check copied from Combokeys.
+      // https://github.com/avocode/combokeys/blob/0b80e13cf7e5217c5b4fbd393289a87b1f48f7cc/helpers/special-aliases.js#L14
+      return /Mac|iPod|iPhone|iPad/.test(navigator.platform) ? '<⌘>' : '<Ctrl>';
     default:
       return chordChar;
   }
