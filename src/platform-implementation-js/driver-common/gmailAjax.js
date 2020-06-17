@@ -10,7 +10,11 @@ import type { AjaxOpts, AjaxResponse } from '../../common/ajax';
 
 const IMAGE_REQUEST_TIMEOUT = 1000 * 60; // one minute
 
-const limitedAjax = rateLimitQueuer(ajax, 1000, 7);
+const limitedAjax = rateLimitQueuer(
+  rateLimitQueuer(ajax, 1000, 7),
+  10 * 1000,
+  40
+);
 
 // Tool for making ajax requests to Gmail endpoints. When used in Inbox, this
 // function is able to handle the issue that happens when the user has no Gmail
