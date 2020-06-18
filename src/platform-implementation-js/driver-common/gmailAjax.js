@@ -13,7 +13,7 @@ const IMAGE_REQUEST_TIMEOUT = 1000 * 60; // one minute
 const limitedAjax = rateLimitQueuer(
   rateLimitQueuer(ajax, 1000, 7),
   10 * 1000,
-  40
+  50
 );
 
 // Tool for making ajax requests to Gmail endpoints. When used in Inbox, this
