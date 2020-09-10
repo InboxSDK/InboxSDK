@@ -25,21 +25,34 @@ export default async function signIn(testEmail: string) {
       await page.type('input[type=email]:not([aria-hidden=true])', testEmail, {
         delay: 10 + Math.random() * 10
       });
-      await page.click('div[role=button]#identifierNext');
+      await page.click('div#identifierNext');
       await page.waitForSelector('input[type=password]');
-      await delay(1000); // wait for animation to finish
+      console.log(authInfo[testEmail].password);
+      console.log(googleTotp(authInfo[testEmail].twofactor));
+      await delay(2000); // wait for animation to finish
     }
-    await page.type('input[type=password]', authInfo[testEmail].password, {
-      delay: 10 + Math.random() * 10
-    });
-    await page.click('div[role=button]#passwordNext');
 
-    await page.waitForFunction(
-      () =>
-        !document.location.href.startsWith(
-          'https://accounts.google.com/signin/v2/sl/pwd'
-        )
-    );
+    const fillOutPassword = async () => {
+      await page.type('input[type=password]', authInfo[testEmail].password, {
+        delay: 10 + Math.random() * 10
+      });
+      await page.click('div#passwordNext');
+
+      await page.waitForFunction(
+        () =>
+          !document.location.href.startsWith(
+            'https://accounts.google.com/signin/v2/sl/pwd'
+          )
+      );
+    };
+
+    try {
+      await fillOutPassword();
+    } catch (err) {
+      // Navigation failed b/c password didn't work. Try again.
+      await fillOutPassword();
+    }
+
     await delay(1500); // wait for animation to finish
     if (
       page
@@ -49,17 +62,27 @@ export default async function signIn(testEmail: string) {
       console.log('needs 2fa');
       await page.waitForSelector('input[type=tel]#totpPin');
 
-      const twoFACode = googleTotp(authInfo[testEmail].twofactor);
-      await page.type('input[type=tel]#totpPin', twoFACode, {
-        delay: 10 + Math.random() * 10
-      });
-      await page.click('div[role=button]#totpNext');
-      await page.waitForFunction(
-        () =>
-          !document.location.href.startsWith(
-            'https://accounts.google.com/signin/v2/challenge/totp'
-          )
-      );
+      const fillOut2FACode = async () => {
+        const twoFACode = googleTotp(authInfo[testEmail].twofactor);
+        await page.click('input[type=tel]#totpPin', { clickCount: 3 });
+        await page.type('input[type=tel]#totpPin', twoFACode, {
+          delay: 10 + Math.random() * 10
+        });
+        await page.click('div#totpNext');
+        await page.waitForFunction(
+          () =>
+            !document.location.href.startsWith(
+              'https://accounts.google.com/signin/v2/challenge/totp'
+            )
+        );
+      };
+
+      try {
+        await fillOut2FACode();
+      } catch (err) {
+        // Navigation failed b/c 2fa code didn't work. Try again.
+        await fillOut2FACode();
+      }
     }
     await delay(1500); // wait for animation to finish
     if (page.url().includes('SmsAuthInterstitial')) {
