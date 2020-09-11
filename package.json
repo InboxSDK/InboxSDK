@@ -116,6 +116,8 @@
     "prettier-check": "^2.0.0",
     "pretty-quick": "^2.0.1",
     "puppeteer": "^5.2.1",
+    "puppeteer-extra": "^3.1.15",
+    "puppeteer-extra-plugin-stealth": "^2.6.1",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-draggable-list": "^4.0.2",
