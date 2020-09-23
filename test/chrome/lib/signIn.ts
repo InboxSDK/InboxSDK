@@ -4,10 +4,6 @@ import delay from 'pdelay';
 
 export default async function signIn(testEmail: string) {
   const authInfo = await readAuthInfo();
-  console.log(
-    '==== authInfo[testEmail].password',
-    authInfo[testEmail].password
-  );
   const context = await browser.createIncognitoBrowserContext();
   const page = await context.newPage();
   try {
