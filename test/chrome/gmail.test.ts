@@ -1,5 +1,5 @@
 import signIn from './lib/signIn';
-import attemptWithRetries from '../../src/platform-implementation-js/lib/attemptWithRetries';
+// import attemptWithRetries from '../../src/platform-implementation-js/lib/attemptWithRetries';
 
 const testEmail = 'inboxsdktest@gmail.com';
 
@@ -46,37 +46,37 @@ afterEach(async () => {
 //   });
 // });
 
-function waitForCounter(attribute: string, goal: number): Promise<number> {
-  return page.waitForFunction(
-    (attribute, goal) => {
-      const value = Number(document.head.getAttribute(attribute));
-      if (value >= goal) {
-        return value;
-      }
-      return null;
-    },
-    { polling: 100 },
-    attribute,
-    goal
-  ) as any;
-}
+// function waitForCounter(attribute: string, goal: number): Promise<number> {
+//   return page.waitForFunction(
+//     (attribute, goal) => {
+//       const value = Number(document.head.getAttribute(attribute));
+//       if (value >= goal) {
+//         return value;
+//       }
+//       return null;
+//     },
+//     { polling: 100 },
+//     attribute,
+//     goal
+//   ) as any;
+// }
 
-function getCounter(attribute: string): Promise<number> {
-  return page.$eval(
-    'head',
-    (head, attribute) => Number(head.getAttribute(attribute)),
-    attribute
-  );
-}
+// function getCounter(attribute: string): Promise<number> {
+//   return page.$eval(
+//     'head',
+//     (head, attribute) => Number(head.getAttribute(attribute)),
+//     attribute
+//   );
+// }
 
-async function openThread() {
-  await attemptWithRetries(async () => {
-    await page
-      .waitForSelector('tr.zA[id] span.bog', { visible: true })
-      .then(el => el.click());
-  }, 3);
-  await page.waitForFunction(() => document.location.hash !== '#inbox');
-}
+// async function openThread() {
+//   await attemptWithRetries(async () => {
+//     await page
+//       .waitForSelector('tr.zA[id] span.bog', { visible: true })
+//       .then(el => el.click());
+//   }, 3);
+//   await page.waitForFunction(() => document.location.hash !== '#inbox');
+// }
 
 // describe('compose', () => {
 //   for (const mode of ['full', 'reply']) {
