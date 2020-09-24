@@ -7,11 +7,13 @@ export default function blockAndReemiteKeyboardEvents(element: HTMLElement) {
   // a single event listener on the document). By stopping propagation of
   // the original event and reemiting it on the document, we preserve
   // exisitng behavior while giving React a chance to hear it.
-  Kefir.merge([
+  Kefir.merge<KeyboardEvent, any>([
+    // fromEvents(target, eventName)
     Kefir.fromEvents(element, 'keypress'),
     Kefir.fromEvents(element, 'keydown'),
     Kefir.fromEvents(element, 'keyup')
   ]).onValue((event: KeyboardEvent) => {
+    // onValue(callback: (value: T) => void): this;
     event.stopPropagation();
 
     const fakeEvent = new KeyboardEvent(event.type, { bubbles: true });
