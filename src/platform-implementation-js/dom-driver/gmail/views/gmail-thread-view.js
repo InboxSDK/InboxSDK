@@ -166,6 +166,9 @@ class GmailThreadView {
   }
 
   destroy() {
+    // $FlowDisableNextLine: set to null for garbage collection
+    this._element = null;
+
     this._eventStream.end();
     this._stopper.destroy();
     if (this._toolbarView) this._toolbarView.destroy();

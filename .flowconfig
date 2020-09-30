@@ -20,3 +20,4 @@ module.use_strict=true
 munge_underscores=true
 esproposal.optional_chaining=enable
 esproposal.nullish_coalescing=enable
+suppress_comment=\\(.\\|\n\\)*\\$FlowDisableNextLine

@@ -141,6 +141,9 @@ class GmailMessageView {
   }
 
   destroy() {
+    // $FlowDisableNextLine: set to null for garbage collection
+    this._element = null;
+
     this._stopper.destroy();
     this._eventStream.end();
     if (this._gmailAttachmentAreaView) this._gmailAttachmentAreaView.destroy();
