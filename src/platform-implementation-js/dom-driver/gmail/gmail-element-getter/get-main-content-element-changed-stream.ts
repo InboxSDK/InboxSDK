@@ -25,7 +25,7 @@ export default function getMainContentElementChangedStream(
               return { target: el };
             })
             .filter(_isNowVisible)
-            .map(e => e.target)
+            .map(() => el)
         )
     )
     .toProperty();
