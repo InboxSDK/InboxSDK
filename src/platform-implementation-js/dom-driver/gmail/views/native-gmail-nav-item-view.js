@@ -38,7 +38,7 @@ export default class NativeGmailNavItemView {
     this._element = nativeElement;
     this._eventStream = kefirBus();
     this._elementBus = kefirBus();
-    this._elementStream = this._elementBus.toProperty(() => nativeElement);
+    this._elementStream = this._elementBus.toProperty(() => this._element);
 
     this._navItemName = navItemName;
 
