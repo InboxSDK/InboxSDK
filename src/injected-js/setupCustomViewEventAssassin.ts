@@ -1,11 +1,9 @@
-/* @flow */
-
 import { defn } from 'ud';
 import includes from 'lodash/includes';
 import closest from 'closest-ng';
 import * as logger from './injected-logger';
 
-function md<T>(value: T): { value: T, configurable: boolean } {
+function md<T>(value: T): { value: T; configurable: boolean } {
   return { value, configurable: true };
 }
 
@@ -37,14 +35,10 @@ const handler = defn(module, function(event: KeyboardEvent) {
   try {
     // If the key is in a blacklist and it originated while a custom view is
     // present, then maim the event object before Gmail or Inbox sees it.
-    if (
-      !((document.body: any): HTMLElement).classList.contains(
-        'inboxsdk__custom_view_active'
-      )
-    )
+    if (!document.body.classList.contains('inboxsdk__custom_view_active'))
       return;
 
-    const target: HTMLElement = (event.target: any);
+    const target = event.target as HTMLElement;
 
     const key =
       event.key ||
@@ -53,7 +47,7 @@ const handler = defn(module, function(event: KeyboardEvent) {
       includes(blockedAnyModKeys, key) ||
       /* safari */ includes(
         blockedKeyIdentifiers,
-        (event: any).keyIdentifier
+        (event as any).keyIdentifier
       ) ||
       includes(blockedAnyModCharacters, key) ||
       (!event.shiftKey &&
