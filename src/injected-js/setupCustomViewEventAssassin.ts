@@ -31,48 +31,56 @@ const blockedAnyModCharacters = '!#[]{}_+=-;:\r\n1234567890`~';
 const blockedNoModCharacters = ',xsyemrafz.ujkpnl';
 const blockedShiftCharacters = 'parfniut';
 
+function shouldBlockEvent(event: KeyboardEvent): boolean {
+  if (!document.body.classList.contains('inboxsdk__custom_view_active')) {
+    return false;
+  }
+
+  const target = event.target as HTMLElement;
+
+  const key =
+    event.key || /* safari*/ String.fromCharCode(event.which || event.keyCode);
+  if (
+    includes(blockedAnyModKeys, key) ||
+    /* safari */ includes(
+      blockedKeyIdentifiers,
+      (event as any).keyIdentifier
+    ) ||
+    includes(blockedAnyModCharacters, key) ||
+    (!event.shiftKey &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.altKey &&
+      includes(blockedNoModCharacters, key)) ||
+    (event.shiftKey &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.altKey &&
+      includes(blockedShiftCharacters, key.toLowerCase()))
+  ) {
+    if (
+      // Gmail already ignores events originating in these elements even if
+      // they were made by an extension.
+      closest(target, 'input, textarea, button, [contenteditable]') ||
+      // Gmail ignores events originating in its own interactive elements
+      // which tend to have certain role attributes.
+      (!closest(target, '.inboxsdk__custom_view') &&
+        closest(target, '[role=button], [role=link]'))
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
+  return false;
+}
+
 const handler = defn(module, function(event: KeyboardEvent) {
   try {
     // If the key is in a blacklist and it originated while a custom view is
     // present, then maim the event object before Gmail or Inbox sees it.
-    if (!document.body.classList.contains('inboxsdk__custom_view_active'))
-      return;
-
-    const target = event.target as HTMLElement;
-
-    const key =
-      event.key ||
-      /* safari*/ String.fromCharCode(event.which || event.keyCode);
-    if (
-      includes(blockedAnyModKeys, key) ||
-      /* safari */ includes(
-        blockedKeyIdentifiers,
-        (event as any).keyIdentifier
-      ) ||
-      includes(blockedAnyModCharacters, key) ||
-      (!event.shiftKey &&
-        !event.ctrlKey &&
-        !event.metaKey &&
-        !event.altKey &&
-        includes(blockedNoModCharacters, key)) ||
-      (event.shiftKey &&
-        !event.ctrlKey &&
-        !event.metaKey &&
-        !event.altKey &&
-        includes(blockedShiftCharacters, key.toLowerCase()))
-    ) {
-      if (
-        // Gmail already ignores events originating in these elements even if
-        // they were made by an extension.
-        closest(target, 'input, textarea, button, [contenteditable]') ||
-        // Gmail ignores events originating in its own interactive elements
-        // which tend to have certain role attributes.
-        (!closest(target, '.inboxsdk__custom_view') &&
-          closest(target, '[role=button], [role=link]'))
-      ) {
-        return;
-      }
-
+    if (shouldBlockEvent(event)) {
       Object.defineProperties(event, {
         altKey: md(false),
         ctrlKey: md(false),
