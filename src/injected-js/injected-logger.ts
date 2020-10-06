@@ -1,5 +1,3 @@
-/* @flow */
-
 export function error(err: Error, details?: any) {
   if (!err) {
     err = new Error('No error given');
@@ -11,11 +9,11 @@ export function error(err: Error, details?: any) {
     details = '<failed to jsonify>';
   }
 
-  const errorProperties: Object = {};
-  for (let name in err) {
+  const errorProperties: any = {};
+  for (const name in err) {
     if (Object.prototype.hasOwnProperty.call(err, name)) {
       try {
-        const value = (err: any)[name];
+        const value = (err as any)[name];
         JSON.stringify(value);
         errorProperties[name] = value;
       } catch (err) {

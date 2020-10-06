@@ -16,6 +16,13 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     customRouteView.setFullWidth(false);
 
     customRouteView.getElement().textContent = 'hello world! ' + customRouteView.getParams().monkeyName;
+    const focusTest = document.createElement('div');
+    focusTest.innerHTML = `
+      <input value="foo">
+      <div tabindex="-1">focusable element</div>
+    `;
+    customRouteView.getElement().appendChild(focusTest);
+
     const list = document.createElement('ul');
     // threadIds.forEach(function(threadId) {
     //   const link = document.createElement('a');
