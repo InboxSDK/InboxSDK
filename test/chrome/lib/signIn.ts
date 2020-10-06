@@ -4,8 +4,6 @@ import delay from 'pdelay';
 
 export default async function signIn(testEmail: string) {
   const authInfo = await readAuthInfo();
-  const context = await browser.createIncognitoBrowserContext();
-  const page = await context.newPage();
   try {
     await page.goto('https://mail.google.com', { waitUntil: 'networkidle2' });
   } catch (err) {
@@ -13,7 +11,9 @@ export default async function signIn(testEmail: string) {
     console.log(err);
     await page.goto('https://mail.google.com', { waitUntil: 'networkidle2' });
   }
-  if (page.url().startsWith('https://www.google.com/intl/en-GB/gmail/about/')) {
+  if (
+    page.url().startsWith('https://www.google.com/intl/en-GB/gmail/about/#')
+  ) {
     await page.goto(
       'https://accounts.google.com/AccountChooser?service=mail&continue=https://mail.google.com/mail/'
     );
@@ -93,10 +93,10 @@ export default async function signIn(testEmail: string) {
       await page.click('#smsauth-interstitial-remindbutton');
     }
   }
-  // await page.waitForFunction(
-  //   () =>
-  //     document.location.href.startsWith('https://mail.google.com/mail/') &&
-  //     document.location.href.endsWith('#inbox'),
-  //   { polling: 100 }
-  // );
+  await page.waitForFunction(
+    () =>
+      document.location.href.startsWith('https://mail.google.com/mail/') &&
+      document.location.href.endsWith('#inbox'),
+    { polling: 100 }
+  );
 }

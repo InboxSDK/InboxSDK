@@ -1,7 +1,10 @@
 import signIn from './lib/signIn';
-// import attemptWithRetries from '../../src/platform-implementation-js/lib/attemptWithRetries';
+import attemptWithRetries from '../../src/platform-implementation-js/lib/attemptWithRetries';
+import pexpect from 'expect-puppeteer';
+import { Page } from 'puppeteer';
 
-const testEmail = 'inboxsdktest@gmail.com';
+// const testEmail = 'inboxsdktest@gmail.com';
+const testEmail = 'pipelinetest@streak.com';
 
 // https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md
 
@@ -286,7 +289,35 @@ afterEach(async () => {
 // });
 
 describe('test run', () => {
-  it('works', () => {
-    expect(1).toEqual(1);
+  it('works', async () => {
+    const authWindowPromise: Promise<Page> = new Promise(resolve =>
+      browser.on('targetcreated', async target => {
+        const page = await target.page();
+        if (
+          page &&
+          (page.url().includes('signin') || page.url().includes('oauth'))
+        ) {
+          resolve(page);
+        }
+      })
+    );
+    await page.waitForSelector('.streak__ww_google_signin');
+    await page.click('.streak__ww_google_signin');
+    const authPage = await authWindowPromise;
+
+    // Google OAuth window
+    await authPage.waitForFunction(() =>
+      document.location.href.includes(
+        'https://accounts.google.com/o/oauth2/auth/oauthchooseaccount'
+      )
+    );
+    await authPage.waitForSelector(
+      `div[data-identifier="pipelinetest@streak.com"]`
+    );
+    await pexpect(
+      authPage
+    ).toClick(`div[data-identifier="pipelinetest@streak.com"]`, { delay: 100 });
+    await authPage.waitForSelector('#submit_approve_access');
+    await pexpect(authPage).toClick('#submit_approve_access', { delay: 100 });
   });
 });
