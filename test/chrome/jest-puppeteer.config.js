@@ -17,11 +17,11 @@ require.cache[require.resolve('puppeteer')] =
 
 module.exports = {
   launch: {
-    headless: false,
-    args: [
-      `--disable-extensions-except=${pathToExtension}`,
-      `--load-extension=${pathToExtension}`
-    ],
-    userDataDir
+    headless: false
+    // args: [
+    //   `--disable-extensions-except=${pathToExtension}`,
+    //   `--load-extension=${pathToExtension}`
+    // ],
+    // userDataDir
   }
 };

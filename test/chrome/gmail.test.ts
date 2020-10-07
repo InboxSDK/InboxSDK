@@ -301,8 +301,8 @@ describe('test run', () => {
         }
       })
     );
-    await page.waitForSelector('.streak__ww_google_signin');
-    await page.click('.streak__ww_google_signin');
+    // await page.waitForSelector('.streak__ww_google_signin');
+    // await page.click('.streak__ww_google_signin');
     const authPage = await authWindowPromise;
 
     // Google OAuth window

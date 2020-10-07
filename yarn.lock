@@ -6323,7 +6323,7 @@ jest-pnp-resolver@^1.2.2:
   resolved "https://registry.yarnpkg.com/jest-pnp-resolver/-/jest-pnp-resolver-1.2.2.tgz#b704ac0ae028a89108a4d040b3f919dfddc8e33c"
   integrity sha512-olV41bKSMm8BdnuMsewT4jqlZ8+3TCARAXjZGT9jcoSnrfUnRCqnMoF9XEeoWjbzObpqF9dRhHQj0Xb9QdF6/w==
 
-jest-puppeteer@^4.4.0:
+jest-puppeteer@^4.1.1:
   version "4.4.0"
   resolved "https://registry.yarnpkg.com/jest-puppeteer/-/jest-puppeteer-4.4.0.tgz#4b906e638a5e3782ed865e7b673c82047b85952e"
   integrity sha512-ZaiCTlPZ07B9HW0erAWNX6cyzBqbXMM7d2ugai4epBDKpKvRDpItlRQC6XjERoJELKZsPziFGS0OhhUvTvQAXA==
