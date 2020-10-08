@@ -12,7 +12,7 @@ export default async function signIn(testEmail: string) {
     await page.goto('https://mail.google.com', { waitUntil: 'networkidle2' });
   }
   if (
-    page.url().startsWith('https://www.google.com/intl/en-GB/gmail/about/#')
+    page.url().match(/^https:\/\/www\.google\.com\/.*gmail\/about\//)
   ) {
     await page.goto(
       'https://accounts.google.com/AccountChooser?service=mail&continue=https://mail.google.com/mail/'
