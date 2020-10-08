@@ -1,7 +1,6 @@
 import signIn from './lib/signIn';
 import attemptWithRetries from '../../src/platform-implementation-js/lib/attemptWithRetries';
 
-// const testEmail = 'inboxsdktest@gmail.com';
 const testEmail = 'pipelinetest@streak.com';
 
 // https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md
