@@ -1,7 +1,5 @@
 import signIn from './lib/signIn';
 import attemptWithRetries from '../../src/platform-implementation-js/lib/attemptWithRetries';
-import pexpect from 'expect-puppeteer';
-import { Page } from 'puppeteer';
 
 // const testEmail = 'inboxsdktest@gmail.com';
 const testEmail = 'pipelinetest@streak.com';
