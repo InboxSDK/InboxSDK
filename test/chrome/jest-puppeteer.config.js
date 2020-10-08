@@ -9,11 +9,11 @@ const userDataDir = path.join(os.tmpdir(), 'jest_puppeteer_userDataDir');
 
 module.exports = {
   launch: {
-    headless: false
-    // args: [
-    //   `--disable-extensions-except=${pathToExtension}`,
-    //   `--load-extension=${pathToExtension}`
-    // ],
-    // userDataDir
+    headless: false,
+    args: [
+      `--disable-extensions-except=${pathToExtension}`,
+      `--load-extension=${pathToExtension}`
+    ],
+    userDataDir
   }
 };
