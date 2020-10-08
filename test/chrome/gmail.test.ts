@@ -20,7 +20,6 @@ afterEach(async () => {
     (window as any)._errors = [];
     return errors;
   });
-  console.log('=== errors', errors);
   expect(Array.isArray(errors)).toBe(true);
   expect(errors).toEqual([]);
 });
