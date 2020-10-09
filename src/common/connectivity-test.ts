@@ -9,7 +9,10 @@ function imageTest(url: string): Promise<boolean> {
     img.onload = function() {
       resolve(true);
     };
-    img.onloadend = img.onerror = function() {
+    img.addEventListener('loadend', function() {
+      resolve(false);
+    });
+    img.onerror = function() {
       resolve(false);
     };
     img.src = cachebustUrl(url);
