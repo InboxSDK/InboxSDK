@@ -625,8 +625,12 @@ class GmailThreadRowView {
                   hAlign: 'left',
                   vAlign: 'top'
                 });
-                activeDropdown.on('destroy', function() {
-                  setTimeout(function() {
+                activeDropdown.on('destroy', () => {
+                  setTimeout(() => {
+                    this._elements[0].classList.remove(
+                      'inboxsdk__dropdown_active'
+                    );
+                    this._elements[0].classList.remove('buL'); // gmail class to force row button toolbar to be visible
                     activeDropdown = null;
                   }, 1);
                 });
