@@ -13,9 +13,8 @@ export default function getMainContentElementChangedStream(
   const s = waitForMainContentContainer(GmailElementGetter)
     .flatMap(mainContentContainer =>
       makeElementChildStream(mainContentContainer)
-        .map(({ el }) => el)
-        .filter(el => el.classList.contains('nH'))
-        .flatMap(el =>
+        .filter(({ el }) => el.classList.contains('nH'))
+        .flatMap(({ el, removalStream }) =>
           makeMutationObserverChunkedStream(el, {
             attributes: true,
             attributeFilter: ['style']
@@ -26,6 +25,7 @@ export default function getMainContentElementChangedStream(
             })
             .filter(_isNowVisible)
             .map(e => e.target)
+            .takeUntilBy(removalStream)
         )
     )
     .toProperty();
