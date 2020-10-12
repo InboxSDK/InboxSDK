@@ -11,12 +11,13 @@ export default async function signIn(testEmail: string) {
     console.log(err);
     await page.goto('https://mail.google.com', { waitUntil: 'networkidle2' });
   }
-  if (page.url().startsWith('https://www.google.com/gmail/about/')) {
+  if (page.url().match(/^https:\/\/www\.google\.com\/.*gmail\/about\//)) {
     await page.goto(
       'https://accounts.google.com/AccountChooser?service=mail&continue=https://mail.google.com/mail/'
     );
   }
   if (page.url().startsWith('https://accounts.google.com/')) {
+    // eslint-disable-next-line no-console
     console.log('need to sign in');
     await page.waitForSelector(
       'input[type=email]:not([aria-hidden=true]), input[type=password]'
@@ -57,6 +58,7 @@ export default async function signIn(testEmail: string) {
         .url()
         .startsWith('https://accounts.google.com/signin/v2/challenge/totp')
     ) {
+      // eslint-disable-next-line no-console
       console.log('needs 2fa');
       await page.waitForSelector('input[type=tel]#totpPin');
 
@@ -84,6 +86,7 @@ export default async function signIn(testEmail: string) {
     }
     await delay(1500); // wait for animation to finish
     if (page.url().includes('SmsAuthInterstitial')) {
+      // eslint-disable-next-line no-console
       console.log('got sms interstitial screen');
       await page.click('#smsauth-interstitial-remindbutton');
     }

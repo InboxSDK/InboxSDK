@@ -53,7 +53,7 @@ var ComposeView = /** @lends ComposeView */ {
    * the form that holds the To, CC, BCC, elements.
    * @return {HTMLElement}
    */
-  getMetadataFormElement: function() {},
+  getMetadataForm: function() {},
 
   /**
    * Returns the initial message ID of the draft. If this is a new compose then the
