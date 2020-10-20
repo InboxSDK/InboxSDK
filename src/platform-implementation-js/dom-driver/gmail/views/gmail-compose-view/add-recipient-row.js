@@ -87,8 +87,8 @@ function _createRecipientRowElement(
   var firstRowElement = gmailComposeView.getRecipientRowElements()[0];
   var parent: HTMLElement = (firstRowElement.parentElement: any);
   parent.insertBefore(row, firstRowElement.nextSibling);
-  parent.parentElement.parentElement.classList.add(
-    'inboxsdk__compose_addressList'
-  );
+  const parentThatCanSometimesBeHidden =
+    parent.parentElement && parent.parentElement.parentElement;
+  parentThatCanSometimesBeHidden.classList.add('inboxsdk__compose_addressList');
   return row;
 }
