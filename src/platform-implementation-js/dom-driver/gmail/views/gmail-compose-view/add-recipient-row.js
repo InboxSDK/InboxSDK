@@ -89,6 +89,9 @@ function _createRecipientRowElement(
   parent.insertBefore(row, firstRowElement.nextSibling);
   const parentThatCanSometimesBeHidden =
     parent.parentElement && parent.parentElement.parentElement;
-  parentThatCanSometimesBeHidden.classList.add('inboxsdk__compose_addressList');
+  parentThatCanSometimesBeHidden &&
+    parentThatCanSometimesBeHidden.classList.add(
+      'inboxsdk__compose_addressList'
+    );
   return row;
 }
