@@ -6,7 +6,7 @@ import simpleEncryptor from 'simple-encryptor';
 // ./tools/write-test-secret.js to create a new value.
 
 const ciphertext =
-  'c4aadddf6d682e87d7fb23c0a968b06cc889246204c800cab84a1e1eaaf321f79981df2be855d4927182f97bd47447e397FKGJc7Ijge9PLot1VTtkm9IswFZMzXhlyRvdNuVkozPh95EaQZ41gxVqX2Tbw4rxfhPrKMHBovQkSMlP77xlREmdsQq6h66fBOTd5D/Lwp2e6JxlNpiHE+VwrkPb3K9aH2KhQ9532CV1tSKNEEXLOiyVS8eVkDZn7kRHbqXh0=';
+  '627e61f10747cedf6aaaeca80cae872971d377663f2ca7bb9d510e92bb4a3645061f87959841600844f12c26128fa0d4Mama0AGpxGDGL88ZsTScyTSAHWV0/fkSqKCKMxXUQr7kJmMChJFH0ykNBZQBZKfESGDzCCwPbQp4hw6nP69nZNNgycEih+N/Q7r18TJOxiOGU9cF5QBlrxe13L7CJD1StJNbyxoVTRhtp+KS9hikyA==';
 
 interface AuthInfo {
   [email: string]: {
