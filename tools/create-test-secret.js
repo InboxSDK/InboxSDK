@@ -17,9 +17,9 @@ const encryptor = simpleEncryptor(
 
 async function main() {
   console.error('Enter plaintext and then press ctrl-D:');
-  let plaintext = await read(process.stdin);
-  plaintext = JSON.stringify(JSON.parse(plaintext));
-  const ciphertext = encryptor.encrypt(plaintext);
+  const plaintext = await read(process.stdin);
+  const plainobj = JSON.parse(plaintext);
+  const ciphertext = encryptor.encrypt(plainobj);
   console.log(ciphertext);
 }
 

@@ -16,6 +16,6 @@ const encryptor = simpleEncryptor(
 
 rl.question('Enter ciphertext: ', ciphertext => {
   const result = encryptor.decrypt(ciphertext);
-  console.log(result);
+  console.log(JSON.stringify(result, null, 2));
   rl.close();
 });
