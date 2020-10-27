@@ -91,10 +91,15 @@ export default async function signIn(testEmail: string) {
       await page.click('#smsauth-interstitial-remindbutton');
     }
   }
-  await page.waitForFunction(
-    () =>
-      document.location.href.startsWith('https://mail.google.com/mail/') &&
-      document.location.href.endsWith('#inbox'),
-    { polling: 100 }
-  );
+  try {
+    await page.waitForFunction(
+      () =>
+        document.location.href.startsWith('https://mail.google.com/mail/') &&
+        document.location.href.endsWith('#inbox'),
+      { polling: 100 }
+    );
+  } catch (err) {
+    console.error('found url while waiting for gmail:', page.url());
+    throw err;
+  }
 }
