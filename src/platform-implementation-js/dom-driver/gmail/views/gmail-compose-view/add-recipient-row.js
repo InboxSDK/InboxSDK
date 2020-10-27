@@ -87,6 +87,8 @@ function _createRecipientRowElement(
   var firstRowElement = gmailComposeView.getRecipientRowElements()[0];
   var parent: HTMLElement = (firstRowElement.parentElement: any);
   parent.insertBefore(row, firstRowElement.nextSibling);
-
+  const addressBarContainer = parent.closest('.fX');
+  addressBarContainer &&
+    addressBarContainer.classList.add('inboxsdk__compose_addressList');
   return row;
 }

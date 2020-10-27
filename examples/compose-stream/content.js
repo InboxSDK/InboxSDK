@@ -133,6 +133,21 @@ InboxSDK.load(2, 'compose-stream-example').then(inboxSDK => {
       section: 'SEND_RIGHT'
     });
 
+    composeView.addButton({
+      title: 'add a new recipient',
+      iconUrl: dataUri,
+      onClick(event) {
+        const pipelineRowContainer = document.createElement('div');
+        const undoPipelineRow = composeView.addRecipientRow({
+          el: pipelineRowContainer,
+          labelClass: 'fooClass',
+          labelText: 'some label'
+        });
+        document.getElementsByClassName('fX')[0].style.display= 'flex';
+      },
+      section: 'SEND_RIGHT'
+    });
+
     Bacon.fromEventTarget(fileInput, 'change')
       .takeUntil(Bacon.fromEventTarget(composeView, 'destroy'))
       .onValue(() => {
