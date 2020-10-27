@@ -1,6 +1,6 @@
 {
-  "name": "Example Gmail Extension",
-  "description": "Example extension showing use of the Streak Gmail SDK",
+  "name": "Header Support",
+  "description": "Header Support example!",
   "version": "0.1",
   "content_scripts": [
     {
