@@ -10,6 +10,6 @@ InboxSDK.load(2, 'header support button').then(function(sdk){
     onClick: () => {
       window.open('https://streak.com')
     }
-  }).then(p => window.globalCP = p);
+  });
 });
 
