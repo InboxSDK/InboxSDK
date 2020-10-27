@@ -237,7 +237,7 @@ class GmailDriver {
     this._keyboardShortcutHelpModifier = new KeyboardShortcutHelpModifier();
     this._butterBarDriver = new GmailButterBarDriver();
 
-    Kefir.later(30 * 1000)
+    Kefir.later(45 * 1000)
       .takeUntilBy(
         toItemWithLifetimeStream(this._page.tree.getAllByTag('supportMenu'))
       )
