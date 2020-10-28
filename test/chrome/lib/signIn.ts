@@ -4,10 +4,6 @@ import delay from 'pdelay';
 
 export default async function signIn(testEmail: string) {
   const authInfo = await readAuthInfo();
-
-  const cookies = await page.cookies('https://accounts.google.com/');
-  page.deleteCookie(...cookies);
-
   try {
     await page.goto('https://mail.google.com', { waitUntil: 'networkidle2' });
   } catch (err) {
