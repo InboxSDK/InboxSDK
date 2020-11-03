@@ -182,13 +182,8 @@ export default class NativeGmailNavItemView {
     );
 
     const element = gmailNavItemView.getElement();
-    if (this._driver.isUsingMaterialUI()) {
-      querySelector(element, '.TN').style.marginLeft =
-        getLeftIndentationPaddingValue(this._driver) + 'px';
-    } else {
-      querySelector(element, '.TO').style.paddingLeft =
-        getLeftIndentationPaddingValue(this._driver) + 'px';
-    }
+    querySelector(element, '.TN').style.marginLeft =
+      getLeftIndentationPaddingValue(this._driver) + 'px';
 
     this._setHeights();
   }
@@ -239,20 +234,9 @@ export default class NativeGmailNavItemView {
       true
     );
 
-    if (this._driver.isUsingMaterialUI()) {
-      const insertionPoint = this._element.querySelector('.TN');
-      if (insertionPoint)
-        (insertionPoint: any).insertAdjacentElement(
-          'afterbegin',
-          expandoElement
-        );
-    } else {
-      const insertionPoint = this._element.querySelector('.nU');
-      if (insertionPoint)
-        (insertionPoint: any).insertAdjacentElement(
-          'beforebegin',
-          expandoElement
-        );
+    const insertionPoint = this._element.querySelector('.TN');
+    if (insertionPoint) {
+      (insertionPoint: any).insertAdjacentElement('afterbegin', expandoElement);
     }
 
     if (

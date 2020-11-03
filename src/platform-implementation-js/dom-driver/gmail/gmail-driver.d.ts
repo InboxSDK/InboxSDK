@@ -51,7 +51,6 @@ export default class GmailDriver implements Driver {
   public getGmailActionToken(): Promise<string>;
   public getUserEmailAddress(): string;
   public isConversationViewDisabled(): Promise<boolean>;
-  public isUsingMaterialUI(): boolean;
   public getUserLanguage(): string;
   public getUserContact(): Contact;
   public getAccountSwitcherContactList(): Contact[];

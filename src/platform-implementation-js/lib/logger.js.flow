@@ -15,7 +15,6 @@ declare export default class Logger {
 
   setUserEmailAddress(email: string): void;
   shouldTrackEverything(): boolean;
-  setIsUsingMaterialGmailUI(isUsing: boolean): void;
   setIsUsingSyncAPI(isUsing: boolean): void;
   static run<T>(cb: () => T, details?: any): T;
   run<T>(cb: () => T, details?: any): T;

@@ -800,10 +800,6 @@ class InboxDriver {
     return Promise.resolve(false);
   }
 
-  isUsingMaterialUI(): boolean {
-    return false;
-  }
-
   getUserLanguage(): string {
     return this._pageCommunicator.getUserLanguage();
   }

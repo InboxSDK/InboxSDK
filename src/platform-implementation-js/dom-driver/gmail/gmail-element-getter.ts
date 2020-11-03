@@ -99,13 +99,9 @@ const GmailElementGetter = {
   },
 
   getSearchInput(): HTMLInputElement | null {
-    const classicUIInput = document.getElementById(
-      'gbqfq'
-    ) as HTMLInputElement | null;
-    const materialUIInput = document.querySelector(
+    return document.querySelector(
       'form[role=search] input'
     ) as HTMLInputElement | null;
-    return classicUIInput || materialUIInput;
   },
 
   getSearchSuggestionsBoxParent(): HTMLElement | null {
@@ -184,18 +180,9 @@ const GmailElementGetter = {
   },
 
   getTopAccountContainer(): HTMLElement | null {
-    if (this.isUsingMaterialUI()) {
-      return document.querySelector(
-        'header[role="banner"] > div:nth-child(2) > div:nth-child(2)'
-      );
-    }
-
-    const gPlusMenu = document.getElementById('gbsfw');
-    if (!gPlusMenu) {
-      return null;
-    }
-
-    return gPlusMenu.parentElement!.parentElement;
+    return document.querySelector(
+      'header[role="banner"] > div:nth-child(2) > div:nth-child(2)'
+    );
   },
 
   isGplusEnabled(): boolean {
@@ -209,12 +196,6 @@ const GmailElementGetter = {
         'a[href*="https://plus"][href*="upgrade"]'
       ).length === 0
     );
-  },
-
-  isUsingMaterialUI(): boolean {
-    const s = document.head.getAttribute('data-inboxsdk-using-material-ui');
-    if (s == null) throw new Error('Failed to read value');
-    return s === 'true';
   },
 
   StandaloneCompose: {

@@ -153,12 +153,7 @@ function _handleViewDriverStreamEvent(
   switch (event.eventName) {
     case 'click':
       // When in Gmailv2, we ignore the onClick, routeID, and routeParams options on GROUPER nav-items
-      if (
-        navItemDescriptor.type === NAV_ITEM_TYPES.GROUPER &&
-        typeof driver.isUsingMaterialUI === 'function' &&
-        driver.isUsingMaterialUI()
-      )
-        return;
+      if (navItemDescriptor.type === NAV_ITEM_TYPES.GROUPER) return;
 
       if (typeof navItemDescriptor.onClick === 'function') {
         let defaultPrevented = false;

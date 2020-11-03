@@ -16,7 +16,6 @@ export default function gmailLoadEvent(driver: GmailDriver) {
         windowHeight: window.innerHeight,
         language: pageCommunicator.getUserLanguage(),
         isUsingSyncAPI: pageCommunicator.isUsingSyncAPI(),
-        isUsingMaterialUI: driver.isUsingMaterialUI(),
         previewPane: pageCommunicator.getUserOriginalPreviewPaneMode(),
         isConversationViewDisabled,
         wasAccountSwitcherReadyAtStart: driver.getEnvData()
