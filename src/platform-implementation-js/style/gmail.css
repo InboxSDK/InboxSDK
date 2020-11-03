@@ -100,13 +100,9 @@ div.T-I.inboxsdk__button {
 }
 
 .f4.J-N-JX.inboxsdk__message_more_icon {
-  margin-top: -1px;
-  width: 16px;
   height: 16px;
-}
-
-body:not(.inboxsdk__gmailv1css) .f4.J-N-JX.inboxsdk__message_more_icon {
   margin-top: 1px;
+  width: 16px;
 }
 
 /* end */
@@ -120,51 +116,39 @@ steps to repro:
 2. open non-native sidebar
 3. mole overlaps sidebar
 */
-body:not(.inboxsdk__gmailv1css)
-  .dw
-  .nH
-  > .no
-  .nH.nn:last-child[style='width: 320px;'] {
+.dw .nH > .no .nH.nn:last-child[style='width: 320px;'] {
   width: 376px !important;
 }
 
 /* fix native button wrapping */
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose .a8X {
+.inboxsdk__compose .a8X {
   overflow: visible;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose .a8X > .bAK {
+.inboxsdk__compose .a8X > .bAK {
   flex-wrap: nowrap;
 }
 
 /* in material Gmail reduce padding between buttons  */
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__compose_narrow_buttons
-  .gU:not(:first-child) {
+.inboxsdk__compose_narrow_buttons .gU:not(:first-child) {
   padding-left: 5px;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__compose_narrow_buttons
-  .inboxsdk__compose_actionToolbar {
+.inboxsdk__compose_narrow_buttons .inboxsdk__compose_actionToolbar {
   padding-left: 10px;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__compose_narrow_buttons
-  .wG:not(:first-child) {
+.inboxsdk__compose_narrow_buttons .wG:not(:first-child) {
   margin-left: 15px;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__compose_narrow_buttons
+.inboxsdk__compose_narrow_buttons
   .inboxsdk__compose_actionToolbar
   div.inboxsdk__composeButton:last-child {
   margin-right: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__compose_narrow_buttons
+.inboxsdk__compose_narrow_buttons
   .inboxsdk__compose_actionToolbar
   div.inboxsdk__composeButton
   + div.inboxsdk__composeButton {
@@ -201,7 +185,7 @@ body:not(.inboxsdk__gmailv1css)
   opacity: 1;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton::before {
+.inboxsdk__composeButton::before {
   content: '';
   display: block;
   opacity: 0;
@@ -219,7 +203,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton::before {
   border-radius: 4px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton:hover::before {
+.inboxsdk__composeButton:hover::before {
   background-color: rgba(32, 33, 36, 0.059);
   border: none;
   box-shadow: none;
@@ -227,9 +211,8 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton:hover::before {
   transform: scale(1);
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__composeButton:focus::before,
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__composeButton.inboxsdk__composeButton_active::before {
+.inboxsdk__composeButton:focus::before,
+.inboxsdk__composeButton.inboxsdk__composeButton_active::before {
   background-color: rgba(32, 33, 36, 0.122);
   border: none;
   box-shadow: none;
@@ -253,7 +236,7 @@ body:not(.inboxsdk__gmailv1css)
   border-radius: 4px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_sendButton {
+.inboxsdk__compose_sendButton {
   padding: 6px 4px;
   margin-left: 2px;
 }
@@ -262,9 +245,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_sendButton {
   height: 20px;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__compose_inlineReply
-  .inboxsdk__compose_sendButton {
+.inboxsdk__compose_inlineReply .inboxsdk__compose_sendButton {
   height: 24px;
 }
 
@@ -284,7 +265,7 @@ body:not(.inboxsdk__gmailv1css)
   white-space: nowrap;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_actionToolbar {
+.inboxsdk__compose_actionToolbar {
   padding-left: 6px;
 }
 
@@ -323,34 +304,27 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_actionToolbar {
   padding: 5px 15px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar {
+.inboxsdk__compose_groupedActionToolbar {
   margin-bottom: 7px;
   padding: 4px 5px;
   background: white;
   left: -3px;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__compose_inlineReply
-  .inboxsdk__compose_groupedActionToolbar {
+.inboxsdk__compose_inlineReply .inboxsdk__compose_groupedActionToolbar {
   left: 14px;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__compose_groupedActionToolbar
-  .inboxsdk__composeButton:first-child {
+.inboxsdk__compose_groupedActionToolbar .inboxsdk__composeButton:first-child {
   margin-left: 0px;
   margin-right: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__composeButton.inboxsdk__compose_groupedActionButton {
+.inboxsdk__composeButton.inboxsdk__compose_groupedActionButton {
   margin-right: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__compose_groupedActionToolbar
-  .inboxsdk__composeButton {
+.inboxsdk__compose_groupedActionToolbar .inboxsdk__composeButton {
   padding: 4px;
 }
 
@@ -359,9 +333,7 @@ there's an element that gets a height of 40px when the gmail formatting toolbar
 is visible. This rule makes that same element get the 40px height when
 the actionToolbar is visible
 */
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__compose_groupedActionToolbar_visible
-  .bA3 {
+.inboxsdk__compose_groupedActionToolbar_visible .bA3 {
   height: 40px;
 }
 
@@ -369,13 +341,11 @@ body:not(.inboxsdk__gmailv1css)
   z-index: 1;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__compose_groupedActionToolbar
-  div.inboxsdk__button {
+.inboxsdk__compose_groupedActionToolbar div.inboxsdk__button {
   margin-right: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar_arrow {
+.inboxsdk__compose_groupedActionToolbar_arrow {
   display: none;
 }
 
@@ -392,7 +362,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_groupedActionToolbar_arrow {
   vertical-align: middle;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_customSendContainer {
+.inboxsdk__compose_customSendContainer {
   height: 36px;
   line-height: 36px;
 }
@@ -489,13 +459,11 @@ input.inboxsdk__x_close_button {
   max-height: 100%;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_custom_date_container {
+.inboxsdk__thread_row_custom_date_container {
   max-width: inherit;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__thread_row_button
-  .inboxsdk__button_iconImg {
+.inboxsdk__thread_row_button .inboxsdk__button_iconImg {
   height: 20px;
   width: 20px;
   margin-top: 0px;
@@ -586,77 +554,62 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
  The <span> element is what inboxSDK will render threadRowButtons as when Gmail hover actions are disabled.
  The following rules fix the issue where threadRowButtons were spilling over into the thread row email text.
  */
-body:not(.inboxsdk__gmailv1css) .zA td.apU.xY {
+.zA td.apU.xY {
   width: initial;
 }
 
-body:not(.inboxsdk__gmailv1css) .zA td.apU.xY span.inboxsdk__thread_row_button {
+.zA td.apU.xY span.inboxsdk__thread_row_button {
   margin: 0 10px;
   opacity: 0.16;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .zA.aqw
-  td.apU.xY
-  span.inboxsdk__thread_row_button {
+.zA.aqw td.apU.xY span.inboxsdk__thread_row_button {
   opacity: 0.54;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .zA.aqw
-  td.apU.xY
-  span.inboxsdk__thread_row_button:hover {
+.zA.aqw td.apU.xY span.inboxsdk__thread_row_button:hover {
   opacity: 1;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .zA
-  td.apU.xY
-  span.inboxsdk__thread_row_button::before {
+.zA td.apU.xY span.inboxsdk__thread_row_button::before {
   /* Google adds in a pseduo ::before element to span elems with the T-KT class applied.
   Explicity setting this width and height to zero as remove weird positioning that results */
   width: 0px;
   height: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_attachment_icon {
+.inboxsdk__thread_row_attachment_icon {
   vertical-align: middle;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_attachment_icons_present {
+.inboxsdk__thread_row_attachment_icons_present {
   max-width: inherit;
 }
 
 /* narrow vertical preview pane */
-body:not(.inboxsdk__gmailv1css)
-  .Zs
-  .inboxsdk__thread_row_attachment_icons_present {
+.Zs .inboxsdk__thread_row_attachment_icons_present {
   flex-grow: 0;
 }
 
-body:not(.inboxsdk__gmailv1css) .Zs .inboxsdk__thread_row_label {
+.Zs .inboxsdk__thread_row_label {
   order: 1;
 }
 
-body:not(.inboxsdk__gmailv1css) .Zs .inboxsdk__thread_row_icon_wrapper {
+.Zs .inboxsdk__thread_row_icon_wrapper {
   order: 1;
   margin-left: 3px;
   margin-right: 0px;
 }
 /* end narrow vertical preview pane */
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_icon_wrapper,
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__thread_row_icon_wrapper
-  .inboxsdk__button_icon,
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__thread_row_icon_wrapper
-  .inboxsdk__button_iconImg {
+.inboxsdk__thread_row_icon_wrapper,
+.inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon,
+.inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
   height: 18px;
   width: 18px;
 }
 
-body:not(.inboxsdk__gmailv1css) .zA:hover .inboxsdk__thread_row_icon_wrapper {
+.zA:hover .inboxsdk__thread_row_icon_wrapper {
   align-self: flex-start;
   margin-top: 1px;
 }
@@ -736,14 +689,14 @@ body:not(.inboxsdk__gmailv1css) .zA:hover .inboxsdk__thread_row_icon_wrapper {
   max-height: 3px;
 }
 
-body:not(.inboxsdk__gmailv1css) .aQw .inboxsdk__button_icon {
+.aQw .inboxsdk__button_icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   height: 28px;
 }
 
-body:not(.inboxsdk__gmailv1css) .aQw .inboxsdk__button_iconImg {
+.aQw .inboxsdk__button_iconImg {
   height: 18px;
   width: 18px;
 }
@@ -763,7 +716,7 @@ body:not(.inboxsdk__gmailv1css) .aQw .inboxsdk__button_iconImg {
   margin: 0;
 }
 
-body .dw {
+.dw {
   /* Fixes issue where a tall compose window opened over a custom view could be
    * overlapped by Gmail's top bar. Also fixes issue where mole widgets are
    * only visible while a compose window is open.
@@ -830,17 +783,17 @@ div.inboxsdk__compose_statusbar {
   margin: 0;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__compose_statusbar {
+.inboxsdk__compose_statusbar {
   background: none;
   position: relative;
 }
 
 /* only include padding when in thread inline view */
-body:not(.inboxsdk__gmailv1css) .HM .I5 .inboxsdk__compose_statusbar {
+.HM .I5 .inboxsdk__compose_statusbar {
   padding: 0 16px 16px 16px;
 }
 
-body:not(.inboxsdk__gmailv1css) table + .inboxsdk__compose_statusbar {
+table + .inboxsdk__compose_statusbar {
   margin-top: -8px;
 }
 
@@ -878,7 +831,7 @@ isn't visible behind it. */
   background-color: white;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__recipient_row {
+.inboxsdk__recipient_row {
   display: flex;
 }
 
@@ -927,20 +880,16 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__recipient_row {
   display: none !important;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  [data-toolbar-icononly='false']
-  .inboxsdk__button_text {
+[data-toolbar-icononly='false'] .inboxsdk__button_text {
   color: #5f6368;
 }
 
-body:not(.inboxsdk__gmailv1css) [data-toolbar-icononly='false'] .asa:before {
+[data-toolbar-icononly='false'] .asa:before {
   border-radius: 4px;
   border: none !important;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  [data-toolbar-icononly='false']
-  .inboxsdk__button {
+[data-toolbar-icononly='false'] .inboxsdk__button {
   align-items: center;
   border: none;
   display: inline-flex;
@@ -1003,8 +952,7 @@ body:not(.inboxsdk__gmailv1css)
   margin-bottom: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__modal_fullscreen.inboxsdk__modal_content_no_buttons:not(.inboxsdk__modal_hideBottom)
+.inboxsdk__modal_fullscreen.inboxsdk__modal_content_no_buttons:not(.inboxsdk__modal_hideBottom)
   .inboxsdk__modal_content {
   margin-bottom: 0px;
   padding-bottom: 24px;
@@ -1082,8 +1030,8 @@ body:not(.inboxsdk__gmailv1css)
   left: auto !important;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__drawers_in_use .aDi,
-body:not(.inboxsdk__gmailv1css) .inboxsdk__moles_in_use .aDi {
+.inboxsdk__drawers_in_use .aDi,
+.inboxsdk__moles_in_use .aDi {
   position: static;
 }
 
@@ -1120,7 +1068,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__moles_in_use .aDi {
   min-height: 36px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__mole_view_inner {
+.inboxsdk__mole_view_inner {
   min-height: 40px;
 }
 
@@ -1138,7 +1086,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__mole_view_inner {
   cursor: pointer;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__mole_view_titlebar {
+.inboxsdk__mole_view_titlebar {
   border-radius: 4px 4px 0 0;
   height: 40px;
   padding-top: 9px;
@@ -1425,17 +1373,14 @@ body[dir='rtl'] .idm5_container_app_sidebar_no_icons.no[dir='ltr'] {
   margin-bottom: 18px;
 }
 
-body:not(.inboxsdk__gmailv1css) .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
+body .IDMAP_sidebar_iconArea .inboxsdk__button_icon {
   overflow: visible;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .IDMAP_sidebar_iconArea
+.IDMAP_sidebar_iconArea
   .sidebar_button_container_active
   .inboxsdk__button_icon::before,
-body:not(.inboxsdk__gmailv1css)
-  .IDMAP_sidebar_iconArea
-  .inboxsdk__button_icon:hover:before {
+.IDMAP_sidebar_iconArea .inboxsdk__button_icon:hover:before {
   content: '';
   background: #f1f3f4;
   position: absolute;
@@ -1447,8 +1392,7 @@ body:not(.inboxsdk__gmailv1css)
   z-index: 0;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .IDMAP_sidebar_iconArea
+.IDMAP_sidebar_iconArea
   .sidebar_button_container_active
   .inboxsdk__button_icon::before {
   background: #e8eaed;
@@ -1460,10 +1404,7 @@ body:not(.inboxsdk__gmailv1css)
   margin-top: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .IDMAP_sidebar_iconArea
-  .inboxsdk__button_icon
-  .inboxsdk__button_iconImg {
+.IDMAP_sidebar_iconArea .inboxsdk__button_icon .inboxsdk__button_iconImg {
   position: absolute;
   left: 0px;
   top: 0px;
@@ -1516,39 +1457,31 @@ body:not(.inboxsdk__gmailv1css)
   display: none !important;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .IDMAP_app_sidebar_in_use
-  .IDMAP_app_sidebar_container.addon_sidebar {
+.IDMAP_app_sidebar_in_use .IDMAP_app_sidebar_container.addon_sidebar {
   height: 100%;
   overflow: auto;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .IDMAP_app_sidebar_in_use
+.IDMAP_app_sidebar_in_use
   .IDMAP_app_sidebar_container.addon_sidebar
   .IDMAP_app_sidebar_content_area {
   width: 100%;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .IDMAP_app_sidebar_in_use:not(.companion_app_sidebar_visible)
-  .addon_sidebar {
+.IDMAP_app_sidebar_in_use:not(.companion_app_sidebar_visible) .addon_sidebar {
   display: none;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .IDMAP_app_sidebar_content_panel_title_icon_container {
+.IDMAP_app_sidebar_content_panel_title_icon_container {
   margin-left: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .IDMAP_app_sidebar_content_panel
-  .IDMAP_app_sidebar_content_panel_top_line {
+.IDMAP_app_sidebar_content_panel .IDMAP_app_sidebar_content_panel_top_line {
   padding: 0px 16px;
 }
 
 /* hide thread addon icons when in custom view */
-body:not(.inboxsdk__gmailv1css).inboxsdk__custom_view_active
+body.inboxsdk__custom_view_active
   .brC-aT5-aOt-ato-Kp-Jw
   [role='tablist']
   > div:not(:last-child) {
@@ -1556,19 +1489,13 @@ body:not(.inboxsdk__gmailv1css).inboxsdk__custom_view_active
 }
 
 /* make the native addon icon container for thread add-ons (div.bvq) always visible */
-body:not(.inboxsdk__gmailv1css) .IDMAP_app_sidebar_in_use .bvq,
-body:not(.inboxsdk__gmailv1css)
-  .IDMAP_app_sidebar_in_use
-  .bvq
-  > div:last-child {
+.IDMAP_app_sidebar_in_use .bvq,
+.IDMAP_app_sidebar_in_use .bvq > div:last-child {
   display: block !important;
 }
 
 /* hide the native addon loading div */
-body:not(.inboxsdk__gmailv1css)
-  .IDMAP_companion_container_app_sidebar_in_use
-  .bvq
-  > div:first-child {
+.IDMAP_companion_container_app_sidebar_in_use .bvq > div:first-child {
   display: none !important;
 }
 
@@ -1591,16 +1518,10 @@ body:not(.inboxsdk__gmailv1css)
   font-weight: normal;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__hide_native_marker
-  .ain:not(.inboxsdk__navItem)
-  .bsU {
+.inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .bsU {
   font-weight: normal;
 }
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__hide_native_marker
-  .ain:not(.inboxsdk__navItem)
-  .TO {
+.inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .TO {
   background: none;
 }
 
@@ -1628,76 +1549,66 @@ body[dir='rtl'] .inboxsdk__hide_addon_container[dir='ltr'] {
   display: none;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem {
+.inboxsdk__navItem {
   font-size: 14px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO.n4 {
+.inboxsdk__navItem > .TO.n4 {
   display: block;
   padding-left: 0;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO.n4 .qj > .G-asx {
+.inboxsdk__navItem > .TO.n4 .qj > .G-asx {
   margin-right: 0;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .bsU:empty {
+.inboxsdk__navItem > .TO .bsU:empty {
   display: none;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .qj:empty::after {
+.inboxsdk__navItem > .TO .qj:empty::after {
   content: '';
   border: 8px solid;
   border-radius: 50%;
   border-color: rgb(118, 118, 118);
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__navItem
-  > .TO
-  .qj[style*='border-color']:empty::after {
+.inboxsdk__navItem > .TO .qj[style*='border-color']:empty::after {
   border-color: inherit;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO:hover .pM {
+.inboxsdk__navItem > .TO:hover .pM {
   display: flex;
   display: -webkit-flex;
   visibility: visible;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .afM {
+.inboxsdk__navItem > .TO .afM {
   cursor: pointer;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO:hover .afM {
+.inboxsdk__navItem > .TO:hover .afM {
   display: block;
   visibility: visible;
 }
 
 /* This does slightly break from the native Gmail behavior, but we keep the dropdown button
   visible while it has an active dropdown */
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO img.afM.afO {
+.inboxsdk__navItem > .TO img.afM.afO {
   display: block;
   visibility: visible;
 }
 
 /* Keep the subtitle hidden while the dropdown is active */
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__navItem
-  > .TO
-  img.afM.afO
-  ~ .aio
-  > .bsU {
+.inboxsdk__navItem > .TO img.afM.afO ~ .aio > .bsU {
   display: none;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO:hover .bsU {
+.inboxsdk__navItem > .TO:hover .bsU {
   display: none;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__navItem.inboxsdk__navItem_nonClickable
-  > .TO:active {
+.inboxsdk__navItem.inboxsdk__navItem_nonClickable > .TO:active {
   background-color: initial;
 }
 
@@ -1706,16 +1617,16 @@ body:not(.inboxsdk__gmailv1css)
   visibility: visible;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link {
+.inboxsdk__navItem_link {
   cursor: pointer;
   margin-left: auto;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link > a {
+.inboxsdk__navItem_link > a {
   margin-left: 16px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .inboxsdk__button {
+.inboxsdk__navItem > .TO .inboxsdk__button {
   margin-right: 0;
 }
 
@@ -1740,12 +1651,12 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem > .TO .inboxsdk__button {
   z-index: 1;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link > a,
+.inboxsdk__navItem_link > a,
 .aip .CK {
   color: #15c;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link > a:hover,
+.inboxsdk__navItem_link > a:hover,
 .aip .CK:hover {
   text-decoration: underline;
 }
@@ -1767,7 +1678,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__navItem_link > a:hover,
   margin-bottom: 0px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__custom_sections {
+.inboxsdk__custom_sections {
   margin-bottom: 8px;
 }
 
@@ -1792,11 +1703,11 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__custom_sections {
 
 /* end lone collapsed SectionView in Gmailv1 */
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer.Wg {
+.inboxsdk__results_collapsedContainer.Wg {
   height: auto;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer > div {
+.inboxsdk__results_collapsedContainer > div {
   display: flex;
   display: -webkit-flex;
   flex-wrap: wrap;
@@ -1807,8 +1718,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__results_collapsedContainer > div {
 
 /* lone collapsed SectionView in Gmailv2 */
 /* If only a single SectionView is collapsed then its dropdown button and titleTextLink are still shown */
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__results_collapsedContainer
+.inboxsdk__results_collapsedContainer
   > div
   > .inboxsdk__resultsSection_collapsed:first-child:last-child {
   flex: 1;
@@ -1816,8 +1726,7 @@ body:not(.inboxsdk__gmailv1css)
   margin-right: 0;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__results_collapsedContainer
+.inboxsdk__results_collapsedContainer
   > div
   > .inboxsdk__resultsSection_collapsed:first-child:last-child
   > .inboxsdk__resultsSection_header {
@@ -1829,8 +1738,7 @@ body:not(.inboxsdk__gmailv1css)
   -webkit-flex: 1;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__results_collapsedContainer
+.inboxsdk__results_collapsedContainer
   > div
   > .inboxsdk__resultsSection_collapsed:first-child:last-child
   > .inboxsdk__resultsSection_header
@@ -1849,8 +1757,7 @@ body:not(.inboxsdk__gmailv1css)
   margin-right: 20px;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
+.inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
   display: inline-flex;
 }
 
@@ -1867,7 +1774,7 @@ body:not(.inboxsdk__gmailv1css)
   cursor: pointer;
   display: inline-block;
 }
-body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_title {
+.inboxsdk__resultsSection_title {
   display: flex;
   align-items: center;
   height: 48px;
@@ -1877,7 +1784,7 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_title {
   padding: 3px 0 3px 8px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_header {
+.inboxsdk__resultsSection_header {
   min-height: 48px;
   line-height: 48px;
 }
@@ -1916,18 +1823,12 @@ body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_header {
   align-items: center;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__resultsSection
-  .inboxsdk__resultsSection_tableRow.zA:hover
-  > .xW {
+.inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow.zA:hover > .xW {
   /* Gmailv2 tries to hide the "xW" element when a "zA" element is hovered. This prevent that. */
   display: flex;
 }
 
-body:not(.inboxsdk__gmailv1css)
-  .inboxsdk__resultsSection
-  .inboxsdk__resultsSection_tableRow.zA
-  > .xW {
+.inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow.zA > .xW {
   max-width: none;
   flex-basis: auto;
 }
@@ -1967,12 +1868,12 @@ body:not(.inboxsdk__gmailv1css)
   align-self: center;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__thread_row_label {
+.inboxsdk__thread_row_label {
   align-self: flex-end;
 }
 
 /* label in vertical preview pane */
-body:not(.inboxsdk__gmailv1css) .apv .inboxsdk__thread_row_label {
+.apv .inboxsdk__thread_row_label {
   align-self: flex-start;
 }
 
@@ -1984,7 +1885,7 @@ body:not(.inboxsdk__gmailv1css) .apv .inboxsdk__thread_row_label {
   margin-left: 4px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__resultsSection_label_icon {
+.inboxsdk__resultsSection_label_icon {
   margin-top: 1px;
 }
 
@@ -2194,11 +2095,11 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 /* app toolbar */
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton {
+.inboxsdk__appButton {
   margin-right: 8px;
 }
 
-body:not(.inboxsdk__gmailv1css) .inboxsdk__appButton + .inboxsdk__appButton {
+.inboxsdk__appButton + .inboxsdk__appButton {
   margin-left: 16px;
 }
 
