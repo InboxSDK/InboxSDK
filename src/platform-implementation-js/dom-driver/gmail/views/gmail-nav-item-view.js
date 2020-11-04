@@ -576,6 +576,10 @@ export default class GmailNavItemView {
         }
 
         buttonOptions.onClick(event);
+
+        event.dropdown.on('destroy', () => {
+          buttonOptions.buttonView.deactivate();
+        });
       };
     } else {
       buttonOptions.dropdownShowFunction = buttonOptions.onClick;
