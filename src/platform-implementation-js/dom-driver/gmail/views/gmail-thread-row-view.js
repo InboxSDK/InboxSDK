@@ -374,25 +374,10 @@ class GmailThreadRowView {
             labelParentDiv !==
             labelMod.gmailLabelView.getElement().parentElement
           ) {
-            if (this._driver.isUsingMaterialUI()) {
-              labelParentDiv.insertAdjacentElement(
-                'afterbegin',
-                labelMod.gmailLabelView.getElement()
-              );
-            } else {
-              //we are vertical preview pane
-              if (this._elements.length > 1) {
-                labelParentDiv.insertAdjacentElement(
-                  'afterbegin',
-                  labelMod.gmailLabelView.getElement()
-                );
-              } else {
-                labelParentDiv.insertBefore(
-                  labelMod.gmailLabelView.getElement(),
-                  labelParentDiv.querySelector('.y6')
-                );
-              }
-            }
+            labelParentDiv.insertAdjacentElement(
+              'afterbegin',
+              labelMod.gmailLabelView.getElement()
+            );
           }
 
           this._getImageFixer().emit();
@@ -467,20 +452,10 @@ class GmailThreadRowView {
         const labelParent = this._getLabelParent();
 
         if (!labelParent.contains(iconWrapper)) {
-          if (this._driver.isUsingMaterialUI()) {
-            querySelector(labelParent, '.y6').insertAdjacentElement(
-              'beforebegin',
-              iconWrapper
-            );
-          } else if (this._elements.length > 1) {
-            labelParent.insertAdjacentElement('beforeend', iconWrapper);
-          } else {
-            const insertionPoint = querySelector(labelParent, '.y6');
-            insertionPoint.insertBefore(
-              iconWrapper,
-              insertionPoint.firstElementChild
-            );
-          }
+          querySelector(labelParent, '.y6').insertAdjacentElement(
+            'beforebegin',
+            iconWrapper
+          );
         }
 
         this._getImageFixer().emit();

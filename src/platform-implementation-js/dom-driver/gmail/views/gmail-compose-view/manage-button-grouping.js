@@ -198,14 +198,11 @@ function _doButtonsNeedToGroup(gmailComposeView: GmailComposeView): boolean {
 
 function _getBottomBarTableWidth(gmailComposeView: GmailComposeView): number {
   const bottomBarTable = gmailComposeView.getBottomBarTable();
-  if (gmailComposeView.getGmailDriver().isUsingMaterialUI()) {
-    return Array.from(bottomBarTable.querySelectorAll('.btC > td')).reduce(
-      (total, el) => total + el.clientWidth,
-      0
-    );
-  } else {
-    return bottomBarTable.clientWidth;
-  }
+
+  return Array.from(bottomBarTable.querySelectorAll('.btC > td')).reduce(
+    (total, el) => total + el.clientWidth,
+    0
+  );
 }
 
 function _createGroupedActionToolbarContainer(

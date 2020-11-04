@@ -10,10 +10,7 @@ import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation
 import cssSelectorEscape from '../../../../lib/css-selector-escape';
 import type GmailComposeView from '../gmail-compose-view';
 
-const OLD_GMAIL_STATUS_HEIGHT = 42;
 const MATERIAL_UI_GMAIL_STATUS_HEIGHT = 60;
-
-const OLD_GMAIL_TOP_FORM_HEIGHT = 84;
 const MATERIAL_UI_TOP_FORM_HEIGHT = 72;
 
 var getSizeFixerSheet: () => CSSStyleSheet = once(() => {
@@ -84,13 +81,6 @@ export default function sizeFixer(
   }
   gmailComposeView.getElement().classList.add('inboxsdk__size_fixer');
 
-  const expectedStatusBarHeight = driver.isUsingMaterialUI()
-    ? MATERIAL_UI_GMAIL_STATUS_HEIGHT
-    : OLD_GMAIL_STATUS_HEIGHT;
-  const expectedTopFormHeight = driver.isUsingMaterialUI()
-    ? MATERIAL_UI_TOP_FORM_HEIGHT
-    : OLD_GMAIL_TOP_FORM_HEIGHT;
-
   var composeEvents = gmailComposeView.getEventStream();
   var stopper = composeEvents.filter(() => false).beforeEnd(() => null);
   var resizeEvents = composeEvents
@@ -140,12 +130,12 @@ export default function sizeFixer(
     .takeUntilBy(stopper)
     .onValue(() => {
       const statusUnexpectedHeight = Math.max(
-        statusAreaParent.offsetHeight - expectedStatusBarHeight,
+        statusAreaParent.offsetHeight - MATERIAL_UI_GMAIL_STATUS_HEIGHT,
         0
       );
 
       const topFormUnexpectedHeight = Math.max(
-        topForm.offsetHeight - expectedTopFormHeight,
+        topForm.offsetHeight - MATERIAL_UI_TOP_FORM_HEIGHT,
         0
       );
 
