@@ -114,28 +114,6 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
   iconElement: null,
 
   /**
-   * In Inbox, providing a {backgroundColor} will add a colored circle indicator
-   * on the left of a {NavItemView}, provided that it is either a root NavItem with
-   * no children or a {NavItemView} 1 level deep.
-   * ^optional
-   * ^default=null
-   * @type {string}
-   */
-  backgroundColor: null,
-
-  /**
-   * In Inbox, {expanderForegroundColor} controls the color of the expand/collapse
-   * arrow for {NavItemView}s with children that are 1 level deep.
-   * This arrow will appear on top of the colored circle defined by {backgroundColor},
-   * and should be complimentary if {backgroundColor} and {expanderForegroundColor}
-   * are both provided.
-   * ^optional
-   * ^default=null
-   * @type {string}
-   */
-  expanderForegroundColor: null,
-
-  /**
    * The nav item type affects how the item is displayed.
    * ^optional
    * ^default=NAVIGATION
