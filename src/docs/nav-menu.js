@@ -206,18 +206,6 @@ var DropdownButtonAccessoryDescriptor = /** @lends DropdownButtonAccessoryDescri
   type: 'DROPDOWN_BUTTON',
 
   /**
-   * The color of the background of the dropdown button. Ignored in Inbox.
-   * @type {string}
-   */
-  buttonBackgroundColor: null,
-
-  /**
-   * The color of the foreground of the dropdown button. Ignored in Inbox.
-   * @type {string}
-   */
-  buttonForegroundColor: null,
-
-  /**
    * A callback when the dropdown button is pressed. The event object passed to you has a
    * dropdown property which you can fill your content with.
    * @type {func(event)}
