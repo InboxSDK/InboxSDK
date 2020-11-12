@@ -22,6 +22,14 @@ class User {
     return get(memberMap, this).driver.isConversationViewDisabled();
   }
 
+  isUsingGmailMaterialUI() {
+    get(memberMap, this)
+      .driver.getLogger()
+      .deprecationWarning('User.isUsingGmailMaterialUI');
+
+    return true;
+  }
+
   getLanguage() {
     return get(memberMap, this).driver.getUserLanguage();
   }
