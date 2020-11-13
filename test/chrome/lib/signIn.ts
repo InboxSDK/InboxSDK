@@ -46,7 +46,7 @@ export default async function signIn(testEmail: string) {
     }
 
     const fillOutPassword = async () => {
-      await delay(1500); // wait for animation to finish
+      await delay(3000); // wait for animation to finish
       await page.type('input[type=password]', authInfo[testEmail].password, {
         delay: 10 + Math.random() * 10
       });
