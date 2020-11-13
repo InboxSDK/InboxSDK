@@ -24,12 +24,15 @@ export default async function signIn(testEmail: string) {
       page.url().startsWith('https://accounts.google.com/AccountChooser/') ||
       page
         .url()
-        .startsWith('https://accounts.google.com/ServiceLogin/signinchooser') ||
+        .startsWith('https://accounts.google.com/ServiceLogin/signinchooser')
+    ) {
+      await page.click('div#profileIdentifier');
+    } else if (
       page
         .url()
         .startsWith('https://accounts.google.com/ServiceLogin/webreauth')
     ) {
-      await page.click('div#profileIdentifier');
+      await page.click('div#identifierNext');
     } else {
       await page.waitForSelector(
         'input[type=email]:not([aria-hidden=true]), input[type=password]'
@@ -49,6 +52,7 @@ export default async function signIn(testEmail: string) {
     }
 
     const fillOutPassword = async () => {
+      console.log(page.url());
       await delay(3000); // wait for animation to finish
       await page.type('input[type=password]', authInfo[testEmail].password, {
         delay: 10 + Math.random() * 10
