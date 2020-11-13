@@ -17,6 +17,15 @@ export default async function signIn(testEmail: string) {
     );
   }
   if (page.url().startsWith('https://accounts.google.com/')) {
+    if (
+      page.url().startsWith('https://accounts.google.com/AccountChooser/') ||
+      page
+        .url()
+        .startsWith('https://accounts.google.com/ServiceLogin/signinchooser')
+    ) {
+      await page.click('div#profileIdentifier');
+    }
+
     // eslint-disable-next-line no-console
     console.log('need to sign in');
     await page.waitForSelector(
