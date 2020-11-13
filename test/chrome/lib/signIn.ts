@@ -24,11 +24,13 @@ export default async function signIn(testEmail: string) {
       page.url().startsWith('https://accounts.google.com/AccountChooser/') ||
       page
         .url()
-        .startsWith('https://accounts.google.com/ServiceLogin/signinchooser')
+        .startsWith('https://accounts.google.com/ServiceLogin/signinchooser') ||
+      page
+        .url()
+        .startsWith('https://accounts.google.com/ServiceLogin/webreauth')
     ) {
       await page.click('div#profileIdentifier');
     } else {
-      console.log('page url', page.url());
       await page.waitForSelector(
         'input[type=email]:not([aria-hidden=true]), input[type=password]'
       );
