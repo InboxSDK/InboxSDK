@@ -28,6 +28,7 @@ export default async function signIn(testEmail: string) {
     ) {
       await page.click('div#profileIdentifier');
     } else {
+      console.log('page url', page.url());
       await page.waitForSelector(
         'input[type=email]:not([aria-hidden=true]), input[type=password]'
       );
