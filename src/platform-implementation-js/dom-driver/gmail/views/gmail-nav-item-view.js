@@ -13,7 +13,6 @@ import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-ob
 
 import ButtonView from '../widgets/buttons/button-view';
 import ArrowDropdownButtonView from '../widgets/buttons/arrow-dropdown-button-view';
-import LabelDropdownButtonView from '../widgets/buttons/label-dropdown-button-view';
 import CreateAccessoryButtonView from '../widgets/buttons/create-accessory-button-view';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 
@@ -462,7 +461,16 @@ export default class GmailNavItemView {
         this._createDropdownButtonAccessory(accessoryDescriptor);
         break;
       case 'SETTINGS_BUTTON':
-        this._createSettingsButtonAccessory(accessoryDescriptor);
+        this._driver
+          .getLogger()
+          .deprecationWarning(
+            'SettingsButtonAccessoryDescriptor',
+            'DropdownButtonAccessoryDescriptor'
+          );
+        this._createDropdownButtonAccessory({
+          ...accessoryDescriptor,
+          type: 'DROPDOWN_BUTTON'
+        });
         break;
     }
 
@@ -534,11 +542,6 @@ export default class GmailNavItemView {
   }
 
   _createDropdownButtonAccessory(accessoryDescriptor: Object) {
-    if (!this._driver.isUsingMaterialUI()) {
-      this._createSettingsButtonAccessory(accessoryDescriptor);
-      return;
-    }
-
     const buttonOptions = { ...accessoryDescriptor };
     buttonOptions.buttonView = new ArrowDropdownButtonView(buttonOptions);
     buttonOptions.dropdownViewDriverClass = GmailDropdownView;
@@ -600,45 +603,6 @@ export default class GmailNavItemView {
       buttonOptions.buttonView.getElement(),
       insertionPoint.firstElementChild
     );
-
-    this._setupContextClickHandler(accessoryViewController);
-  }
-
-  _createSettingsButtonAccessory(accessoryDescriptor: Object) {
-    const buttonOptions = { ...accessoryDescriptor };
-    buttonOptions.buttonView = new LabelDropdownButtonView(buttonOptions);
-    buttonOptions.dropdownViewDriverClass = GmailDropdownView;
-    buttonOptions.dropdownPositionOptions = {
-      position: 'bottom',
-      hAlign: 'left',
-      vAlign: 'top'
-    };
-    buttonOptions.dropdownShowFunction = ({ dropdown }) => {
-      if (this._driver.isUsingMaterialUI()) {
-        dropdown.el.style.marginLeft = '16px';
-      }
-
-      buttonOptions.onClick({ dropdown });
-    };
-
-    const accessoryViewController = new DropdownButtonViewController(
-      buttonOptions
-    );
-    this._accessoryViewController = accessoryViewController;
-
-    const innerElement = querySelector(this._element, '.TO');
-    innerElement.addEventListener('mouseenter', () =>
-      innerElement.classList.add('inboxsdk__navItem_hover')
-    );
-    innerElement.addEventListener('mouseleave', () =>
-      innerElement.classList.remove('inboxsdk__navItem_hover')
-    );
-
-    const insertionPoint = this._driver.isUsingMaterialUI()
-      ? querySelector(this._element, '.TN')
-      : querySelector(this._element, '.aio');
-
-    insertionPoint.appendChild(buttonOptions.buttonView.getElement());
 
     this._setupContextClickHandler(accessoryViewController);
   }
