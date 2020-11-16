@@ -23,7 +23,11 @@ class User {
   }
 
   isUsingGmailMaterialUI() {
-    return get(memberMap, this).driver.isUsingMaterialUI();
+    get(memberMap, this)
+      .driver.getLogger()
+      .deprecationWarning('User.isUsingGmailMaterialUI');
+
+    return true;
   }
 
   getLanguage() {

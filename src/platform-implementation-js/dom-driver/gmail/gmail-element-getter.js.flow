@@ -4,41 +4,40 @@ import Kefir from 'kefir';
 import type { ElementWithLifetime } from '../../lib/dom/make-element-child-stream';
 
 declare var GmailElementGetter: {
-  waitForGmailModeToSettle(): Promise<void>;
-  getMainContentElementChangedStream(): Kefir.Observable<HTMLElement>;
-  isStandalone(): boolean;
-  isStandaloneComposeWindow(): boolean;
-  isStandaloneThreadWindow(): boolean;
-  getComposeWindowContainer(): ?HTMLElement;
-  getFullscreenComposeWindowContainerStream(): Kefir.Observable<ElementWithLifetime>;
-  getFullscreenComposeWindowContainer(): ?HTMLElement;
-  getContentSectionElement(): ?HTMLElement;
-  getMainContentContainer(): ?HTMLElement;
-  getScrollContainer(): ?HTMLElement;
-  getMoleParent(): ?HTMLElement;
-  isPreviewPane(): boolean;
-  getRowListElements(): HTMLElement[];
-  getSearchInput(): ?HTMLInputElement;
-  getSearchSuggestionsBoxParent(): ?HTMLElement;
-  getToolbarElement(): HTMLElement;
-  getThreadContainerElement(): ?HTMLElement;
-  getThreadBackButton(): ?HTMLElement;
-  getSidebarContainerElement(): ?HTMLElement;
-  getComposeButton(): ?HTMLElement;
-  getLeftNavContainerElement(): ?HTMLElement;
-  getAddonSidebarContainerElement(): ?HTMLElement;
-  getCompanionSidebarContentContainerElement(): ?HTMLElement;
-  getCompanionSidebarIconContainerElement(): ?HTMLElement;
-  getMainContentBodyContainerElement(): ?HTMLElement;
-  getGtalkButtons(): ?HTMLElement;
-  getNavItemMenuInjectionContainer(): ?HTMLElement;
-  getActiveMoreMenu(): ?HTMLElement;
-  getTopAccountContainer(): ?HTMLElement;
-  isGplusEnabled(): boolean;
-  isUsingMaterialUI(): boolean;
+  waitForGmailModeToSettle(): Promise<void>,
+  getMainContentElementChangedStream(): Kefir.Observable<HTMLElement>,
+  isStandalone(): boolean,
+  isStandaloneComposeWindow(): boolean,
+  isStandaloneThreadWindow(): boolean,
+  getComposeWindowContainer(): ?HTMLElement,
+  getFullscreenComposeWindowContainerStream(): Kefir.Observable<ElementWithLifetime>,
+  getFullscreenComposeWindowContainer(): ?HTMLElement,
+  getContentSectionElement(): ?HTMLElement,
+  getMainContentContainer(): ?HTMLElement,
+  getScrollContainer(): ?HTMLElement,
+  getMoleParent(): ?HTMLElement,
+  isPreviewPane(): boolean,
+  getRowListElements(): HTMLElement[],
+  getSearchInput(): ?HTMLInputElement,
+  getSearchSuggestionsBoxParent(): ?HTMLElement,
+  getToolbarElement(): HTMLElement,
+  getThreadContainerElement(): ?HTMLElement,
+  getThreadBackButton(): ?HTMLElement,
+  getSidebarContainerElement(): ?HTMLElement,
+  getComposeButton(): ?HTMLElement,
+  getLeftNavContainerElement(): ?HTMLElement,
+  getAddonSidebarContainerElement(): ?HTMLElement,
+  getCompanionSidebarContentContainerElement(): ?HTMLElement,
+  getCompanionSidebarIconContainerElement(): ?HTMLElement,
+  getMainContentBodyContainerElement(): ?HTMLElement,
+  getGtalkButtons(): ?HTMLElement,
+  getNavItemMenuInjectionContainer(): ?HTMLElement,
+  getActiveMoreMenu(): ?HTMLElement,
+  getTopAccountContainer(): ?HTMLElement,
+  isGplusEnabled(): boolean,
   StandaloneCompose: {
-    getComposeWindowContainer(): ?HTMLElement;
-  };
+    getComposeWindowContainer(): ?HTMLElement
+  }
 };
 
 export default GmailElementGetter;

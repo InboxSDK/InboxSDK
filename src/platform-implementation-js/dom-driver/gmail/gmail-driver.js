@@ -254,7 +254,7 @@ class GmailDriver {
         overrideGmailBackButton(this, this._gmailRouteProcessor);
         trackGmailStyles();
         temporaryTrackDownloadUrlValidity(this);
-        if (opts.suppressAddonTitle != null && this.isUsingMaterialUI()) {
+        if (opts.suppressAddonTitle != null) {
           suppressAddon(this, opts.suppressAddonTitle);
         }
       })
@@ -748,21 +748,12 @@ class GmailDriver {
         this._pageCommunicator = pageCommunicator;
         this._logger.setUserEmailAddress(this.getUserEmailAddress());
         this._logger.setIsUsingSyncAPI(pageCommunicator.isUsingSyncAPI());
-        this._logger.setIsUsingMaterialGmailUI(
-          GmailElementGetter.isUsingMaterialUI()
-        );
         this._userInfo = new UserInfo(this);
 
         return this._userInfo.waitForAccountSwitcherReady();
       })
       .then(() => {
         this._timestampAccountSwitcherReady = Date.now();
-
-        if (!GmailElementGetter.isUsingMaterialUI()) {
-          ((document.body: any): HTMLElement).classList.add(
-            'inboxsdk__gmailv1css'
-          );
-        }
 
         this._routeViewDriverStream = setupRouteViewDriverStream(
           this._gmailRouteProcessor,
@@ -855,31 +846,20 @@ class GmailDriver {
   async addGlobalSidebarContentPanel(
     descriptor: Kefir.Observable<Object>
   ): Promise<?ContentPanelViewDriver> {
-    if (this.isUsingMaterialUI()) {
-      await this.waitForGlobalSidebarReady()
-        .merge(
-          this._stopper.flatMap(() =>
-            Kefir.constantError(
-              new Error('Driver instance was destroyed early')
-            )
-          )
+    await this.waitForGlobalSidebarReady()
+      .merge(
+        this._stopper.flatMap(() =>
+          Kefir.constantError(new Error('Driver instance was destroyed early'))
         )
-        .take(1)
-        .takeErrors(1)
-        .toPromise();
-      const appSidebar = this.getGlobalSidebar();
-      return appSidebar.addGlobalSidebarContentPanel(descriptor);
-    } else {
-      return null;
-    }
+      )
+      .take(1)
+      .takeErrors(1)
+      .toPromise();
+    const appSidebar = this.getGlobalSidebar();
+    return appSidebar.addGlobalSidebarContentPanel(descriptor);
   }
 
   waitForGlobalSidebarReady(): Kefir.Observable<void> {
-    if (!this.isUsingMaterialUI()) {
-      throw new Error(
-        'Should not happen: waitForGlobalSidebarReady called in Gmail v1'
-      );
-    }
     const condition = () =>
       GmailElementGetter.getCompanionSidebarContentContainerElement() &&
       (GmailElementGetter.getCompanionSidebarIconContainerElement() ||
@@ -907,10 +887,6 @@ class GmailDriver {
 
   isRunningInPageContext(): boolean {
     return !!(global.GLOBALS && global._GM_main);
-  }
-
-  isUsingMaterialUI(): boolean {
-    return GmailElementGetter.isUsingMaterialUI();
   }
 
   isUsingSyncAPI(): boolean {

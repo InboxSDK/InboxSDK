@@ -138,10 +138,7 @@ class StatusBar extends SimpleElementView implements IStatusBar {
 
         insertElementInOrder(prependContainer, this.el);
       } else {
-        if (
-          this._gmailComposeView.getGmailDriver().isUsingMaterialUI() &&
-          this._gmailComposeView.isInlineReplyForm()
-        ) {
+        if (this._gmailComposeView.isInlineReplyForm()) {
           const nativeStatusBar = querySelector(
             this._gmailComposeView.getElement(),
             '.iN > tbody .aDj .aDh .IZ'

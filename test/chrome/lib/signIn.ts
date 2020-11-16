@@ -19,19 +19,40 @@ export default async function signIn(testEmail: string) {
   if (page.url().startsWith('https://accounts.google.com/')) {
     // eslint-disable-next-line no-console
     console.log('need to sign in');
-    await page.waitForSelector(
-      'input[type=email]:not([aria-hidden=true]), input[type=password]'
-    );
-    if (await page.$('input[type=email]:not([aria-hidden=true])')) {
-      await page.type('input[type=email]:not([aria-hidden=true])', testEmail, {
-        delay: 10 + Math.random() * 10
-      });
+
+    if (
+      page.url().startsWith('https://accounts.google.com/AccountChooser/') ||
+      page
+        .url()
+        .startsWith('https://accounts.google.com/ServiceLogin/signinchooser')
+    ) {
+      await page.click('div#profileIdentifier');
+    } else if (
+      page
+        .url()
+        .startsWith('https://accounts.google.com/ServiceLogin/webreauth')
+    ) {
       await page.click('div#identifierNext');
-      await page.waitForSelector('input[type=password]');
-      await delay(2000); // wait for animation to finish
+    } else {
+      await page.waitForSelector(
+        'input[type=email]:not([aria-hidden=true]), input[type=password]'
+      );
+      if (await page.$('input[type=email]:not([aria-hidden=true])')) {
+        await page.type(
+          'input[type=email]:not([aria-hidden=true])',
+          testEmail,
+          {
+            delay: 10 + Math.random() * 10
+          }
+        );
+        await page.click('div#identifierNext');
+        await page.waitForSelector('input[type=password]');
+        await delay(2000); // wait for animation to finish
+      }
     }
 
     const fillOutPassword = async () => {
+      await delay(3000); // wait for animation to finish
       await page.type('input[type=password]', authInfo[testEmail].password, {
         delay: 10 + Math.random() * 10
       });

@@ -284,7 +284,7 @@ class GmailToolbarView {
   _getButtonView(buttonDescriptor: Object): Object {
     const buttonView = new ButtonView({
       ...buttonDescriptor,
-      ...(this._driver.isUsingMaterialUI() ? { noArrow: true } : {})
+      noArrow: true
     });
 
     if (this._rowListViewDriver) {

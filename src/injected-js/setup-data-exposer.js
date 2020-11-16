@@ -71,10 +71,6 @@ export default function setupDataExposer() {
         'data-inboxsdk-using-sync-api',
         context.GM_SPT_ENABLED
       );
-      (document.head: any).setAttribute(
-        'data-inboxsdk-using-material-ui',
-        context.GM_RFT_ENABLED
-      );
 
       if (context.GLOBALS) {
         // Gmail

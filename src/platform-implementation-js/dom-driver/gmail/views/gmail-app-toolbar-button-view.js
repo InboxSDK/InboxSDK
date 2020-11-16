@@ -34,7 +34,7 @@ export default class GmailAppToolbarButtonView {
       }
     });
 
-    if (driver.isUsingMaterialUI()) monitorTopBannerSizeAndReact();
+    monitorTopBannerSizeAndReact();
   }
 
   destroy() {
@@ -178,9 +178,8 @@ function _createAppButtonElement(
     throw err;
   }
 
-  const insertionElement: ?HTMLElement = driver.isUsingMaterialUI()
-    ? topAccountContainer
-    : (topAccountContainer.children[0]: any);
+  const insertionElement: ?HTMLElement = topAccountContainer;
+
   if (!insertionElement) {
     const err = new Error('Could not make button');
     driver.getLogger().error(err, {

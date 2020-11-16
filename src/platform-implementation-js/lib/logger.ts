@@ -19,8 +19,6 @@ let _extensionLoaderVersion: string | undefined;
 let _extensionImplVersion: string | undefined;
 let _extensionUserEmailHash: string | undefined;
 let _extensionUseEventTracking = false;
-
-let _isUsingMaterialGmailUI: boolean | undefined = undefined;
 let _isUsingSyncAPI: boolean | undefined = undefined;
 
 const _sessionId = getSessionId();
@@ -118,10 +116,6 @@ export default class Logger {
       _extensionUserEmailHash ===
       'ca05afe92819df590a4196c31814fdb24050e8f49d8a41613f3d6cfb5729c785'
     );
-  }
-
-  public setIsUsingMaterialGmailUI(isUsing: boolean) {
-    _isUsingMaterialGmailUI = isUsing;
   }
 
   public setIsUsingSyncAPI(isUsing: boolean) {
@@ -407,8 +401,7 @@ function _logError(
     loaderVersion: _extensionLoaderVersion,
     implVersion: _extensionImplVersion,
     userEmailHash: _extensionUserEmailHash,
-    isUsingSyncAPI: _isUsingSyncAPI,
-    isUsingMaterialGmailUI: _isUsingMaterialGmailUI
+    isUsingSyncAPI: _isUsingSyncAPI
   });
 }
 
@@ -454,7 +447,6 @@ function _trackEvent(
     loaderVersion: _extensionLoaderVersion,
     implementationVersion: _extensionImplVersion,
     isUsingSyncAPI: _isUsingSyncAPI,
-    isUsingMaterialGmailUI: _isUsingMaterialGmailUI,
     properties: properties
   };
 
