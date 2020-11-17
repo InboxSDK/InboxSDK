@@ -582,20 +582,20 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
   vertical-align: middle;
 }
 
-.inboxsdk__thread_row_attachment_icons_present {
+.xY.inboxsdk__thread_row_attachment_icons_present {
   max-width: inherit;
 }
 
 /* narrow vertical preview pane */
-.Zs .inboxsdk__thread_row_attachment_icons_present {
+.Zs .xY.inboxsdk__thread_row_attachment_icons_present {
   flex-grow: 0;
 }
 
-.Zs .inboxsdk__thread_row_label {
+.Zs .xY.inboxsdk__thread_row_label {
   order: 1;
 }
 
-.Zs .inboxsdk__thread_row_icon_wrapper {
+.Zs .xY.inboxsdk__thread_row_icon_wrapper {
   order: 1;
   margin-left: 3px;
   margin-right: 0px;
