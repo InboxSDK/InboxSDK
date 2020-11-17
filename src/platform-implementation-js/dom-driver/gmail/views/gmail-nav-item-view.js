@@ -12,7 +12,7 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 
 import ButtonView from '../widgets/buttons/button-view';
-import ArrowDropdownButtonView from '../widgets/buttons/arrow-dropdown-button-view';
+import MoreDropdownButtonView from '../widgets/buttons/more-dropdown-button-view';
 import LabelDropdownButtonView from '../widgets/buttons/label-dropdown-button-view';
 import CreateAccessoryButtonView from '../widgets/buttons/create-accessory-button-view';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
@@ -491,7 +491,7 @@ export default class GmailNavItemView {
 
   _createDropdownButtonAccessory(accessoryDescriptor: Object) {
     const buttonOptions = { ...accessoryDescriptor };
-    buttonOptions.buttonView = new ArrowDropdownButtonView(buttonOptions);
+    buttonOptions.buttonView = new MoreDropdownButtonView(buttonOptions);
     buttonOptions.dropdownViewDriverClass = GmailDropdownView;
     buttonOptions.dropdownPositionOptions = {
       position: 'bottom',
@@ -526,6 +526,10 @@ export default class GmailNavItemView {
       }
 
       buttonOptions.onClick(event);
+
+      event.dropdown.on('destroy', () => {
+        buttonOptions.buttonView.deactivate();
+      });
     };
 
     const accessoryViewController = new DropdownButtonViewController(
@@ -543,10 +547,7 @@ export default class GmailNavItemView {
 
     const insertionPoint = querySelector(this._element, '.TN');
 
-    insertionPoint.insertBefore(
-      buttonOptions.buttonView.getElement(),
-      insertionPoint.firstElementChild
-    );
+    insertionPoint.appendChild(buttonOptions.buttonView.getElement());
 
     this._setupContextClickHandler(accessoryViewController);
   }
