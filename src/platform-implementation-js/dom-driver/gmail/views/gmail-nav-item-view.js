@@ -12,7 +12,7 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 
 import ButtonView from '../widgets/buttons/button-view';
-import ArrowDropdownButtonView from '../widgets/buttons/arrow-dropdown-button-view';
+import MoreDropdownButtonView from '../widgets/buttons/more-dropdown-button-view';
 import CreateAccessoryButtonView from '../widgets/buttons/create-accessory-button-view';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 
@@ -107,9 +107,7 @@ export default class GmailNavItemView {
     navItemDescriptor: Object
   ): GmailNavItemView {
     const nestedNavItemLevel =
-      this._type === NAV_ITEM_TYPES.GROUPER && this._driver.isUsingMaterialUI()
-        ? this._level
-        : this._level + 1;
+      this._type === NAV_ITEM_TYPES.GROUPER ? this._level : this._level + 1;
     const gmailNavItemView = new GmailNavItemView(
       this._driver,
       orderGroup,
@@ -198,39 +196,26 @@ export default class GmailNavItemView {
     this._element = document.createElement('div');
     this._element.setAttribute('class', 'aim inboxsdk__navItem');
 
-    if (this._driver.isUsingMaterialUI()) {
-      this._element.innerHTML = [
-        '<div class="TO">',
-        '<div class="TN aik">',
+    this._element.innerHTML = [
+      '<div class="TO">',
+      '<div class="TN aik">',
 
-        // This element needs a style attribute defined on it as there is a Gmail css rule of
-        // selecting for "gj[style]" the sets the opacity to 1 rather than 0.6.
-        '<div class="qj" style="">',
-        '</div>',
+      // This element needs a style attribute defined on it as there is a Gmail css rule of
+      // selecting for "gj[style]" the sets the opacity to 1 rather than 0.6.
+      '<div class="qj" style="">',
+      '</div>',
 
-        '<div class="aio aip">',
-        '<span class="nU" role="link">',
-        '</span>',
-        // This bsU element is the container "subtitle" text.
-        '<span class="bsU">',
-        '</span>',
-        '</div>',
+      '<div class="aio aip">',
+      '<span class="nU" role="link">',
+      '</span>',
+      // This bsU element is the container "subtitle" text.
+      '<span class="bsU">',
+      '</span>',
+      '</div>',
 
-        '</div>',
-        '</div>'
-      ].join('');
-    } else {
-      this._element.innerHTML = [
-        '<div class="TO">',
-        '<div class="TN aik">',
-        '<div class="aio aip">',
-        '<span class="nU" role="link">',
-        '</span>',
-        '</div>',
-        '</div>',
-        '</div>'
-      ].join('');
-    }
+      '</div>',
+      '</div>'
+    ].join('');
 
     const innerElement = querySelector(this._element, '.TO');
 
@@ -269,13 +254,7 @@ export default class GmailNavItemView {
   _updateHighlight({ eventName }: { eventName: string }) {
     switch (eventName) {
       case 'mouseenter':
-        if (
-          this._navItemDescriptor.routeID ||
-          typeof this._navItemDescriptor.onClick === 'function' ||
-          this._driver.isUsingMaterialUI()
-        ) {
-          this._setHighlight(true);
-        }
+        this._setHighlight(true);
 
         break;
       case 'mouseleave':
@@ -293,10 +272,7 @@ export default class GmailNavItemView {
     this._updateSubtitle(navItemDescriptor);
     this._updateOrder(navItemDescriptor);
 
-    if (
-      this._type === NAV_ITEM_TYPES.GROUPER &&
-      this._driver.isUsingMaterialUI()
-    ) {
+    if (this._type === NAV_ITEM_TYPES.GROUPER) {
       this._setupGrouper(navItemDescriptor);
       return;
     }
@@ -360,9 +336,7 @@ export default class GmailNavItemView {
   }
 
   _updateIcon(navItemDescriptor: Object) {
-    const iconContainerElement = this._driver.isUsingMaterialUI()
-      ? querySelector(this._element, '.qj')
-      : querySelector(this._element, '.aio');
+    const iconContainerElement = querySelector(this._element, '.qj');
 
     // render custom icon
     if (navItemDescriptor.iconElement) {
@@ -384,14 +358,9 @@ export default class GmailNavItemView {
   }
 
   _updateClickability(navItemDescriptor: Object) {
-    if (!this._driver.isUsingMaterialUI()) return;
-
     if (
       navItemDescriptor.type === NAV_ITEM_TYPES.LINK ||
-      navItemDescriptor.type === NAV_ITEM_TYPES.MANAGE ||
-      (!navItemDescriptor.routeID &&
-        typeof navItemDescriptor.onClick !== 'function' &&
-        !this._driver.isUsingMaterialUI())
+      navItemDescriptor.type === NAV_ITEM_TYPES.MANAGE
     ) {
       this._element.classList.add('inboxsdk__navItem_nonClickable');
     } else {
@@ -401,12 +370,11 @@ export default class GmailNavItemView {
 
   _updateSubtitle(navItemDescriptor: Object) {
     if (
-      !this._driver.isUsingMaterialUI() ||
-      (navItemDescriptor.accessory &&
-        !['SETTINGS_BUTTON', 'DROPDOWN_BUTTON'].includes(
-          navItemDescriptor.accessory.type
-        ) &&
-        navItemDescriptor.type !== NAV_ITEM_TYPES.GROUPER)
+      navItemDescriptor.accessory &&
+      !['SETTINGS_BUTTON', 'DROPDOWN_BUTTON'].includes(
+        navItemDescriptor.accessory.type
+      ) &&
+      navItemDescriptor.type !== NAV_ITEM_TYPES.GROUPER
     ) {
       return;
     }
@@ -463,12 +431,7 @@ export default class GmailNavItemView {
   }
 
   _createCreateAccessory(accessoryDescriptor: Object) {
-    if (this._driver.isUsingMaterialUI()) {
-      this._createPlusButtonAccessory(accessoryDescriptor);
-    } else {
-      accessoryDescriptor.name = '+ New';
-      this._createLinkButtonAccessory(accessoryDescriptor);
-    }
+    this._createPlusButtonAccessory(accessoryDescriptor);
   }
 
   _createPlusButtonAccessory(accessoryDescriptor: Object) {
@@ -486,11 +449,7 @@ export default class GmailNavItemView {
 
   _createLinkButtonAccessory(accessoryDescriptor: Object) {
     const linkDiv = document.createElement('div');
-
-    const linkDivClassName = this._driver.isUsingMaterialUI()
-      ? 'inboxsdk__navItem_link'
-      : 'CL inboxsdk__navItem_link';
-
+    const linkDivClassName = 'inboxsdk__navItem_link';
     linkDiv.setAttribute('class', linkDivClassName);
 
     const anchor = document.createElement('a');
@@ -519,16 +478,14 @@ export default class GmailNavItemView {
       buttonOptions
     );
 
-    const insertionPoint = this._driver.isUsingMaterialUI()
-      ? querySelector(this._element, '.TN')
-      : querySelector(this._element, '.aio');
+    const insertionPoint = querySelector(this._element, '.TN');
 
     insertionPoint.appendChild(buttonOptions.buttonView.getElement());
   }
 
   _createDropdownButtonAccessory(accessoryDescriptor: Object) {
     const buttonOptions = { ...accessoryDescriptor };
-    buttonOptions.buttonView = new ArrowDropdownButtonView(buttonOptions);
+    buttonOptions.buttonView = new MoreDropdownButtonView(buttonOptions);
     buttonOptions.dropdownViewDriverClass = GmailDropdownView;
     buttonOptions.dropdownPositionOptions = {
       position: 'bottom',
@@ -536,38 +493,38 @@ export default class GmailNavItemView {
       vAlign: 'top'
     };
 
-    if (this._driver.isUsingMaterialUI()) {
-      const container = GmailElementGetter.getLeftNavContainerElement();
-      if (!container) throw new Error('leftNavContainer not found');
+    const container = GmailElementGetter.getLeftNavContainerElement();
+    if (!container) throw new Error('leftNavContainer not found');
 
-      buttonOptions.dropdownShowFunction = event => {
-        // bhZ is the class to indicate the left nav is collapsible mode
-        // bym is class to show expanded when the left nav is collapsible
-        if (container.classList.contains('bhZ')) {
-          const stopper = Kefir.fromEvents(event.dropdown, 'destroy');
+    buttonOptions.dropdownShowFunction = event => {
+      // bhZ is the class to indicate the left nav is collapsible mode
+      // bym is class to show expanded when the left nav is collapsible
+      if (container.classList.contains('bhZ')) {
+        const stopper = Kefir.fromEvents(event.dropdown, 'destroy');
 
-          // monitor class on the container and keep re-adding bym until dropdown closes
-          makeMutationObserverChunkedStream(container, {
-            attributes: true,
-            attributeFilter: ['class']
-          })
-            .takeUntilBy(stopper)
-            .toProperty(() => null)
-            .onValue(() => {
-              if (!container.classList.contains('bym'))
-                container.classList.add('bym');
-            });
-
-          stopper.onValue(() => {
-            container.classList.remove('bym');
+        // monitor class on the container and keep re-adding bym until dropdown closes
+        makeMutationObserverChunkedStream(container, {
+          attributes: true,
+          attributeFilter: ['class']
+        })
+          .takeUntilBy(stopper)
+          .toProperty(() => null)
+          .onValue(() => {
+            if (!container.classList.contains('bym'))
+              container.classList.add('bym');
           });
-        }
 
-        buttonOptions.onClick(event);
-      };
-    } else {
-      buttonOptions.dropdownShowFunction = buttonOptions.onClick;
-    }
+        stopper.onValue(() => {
+          container.classList.remove('bym');
+        });
+      }
+
+      buttonOptions.onClick(event);
+
+      event.dropdown.on('destroy', () => {
+        buttonOptions.buttonView.deactivate();
+      });
+    };
 
     const accessoryViewController = new DropdownButtonViewController(
       buttonOptions
@@ -584,10 +541,7 @@ export default class GmailNavItemView {
 
     const insertionPoint = querySelector(this._element, '.TN');
 
-    insertionPoint.insertBefore(
-      buttonOptions.buttonView.getElement(),
-      insertionPoint.firstElementChild
-    );
+    insertionPoint.appendChild(buttonOptions.buttonView.getElement());
 
     this._setupContextClickHandler(accessoryViewController);
   }
@@ -672,19 +626,12 @@ export default class GmailNavItemView {
     // actually use this._level - 1 as the indentationFactor if we don't want to further indent the
     // nested items (i.e. the current item is of type GROUPER and we're in Gmailv2).
     const indentationFactor =
-      this._type === NAV_ITEM_TYPES.GROUPER && this._driver.isUsingMaterialUI()
-        ? this._level - 1
-        : this._level;
+      this._type === NAV_ITEM_TYPES.GROUPER ? this._level - 1 : this._level;
 
     const element = gmailNavItemView.getElement();
 
-    if (this._driver.isUsingMaterialUI()) {
-      querySelector(element, '.TN').style.marginLeft =
-        getLeftIndentationPaddingValue(this._driver) * indentationFactor + 'px';
-    } else {
-      querySelector(element, '.TO').style.paddingLeft =
-        getLeftIndentationPaddingValue(this._driver) * indentationFactor + 'px';
-    }
+    querySelector(element, '.TN').style.marginLeft =
+      getLeftIndentationPaddingValue(this._driver) * indentationFactor + 'px';
 
     this._setHeights();
   }
@@ -717,11 +664,9 @@ export default class GmailNavItemView {
   }
 
   _createExpando() {
-    if (
-      this._type === NAV_ITEM_TYPES.GROUPER &&
-      this._driver.isUsingMaterialUI()
-    )
+    if (this._type === NAV_ITEM_TYPES.GROUPER) {
       return;
+    }
 
     const expandoElement = (this._expandoElement = document.createElement(
       'div'
@@ -736,9 +681,7 @@ export default class GmailNavItemView {
       e.stopPropagation();
     });
 
-    const insertionPoint = this._driver.isUsingMaterialUI()
-      ? this._element.querySelector('.TN.aik')
-      : this._element.querySelector('.aip');
+    const insertionPoint = this._element.querySelector('.TN.aik');
 
     if (insertionPoint)
       (insertionPoint: any).insertAdjacentElement('afterbegin', expandoElement);
@@ -765,9 +708,7 @@ export default class GmailNavItemView {
 
   _isCollapsible() {
     return (
-      Boolean(this._expandoElement) ||
-      (this._type === NAV_ITEM_TYPES.GROUPER &&
-        this._driver.isUsingMaterialUI())
+      Boolean(this._expandoElement) || this._type === NAV_ITEM_TYPES.GROUPER
     );
   }
 
@@ -776,10 +717,7 @@ export default class GmailNavItemView {
     if (expandoElement) {
       expandoElement.classList.remove('aih');
       expandoElement.classList.add('aii');
-    } else if (
-      this._type === NAV_ITEM_TYPES.GROUPER &&
-      this._driver.isUsingMaterialUI()
-    ) {
+    } else if (this._type === NAV_ITEM_TYPES.GROUPER) {
       const navItemElement = this._element.firstElementChild;
       if (navItemElement) navItemElement.classList.remove('air');
     }
@@ -801,10 +739,7 @@ export default class GmailNavItemView {
     if (expandoElement) {
       expandoElement.classList.add('aih');
       expandoElement.classList.remove('aii');
-    } else if (
-      this._type === NAV_ITEM_TYPES.GROUPER &&
-      this._driver.isUsingMaterialUI()
-    ) {
+    } else if (this._type === NAV_ITEM_TYPES.GROUPER) {
       const navItemElement = this._element.firstElementChild;
       if (navItemElement) navItemElement.classList.add('air');
     }
@@ -848,7 +783,5 @@ export default class GmailNavItemView {
 }
 
 export function getLeftIndentationPaddingValue(driver: GmailDriver): number {
-  return driver.isUsingMaterialUI()
-    ? GMAIL_V2_LEFT_INDENTATION_PADDING
-    : GMAIL_V1_LEFT_INDENTATION_PADDING;
+  return GMAIL_V2_LEFT_INDENTATION_PADDING;
 }

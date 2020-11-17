@@ -10,12 +10,6 @@ var User = /** @lends User */ {
   getEmailAddress: function() {},
 
   /**
-   * Is the currently tab the new material Gmail interface
-   * @return {boolean}
-   */
-  isUsingGmailMaterialUI: function() {},
-
-  /**
    * Is conversation view disabled by the user
    * @return {boolean}
    */

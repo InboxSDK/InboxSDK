@@ -5,7 +5,6 @@ import type GmailComposeView from '../gmail-compose-view';
 const composeViewActionToolbars = new WeakMap();
 
 export default function getAdditionalActionToolbar(
-  isUsingMaterialUI: boolean,
   gmailComposeView: GmailComposeView
 ) {
   var groupedActionToolbar = gmailComposeView
@@ -25,7 +24,6 @@ export default function getAdditionalActionToolbar(
   actionToolbar = composeViewActionToolbars.get(gmailComposeView);
   if (!actionToolbar) {
     const _actionToolbar = (actionToolbar = _addActionToolbar(
-      isUsingMaterialUI,
       gmailComposeView
     ));
     gmailComposeView.getStopper().onValue(() => {
@@ -36,23 +34,12 @@ export default function getAdditionalActionToolbar(
   return actionToolbar;
 }
 
-function _addActionToolbar(
-  isUsingMaterialUI: boolean,
-  gmailComposeView: GmailComposeView
-) {
+function _addActionToolbar(gmailComposeView: GmailComposeView) {
   const td = document.createElement('td');
   td.setAttribute('class', 'inboxsdk__compose_actionToolbar gU');
   const formattingArea = gmailComposeView.getFormattingArea();
   if (!formattingArea) throw new Error('formatting area missing');
   formattingArea.insertAdjacentElement('beforebegin', td);
-
-  if (!isUsingMaterialUI) {
-    const separator = document.createElement('td');
-    separator.setAttribute('class', 'inboxsdk__compose_separator gU');
-    separator.innerHTML = '<div class="Uz"></div>';
-
-    td.insertAdjacentElement('afterend', separator);
-  }
 
   let parent = td.parentElement;
   while (parent) {

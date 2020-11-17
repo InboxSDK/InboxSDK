@@ -270,12 +270,20 @@ InboxSDK.load(1, 'custom-thread-list').then(function(sdk) {
 	setInterval(initItems, 10000);
 
 	var listNavItem = sdk.NavMenu.addNavItem({
-		name: 'TL Custom List - Finite',
 		iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+		name: 'TL Custom List - Finite',
 		routeID: 'tlbeep-finite',
 	});
 
 	var listNavItem = sdk.NavMenu.addNavItem({
+    accessory: {
+      type: 'DROPDOWN_BUTTON',
+      buttonBackgroundColor: 'tomato',
+      buttonForegroundColor: 'gray',
+      onClick: event => {
+        event.dropdown.el.innerHTML = "this is a dropdown";
+      }
+    },
 		name: 'TL Custom List - Many',
 		iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
 		routeID: 'tlbeep-many',

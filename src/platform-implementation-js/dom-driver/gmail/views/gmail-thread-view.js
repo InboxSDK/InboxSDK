@@ -75,10 +75,8 @@ class GmailThreadView {
       this._driver.getLogger().error(err)
     );
 
-    const waitForSidebarReady = (this._driver.isUsingMaterialUI()
-      ? this._driver.waitForGlobalSidebarReady()
-      : Kefir.constant(null)
-    )
+    const waitForSidebarReady = this._driver
+      .waitForGlobalSidebarReady()
       .merge(
         this._driver
           .delayToTimeAfterReady(15 * 1000)
@@ -185,37 +183,8 @@ class GmailThreadView {
   }
 
   addSidebarContentPanel(descriptor: Kefir.Observable<Object>) {
-    if (this._driver.isUsingMaterialUI()) {
-      const sidebar = this._driver.getGlobalSidebar();
-      return sidebar.addThreadSidebarContentPanel(descriptor, this);
-    } else {
-      const sidebarElement = GmailElementGetter.getSidebarContainerElement();
-      const addonSidebarElement = GmailElementGetter.getAddonSidebarContainerElement();
-      const companionSidebarContentContainerElement = GmailElementGetter.getCompanionSidebarContentContainerElement();
-      if (!sidebarElement && !addonSidebarElement) {
-        console.warn('This view does not have a sidebar'); //eslint-disable-line no-console
-        return;
-      }
-      let sidebar = this._threadSidebar;
-      if (!sidebar) {
-        let widthManager;
-        if (addonSidebarElement) {
-          widthManager = this._setupWidthManager();
-        }
-        sidebar = this._threadSidebar = new GmailThreadSidebarView(
-          this._driver,
-          sidebarElement,
-          addonSidebarElement,
-          widthManager
-        );
-        sidebar.getStopper().onValue(() => {
-          if (this._threadSidebar === sidebar) {
-            this._threadSidebar = null;
-          }
-        });
-      }
-      return sidebar.addSidebarContentPanel(descriptor);
-    }
+    const sidebar = this._driver.getGlobalSidebar();
+    return sidebar.addThreadSidebarContentPanel(descriptor, this);
   }
 
   addNoticeBar(): SimpleElementView {

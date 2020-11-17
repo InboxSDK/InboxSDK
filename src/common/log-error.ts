@@ -14,7 +14,6 @@ export interface LogErrorContext {
   implVersion?: string;
   userEmailHash?: string;
   isUsingSyncAPI?: boolean;
-  isUsingMaterialGmailUI?: boolean;
 }
 
 const sessionId = getSessionId();
@@ -50,13 +49,7 @@ export default function logError(
       err = new Error('Logger.error called with non-error: ' + err);
       markErrorAsSeen(err);
     }
-    const {
-      appIds,
-      implVersion,
-      isUsingSyncAPI,
-      isUsingMaterialGmailUI,
-      userEmailHash
-    } = context;
+    const { appIds, implVersion, isUsingSyncAPI, userEmailHash } = context;
     const loaderVersion = context.loaderVersion || BUILD_VERSION;
     const sentByApp = !!context.sentByApp;
 
@@ -95,7 +88,6 @@ export default function logError(
     stuffToLog.push('\nInboxSDK Loader Version:', loaderVersion);
     stuffToLog.push('\nInboxSDK Implementation Version:', implVersion);
     stuffToLog.push('\nIs Using Sync API:', isUsingSyncAPI);
-    stuffToLog.push('\nIs Using Material Gmail UI:', isUsingMaterialGmailUI);
 
     // eslint-disable-next-line no-console
     console.error(...stuffToLog);
@@ -113,7 +105,6 @@ export default function logError(
       loaderVersion: loaderVersion,
       implementationVersion: implVersion,
       isUsingSyncAPI,
-      isUsingMaterialGmailUI,
       origin: document.location.origin,
       timestamp: Date.now() * 1000
     };
