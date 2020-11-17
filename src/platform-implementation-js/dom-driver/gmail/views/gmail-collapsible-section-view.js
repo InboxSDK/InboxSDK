@@ -200,31 +200,6 @@ class GmailCollapsibleSectionView {
     if (this._element) this._element.appendChild(headerElement);
   }
 
-  _setupGmailv1Header(
-    headerElement: HTMLElement,
-    collapsibleSectionDescriptor: Object
-  ) {
-    const titleElement = (this._titleElement = document.createElement('div'));
-    titleElement.setAttribute('class', 'inboxsdk__resultsSection_title');
-
-    titleElement.innerHTML =
-      '<span class="Wp Wq"></span>' +
-      '<h3 class="' +
-      (this._isSearch ? 'Wd' : 'Wr') +
-      '">' +
-      escape(collapsibleSectionDescriptor.title) +
-      '</h3>';
-
-    const floatRightElement = document.createElement('div');
-    floatRightElement.classList.add('Cr');
-
-    if (this._isSearch) floatRightElement.classList.add('Wg');
-    else titleElement.classList.add('Wn');
-
-    headerElement.appendChild(titleElement);
-    headerElement.appendChild(floatRightElement);
-  }
-
   _setupGmailv2Header(
     headerElement: HTMLElement,
     collapsibleSectionDescriptor: Object

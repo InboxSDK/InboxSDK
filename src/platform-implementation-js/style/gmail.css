@@ -716,7 +716,7 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
   margin: 0;
 }
 
-.dw {
+body .dw {
   /* Fixes issue where a tall compose window opened over a custom view could be
    * overlapped by Gmail's top bar. Also fixes issue where mole widgets are
    * only visible while a compose window is open.
