@@ -114,26 +114,14 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
   iconElement: null,
 
   /**
-   * In Inbox, providing a {backgroundColor} will add a colored circle indicator
-   * on the left of a {NavItemView}, provided that it is either a root NavItem with
-   * no children or a {NavItemView} 1 level deep.
+   * If you provide none of the {iconUrl}, {iconElement}, {iconClass} properties, then a colored circle will be displayed
+   * next to the {NavItemView} that has its color set by this property, or gray by default.
    * ^optional
    * ^default=null
    * @type {string}
    */
-  backgroundColor: null,
 
-  /**
-   * In Inbox, {expanderForegroundColor} controls the color of the expand/collapse
-   * arrow for {NavItemView}s with children that are 1 level deep.
-   * This arrow will appear on top of the colored circle defined by {backgroundColor},
-   * and should be complimentary if {backgroundColor} and {expanderForegroundColor}
-   * are both provided.
-   * ^optional
-   * ^default=null
-   * @type {string}
-   */
-  expanderForegroundColor: null,
+  backgroundColor: null,
 
   /**
    * The nav item type affects how the item is displayed.
@@ -204,18 +192,6 @@ var DropdownButtonAccessoryDescriptor = /** @lends DropdownButtonAccessoryDescri
    * @type {string}
    */
   type: 'DROPDOWN_BUTTON',
-
-  /**
-   * The color of the background of the dropdown button. Ignored in Inbox.
-   * @type {string}
-   */
-  buttonBackgroundColor: null,
-
-  /**
-   * The color of the foreground of the dropdown button. Ignored in Inbox.
-   * @type {string}
-   */
-  buttonForegroundColor: null,
 
   /**
    * A callback when the dropdown button is pressed. The event object passed to you has a

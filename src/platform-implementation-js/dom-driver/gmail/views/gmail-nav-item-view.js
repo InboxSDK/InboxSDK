@@ -13,7 +13,6 @@ import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-ob
 
 import ButtonView from '../widgets/buttons/button-view';
 import MoreDropdownButtonView from '../widgets/buttons/more-dropdown-button-view';
-import LabelDropdownButtonView from '../widgets/buttons/label-dropdown-button-view';
 import CreateAccessoryButtonView from '../widgets/buttons/create-accessory-button-view';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 
@@ -360,14 +359,8 @@ export default class GmailNavItemView {
     // Setting the border-color of the icon container element while in Gmailv2 will trigger an SDK
     // css rule that will render a circle of border-color if the icon container element has no
     // children i.e. if no iconUrl or iconClass is defined on navItemDescriptor.
-    if (
-      navItemDescriptor.backgroundColor ||
-      (navItemDescriptor.accessory &&
-        navItemDescriptor.accessory.buttonBackgroundColor)
-    ) {
-      const circleColor =
-        navItemDescriptor.backgroundColor ||
-        navItemDescriptor.accessory.buttonBackgroundColor;
+    if (navItemDescriptor.backgroundColor) {
+      const circleColor = navItemDescriptor.backgroundColor;
       iconContainerElement.style.borderColor = circleColor;
     }
   }
@@ -429,7 +422,16 @@ export default class GmailNavItemView {
         this._createDropdownButtonAccessory(accessoryDescriptor);
         break;
       case 'SETTINGS_BUTTON':
-        this._createSettingsButtonAccessory(accessoryDescriptor);
+        this._driver
+          .getLogger()
+          .deprecationWarning(
+            'SettingsButtonAccessoryDescriptor',
+            'DropdownButtonAccessoryDescriptor'
+          );
+        this._createDropdownButtonAccessory({
+          ...accessoryDescriptor,
+          type: 'DROPDOWN_BUTTON'
+        });
         break;
     }
 
@@ -530,40 +532,6 @@ export default class GmailNavItemView {
       event.dropdown.on('destroy', () => {
         buttonOptions.buttonView.deactivate();
       });
-    };
-
-    const accessoryViewController = new DropdownButtonViewController(
-      buttonOptions
-    );
-    this._accessoryViewController = accessoryViewController;
-
-    const innerElement = querySelector(this._element, '.TO');
-    innerElement.addEventListener('mouseenter', () =>
-      innerElement.classList.add('inboxsdk__navItem_hover')
-    );
-    innerElement.addEventListener('mouseleave', () =>
-      innerElement.classList.remove('inboxsdk__navItem_hover')
-    );
-
-    const insertionPoint = querySelector(this._element, '.TN');
-
-    insertionPoint.appendChild(buttonOptions.buttonView.getElement());
-
-    this._setupContextClickHandler(accessoryViewController);
-  }
-
-  _createSettingsButtonAccessory(accessoryDescriptor: Object) {
-    const buttonOptions = { ...accessoryDescriptor };
-    buttonOptions.buttonView = new LabelDropdownButtonView(buttonOptions);
-    buttonOptions.dropdownViewDriverClass = GmailDropdownView;
-    buttonOptions.dropdownPositionOptions = {
-      position: 'bottom',
-      hAlign: 'left',
-      vAlign: 'top'
-    };
-    buttonOptions.dropdownShowFunction = ({ dropdown }) => {
-      dropdown.el.style.marginLeft = '16px';
-      buttonOptions.onClick({ dropdown });
     };
 
     const accessoryViewController = new DropdownButtonViewController(
