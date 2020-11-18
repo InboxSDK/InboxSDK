@@ -114,6 +114,16 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
   iconElement: null,
 
   /**
+   * If you provide none of the {iconUrl}, {iconElement}, {iconClass} properties, then a colored circle will be displayed
+   * next to the {NavItemView} that has its color set by this property, or gray by default.
+   * ^optional
+   * ^default=null
+   * @type {string}
+   */
+
+  backgroundColor: null,
+
+  /**
    * The nav item type affects how the item is displayed.
    * ^optional
    * ^default=NAVIGATION

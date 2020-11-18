@@ -355,6 +355,14 @@ export default class GmailNavItemView {
       navItemDescriptor.iconClass,
       navItemDescriptor.iconUrl
     );
+
+    // Setting the border-color of the icon container element while in Gmailv2 will trigger an SDK
+    // css rule that will render a circle of border-color if the icon container element has no
+    // children i.e. if no iconUrl or iconClass is defined on navItemDescriptor.
+    if (navItemDescriptor.backgroundColor) {
+      const circleColor = navItemDescriptor.backgroundColor;
+      iconContainerElement.style.borderColor = circleColor;
+    }
   }
 
   _updateClickability(navItemDescriptor: Object) {
