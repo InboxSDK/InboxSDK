@@ -13,7 +13,6 @@ import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-ob
 
 import ButtonView from '../widgets/buttons/button-view';
 import MoreDropdownButtonView from '../widgets/buttons/more-dropdown-button-view';
-import LabelDropdownButtonView from '../widgets/buttons/label-dropdown-button-view';
 import CreateAccessoryButtonView from '../widgets/buttons/create-accessory-button-view';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 
@@ -86,7 +85,6 @@ export default class GmailNavItemView {
 
   destroy() {
     this._element.remove();
-
     if (this._accessoryViewController) this._accessoryViewController.destroy();
     if (this._eventStream) this._eventStream.end();
     if (this._expandoElement) this._expandoElement.remove();
@@ -101,10 +99,6 @@ export default class GmailNavItemView {
     return this._eventStream;
   }
 
-  getName(): string {
-    return this._name;
-  }
-
   getNavItemDescriptor(): Object {
     return this._navItemDescriptor;
   }
@@ -115,6 +109,10 @@ export default class GmailNavItemView {
 
   getOrderHint(): ?number {
     return this._orderHint;
+  }
+
+  getName(): string {
+    return this._name;
   }
 
   isCollapsed(): boolean {
@@ -190,6 +188,11 @@ export default class GmailNavItemView {
       insertBeforeElement
     );
 
+    // If the current nav-item is of type GROUPER and we are in Gmailv2, then any nested nav-items
+    // should be at the same indentation as the current nav-item. Somewhat confusingly, this._level
+    // is normally the indentationFactor for the nested children of the current nav-item, so we
+    // actually use this._level - 1 as the indentationFactor if we don't want to further indent the
+    // nested items (i.e. the current item is of type GROUPER and we're in Gmailv2).
     const indentationFactor =
       this._type === NAV_ITEM_TYPES.GROUPER ? this._level - 1 : this._level;
 
@@ -235,7 +238,16 @@ export default class GmailNavItemView {
         this._createDropdownButtonAccessory(accessoryDescriptor);
         break;
       case 'SETTINGS_BUTTON':
-        this._createSettingsButtonAccessory(accessoryDescriptor);
+        this._driver
+          .getLogger()
+          .deprecationWarning(
+            'SettingsButtonAccessoryDescriptor',
+            'DropdownButtonAccessoryDescriptor'
+          );
+        this._createDropdownButtonAccessory({
+          ...accessoryDescriptor,
+          type: 'DROPDOWN_BUTTON'
+        });
         break;
     }
 
@@ -403,40 +415,6 @@ export default class GmailNavItemView {
     const insertionPoint = querySelector(this._element, '.TN');
 
     insertionPoint.appendChild(buttonOptions.buttonView.getElement());
-  }
-
-  _createSettingsButtonAccessory(accessoryDescriptor: Object) {
-    const buttonOptions = { ...accessoryDescriptor };
-    buttonOptions.buttonView = new LabelDropdownButtonView(buttonOptions);
-    buttonOptions.dropdownViewDriverClass = GmailDropdownView;
-    buttonOptions.dropdownPositionOptions = {
-      position: 'bottom',
-      hAlign: 'left',
-      vAlign: 'top'
-    };
-    buttonOptions.dropdownShowFunction = ({ dropdown }) => {
-      dropdown.el.style.marginLeft = '16px';
-      buttonOptions.onClick({ dropdown });
-    };
-
-    const accessoryViewController = new DropdownButtonViewController(
-      buttonOptions
-    );
-    this._accessoryViewController = accessoryViewController;
-
-    const innerElement = querySelector(this._element, '.TO');
-    innerElement.addEventListener('mouseenter', () =>
-      innerElement.classList.add('inboxsdk__navItem_hover')
-    );
-    innerElement.addEventListener('mouseleave', () =>
-      innerElement.classList.remove('inboxsdk__navItem_hover')
-    );
-
-    const insertionPoint = querySelector(this._element, '.TN');
-
-    insertionPoint.appendChild(buttonOptions.buttonView.getElement());
-
-    this._setupContextClickHandler(accessoryViewController);
   }
 
   _expand() {
@@ -690,14 +668,8 @@ export default class GmailNavItemView {
     // Setting the border-color of the icon container element while in Gmailv2 will trigger an SDK
     // css rule that will render a circle of border-color if the icon container element has no
     // children i.e. if no iconUrl or iconClass is defined on navItemDescriptor.
-    if (
-      navItemDescriptor.backgroundColor ||
-      (navItemDescriptor.accessory &&
-        navItemDescriptor.accessory.buttonBackgroundColor)
-    ) {
-      const circleColor =
-        navItemDescriptor.backgroundColor ||
-        navItemDescriptor.accessory.buttonBackgroundColor;
+    if (navItemDescriptor.backgroundColor) {
+      const circleColor = navItemDescriptor.backgroundColor;
       iconContainerElement.style.borderColor = circleColor;
     }
   }
