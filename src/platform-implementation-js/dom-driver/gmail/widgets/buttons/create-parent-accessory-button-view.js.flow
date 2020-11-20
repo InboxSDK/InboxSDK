@@ -1,0 +1,13 @@
+/* @flow */
+
+import Kefir from 'kefir';
+
+declare export default class CreateParentAccessoryButtonView {
+  constructor(): CreateParentAccessoryButtonView;
+
+  activate(): void;
+  deactivate(): void;
+  destroy(): void;
+  getElement(): HTMLElement;
+  getEventStream(): Kefir.Observable<Object>;
+}
