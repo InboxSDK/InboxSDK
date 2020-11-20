@@ -13,7 +13,9 @@ import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-ob
 
 import ButtonView from '../widgets/buttons/button-view';
 import MoreDropdownButtonView from '../widgets/buttons/more-dropdown-button-view';
+import MoreParentDropdownButtonView from '../widgets/buttons/more-parent-accessory-button-view';
 import CreateAccessoryButtonView from '../widgets/buttons/create-accessory-button-view';
+import CreateParentAccessoryButtonView from '../widgets/buttons/create-parent-accessory-button-view';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 
 import DropdownButtonViewController from '../../../widgets/buttons/dropdown-button-view-controller';
@@ -51,6 +53,9 @@ export default class GmailNavItemView {
   _orderHint: any;
   _type: ?string = null;
 
+  // delete after new left nav is fully launched, use this._level === 1 instead
+  _isNewLeftNavParent: boolean;
+
   constructor(driver: GmailDriver, orderGroup: number | string, level: number) {
     this._driver = driver;
     this._eventStream = kefirBus();
@@ -58,7 +63,15 @@ export default class GmailNavItemView {
     this._navItemNumber = ++NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED;
     this._orderGroup = orderGroup;
 
-    this._setupElement();
+    // delete after new left nav is fully launched, use this._level === 1 instead
+    this._isNewLeftNavParent =
+      GmailElementGetter.isNewLeftNav() && this._level === 1;
+
+    if (this._isNewLeftNavParent) {
+      this._setupParentElement();
+    } else {
+      this._setupChildElement();
+    }
   }
 
   addNavItem(
@@ -79,6 +92,10 @@ export default class GmailNavItemView {
       .onValue(() => this._addNavItemElement(gmailNavItemView));
 
     gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
+
+    if (this._isNewLeftNavParent) {
+      this._createExpandoParent();
+    }
 
     return gmailNavItemView;
   }
@@ -128,7 +145,8 @@ export default class GmailNavItemView {
       !this._element ||
       this._type === NAV_ITEM_TYPES.LINK ||
       this._type === NAV_ITEM_TYPES.MANAGE ||
-      this._isActive === value
+      this._isActive === value ||
+      this._isNewLeftNavParent
     ) {
       return;
     }
@@ -194,32 +212,43 @@ export default class GmailNavItemView {
     // actually use this._level - 1 as the indentationFactor if we don't want to further indent the
     // nested items (i.e. the current item is of type GROUPER and we're in Gmailv2).
     const indentationFactor =
-      this._type === NAV_ITEM_TYPES.GROUPER ? this._level - 1 : this._level;
+      this._type === NAV_ITEM_TYPES.GROUPER || this._isNewLeftNavParent
+        ? this._level - 1
+        : this._level;
 
     const element = gmailNavItemView.getElement();
 
-    querySelector(element, '.TN').style.marginLeft =
-      getLeftIndentationPaddingValue(this._driver) * indentationFactor + 'px';
+    if (GmailElementGetter.isNewLeftNav()) {
+      querySelector(element, '.TN').style.marginLeft =
+        6 * indentationFactor + 'px';
+    } else {
+      querySelector(element, '.TN').style.marginLeft =
+        getLeftIndentationPaddingValue(this._driver) * indentationFactor + 'px';
+    }
 
     this._setHeights();
   }
 
   _collapse() {
-    const expandoElement = this._expandoElement;
-    if (expandoElement) {
-      expandoElement.classList.remove('aih');
-      expandoElement.classList.add('aii');
-    } else if (this._type === NAV_ITEM_TYPES.GROUPER) {
-      const navItemElement = this._element.firstElementChild;
-      if (navItemElement) navItemElement.classList.remove('air');
-    }
-
-    if (this._itemContainerElement)
-      this._itemContainerElement.style.display = 'none';
-
     this._isCollapsed = true;
 
-    this._setHeights();
+    if (this._isNewLeftNavParent) {
+      this._element.classList.remove('Xr');
+    } else {
+      const expandoElement = this._expandoElement;
+      if (expandoElement) {
+        expandoElement.classList.remove('aih');
+        expandoElement.classList.add('aii');
+      } else if (this._type === NAV_ITEM_TYPES.GROUPER) {
+        const navItemElement = this._element.firstElementChild;
+        if (navItemElement) navItemElement.classList.remove('air');
+      }
+
+      if (this._itemContainerElement)
+        this._itemContainerElement.style.display = 'none';
+
+      this._setHeights();
+    }
 
     this._eventStream.emit({
       eventName: 'collapsed'
@@ -259,6 +288,38 @@ export default class GmailNavItemView {
   }
 
   _createDropdownButtonAccessory(accessoryDescriptor: Object) {
+    if (this._isNewLeftNavParent) {
+      const buttonOptions = { ...accessoryDescriptor };
+      buttonOptions.buttonView = new MoreParentDropdownButtonView();
+      buttonOptions.dropdownViewDriverClass = GmailDropdownView;
+      buttonOptions.dropdownPositionOptions = {
+        position: 'right',
+        hAlign: 'left',
+        vAlign: 'top'
+      };
+      buttonOptions.dropdownShowFunction = ({ dropdown }) => {
+        dropdown.el.style.marginLeft = '24px';
+        buttonOptions.onClick({ dropdown });
+      };
+
+      const accessoryViewController = new DropdownButtonViewController(
+        buttonOptions
+      );
+      this._accessoryViewController = accessoryViewController;
+
+      const accessoryEl = querySelector(this._element, '.Yh');
+      const parentNode = accessoryEl.parentNode;
+      if (parentNode) {
+        parentNode.replaceChild(
+          buttonOptions.buttonView.getElement(),
+          accessoryEl
+        );
+      }
+
+      return;
+    }
+
+    // child dropdown button accessory
     const buttonOptions = { ...accessoryDescriptor };
     buttonOptions.buttonView = new MoreDropdownButtonView(buttonOptions);
     buttonOptions.dropdownViewDriverClass = GmailDropdownView;
@@ -315,7 +376,6 @@ export default class GmailNavItemView {
     );
 
     const insertionPoint = querySelector(this._element, '.TN');
-
     insertionPoint.appendChild(buttonOptions.buttonView.getElement());
 
     this._setupContextClickHandler(accessoryViewController);
@@ -351,7 +411,25 @@ export default class GmailNavItemView {
     }
   }
 
+  _createExpandoParent() {
+    const parentExpandoElement = querySelector(this._element, '.XR');
+    parentExpandoElement.style.visibility = 'visible';
+    this._expandoElement = parentExpandoElement;
+
+    if (this._isCollapsed) {
+      this._collapse();
+    } else {
+      this._expand();
+    }
+  }
+
   _createIconButtonAccessory(accessoryDescriptor: Object) {
+    if (this._isNewLeftNavParent) {
+      console.warn(
+        "The IconButtonAccessoryDescriptor is not supported at the parent level in the Gmail's new left nav. See documentation on inboxsdk.com for supported features."
+      );
+    }
+
     const buttonOptions = { ...accessoryDescriptor, buttonColor: 'pureIcon' };
     buttonOptions.buttonView = new ButtonView(buttonOptions);
 
@@ -360,7 +438,6 @@ export default class GmailNavItemView {
     );
 
     const insertionPoint = querySelector(this._element, '.TN');
-
     insertionPoint.appendChild(buttonOptions.buttonView.getElement());
   }
 
@@ -405,6 +482,46 @@ export default class GmailNavItemView {
   }
 
   _createPlusButtonAccessory(accessoryDescriptor: Object) {
+    if (this._isNewLeftNavParent) {
+      const buttonOptions = { ...accessoryDescriptor };
+      buttonOptions.buttonView = new CreateParentAccessoryButtonView();
+
+      // TODO: new Gmail left nav parent accessory opens a dropdown which would be a breaking
+      // change if we were to also create a dropdown view bc existing users would have to manually
+      // close the dropdown if they only wanted a click callback. We could have a "hasDropdown"
+      // prop to conditionally render the dropdown, but when is enough enough?
+      // buttonOptions.dropdownViewDriverClass = GmailDropdownView;
+      // buttonOptions.dropdownPositionOptions = {
+      //   position: 'right',
+      //   hAlign: 'left',
+      //   vAlign: 'top'
+      // };
+      // buttonOptions.dropdownShowFunction = ({ dropdown }) => {
+      //   dropdown.el.style.marginLeft = '24px';
+      //   buttonOptions.onClick({ dropdown });
+      // };
+
+      // this._accessoryViewController = new DropdownButtonViewController(
+      //   buttonOptions
+      // );
+
+      this._accessoryViewController = new BasicButtonViewController(
+        buttonOptions
+      );
+
+      const accessoryEl = querySelector(this._element, '.Yh');
+      const parentNode = accessoryEl.parentNode;
+      if (parentNode) {
+        parentNode.replaceChild(
+          buttonOptions.buttonView.getElement(),
+          accessoryEl
+        );
+      }
+
+      return;
+    }
+
+    // child create button accessory
     const buttonOptions = { ...accessoryDescriptor };
     buttonOptions.buttonView = new CreateAccessoryButtonView();
 
@@ -413,40 +530,49 @@ export default class GmailNavItemView {
     );
 
     const insertionPoint = querySelector(this._element, '.TN');
-
     insertionPoint.appendChild(buttonOptions.buttonView.getElement());
   }
 
   _expand() {
-    const expandoElement = this._expandoElement;
-    if (expandoElement) {
-      expandoElement.classList.add('aih');
-      expandoElement.classList.remove('aii');
-    } else if (this._type === NAV_ITEM_TYPES.GROUPER) {
-      const navItemElement = this._element.firstElementChild;
-      if (navItemElement) navItemElement.classList.add('air');
+    if (this._isNewLeftNavParent) {
+      this._element.classList.add('Xr');
+    } else {
+      const expandoElement = this._expandoElement;
+      if (expandoElement) {
+        expandoElement.classList.add('aih');
+        expandoElement.classList.remove('aii');
+      } else if (this._type === NAV_ITEM_TYPES.GROUPER) {
+        const navItemElement = this._element.firstElementChild;
+        if (navItemElement) {
+          navItemElement.classList.add('air');
+        }
+      }
+
+      if (this._itemContainerElement) {
+        this._itemContainerElement.style.display = '';
+      }
+
+      this._setHeights();
     }
 
-    if (this._itemContainerElement)
-      this._itemContainerElement.style.display = '';
-
     this._isCollapsed = false;
-
     this._eventStream.emit({
       eventName: 'expanded'
     });
-
-    this._setHeights();
   }
 
   _getItemContainerElement(): HTMLElement {
-    let itemContainerElement = this._itemContainerElement;
-    if (!itemContainerElement) {
-      itemContainerElement = this._createItemContainerElement();
-      this._createExpando();
-    }
+    if (this._isNewLeftNavParent) {
+      return querySelector(this._element, '.TK');
+    } else {
+      let itemContainerElement = this._itemContainerElement;
+      if (!itemContainerElement) {
+        itemContainerElement = this._createItemContainerElement();
+        this._createExpando();
+      }
 
-    return itemContainerElement;
+      return itemContainerElement;
+    }
   }
 
   _isCollapsible() {
@@ -476,6 +602,10 @@ export default class GmailNavItemView {
   }
 
   _setHeights() {
+    if (this._level == 1) {
+      return;
+    }
+
     const toElement = querySelector(this._element, '.TO');
 
     if (this._element.classList.contains('ain') && this._itemContainerElement) {
@@ -523,7 +653,7 @@ export default class GmailNavItemView {
       });
   }
 
-  _setupElement() {
+  _setupChildElement() {
     this._element = document.createElement('div');
     this._element.setAttribute('class', 'aim inboxsdk__navItem');
 
@@ -561,6 +691,45 @@ export default class GmailNavItemView {
       this._updateHighlight(event);
     });
 
+    this._eventStream.plug(
+      Kefir.fromEvents(innerElement, 'click').map(
+        this._makeEventMapper('click')
+      )
+    );
+  }
+
+  _setupParentElement() {
+    this._element = document.createElement('div');
+    this._element.setAttribute('class', 'Xa wT W8 XJ inboxsdk__navItem');
+    this._element.innerHTML = [
+      '<div class="V6 CL Y2">',
+      '<div class="XR" role="button" tabindex="0" type="button" style="visibility: hidden">',
+      '</div>',
+      '<span class="XS">',
+      '<span class="WW inboxsdk__navItem_name" role="heading" aria-level="2">',
+      '</span>',
+      '<span class="XU" aria-hidden="true" style="display: none">',
+      '</span>',
+      '</span>',
+      '<div class="Yh">',
+      '</div>',
+      '</div>',
+      '<div class="V3">',
+      '<div class="wT">',
+      '<div class="TK">',
+      '</div>',
+      '</div>',
+      '</div>'
+    ].join('');
+
+    const expandoElement = querySelector(this._element, '.XR');
+    Kefir.fromEvents(expandoElement, 'click')
+      .map(this._makeEventMapper('click'))
+      .onValue(event => {
+        this._element.classList.toggle('Xr');
+      });
+
+    const innerElement = querySelector(this._element, '.V6.CL');
     this._eventStream.plug(
       Kefir.fromEvents(innerElement, 'click').map(
         this._makeEventMapper('click')
@@ -645,7 +814,9 @@ export default class GmailNavItemView {
   }
 
   _updateIcon(navItemDescriptor: Object) {
-    const iconContainerElement = querySelector(this._element, '.qj');
+    const iconContainerElement = this._isNewLeftNavParent
+      ? querySelector(this._element, '.Yh')
+      : querySelector(this._element, '.qj');
 
     // render custom icon
     if (navItemDescriptor.iconElement) {
@@ -717,7 +888,22 @@ export default class GmailNavItemView {
     this._orderHint = navItemDescriptor.orderHint;
   }
 
+  _updateRole(routeID?: string) {
+    const roleElement = querySelector(this._element, '.V6.CL');
+
+    if (routeID) {
+      roleElement.setAttribute('role', 'link');
+    } else {
+      roleElement.setAttribute('role', 'group');
+      roleElement.classList.add('X9');
+    }
+  }
+
   _updateSubtitle(navItemDescriptor: Object) {
+    if (this._isNewLeftNavParent) {
+      return;
+    }
+
     if (
       navItemDescriptor.accessory &&
       !['SETTINGS_BUTTON', 'DROPDOWN_BUTTON'].includes(
@@ -778,13 +964,17 @@ export default class GmailNavItemView {
     this._updateSubtitle(navItemDescriptor);
     this._updateOrder(navItemDescriptor);
 
+    if (this._isNewLeftNavParent) {
+      this._updateRole(navItemDescriptor.routeID);
+    }
+
     if (this._type === NAV_ITEM_TYPES.GROUPER) {
       this._setupGrouper(navItemDescriptor);
       return;
     }
 
-    this._updateIcon(navItemDescriptor);
     this._updateAccessory(navItemDescriptor.accessory);
+    this._updateIcon(navItemDescriptor);
     this._updateClickability(navItemDescriptor);
   }
 }
