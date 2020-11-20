@@ -30,6 +30,7 @@ declare var GmailElementGetter: {
   getToolbarElement(): HTMLElement,
   getTopAccountContainer(): ?HTMLElement,
   isGplusEnabled(): boolean,
+  isNewLeftNav(): boolean,
   isPreviewPane(): boolean,
   isStandalone(): boolean,
   isStandaloneComposeWindow(): boolean,

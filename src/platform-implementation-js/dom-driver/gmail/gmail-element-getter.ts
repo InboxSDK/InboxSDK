@@ -108,7 +108,9 @@ const GmailElementGetter = {
   },
 
   getNavItemMenuInjectionContainer(): HTMLElement | null {
-    return document.querySelector('.aeN .n3');
+    return this.isNewLeftNav()
+      ? document.querySelector('.aeN')
+      : document.querySelector('.aeN .n3');
   },
 
   getRowListElements(): HTMLElement[] {
@@ -169,6 +171,10 @@ const GmailElementGetter = {
         'a[href*="https://plus"][href*="upgrade"]'
       ).length === 0
     );
+  },
+
+  isNewLeftNav(): boolean {
+    return Boolean(document.querySelector('.WR[role="navigation"]'));
   },
 
   isPreviewPane(): boolean {
