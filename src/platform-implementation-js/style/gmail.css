@@ -602,7 +602,6 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
 }
 /* end narrow vertical preview pane */
 
-.inboxsdk__thread_row_icon_wrapper,
 .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon,
 .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
   height: 18px;
@@ -610,10 +609,11 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
 }
 
 .inboxsdk__thread_row_icon_wrapper {
-  width: 25px;
+  width: 20px;
   margin-right: 3px;
   align-self: center;
   height: 20px;
+  flex: 0 0 auto;
 }
 
 .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
