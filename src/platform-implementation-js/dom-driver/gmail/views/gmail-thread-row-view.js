@@ -115,8 +115,6 @@ class GmailThreadRowView {
   _cachedThreadID: ?string;
   _cachedSyncThreadID: ?string;
   _cachedSyncDraftIDPromise: ?Promise<?string>;
-  _imageFixer: ?Bus<any>;
-  _imageFixerTask: ?Kefir.Observable<any>;
   _stopper = kefirStopper();
   _refresher: ?Kefir.Observable<any>;
   _subjectRefresher: ?Kefir.Observable<any>;
@@ -175,8 +173,6 @@ class GmailThreadRowView {
     this._userView = null; // supplied by ThreadRowView
     this._cachedThreadID = null; // set in getter
 
-    this._imageFixer = null;
-    this._imageFixerTask = null;
     this._refresher = null;
     this._subjectRefresher = null;
     this._imageRefresher = null;
@@ -379,8 +375,6 @@ class GmailThreadRowView {
               labelMod.gmailLabelView.getElement()
             );
           }
-
-          this._getImageFixer().emit();
         }
       });
   }
@@ -457,20 +451,6 @@ class GmailThreadRowView {
             iconWrapper
           );
         }
-
-        this._getImageFixer().emit();
-      }
-    });
-
-    this._getImageFixerTask().onValue(() => {
-      const el =
-        imageMod &&
-        imageMod.iconWrapper &&
-        imageMod.iconWrapper.firstElementChild;
-      if (el instanceof HTMLElement) {
-        // Make the image reposition itself horizontally.
-        el.style.display =
-          el.style && el.style.display === 'block' ? 'inline-block' : 'block';
       }
     });
   }
@@ -638,7 +618,6 @@ class GmailThreadRowView {
           // thread row so it counts as clicking on the thread.
           (starGroup: any).onmouseover = (starGroup: any).onclick = starGroupEventInterceptor;
         }
-        this._getImageFixer().emit();
       }
     });
   }
@@ -717,7 +696,6 @@ class GmailThreadRowView {
             actionParentDiv.firstChild
           );
         }
-        this._getImageFixer().emit();
       }
     });
   }
@@ -1148,28 +1126,6 @@ class GmailThreadRowView {
           'div.apu'
         )
       : querySelector(this._elements[0], 'td.a4W div.xS div.xT');
-  }
-
-  _getImageFixer(): Bus<any> {
-    let imageFixer = this._imageFixer;
-    if (!imageFixer) {
-      imageFixer = this._imageFixer = kefirBus(); // emit into this to queue an image fixer run
-    }
-
-    return imageFixer;
-  }
-
-  _getImageFixerTask(): Kefir.Observable<any> {
-    let imageFixerTask = this._imageFixerTask;
-    if (!imageFixerTask) {
-      imageFixerTask = this._imageFixerTask = this._getImageFixer()
-        .bufferBy(this._getImageFixer().flatMap(x => delayAsap()))
-        .filter(x => x.length > 0)
-        .map(x => null)
-        .takeUntilBy(this._stopper);
-    }
-
-    return imageFixerTask;
   }
 
   _getWatchElement(): HTMLElement {
