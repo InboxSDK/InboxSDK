@@ -1160,6 +1160,7 @@ class GmailThreadRowView {
   }
 
   _getSubjectRefresher(): Kefir.Observable<any> {
+    // emit an event whenever the subject element is swapped out for a new one.
     let subjectRefresher = this._subjectRefresher;
     if (!subjectRefresher) {
       if (this._isVertical) {
@@ -1173,19 +1174,6 @@ class GmailThreadRowView {
             childList: true
           }
         )
-          .merge(
-            makeMutationObserverChunkedStream(watchElement, {
-              attributes: true,
-              attributeFilter: ['class']
-            })
-              .map(() =>
-                Array.from(watchElement.classList)
-                  .filter(className => className.indexOf('inboxsdk') !== 0)
-                  .sort()
-                  .join(' ')
-              )
-              .skipDuplicates()
-          )
           .map(() => null)
           .takeUntilBy(this._stopper)
           .toProperty(() => null);
