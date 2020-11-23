@@ -609,11 +609,6 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
   width: 18px;
 }
 
-.zA:hover .inboxsdk__thread_row_icon_wrapper {
-  align-self: flex-start;
-  margin-top: 1px;
-}
-
 .inboxsdk__thread_row_icon_wrapper {
   width: 25px;
   margin-right: 3px;
