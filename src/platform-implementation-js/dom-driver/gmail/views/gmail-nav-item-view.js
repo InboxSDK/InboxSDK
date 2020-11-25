@@ -720,13 +720,25 @@ export default class GmailNavItemView {
       '<div class="Yh">',
       '</div>',
       '</div>',
-      '<div class="V3">',
+      '<div class="V3 ada">',
       '<div class="wT">',
       '<div class="TK">',
       '</div>',
       '</div>',
       '</div>'
     ].join('');
+
+    const scrollContainer = querySelector(this._element, '.V3');
+    Kefir.fromEvents(scrollContainer, 'scroll')
+      .debounce(10)
+      .map(this._makeEventMapper('scroll'))
+      .onValue(event => {
+        if (scrollContainer.scrollTop > 0) {
+          scrollContainer.classList.add('adh');
+        } else {
+          scrollContainer.classList.remove('adh');
+        }
+      });
 
     const expandoElement = querySelector(this._element, '.XR');
     Kefir.fromEvents(expandoElement, 'click')
