@@ -3,6 +3,23 @@ function log() {
 }
 
 InboxSDK.load(1, 'nav-menu').then(function(sdk) {
+  var appendStylesheet = function(url) {
+    const css = '.inboxsdk__button_icon.bentoboxIndicator { background: transparent url(https://dev.mailfoogae.appspot.com:8888/buildTemp/dev/clientjs/pipelineIndicator.ebfc97a74f09365a433e8537ff414815.png) no-repeat; height: 18px; width: 18px; }';
+    const head = document.head || document.getElementsByTagName('head')[0];
+    const style = document.createElement('style');
+
+    head.appendChild(style);
+    style.type = 'text/css';
+    style.appendChild(document.createTextNode(css));
+
+    const sheet = document.createElement('link');
+    sheet.rel = 'stylesheet';
+    sheet.type = 'text/css';
+    sheet.href = url;
+    document.head.appendChild(sheet);
+  };
+  
+
   sdk.Router.handleCustomRoute('this-is-a-parent-custom-route', (customRouteView) => {
     const el = document.createElement('span');
     el.innerHTML = "This is a parent custom route!";
@@ -64,7 +81,7 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
     });
   }
 
-  const initNavItemToggle = () => {
+  const initNavItemCollapse = () => {
     const parent = sdk.NavMenu.addNavItem({
       accessory: {
         onClick: () => {
@@ -137,6 +154,31 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
     });
   }
 
+  const initNavItemAccessoryAndIcon = () => {
+    appendStylesheet();
+
+    sdk.NavMenu.addNavItem({
+      accessory: {
+        onClick: event => {
+          event.dropdown.el.innerHTML = 'This is the dropdown el';
+        },
+        type: 'DROPDOWN_BUTTON',
+      },
+      name: 'P - Dropdown w/o icon',
+    });
+
+    sdk.NavMenu.addNavItem({
+      accessory: {
+        onClick: event => {
+          event.dropdown.el.innerHTML = 'This is the dropdown el';
+        },
+        type: 'CREATE',
+      },
+      iconClass: 'bentoboxIndicator',
+      name: 'P - Create w/ iconClass',
+    });
+  }
+
   const initNavItemAccessories = () => {
     sdk.NavMenu.addNavItem({
       accessory: {
@@ -160,8 +202,11 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
   }
 
   const initNavItemIcons = () => {
+    appendStylesheet();
+
     sdk.NavMenu.addNavItem({
       iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+      routeID: 'this-is-a-parent-custom-route',
       name: 'P - iconUrl'
     });
   
@@ -175,17 +220,18 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
       display: "flex",
       height: "18px",
       justifyContent: "center",
-      marginLeft: "1px",
       width: "18px"
     });
   
     sdk.NavMenu.addNavItem({
       iconElement,
+      routeID: 'this-is-a-parent-custom-route',
       name: 'P - iconElement'
     });
   
     const parentIconClass = sdk.NavMenu.addNavItem({
-      iconClass: 'navMenu_iconClass_example',
+      iconClass: 'bentoboxIndicator',
+      routeID: 'this-is-a-parent-custom-route',
       name: 'P - iconClass',
     });
   
@@ -203,18 +249,12 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
     })
   }
 
-  const initNavItem = () => {
-    sdk.NavMenu.addNavItem({
-      name: 'Parent'
-    });
-  }
-
-  initNavItemAdd();
-  initNavItemSubtitle();
-  initNavItemToggle();
+  // initNavItemAdd();
+  // initNavItemSubtitle();
+  // initNavItemCollapse();
   initNavItemChildren();
-  initNavItemAccessories();
-  initNavItemIcons();
-  initNavItemRoute();
-  initNavItem();
+  // initNavItemAccessoryAndIcon();
+  // initNavItemAccessories();
+  // initNavItemIcons();
+  // initNavItemRoute();
 });
