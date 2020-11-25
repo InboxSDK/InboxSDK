@@ -310,6 +310,9 @@ export default class GmailNavItemView {
       const accessoryEl = querySelector(this._element, '.Yh');
       const parentNode = accessoryEl.parentNode;
       if (parentNode) {
+        buttonOptions.buttonView
+          .getElement()
+          .classList.add(...accessoryEl.classList);
         parentNode.replaceChild(
           buttonOptions.buttonView.getElement(),
           accessoryEl
@@ -512,6 +515,9 @@ export default class GmailNavItemView {
       const accessoryEl = querySelector(this._element, '.Yh');
       const parentNode = accessoryEl.parentNode;
       if (parentNode) {
+        buttonOptions.buttonView
+          .getElement()
+          .classList.add(...accessoryEl.classList);
         parentNode.replaceChild(
           buttonOptions.buttonView.getElement(),
           accessoryEl

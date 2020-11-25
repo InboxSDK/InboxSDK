@@ -1683,7 +1683,7 @@ body[dir='rtl'] .inboxsdk__hide_addon_container[dir='ltr'] {
 
 .WR[role="navigation"] /* new left nav */
   .inboxsdk__navItem
-  .Yh:not(.inboxsdk__navItem_parent_accessory_button)
+  .Yh
   .inboxsdk__button_icon {
   display: none;
 }
@@ -1694,27 +1694,41 @@ body[dir='rtl'] .inboxsdk__hide_addon_container[dir='ltr'] {
 
 .WR[role="navigation"].bhZ:not(.bym) /* .WR is the new left nav */
   .inboxsdk__navItem
+  .Yh {
+  opacity: 1;
+}
+
+.WR[role="navigation"].bhZ:not(.bym) /* .WR is the new left nav */
+  .inboxsdk__navItem
+  .Yh.inboxsdk__navItem_parent_accessory_button {
+  background-image: none !important;
+  /* display: none; */
+}
+
+.WR[role="navigation"].bhZ:not(.bym) /* .WR is the new left nav */
+  .inboxsdk__navItem
   .Yh:empty {
-  background-color: rgb(32, 33, 36);
+  background-color: rgba(32, 33, 36, 0.71);
   border-radius: 50%;
   display: inherit;
   height: 18px;
+  margin-left: 1px;
   width: 18px;
 }
 
-.WR[role="navigation"].bhZ:not(.bym) /* .WR is the new left nav */
+.WR[role='navigation'].bhZ:not(.bym)
   .inboxsdk__navItem
-  .Yh 
+  .Yh
   .inboxsdk__button_icon {
-  background: none;
+  /* background-image: inherit; */
   display: inherit;
 }
 
-.WR[role="navigation"].bhZ:not(.bym) /* .WR is the new left nav */
+/* .WR[role="navigation"].bhZ:not(.bym)
   .inboxsdk__navItem
-  .inboxsdk__navItem_parent_accessory_button {
-  background-image: none !important;
-}
+  .Yh:not(.inboxsdk__navItem_parent_accessory_button) {
+  display: none;
+} */
 
 /* end nav menu close state */
 
