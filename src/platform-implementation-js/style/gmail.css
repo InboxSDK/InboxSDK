@@ -1702,7 +1702,6 @@ body[dir='rtl'] .inboxsdk__hide_addon_container[dir='ltr'] {
   .inboxsdk__navItem
   .Yh.inboxsdk__navItem_parent_accessory_button {
   background-image: none !important;
-  /* display: none; */
 }
 
 .WR[role="navigation"].bhZ:not(.bym) /* .WR is the new left nav */
@@ -1720,15 +1719,8 @@ body[dir='rtl'] .inboxsdk__hide_addon_container[dir='ltr'] {
   .inboxsdk__navItem
   .Yh
   .inboxsdk__button_icon {
-  /* background-image: inherit; */
   display: inherit;
 }
-
-/* .WR[role="navigation"].bhZ:not(.bym)
-  .inboxsdk__navItem
-  .Yh:not(.inboxsdk__navItem_parent_accessory_button) {
-  display: none;
-} */
 
 /* end nav menu close state */
 
