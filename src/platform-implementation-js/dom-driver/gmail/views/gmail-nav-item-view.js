@@ -427,10 +427,15 @@ export default class GmailNavItemView {
   }
 
   _createIconButtonAccessory(accessoryDescriptor: Object) {
-    if (this._isNewLeftNavParent) {
-      console.warn(
-        "The IconButtonAccessoryDescriptor is not supported at the parent level in the Gmail's new left nav. See documentation on inboxsdk.com for supported features."
+    this._driver
+      .getLogger()
+      .deprecationWarning(
+        'IconButtonAccessoryDescriptor accessory for a parent level NavItemView',
+        'CreateAccessoryDescriptor or DropdownButtonAccessoryDescriptor'
       );
+
+    if (this._isNewLeftNavParent) {
+      return;
     }
 
     const buttonOptions = { ...accessoryDescriptor, buttonColor: 'pureIcon' };
