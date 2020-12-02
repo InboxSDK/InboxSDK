@@ -728,10 +728,10 @@ export default class GmailNavItemView {
       '</div>'
     ].join('');
 
+    // adds shadow rule to nav item container
     const scrollContainer = querySelector(this._element, '.V3');
     Kefir.fromEvents(scrollContainer, 'scroll')
       .debounce(10)
-      .map(this._makeEventMapper('scroll'))
       .onValue(event => {
         if (scrollContainer.scrollTop > 0) {
           scrollContainer.classList.add('adh');
