@@ -504,10 +504,6 @@ export default class GmailNavItemView {
       //   buttonOptions.onClick({ dropdown });
       // };
 
-      // this._accessoryViewController = new DropdownButtonViewController(
-      //   buttonOptions
-      // );
-
       this._accessoryViewController = new BasicButtonViewController(
         buttonOptions
       );
