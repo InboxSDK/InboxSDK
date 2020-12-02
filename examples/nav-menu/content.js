@@ -109,12 +109,13 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
 
   const initNavItemChildren = () => {
     const parent = sdk.NavMenu.addNavItem({
-      name: 'P - with Children',
+      name: 'P - with Children'
     });
   
     childIconUrl = parent.addNavItem({
       iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
-      name: 'Child iconUrl'
+      name: 'Child iconUrl',
+      orderHint: 2
     });
 
     const iconElement = document.createElement('div');
@@ -133,12 +134,14 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
 
     childIconElement = parent.addNavItem({
       iconElement,
-      name: 'Child iconElement'
+      name: 'Child iconElement',
+      orderHint: 1
     });
 
     childIconClass = parent.addNavItem({
       iconClass: 'navMenu_iconClass_example',
-      name: 'Child iconClass'
+      name: 'Child iconClass',
+      orderHint: 3
     });
   
     childIconUrl.addNavItem({
