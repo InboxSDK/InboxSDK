@@ -4,7 +4,7 @@ function log() {
 
 InboxSDK.load(1, 'nav-menu').then(function(sdk) {
   var appendStylesheet = function(url) {
-    const css = '.inboxsdk__button_icon.bentoboxIndicator { background: transparent url(https://dev.mailfoogae.appspot.com:8888/buildTemp/dev/clientjs/pipelineIndicator.ebfc97a74f09365a433e8537ff414815.png) no-repeat; height: 18px; width: 18px; }';
+    const css = '.inboxsdk__button_icon.bentoBoxIndicator { background: transparent url(https://dev.mailfoogae.appspot.com:8888/buildTemp/dev/clientjs/pipelineIndicator.ebfc97a74f09365a433e8537ff414815.png) no-repeat; height: 18px; width: 18px; }';
     const head = document.head || document.getElementsByTagName('head')[0];
     const style = document.createElement('style');
 
@@ -177,7 +177,7 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
         },
         type: 'CREATE',
       },
-      iconClass: 'bentoboxIndicator',
+      iconClass: 'bentoBoxIndicator',
       name: 'P - Create w/ iconClass',
     });
   }
@@ -233,7 +233,7 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
     });
   
     const parentIconClass = sdk.NavMenu.addNavItem({
-      iconClass: 'bentoboxIndicator',
+      iconClass: 'bentoBoxIndicator',
       routeID: 'this-is-a-parent-custom-route',
       name: 'P - iconClass',
     });
@@ -255,9 +255,9 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
   // initNavItemAdd();
   // initNavItemSubtitle();
   // initNavItemCollapse();
-  initNavItemChildren();
+  // initNavItemChildren();
   // initNavItemAccessoryAndIcon();
   // initNavItemAccessories();
-  // initNavItemIcons();
+  initNavItemIcons();
   // initNavItemRoute();
 });
