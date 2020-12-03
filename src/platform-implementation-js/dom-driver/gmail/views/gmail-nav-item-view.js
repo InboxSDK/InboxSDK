@@ -317,6 +317,7 @@ export default class GmailNavItemView {
           buttonOptions.buttonView.getElement(),
           accessoryEl
         );
+        this._iconSettings.iconElement = null;
       }
 
       return;
@@ -523,6 +524,7 @@ export default class GmailNavItemView {
           buttonOptions.buttonView.getElement(),
           accessoryEl
         );
+        this._iconSettings.iconElement = null;
       }
 
       return;
