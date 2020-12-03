@@ -47,9 +47,23 @@ function _waitForNavItemsHolder(): Promise<any> {
 }
 
 function _attachNavItemView(gmailNavItemView) {
-  return function() {
-    insertElementInOrder(_getNavItemsHolder(), gmailNavItemView.getElement());
-  };
+  if (GmailElementGetter.isNewLeftNav()) {
+    return function() {
+      const navMenuInjectionContainer = GmailElementGetter.getNavItemMenuInjectionContainer();
+      if (!navMenuInjectionContainer) {
+        throw new Error('should not happen');
+      }
+
+      querySelector(navMenuInjectionContainer, '.Xa.wT').insertAdjacentElement(
+        'afterend',
+        gmailNavItemView.getElement()
+      );
+    };
+  } else {
+    return function() {
+      insertElementInOrder(_getNavItemsHolder(), gmailNavItemView.getElement());
+    };
+  }
 }
 
 function _getNavItemsHolder(): HTMLElement {

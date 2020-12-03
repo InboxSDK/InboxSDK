@@ -95,7 +95,7 @@ export default class NativeGmailNavItemView {
   }
 
   addNavItem(orderGroup: number, navItemDescriptor: Object): GmailNavItemView {
-    const gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, 1);
+    const gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, 2);
 
     Kefir.merge([
       gmailNavItemView

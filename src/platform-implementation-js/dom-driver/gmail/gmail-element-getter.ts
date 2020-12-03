@@ -10,37 +10,53 @@ import getMainContentElementChangedStream from './gmail-element-getter/get-main-
 
 // TODO Figure out if these functions can and should be able to return null
 const GmailElementGetter = {
-  waitForGmailModeToSettle(): Promise<void> {
-    return waitForGmailModeToSettle().toPromise();
-  },
-
-  getMainContentElementChangedStream: once(function(
-    this: any
-  ): Kefir.Observable<HTMLElement, never> {
-    return getMainContentElementChangedStream(this);
-  }),
-
-  isStandalone(): boolean {
-    return this.isStandaloneComposeWindow() || this.isStandaloneThreadWindow();
-  },
-
-  isStandaloneComposeWindow(): boolean {
-    return (
-      document.body.classList.contains('xE') &&
-      document.body.classList.contains('xp')
+  getActiveMoreMenu(): HTMLElement | null {
+    const elements = document.querySelectorAll<HTMLElement>(
+      '.J-M.aX0.aYO.jQjAxd'
     );
+
+    for (let ii = 0; ii < elements.length; ii++) {
+      if (elements[ii].style.display !== 'none') {
+        return elements[ii];
+      }
+    }
+
+    return null;
   },
 
-  isStandaloneThreadWindow(): boolean {
-    return (
-      document.body.classList.contains('aAU') &&
-      document.body.classList.contains('xE') &&
-      document.body.classList.contains('Su')
-    );
+  getAddonSidebarContainerElement(): HTMLElement | null {
+    // only for Gmailv1 + Gmailv2-before-2018-07-30?
+    return document.querySelector('.no > .nn.bnl');
+  },
+
+  getCompanionSidebarContentContainerElement(): HTMLElement | null {
+    return document.querySelector('.brC-brG');
+  },
+
+  // <div class="brC-aT5-aOt-Jw" role="navigation" aria-label="Side panel">
+  getCompanionSidebarIconContainerElement(): HTMLElement | null {
+    return document.querySelector('.brC-aT5-aOt-Jw');
+  },
+
+  getComposeButton(): HTMLElement | null {
+    return document.querySelector('[gh=cm]');
   },
 
   getComposeWindowContainer(): HTMLElement | null {
     return document.querySelector('.dw .nH > .nH > .no');
+  },
+
+  getContentSectionElement(): HTMLElement | undefined {
+    const leftNavContainer = GmailElementGetter.getLeftNavContainerElement();
+    if (leftNavContainer) {
+      return leftNavContainer.nextElementSibling!.children[0] as HTMLElement;
+    } else {
+      return undefined;
+    }
+  },
+
+  getFullscreenComposeWindowContainer(): HTMLElement | null {
+    return document.querySelector('.aSs .aSt');
   },
 
   getFullscreenComposeWindowContainerStream(): Kefir.Observable<
@@ -62,17 +78,16 @@ const GmailElementGetter = {
     );
   },
 
-  getFullscreenComposeWindowContainer(): HTMLElement | null {
-    return document.querySelector('.aSs .aSt');
+  getGtalkButtons(): HTMLElement | null {
+    return document.querySelector('.aeN .aj5.J-KU-Jg');
   },
 
-  getContentSectionElement(): HTMLElement | undefined {
-    const leftNavContainer = GmailElementGetter.getLeftNavContainerElement();
-    if (leftNavContainer) {
-      return leftNavContainer.nextElementSibling!.children[0] as HTMLElement;
-    } else {
-      return undefined;
-    }
+  getLeftNavContainerElement(): HTMLElement | null {
+    return document.querySelector('.aeN');
+  },
+
+  getMainContentBodyContainerElement(): HTMLElement | null {
+    return document.querySelector('.no > .nn.bkK');
   },
 
   getMainContentContainer(): HTMLElement | null {
@@ -82,20 +97,28 @@ const GmailElementGetter = {
     return document.querySelector('div.aeF > div.nH');
   },
 
-  getScrollContainer(): HTMLElement | null {
-    return document.querySelector('div.Tm.aeJ');
-  },
+  getMainContentElementChangedStream: once(function(
+    this: any
+  ): Kefir.Observable<HTMLElement, never> {
+    return getMainContentElementChangedStream(this);
+  }),
 
   getMoleParent(): HTMLElement | null {
     return document.body.querySelector('.dw .nH > .nH > .no');
   },
 
-  isPreviewPane(): boolean {
-    return !!document.querySelector('.aia');
+  getNavItemMenuInjectionContainer(): HTMLElement | null {
+    return this.isNewLeftNav()
+      ? document.querySelector('.aeN')
+      : document.querySelector('.aeN .n3');
   },
 
   getRowListElements(): HTMLElement[] {
     return Array.from(document.querySelectorAll('[gh=tl]'));
+  },
+
+  getScrollContainer(): HTMLElement | null {
+    return document.querySelector('div.Tm.aeJ');
   },
 
   getSearchInput(): HTMLInputElement | null {
@@ -108,12 +131,8 @@ const GmailElementGetter = {
     return document.querySelector('table.gstl_50 > tbody > tr > td.gssb_e');
   },
 
-  getToolbarElement(): HTMLElement {
-    return querySelector(document, '[gh=tm]');
-  },
-
-  getThreadContainerElement(): HTMLElement | null {
-    return document.querySelector('[role=main] .g.id table.Bs > tr');
+  getSidebarContainerElement(): HTMLElement | null {
+    return document.querySelector('[role=main] table.Bs > tr .y3');
   },
 
   getThreadBackButton(): HTMLElement | null {
@@ -127,56 +146,12 @@ const GmailElementGetter = {
     return toolbarElement.querySelector('.lS');
   },
 
-  getSidebarContainerElement(): HTMLElement | null {
-    return document.querySelector('[role=main] table.Bs > tr .y3');
+  getThreadContainerElement(): HTMLElement | null {
+    return document.querySelector('[role=main] .g.id table.Bs > tr');
   },
 
-  getComposeButton(): HTMLElement | null {
-    return document.querySelector('[gh=cm]');
-  },
-
-  getLeftNavContainerElement(): HTMLElement | null {
-    return document.querySelector('.aeN');
-  },
-
-  getAddonSidebarContainerElement(): HTMLElement | null {
-    // only for Gmailv1 + Gmailv2-before-2018-07-30?
-    return document.querySelector('.no > .nn.bnl');
-  },
-
-  getCompanionSidebarContentContainerElement(): HTMLElement | null {
-    return document.querySelector('.brC-brG');
-  },
-
-  // <div class="brC-aT5-aOt-Jw" role="navigation" aria-label="Side panel">
-  getCompanionSidebarIconContainerElement(): HTMLElement | null {
-    return document.querySelector('.brC-aT5-aOt-Jw');
-  },
-
-  getMainContentBodyContainerElement(): HTMLElement | null {
-    return document.querySelector('.no > .nn.bkK');
-  },
-
-  getGtalkButtons(): HTMLElement | null {
-    return document.querySelector('.aeN .aj5.J-KU-Jg');
-  },
-
-  getNavItemMenuInjectionContainer(): HTMLElement | null {
-    return document.querySelector('.aeN .n3');
-  },
-
-  getActiveMoreMenu(): HTMLElement | null {
-    const elements = document.querySelectorAll<HTMLElement>(
-      '.J-M.aX0.aYO.jQjAxd'
-    );
-
-    for (let ii = 0; ii < elements.length; ii++) {
-      if (elements[ii].style.display !== 'none') {
-        return elements[ii];
-      }
-    }
-
-    return null;
+  getToolbarElement(): HTMLElement {
+    return querySelector(document, '[gh=tm]');
   },
 
   getTopAccountContainer(): HTMLElement | null {
@@ -198,10 +173,41 @@ const GmailElementGetter = {
     );
   },
 
+  isNewLeftNav(): boolean {
+    return Boolean(document.querySelector('.WR[role="navigation"]'));
+  },
+
+  isPreviewPane(): boolean {
+    return !!document.querySelector('.aia');
+  },
+
+  isStandalone(): boolean {
+    return this.isStandaloneComposeWindow() || this.isStandaloneThreadWindow();
+  },
+
+  isStandaloneComposeWindow(): boolean {
+    return (
+      document.body.classList.contains('xE') &&
+      document.body.classList.contains('xp')
+    );
+  },
+
+  isStandaloneThreadWindow(): boolean {
+    return (
+      document.body.classList.contains('aAU') &&
+      document.body.classList.contains('xE') &&
+      document.body.classList.contains('Su')
+    );
+  },
+
   StandaloneCompose: {
     getComposeWindowContainer(): HTMLElement | null {
       return document.querySelector('[role=main]');
     }
+  },
+
+  waitForGmailModeToSettle(): Promise<void> {
+    return waitForGmailModeToSettle().toPromise();
   }
 };
 
