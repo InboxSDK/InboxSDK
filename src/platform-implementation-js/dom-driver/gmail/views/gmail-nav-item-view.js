@@ -65,7 +65,7 @@ export default class GmailNavItemView {
 
     // delete after new left nav is fully launched, use this._level === 1 instead
     this._isNewLeftNavParent =
-      GmailElementGetter.isNewLeftNav() && this._level === 1;
+      GmailElementGetter.hasGoogleMeet() && this._level === 1;
 
     if (this._isNewLeftNavParent) {
       this._setupParentElement();
@@ -218,7 +218,7 @@ export default class GmailNavItemView {
 
     const element = gmailNavItemView.getElement();
 
-    if (GmailElementGetter.isNewLeftNav()) {
+    if (GmailElementGetter.hasGoogleMeet()) {
       querySelector(element, '.TN').style.marginLeft =
         6 * indentationFactor + 'px';
     } else {

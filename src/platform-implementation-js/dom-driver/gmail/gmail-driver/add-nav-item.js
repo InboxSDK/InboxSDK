@@ -47,7 +47,7 @@ function _waitForNavItemsHolder(): Promise<any> {
 }
 
 function _attachNavItemView(gmailNavItemView) {
-  if (GmailElementGetter.isNewLeftNav()) {
+  if (GmailElementGetter.hasGoogleMeet()) {
     return function() {
       const navMenuInjectionContainer = GmailElementGetter.getNavItemMenuInjectionContainer();
       if (!navMenuInjectionContainer) {
