@@ -6,6 +6,8 @@ import type { ElementWithLifetime } from '../../lib/dom/make-element-child-strea
 declare var GmailElementGetter: {
   getActiveMoreMenu(): ?HTMLElement,
   getAddonSidebarContainerElement(): ?HTMLElement,
+  getGoolgeMeetContainerLeft(): ?HTMLElement,
+  getGoolgeMeetContainerRight(): ?HTMLElement,
   getCompanionSidebarContentContainerElement(): ?HTMLElement,
   getCompanionSidebarIconContainerElement(): ?HTMLElement,
   getComposeButton(): ?HTMLElement,
@@ -29,8 +31,8 @@ declare var GmailElementGetter: {
   getThreadContainerElement(): ?HTMLElement,
   getToolbarElement(): HTMLElement,
   getTopAccountContainer(): ?HTMLElement,
+  hasGoogleMeet(): boolean,
   isGplusEnabled(): boolean,
-  isNewLeftNav(): boolean,
   isPreviewPane(): boolean,
   isStandalone(): boolean,
   isStandaloneComposeWindow(): boolean,

@@ -29,6 +29,14 @@ const GmailElementGetter = {
     return document.querySelector('.no > .nn.bnl');
   },
 
+  getGoolgeMeetContainerLeft(): HTMLElement | null {
+    return document.querySelector('.aic+.Xa.wT');
+  },
+
+  getGoolgeMeetContainerRight(): HTMLElement | null {
+    return document.querySelector('.WR.WS > .Xa.wT');
+  },
+
   getCompanionSidebarContentContainerElement(): HTMLElement | null {
     return document.querySelector('.brC-brG');
   },
@@ -108,9 +116,13 @@ const GmailElementGetter = {
   },
 
   getNavItemMenuInjectionContainer(): HTMLElement | null {
-    return this.isNewLeftNav()
-      ? document.querySelector('.aeN')
-      : document.querySelector('.aeN .n3');
+    if (this.hasGoogleMeet()) {
+      return this.getGoolgeMeetContainerLeft()
+        ? document.querySelector('.aeN')
+        : document.querySelector('.akc');
+    }
+
+    return document.querySelector('.aeN .n3');
   },
 
   getRowListElements(): HTMLElement[] {
@@ -160,6 +172,12 @@ const GmailElementGetter = {
     );
   },
 
+  hasGoogleMeet(): boolean {
+    return Boolean(
+      this.getGoolgeMeetContainerLeft() || this.getGoolgeMeetContainerRight()
+    );
+  },
+
   isGplusEnabled(): boolean {
     const topAccountContainer = GmailElementGetter.getTopAccountContainer();
     if (!topAccountContainer) {
@@ -171,10 +189,6 @@ const GmailElementGetter = {
         'a[href*="https://plus"][href*="upgrade"]'
       ).length === 0
     );
-  },
-
-  isNewLeftNav(): boolean {
-    return Boolean(document.querySelector('.WR[role="navigation"]'));
   },
 
   isPreviewPane(): boolean {
