@@ -119,7 +119,7 @@ Error stacks and details may be clipped to fit in BigQuery. The field will end
 with the text `<clipped>` if this is the case. For errors that are clipped, the
 full unclipped value can be found in Google Cloud Storage at
 `https://storage.cloud.google.com/streak_error_logs/requestId/REQUEST_ID_HERE.json`
-where REQUEST_ID_HERE is replaced with the row's `requestId` value.
+where REQUEST_ID_HERE is replaced with the row's `requestId` value. Note that currently we're only storing these full logs for 14 days.
 
 # Build Options
 
