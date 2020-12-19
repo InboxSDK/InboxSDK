@@ -1618,7 +1618,7 @@ class GmailComposeView {
       `.GS tr textarea.vO[name="${addressType}"], .GS tr input[name="${addressType}"]`
     );
     const row = closest(input, 'tr');
-    if (!row) throw new Error();
+    if (!row) throw new Error('Recipient row not found');
     return row;
   }
 
