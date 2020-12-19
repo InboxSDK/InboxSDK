@@ -16,6 +16,7 @@ export const ATTRIBUTE_WHITELIST: Set<string> = new Set([
   'aria-labelledby',
   'aria-busy',
   'aria-multiselectable',
+  'name',
   // inbox props
   'data-action-data',
   'data-item-id',
