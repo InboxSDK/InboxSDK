@@ -12,7 +12,11 @@ export default function getAddressInformationExtractor(
   composeView: GmailComposeView
 ): (node: HTMLElement) => ?Contact {
   return function(node: HTMLElement): ?Contact {
-    const contactNode = node.querySelector(`input[name='${addressType}']`);
+    const contactNode =
+      node instanceof HTMLInputElement &&
+      node.getAttribute('name') === addressType
+        ? node
+        : node.querySelector(`input[name='${addressType}']`);
 
     var emailAddress = null;
     var name = null;
