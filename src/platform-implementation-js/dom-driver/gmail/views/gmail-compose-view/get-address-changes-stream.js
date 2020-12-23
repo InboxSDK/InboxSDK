@@ -59,7 +59,11 @@ function _makeSubAddressStream(
         .transduce(
           t.compose(
             t.mapcat(e => Array.from(e.addedNodes)),
-            t.filter(_isRecipientNode),
+            t.filter(
+              n =>
+                _doesRecipientNodeHaveInput(n, addressType) ||
+                _isRecipientNodeInput(n, addressType)
+            ),
             t.map(
               getAddressInformationExtractor(addressType, gmailComposeView)
             ),
@@ -84,6 +88,19 @@ function _makeSubAddressStream(
 function _isRecipientNode(node) {
   // We want to filter non-element nodes out too.
   return node.classList && node.classList.contains('vR');
+}
+
+function _doesRecipientNodeHaveInput(node, addressType) {
+  return (
+    _isRecipientNode(node) && node.querySelector(`input[name='${addressType}']`)
+  );
+}
+
+function _isRecipientNodeInput(node, addressType) {
+  return (
+    node instanceof HTMLInputElement &&
+    node.getAttribute('name') === addressType
+  );
 }
 
 function _groupChangeEvents(event) {
