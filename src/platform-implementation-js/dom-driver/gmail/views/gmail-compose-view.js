@@ -1689,8 +1689,7 @@ class GmailComposeView {
     const elementsToModify = [
       querySelector(this._element, '.nH.Hy.aXJ .pi > .l.o'),
       querySelector(this._element, '.nH.Hy.aXJ .l.m'),
-      querySelector(this._element, '.nH.Hy.aXJ .l.m > .l.n'),
-      querySelector(this._element, '.nH.Hy.aXJ .l.m > .l.n > .k')
+      querySelector(this._element, '.nH.Hy.aXJ .l.m > .l.n')
     ];
 
     buttonParent.classList.add('inboxsdk__compose_customTitleBarColor');
