@@ -1,0 +1,6 @@
+/* @flow */
+
+/*
+ returns "/u/NUMBER" or "/u/NUMBER/d/DELEGATE_ID" for delegated accounts
+*/
+declare export default function getAccountUrlPart(): string;
