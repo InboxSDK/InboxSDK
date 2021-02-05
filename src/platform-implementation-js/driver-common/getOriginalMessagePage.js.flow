@@ -1,0 +1,16 @@
+/* @flow */
+
+import type { Driver } from '../driver-interfaces/driver';
+
+type Options =
+  | {
+      oldGmailMessageID: string
+    }
+  | {
+      syncMessageID: string
+    };
+
+declare export default function getOriginalMessagePage(
+  driver: Driver,
+  options: Options
+): Promise<string>;

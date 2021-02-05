@@ -1,16 +1,13 @@
-/* @flow */
-
-import { defn } from 'ud';
 import gmailAjax from '../../../driver-common/gmailAjax';
 
 import getOriginalMessagePage from '../../../driver-common/getOriginalMessagePage';
 
-import type GmailDriver from '../gmail-driver';
+import GmailDriver from '../gmail-driver';
 import htmlToText from '../../../../common/html-to-text';
 import querystring from 'querystring';
 import * as GmailResponseProcessor from '../gmail-response-processor';
 
-async function getRfcMessageIdForGmailThreadId(
+export default async function getRfcMessageIdForGmailThreadId(
   driver: GmailDriver,
   gmailThreadId: string
 ): Promise<string> {
@@ -28,7 +25,7 @@ async function getRfcMessageIdForGmailThreadId(
   const gmailMessageIdResponse = await gmailAjax({
     method: 'POST',
     url:
-      (document.location: any).origin +
+      document.location.origin +
       document.location.pathname +
       '?' +
       querystring.stringify(messageIdQuery),
@@ -63,5 +60,3 @@ async function getRfcMessageIdForGmailThreadId(
   }
   return htmlToText(match[1]);
 }
-
-export default defn(module, getRfcMessageIdForGmailThreadId);

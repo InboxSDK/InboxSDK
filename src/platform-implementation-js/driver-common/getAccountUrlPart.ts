@@ -1,5 +1,3 @@
-/* @flow */
-
 /*
  returns "/u/NUMBER" or "/u/NUMBER/d/DELEGATE_ID" for delegated accounts
 */

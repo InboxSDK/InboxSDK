@@ -1,31 +1,30 @@
-/* @flow */
-
 import { defn } from 'ud';
 import gmailAjax from './gmailAjax';
-import getAccountUrlPart from './getAccountUrlPart';
-import type { Driver } from '../driver-interfaces/driver';
+import { Driver } from '../driver-interfaces/driver';
 
 type Options =
   | {
-      oldGmailMessageID: string
+      oldGmailMessageID: string;
+      syncMessageID?: void;
     }
   | {
-      syncMessageID: string
+      syncMessageID: string;
+      oldGmailMessageID?: void;
     };
 
 async function getOriginalMessagePage(
   driver: Driver,
   options: Options
 ): Promise<string> {
-  const data = {
+  const data: any = {
     ik: driver.getPageCommunicator().getIkValue(),
     view: 'om'
   };
 
   if (options.oldGmailMessageID) {
-    (data: Object).th = options.oldGmailMessageID;
+    data.th = options.oldGmailMessageID;
   } else if (options.syncMessageID) {
-    (data: Object).permmsgid = options.syncMessageID;
+    data.permmsgid = options.syncMessageID;
   }
 
   let url;
