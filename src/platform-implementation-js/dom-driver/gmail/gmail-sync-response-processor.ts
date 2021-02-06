@@ -16,6 +16,7 @@ export interface SyncThread {
     snippet: string;
     syncMessageData: Array<{
       syncMessageID: string;
+      oldMessageID?: string;
       date: number;
       recipients?: Recipient[];
     }>;
@@ -65,6 +66,7 @@ export function extractThreadsFromSearchResponse(
             '',
           syncMessageData: descriptor[5].map((md: any) => ({
             syncMessageID: md[1],
+            oldMessageID: md[56],
             date: +md[7]
           }))
         }

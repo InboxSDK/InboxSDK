@@ -22,7 +22,11 @@ describe('extractThreadsFromSearchResponse', () => {
         snippet:
           'www.streak.com ) ( https://www.streak.com/careers ) @Mentions, \nConversations, and Editing for Comments Happy New Year',
         syncMessageData: [
-          { date: 1516729798134, syncMessageID: 'msg-f:1590406465099407434' }
+          {
+            date: 1516729798134,
+            syncMessageID: 'msg-f:1590406465099407434',
+            oldMessageID: '1777401cdeadbeef'
+          }
         ]
       },
       rawResponse: {
@@ -44,7 +48,8 @@ describe('extractThreadsFromSearchResponse', () => {
               '31': '1516729798411',
               '34': 2,
               '44': 0,
-              '48': '1590406465099407434'
+              '48': '1590406465099407434',
+              '56': '1777401cdeadbeef'
             }
           ],
           '8': '1516731537162',
