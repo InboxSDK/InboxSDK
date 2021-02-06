@@ -26,6 +26,7 @@ type GmailBackdrop = any;
 
 export default class GmailDriver implements Driver {
   public onready: Promise<void>;
+  public isUsingSyncAPI(): boolean;
   public getLogger(): Logger;
   public getAppId(): string;
   public getOpts(): PiOpts;
