@@ -55,7 +55,7 @@ export type Driver = {
   openNewComposeViewDriver(): Promise<ComposeViewDriver>,
   getNextComposeViewDriver(): Promise<ComposeViewDriver>,
   getComposeViewDriverStream(): Kefir.Observable<ComposeViewDriver>,
-  openDraftByMessageID(messageID: string): void,
+  openDraftByMessageID(messageID: string): Promise<void>,
   getThreadViewDriverStream(): Kefir.Observable<ThreadViewDriver>,
   getMessageViewDriverStream(): Kefir.Observable<MessageViewDriver>,
   getAttachmentCardViewDriverStream(): Kefir.Observable<AttachmentCardViewDriver>,

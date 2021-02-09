@@ -55,19 +55,19 @@ class Compose {
     return members.membrane.get(composeViewDriver);
   }
 
-  openDraftByMessageID(messageID: string): Promise<ComposeView> {
+  async openDraftByMessageID(messageID: string): Promise<ComposeView> {
     const members = get(memberMap, this);
-    const newComposePromise = members.composeViewStream
-      .merge(Kefir.later(3000, null))
+    const newComposePromise = members.composeViewStream.take(1).toPromise();
+    await members.driver.openDraftByMessageID(messageID);
+    return Kefir.fromPromise(newComposePromise)
+      .merge(
+        Kefir.later(15 * 1000, null).flatMap(() =>
+          Kefir.constantError(new Error('draft did not open in time'))
+        )
+      )
       .take(1)
-      .flatMap(function(view) {
-        return view
-          ? Kefir.constant(view)
-          : Kefir.constantError(new Error('draft did not open'));
-      })
+      .takeErrors(1)
       .toPromise();
-    members.driver.openDraftByMessageID(messageID);
-    return newComposePromise;
   }
 
   getComposeView(): Promise<ComposeView> {

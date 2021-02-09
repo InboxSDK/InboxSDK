@@ -1110,7 +1110,7 @@ class InboxDriver {
     });
   }
 
-  openDraftByMessageID(messageID: string): void {
+  openDraftByMessageID(messageID: string): Promise<void> {
     throw new Error('Not implemented');
   }
 

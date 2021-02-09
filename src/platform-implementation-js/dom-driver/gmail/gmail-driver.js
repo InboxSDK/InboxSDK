@@ -610,8 +610,8 @@ class GmailDriver {
       .toPromise();
   }
 
-  openDraftByMessageID(messageID: string) {
-    openDraftByMessageID(this, messageID);
+  openDraftByMessageID(messageID: string): Promise<void> {
+    return openDraftByMessageID(this, messageID);
   }
 
   createModalViewDriver(options: Object): GmailModalViewDriver {

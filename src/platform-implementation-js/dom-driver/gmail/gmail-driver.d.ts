@@ -35,7 +35,7 @@ export default class GmailDriver implements Driver {
   public openNewComposeViewDriver(): Promise<GmailComposeView>;
   public getNextComposeViewDriver(): Promise<GmailComposeView>;
   public getComposeViewDriverStream(): Kefir.Observable<GmailComposeView, any>;
-  public openDraftByMessageID(messageID: string): void;
+  public openDraftByMessageID(messageID: string): Promise<void>;
   public getThreadViewDriverStream(): Kefir.Observable<GmailThreadView, any>;
   public getMessageViewDriverStream(): Kefir.Observable<GmailMessageView, any>;
   public getAttachmentCardViewDriverStream(): Kefir.Observable<
