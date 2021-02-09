@@ -3,6 +3,7 @@ import qs from 'querystring';
 import getSyncThreadsForSearch from '../../../driver-common/getSyncThreadsForSearch';
 
 import GmailDriver from '../gmail-driver';
+import encodeDraftUrlId from './encodeDraftUrlId';
 import getRfcMessageIdForGmailMessageId from './get-rfc-message-id-for-gmail-message-id';
 
 export default async function openDraftByMessageID(
@@ -65,7 +66,7 @@ export function makeNewSyncHash(
   oldHash = '#' + oldHash.replace(/^#/, '');
   const [pre, query] = oldHash.split('?');
   const params = qs.parse(query);
-  params.compose = `#${syncThreadID}+#${syncMessageID}`;
+  params.compose = encodeDraftUrlId(syncThreadID, syncMessageID);
 
   return pre + '?' + qs.stringify(params);
 }

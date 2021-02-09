@@ -124,6 +124,7 @@
     "safari-fix-map": "^1.0.4",
     "seed-random": "^2.2.0",
     "sha.js": "^2.4.8",
+    "simple-base-converter": "^1.0.6",
     "simple-encryptor": "^3.0.0",
     "sinon": "^9.0.3",
     "sinon-test": "^2.4.0",
