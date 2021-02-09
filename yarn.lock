@@ -1311,6 +1311,13 @@
     "@types/yargs" "^15.0.0"
     chalk "^4.0.0"
 
+"@macil/simple-base-converter@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@macil/simple-base-converter/-/simple-base-converter-1.0.0.tgz#9e6870ef0629b357535547051c5c1928442f6f57"
+  integrity sha512-pKURld2P7R37OxzQ3WWxo9Xt5u2uezcaAa4t4zG9QWLDAfUzlMPK9fhFGBx+6Gypn6R8eSa3GS6ux2kfbYdR5A==
+  dependencies:
+    decimal.js "^10.2.1"
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
@@ -9101,13 +9108,6 @@ signal-exit@^3.0.0, signal-exit@^3.0.2:
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.3.tgz#a1410c2edd8f077b08b4e253c8eacfcaf057461c"
   integrity sha512-VUJ49FC8U1OxwZLxIbTTrDvLnf/6TDgxZcK8wxR8zs13xpx7xbG60ndBlhNrFi2EMuFRoeDoJO7wthSLq42EjA==
-
-simple-base-converter@^1.0.6:
-  version "1.0.6"
-  resolved "https://registry.yarnpkg.com/simple-base-converter/-/simple-base-converter-1.0.6.tgz#e2cdf26e8a870dc2c50c56a8838c8ff2ed8988f1"
-  integrity sha512-EtB8Z0K4sBGoK2BDkR5f8t7I+tYbk3SDEaq6bxKxRgZFYFoSJTWR9EzDqPOtoKZFm7T6VU/peJxR0hsip7NoVA==
-  dependencies:
-    decimal.js "^10.2.1"
 
 simple-concat@^1.0.0:
   version "1.0.1"

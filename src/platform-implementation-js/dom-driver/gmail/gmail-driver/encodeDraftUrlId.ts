@@ -1,4 +1,4 @@
-import { convertBase } from 'simple-base-converter';
+import { convertBase } from '@macil/simple-base-converter';
 
 const B64_ALPHABET =
   'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
