@@ -69,6 +69,13 @@ module.exports = {
         '@typescript-eslint/array-type': ['off'],
         '@typescript-eslint/camelcase': ['error', { properties: 'never' }],
 
+        '@typescript-eslint/no-unused-vars': [
+          'warn',
+          {
+            argsIgnorePattern: '^_'
+          }
+        ],
+
         // TODO maybe remove these
         '@typescript-eslint/no-inferrable-types': ['off'],
         '@typescript-eslint/no-this-alias': ['off']

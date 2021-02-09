@@ -1,44 +1,44 @@
-/* @flow */
-
 import BigNumber from 'bignumber.js';
+import isNotNil from '../../lib/isNotNil';
 
-type Recipient = {
-  emailAddress: string,
-  name: ?string
-};
+interface Recipient {
+  emailAddress: string;
+  name?: string;
+}
 
-export type SyncThread = {|
-  subject: string,
-  snippet: string,
-  syncThreadID: string,
-  oldGmailThreadID: string,
-  rawResponse: Object,
+export interface SyncThread {
+  subject: string;
+  snippet: string;
+  syncThreadID: string;
+  oldGmailThreadID: string;
+  rawResponse: any;
   extraMetaData: {
-    snippet: string,
+    snippet: string;
     syncMessageData: Array<{
-      syncMessageID: string,
-      date: number,
-      recipients?: Recipient[]
-    }>
-  }
-|};
+      syncMessageID: string;
+      oldMessageID?: string;
+      date: number;
+      recipients?: Recipient[];
+    }>;
+  };
+}
 
-export type MinimalSyncThread = {|
-  syncThreadID: string,
+export interface MinimalSyncThread {
+  syncThreadID: string;
   extraMetaData: {
     syncMessageData: Array<{
-      syncMessageID: string,
-      date: number,
-      recipients?: Recipient[]
-    }>
-  }
-|};
+      syncMessageID: string;
+      date: number;
+      recipients?: Recipient[];
+    }>;
+  };
+}
 
 export function extractThreadsFromSearchResponse(
   response: string
 ): SyncThread[] {
   const parsedResponse = JSON.parse(response);
-  const threadDescriptors = parsedResponse && parsedResponse[3];
+  const threadDescriptors: any[] | null = parsedResponse && parsedResponse[3];
 
   if (!threadDescriptors) return [];
 
@@ -64,14 +64,15 @@ export function extractThreadsFromSearchResponse(
               parsedResponse[15][1] &&
               parsedResponse[15][1][index]) ||
             '',
-          syncMessageData: descriptor[5].map(md => ({
+          syncMessageData: descriptor[5].map((md: any) => ({
             syncMessageID: md[1],
+            oldMessageID: md[56],
             date: +md[7]
           }))
         }
       };
     })
-    .filter(Boolean);
+    .filter(isNotNil);
 }
 
 export function extractThreadsFromThreadResponse(
@@ -79,7 +80,7 @@ export function extractThreadsFromThreadResponse(
 ): Array<SyncThread | MinimalSyncThread> {
   const parsedResponse = JSON.parse(response);
 
-  const threadDescriptors = parsedResponse && parsedResponse[2];
+  const threadDescriptors: any[] | null = parsedResponse && parsedResponse[2];
 
   if (!threadDescriptors) throw new Error('Failed to process thread response');
 
@@ -116,7 +117,7 @@ export function extractThreadsFromThreadResponse(
                 recipients: getRecipientsFromMessageDescriptor(md)
               }))
           }
-        };
+        } as MinimalSyncThread;
       } else {
         const threadDescriptor =
           descriptorWrapper[2] && descriptorWrapper[2][1];
@@ -137,7 +138,7 @@ export function extractThreadsFromThreadResponse(
           const messageDescriptors =
             descriptorWrapper[2] && descriptorWrapper[2][2];
 
-          syncMessageData = messageDescriptors.map(md => ({
+          syncMessageData = messageDescriptors.map((md: any) => ({
             syncMessageId: md[1],
             date: +md[16]
           }));
@@ -153,14 +154,14 @@ export function extractThreadsFromThreadResponse(
             syncMessageData,
             snippet: ''
           }
-        };
+        } as SyncThread;
       }
     })
-    .filter(Boolean);
+    .filter(isNotNil);
 }
 
 function getRecipientsFromMessageDescriptor(
-  messageDescriptor: Array<Object>
+  messageDescriptor: Array<any>
 ): Recipient[] | void {
   if (!messageDescriptor[2]) return;
 
@@ -171,7 +172,7 @@ function getRecipientsFromMessageDescriptor(
   return to
     .concat(cc)
     .concat(bcc)
-    .map(recipientDescriptor => ({
+    .map((recipientDescriptor: any) => ({
       emailAddress: recipientDescriptor[2],
       name: recipientDescriptor[3]
     }));
@@ -180,7 +181,7 @@ function getRecipientsFromMessageDescriptor(
 export function replaceThreadsInSearchResponse(
   response: string,
   replacementThreads: SyncThread[],
-  { start, total }: { start: number, total?: number | 'MANY' }
+  _unused: { start: number; total?: number | 'MANY' } // TODO why is this unused?
 ): string {
   const parsedResponse = JSON.parse(response);
 

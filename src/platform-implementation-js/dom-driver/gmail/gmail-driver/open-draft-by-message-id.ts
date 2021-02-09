@@ -1,11 +1,10 @@
-/* @flow */
-
 import qs from 'querystring';
 
-import getRfcMessageIDForSyncMessageID from '../../../driver-common/getRfcMessageIdForSyncMessageId';
 import getSyncThreadsForSearch from '../../../driver-common/getSyncThreadsForSearch';
 
-import type GmailDriver from '../gmail-driver';
+import GmailDriver from '../gmail-driver';
+import encodeDraftUrlId from './encodeDraftUrlId';
+import getRfcMessageIdForGmailMessageId from './get-rfc-message-id-for-gmail-message-id';
 
 export default async function openDraftByMessageID(
   driver: GmailDriver,
@@ -13,7 +12,8 @@ export default async function openDraftByMessageID(
 ) {
   let newHash;
   if (driver.isUsingSyncAPI()) {
-    const rfcMessageID = await driver.getRfcMessageIdForGmailThreadId(
+    const rfcMessageID = await getRfcMessageIdForGmailMessageId(
+      driver,
       messageID
     );
     const { threads } = await getSyncThreadsForSearch(
@@ -21,12 +21,24 @@ export default async function openDraftByMessageID(
       'rfc822msgid:' + rfcMessageID
     );
 
-    if (threads.length === 0) return;
+    if (threads.length === 0) {
+      throw new Error('Failed to get sync message id');
+    }
+
+    const thread = threads[0];
+    const syncMessageData = thread.extraMetaData.syncMessageData.find(
+      m => m.oldMessageID === messageID
+    );
+    if (!syncMessageData) {
+      throw new Error('Failed to find syncMessageData');
+    }
+
+    const { syncMessageID } = syncMessageData;
 
     newHash = makeNewSyncHash(
       window.location.hash,
-      threads[0].syncThreadID,
-      threads[0].extraMetaData.syncMessageData[0].syncMessageID
+      thread.syncThreadID,
+      syncMessageID
     );
   } else {
     newHash = makeNewHash(window.location.hash, messageID);
@@ -54,7 +66,7 @@ export function makeNewSyncHash(
   oldHash = '#' + oldHash.replace(/^#/, '');
   const [pre, query] = oldHash.split('?');
   const params = qs.parse(query);
-  params.compose = `#${syncThreadID}+#${syncMessageID}`;
+  params.compose = encodeDraftUrlId(syncThreadID, syncMessageID);
 
   return pre + '?' + qs.stringify(params);
 }

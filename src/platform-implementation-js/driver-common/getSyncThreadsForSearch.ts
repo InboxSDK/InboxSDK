@@ -1,18 +1,15 @@
-/* @flow */
-
 import { defn } from 'ud';
-import { extractThreads } from '../dom-driver/gmail/gmail-response-processor';
 import { extractThreadsFromSearchResponse } from '../dom-driver/gmail/gmail-sync-response-processor';
 import gmailAjax from './gmailAjax';
 import getAccountUrlPart from './getAccountUrlPart';
-import type { Driver } from '../driver-interfaces/driver';
+import { Driver } from '../driver-interfaces/driver';
 
-import type { SyncThread } from '../dom-driver/gmail/gmail-sync-response-processor';
+import { SyncThread } from '../dom-driver/gmail/gmail-sync-response-processor';
 
 async function getSyncThreadsForSearch(
   driver: Driver,
   searchTerm: string
-): Promise<{ threads: SyncThread[], _text: string }> {
+): Promise<{ threads: SyncThread[]; _text: string }> {
   const { text } = await gmailAjax({
     method: 'POST',
     url: `https://mail.google.com/sync${getAccountUrlPart()}/i/bv`,

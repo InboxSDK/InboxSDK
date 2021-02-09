@@ -1,5 +1,3 @@
-/* @flow */
-
 import fs from 'fs';
 import * as GSRP from './gmail-sync-response-processor';
 
@@ -24,7 +22,11 @@ describe('extractThreadsFromSearchResponse', () => {
         snippet:
           'www.streak.com ) ( https://www.streak.com/careers ) @Mentions, \nConversations, and Editing for Comments Happy New Year',
         syncMessageData: [
-          { date: 1516729798134, syncMessageID: 'msg-f:1590406465099407434' }
+          {
+            date: 1516729798134,
+            syncMessageID: 'msg-f:1590406465099407434',
+            oldMessageID: '1777401cdeadbeef'
+          }
         ]
       },
       rawResponse: {
@@ -46,7 +48,8 @@ describe('extractThreadsFromSearchResponse', () => {
               '31': '1516729798411',
               '34': 2,
               '44': 0,
-              '48': '1590406465099407434'
+              '48': '1590406465099407434',
+              '56': '1777401cdeadbeef'
             }
           ],
           '8': '1516731537162',
@@ -123,7 +126,7 @@ describe('extractThreadsFromThreadResponse', function() {
 
     const threads = GSRP.extractThreadsFromThreadResponse(data);
     expect(threads.length).toBe(1);
-    expect((threads[0]: any).oldGmailThreadID).toBe('16207922dbd860d9');
+    expect((threads[0] as any).oldGmailThreadID).toBe('16207922dbd860d9');
     expect(threads[0].syncThreadID).toBe('thread-f:1594407458713395417');
     expect(threads[0].extraMetaData).toEqual({
       snippet: '',
@@ -151,7 +154,7 @@ describe('extractThreadsFromThreadResponse', function() {
     );
     const threads = GSRP.extractThreadsFromThreadResponse(data);
     expect(threads.length).toBe(1);
-    expect((threads[0]: any).oldGmailThreadID).toBe('1620d2f175a1a6c9');
+    expect((threads[0] as any).oldGmailThreadID).toBe('1620d2f175a1a6c9');
     expect(threads[0].syncThreadID).toBe('thread-f:1594506202591635145');
     expect(threads[0].extraMetaData).toMatchObject({
       snippet: '',
@@ -172,7 +175,7 @@ describe('extractThreadsFromThreadResponse', function() {
     );
     const threads = GSRP.extractThreadsFromThreadResponse(data);
     expect(threads.length).toBe(1);
-    expect((threads[0]: any).oldGmailThreadID).toBe('1636109e7816ac5d');
+    expect((threads[0] as any).oldGmailThreadID).toBe('1636109e7816ac5d');
     expect(threads[0].syncThreadID).toBe('thread-f:1600484990382419037');
     expect(threads[0].extraMetaData).toMatchObject({
       snippet:

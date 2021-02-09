@@ -1,0 +1,9 @@
+/* @flow */
+
+import type { Driver } from '../driver-interfaces/driver';
+import type { SyncThread } from '../dom-driver/gmail/gmail-sync-response-processor';
+
+declare export default function getSyncThreadsForSearch(
+  driver: Driver,
+  searchTerm: string
+): Promise<{ threads: SyncThread[], _text: string }>;
