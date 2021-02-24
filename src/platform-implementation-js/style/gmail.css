@@ -582,7 +582,7 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
   vertical-align: middle;
 }
 
-.xY.inboxsdk__thread_row_attachment_icons_present {
+.zA > .xY.inboxsdk__thread_row_attachment_icons_present {
   max-width: inherit;
 }
 
