@@ -1,12 +1,16 @@
 /* @flow */
 
-var Kefir = require('kefir');
+import Kefir from 'kefir';
+
+import fromEventTargetCapture from '../../../../lib/from-event-target-capture';
+
 import type GmailComposeView from '../gmail-compose-view';
 
 export default function(gmailComposeView: GmailComposeView) {
   Kefir.merge([
-    Kefir.fromEvents((document.body: any), 'mousedown'),
-    Kefir.fromEvents(gmailComposeView.getBodyElement(), 'keydown')
+    fromEventTargetCapture((document.body: any), 'mousedown'),
+    fromEventTargetCapture(gmailComposeView.getBodyElement(), 'keydown'),
+    gmailComposeView.getEventStream().filter(e => e.eventName === 'bodyChanged')
   ])
     .takeUntilBy(gmailComposeView.getStopper())
     .onValue(event => {
