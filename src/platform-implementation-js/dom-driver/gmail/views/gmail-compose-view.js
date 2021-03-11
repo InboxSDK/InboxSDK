@@ -1,5 +1,6 @@
 /* @flow */
 
+import autoHtml from 'auto-html';
 import t from 'transducers.js';
 import once from 'lodash/once';
 import escape from 'lodash/escape';
@@ -1740,7 +1741,7 @@ class GmailComposeView {
 
     const customTitleText = document.createElement('td');
     customTitleText.classList.add('inboxsdk__compose_customTitleBarText');
-    customTitleText.innerHTML = `
+    customTitleText.innerHTML = autoHtml`
       <div class="Hp">
         <h2 class="a3E">
           <div class="aYF">${text}</div>
