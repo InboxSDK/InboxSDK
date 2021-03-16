@@ -1,7 +1,7 @@
 /* @flow */
 
 import Kefir from 'kefir';
-
+import type GmailDriver from '../../gmail-driver';
 import GmailComposeButtonView from './gmail-compose-button-view';
 import BasicButtonViewController from '../../../../widgets/buttons/basic-button-view-controller';
 import DropdownButtonViewController from '../../../../widgets/buttons/dropdown-button-view-controller';
@@ -24,7 +24,8 @@ export default function addButton(
       .onValue((buttonDescriptor: ?Object) => {
         const buttonOptions = _processButtonDescriptor(
           buttonDescriptor,
-          extraOnClickOptions
+          extraOnClickOptions,
+          gmailComposeView.getGmailDriver()
         );
 
         if (!buttonViewController) {
@@ -161,7 +162,8 @@ function _getButtonViewController(buttonDescriptor: Object) {
 
 function _processButtonDescriptor(
   buttonDescriptor: ?Object,
-  extraOnClickOptions: Object
+  extraOnClickOptions: Object,
+  driver: GmailDriver
 ): ?Object {
   // clone the descriptor and set defaults.
   if (!buttonDescriptor) {
@@ -175,6 +177,7 @@ function _processButtonDescriptor(
 
   const oldOnClick = buttonOptions.onClick;
   buttonOptions.onClick = function(event) {
+    driver.getLogger().eventSdkActive('composeView.addedButton.click');
     oldOnClick({ ...extraOnClickOptions, ...event });
   };
 
