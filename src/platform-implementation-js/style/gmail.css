@@ -800,13 +800,16 @@ table + .inboxsdk__compose_statusbar {
   z-index: unset;
 }
 
-/* compose size fixing */
+/* compose size fixing.
+TODO Can we restrict this to only composes we've modified? */
 .inboxsdk__compose .qz {
   max-height: inherit !important;
 }
 
 /* aDi is initially position: fixed, which messes things up, so we make static */
-.inboxsdk__size_fixer .aDj.aDi {
+body:not(.inboxsdk_hack_disableComposeSizeFixer)
+  .inboxsdk__size_fixer
+  .aDj.aDi {
   position: static !important;
 }
 
