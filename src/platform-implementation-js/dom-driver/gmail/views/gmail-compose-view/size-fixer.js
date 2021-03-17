@@ -13,6 +13,9 @@ import type GmailComposeView from '../gmail-compose-view';
 const MATERIAL_UI_GMAIL_STATUS_HEIGHT = 60;
 const MATERIAL_UI_TOP_FORM_HEIGHT = 72;
 
+const SELECTOR_ESCAPE_HATCH_PREFIX =
+  'body:not(.inboxsdk_hack_disableComposeSizeFixer) ';
+
 var getSizeFixerSheet: () => CSSStyleSheet = once(() => {
   const style: HTMLStyleElement = (document.createElement('style'): any);
   style.type = 'text/css';
@@ -99,8 +102,9 @@ export default function sizeFixer(
   }
 
   function setRuleForSelector(selector: string, rule: string) {
-    var fullSelector = byId(composeId) + ' ' + selector;
-    var ix = findIndex(
+    const fullSelector =
+      SELECTOR_ESCAPE_HATCH_PREFIX + byId(composeId) + ' ' + selector;
+    const ix = findIndex(
       sheet.cssRules,
       cssRule => cssRule.selectorText === fullSelector
     );
@@ -155,11 +159,11 @@ export default function sizeFixer(
     // Go through the rules array backwards so that we remove them in backwards
     // order. If we went through in ascending order, we'd have to worry about
     // the list shrinking out from under us.
-    for (var ix = sheet.cssRules.length - 1; ix >= 0; ix--) {
+    for (let ix = sheet.cssRules.length - 1; ix >= 0; ix--) {
       if (
         startsWith(
           (sheet.cssRules: any)[ix].selectorText,
-          byId(composeId) + ' '
+          SELECTOR_ESCAPE_HATCH_PREFIX + byId(composeId) + ' '
         )
       ) {
         sheet.deleteRule(ix);
