@@ -152,7 +152,7 @@ export default class ButtonView implements ButtonViewI {
   private _setupMainElement(options: ButtonViewOptions) {
     this._element.setAttribute(
       'class',
-      'T-I J-J5-Ji ar7 L3 inboxsdk__button ' +
+      'T-I J-J5-Ji ar7 inboxsdk__button ' +
         BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS
     );
     if (options.tooltip) {
