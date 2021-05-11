@@ -1015,6 +1015,7 @@ isn't visible behind it. */
   -webkit-flex: 1;
   flex: 1;
   width: 0;
+  word-wrap: break-word;
 }
 
 /* end modal */
