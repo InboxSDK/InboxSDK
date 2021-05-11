@@ -1295,6 +1295,11 @@ body[dir='rtl'] .idm5_container_app_sidebar_no_icons.no[dir='ltr'] {
   margin-right: 0px !important;
 }
 
+/* quickfix, TODO investigate removing ar7 class from our buttons */
+.inboxsdk__button.ar7 {
+  pointer-events: all !important;
+}
+
 .container_app_sidebar_in_use .bkK.nn,
 .IDMAP_container_app_sidebar_no_icons .bkK.nn {
   width: auto !important;
