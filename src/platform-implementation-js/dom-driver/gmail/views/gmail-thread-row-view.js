@@ -178,7 +178,7 @@ class GmailThreadRowView {
     this._imageRefresher = null;
     this._counts = null;
 
-    this._elements[0].classList.add('inboxsdk__thread_row');
+    this._elements[0].setAttribute('data-inboxsdk-thread-row', 'true');
   }
 
   destroy() {
@@ -1226,7 +1226,9 @@ export function removeAllThreadRowUnclaimedModifications() {
   // run in a setTimeout so that the thread rows get destroyed
   // and populate the unclaimed modifications
   setTimeout(() => {
-    const modifiedRows = document.querySelectorAll('.inboxsdk__thread_row');
+    const modifiedRows = document.querySelectorAll(
+      'tr[data-inboxsdk-thread-row]'
+    );
     Array.prototype.forEach.call(modifiedRows, row => {
       const modifications = cachedModificationsByRow.get(row);
       if (modifications) {
