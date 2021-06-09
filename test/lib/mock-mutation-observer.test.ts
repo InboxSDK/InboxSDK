@@ -18,7 +18,7 @@ it('should work', () => {
       expect(mutations[0].removedNodes).toEqual([c3]);
       expect(mutations[1].addedNodes).toEqual([c3]);
       expect(mutations[1].removedNodes).toEqual([c1, c2]);
-      resolve();
+      resolve(undefined);
     });
 
     const el: any = new EventEmitter();
@@ -40,7 +40,7 @@ it('can disconnect', () => {
       expect(mutations.length).toBe(1);
       expect(mutations[0].addedNodes).toEqual([c1]);
       expect(mutations[0].removedNodes).toEqual([]);
-      resolve();
+      resolve(undefined);
     });
 
     const elBad: any = new EventEmitter();

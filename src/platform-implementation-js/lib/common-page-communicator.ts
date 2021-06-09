@@ -33,7 +33,14 @@ export default class CommonPageCommunicator {
     }
     // For standalone windows.
     if (window.opener) {
-      return window.opener.document.head.getAttribute('data-inboxsdk-ik-value');
+      const openerIk = window.opener.document.head.getAttribute(
+        'data-inboxsdk-ik-value'
+      );
+      if (openerIk) {
+        return openerIk;
+      } else {
+        throw new Error("Failed to look up parent window 'ik' value");
+      }
     }
     throw new Error("Failed to look up 'ik' value");
   }
