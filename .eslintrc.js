@@ -9,7 +9,8 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'plugin:react/recommended',
-    'plugin:no-dupe-class-fields/recommended'
+    'plugin:no-dupe-class-fields/recommended',
+    'plugin:@typescript-eslint/eslint-recommended'
   ],
   parserOptions: {
     ecmaFeatures: {
@@ -42,16 +43,14 @@ module.exports = {
         'no-unused-vars': ['off']
       }
     },
-
-    // Start typescript config
-    ...require('@typescript-eslint/eslint-plugin/dist/configs/eslint-recommended')
-      .default.overrides,
+    // Start typescript config. We commit some atrocities here because we want to use
+    // ESLint for Flow too, not just Typescript.
     {
       files: ['*.ts', '*.tsx'],
       ...(() => {
         const result = {
-          ...require('@typescript-eslint/eslint-plugin/dist/configs/base.json'),
-          ...require('@typescript-eslint/eslint-plugin/dist/configs/recommended.json')
+          ...require('@typescript-eslint/eslint-plugin/dist/configs/base'),
+          ...require('@typescript-eslint/eslint-plugin/dist/configs/recommended')
         };
         delete result.extends;
         return result;
@@ -60,14 +59,14 @@ module.exports = {
     {
       files: ['*.ts', '*.tsx'],
       rules: {
-        'no-undef': ['error'],
+        '@typescript-eslint/ban-types': ['off'],
+        '@typescript-eslint/explicit-module-boundary-types': ['off'],
         '@typescript-eslint/indent': ['off'],
         '@typescript-eslint/explicit-function-return-type': ['off'],
         '@typescript-eslint/no-explicit-any': ['off'],
         '@typescript-eslint/no-use-before-define': ['off'],
         '@typescript-eslint/no-non-null-assertion': ['off'],
         '@typescript-eslint/array-type': ['off'],
-        '@typescript-eslint/camelcase': ['error', { properties: 'never' }],
 
         '@typescript-eslint/no-unused-vars': [
           'warn',
@@ -109,7 +108,12 @@ module.exports = {
       }
     },
     {
-      files: ['jest.config.js', 'jest-puppeteer.config.js', 'tools/**'],
+      files: [
+        '.eslintrc.js',
+        'jest.config.js',
+        'jest-puppeteer.config.js',
+        'tools/**'
+      ],
       rules: {
         'flowtype/require-valid-file-annotation': ['off']
       }
