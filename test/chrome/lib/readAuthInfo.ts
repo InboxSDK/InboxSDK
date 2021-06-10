@@ -1,6 +1,6 @@
 import fs from 'fs';
 import once from 'lodash/once';
-import simpleEncryptor from 'simple-encryptor';
+import { createEncryptor } from 'simple-encryptor';
 
 // You can use ./tools/read-test-secret.js to decrypt this locally and
 // ./tools/write-test-secret.js to create a new value.
@@ -17,7 +17,7 @@ interface AuthInfo {
 
 const readAuthInfo = once(
   async (): Promise<AuthInfo> => {
-    const encryptor = simpleEncryptor(
+    const encryptor = createEncryptor(
       process.env.INBOXSDK_TEST_SECRET ||
         fs
           .readFileSync(__dirname + '/../../../.inboxsdk_test_secret', 'utf8')
