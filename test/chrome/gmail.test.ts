@@ -47,7 +47,7 @@ beforeEach(async () => {
 
 function waitForCounter(attribute: string, goal: number): Promise<number> {
   return page.waitForFunction(
-    (attribute, goal) => {
+    (attribute: string, goal: number) => {
       const value = Number(document.head.getAttribute(attribute));
       if (value >= goal) {
         return value;
@@ -63,7 +63,7 @@ function waitForCounter(attribute: string, goal: number): Promise<number> {
 function getCounter(attribute: string): Promise<number> {
   return page.$eval(
     'head',
-    (head, attribute) => Number(head.getAttribute(attribute)),
+    (head, attribute: any) => Number(head.getAttribute(attribute)),
     attribute
   );
 }
@@ -72,7 +72,7 @@ async function openThread() {
   await attemptWithRetries(async () => {
     await page
       .waitForSelector('tr.zA[id] span.bog', { visible: true })
-      .then(el => el.click());
+      .then(el => el!.click());
   }, 3);
   await page.waitForFunction(() => document.location.hash !== '#inbox');
 }
@@ -90,7 +90,7 @@ describe('compose', () => {
               .waitForSelector('span.ams.bkH[role=link]', {
                 visible: true
               })
-              .then(el => el.click());
+              .then(el => el!.click());
             break;
           }
           case 'full': {

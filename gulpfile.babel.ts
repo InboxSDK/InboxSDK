@@ -88,7 +88,7 @@ async function setupExamples() {
       reject(err);
     });
     stream.on('finish', () => {
-      resolve();
+      resolve(undefined);
     });
   });
   if (args.reloader) {
@@ -133,7 +133,7 @@ async function getBrowserifyHmrOptions(port: number) {
     tlskey = keyFile;
     tlscert = certFile;
   }
-  return { url, tlskey, tlscert, port };
+  return { url, tlskey, tlscert, port, disableHostCheck: true };
 }
 
 interface BrowserifyTaskOptions {
@@ -452,7 +452,8 @@ if (args.singleBundle) {
 
 gulp.task(
   'server',
-  gulp.series(args.singleBundle ? 'sdk' : 'imp', function serverRun() {
-    return require('./live/app').run();
+  gulp.series(args.singleBundle ? 'sdk' : 'imp', async function serverRun() {
+    const app = await import('./live/app');
+    app.run();
   })
 );

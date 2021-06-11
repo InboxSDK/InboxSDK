@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 'use strict';
-const simpleEncryptor = require('simple-encryptor');
+const { createEncryptor } = require('simple-encryptor');
 const fs = require('fs');
 const readline = require('readline');
 
@@ -10,7 +10,7 @@ async function read(stream) {
   return Buffer.concat(chunks).toString('utf8');
 }
 
-const encryptor = simpleEncryptor(
+const encryptor = createEncryptor(
   process.env.INBOXSDK_TEST_SECRET ||
     fs.readFileSync(__dirname + '/../.inboxsdk_test_secret', 'utf8').trim()
 );

@@ -1,11 +1,8 @@
-/* @flow */
-
-var hs = require('http-server');
-var path = require('path');
-var _ = require('lodash');
+import hs from 'http-server';
+import path from 'path';
 
 export function run() {
-  var server = hs.createServer({
+  const server = hs.createServer({
     root: path.join(__dirname, '..', 'dist'),
     cache: 2,
     showDir: 'false',

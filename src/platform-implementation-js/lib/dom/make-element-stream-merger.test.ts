@@ -158,7 +158,7 @@ it(
               break;
             case 2:
               expect(consoleWarnStub.callCount).toBeGreaterThan(0);
-              resolve();
+              resolve(undefined);
               break;
             default:
               throw new Error('Should not happen');

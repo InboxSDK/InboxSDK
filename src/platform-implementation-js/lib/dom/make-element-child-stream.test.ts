@@ -204,7 +204,7 @@ it(
           calls.push(['remove', name]);
 
           if (event.el === child3) {
-            resolve();
+            resolve(undefined);
           }
         });
 
