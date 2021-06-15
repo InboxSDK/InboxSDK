@@ -23,7 +23,7 @@ const getchromeSuffixWithReloaderExtension = once(
     const path =
       getUserHome() +
       '/Library/Application Support/Google/Chrome*/*/Extensions/fimgfedafeadlieiabdeeaodndnlbhid';
-    const results = await fg<string>([path], { onlyDirectories: true });
+    const results = await fg([path], { onlyDirectories: true });
     const firstResult = results[0];
     if (firstResult) {
       return firstResult.match(/Chrome([^/]*)\//)![1];
@@ -38,7 +38,7 @@ const getChromeLocation = memoize(
       '/Applications/Google Chrome' +
       chromeSuffix +
       '.app/Contents/MacOS/Google Chrome*';
-    const results = await fg<string>([path]);
+    const results = await fg([path]);
     return results[0];
   }
 );
