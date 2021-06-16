@@ -128,7 +128,23 @@ async function getBrowserifyHmrOptions(port: number) {
   const certFile = `${HOME}/stunnel/cert.pem`;
 
   let url, tlskey, tlscert;
-  if ((await fg([keyFile])).length && (await fg([certFile])).length) {
+
+  async function checkFilesAllExistAndReadable(
+    filenames: string[]
+  ): Promise<boolean> {
+    try {
+      await Promise.all(
+        filenames.map(filename =>
+          fs.promises.access(filename, fs.constants.R_OK)
+        )
+      );
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  if (await checkFilesAllExistAndReadable([keyFile, certFile])) {
     url = `https://dev.mailfoogae.appspot.com:${port}`;
     tlskey = keyFile;
     tlscert = certFile;
