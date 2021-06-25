@@ -18,12 +18,16 @@ export default function addNavItem(
 ): GmailNavItemView {
   const gmailNavItemView = new GmailNavItemView(driver, orderGroup, 1);
 
-  const attacher = _attachNavItemView(gmailNavItemView);
-
   if (!GmailElementGetter.isStandalone()) {
     GmailElementGetter.waitForGmailModeToSettle()
-      .then(_waitForNavItemsHolder)
       .then(() => {
+        return waitFor(
+          () => !!GmailElementGetter.getNavItemMenuInjectionContainer()
+        );
+      })
+      .then(() => {
+        const attacher = _attachNavItemView(gmailNavItemView);
+
         attacher();
 
         gmailNavItemView
@@ -40,10 +44,6 @@ export default function addNavItem(
   gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
   return gmailNavItemView;
-}
-
-function _waitForNavItemsHolder(): Promise<any> {
-  return waitFor(() => !!GmailElementGetter.getNavItemMenuInjectionContainer());
 }
 
 function _attachNavItemView(gmailNavItemView) {
