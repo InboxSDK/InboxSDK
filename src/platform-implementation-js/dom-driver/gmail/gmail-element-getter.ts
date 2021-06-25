@@ -29,11 +29,11 @@ const GmailElementGetter = {
     return document.querySelector('.no > .nn.bnl');
   },
 
-  getGoolgeMeetContainerLeft(): HTMLElement | null {
+  getGoogleMeetContainerLeft(): HTMLElement | null {
     return document.querySelector('.aic+.Xa.wT');
   },
 
-  getGoolgeMeetContainerRight(): HTMLElement | null {
+  getGoogleMeetContainerRight(): HTMLElement | null {
     return document.querySelector('.WR.WS > .Xa.wT');
   },
 
@@ -117,7 +117,7 @@ const GmailElementGetter = {
 
   getNavItemMenuInjectionContainer(): HTMLElement | null {
     if (this.hasGoogleMeet()) {
-      return this.getGoolgeMeetContainerLeft()
+      return this.getGoogleMeetContainerLeft()
         ? document.querySelector('.aeN')
         : document.querySelector('.akc');
     }
@@ -174,7 +174,7 @@ const GmailElementGetter = {
 
   hasGoogleMeet(): boolean {
     return Boolean(
-      this.getGoolgeMeetContainerLeft() || this.getGoolgeMeetContainerRight()
+      this.getGoogleMeetContainerLeft() || this.getGoogleMeetContainerRight()
     );
   },
 
