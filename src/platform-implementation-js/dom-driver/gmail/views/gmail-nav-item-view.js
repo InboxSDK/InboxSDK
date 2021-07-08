@@ -63,9 +63,8 @@ export default class GmailNavItemView {
     this._navItemNumber = ++NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED;
     this._orderGroup = orderGroup;
 
-    // delete after new left nav is fully launched, use this._level === 1 instead
     this._isNewLeftNavParent =
-      GmailElementGetter.hasGoogleMeet() && this._level === 1;
+      !GmailElementGetter.classicHangoutsChatEnabled() && this._level === 1;
 
     if (this._isNewLeftNavParent) {
       this._setupParentElement();
@@ -193,6 +192,7 @@ export default class GmailNavItemView {
     this._toggleCollapse();
   }
 
+  // TODO this method is only called on orderChanged? is that right?
   _addNavItemElement(gmailNavItemView: GmailNavItemView) {
     const itemContainerElement = this._getItemContainerElement();
 
@@ -218,7 +218,7 @@ export default class GmailNavItemView {
 
     const element = gmailNavItemView.getElement();
 
-    if (GmailElementGetter.hasGoogleMeet()) {
+    if (!GmailElementGetter.classicHangoutsChatEnabled()) {
       querySelector(element, '.TN').style.marginLeft =
         6 * indentationFactor + 'px';
     } else {

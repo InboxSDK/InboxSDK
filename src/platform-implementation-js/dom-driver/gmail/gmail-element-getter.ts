@@ -29,14 +29,6 @@ const GmailElementGetter = {
     return document.querySelector('.no > .nn.bnl');
   },
 
-  getGoogleMeetContainerLeft(): HTMLElement | null {
-    return document.querySelector('.aic+.Xa.wT');
-  },
-
-  getGoogleMeetContainerRight(): HTMLElement | null {
-    return document.querySelector('.WR.WS > .Xa.wT');
-  },
-
   getCompanionSidebarContentContainerElement(): HTMLElement | null {
     return document.querySelector('.brC-brG');
   },
@@ -115,13 +107,35 @@ const GmailElementGetter = {
     return document.body.querySelector('.dw .nH > .nH > .no');
   },
 
-  getNavItemMenuInjectionContainer(): HTMLElement | null {
-    if (this.hasGoogleMeet()) {
-      return this.getGoogleMeetContainerLeft()
-        ? document.querySelector('.aeN')
-        : document.querySelector('.akc');
+  classicHangoutsChatEnabled(): boolean {
+    const leftNavElement = document.querySelector(
+      '.aeN[role=navigation], .aeN [role=navigation]'
+    );
+    if (!leftNavElement) {
+      throw new Error(
+        'classicHangoutsChatEnabled failed to find leftNavElement'
+      );
     }
 
+    // leftNavElement classnames depending on gmail chat & meet settings:
+
+    // No classname difference between open/collapsed
+    //  div.ajl.aib.aZ6 (classic hangouts on left or right, google meet on/off)
+    // ===================
+    // Collapsed gets .bhZ class added
+    //  div.aeN.WR.nH.oy8Mbf.nn (chat off, google meet off)
+    //  div.aeN.WR.BaIAZe.anZ.nH.oy8Mbf.nn (chat off, google meet on)
+    //  div.aeN.WR.anZ.nH.oy8Mbf.nn (google chat on left, google meet on/off)
+    //  div.aeN.WR.ahu.nH.oy8Mbf.nn (google chat on right, google meet on/off)
+
+    return leftNavElement.classList.contains('aZ6');
+  },
+
+  getSeparateSectionNavItemMenuInjectionContainer(): HTMLElement | null {
+    return document.querySelector('.aeN');
+  },
+
+  getSameSectionNavItemMenuInjectionContainer(): HTMLElement | null {
     return document.querySelector('.aeN .n3');
   },
 
@@ -169,12 +183,6 @@ const GmailElementGetter = {
   getTopAccountContainer(): HTMLElement | null {
     return document.querySelector(
       'header[role="banner"] > div:nth-child(2) > div:nth-child(2)'
-    );
-  },
-
-  hasGoogleMeet(): boolean {
-    return Boolean(
-      this.getGoogleMeetContainerLeft() || this.getGoogleMeetContainerRight()
     );
   },
 
