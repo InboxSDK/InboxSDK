@@ -4,7 +4,7 @@ function log() {
 
 InboxSDK.load(1, 'nav-menu').then(function(sdk) {
   var appendStylesheet = function(url) {
-    const css = '.inboxsdk__button_icon.bentoBoxIndicator { background: transparent url(https://dev.mailfoogae.appspot.com:8888/buildTemp/dev/clientjs/pipelineIndicator.ebfc97a74f09365a433e8537ff414815.png) no-repeat; height: 18px; width: 18px; }';
+    const css = '.inboxsdk__button_icon.bentoBoxIndicator { background: transparent url(https://assets.streak.com/clientjs-commit-builds/assets/pipelineIndicator.ebfc97a74f09365a433e8537ff414815.png) no-repeat; height: 18px; width: 18px; }';
     const head = document.head || document.getElementsByTagName('head')[0];
     const style = document.createElement('style');
 
@@ -18,7 +18,7 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
     sheet.href = url;
     document.head.appendChild(sheet);
   };
-  
+
 
   sdk.Router.handleCustomRoute('this-is-a-parent-custom-route', (customRouteView) => {
     const el = document.createElement('span');
@@ -91,7 +91,7 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
       },
       name: 'P - Toggle Collapse',
     });
-  
+
     const child = parent.addNavItem({
       accessory: {
         onClick: () => {
@@ -101,17 +101,17 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
       },
       name: 'C - Toggle Collapse'
     });
-  
+
     child.addNavItem({
       name: 'Child of Child'
-    });    
+    });
   }
 
   const initNavItemChildren = () => {
     const parent = sdk.NavMenu.addNavItem({
       name: 'P - with Children'
     });
-  
+
     childIconUrl = parent.addNavItem({
       iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
       name: 'Child iconUrl',
@@ -143,7 +143,7 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
       name: 'Child iconClass',
       orderHint: 3
     });
-  
+
     childIconUrl.addNavItem({
       name: 'Child of Child'
     });
@@ -192,7 +192,7 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
       },
       name: 'P - Dropdown',
     });
-  
+
     sdk.NavMenu.addNavItem({
       accessory: {
         onClick: () => {
@@ -212,7 +212,7 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
       routeID: 'this-is-a-parent-custom-route',
       name: 'P - iconUrl'
     });
-  
+
     const iconElement = document.createElement('div');
     iconElement.innerHTML = "S";
     Object.assign(iconElement.style, {
@@ -225,19 +225,19 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
       justifyContent: "center",
       width: "18px"
     });
-  
+
     sdk.NavMenu.addNavItem({
       iconElement,
       routeID: 'this-is-a-parent-custom-route',
       name: 'P - iconElement'
     });
-  
+
     const parentIconClass = sdk.NavMenu.addNavItem({
       iconClass: 'bentoBoxIndicator',
       routeID: 'this-is-a-parent-custom-route',
       name: 'P - iconClass',
     });
-  
+
   }
 
   const initNavItemRoute = () => {
