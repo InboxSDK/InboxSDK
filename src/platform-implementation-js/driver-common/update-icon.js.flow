@@ -1,0 +1,11 @@
+/* @flow */
+
+declare export default function updateIcon(
+  iconSettings: Object,
+  containerElement: HTMLElement,
+  append: boolean,
+  newIconClass: ?string,
+  newIconUrl: ?string,
+  insertBeforeEl: ?HTMLElement, // Should not be used with append: true — the append flag will override
+  newIconHtml?: string
+): void;

@@ -1,9 +1,15 @@
 /* @flow */
 
+export interface IconSettings {
+  iconElement?: HTMLElement | null;
+  iconHtmlElement?: HTMLElement | null;
+  iconImgElement?: HTMLElement | null;
+}
+
 function createIconElement(
   containerElement: HTMLElement,
   append: boolean,
-  insertBeforeEl: ?HTMLElement
+  insertBeforeEl: HTMLElement | null | undefined
 ) {
   const iconElement = document.createElement('div');
   iconElement.classList.add('inboxsdk__button_icon');
@@ -14,7 +20,7 @@ function createIconElement(
   } else {
     containerElement.insertBefore(
       iconElement,
-      insertBeforeEl || (containerElement: any).firstElementChild
+      insertBeforeEl || (containerElement as any).firstElementChild
     );
   }
 
@@ -25,7 +31,7 @@ function createIconImgElement(
   iconUrl: string,
   containerElement: HTMLElement,
   append: boolean,
-  insertBeforeEl: ?HTMLElement
+  insertBeforeEl: HTMLElement | null | undefined
 ) {
   const iconElement = createIconElement(
     containerElement,
@@ -44,12 +50,12 @@ function createIconImgElement(
 
 // TODO make this return a class instead of taking the iconSettings state object
 export default function updateIcon(
-  iconSettings: Object,
+  iconSettings: IconSettings,
   containerElement: HTMLElement,
   append: boolean,
-  newIconClass: ?string,
-  newIconUrl: ?string,
-  insertBeforeEl: ?HTMLElement, // Should not be used with append: true — the append flag will override
+  newIconClass: string | null | undefined,
+  newIconUrl: string | null | undefined,
+  insertBeforeEl: HTMLElement | null | undefined, // Should not be used with append: true — the append flag will override
   newIconHtml?: string
 ) {
   if (append && insertBeforeEl)
@@ -91,7 +97,8 @@ export default function updateIcon(
         insertBeforeEl
       );
     } else {
-      iconSettings.iconImgElement.firstElementChild.src = newIconUrl;
+      (iconSettings.iconImgElement!
+        .firstElementChild! as HTMLImageElement).src = newIconUrl;
     }
 
     iconSettings.iconImgElement.setAttribute(

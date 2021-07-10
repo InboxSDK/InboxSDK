@@ -1,5 +1,3 @@
-/* @flow */
-
 /**
  * The different nav item types that exist
  * @class

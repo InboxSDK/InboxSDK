@@ -91,7 +91,6 @@
     "http-server": "^0.10.0",
     "husky": "^2.3.0",
     "immutability-helper": "^3.0.0",
-    "isnumber": "^1.0.0",
     "jest": "^27.0.4",
     "jest-circus": "^27.0.4",
     "jest-puppeteer": "^5.0.4",
