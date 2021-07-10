@@ -1,5 +1,3 @@
-/* @flow */
-
 export interface IconSettings {
   iconElement?: HTMLElement | null;
   iconHtmlElement?: HTMLElement | null;

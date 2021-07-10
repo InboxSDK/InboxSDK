@@ -1,5 +1,3 @@
-/* @flow */
-
 // Use insert-element-in-order instead of this!
 export default function getInsertBeforeElement(
   checkElement: HTMLElement,

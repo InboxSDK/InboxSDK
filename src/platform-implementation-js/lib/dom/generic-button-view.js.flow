@@ -1,0 +1,12 @@
+/* @flow */
+
+import * as Kefir from 'kefir';
+
+declare export default class GenericButtonView {
+  constructor(element: HTMLElement): this;
+  destroy(): void;
+  getElement(): HTMLElement;
+  getEventStream(): Kefir.Observable<Object>;
+  activate(): void;
+  deactivate(): void;
+}

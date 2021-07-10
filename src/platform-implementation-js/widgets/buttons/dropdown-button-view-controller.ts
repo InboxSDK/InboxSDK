@@ -1,20 +1,17 @@
-/* @flow */
-
-import { defn } from 'ud';
-import type Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import type ButtonView from '../../dom-driver/gmail/widgets/buttons/button-view';
+import ButtonView from '../../dom-driver/gmail/widgets/buttons/button-view';
 import DropdownView from './dropdown-view';
 
-class DropdownButtonViewController {
-  _view: ?ButtonView;
-  _dropdownShowFunction: ?Function;
-  _dropdownView: ?DropdownView;
-  _DropdownViewDriverClass: Class<any>;
-  _dropdownPositionOptions: Object;
-  _stopper = kefirStopper();
+export default class DropdownButtonViewController {
+  private _view: ButtonView | null;
+  private _dropdownShowFunction: Function | null | undefined;
+  private _dropdownView: DropdownView | null = null;
+  private readonly _DropdownViewDriverClass: any;
+  private _dropdownPositionOptions: any;
+  private readonly _stopper = kefirStopper();
 
-  constructor(options: Object) {
+  constructor(options: any) {
     this._dropdownShowFunction = options.dropdownShowFunction;
     this._DropdownViewDriverClass = options.dropdownViewDriverClass;
 
@@ -28,7 +25,7 @@ class DropdownButtonViewController {
     this._bindToViewEvents();
   }
 
-  getStopper(): Kefir.Observable<null> {
+  getStopper(): Kefir.Observable<null, never> {
     return this._stopper;
   }
 
@@ -44,7 +41,7 @@ class DropdownButtonViewController {
     this._stopper.destroy();
   }
 
-  update(options: ?Object) {
+  update(options: any) {
     this.getView().update(options);
     this.setDropdownShowFunction(options && options.dropdownShowFunction);
   }
@@ -54,7 +51,7 @@ class DropdownButtonViewController {
     return this._view;
   }
 
-  setDropdownShowFunction(func: ?Function) {
+  setDropdownShowFunction(func: Function | null | undefined) {
     this._dropdownShowFunction = func;
   }
 
@@ -66,7 +63,8 @@ class DropdownButtonViewController {
 
     const dropdownView = (this._dropdownView = new DropdownView(
       new this._DropdownViewDriverClass(),
-      view.getElement()
+      view.getElement(),
+      undefined
     ));
 
     if (this._dropdownPositionOptions) {
@@ -93,7 +91,7 @@ class DropdownButtonViewController {
     return !!this._dropdownView;
   }
 
-  _bindToViewEvents() {
+  private _bindToViewEvents() {
     if (!this._view) throw new Error('Already destroyed');
     this._view
       .getEventStream()
@@ -103,7 +101,7 @@ class DropdownButtonViewController {
       });
   }
 
-  _toggleDropdownState() {
+  private _toggleDropdownState() {
     if (this._dropdownView) {
       this._dropdownView.close();
     } else {
@@ -111,7 +109,7 @@ class DropdownButtonViewController {
     }
   }
 
-  _dropdownClosed() {
+  private _dropdownClosed() {
     const view = this._view;
     if (view) {
       view.deactivate();
@@ -122,5 +120,3 @@ class DropdownButtonViewController {
     }
   }
 }
-
-export default defn(module, DropdownButtonViewController);
