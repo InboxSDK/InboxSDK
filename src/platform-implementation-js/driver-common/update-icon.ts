@@ -53,7 +53,7 @@ export default function updateIcon(
   append: boolean,
   newIconClass: string | null | undefined,
   newIconUrl: string | null | undefined,
-  insertBeforeEl: HTMLElement | null | undefined, // Should not be used with append: true — the append flag will override
+  insertBeforeEl?: HTMLElement | null | undefined, // Should not be used with append: true — the append flag will override
   newIconHtml?: string
 ) {
   if (append && insertBeforeEl)

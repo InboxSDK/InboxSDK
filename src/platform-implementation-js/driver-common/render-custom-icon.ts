@@ -2,7 +2,7 @@ export default function renderCustomIcon(
   containerElement: HTMLElement,
   customIconElement: HTMLElement,
   append: boolean,
-  insertBeforeEl: HTMLElement | null | undefined
+  insertBeforeEl?: HTMLElement | null | undefined
 ) {
   // Check if icon wrapper exist or not
   // when renderCustomIcon gets called for updating navItemDescriptor

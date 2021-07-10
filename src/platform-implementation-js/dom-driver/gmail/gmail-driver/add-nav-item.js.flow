@@ -1,0 +1,12 @@
+/* @flow */
+
+import Kefir from 'kefir';
+import GmailNavItemView from '../views/gmail-nav-item-view';
+
+import type GmailDriver from '../gmail-driver';
+
+declare export default function addNavItem(
+  driver: GmailDriver,
+  orderGroup: string,
+  navItemDescriptor: Kefir.Observable<Object>
+): GmailNavItemView;

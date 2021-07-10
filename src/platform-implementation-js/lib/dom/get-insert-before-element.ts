@@ -1,7 +1,7 @@
 // Use insert-element-in-order instead of this!
 export default function getInsertBeforeElement(
   checkElement: HTMLElement,
-  childElements: Array<any> | NodeListOf<any>,
+  childElements: ArrayLike<any>,
   dataAttributes: string[]
 ): HTMLElement | null {
   const checkValues: { [attr: string]: any } = {};

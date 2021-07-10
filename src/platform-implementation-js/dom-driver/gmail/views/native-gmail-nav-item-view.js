@@ -183,7 +183,7 @@ export default class NativeGmailNavItemView {
 
     const element = gmailNavItemView.getElement();
     querySelector(element, '.TN').style.marginLeft =
-      getLeftIndentationPaddingValue(this._driver) + 'px';
+      getLeftIndentationPaddingValue() + 'px';
 
     this._setHeights();
   }
