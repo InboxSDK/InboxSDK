@@ -1,10 +1,8 @@
-/* @flow */
-
 export default function renderCustomIcon(
   containerElement: HTMLElement,
   customIconElement: HTMLElement,
   append: boolean,
-  insertBeforeEl: ?HTMLElement
+  insertBeforeEl?: HTMLElement | null | undefined
 ) {
   // Check if icon wrapper exist or not
   // when renderCustomIcon gets called for updating navItemDescriptor
@@ -23,7 +21,7 @@ export default function renderCustomIcon(
   } else {
     containerElement.insertBefore(
       containerElement,
-      insertBeforeEl || (containerElement: any).firstElementChild
+      insertBeforeEl || containerElement!.firstElementChild
     );
   }
 }

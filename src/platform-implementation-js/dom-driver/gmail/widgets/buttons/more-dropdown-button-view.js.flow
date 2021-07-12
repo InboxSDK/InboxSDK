@@ -1,0 +1,7 @@
+/* @flow */
+
+import GenericButtonView from '../../../../lib/dom/generic-button-view';
+
+declare export default class MoreDropdownButtonView extends GenericButtonView {
+  constructor(): this;
+}

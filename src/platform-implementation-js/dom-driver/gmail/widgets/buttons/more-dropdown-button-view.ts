@@ -1,12 +1,12 @@
-/* @flow */
-
 import GenericButtonView from '../../../../lib/dom/generic-button-view';
 
 export default class MoreDropdownButtonView extends GenericButtonView {
-  _isActive = false;
+  private _isActive = false;
 
-  constructor(buttonOptions: Object) {
-    const element = document.createElement('div');
+  constructor() {
+    super(document.createElement('div'));
+    const element = this._element;
+
     element.setAttribute('class', 'nL aig');
 
     const child = document.createElement('div');
@@ -14,21 +14,19 @@ export default class MoreDropdownButtonView extends GenericButtonView {
 
     element.appendChild(child);
 
-    element.addEventListener('click', function() {
+    element.addEventListener('click', () => {
       this._isActive = true;
     });
 
-    element.addEventListener('mouseenter', function() {
+    element.addEventListener('mouseenter', () => {
       child.classList.add('aj1');
     });
 
-    element.addEventListener('mouseleave', function() {
+    element.addEventListener('mouseleave', () => {
       if (!this._isActive) {
         child.classList.remove('aj1');
       }
     });
-
-    super(element);
   }
 
   activate() {

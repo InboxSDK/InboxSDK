@@ -1,15 +1,11 @@
-/* @flow */
-
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
-import type { Bus } from 'kefir-bus';
 
 export default class GenericButtonView {
-  _eventStream: Bus<any>;
-  _element: HTMLElement;
+  private readonly _eventStream = kefirBus<any, any>();
+  protected readonly _element: HTMLElement;
 
   constructor(element: HTMLElement) {
-    this._eventStream = kefirBus();
     this._element = element;
 
     this._setupEventStream();
@@ -24,7 +20,7 @@ export default class GenericButtonView {
     return this._element;
   }
 
-  getEventStream(): Kefir.Observable<Object> {
+  getEventStream(): Kefir.Observable<any, any> {
     return this._eventStream;
   }
 
@@ -36,16 +32,19 @@ export default class GenericButtonView {
     /* do nothing */
   }
 
-  _setupEventStream() {
-    var clickEventStream = Kefir.fromEvents(this._element, 'click');
+  private _setupEventStream() {
+    const clickEventStream = Kefir.fromEvents<MouseEvent, never>(
+      this._element,
+      'click'
+    );
 
-    clickEventStream.onValue(function(event) {
+    clickEventStream.onValue(event => {
       event.stopPropagation();
       event.preventDefault();
     });
 
     this._eventStream.plug(
-      clickEventStream.map(function(event) {
+      clickEventStream.map(event => {
         return {
           eventName: 'click',
           domEvent: event

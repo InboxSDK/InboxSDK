@@ -1,9 +1,6 @@
-/* @flow */
-
 import autoHtml from 'auto-html';
-import Kefir from 'kefir';
-import kefirBus from 'kefir-bus';
-import type { Bus } from 'kefir-bus';
+import * as Kefir from 'kefir';
+import kefirBus, { Bus } from 'kefir-bus';
 
 import GmailElementGetter from '../gmail-element-getter';
 
@@ -21,40 +18,38 @@ import GmailDropdownView from '../widgets/gmail-dropdown-view';
 import DropdownButtonViewController from '../../../widgets/buttons/dropdown-button-view-controller';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
-import updateIcon from '../../../driver-common/update-icon';
+import updateIcon, { IconSettings } from '../../../driver-common/update-icon';
 import renderCustomIcon from '../../../driver-common/render-custom-icon';
 
 import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 
-import type GmailDriver from '../gmail-driver';
+import GmailDriver from '../gmail-driver';
 
 let NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED = 0;
 
-const GMAIL_V1_LEFT_INDENTATION_PADDING = 14;
 const GMAIL_V2_LEFT_INDENTATION_PADDING = 12;
 
 export default class GmailNavItemView {
-  _accessory: ?Object = null;
-  _accessoryCreated: boolean = false;
-  _accessoryViewController: ?Object = null;
-  _driver: GmailDriver;
-  _element: HTMLElement;
-  _eventStream: Bus<any>;
-  _expandoElement: ?HTMLElement = null;
-  _iconSettings: Object = {};
-  _isActive: boolean = false;
-  _isCollapsed: boolean = false;
-  _itemContainerElement: ?HTMLElement = null;
-  _level: number;
-  _name: string = '';
-  _navItemDescriptor: Object;
-  _navItemNumber: number;
-  _orderGroup: number | string;
-  _orderHint: any;
-  _type: ?string = null;
+  private _accessory: any = null;
+  private _accessoryViewController: any = null;
+  private _driver: GmailDriver;
+  private _element: HTMLElement;
+  private _eventStream: Bus<any, any>;
+  private _expandoElement: HTMLElement | null = null;
+  private _iconSettings: IconSettings = {};
+  private _isActive: boolean = false;
+  private _isCollapsed: boolean = false;
+  private _itemContainerElement: HTMLElement | null = null;
+  private _level: number;
+  private _name: string = '';
+  private _navItemDescriptor: any;
+  private _navItemNumber: number;
+  private _orderGroup: number | string;
+  private _orderHint: any;
+  private _type: string | null = null;
 
   // delete after new left nav is fully launched, use this._level === 1 instead
-  _isNewLeftNavParent: boolean;
+  private _isNewLeftNavParent: boolean;
 
   constructor(driver: GmailDriver, orderGroup: number | string, level: number) {
     this._driver = driver;
@@ -67,15 +62,15 @@ export default class GmailNavItemView {
       !GmailElementGetter.classicHangoutsChatEnabled() && this._level === 1;
 
     if (this._isNewLeftNavParent) {
-      this._setupParentElement();
+      this._element = this._setupParentElement();
     } else {
-      this._setupChildElement();
+      this._element = this._setupChildElement();
     }
   }
 
   addNavItem(
     orderGroup: number | string,
-    navItemDescriptor: Object
+    navItemDescriptor: any
   ): GmailNavItemView {
     const nestedNavItemLevel =
       this._type === NAV_ITEM_TYPES.GROUPER ? this._level : this._level + 1;
@@ -87,7 +82,7 @@ export default class GmailNavItemView {
 
     gmailNavItemView
       .getEventStream()
-      .filter(event => event.eventName === 'orderChanged')
+      .filter((event: any) => event.eventName === 'orderChanged')
       .onValue(() => this._addNavItemElement(gmailNavItemView));
 
     gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
@@ -111,11 +106,11 @@ export default class GmailNavItemView {
     return this._element;
   }
 
-  getEventStream(): Kefir.Observable<Object> {
+  getEventStream(): Kefir.Observable<any, any> {
     return this._eventStream;
   }
 
-  getNavItemDescriptor(): Object {
+  getNavItemDescriptor(): any {
     return this._navItemDescriptor;
   }
 
@@ -123,7 +118,7 @@ export default class GmailNavItemView {
     return this._orderGroup;
   }
 
-  getOrderHint(): ?number {
+  getOrderHint(): any {
     return this._orderHint;
   }
 
@@ -181,7 +176,7 @@ export default class GmailNavItemView {
   }
 
   setNavItemDescriptor(
-    navItemDescriptorPropertyStream: Kefir.Observable<Object>
+    navItemDescriptorPropertyStream: Kefir.Observable<any, any>
   ) {
     navItemDescriptorPropertyStream
       .takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null))
@@ -193,7 +188,7 @@ export default class GmailNavItemView {
   }
 
   // TODO this method is only called on orderChanged? is that right?
-  _addNavItemElement(gmailNavItemView: GmailNavItemView) {
+  private _addNavItemElement(gmailNavItemView: GmailNavItemView) {
     const itemContainerElement = this._getItemContainerElement();
 
     const insertBeforeElement = getInsertBeforeElement(
@@ -223,13 +218,13 @@ export default class GmailNavItemView {
         6 * indentationFactor + 'px';
     } else {
       querySelector(element, '.TN').style.marginLeft =
-        getLeftIndentationPaddingValue(this._driver) * indentationFactor + 'px';
+        getLeftIndentationPaddingValue() * indentationFactor + 'px';
     }
 
     this._setHeights();
   }
 
-  _collapse() {
+  private _collapse() {
     this._isCollapsed = true;
 
     if (this._isNewLeftNavParent) {
@@ -255,7 +250,7 @@ export default class GmailNavItemView {
     });
   }
 
-  _createAccessory(accessoryDescriptor: Object) {
+  private _createAccessory(accessoryDescriptor: any) {
     switch (accessoryDescriptor.type) {
       case 'CREATE':
         this._createCreateAccessory(accessoryDescriptor);
@@ -279,17 +274,15 @@ export default class GmailNavItemView {
         });
         break;
     }
-
-    this._accessoryCreated = true;
   }
 
-  _createCreateAccessory(accessoryDescriptor: Object) {
+  private _createCreateAccessory(accessoryDescriptor: any) {
     this._createPlusButtonAccessory(accessoryDescriptor);
   }
 
-  _createDropdownButtonAccessory(accessoryDescriptor: Object) {
+  private _createDropdownButtonAccessory(accessoryDescriptor: any) {
     if (this._isNewLeftNavParent) {
-      const buttonOptions = { ...accessoryDescriptor };
+      const buttonOptions: any = { ...accessoryDescriptor };
       buttonOptions.buttonView = new MoreParentDropdownButtonView();
       buttonOptions.dropdownViewDriverClass = GmailDropdownView;
       buttonOptions.dropdownPositionOptions = {
@@ -297,7 +290,7 @@ export default class GmailNavItemView {
         hAlign: 'left',
         vAlign: 'top'
       };
-      buttonOptions.dropdownShowFunction = ({ dropdown }) => {
+      buttonOptions.dropdownShowFunction = ({ dropdown }: any) => {
         dropdown.el.style.marginLeft = '24px';
         buttonOptions.onClick({ dropdown });
       };
@@ -324,8 +317,8 @@ export default class GmailNavItemView {
     }
 
     // child dropdown button accessory
-    const buttonOptions = { ...accessoryDescriptor };
-    buttonOptions.buttonView = new MoreDropdownButtonView(buttonOptions);
+    const buttonOptions: any = { ...accessoryDescriptor };
+    buttonOptions.buttonView = new MoreDropdownButtonView();
     buttonOptions.dropdownViewDriverClass = GmailDropdownView;
     buttonOptions.dropdownPositionOptions = {
       position: 'bottom',
@@ -336,7 +329,7 @@ export default class GmailNavItemView {
     const container = GmailElementGetter.getLeftNavContainerElement();
     if (!container) throw new Error('leftNavContainer not found');
 
-    buttonOptions.dropdownShowFunction = event => {
+    buttonOptions.dropdownShowFunction = (event: any) => {
       // bhZ is the class to indicate the left nav is collapsible mode
       // bym is class to show expanded when the left nav is collapsible
       if (container.classList.contains('bhZ')) {
@@ -385,7 +378,7 @@ export default class GmailNavItemView {
     this._setupContextClickHandler(accessoryViewController);
   }
 
-  _createExpando() {
+  private _createExpando() {
     if (this._type === NAV_ITEM_TYPES.GROUPER) {
       return;
     }
@@ -406,7 +399,7 @@ export default class GmailNavItemView {
     const insertionPoint = this._element.querySelector('.TN.aik');
 
     if (insertionPoint)
-      (insertionPoint: any).insertAdjacentElement('afterbegin', expandoElement);
+      insertionPoint.insertAdjacentElement('afterbegin', expandoElement);
 
     if (this._isCollapsed) {
       this._collapse();
@@ -415,7 +408,7 @@ export default class GmailNavItemView {
     }
   }
 
-  _createExpandoParent() {
+  private _createExpandoParent() {
     const parentExpandoElement = querySelector(this._element, '.XR');
     parentExpandoElement.style.visibility = 'visible';
     this._expandoElement = parentExpandoElement;
@@ -427,7 +420,7 @@ export default class GmailNavItemView {
     }
   }
 
-  _createIconButtonAccessory(accessoryDescriptor: Object) {
+  private _createIconButtonAccessory(accessoryDescriptor: Object) {
     this._driver
       .getLogger()
       .deprecationWarning(
@@ -439,7 +432,10 @@ export default class GmailNavItemView {
       return;
     }
 
-    const buttonOptions = { ...accessoryDescriptor, buttonColor: 'pureIcon' };
+    const buttonOptions: any = {
+      ...accessoryDescriptor,
+      buttonColor: 'pureIcon'
+    };
     buttonOptions.buttonView = new ButtonView(buttonOptions);
 
     this._accessoryViewController = new BasicButtonViewController(
@@ -450,7 +446,7 @@ export default class GmailNavItemView {
     insertionPoint.appendChild(buttonOptions.buttonView.getElement());
   }
 
-  _createItemContainerElement(): HTMLElement {
+  private _createItemContainerElement(): HTMLElement {
     const itemContainerElement = (this._itemContainerElement = document.createElement(
       'div'
     ));
@@ -467,7 +463,7 @@ export default class GmailNavItemView {
     return itemContainerElement;
   }
 
-  _createLinkButtonAccessory(accessoryDescriptor: Object) {
+  private _createLinkButtonAccessory(accessoryDescriptor: any) {
     const linkDiv = document.createElement('div');
     const linkDivClassName = 'inboxsdk__navItem_link';
     linkDiv.setAttribute('class', linkDivClassName);
@@ -490,9 +486,9 @@ export default class GmailNavItemView {
     querySelector(this._element, '.aio').appendChild(linkDiv);
   }
 
-  _createPlusButtonAccessory(accessoryDescriptor: Object) {
+  private _createPlusButtonAccessory(accessoryDescriptor: any) {
     if (this._isNewLeftNavParent) {
-      const buttonOptions = { ...accessoryDescriptor };
+      const buttonOptions: any = { ...accessoryDescriptor };
       buttonOptions.buttonView = new CreateParentAccessoryButtonView();
 
       // TODO: new Gmail left nav parent accessory opens a dropdown which would be a breaking
@@ -542,7 +538,7 @@ export default class GmailNavItemView {
     insertionPoint.appendChild(buttonOptions.buttonView.getElement());
   }
 
-  _expand() {
+  private _expand() {
     if (this._isNewLeftNavParent) {
       this._element.classList.add('Xr');
     } else {
@@ -570,7 +566,7 @@ export default class GmailNavItemView {
     });
   }
 
-  _getItemContainerElement(): HTMLElement {
+  private _getItemContainerElement(): HTMLElement {
     if (this._isNewLeftNavParent) {
       return querySelector(this._element, '.TK');
     } else {
@@ -584,33 +580,27 @@ export default class GmailNavItemView {
     }
   }
 
-  _isCollapsible() {
+  private _isCollapsible() {
     return (
       Boolean(this._expandoElement) || this._type === NAV_ITEM_TYPES.GROUPER
     );
   }
 
-  _isExpanded(): boolean {
-    return this._expandoElement
-      ? this._expandoElement.classList.contains('aih')
-      : false;
-  }
-
-  _makeEventMapper(
+  private _makeEventMapper(
     eventName: string
-  ): (domEvent: Object) => { eventName: string, domEvent: Object } {
+  ): <T extends Event>(domEvent: T) => { eventName: string; domEvent: T } {
     return function(domEvent) {
       domEvent.stopPropagation();
       domEvent.preventDefault();
 
       return {
-        eventName: eventName,
-        domEvent: domEvent
+        eventName,
+        domEvent
       };
     };
   }
 
-  _setHeights() {
+  private _setHeights() {
     if (this._level == 1) {
       return;
     }
@@ -633,7 +623,7 @@ export default class GmailNavItemView {
     }
   }
 
-  _setHighlight(value: boolean) {
+  private _setHighlight(value: boolean) {
     if (
       !this._element ||
       this._type === NAV_ITEM_TYPES.LINK ||
@@ -649,8 +639,8 @@ export default class GmailNavItemView {
     }
   }
 
-  _setupContextClickHandler(accessoryViewController: Object) {
-    Kefir.fromEvents(this._element, 'contextmenu')
+  private _setupContextClickHandler(accessoryViewController: any) {
+    Kefir.fromEvents<MouseEvent, never>(this._element, 'contextmenu')
       .takeWhile(
         () => this._accessoryViewController === accessoryViewController
       )
@@ -662,11 +652,11 @@ export default class GmailNavItemView {
       });
   }
 
-  _setupChildElement() {
-    this._element = document.createElement('div');
-    this._element.setAttribute('class', 'aim inboxsdk__navItem');
+  private _setupChildElement(): HTMLElement {
+    const element = document.createElement('div');
+    element.setAttribute('class', 'aim inboxsdk__navItem');
 
-    this._element.innerHTML = [
+    element.innerHTML = [
       '<div class="TO">',
       '<div class="TN aik">',
 
@@ -687,13 +677,13 @@ export default class GmailNavItemView {
       '</div>'
     ].join('');
 
-    const innerElement = querySelector(this._element, '.TO');
+    const innerElement = querySelector(element, '.TO');
 
     Kefir.merge([
-      Kefir.fromEvents(innerElement, 'mouseenter').map(
+      Kefir.fromEvents<MouseEvent, never>(innerElement, 'mouseenter').map(
         this._makeEventMapper('mouseenter')
       ),
-      Kefir.fromEvents(innerElement, 'mouseleave').map(
+      Kefir.fromEvents<MouseEvent, never>(innerElement, 'mouseleave').map(
         this._makeEventMapper('mouseleave')
       )
     ]).onValue(event => {
@@ -701,16 +691,18 @@ export default class GmailNavItemView {
     });
 
     this._eventStream.plug(
-      Kefir.fromEvents(innerElement, 'click').map(
+      Kefir.fromEvents<MouseEvent, never>(innerElement, 'click').map(
         this._makeEventMapper('click')
       )
     );
+
+    return element;
   }
 
-  _setupParentElement() {
-    this._element = document.createElement('div');
-    this._element.setAttribute('class', 'Xa wT W8 XJ inboxsdk__navItem');
-    this._element.innerHTML = [
+  private _setupParentElement(): HTMLElement {
+    const element = document.createElement('div');
+    element.className = 'Xa wT W8 XJ inboxsdk__navItem';
+    element.innerHTML = [
       '<div class="V6 CL Y2">',
       '<div class="XR" role="button" tabindex="0" type="button" style="visibility: hidden">',
       '</div>',
@@ -732,10 +724,10 @@ export default class GmailNavItemView {
     ].join('');
 
     // adds shadow rule to nav item container
-    const scrollContainer = querySelector(this._element, '.V3');
+    const scrollContainer = querySelector(element, '.V3');
     Kefir.fromEvents(scrollContainer, 'scroll')
       .debounce(10)
-      .onValue(event => {
+      .onValue(() => {
         if (scrollContainer.scrollTop > 0) {
           scrollContainer.classList.add('adh');
         } else {
@@ -743,23 +735,26 @@ export default class GmailNavItemView {
         }
       });
 
-    const expandoElement = querySelector(this._element, '.XR');
-    Kefir.fromEvents(expandoElement, 'click')
+    const expandoElement = querySelector(element, '.XR');
+    Kefir.fromEvents<MouseEvent, never>(expandoElement, 'click')
       .map(this._makeEventMapper('click'))
-      .onValue(event => {
-        this._element.classList.toggle('Xr');
+      .onValue(() => {
+        element.classList.toggle('Xr');
       });
 
-    const innerElement = querySelector(this._element, '.V6.CL');
+    const innerElement = querySelector(element, '.V6.CL');
     this._eventStream.plug(
-      Kefir.fromEvents(innerElement, 'click').map(
+      Kefir.fromEvents<MouseEvent, never>(innerElement, 'click').map(
         this._makeEventMapper('click')
       )
     );
+
+    return element;
   }
 
-  _setupGrouper(navItemDescriptor: Object) {
-    const navItemElement = this._element.firstElementChild;
+  private _setupGrouper() {
+    const navItemElement = this._element
+      .firstElementChild as HTMLElement | null;
     if (navItemElement) {
       navItemElement.classList.add('n4');
 
@@ -780,7 +775,7 @@ export default class GmailNavItemView {
       '<div class="G-asx T-I-J3 J-J5-Ji">&nbsp;</div>';
   }
 
-  _toggleCollapse() {
+  private _toggleCollapse() {
     if (!this._isCollapsible()) {
       this._isCollapsed = !this._isCollapsed;
       return;
@@ -793,7 +788,7 @@ export default class GmailNavItemView {
     }
   }
 
-  _updateAccessory(accessory: Object) {
+  private _updateAccessory(accessory: any) {
     if (this._accessory === accessory) {
       return;
     }
@@ -810,7 +805,7 @@ export default class GmailNavItemView {
     this._accessory = accessory;
   }
 
-  _updateClickability(navItemDescriptor: Object) {
+  private _updateClickability(navItemDescriptor: any) {
     if (
       navItemDescriptor.type === NAV_ITEM_TYPES.LINK ||
       navItemDescriptor.type === NAV_ITEM_TYPES.MANAGE
@@ -821,7 +816,7 @@ export default class GmailNavItemView {
     }
   }
 
-  _updateHighlight({ eventName }: { eventName: string }) {
+  private _updateHighlight({ eventName }: { eventName: string }) {
     switch (eventName) {
       case 'mouseenter':
         this._setHighlight(true);
@@ -834,7 +829,7 @@ export default class GmailNavItemView {
     }
   }
 
-  _updateIcon(navItemDescriptor: Object) {
+  private _updateIcon(navItemDescriptor: any) {
     const iconContainerElement = this._isNewLeftNavParent
       ? querySelector(this._element, '.Yh')
       : querySelector(this._element, '.qj');
@@ -866,7 +861,7 @@ export default class GmailNavItemView {
     }
   }
 
-  _updateName(name: string) {
+  private _updateName(name: string) {
     if (this._name === name) {
       return;
     }
@@ -883,7 +878,7 @@ export default class GmailNavItemView {
     this._name = name;
   }
 
-  _updateOrder(navItemDescriptor: Object) {
+  private _updateOrder(navItemDescriptor: any) {
     this._element.setAttribute('data-group-order-hint', '' + this._orderGroup);
     this._element.setAttribute(
       'data-insertion-order-hint',
@@ -909,7 +904,7 @@ export default class GmailNavItemView {
     this._orderHint = navItemDescriptor.orderHint;
   }
 
-  _updateRole(routeID?: string) {
+  private _updateRole(routeID?: string) {
     const roleElement = querySelector(this._element, '.V6.CL');
 
     if (routeID) {
@@ -920,7 +915,7 @@ export default class GmailNavItemView {
     }
   }
 
-  _updateSubtitle(navItemDescriptor: Object) {
+  private _updateSubtitle(navItemDescriptor: any) {
     if (this._isNewLeftNavParent) {
       return;
     }
@@ -941,7 +936,7 @@ export default class GmailNavItemView {
     ).innerHTML += autoHtml`${navItemDescriptor.subtitle || ''}`;
   }
 
-  _updateType(type: string) {
+  private _updateType(type: string) {
     if (!this._element) {
       return;
     }
@@ -977,7 +972,7 @@ export default class GmailNavItemView {
     this._type = type;
   }
 
-  _updateValues(navItemDescriptor: Object) {
+  private _updateValues(navItemDescriptor: any) {
     this._navItemDescriptor = navItemDescriptor;
 
     this._updateType(navItemDescriptor.type);
@@ -990,7 +985,7 @@ export default class GmailNavItemView {
     }
 
     if (this._type === NAV_ITEM_TYPES.GROUPER) {
-      this._setupGrouper(navItemDescriptor);
+      this._setupGrouper();
       return;
     }
 
@@ -1000,6 +995,6 @@ export default class GmailNavItemView {
   }
 }
 
-export function getLeftIndentationPaddingValue(driver: GmailDriver): number {
+export function getLeftIndentationPaddingValue(): number {
   return GMAIL_V2_LEFT_INDENTATION_PADDING;
 }

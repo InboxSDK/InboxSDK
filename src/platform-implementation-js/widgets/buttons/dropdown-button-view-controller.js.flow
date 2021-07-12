@@ -1,0 +1,16 @@
+/* @flow */
+
+import type Kefir from 'kefir';
+import type ButtonView from '../../dom-driver/gmail/widgets/buttons/button-view';
+
+declare export default class DropdownButtonViewController {
+  constructor(options: Object): this;
+  getStopper(): Kefir.Observable<null>;
+  destroy(): void;
+  update(options: ?Object): void;
+  getView(): ButtonView;
+  setDropdownShowFunction(func: ?Function): void;
+  showDropdown(): void;
+  hideDropdown(): void;
+  isDropdownVisible(): boolean;
+}

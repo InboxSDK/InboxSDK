@@ -1,0 +1,35 @@
+/* @flow */
+
+import Kefir from 'kefir';
+
+import type GmailDriver from '../gmail-driver';
+
+declare export default class GmailNavItemView {
+  constructor(
+    driver: GmailDriver,
+    orderGroup: number | string,
+    level: number
+  ): this;
+
+  addNavItem(
+    orderGroup: number | string,
+    navItemDescriptor: Object
+  ): GmailNavItemView;
+  destroy(): void;
+  getElement(): HTMLElement;
+  getEventStream(): Kefir.Observable<Object>;
+  getNavItemDescriptor(): Object;
+  getOrderGroup(): number | string;
+  getOrderHint(): ?number;
+  getName(): string;
+  isCollapsed(): boolean;
+  remove(): void;
+  setActive(value: boolean): void;
+  setCollapsed(value: boolean): void;
+  setNavItemDescriptor(
+    navItemDescriptorPropertyStream: Kefir.Observable<Object>
+  ): void;
+  toggleCollapse(): void;
+}
+
+declare export function getLeftIndentationPaddingValue(): number;

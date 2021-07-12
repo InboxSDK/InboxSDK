@@ -1,6 +1,4 @@
-/* @flow */
-
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailNavItemView from '../views/gmail-nav-item-view';
 import Logger from '../../../lib/logger';
@@ -9,12 +7,12 @@ import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 
-import type GmailDriver from '../gmail-driver';
+import GmailDriver from '../gmail-driver';
 
 export default function addNavItem(
   driver: GmailDriver,
   orderGroup: string,
-  navItemDescriptor: Kefir.Observable<Object>
+  navItemDescriptor: Kefir.Observable<any, any>
 ): GmailNavItemView {
   const gmailNavItemView = new GmailNavItemView(driver, orderGroup, 1);
 
@@ -47,7 +45,7 @@ export default function addNavItem(
   return gmailNavItemView;
 }
 
-function _attachNavItemView(gmailNavItemView) {
+function _attachNavItemView(gmailNavItemView: GmailNavItemView) {
   if (!GmailElementGetter.classicHangoutsChatEnabled()) {
     // If we're in the modern (non-classic-hangouts) leftnav, then put
     // the added nav items in a floating section at the bottom separate
@@ -59,7 +57,9 @@ function _attachNavItemView(gmailNavItemView) {
       }
 
       const nonMailLeftNavSections = Array.from(
-        document.querySelectorAll('.Xa.wT:not([data-group-order-hint])')
+        document.querySelectorAll<HTMLElement>(
+          '.Xa.wT:not([data-group-order-hint])'
+        )
       ).slice(1);
       nonMailLeftNavSections.forEach(div => {
         div.dataset.groupOrderHint = 'zz_gmail';

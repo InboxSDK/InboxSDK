@@ -1,0 +1,9 @@
+/* @flow */
+
+// Use insert-element-in-order instead
+
+declare export default function getInsertBeforeElement(
+  checkElement: HTMLElement,
+  childElements: any,
+  dataAttributes: string[]
+): ?HTMLElement;
