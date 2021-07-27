@@ -21,13 +21,6 @@ Streak's CSS). Any new features that add elements controlled by the extension
 ought to be styled (positioned) reasonably by the InboxSDK without requiring
 the extension to include its own non-trivial CSS.
 
-## Types
-
-This project uses Facebook's Flow type checker (https://flowtype.org/). You can
-use the `yarn flow` command from within the repo to do type checking. You
-should run this frequently (or install an editor plugin) while developing in
-order to check your code for type safety.
-
 ## Fixing Unreproducible Bugs
 
 Gmail frequently delivers rolling updates to users, so that a small percent of
@@ -164,18 +157,22 @@ tests can be run with `yarn puppeteer`.
 
 # Implementation Notes
 
+## Build
+
 When the `--singleBundle` flag isn't used, two javascript files are created:
 inboxsdk.js and platform-implementation.js. inboxsdk.js implements the InboxSDK
 object with the load method. It triggers an AJAX request for
 platform-implementation.js which is evaluated and creates a
 PlatformImplementation object.
 
-## src/inboxsdk-js/
+## Paths
+
+### src/inboxsdk-js/
 
 This contains the code for the global `InboxSDK` object with the `load` and
 `loadScript` methods.
 
-## src/platform-implementation-js/
+### src/platform-implementation-js/
 
 This is the code that the InboxSDK loader fetches from our server.
 
@@ -194,7 +191,7 @@ and instantiates a ComposeView object wrapping it, adding some logic common to
 both Gmail and Inbox, and this ComposeView object is what is exposed to the
 extension.
 
-## src/injected-js/
+### src/injected-js/
 
 This code ultimately ends up inside of platform-implementation.js. Unlike the
 rest of the code, it's executed within Gmail's environment instead of the
@@ -210,6 +207,12 @@ lives in the injected script.
 The file "src/injected-js/main.js" is browserified into "dist/injected.js",
 which is then included by "src/platform-implementation-js/lib/inject-script.js"
 and built into "dist/platform-implementation.js".
+
+## Technology Choices
+
+We're trying to use Typescript as much as possible now. There are still a lot of classic Javascript and Flow Javascript files left over. As needed, you can make `.d.ts` type-def files so Typescript can see them, and you can make `.js.flow` type-def files so Flow can see Typescript files. If you're working on a bit of code that's not in a Typescript file, consider changing the file to be Typescript.
+
+React is done for some UIs, but there's a complication to using it generally: we often need to integrate with elements from Gmail itself or other instances of the InboxSDK. React only works well for the case where there are a lot of elements created and managed by the InboxSDK itself, we have many places where we have to integrate with outside elements, and most of our additions into the page are pretty simple DOM-wise, so we're pretty picky about where we use React.
 
 ## Element Detection Notes
 
