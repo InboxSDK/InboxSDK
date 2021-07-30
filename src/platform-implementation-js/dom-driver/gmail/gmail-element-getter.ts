@@ -142,10 +142,6 @@ const GmailElementGetter = {
     if (leftNavElement.classList.contains('aZ6')) {
       return true;
     } else {
-      if (document.querySelector('[role=navigation] > .aic')) {
-        // The compose button of old Hangouts-only Gmail is present
-        return true;
-      }
       return false;
     }
   },
