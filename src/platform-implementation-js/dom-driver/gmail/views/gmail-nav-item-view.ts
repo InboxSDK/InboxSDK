@@ -59,7 +59,7 @@ export default class GmailNavItemView {
     this._orderGroup = orderGroup;
 
     this._isNewLeftNavParent =
-      !GmailElementGetter.classicHangoutsChatEnabled() && this._level === 1;
+      !GmailElementGetter.shouldAddNavItemsInline() && this._level === 1;
 
     if (this._isNewLeftNavParent) {
       this._element = this._setupParentElement();
@@ -213,7 +213,7 @@ export default class GmailNavItemView {
 
     const element = gmailNavItemView.getElement();
 
-    if (!GmailElementGetter.classicHangoutsChatEnabled()) {
+    if (!GmailElementGetter.shouldAddNavItemsInline()) {
       querySelector(element, '.TN').style.marginLeft =
         6 * indentationFactor + 'px';
     } else {

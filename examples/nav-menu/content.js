@@ -254,7 +254,7 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
 
   // initNavItemAdd();
   // initNavItemSubtitle();
-  // initNavItemCollapse();
+  initNavItemCollapse();
   // initNavItemChildren();
   // initNavItemAccessoryAndIcon();
   // initNavItemAccessories();

@@ -107,18 +107,29 @@ const GmailElementGetter = {
     return document.body.querySelector('.dw .nH > .nH > .no');
   },
 
-  classicHangoutsChatEnabled(): boolean {
+  // This function checks whether we should use the old InboxSDK style of adding nav items
+  // inline among Gmail's nav items (as opposed to the newer style where we put our nav items
+  // in their own sections at the bottom of the leftnav).
+  shouldAddNavItemsInline(): boolean {
+    // There's two cases this function should return true:
+    // - The user is in a pre-Google-Chat Hangouts-only version of Gmail (the Gmail Settings ->
+    //   Chat and Meet -> Chat menu only has the options "Hangouts On" and "Hangouts Off").
+    // - The user has "Classic Hangouts" picked in Gmail Settings -> Chat and Meet -> Chat.
+
     const leftNavElement = document.querySelector(
       '.aeN[role=navigation], .aeN [role=navigation]'
     );
     if (!leftNavElement) {
-      throw new Error(
-        'classicHangoutsChatEnabled failed to find leftNavElement'
-      );
+      throw new Error('shouldAddNavItemsInline failed to find leftNavElement');
     }
 
     // leftNavElement classnames depending on gmail chat & meet settings:
 
+    // Old Hangouts-only Gmail
+    //  div.aeN.WR.nH.oy8Mbf.nn
+    //  (looks identical to current Gmail's chat-off-meet-off setup, but there are important
+    //  CSS differences inside the element!)
+    // ===================
     // No classname difference between open/collapsed
     //  div.ajl.aib.aZ6 (classic hangouts on left or right, google meet on/off)
     // ===================
@@ -128,7 +139,15 @@ const GmailElementGetter = {
     //  div.aeN.WR.anZ.nH.oy8Mbf.nn (google chat on left, google meet on/off)
     //  div.aeN.WR.ahu.nH.oy8Mbf.nn (google chat on right, google meet on/off)
 
-    return leftNavElement.classList.contains('aZ6');
+    if (leftNavElement.classList.contains('aZ6')) {
+      return true;
+    } else {
+      if (document.querySelector('[role=navigation] > .aic')) {
+        // The compose button of old Hangouts-only Gmail is present
+        return true;
+      }
+      return false;
+    }
   },
 
   getSeparateSectionNavItemMenuInjectionContainer(): HTMLElement | null {

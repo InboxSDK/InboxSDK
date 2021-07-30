@@ -46,7 +46,7 @@ export default function addNavItem(
 }
 
 function _attachNavItemView(gmailNavItemView: GmailNavItemView) {
-  if (!GmailElementGetter.classicHangoutsChatEnabled()) {
+  if (!GmailElementGetter.shouldAddNavItemsInline()) {
     // If we're in the modern (non-classic-hangouts) leftnav, then put
     // the added nav items in a floating section at the bottom separate
     // from the Mail section.
