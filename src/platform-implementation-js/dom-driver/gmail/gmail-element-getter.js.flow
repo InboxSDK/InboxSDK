@@ -30,7 +30,7 @@ declare var GmailElementGetter: {
   getThreadContainerElement(): ?HTMLElement,
   getToolbarElement(): HTMLElement,
   getTopAccountContainer(): ?HTMLElement,
-  classicHangoutsChatEnabled(): boolean,
+  shouldAddNavItemsInline(): boolean,
   getSeparateSectionNavItemMenuInjectionContainer(): ?HTMLElement,
   getSameSectionNavItemMenuInjectionContainer(): ?HTMLElement,
   isGplusEnabled(): boolean,

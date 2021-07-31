@@ -1557,6 +1557,14 @@ body[dir='rtl'] .inboxsdk__hide_addon_container[dir='ltr'] {
   font-size: 14px;
 }
 
+/*
+fix issue in pre-Chat Gmail versions where somehow a style="flex-grow: 1" attribute
+shows up on our elements preventing them from collapsing.
+*/
+.inboxsdk__navItem:not(.Xr) > .V3[style] {
+  flex-grow: 0 !important;
+}
+
 .inboxsdk__navItem > .TO.n4 {
   display: block;
   padding-left: 0;
