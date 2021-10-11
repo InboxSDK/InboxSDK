@@ -29,6 +29,8 @@ let NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED = 0;
 
 const GMAIL_V2_LEFT_INDENTATION_PADDING = 12;
 
+// TODO could we recreate this with React? There's so much statefulness that it's
+
 export default class GmailNavItemView {
   private _accessory: any = null;
   private _accessoryViewController: any = null;
@@ -47,6 +49,7 @@ export default class GmailNavItemView {
   private _orderGroup: number | string;
   private _orderHint: any;
   private _type: string | null = null;
+  private _collapseKey: string | null = null;
 
   // delete after new left nav is fully launched, use this._level === 1 instead
   private _isNewLeftNavParent: boolean;
@@ -778,13 +781,23 @@ export default class GmailNavItemView {
   private _toggleCollapse() {
     if (!this._isCollapsible()) {
       this._isCollapsed = !this._isCollapsed;
-      return;
-    }
-
-    if (this._isCollapsed) {
-      this._expand();
     } else {
-      this._collapse();
+      if (this._isCollapsed) {
+        this._expand();
+      } else {
+        this._collapse();
+      }
+    }
+    try {
+      const storageKey = 'inboxsdk__navitem_collapsed__' + this._collapseKey;
+      if (this._isCollapsed) {
+        localStorage.setItem(storageKey, 'true');
+      } else {
+        localStorage.removeItem(storageKey);
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Caught error', e);
     }
   }
 
@@ -974,6 +987,14 @@ export default class GmailNavItemView {
 
   private _updateValues(navItemDescriptor: any) {
     this._navItemDescriptor = navItemDescriptor;
+
+    if (this._collapseKey == null) {
+      this._collapseKey = navItemDescriptor.key || `${navItemDescriptor.name}`;
+      this._isCollapsed =
+        localStorage.getItem(
+          'inboxsdk__navitem_collapsed__' + this._collapseKey
+        ) === 'true';
+    }
 
     this._updateType(navItemDescriptor.type);
     this._updateName(navItemDescriptor.name);
