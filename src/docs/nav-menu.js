@@ -129,7 +129,14 @@ var NavItemDescriptor = /** @lends NavItemDescriptor */ {
    * ^default=NAVIGATION
    * @type {NavItemTypes}
    */
-  type: null
+  type: null,
+
+  /**
+   * Unique identifier for the nav item used for remembering collapse state between sessions. Defaults to the name if not given.
+   * ^optional
+   * @type {string}
+   */
+  key: null
 };
 
 /**

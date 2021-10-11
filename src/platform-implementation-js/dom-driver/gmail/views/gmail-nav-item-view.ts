@@ -167,14 +167,24 @@ export default class GmailNavItemView {
   setCollapsed(value: boolean) {
     this._isCollapsed = value;
 
-    if (!this._isCollapsible()) {
-      return;
+    if (this._isCollapsible()) {
+      if (value) {
+        this._collapse();
+      } else {
+        this._expand();
+      }
     }
 
-    if (value) {
-      this._collapse();
-    } else {
-      this._expand();
+    try {
+      const storageKey = 'inboxsdk__navitem_collapsed__' + this._collapseKey;
+      if (this._isCollapsed) {
+        localStorage.setItem(storageKey, 'true');
+      } else {
+        localStorage.removeItem(storageKey);
+      }
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error('Caught error', e);
     }
   }
 
@@ -187,7 +197,7 @@ export default class GmailNavItemView {
   }
 
   toggleCollapse() {
-    this._toggleCollapse();
+    this.setCollapsed(!this._isCollapsed);
   }
 
   // TODO this method is only called on orderChanged? is that right?
@@ -395,7 +405,7 @@ export default class GmailNavItemView {
     expandoElement.title = `Expand ${this._name || ''}`;
 
     expandoElement.addEventListener('click', (e: MouseEvent) => {
-      this._toggleCollapse();
+      this.toggleCollapse();
       e.stopPropagation();
     });
 
@@ -742,7 +752,7 @@ export default class GmailNavItemView {
     Kefir.fromEvents<MouseEvent, never>(expandoElement, 'click')
       .map(this._makeEventMapper('click'))
       .onValue(() => {
-        element.classList.toggle('Xr');
+        this.toggleCollapse();
       });
 
     const innerElement = querySelector(element, '.V6.CL');
@@ -763,7 +773,7 @@ export default class GmailNavItemView {
 
       navItemElement.addEventListener('click', (e: MouseEvent) => {
         e.stopPropagation();
-        this._toggleCollapse();
+        this.toggleCollapse();
       });
 
       if (this._isCollapsed) {
@@ -776,29 +786,6 @@ export default class GmailNavItemView {
     const iconContainerElement = querySelector(this._element, '.qj');
     iconContainerElement.innerHTML =
       '<div class="G-asx T-I-J3 J-J5-Ji">&nbsp;</div>';
-  }
-
-  private _toggleCollapse() {
-    if (!this._isCollapsible()) {
-      this._isCollapsed = !this._isCollapsed;
-    } else {
-      if (this._isCollapsed) {
-        this._expand();
-      } else {
-        this._collapse();
-      }
-    }
-    try {
-      const storageKey = 'inboxsdk__navitem_collapsed__' + this._collapseKey;
-      if (this._isCollapsed) {
-        localStorage.setItem(storageKey, 'true');
-      } else {
-        localStorage.removeItem(storageKey);
-      }
-    } catch (e) {
-      // eslint-disable-next-line no-console
-      console.error('Caught error', e);
-    }
   }
 
   private _updateAccessory(accessory: any) {
