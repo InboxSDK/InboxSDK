@@ -1,3 +1,7 @@
+# Public Mailing List
+
+https://groups.google.com/g/inboxsdk/
+
 # Development Cycle Essentials
 
 Run `yarn` to install the necessary dependencies, and run `yarn start` to
