@@ -69,6 +69,8 @@ import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
 import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
 import getFormattingAreaOffsetLeft from './gmail-compose-view/get-formatting-area-offset-left';
 import overrideEditSubject from './gmail-compose-view/override-edit-subject';
+import PageParserTree from 'page-parser-tree';
+import { TagTree } from 'tag-tree';
 
 import * as fromManager from './gmail-compose-view/from-manager';
 
@@ -115,6 +117,8 @@ class GmailComposeView {
   _closedProgrammatically: boolean = false;
   _destroyed: boolean = false;
   _removedFromDOMStopper: Stopper;
+  _page: PageParserTree;
+  tagTree: TagTree<HTMLElement>;
   ready: () => Kefir.Observable<GmailComposeView>;
 
   constructor(
@@ -152,6 +156,50 @@ class GmailComposeView {
     this._removedFromDOMStopper = kefirStopper();
 
     this._isTriggeringADraftSavePending = false;
+
+    this._page = new PageParserTree(element, {
+      tags: {},
+      watchers: [],
+      finders: {
+        toRecipient: {
+          fn: root => {
+            const oldRow = this.getOldRecipientRowForType('to');
+            if (oldRow) {
+              return oldRow.querySelectorAll('.vR');
+            } else {
+              return root.querySelectorAll(
+                '.GS .anm[name="to"] [role=listbox] [role=option][data-name]'
+              );
+            }
+          }
+        },
+        ccRecipient: {
+          fn: root => {
+            const oldRow = this.getOldRecipientRowForType('cc');
+            if (oldRow) {
+              return oldRow.querySelectorAll('.vR');
+            } else {
+              return root.querySelectorAll(
+                '.GS .anm[name="cc"] [role=listbox] [role=option][data-name]'
+              );
+            }
+          }
+        },
+        bccRecipient: {
+          fn: root => {
+            const oldRow = this.getOldRecipientRowForType('bcc');
+            if (oldRow) {
+              return oldRow.querySelectorAll('.vR');
+            } else {
+              return root.querySelectorAll(
+                '.GS .anm[name="bcc"] [role=listbox] [role=option][data-name]'
+              );
+            }
+          }
+        }
+      }
+    });
+    this.tagTree = this._page.tree;
 
     let saveAndSendStream;
     if (this._driver.isUsingSyncAPI()) {
@@ -492,6 +540,7 @@ class GmailComposeView {
     // this gets called when the element gets removed from the DOM
     // however we don't want to pass through that destroy event right away
     this._removedFromDOMStopper.destroy();
+    this._page.dump();
   }
 
   _destroy() {
@@ -1621,14 +1670,17 @@ class GmailComposeView {
     );
   }
 
-  getOldRecipientRowForType(addressType: 'to' | 'cc' | 'bcc'): HTMLElement {
-    const input = querySelector(
-      this._element,
+  getOldRecipientRowForType(
+    addressType: 'to' | 'cc' | 'bcc'
+  ): HTMLElement | null {
+    const input = this._element.querySelector(
       `.GS tr textarea.vO[name="${addressType}"], .GS tr input[name="${addressType}"]`
     );
-    const row = closest(input, 'tr');
-    if (!row) throw new Error();
-    return row;
+    if (input) {
+      return closest(input, 'tr');
+    } else {
+      return null;
+    }
   }
 
   addManagedViewController(viewController: { destroy(): void }) {

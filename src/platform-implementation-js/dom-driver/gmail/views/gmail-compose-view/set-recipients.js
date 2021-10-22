@@ -23,6 +23,9 @@ export default function setRecipients(
   let contactRow;
   try {
     contactRow = gmailComposeView.getOldRecipientRowForType(addressType);
+    if (!contactRow) {
+      throw new Error('getOldRecipientRowForType failed');
+    }
   } catch (err) {
     Logger.error(err, { addressType });
     return;
