@@ -1608,12 +1608,20 @@ class GmailComposeView {
   // getRecipientRowForType is recommended over this
   getRecipientRowElements(): HTMLElement[] {
     return Array.prototype.filter.call(
-      this._element.querySelectorAll('.GS tr'),
+      this._element.querySelectorAll('.GS tr, .GS .anm[name] [role=listbox]'),
       tr => !tr.classList.contains('inboxsdk__recipient_row')
     );
   }
 
-  getRecipientRowForType(addressType: 'to' | 'cc' | 'bcc'): HTMLElement {
+  getRecipientRowForType(addressType: 'to' | 'cc' | 'bcc'): HTMLElement | null {
+    // handling new recipients
+    // https://workspaceupdates.googleblog.com/2021/10/visual-updates-for-composing-email-in-gmail.html
+    return this._element.querySelector(
+      `.GS .anm[name="${addressType}"] [role=listbox]`
+    );
+  }
+
+  getOldRecipientRowForType(addressType: 'to' | 'cc' | 'bcc'): HTMLElement {
     const input = querySelector(
       this._element,
       `.GS tr textarea.vO[name="${addressType}"], .GS tr input[name="${addressType}"]`
