@@ -8,6 +8,8 @@ import makeMutationObserverStream from '../../../../lib/dom/make-mutation-observ
 import getAddressInformationExtractor from './get-address-information-extractor';
 
 import type GmailComposeView from '../gmail-compose-view';
+import makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
+import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
 
 export default function getAddressChangesStream(
   gmailComposeView: GmailComposeView
@@ -33,73 +35,58 @@ export default function getAddressChangesStream(
   ]);
 }
 
+function readContactFromElement(
+  contactNode: HTMLElement,
+  addressType: ReceiverType,
+  gmailComposeView: GmailComposeView
+): Contact | null {
+  if (contactNode.getAttribute('role') === 'option') {
+    // Handling updated compose recipients
+    // https://workspaceupdates.googleblog.com/2021/10/visual-updates-for-composing-email-in-gmail.html
+    return {
+      name: contactNode.getAttribute('data-name'),
+      emailAddress: (contactNode.getAttribute('data-hovercard-id'): any)
+    };
+  } else {
+    return getAddressInformationExtractor(
+      addressType,
+      gmailComposeView
+    )(contactNode);
+  }
+}
+
 function _makeSubAddressStream(
   addressType: ReceiverType,
   gmailComposeView: GmailComposeView
-) {
-  let contactRow;
-  try {
-    contactRow = gmailComposeView.getRecipientRowForType(addressType);
-  } catch (err) {
-    Logger.error(err, { addressType });
-    return Kefir.never();
-  }
-
-  const mainSubAddressStream = makeMutationObserverStream(contactRow, {
-    childList: true,
-    subtree: true
-  });
-
-  return Kefir.later(0, null).flatMap(function() {
-    return Kefir.merge([
-      mainSubAddressStream
-        .toProperty(() => {
-          return { addedNodes: contactRow.querySelectorAll('.vR') };
-        })
-        .transduce(
-          t.compose(
-            t.mapcat(e => Array.from(e.addedNodes)),
-            t.filter(
-              n =>
-                _doesRecipientNodeHaveInput(n, addressType) ||
-                _isRecipientNodeInput(n, addressType)
-            ),
-            t.map(
-              getAddressInformationExtractor(addressType, gmailComposeView)
-            ),
-            t.keep(),
-            t.map(info => _convertToEvent(addressType + 'ContactAdded', info))
-          )
-        ),
-
-      mainSubAddressStream.transduce(
-        t.compose(
-          t.mapcat(e => Array.from(e.removedNodes)),
-          t.filter(_isRecipientNode),
-          t.map(getAddressInformationExtractor(addressType, gmailComposeView)),
-          t.keep(),
-          t.map(info => _convertToEvent(addressType + 'ContactRemoved', info))
-        )
-      )
-    ]);
-  });
-}
-
-function _isRecipientNode(node) {
-  // We want to filter non-element nodes out too.
-  return node.classList && node.classList.contains('vR');
-}
-
-function _doesRecipientNodeHaveInput(node, addressType) {
-  return (
-    _isRecipientNode(node) && node.querySelector(`input[name='${addressType}']`)
+): Kefir.Observable<{ eventName: string, data: { contact: Contact } }> {
+  const contactNodes = gmailComposeView.tagTree.getAllByTag(
+    `${addressType}Recipient`
   );
-}
 
-function _isRecipientNodeInput(node, addressType) {
-  return (
-    node instanceof HTMLInputElement &&
-    node.getAttribute('name') === addressType
+  return toItemWithLifetimeStream(contactNodes).flatMap(
+    ({ el, removalStream }) => {
+      const contact = readContactFromElement(
+        el.getValue(),
+        addressType,
+        gmailComposeView
+      );
+      if (!contact) {
+        return Kefir.never();
+      }
+      return Kefir.constant({
+        eventName: `${addressType}ContactAdded`,
+        data: {
+          contact
+        }
+      }).merge(
+        removalStream.map(() => ({
+          eventName: `${addressType}ContactRemoved`,
+          data: {
+            contact
+          }
+        }))
+      );
+    }
   );
 }
 

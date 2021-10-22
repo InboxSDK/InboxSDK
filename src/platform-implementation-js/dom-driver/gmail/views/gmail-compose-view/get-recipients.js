@@ -9,27 +9,26 @@ export default function getRecipients(
   gmailComposeView: GmailComposeView,
   addressType: ReceiverType
 ): Contact[] {
-  let contactRow;
-  try {
-    contactRow = gmailComposeView.getRecipientRowForType(addressType);
-  } catch (err) {
-    Logger.error(err, { addressType });
-    return [];
-  }
-
-  const candidateContacts = _extractPeopleContacts(
-    contactRow,
-    addressType,
-    gmailComposeView
+  const contactNodes = gmailComposeView.tagTree.getAllByTag(
+    `${addressType}Recipient`
   );
-  const contacts = candidateContacts.filter(Boolean);
-  return contacts;
-}
-
-function _extractPeopleContacts(container, addressType, gmailComposeView) {
-  const peopleSpans = container.querySelectorAll('.vR');
-  return Array.prototype.map.call(
-    peopleSpans,
-    getAddressInformationExtractor(addressType, gmailComposeView)
-  );
+  return Array.from(contactNodes.values())
+    .map(node => {
+      const contactNode = node.getValue();
+      if (contactNode.getAttribute('role') === 'option') {
+        // new recipient
+        // https://workspaceupdates.googleblog.com/2021/10/visual-updates-for-composing-email-in-gmail.html
+        return {
+          name: contactNode.getAttribute('data-name'),
+          emailAddress: (contactNode.getAttribute('data-hovercard-id'): any)
+        };
+      } else {
+        // old
+        return getAddressInformationExtractor(
+          addressType,
+          gmailComposeView
+        )(contactNode);
+      }
+    })
+    .filter(Boolean);
 }

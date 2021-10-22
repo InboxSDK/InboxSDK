@@ -18,9 +18,14 @@ export default function setRecipients(
     return;
   }
 
+  // TODO handle new recipient row type
+
   let contactRow;
   try {
-    contactRow = gmailComposeView.getRecipientRowForType(addressType);
+    contactRow = gmailComposeView.getOldRecipientRowForType(addressType);
+    if (!contactRow) {
+      throw new Error('getOldRecipientRowForType failed');
+    }
   } catch (err) {
     Logger.error(err, { addressType });
     return;

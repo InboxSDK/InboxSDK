@@ -10,8 +10,8 @@ import type GmailComposeView from '../gmail-compose-view';
 export default function getAddressInformationExtractor(
   addressType: string,
   composeView: GmailComposeView
-): (node: HTMLElement) => ?Contact {
-  return function(node: HTMLElement): ?Contact {
+): (node: HTMLElement) => Contact | null {
+  return function(node: HTMLElement): Contact | null {
     const contactNode =
       node instanceof HTMLInputElement &&
       node.getAttribute('name') === addressType
