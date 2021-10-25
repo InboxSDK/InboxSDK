@@ -20,7 +20,28 @@ export default function setRecipients(
 
   let oldRange;
 
-  const contactRow = gmailComposeView.getRecipientRowForType(addressType);
+  let contactRow = gmailComposeView.getRecipientRowForType(addressType);
+
+  // <span id=":8l" class="aB gQ pE" role="link" tabindex="1" data-tooltip="Add Cc recipients ‪(⌘⇧C)‬" aria-label="Add Cc recipients ‪(⌘⇧C)‬" style="user-select: none; display: none;">Cc</span>
+  // <span id=":8m" class="aB  gQ pB" role="link" tabindex="1" data-tooltip="Add Bcc recipients ‪(⌘⇧B)‬" aria-label="Add Bcc recipients ‪(⌘⇧B)‬" style="user-select: none;">Bcc</span>
+  if (addressType === 'cc') {
+    const ccButton = gmailComposeView
+      .getElement()
+      .querySelector('span.pE[role=link]');
+    if (ccButton) {
+      ccButton.click();
+      contactRow = gmailComposeView.getRecipientRowForType(addressType);
+    }
+  } else if (addressType === 'bcc') {
+    const bccButton = gmailComposeView
+      .getElement()
+      .querySelector('span.pB[role=link]');
+    if (bccButton) {
+      bccButton.click();
+      contactRow = gmailComposeView.getRecipientRowForType(addressType);
+    }
+  }
+
   if (contactRow) {
     // new stuff
 
@@ -38,11 +59,14 @@ export default function setRecipients(
       el.click();
     });
 
-    emailAddresses.forEach(email => {
-      emailAddressEntry.value = email;
-      // Push enter so Gmail interprets the addresses.
-      simulateKey(emailAddressEntry, 13, 0);
-    });
+    emailAddressEntry.value = emailAddresses.join(',');
+    simulateKey(emailAddressEntry, 13, 0);
+
+    // emailAddresses.forEach(email => {
+    //   emailAddressEntry.value = email;
+    //   // Push enter so Gmail interprets the addresses.
+    //   simulateKey(emailAddressEntry, 13, 0);
+    // });
 
     oldRange = gmailComposeView.getLastSelectionRange();
 
