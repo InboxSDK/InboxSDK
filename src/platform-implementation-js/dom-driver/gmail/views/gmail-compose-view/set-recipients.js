@@ -22,8 +22,6 @@ export default function setRecipients(
 
   let contactRow = gmailComposeView.getRecipientRowForType(addressType);
 
-  // <span id=":8l" class="aB gQ pE" role="link" tabindex="1" data-tooltip="Add Cc recipients ‪(⌘⇧C)‬" aria-label="Add Cc recipients ‪(⌘⇧C)‬" style="user-select: none; display: none;">Cc</span>
-  // <span id=":8m" class="aB  gQ pB" role="link" tabindex="1" data-tooltip="Add Bcc recipients ‪(⌘⇧B)‬" aria-label="Add Bcc recipients ‪(⌘⇧B)‬" style="user-select: none;">Bcc</span>
   if (addressType === 'cc') {
     const ccButton = gmailComposeView
       .getElement()
@@ -43,7 +41,8 @@ export default function setRecipients(
   }
 
   if (contactRow) {
-    // new stuff
+    // new recipient fields
+    // https://workspaceupdates.googleblog.com/2021/10/visual-updates-for-composing-email-in-gmail.html
 
     const emailAddressEntry = querySelector(
       contactRow,
@@ -66,12 +65,8 @@ export default function setRecipients(
 
     emailAddressEntry.value = emailAddresses.join(',');
     simulateKey(emailAddressEntry, 13, 0);
-
-    // Focus the recipients preview label so Gmail re-renders it.
-    // const cover = querySelector(gmailComposeView.getElement(), 'div.aoD.hl');
-    // cover.dispatchEvent(new FocusEvent('focus'));
   } else {
-    // old stuff
+    // old recipient fields
     let contactRow;
     try {
       contactRow = gmailComposeView.getOldRecipientRowForType(addressType);
