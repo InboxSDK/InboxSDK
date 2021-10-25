@@ -38,10 +38,11 @@ export default function setRecipients(
       el.click();
     });
 
-    emailAddressEntry.value = emailAddresses.join(',');
-
-    // Push enter so Gmail interprets the addresses.
-    simulateKey(emailAddressEntry, 13, 0);
+    emailAddresses.forEach(email => {
+      emailAddressEntry.value = email;
+      // Push enter so Gmail interprets the addresses.
+      simulateKey(emailAddressEntry, 13, 0);
+    });
 
     oldRange = gmailComposeView.getLastSelectionRange();
 
