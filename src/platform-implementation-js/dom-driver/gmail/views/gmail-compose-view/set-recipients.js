@@ -49,6 +49,11 @@ export default function setRecipients(
       contactRow,
       'input[role=combobox][aria-autocomplete=list]'
     );
+    if (!(emailAddressEntry instanceof HTMLInputElement)) {
+      throw new Error();
+    }
+
+    oldRange = gmailComposeView.getLastSelectionRange();
 
     // Remove existing recipients
     Array.from(
@@ -61,14 +66,6 @@ export default function setRecipients(
 
     emailAddressEntry.value = emailAddresses.join(',');
     simulateKey(emailAddressEntry, 13, 0);
-
-    // emailAddresses.forEach(email => {
-    //   emailAddressEntry.value = email;
-    //   // Push enter so Gmail interprets the addresses.
-    //   simulateKey(emailAddressEntry, 13, 0);
-    // });
-
-    oldRange = gmailComposeView.getLastSelectionRange();
 
     // Focus the recipients preview label so Gmail re-renders it.
     // const cover = querySelector(gmailComposeView.getElement(), 'div.aoD.hl');

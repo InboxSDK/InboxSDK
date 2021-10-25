@@ -159,7 +159,82 @@ class GmailComposeView {
 
     this._page = new PageParserTree(element, {
       tags: {},
-      watchers: [],
+      watchers: [
+        {
+          sources: [null],
+          tag: 'recipientsCommon',
+          selectors: [
+            'div',
+            'div',
+            'div[jsaction]',
+            'div[role=region]',
+            'table',
+            'tbody',
+            'tr',
+            'td',
+            'form',
+            'div',
+            'table.GS',
+            'tbody',
+            'tr.bzf',
+            'td.eV',
+            'div',
+            'div'
+          ]
+        },
+        {
+          sources: ['recipientsCommon'],
+          tag: 'toRecipient',
+          selectors: [
+            {
+              $or: [
+                [
+                  'div.anm[name="to"]',
+                  'div',
+                  'div',
+                  'div',
+                  'div',
+                  '[role=listbox]',
+                  'div',
+                  'div',
+                  'div[role=option][data-name]'
+                ],
+                ['xyztest']
+              ]
+            }
+          ]
+        },
+        {
+          sources: ['recipientsCommon'],
+          tag: 'ccRecipient',
+          selectors: [
+            'div.anm[name="cc"]',
+            'div',
+            'div',
+            'div',
+            'div',
+            '[role=listbox]',
+            'div',
+            'div',
+            'div[role=option][data-name]'
+          ]
+        },
+        {
+          sources: ['recipientsCommon'],
+          tag: 'bccRecipient',
+          selectors: [
+            'div.anm[name="bcc"]',
+            'div',
+            'div',
+            'div',
+            'div',
+            '[role=listbox]',
+            'div',
+            'div',
+            'div[role=option][data-name]'
+          ]
+        }
+      ],
       finders: {
         toRecipient: {
           fn: root => {
