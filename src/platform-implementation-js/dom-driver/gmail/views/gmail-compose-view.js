@@ -208,14 +208,11 @@ class GmailComposeView {
                   'div[role=option][data-name]'
                 ],
                 [
-                  { $log: 'before querySelector' },
                   {
                     $map: el =>
                       el.querySelector('textarea.vO[name=to], input[name=to]')
                   },
-                  { $log: 'after querySelector' },
                   { $map: el => (el.closest('tr'): any) },
-                  { $log: 'after closest' },
                   'td.eV',
                   'div',
                   'div',
