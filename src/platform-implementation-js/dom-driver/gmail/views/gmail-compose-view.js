@@ -69,6 +69,7 @@ import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
 import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
 import getFormattingAreaOffsetLeft from './gmail-compose-view/get-formatting-area-offset-left';
 import overrideEditSubject from './gmail-compose-view/override-edit-subject';
+import censorHTMLtree from '../../../../common/censorHTMLtree';
 import PageParserTree from 'page-parser-tree';
 import { TagTree } from 'tag-tree';
 
@@ -158,14 +159,151 @@ class GmailComposeView {
     this._isTriggeringADraftSavePending = false;
 
     this._page = new PageParserTree(element, {
+      logError(err, el) {
+        const details = {
+          el,
+          html: el ? censorHTMLtree(el) : null
+        };
+        driver.getLogger().errorSite(err, details);
+      },
       tags: {},
-      watchers: [],
+      watchers: [
+        {
+          sources: [null],
+          tag: 'recipientsCommon',
+          selectors: [
+            'div',
+            'div',
+            'div[jsaction]',
+            'div[role=region]',
+            'table',
+            'tbody',
+            'tr',
+            'td',
+            'form',
+            'div',
+            'table.GS',
+            'tbody',
+            'tr.bzf',
+            'td.eV',
+            'div',
+            'div'
+          ]
+        },
+        {
+          sources: ['recipientsCommon'],
+          tag: 'toRecipient',
+          selectors: [
+            {
+              $or: [
+                [
+                  'div.anm[name="to"]',
+                  'div',
+                  'div',
+                  'div',
+                  'div',
+                  '[role=listbox]',
+                  'div',
+                  'div',
+                  'div[role=option][data-name]'
+                ],
+                [
+                  { $log: 'before querySelector' },
+                  {
+                    $map: el =>
+                      el.querySelector('textarea.vO[name=to], input[name=to]')
+                  },
+                  { $log: 'after querySelector' },
+                  { $map: el => (el.closest('tr'): any) },
+                  { $log: 'after closest' },
+                  'td.eV',
+                  'div',
+                  'div',
+                  '.vR',
+                  'input[type=hidden]',
+                  { $map: el => (el.parentElement: any) }
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          sources: ['recipientsCommon'],
+          tag: 'ccRecipient',
+          selectors: [
+            {
+              $or: [
+                [
+                  'div.anm[name="cc"]',
+                  'div',
+                  'div',
+                  'div',
+                  'div',
+                  '[role=listbox]',
+                  'div',
+                  'div',
+                  'div[role=option][data-name]'
+                ],
+                [
+                  {
+                    $map: el =>
+                      el.querySelector('textarea.vO[name=cc], input[name=cc]')
+                  },
+                  { $map: el => (el.closest('tr'): any) },
+                  'td.eV',
+                  'div',
+                  'div',
+                  '.vR',
+                  'input[type=hidden]',
+                  { $map: el => (el.parentElement: any) }
+                ]
+              ]
+            }
+          ]
+        },
+        {
+          sources: ['recipientsCommon'],
+          tag: 'bccRecipient',
+          selectors: [
+            {
+              $or: [
+                [
+                  'div.anm[name="bcc"]',
+                  'div',
+                  'div',
+                  'div',
+                  'div',
+                  '[role=listbox]',
+                  'div',
+                  'div',
+                  'div[role=option][data-name]'
+                ],
+                [
+                  {
+                    $map: el =>
+                      el.querySelector('textarea.vO[name=bcc], input[name=bcc]')
+                  },
+                  { $map: el => (el.closest('tr'): any) },
+                  'td.eV',
+                  'div',
+                  'div',
+                  '.vR',
+                  'input[type=hidden]',
+                  { $map: el => (el.parentElement: any) }
+                ]
+              ]
+            }
+          ]
+        }
+      ],
       finders: {
         toRecipient: {
           fn: root => {
             const oldRow = this.getOldRecipientRowForType('to');
             if (oldRow) {
-              return oldRow.querySelectorAll('.vR');
+              return Array.from(
+                oldRow.querySelectorAll('.vR > input[type=hidden]')
+              ).map(el => (el.parentElement: any));
             } else {
               return root.querySelectorAll(
                 '.GS .anm[name="to"] [role=listbox] [role=option][data-name]'
@@ -177,7 +315,9 @@ class GmailComposeView {
           fn: root => {
             const oldRow = this.getOldRecipientRowForType('cc');
             if (oldRow) {
-              return oldRow.querySelectorAll('.vR');
+              return Array.from(
+                oldRow.querySelectorAll('.vR > input[type=hidden]')
+              ).map(el => (el.parentElement: any));
             } else {
               return root.querySelectorAll(
                 '.GS .anm[name="cc"] [role=listbox] [role=option][data-name]'
@@ -189,7 +329,9 @@ class GmailComposeView {
           fn: root => {
             const oldRow = this.getOldRecipientRowForType('bcc');
             if (oldRow) {
-              return oldRow.querySelectorAll('.vR');
+              return Array.from(
+                oldRow.querySelectorAll('.vR > input[type=hidden]')
+              ).map(el => (el.parentElement: any));
             } else {
               return root.querySelectorAll(
                 '.GS .anm[name="bcc"] [role=listbox] [role=option][data-name]'

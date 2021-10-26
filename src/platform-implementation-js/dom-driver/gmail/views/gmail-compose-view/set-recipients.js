@@ -18,56 +18,104 @@ export default function setRecipients(
     return;
   }
 
-  // TODO handle new recipient row type
+  let oldRange;
 
-  let contactRow;
-  try {
-    contactRow = gmailComposeView.getOldRecipientRowForType(addressType);
-    if (!contactRow) {
-      throw new Error('getOldRecipientRowForType failed');
-    }
-  } catch (err) {
-    Logger.error(err, { addressType });
-    return;
-  }
-
-  const emailAddressEntry = contactRow.querySelector('textarea.vO');
-
-  if (
-    !emailAddressEntry ||
-    !(emailAddressEntry instanceof HTMLTextAreaElement)
-  ) {
-    return;
-  }
-
-  // Remove existing recipients
-  Array.from(contactRow.querySelectorAll('.vR .vM')).forEach(el => {
-    simulateClick(el);
-  });
-
-  emailAddressEntry.value = emailAddresses.join(',');
-
-  // Push enter so Gmail interprets the addresses.
-  simulateKey(emailAddressEntry, 13, 0);
-
-  const oldRange = gmailComposeView.getLastSelectionRange();
-
-  // Focus the recipients preview label so Gmail re-renders it.
-  const cover = querySelector(gmailComposeView.getElement(), 'div.aoD.hl');
-  cover.dispatchEvent(new FocusEvent('focus'));
+  let contactRow = gmailComposeView.getRecipientRowForType(addressType);
 
   if (addressType === 'cc') {
-    const ccButton = querySelector(
-      gmailComposeView.getElement(),
-      'span.aB.gQ.pE'
-    );
-    simulateClick(ccButton);
+    const ccButton = gmailComposeView
+      .getElement()
+      .querySelector('span.pE[role=link]');
+    if (ccButton) {
+      ccButton.click();
+      contactRow = gmailComposeView.getRecipientRowForType(addressType);
+    }
   } else if (addressType === 'bcc') {
-    const bccButton = querySelector(
-      gmailComposeView.getElement(),
-      'span.aB.gQ.pB'
+    const bccButton = gmailComposeView
+      .getElement()
+      .querySelector('span.pB[role=link]');
+    if (bccButton) {
+      bccButton.click();
+      contactRow = gmailComposeView.getRecipientRowForType(addressType);
+    }
+  }
+
+  if (contactRow) {
+    // new recipient fields
+    // https://workspaceupdates.googleblog.com/2021/10/visual-updates-for-composing-email-in-gmail.html
+
+    const emailAddressEntry = querySelector(
+      contactRow,
+      'input[role=combobox][aria-autocomplete=list]'
     );
-    simulateClick(bccButton);
+    if (!(emailAddressEntry instanceof HTMLInputElement)) {
+      throw new Error();
+    }
+
+    oldRange = gmailComposeView.getLastSelectionRange();
+
+    // Remove existing recipients
+    Array.from(
+      contactRow.querySelectorAll(
+        'div[role=option][data-name] div.afX[aria-label]'
+      )
+    ).forEach(el => {
+      el.click();
+    });
+
+    emailAddressEntry.value = emailAddresses.join(',');
+    simulateKey(emailAddressEntry, 13, 0);
+  } else {
+    // old recipient fields
+    let contactRow;
+    try {
+      contactRow = gmailComposeView.getOldRecipientRowForType(addressType);
+      if (!contactRow) {
+        throw new Error('getOldRecipientRowForType failed');
+      }
+    } catch (err) {
+      Logger.error(err, { addressType });
+      return;
+    }
+
+    const emailAddressEntry = contactRow.querySelector('textarea.vO');
+
+    if (
+      !emailAddressEntry ||
+      !(emailAddressEntry instanceof HTMLTextAreaElement)
+    ) {
+      return;
+    }
+
+    // Remove existing recipients
+    Array.from(contactRow.querySelectorAll('.vR .vM')).forEach(el => {
+      simulateClick(el);
+    });
+
+    emailAddressEntry.value = emailAddresses.join(',');
+
+    // Push enter so Gmail interprets the addresses.
+    simulateKey(emailAddressEntry, 13, 0);
+
+    oldRange = gmailComposeView.getLastSelectionRange();
+
+    // Focus the recipients preview label so Gmail re-renders it.
+    const cover = querySelector(gmailComposeView.getElement(), 'div.aoD.hl');
+    cover.dispatchEvent(new FocusEvent('focus'));
+
+    if (addressType === 'cc') {
+      const ccButton = querySelector(
+        gmailComposeView.getElement(),
+        'span.aB.gQ.pE'
+      );
+      simulateClick(ccButton);
+    } else if (addressType === 'bcc') {
+      const bccButton = querySelector(
+        gmailComposeView.getElement(),
+        'span.aB.gQ.pB'
+      );
+      simulateClick(bccButton);
+    }
   }
 
   // Then restore focus to what it was before.
