@@ -6,6 +6,10 @@ import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import getRecipients from './get-recipients';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import simulateKey from '../../../../lib/dom/simulate-key';
+import {
+  getRecipientRowForType,
+  getOldRecipientRowForType
+} from './page-parser';
 
 const ADDRESS_TYPES = ['to', 'cc', 'bcc'];
 
@@ -20,7 +24,10 @@ export default function setRecipients(
 
   let oldRange;
 
-  let contactRow = gmailComposeView.getRecipientRowForType(addressType);
+  let contactRow = getRecipientRowForType(
+    gmailComposeView.getElement(),
+    addressType
+  );
 
   if (addressType === 'cc') {
     const ccButton = gmailComposeView
@@ -28,7 +35,10 @@ export default function setRecipients(
       .querySelector('span.pE[role=link]');
     if (ccButton) {
       ccButton.click();
-      contactRow = gmailComposeView.getRecipientRowForType(addressType);
+      contactRow = getRecipientRowForType(
+        gmailComposeView.getElement(),
+        addressType
+      );
     }
   } else if (addressType === 'bcc') {
     const bccButton = gmailComposeView
@@ -36,7 +46,10 @@ export default function setRecipients(
       .querySelector('span.pB[role=link]');
     if (bccButton) {
       bccButton.click();
-      contactRow = gmailComposeView.getRecipientRowForType(addressType);
+      contactRow = getRecipientRowForType(
+        gmailComposeView.getElement(),
+        addressType
+      );
     }
   }
 
@@ -63,13 +76,19 @@ export default function setRecipients(
       el.click();
     });
 
-    emailAddressEntry.value = emailAddresses.join(',');
-    simulateKey(emailAddressEntry, 13, 0);
+    const clipboardData = new DataTransfer();
+    clipboardData.setData('text/plain', emailAddresses.join(','));
+    emailAddressEntry.dispatchEvent(
+      new ClipboardEvent('paste', { clipboardData })
+    );
   } else {
     // old recipient fields
     let contactRow;
     try {
-      contactRow = gmailComposeView.getOldRecipientRowForType(addressType);
+      contactRow = getOldRecipientRowForType(
+        gmailComposeView.getElement(),
+        addressType
+      );
       if (!contactRow) {
         throw new Error('getOldRecipientRowForType failed');
       }
