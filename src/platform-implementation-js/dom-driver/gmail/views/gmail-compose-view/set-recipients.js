@@ -76,8 +76,11 @@ export default function setRecipients(
       el.click();
     });
 
-    emailAddressEntry.value = emailAddresses.join(',');
-    simulateKey(emailAddressEntry, 13, 0);
+    const clipboardData = new DataTransfer();
+    clipboardData.setData('text/plain', emailAddresses.join(','));
+    emailAddressEntry.dispatchEvent(
+      new ClipboardEvent('paste', { clipboardData })
+    );
   } else {
     // old recipient fields
     let contactRow;
