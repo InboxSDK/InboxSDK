@@ -2,6 +2,7 @@
 
 import GmailComposeView from '../gmail-compose-view';
 import Logger from '../../../../lib/logger';
+import { getRecipientChips } from './page-parser';
 
 import getAddressInformationExtractor from './get-address-information-extractor';
 
@@ -9,13 +10,12 @@ export default function getRecipients(
   gmailComposeView: GmailComposeView,
   addressType: ReceiverType
 ): Contact[] {
-  const contactNodes = gmailComposeView.tagTree.getAllByTag(
-    `${addressType}Recipient`
+  const contactNodes = getRecipientChips(
+    gmailComposeView.getElement(),
+    addressType
   );
-  // TODO should not use page-parser-tree?
-  return Array.from(contactNodes.values())
-    .map(node => {
-      const contactNode = node.getValue();
+  return Array.from(contactNodes)
+    .map(contactNode => {
       if (contactNode.getAttribute('role') === 'option') {
         // new recipient
         // https://workspaceupdates.googleblog.com/2021/10/visual-updates-for-composing-email-in-gmail.html

@@ -8,6 +8,11 @@ declare export function makePageParser(
   logger: Logger
 ): PageParserTree;
 
+declare export function getRecipientChips(
+  element: HTMLElement,
+  addressType: 'to' | 'cc' | 'bcc'
+): Array<HTMLElement> | NodeList<HTMLElement>;
+
 declare export function getRecipientRowElements(
   element: HTMLElement
 ): HTMLElement[];
