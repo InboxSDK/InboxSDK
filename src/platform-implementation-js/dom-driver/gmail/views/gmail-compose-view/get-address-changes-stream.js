@@ -6,6 +6,7 @@ import t from 'transducers.js';
 import Logger from '../../../../lib/logger';
 import makeMutationObserverStream from '../../../../lib/dom/make-mutation-observer-stream';
 import getAddressInformationExtractor from './get-address-information-extractor';
+import { getRecipientRowElements } from './page-parser';
 
 import type GmailComposeView from '../gmail-compose-view';
 import makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
@@ -14,7 +15,9 @@ import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
 export default function getAddressChangesStream(
   gmailComposeView: GmailComposeView
 ): Kefir.Observable<Object> {
-  const recipientRowElements = gmailComposeView.getRecipientRowElements();
+  const recipientRowElements = getRecipientRowElements(
+    gmailComposeView.getElement()
+  );
 
   if (!recipientRowElements || recipientRowElements.length === 0) {
     return Kefir.never();

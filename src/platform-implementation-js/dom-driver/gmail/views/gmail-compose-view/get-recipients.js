@@ -12,6 +12,7 @@ export default function getRecipients(
   const contactNodes = gmailComposeView.tagTree.getAllByTag(
     `${addressType}Recipient`
   );
+  // TODO should not use page-parser-tree?
   return Array.from(contactNodes.values())
     .map(node => {
       const contactNode = node.getValue();

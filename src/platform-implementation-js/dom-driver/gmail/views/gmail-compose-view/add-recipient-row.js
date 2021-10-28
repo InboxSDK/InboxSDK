@@ -3,6 +3,7 @@
 import Kefir from 'kefir';
 
 import blockAndReemiteKeyboardEvents from '../../../../lib/dom/block-and-reemit-keyboard-events';
+import { getRecipientRowElements } from './page-parser';
 
 import type GmailComposeView from '../gmail-compose-view';
 
@@ -84,7 +85,9 @@ function _createRecipientRowElement(
     contentTD.appendChild(options.el);
   }
 
-  var firstRowElement = gmailComposeView.getRecipientRowElements()[0];
+  var firstRowElement = getRecipientRowElements(
+    gmailComposeView.getElement()
+  )[0];
   var parent: HTMLElement = (firstRowElement.parentElement: any);
   parent.insertBefore(row, firstRowElement.nextSibling);
   const addressBarContainer = parent.closest('.fX');

@@ -1,0 +1,21 @@
+/* @flow */
+
+import PageParserTree from 'page-parser-tree';
+import type Logger from '../../../../lib/logger';
+
+declare export function makePageParser(
+  element: HTMLElement,
+  logger: Logger
+): PageParserTree;
+
+declare export function getRecipientRowElements(
+  element: HTMLElement
+): HTMLElement[];
+declare export function getRecipientRowForType(
+  element: HTMLElement,
+  addressType: 'to' | 'cc' | 'bcc'
+): HTMLElement | null;
+declare export function getOldRecipientRowForType(
+  element: HTMLElement,
+  addressType: 'to' | 'cc' | 'bcc'
+): HTMLElement | null;
