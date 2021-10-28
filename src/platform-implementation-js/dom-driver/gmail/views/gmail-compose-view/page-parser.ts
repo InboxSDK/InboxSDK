@@ -147,49 +147,32 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
     ],
     finders: {
       toRecipient: {
-        fn: root => {
-          const oldRow = getOldRecipientRowForType(root, 'to');
-          if (oldRow) {
-            return Array.from(
-              oldRow.querySelectorAll('.vR > input[type=hidden]')
-            ).map(el => el.parentElement!);
-          } else {
-            return root.querySelectorAll(
-              '.GS .anm[name="to"] [role=listbox] [role=option][data-name]'
-            );
-          }
-        }
+        fn: root => getRecipientChips(root, 'to')
       },
       ccRecipient: {
-        fn: root => {
-          const oldRow = getOldRecipientRowForType(root, 'cc');
-          if (oldRow) {
-            return Array.from(
-              oldRow.querySelectorAll('.vR > input[type=hidden]')
-            ).map(el => el.parentElement!);
-          } else {
-            return root.querySelectorAll(
-              '.GS .anm[name="cc"] [role=listbox] [role=option][data-name]'
-            );
-          }
-        }
+        fn: root => getRecipientChips(root, 'cc')
       },
       bccRecipient: {
-        fn: root => {
-          const oldRow = getOldRecipientRowForType(root, 'bcc');
-          if (oldRow) {
-            return Array.from(
-              oldRow.querySelectorAll('.vR > input[type=hidden]')
-            ).map(el => el.parentElement!);
-          } else {
-            return root.querySelectorAll(
-              '.GS .anm[name="bcc"] [role=listbox] [role=option][data-name]'
-            );
-          }
-        }
+        fn: root => getRecipientChips(root, 'bcc')
       }
     }
   });
+}
+
+export function getRecipientChips(
+  element: HTMLElement,
+  addressType: 'to' | 'cc' | 'bcc'
+): Array<HTMLElement> | NodeListOf<HTMLElement> {
+  const oldRow = getOldRecipientRowForType(element, addressType);
+  if (oldRow) {
+    return Array.from(oldRow.querySelectorAll('.vR > input[type=hidden]')).map(
+      el => el.parentElement!
+    );
+  } else {
+    return element.querySelectorAll<HTMLElement>(
+      `.GS .anm[name="${addressType}"] [role=listbox] [role=option][data-name]`
+    );
+  }
 }
 
 // getRecipientRowForType is recommended over this
