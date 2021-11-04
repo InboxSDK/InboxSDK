@@ -24,7 +24,7 @@ export default function setRecipients(
 
   let oldRange;
 
-  let contactRow = getRecipientRowForType(
+  let _contactRow = getRecipientRowForType(
     gmailComposeView.getElement(),
     addressType
   );
@@ -35,7 +35,7 @@ export default function setRecipients(
       .querySelector('span.pE[role=link]');
     if (ccButton) {
       ccButton.click();
-      contactRow = getRecipientRowForType(
+      _contactRow = getRecipientRowForType(
         gmailComposeView.getElement(),
         addressType
       );
@@ -46,12 +46,14 @@ export default function setRecipients(
       .querySelector('span.pB[role=link]');
     if (bccButton) {
       bccButton.click();
-      contactRow = getRecipientRowForType(
+      _contactRow = getRecipientRowForType(
         gmailComposeView.getElement(),
         addressType
       );
     }
   }
+
+  const contactRow = _contactRow;
 
   if (contactRow) {
     // new recipient fields
@@ -83,6 +85,40 @@ export default function setRecipients(
     emailAddressEntry.dispatchEvent(
       new ClipboardEvent('paste', { clipboardData })
     );
+
+    // On fresh composes, if set_Recipients is called immediately, then
+    // Gmail asynchronously resets the recipients field. Detect this and
+    // put our change back.
+    const nameEl = contactRow.closest('div.anm[name]');
+    if (
+      nameEl &&
+      !nameEl.hasAttribute('style') &&
+      !nameEl.hasAttribute('data-inboxsdk-handled-reset')
+    ) {
+      // We're in a fresh compose.
+      const claim = String(
+        Number(
+          nameEl.getAttribute('data-inboxsdk-tracking-fresh-compose') || 0
+        ) + 1
+      );
+      nameEl.setAttribute('data-inboxsdk-tracking-fresh-compose', claim);
+      setTimeout(() => {
+        if (
+          nameEl.getAttribute('data-inboxsdk-tracking-fresh-compose') === claim
+        ) {
+          nameEl.removeAttribute('data-inboxsdk-tracking-fresh-compose');
+
+          if (
+            contactRow.querySelectorAll(
+              'div[role=option][data-name] div.afX[aria-label]'
+            ).length === 0
+          ) {
+            nameEl.setAttribute('data-inboxsdk-handled-reset', 'true');
+            setRecipients(gmailComposeView, addressType, emailAddresses);
+          }
+        }
+      }, 100);
+    }
   } else {
     // old recipient fields
     let contactRow;
