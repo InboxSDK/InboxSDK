@@ -76,6 +76,8 @@ export default function setRecipients(
       el.click();
     });
 
+    emailAddressEntry.value = '';
+
     const clipboardData = new DataTransfer();
     clipboardData.setData('text/plain', emailAddresses.join(','));
     emailAddressEntry.dispatchEvent(
