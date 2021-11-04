@@ -88,7 +88,8 @@ export default function setRecipients(
 
     // On fresh composes, if set_Recipients is called immediately, then
     // Gmail asynchronously resets the recipients field. Detect this and
-    // put our change back.
+    // put our change back. Fresh composes lack a style attribute on the
+    // div.anm[name] element.
     const nameEl = contactRow.closest('div.anm[name]');
     if (
       emailAddresses.length > 0 &&
