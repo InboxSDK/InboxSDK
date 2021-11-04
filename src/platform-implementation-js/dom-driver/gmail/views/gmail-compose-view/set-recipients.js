@@ -91,11 +91,21 @@ export default function setRecipients(
     // put our change back.
     const nameEl = contactRow.closest('div.anm[name]');
     if (
+      emailAddresses.length > 0 &&
       nameEl &&
       !nameEl.hasAttribute('style') &&
       !nameEl.hasAttribute('data-inboxsdk-handled-reset')
     ) {
       // We're in a fresh compose.
+
+      // If setRecipients is called multiple times on a fresh compose,
+      // we only want the last call's setTimeout callback to do anything.
+      // Do this by marking a DOM element with a unique claim value and
+      // checking for it in the callback. Note that we generate the claim
+      // value by reading from the existing DOM value instead of a variable
+      // in module scope because there might be multiple extensions using
+      // the InboxSDK; we must use the shared DOM as the source of truth
+      // for values shared between InboxSDK instances.
       const claim = String(
         Number(
           nameEl.getAttribute('data-inboxsdk-tracking-fresh-compose') || 0
@@ -108,12 +118,18 @@ export default function setRecipients(
         ) {
           nameEl.removeAttribute('data-inboxsdk-tracking-fresh-compose');
 
+          // Does it look like our contact chips have all been removed?
           if (
             contactRow.querySelectorAll(
               'div[role=option][data-name] div.afX[aria-label]'
             ).length === 0
           ) {
+            // put a mark in the DOM to be absolutely sure we can't
+            // get in an infinite loop (which could happen if Gmail doesn't
+            // actually set the style attribute, and our selector above fails
+            // to find the recipient chips).
             nameEl.setAttribute('data-inboxsdk-handled-reset', 'true');
+
             setRecipients(gmailComposeView, addressType, emailAddresses);
           }
         }
