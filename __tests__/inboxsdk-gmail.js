@@ -28,7 +28,7 @@ const originalWindowProperties = Object.keys(window);
 );
 (document.head: any).setAttribute('data-inboxsdk-using-sync-api', 'false');
 
-const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST').default;
+const { InboxSDK } = require('../src/inboxsdk-js/inboxsdk-TEST');
 //preload implementation
 require('../src/platform-implementation-js/platform-implementation');
 

@@ -7,7 +7,7 @@ import checkRequirements from './check-requirements';
 import { BUILD_VERSION } from '../common/version';
 import loadScript from '../common/load-script';
 
-const InboxSDK = {
+export const InboxSDK = {
   LOADER_VERSION: BUILD_VERSION,
   loadScript,
   load(version: any, appId: string, opts: ?Object) {
@@ -41,5 +41,3 @@ if (
 ) {
   PlatformImplementationLoader.preload();
 }
-
-export default InboxSDK;
