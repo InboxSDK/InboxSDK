@@ -129,10 +129,6 @@ source files for changes to trigger rebuilds of the bundle automatically
 (`--watch`), and tells Chrome to reload its extensions after SDK rebuilds
 (`--reload`).
 
-The `-h` (`--hot`) flag is also available, which uses
-[Browserify-HMR](https://github.com/Macil/browserify-hmr) to make code
-changes be hot-reloadable into a running extension.
-
 Separate SDK and implementation bundles can be built and a local test server
 which hosts the remote implementation bundle can be started by running:
 

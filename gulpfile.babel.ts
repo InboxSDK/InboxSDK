@@ -121,41 +121,41 @@ async function getVersion(): Promise<string> {
   return version;
 }
 
-async function getBrowserifyHmrOptions(port: number) {
-  const HOME = process.env.HOME;
-  if (!HOME) throw new Error('HOME env variable not set');
-  const keyFile = `${HOME}/stunnel/key.pem`;
-  const certFile = `${HOME}/stunnel/cert.pem`;
+// async function getBrowserifyHmrOptions(port: number) {
+//   const HOME = process.env.HOME;
+//   if (!HOME) throw new Error('HOME env variable not set');
+//   const keyFile = `${HOME}/stunnel/key.pem`;
+//   const certFile = `${HOME}/stunnel/cert.pem`;
 
-  let url, tlskey, tlscert;
+//   let url, tlskey, tlscert;
 
-  async function checkFilesAllExistAndReadable(
-    filenames: string[]
-  ): Promise<boolean> {
-    try {
-      await Promise.all(
-        filenames.map(filename =>
-          fs.promises.access(filename, fs.constants.R_OK)
-        )
-      );
-      return true;
-    } catch (err) {
-      return false;
-    }
-  }
+//   async function checkFilesAllExistAndReadable(
+//     filenames: string[]
+//   ): Promise<boolean> {
+//     try {
+//       await Promise.all(
+//         filenames.map(filename =>
+//           fs.promises.access(filename, fs.constants.R_OK)
+//         )
+//       );
+//       return true;
+//     } catch (err) {
+//       return false;
+//     }
+//   }
 
-  if (await checkFilesAllExistAndReadable([keyFile, certFile])) {
-    url = `https://dev.mailfoogae.appspot.com:${port}`;
-    tlskey = keyFile;
-    tlscert = certFile;
-  }
-  return { url, tlskey, tlscert, port, disableHostCheck: true };
-}
+//   if (await checkFilesAllExistAndReadable([keyFile, certFile])) {
+//     url = `https://dev.mailfoogae.appspot.com:${port}`;
+//     tlskey = keyFile;
+//     tlscert = certFile;
+//   }
+//   return { url, tlskey, tlscert, port, disableHostCheck: true };
+// }
 
 interface BrowserifyTaskOptions {
   entry: string;
   destName: string;
-  hotPort?: number;
+  // hotPort?: number;
   disableMinification?: boolean;
   afterBuild?: () => Promise<void>;
   noSourceMapComment?: boolean;
@@ -163,14 +163,14 @@ interface BrowserifyTaskOptions {
 }
 
 async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
-  const { entry, destName, hotPort, disableMinification } = options;
+  const { entry, destName, disableMinification } = options;
 
   const willMinify = args.minify && !disableMinification;
 
   process.env.VERSION = await getVersion();
-  const browserifyHmrOptions = hotPort
-    ? await getBrowserifyHmrOptions(hotPort)
-    : null;
+  // const browserifyHmrOptions = hotPort
+  //   ? await getBrowserifyHmrOptions(hotPort)
+  //   : null;
 
   let bundler = browserify({
     entries: entry,
@@ -195,10 +195,10 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
     )
     .transform('redirectify', { global: true });
 
-  if (args.hot && hotPort) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    bundler.plugin(require('browserify-hmr'), browserifyHmrOptions!);
-  }
+  // if (args.hot && hotPort) {
+  //   // eslint-disable-next-line @typescript-eslint/no-var-requires
+  //   bundler.plugin(require('browserify-hmr'), browserifyHmrOptions!);
+  // }
 
   async function buildBundle(): Promise<void> {
     const sourcemapPipeline = lazyPipe()
@@ -287,7 +287,7 @@ gulp.task('injected', () => {
   return browserifyTask({
     entry: './src/injected-js/main.js',
     destName: 'injected.js',
-    hotPort: 3142,
+    // hotPort: 3142,
     sourceMappingURLPrefix: 'https://www.inboxsdk.com/build/'
   });
 });
@@ -434,7 +434,7 @@ if (args.singleBundle) {
       return browserifyTask({
         entry: './src/inboxsdk-js/main-DEV.js',
         destName: sdkFilename,
-        hotPort: 3140,
+        // hotPort: 3140,
         afterBuild: setupExamples
       });
     })
@@ -458,8 +458,8 @@ if (args.singleBundle) {
     gulp.series('injected', function impBundle() {
       return browserifyTask({
         entry: './src/platform-implementation-js/main.js',
-        destName: 'platform-implementation.js',
-        hotPort: 3141
+        destName: 'platform-implementation.js'
+        // hotPort: 3141
       });
     })
   );

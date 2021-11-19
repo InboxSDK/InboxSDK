@@ -148,9 +148,6 @@
   "license": "All Rights Reserved",
   "main": "src/inboxsdk-js/inboxsdk.js",
   "name": "inboxsdk",
-  "optionalDependencies": {
-    "browserify-hmr": "^0.4.1"
-  },
   "prettier": {
     "singleQuote": true
   },
