@@ -9,4 +9,4 @@
 /examples
 #/examples/*/inboxsdk.js*
 /chromeTestOutput
-/packages/core/index.js
+/packages/core/inboxsdk.js
