@@ -61,10 +61,11 @@ if (args.production && !args.minify) {
 
 // --watch causes Browserify to use full paths in module references. We don't
 // want those visible in production.
-if (args.production && (args.watch || args.singleBundle || args.fullPaths)) {
-  throw new Error(
-    '--production can not be used with --watch, --singleBundle, or --fullPaths'
-  );
+if (
+  args.production &&
+  (args.watch || /*args.singleBundle ||*/ args.fullPaths)
+) {
+  throw new Error('--production can not be used with --watch or --fullPaths');
 }
 
 process.env.NODE_ENV = args.production ? 'production' : 'development';
@@ -155,6 +156,7 @@ async function getVersion(): Promise<string> {
 interface BrowserifyTaskOptions {
   entry: string;
   destName: string;
+  standalone?: string;
   // hotPort?: number;
   disableMinification?: boolean;
   afterBuild?: () => Promise<void>;
@@ -178,7 +180,8 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
     extensions: ['.ts', '.tsx'],
     fullPaths: args.fullPaths,
     cache: {},
-    packageCache: {}
+    packageCache: {},
+    standalone: options.standalone
   })
     .transform(
       babelify.configure({
@@ -432,8 +435,9 @@ if (args.singleBundle) {
     'sdk',
     gulp.series('injected', function sdkBundle() {
       return browserifyTask({
-        entry: './src/inboxsdk-js/main-DEV.js',
+        entry: './src/inboxsdk-js/inboxsdk-SINGLE.js',
         destName: sdkFilename,
+        standalone: 'InboxSDK',
         // hotPort: 3140,
         afterBuild: setupExamples
       });
@@ -446,8 +450,9 @@ if (args.singleBundle) {
 } else {
   gulp.task('sdk', () => {
     return browserifyTask({
-      entry: './src/inboxsdk-js/main.js',
+      entry: './src/inboxsdk-js/inboxsdk.js',
       destName: sdkFilename,
+      standalone: 'InboxSDK',
       disableMinification: true,
       afterBuild: setupExamples,
       noSourceMapComment: true
