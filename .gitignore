@@ -10,3 +10,4 @@ yarn-debug.log
 /chromeTestOutput
 /.inboxsdk_test_secret
 yarn-error.log
+/packages/core/inboxsdk.js
