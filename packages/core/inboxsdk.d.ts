@@ -1,0 +1,679 @@
+import { EventEmitter } from 'events';
+import * as Kefir from 'kefir';
+
+export const LOADER_VERSION: string;
+export interface LoadScriptOptions {
+  // By default, the script is executed within a function, so that top-level
+  // variables defined in it don't become global variables. Setting nowrap to
+  // true disables this behavior.
+  nowrap?: boolean;
+  disableSourceMappingURL?: boolean;
+  XMLHttpRequest?: typeof XMLHttpRequest;
+}
+export function loadScript(
+  url: string,
+  opts?: LoadScriptOptions
+): Promise<void>;
+export function load(
+  version: number,
+  appId: string,
+  opts: any
+): Promise<InboxSDK>;
+
+// types
+
+export interface InboxSDK {
+  Conversations: Conversations;
+  Compose: Compose;
+  ButterBar: ButterBar;
+  Lists: Lists;
+  NavMenu: NavMenu;
+  Router: Router;
+  Widgets: Widgets;
+  Toolbars: Toolbars;
+  User: User;
+  Keyboard: Keyboard;
+  Search: Search;
+  Global: Global;
+}
+
+export interface Global {
+  addSidebarContentPanel(
+    contentPanelDescriptor: ContentPanelDescriptor
+  ): Promise<ContentPanelView | null>;
+  addSupportItem(
+    supportItemDescriptor: SupportItemDescriptor
+  ): GmailSupportItemView;
+}
+
+export interface GmailSupportItemView {
+  destroy(): void;
+}
+
+export interface SupportItemDescriptor {
+  element: HTMLElement;
+  onClick(): void;
+}
+export interface Conversations {
+  registerThreadViewHandler(
+    callback: (threadView: ThreadView) => void
+  ): () => void;
+  registerMessageViewHandler(
+    callback: (messageView: MessageView) => void
+  ): () => void;
+}
+
+export interface Compose {
+  openDraftByMessageID(messageId: string): Promise<ComposeView>;
+  openNewComposeView(): Promise<ComposeView>;
+  registerComposeViewHandler(handler: (composeView: ComposeView) => void): void;
+}
+
+export interface ButterBar {
+  showMessage(messageDescriptor: MessageDescriptor): { destroy: () => void };
+  showLoading(
+    messageDescriptor: LoadingMessageDescriptor
+  ): { destroy: () => void };
+  showError(messageDescriptor: MessageDescriptor): { destroy: () => void };
+  showSaving(
+    messageDescriptor: SavingMessageDescriptor
+  ): {
+    resolve: () => void;
+    reject: () => void;
+    promise: Promise<any>;
+  };
+  hideMessage(messageKey: Record<string, any> | string): void;
+  hideGmailMessage(): void;
+}
+
+// todo:
+// export interface CreateAccessoryDescriptor {}
+// export interface IconButtonAccessoryDescriptor {}
+// export interface DropdownButtonAccessoryDescriptor {}
+
+type NavItemTypes = {
+  GROUPER: 'GROUPER';
+  LINK: 'LINK';
+  NAVIGATION: 'NAVIGATION';
+};
+
+export interface NavItemDescriptor {
+  name: string;
+  routeID?: string | null;
+  routeParams?: object | null;
+  onClick?: () => void | null;
+  orderHint?: number;
+  // todo: accessory: CreateAccessoryDescriptor | IconButtonAccessoryDescriptor | DropdownButtonAccessoryDescriptor
+  accessory?: any;
+  iconUrl?: string | null;
+  iconClass?: string | null;
+  iconElement?: HTMLElement | null;
+  backgroundColor?: string | null;
+  expanderForegroundColor?: string | null;
+  type?: keyof NavItemTypes;
+}
+
+export interface NativeNavItemView extends EventEmitter {
+  addNavItem(descriptor: NavItemDescriptor): NavItemView;
+  setCollapsed(collapseState: boolean): void;
+  isCollapsed(): boolean;
+}
+
+export interface NavMenu {
+  SENT_MAIL: NativeNavItemView;
+  NavItemTypes: NavItemTypes;
+  addNavItem(
+    descriptor: NavItemDescriptor | Kefir.Observable<NavItemDescriptor, any>
+  ): NavItemView;
+}
+
+export interface Router {
+  createLink(routeID: string, params?: any): string;
+  getCurrentRouteView(): RouteView;
+  goto(routeID: string, params?: any): Promise<void>;
+  handleAllRoutes(handler: (routeView: RouteView) => void): () => void;
+  handleCustomRoute(
+    routeID: string,
+    handler: (customRouteView: CustomRouteView) => void
+  ): () => void;
+  handleCustomListRoute(
+    routeID: string,
+    handler: (offset: number, max: number) => void
+  ): void;
+  handleListRoute(
+    routeID: string,
+    handler: (listRouteView: ListRouteView) => void
+  ): void;
+  NativeRouteIDs: Record<NativeRouteIdTypes, string>;
+  RouteTypes: Record<RouteTypes, string>;
+}
+
+type NativeRouteIdTypes =
+  | 'INBOX'
+  | 'ALL_MAIL'
+  | 'SENT'
+  | 'STARRED'
+  | 'DRAFTS'
+  | 'SNOOZED'
+  | 'DONE'
+  | 'REMINDERS'
+  | 'LABEL'
+  | 'TRASH'
+  | 'SPAM'
+  | 'IMPORTANT'
+  | 'SEARCH'
+  | 'THREAD'
+  | 'CHATS'
+  | 'CHAT'
+  | 'CONTACTS'
+  | 'CONTACT'
+  | 'SETTINGS'
+  | 'ANY_LIST';
+
+type RouteTypes =
+  | 'CHAT'
+  | 'CUSTOM'
+  | 'LIST'
+  | 'SETTINGS'
+  | 'THREAD'
+  | 'UNKNOWN';
+
+export interface Widgets {
+  showModalView(descriptor: ModalDescriptor): ModalView;
+  showMoleView(descriptor: MoleDescriptor): MoleView;
+  showDrawerView(descriptor: DrawerDescriptor): DrawerView;
+}
+
+export interface Toolbars {
+  registerThreadButton(descriptor: ToolbarButtonDescriptor): () => void;
+  registerToolbarButtonForThreadView(
+    descriptor: LegacyToolbarButtonDescriptor
+  ): () => void;
+  SectionNames: {
+    INBOX_STATE: 'INBOX_STATE';
+    METADATA_STATE: 'METADATA_STATE';
+    OTHER: 'OTHER';
+  };
+}
+
+export interface Keyboard {
+  createShortcutHandle(
+    descriptor: KeyboardShortcutDescriptor
+  ): KeyboardShortcutHandle;
+}
+
+export interface Search {
+  registerSearchSuggestionsProvider(
+    handler: (
+      query: string
+    ) =>
+      | Array<AutocompleteSearchResult>
+      | Promise<Array<AutocompleteSearchResult>>
+  ): void;
+  registerSearchQueryRewriter(rewriter: SearchQueryRewriter): void;
+}
+
+export interface Lists {
+  registerThreadRowViewHandler(
+    handler: (threadRowView: ThreadRowView) => void
+  ): () => void;
+  getSelectedThreadRowViews(): ThreadRowView[];
+  registerThreadRowViewSelectionHandler(handler: () => void): () => void;
+}
+
+export interface User {
+  getEmailAddress(): string;
+  getLanguage(): string;
+  isConversationViewDisabled(): Promise<boolean>;
+}
+
+interface Destroyable extends EventEmitter {
+  readonly destroyed: boolean;
+  addListener(event: 'destroy', listener: () => void): this;
+  // emit(event: "destroy"): boolean;
+  on(event: 'destroy', listener: () => void): this;
+  off(event: 'destroy', listener: () => void): this;
+  once(event: 'destroy', listener: () => void): this;
+  prependListener(event: 'destroy', listener: () => void): this;
+  prependOnceListener(event: 'destroy', listener: () => void): this;
+  removeListener(event: 'destroy', listener: () => void): this;
+}
+
+export interface ImageDescriptor {
+  imageUrl?: string;
+  imageClass?: string;
+  tooltip?: string;
+  orderHint?: number;
+}
+
+export interface ThreadRowView extends Destroyable {
+  addLabel(labelDescriptor: LabelDescriptor | any): void;
+  addAttachmentIcon(threadRowAttachmentIconDescriptor: any): void;
+  addImage(
+    imageDescriptor:
+      | ImageDescriptor
+      | Kefir.Observable<ImageDescriptor | null, any>
+  ): void;
+  getVisibleDraftCount(): number;
+  getThreadIDIfStable(): string | null;
+  getThreadIDIfStableAsync(): Promise<string | null>;
+  addButton(threadRowButtonDescriptor: any): void;
+  getThreadID(): string;
+  getThreadIDAsync(): Promise<string>;
+  getDraftID(): Promise<string>;
+  replaceDate(
+    threadDateDescriptor:
+      | ThreadDateDescriptor
+      | null
+      | Kefir.Observable<ThreadDateDescriptor | null, any>
+  ): void;
+  getVisibleMessageCount(): number;
+  getSubject(): string;
+  getContacts(): Array<{ name: string | null; emailAddress: string }>;
+  replaceDraftLabel(
+    descriptor:
+      | DraftLabelDescriptor
+      | null
+      | Kefir.Observable<DraftLabelDescriptor | null, any>
+  ): void;
+}
+
+export interface ThreadDateDescriptor {
+  text: string;
+  tooltip?: string;
+  textColor?: string;
+}
+
+export interface DraftLabelDescriptor {
+  text: string;
+  count?: string | number;
+}
+
+export interface LabelDescriptor {
+  title: string;
+  iconUrl: string;
+  iconClass?: string;
+  foregroundColor?: string;
+  backgroundColor?: string;
+}
+
+export interface ThreadRowAttachmentIconDescriptor {
+  iconUrl?: string;
+  iconClass?: string;
+  tooltip?: string;
+}
+
+export interface NavItemView extends EventEmitter {
+  addNavItem(descriptor: any): NavItemView;
+  remove(): void;
+  setCollapsed(collapseState: boolean): void;
+  isCollapsed(): boolean;
+}
+
+export interface SectionView extends EventEmitter {
+  remove(): void;
+}
+
+export interface CollapsibleSectionView extends SectionView {
+  setCollapsed(value: boolean): void;
+}
+
+export interface RouteView extends EventEmitter {
+  getRouteID(): string | null;
+  getRouteType(): string;
+  getParams(): { [key: string]: string };
+}
+
+export interface ListRouteView extends RouteView {
+  addCollapsibleSection(options: any): CollapsibleSectionView;
+  addSection(options: any): SectionView;
+}
+
+export interface CustomRouteView extends RouteView {
+  getElement(): HTMLElement;
+}
+
+export interface CustomListDescriptor {
+  hasMore?: boolean;
+  threads: string | Array<ThreadDescriptor>;
+  total?: number;
+}
+
+export interface ThreadDescriptor {
+  gmailThreadId?: string;
+  rfcMessageId?: string;
+}
+
+export interface ModalDescriptor {
+  el: HTMLElement;
+  chrome?: boolean;
+  constrainTitleWidth?: boolean;
+  showCloseButton?: boolean;
+  title?: string;
+  buttons?: Array<ModalButtonDescriptor>;
+}
+
+export interface ModalButtonDescriptor {
+  text: string;
+  title?: string;
+  onClick(event: { modalView: ModalView }): any;
+  type?: 'PRIMARY_ACTION' | 'SECONDARY_ACTION';
+  orderHint?: number;
+}
+
+export interface ModalView extends EventEmitter {
+  close(): void;
+}
+
+export interface DrawerView extends EventEmitter {
+  close(): void;
+  associateComposeView(
+    composeView: ComposeView,
+    closeWithCompose: boolean
+  ): void;
+}
+
+export interface DrawerDescriptor {
+  el: HTMLElement;
+  chrome?: boolean;
+  title?: string;
+  composeView?: ComposeView;
+  closeWithCompose?: boolean;
+  matchSidebarContentPanelWidth?: boolean;
+}
+
+export interface MoleDescriptor {
+  el: HTMLElement;
+  title?: string;
+  titleEl?: HTMLElement;
+  minimizedTitleEl?: HTMLElement;
+  className?: string;
+  titleButtons?: Array<ButtonDescriptor>;
+  chrome?: boolean;
+}
+
+export interface ButtonDescriptor {
+  title?: string;
+  iconUrl?: string;
+  iconClass?: string;
+  hasDropdown?: boolean;
+  onClick(): void;
+}
+
+export interface MoleView extends EventEmitter {
+  close(): void;
+  getMinimized(): boolean;
+  setMinimized(value: boolean): void;
+  setTitle(title: string): void;
+}
+
+export interface SimpleElementView extends EventEmitter {
+  el: HTMLElement;
+  destroyed: boolean;
+  destroy(): void;
+}
+
+export interface ThreadView extends EventEmitter {
+  addLabel(): SimpleElementView;
+  addSidebarContentPanel(
+    contentPanelDescriptor: ContentPanelDescriptor
+  ): ContentPanelView;
+  getMessageViews(): Array<MessageView>;
+  getMessageViewsAll(): Array<MessageView>;
+  getSubject(): string;
+  getThreadID(): string;
+  getThreadIDAsync(): Promise<string>;
+  addNoticeBar(): SimpleElementView;
+  // Undocumented methods
+  // addCustomMessage(descriptor: {
+  //   collapsedEl: HTMLElement;
+  //   headerEl: HTMLElement;
+  //   bodyEl: HTMLElement;
+  //   iconUrl: string;
+  //   sortDate: Date;
+  // }): CustomMessageView;
+  // registerHiddenCustomMessageNoticeProvider(
+  //   provider: (
+  //     numCustomHidden: number,
+  //     numberNativeHidden: number,
+  //     unmountPromise: Promise<void>
+  //   ) => HTMLElement | null
+  // ): void;
+}
+
+export interface CustomMessageView extends EventEmitter {
+  destroy(): void;
+  expand(): void;
+  collapse(): void;
+  getElement(): HTMLElement;
+  getSortDate(): Date | null;
+}
+
+export interface ContentPanelView extends EventEmitter {
+  close(): void;
+  isActive(): boolean;
+  open(): void;
+  remove(): void;
+}
+
+export interface ContentPanelDescriptor {
+  el: HTMLElement;
+  title: string;
+  iconUrl?: string;
+  iconClass?: string;
+  orderHint?: number;
+}
+
+export interface MessageView extends EventEmitter {
+  getBodyElement(): HTMLElement;
+  isElementInQuotedArea(element: HTMLElement): boolean;
+  isLoaded(): boolean;
+  getSender(): Contact;
+  getRecipients(): Array<Contact>;
+  getRecipientsFull(): Promise<Array<Contact>>;
+  getLinksInBody(): Array<MessageViewLinkDescriptor>;
+  getThreadView(): ThreadView;
+  getMessageIDAsync(): Promise<string>;
+}
+
+export interface Contact {
+  name: string;
+  emailAddress: string;
+}
+
+export interface MessageViewLinkDescriptor {
+  text: string;
+  html: string;
+  element: HTMLElement;
+  href: string;
+  isInQuotedArea: boolean;
+}
+
+export interface ToolbarButtonDescriptor {
+  title: string;
+  iconUrl?: string;
+  iconClass?: string;
+  positions?: Array<'THREAD' | 'ROW' | 'LIST'> | null;
+  threadSection?: string;
+  listSection?: string;
+  onClick(event: ToolbarButtonOnClickEvent): void;
+  hasDropdown: boolean;
+  hideFor?: (routeView: RouteView) => boolean;
+  keyboardShortcutHandle?: KeyboardShortcutHandle;
+  orderHint?: number;
+}
+
+export interface LegacyToolbarButtonDescriptor {
+  title: string;
+  iconUrl?: string;
+  iconClass?: string;
+  section: 'INBOX_STATE' | 'METADATA_STATE' | 'OTHER';
+  onClick(event: ToolbarButtonOnClickEvent): void;
+  hasDropdown?: boolean;
+  hideFor?: (routeView: RouteView) => boolean;
+  keyboardShortcutHandle?: KeyboardShortcutHandle;
+}
+
+export interface ToolbarButtonOnClickEvent {
+  selectedThreadViews: Array<ThreadView>;
+  selectedThreadRowViews: Array<ThreadRowView>;
+  dropdown?: DropdownView;
+}
+
+export interface KeyboardShortcutDescriptor {
+  chord: string;
+  description: string;
+}
+
+export interface KeyboardShortcutHandle {
+  remove(): void;
+}
+
+export interface DropdownView extends EventEmitter {
+  close(): void;
+  el: HTMLElement;
+  destroyed: boolean;
+  reposition(): void;
+}
+
+export interface ComposeView extends EventEmitter {
+  addButton(
+    buttonOptions:
+      | ComposeButtonDescriptor
+      | Kefir.Observable<ComposeButtonDescriptor, any>
+  ): void;
+  addComposeNotice(): ComposeNoticeView;
+  addRecipientRow(
+    RecipientRowOptions:
+      | RecipientRowOptions
+      | Kefir.Observable<RecipientRowOptions, any>
+  ): { destroy(): void };
+  addStatusBar(statusBarDescriptor: StatusBarDescriptor): StatusBarView;
+  close(): void;
+  ensureAppButtonToolbarsAreClosed(): void;
+  ensureFormattingToolbarIsHidden(): void;
+  getBccRecipients(): Array<Contact>;
+  getBodyElement(): HTMLElement;
+  getCcRecipients(): Array<Contact>;
+  getCurrentDraftID(): Promise<string>;
+  getElement(): HTMLElement;
+  getDraftID(): Promise<string | null>;
+  getSubject(): string;
+  getThreadID(): string;
+  getToRecipients(): Array<Contact>;
+  insertHTMLIntoBodyAtCursor(html: string): HTMLElement;
+  isForward(): boolean;
+  isInlineReplyForm(): boolean;
+  isReply(): boolean;
+  overrideEditSubject(): void;
+  replaceSendButton({ el }: { el: HTMLElement }): () => void;
+  setBccRecipients(emails: string[]): void;
+  setBodyHTML(html: string): void;
+  setCcRecipients(emails: string[]): void;
+  setFullscreen(isFullScreen: boolean): void;
+  setSubject(subject: string): void;
+  setTitleBarColor(color: string): () => void;
+  setToRecipients(recipients: string[]): void;
+}
+
+export interface ComposeButtonDescriptor {
+  title: string;
+  iconUrl?: string;
+  iconClass?: string;
+  onClick(event: ComposeViewButtonOnClickEvent): void;
+  hasDropdown?: boolean;
+  type?: 'SEND_ACTION' | 'MODIFIER';
+  orderHint?: number;
+  enabled?: boolean;
+  noOverflow?: boolean;
+  tooltip?: string | null;
+}
+
+export interface ComposeViewButtonOnClickEvent {
+  composeView: ComposeView;
+  dropdown: DropdownView;
+}
+
+export interface RecipientRowOptions {
+  el?: HTMLElement;
+  labelClass?: string;
+  labelText?: string;
+  labelTextClass?: string;
+}
+
+export interface AutocompleteSearchResult {
+  name?: null | string;
+  nameHTML?: null | string;
+  description?: null | string;
+  descriptionHTML?: null | string;
+  routeName?: null | string;
+  routeParams?: null | { [ix: string]: string | number };
+  externalURL?: null | string;
+  searchTerm?: null | string;
+  iconUrl?: null | string;
+  iconClass?: null | string;
+  iconHTML?: null | string;
+  onClick?: null | (() => void);
+}
+
+export interface StatusBarDescriptor {
+  addAboveNativeStatusBar?: boolean;
+  height?: number;
+  orderHint?: number;
+}
+
+export interface StatusBarView extends SimpleElementView {
+  setHeight(newHeight: number): any;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface ComposeNoticeView extends SimpleElementView {}
+
+export interface MessageButtonDescriptor {
+  onClick(): void;
+  title: string;
+}
+
+export interface MessageDescriptor {
+  buttons?: Array<MessageButtonDescriptor>;
+  className?: string;
+  el?: string;
+  hideOnViewChanged?: boolean;
+  html?: string;
+  messageKey?: Record<string, any> | string;
+  persistent?: boolean;
+  priority?: number;
+  text?: string;
+  time?: number;
+}
+
+export interface LoadingMessageDescriptor {
+  className?: string;
+  el?: string;
+  hideOnViewChanged?: boolean;
+  html?: string;
+  messageKey?: Record<string, any>;
+  persistent?: boolean;
+  priority?: number;
+  text?: string;
+}
+
+export interface SavingMessageDescriptor {
+  className?: string;
+  confirmationText?: string;
+  confirmationTime?: number;
+  el?: string;
+  hideOnViewChanged?: boolean;
+  html?: string;
+  messageKey?: Record<string, any> | string;
+  persistent?: boolean;
+  priority?: number;
+  showConfirmation?: boolean;
+  text?: string;
+  time?: number;
+}
+
+export interface SearchQueryRewriter {
+  term: string;
+  termReplacer(): string | Promise<string>;
+}

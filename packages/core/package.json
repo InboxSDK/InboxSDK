@@ -8,6 +8,11 @@
   "private": false,
   "sideEffects": false,
   "files": [
-    "inboxsdk.js"
-  ]
+    "inboxsdk.js",
+    "inboxsdk.d.ts"
+  ],
+  "dependencies": {
+    "@types/kefir": "^3.8.6",
+    "@types/node": "*"
+  }
 }
