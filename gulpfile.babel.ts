@@ -439,7 +439,8 @@ if (args.singleBundle) {
         destName: sdkFilename,
         standalone: 'InboxSDK',
         // hotPort: 3140,
-        afterBuild: setupExamples
+        afterBuild: setupExamples,
+        noSourceMapComment: Boolean(args.production)
       });
     })
   );
