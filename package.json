@@ -157,6 +157,7 @@
     "dir": "overrides"
   },
   "scripts": {
+    "publish-npm": "gulp --production --minify --singleBundle && mv dist/inboxsdk.js packages/core/ && cd packages/core/ && yarn publish",
     "flow_check": "flow check",
     "jest": "jest",
     "lint": "eslint . --ext js,jsx,ts,tsx,flow",
