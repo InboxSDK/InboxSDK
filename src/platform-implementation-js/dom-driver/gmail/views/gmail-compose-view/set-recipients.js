@@ -5,6 +5,7 @@ import Logger from '../../../../lib/logger';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import getRecipients from './get-recipients';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
+import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import simulateKey from '../../../../lib/dom/simulate-key';
 import {
   getRecipientRowForType,
@@ -29,11 +30,31 @@ export default function setRecipients(
     addressType
   );
 
+  function needToWaitForCcOrBccButton(button: HTMLElement): boolean {
+    const signalElement = button.closest('.fX.aiL');
+    if (signalElement && signalElement.style.display === 'none') {
+      makeMutationObserverChunkedStream(signalElement, {
+        attributes: true,
+        attributeFilter: ['style']
+      })
+        .filter(() => signalElement.style.display !== 'none')
+        .takeUntilBy(gmailComposeView.getStopper())
+        .onValue(() => {
+          setRecipients(gmailComposeView, addressType, emailAddresses);
+        });
+      return true;
+    }
+    return false;
+  }
+
   if (addressType === 'cc') {
     const ccButton = gmailComposeView
       .getElement()
       .querySelector('span.pE[role=link]');
     if (ccButton) {
+      if (needToWaitForCcOrBccButton(ccButton)) {
+        return;
+      }
       ccButton.click();
       _contactRow = getRecipientRowForType(
         gmailComposeView.getElement(),
@@ -45,6 +66,9 @@ export default function setRecipients(
       .getElement()
       .querySelector('span.pB[role=link]');
     if (bccButton) {
+      if (needToWaitForCcOrBccButton(bccButton)) {
+        return;
+      }
       bccButton.click();
       _contactRow = getRecipientRowForType(
         gmailComposeView.getElement(),
