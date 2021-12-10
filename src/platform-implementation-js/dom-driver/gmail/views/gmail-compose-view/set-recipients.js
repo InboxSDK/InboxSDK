@@ -31,7 +31,7 @@ export default function setRecipients(
   );
 
   function needToWaitForCcOrBccButton(button: HTMLElement): boolean {
-    const signalElement = button.closest('.fX.aiL');
+    const signalElement: ?HTMLElement = (button.closest('.fX.aiL'): any);
     if (signalElement && signalElement.style.display === 'none') {
       makeMutationObserverChunkedStream(signalElement, {
         attributes: true,
