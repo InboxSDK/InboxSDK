@@ -74,50 +74,6 @@ it.)
 
 ---
 
-# Querying for Error Logs
-
-(Streak Employees) We can use the following BigQuery query to query for the
-details of errors with a specific message. You must update the `20190711` part
-of the query to the date you want to query for.
-
-```sql
-SELECT
-TIMESTAMP_MICROS(errors.timestamp) AS timestamp,
-SUBSTR(errors.message, 1, 60) AS summary,
-REGEXP_EXTRACT(headers, r'\n[Rr]eferer:\s+(https://[^/\n]+)') AS domain,
-CONCAT(
-  IFNULL(errors.stack, '(no stack)'),
-  '\n\nlogged from:\n', IFNULL(errors.loggedFrom, '(none given)'),
-  '\n\ndetails:\n', IFNULL(errors.details, '(none given)'),
-  '\n\nappIds: ', IFNULL(TO_JSON_STRING(errors.appIds), '(none given)'),
-  '\nsdkVersion: ', IFNULL(errors.loaderVersion, '(none given)'),
-  '\nsdkImplVersion: ', IFNULL(errors.implementationVersion, '(none given)')
-) AS report,
-headers,
-trace,
-errors.sessionId, requestId, errors.emailHash
-FROM `mailfoogae.logs.backend_prod_3950ab_20190711` AS logs
-CROSS JOIN UNNEST(logs.errors) as errors
-WHERE errors.source = "SDK"
-  --AND errors.appIds.appId = 'sdk_streak_21e9788951'
-  --AND errors.message LIKE '%Timed out waiting for first port message%'
-  --AND errors.emailHash = TO_HEX(SHA256(CONCAT("inboxsdk:", "tesla@streak.com")))
-  --AND errors.sessionId = '1562882411623-0.26325378576101466'
-ORDER BY timestamp ASC
-LIMIT 200
-```
-
-The `errors.emailHash` field is the result of `sha256("inboxsdk:" + email)`
-applied to the user's email address. This allows us to find the error logs for
-a user who reports an issue without logging the email addresses of all of the
-InboxSDK end users.
-
-Error stacks and details may be clipped to fit in BigQuery. The field will end
-with the text `<clipped>` if this is the case. For errors that are clipped, the
-full unclipped value can be found in Google Cloud Storage at
-`https://storage.cloud.google.com/streak_error_logs/requestId/REQUEST_ID_HERE.json`
-where REQUEST_ID_HERE is replaced with the row's `requestId` value. Note that currently we're only storing these full logs for 14 days.
-
 # Build Options
 
 By default, `yarn start` runs the following command:
