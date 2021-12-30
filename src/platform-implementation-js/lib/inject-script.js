@@ -42,7 +42,7 @@ const injectScript: () => Promise<null> = once(function() {
     // script.text = codeToRun;
 
     // (document.head: any).appendChild(script).parentNode.removeChild(script);
-    window.chrome.runtime.sendMessage({ type: 'injectPageWorld' });
+    window.chrome.runtime.sendMessage({ type: 'inboxsdk__injectPageWorld' });
     (document.head: any).setAttribute('data-inboxsdk-script-injected', 'true');
   }
 
