@@ -6,7 +6,7 @@
   "author": "Streak",
   "license": "All Rights Reserved",
   "private": false,
-  "sideEffects": false,
+  "sideEffects": true,
   "files": [
     "inboxsdk.js",
     "inboxsdk.d.ts"

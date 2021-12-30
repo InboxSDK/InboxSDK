@@ -21,7 +21,6 @@ import stdio from 'stdio';
 import gutil from 'gulp-util';
 import rename from 'gulp-rename';
 import extReloader from './live/extReloader';
-import rimraf from 'rimraf';
 import Kefir from 'kefir';
 import fg from 'fast-glob';
 import exec from './src/build/exec';
@@ -241,7 +240,8 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
           streamify(sourcemapPipeline())
         )
       )
-      .pipe(destAtomic('./dist/'));
+      .pipe(destAtomic('./dist/'))
+      .pipe(destAtomic('./packages/core/'));
 
     await new Promise((resolve, reject) => {
       const errCb = _.once(err => {
@@ -286,17 +286,24 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
   return buildBundle();
 }
 
-gulp.task('injected', () => {
+gulp.task('pageWorld', () => {
   return browserifyTask({
     entry: './src/injected-js/main.js',
-    destName: 'injected.js',
+    destName: 'pageWorld.js',
     // hotPort: 3142,
     sourceMappingURLPrefix: 'https://www.inboxsdk.com/build/'
   });
 });
 
-gulp.task('clean', cb => {
-  rimraf('./dist/', cb);
+gulp.task('clean', async () => {
+  await fs.promises.rm('./dist', { force: true, recursive: true });
+  for (const filename of [
+    './packages/core/inboxsdk.js',
+    './packages/core/pageWorld.js'
+  ]) {
+    await fs.promises.rm(filename, { force: true });
+    await fs.promises.rm(filename + '.map', { force: true });
+  }
 });
 
 gulp.task('docs', async () => {
@@ -433,7 +440,7 @@ function isFileEligbleForDocs(filename: string): boolean {
 if (args.singleBundle) {
   gulp.task(
     'sdk',
-    gulp.series('injected', function sdkBundle() {
+    gulp.series('pageWorld', function sdkBundle() {
       return browserifyTask({
         entry: './src/inboxsdk-js/inboxsdk-SINGLE.js',
         destName: sdkFilename,
@@ -461,7 +468,7 @@ if (args.singleBundle) {
   });
   gulp.task(
     'imp',
-    gulp.series('injected', function impBundle() {
+    gulp.series('pageWorld', function impBundle() {
       return browserifyTask({
         entry: './src/platform-implementation-js/main.js',
         destName: 'platform-implementation.js'
