@@ -74,7 +74,7 @@
     "eslint-plugin-no-dupe-class-fields": "^1.0.0",
     "eslint-plugin-react": "^7.1.0",
     "event-listener-with-options": "^1.0.3",
-    "ext-corb-workaround": "^1.0.0",
+    "ext-corb-workaround": "^2.0.0",
     "fast-glob": "^3.2.5",
     "flow-bin": "^0.98.1",
     "gulp": "^4.0.2",

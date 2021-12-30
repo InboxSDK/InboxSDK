@@ -4300,10 +4300,10 @@ expect@^27.0.2:
     jest-message-util "^27.0.2"
     jest-regex-util "^27.0.1"
 
-ext-corb-workaround@^1.0.0:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/ext-corb-workaround/-/ext-corb-workaround-1.0.2.tgz#ab862dae11daf2995334a0671aeb860c7dc79125"
-  integrity sha512-BjpSYkRGoIy3D48XhgO8reDKBfhjtHl5ZHu/F5mSr0nYupqFWgjscsDpGIZsTFTYJBETwWXo2Q+zzUw5kBY8GA==
+ext-corb-workaround@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/ext-corb-workaround/-/ext-corb-workaround-2.0.0.tgz#05c5fa058eb274e323e15b8fee2cb0db9b67a7a1"
+  integrity sha512-qlRDFDNYj4/w07N0CpzlG7YgIK/t1yfLjlv6y9mySV2Uw7EFurVvJZNIEeXpBs8GGNSURt6400Q2hdbNFOtsrg==
   dependencies:
     "@babel/runtime" "^7.8.4"
     lodash "^4.17.15"
