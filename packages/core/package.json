@@ -9,7 +9,11 @@
   "sideEffects": true,
   "files": [
     "inboxsdk.js",
-    "inboxsdk.d.ts"
+    "inboxsdk.d.ts",
+    "background.js",
+    "background.d.ts",
+    "pageWorld.js",
+    "pageWorld.d.ts"
   ],
   "dependencies": {
     "@types/kefir": "^3.8.6",
