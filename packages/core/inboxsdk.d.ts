@@ -537,6 +537,7 @@ export interface DropdownView extends EventEmitter {
 }
 
 export interface ComposeView extends EventEmitter {
+  destroyed: boolean;
   addButton(
     buttonOptions:
       | ComposeButtonDescriptor
@@ -561,6 +562,11 @@ export interface ComposeView extends EventEmitter {
   getSubject(): string;
   getThreadID(): string;
   getToRecipients(): Array<Contact>;
+  getHTMLContent(): string;
+  getTextContent(): string;
+  isMinimized(): boolean;
+  setMinimized(minimized: boolean): void;
+  isFullScreen(): boolean;
   insertHTMLIntoBodyAtCursor(html: string): HTMLElement;
   isForward(): boolean;
   isInlineReplyForm(): boolean;
@@ -574,6 +580,13 @@ export interface ComposeView extends EventEmitter {
   setSubject(subject: string): void;
   setTitleBarColor(color: string): () => void;
   setToRecipients(recipients: string[]): void;
+  send(options: SendOptions): void;
+  getFromContact(): Contact;
+  getFromContactChoices(): Contact[];
+}
+
+export interface SendOptions {
+  sendAndArchive?: boolean;
 }
 
 export interface ComposeButtonDescriptor {
