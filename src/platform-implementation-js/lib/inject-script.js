@@ -18,7 +18,7 @@ const injectScript: () => Promise<null> = once(function() {
           const scr = document.createElement('script');
           scr.type = 'text/javascript';
           scr.src = window.chrome.runtime.getURL('pageWorld.js');
-          document.documentElement.appendChild(scr);
+          (document.documentElement: any).appendChild(scr);
         }
       }
     );
