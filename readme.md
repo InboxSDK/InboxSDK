@@ -2,6 +2,22 @@
 
 https://groups.google.com/g/inboxsdk/
 
+# Documentation
+
+https://inboxsdk.github.io/inboxsdk-docs/
+
+# Usage
+
+See https://github.com/InboxSDK/hello-world for an example extension using the InboxSDK.
+
+# Licensing
+
+This release of the InboxSDK is made available under two different licenses: The Mozilla Public License and the GNU Lesser General Public License. Your use of the InboxSDK must abide by one of these licenses. The intention of this is that any modifications of the InboxSDK in redistributed software must be made open source, without requiring applications using the InboxSDK to be open source themselves.
+
+# Contribution Guidelines
+
+Please feel free to open issues or pull requests for bug fixes. For feature requests, please open an issue first so we can decide if and how we may want to support the feature. Many features require ongoing maintenance to support as Gmail changes, and we may not want to commit to supporting every requested feature. If we decide not to implement a feature, we may be able to find a way to implement functionality in the InboxSDK to help applications implement the feature themselves.
+
 # Development Cycle Essentials
 
 Run `yarn` to install the necessary dependencies, and run `yarn start` to
