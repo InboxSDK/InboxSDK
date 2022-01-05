@@ -145,7 +145,7 @@
       "pre-commit": "pretty-quick --staged"
     }
   },
-  "license": "All Rights Reserved",
+  "license": "(MIT OR Apache-2.0)",
   "main": "src/inboxsdk-js/inboxsdk.js",
   "name": "inboxsdk",
   "optionalDependencies": {
