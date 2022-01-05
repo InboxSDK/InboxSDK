@@ -12,7 +12,7 @@ See https://github.com/InboxSDK/hello-world for an example extension using the I
 
 # Licensing
 
-This release of the InboxSDK is made available under two different licenses: The Mozilla Public License and the GNU Lesser General Public License. Your use of the InboxSDK must abide by one of these licenses. The intention of this is that any modifications of the InboxSDK in redistributed software must be made open source, without requiring applications using the InboxSDK to be open source themselves.
+This release of the InboxSDK is distributed under the terms of both the MIT license and the Apache License (Version 2.0). The InboxSDK may be used and redistributed according to the terms of either license. These are permissive licenses that do not require modifications or embedding applications to be open source themselves. See [LICENSE-APACHE.txt](LICENSE-APACHE.txt), [LICENSE-MIT.txt](LICENSE-MIT.txt), and [COPYRIGHT.txt](COPYRIGHT.txt) for details.
 
 # Contribution Guidelines
 
