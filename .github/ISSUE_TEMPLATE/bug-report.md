@@ -1,9 +1,8 @@
 ---
 name: "\U0001F41B  InboxSDK Bug report"
 about: Report a reproducible bug or regression.
-title: ''
-labels: ''
-assignees: ''
+title: 'Bug: '
+labels: 'status: Unconfirmed'
 
 ---
 
