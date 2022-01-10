@@ -1,0 +1,33 @@
+---
+name: "\U0001F41B  InboxSDK Bug report"
+about: Report a reproducible bug or regression.
+title: 'Bug: '
+labels: 'status: Unconfirmed'
+
+---
+
+<!--
+  Please provide a clear and concise description of what the bug is. Include
+  screenshots if needed. Please test using the latest version of InboxSDK to make sure your issue has not already been fixed.
+-->
+
+**Describe the bug**
+
+
+**To Reproduce**
+Steps to reproduce the behavior:
+1. 
+2. 
+3. 
+4. 
+
+**Expected behavior**
+
+
+**Screenshots**
+
+
+**Additional context**
+<!--
+Add any other context about the problem here. Eg browser version, gmail version
+-->
