@@ -15,7 +15,12 @@ labels: 'status: Unconfirmed'
 **Describe the bug**
 
 **To Reproduce**
-Steps to reproduce the behavior: 1. 2. 3. 4.
+Steps to reproduce the behavior:
+
+1.
+2.
+3.
+4.
 
 **Expected behavior**
 
