@@ -39,7 +39,7 @@ module.exports = {
       plugins: ['flowtype'],
       rules: {
         'flowtype/define-flow-type': 1,
-        // 'flowtype/require-valid-file-annotation': ['error', 'always'],
+        'flowtype/require-valid-file-annotation': ['error', 'always'],
         'no-unused-vars': ['off']
       }
     },
@@ -111,6 +111,10 @@ module.exports = {
       files: ['packages/core/background.js'],
       globals: {
         chrome: 'readonly'
+      },
+      rules: {
+        'flowtype/define-flow-type': ['off'],
+        'flowtype/require-valid-file-annotation': ['off']
       }
     },
     {
