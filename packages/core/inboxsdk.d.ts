@@ -556,7 +556,7 @@ export interface ComposeView extends EventEmitter {
   getBccRecipients(): Array<Contact>;
   getBodyElement(): HTMLElement;
   getCcRecipients(): Array<Contact>;
-  getCurrentDraftID(): Promise<string>;
+  getCurrentDraftID(): Promise<string | null>;
   getElement(): HTMLElement;
   getDraftID(): Promise<string | null>;
   getSubject(): string;
