@@ -24,8 +24,6 @@ import extReloader from './live/extReloader';
 import Kefir from 'kefir';
 import fg from 'fast-glob';
 import exec from './src/build/exec';
-import escapeShellArg from './src/build/escapeShellArg';
-import dir from 'node-dir';
 import babelify from 'babelify';
 import lazyPipe from 'lazypipe';
 import concat from 'gulp-concat';
@@ -37,9 +35,8 @@ const args = stdio.getopt({
   watch: { key: 'w', description: 'Automatic rebuild' },
   reloader: { key: 'r', description: 'Automatic extension reloader' },
   hot: { key: 'h', description: 'hot module replacement' },
-  singleBundle: {
-    key: 's',
-    description: 'Single bundle build (for development)'
+  remote: {
+    description: 'Remote-loading bundle'
   },
   minify: { key: 'm', description: 'Minify build' },
   production: { key: 'p', description: 'Production build' },
@@ -60,10 +57,7 @@ if (args.production && !args.minify) {
 
 // --watch causes Browserify to use full paths in module references. We don't
 // want those visible in production.
-if (
-  args.production &&
-  (args.watch || /*args.singleBundle ||*/ args.fullPaths)
-) {
+if (args.production && (args.watch || args.fullPaths)) {
   throw new Error('--production can not be used with --watch or --fullPaths');
 }
 
@@ -306,138 +300,7 @@ gulp.task('clean', async () => {
   }
 });
 
-gulp.task('docs', async () => {
-  const paths: dir.PathsResult = await new Promise((resolve, reject) => {
-    dir.paths(__dirname + '/src', (err, paths) => {
-      if (err) reject(err);
-      else resolve(paths);
-    });
-  });
-
-  const files = await Promise.all(
-    _.chain(paths.files)
-      .filter(isFileEligbleForDocs)
-      .sort()
-      .map(parseCommentsInFile)
-      .value()
-  );
-  const classes = _.chain(files)
-    .filter(Boolean)
-    .map((x: any) => x.classes)
-    .flatten()
-    .filter(Boolean)
-    .map(transformClass)
-    .forEach(checkForDocIssues)
-    .value();
-
-  const docsJson = {
-    classes: _.chain(classes)
-      .map(ele => [ele.name, ele])
-      .fromPairs()
-      .value()
-  };
-
-  const outDir = './dist';
-  try {
-    await fs.promises.stat(outDir);
-  } catch (err) {
-    await fs.promises.mkdir(outDir);
-  }
-
-  await fs.promises.writeFile(
-    'dist/docs.json',
-    JSON.stringify(docsJson, null, 2)
-  );
-});
-
-function checkForDocIssues(c: any) {
-  if (c.functions) {
-    for (const func of c.functions) {
-      if (!func.returns) {
-        throw new Error(
-          'WARNING: ' +
-            func.name +
-            ' in ' +
-            c.name +
-            " doesn't have a return tag"
-        );
-      }
-    }
-  }
-}
-
-async function parseCommentsInFile(file: string): Promise<any> {
-  gutil.log('Parsing: ' + gutil.colors.cyan(file));
-  const { stdout, stderr } = await exec(
-    'node_modules/.bin/jsdoc ' +
-      escapeShellArg(file) +
-      ' -t templates/haruki -d console -q format=json',
-    { passStdErr: true }
-  );
-  if (stderr) {
-    process.stderr.write(stderr);
-    throw new Error('Got stderr');
-  }
-  try {
-    const comments = JSON.parse(stdout);
-    comments['filename'] = file;
-    return comments;
-  } catch (err) {
-    console.error('error in file', file, err);
-    console.error('char count:', stdout.length);
-    throw err;
-  }
-}
-
-function transformClass(c: any) {
-  (c.functions || []).forEach((func: any) => {
-    func.description = (func.description as string).replace(
-      /\n\^(\S+)/g,
-      (m, rule) => {
-        if (rule === 'gmail' || rule === 'inbox') {
-          if (!func.environments) func.environments = [];
-          func.environments.push(rule);
-          return '';
-        }
-        throw new Error(`Unknown rule ^${rule}`);
-      }
-    );
-  });
-
-  (c.properties || []).forEach((prop: any) => {
-    prop.optional = false;
-
-    prop.description = (prop.description as string).replace(
-      /\n\^(\S+)/g,
-      (m, rule) => {
-        if (rule === 'optional') {
-          prop.optional = true;
-          return '';
-        }
-        const defaultM = /^default=(.*)$/.exec(rule);
-        if (defaultM) {
-          prop.default = defaultM[1];
-          return '';
-        }
-        throw new Error(`Unknown property rule ^${rule}`);
-      }
-    );
-  });
-
-  return c;
-}
-
-function isFileEligbleForDocs(filename: string): boolean {
-  return (
-    filename.endsWith('.js') &&
-    (filename.includes('src/docs/') ||
-      filename.endsWith(
-        'src/platform-implementation-js/constants/nav-item-types.js'
-      ))
-  );
-}
-
-if (args.singleBundle) {
+if (!args.remote) {
   gulp.task(
     'sdk',
     gulp.series('pageWorld', function sdkBundle() {
@@ -452,7 +315,7 @@ if (args.singleBundle) {
     })
   );
   gulp.task('imp', () => {
-    throw new Error('No separate imp bundle in singleBundle bundle mode');
+    throw new Error('No separate imp bundle in non-remote bundle mode');
   });
   gulp.task('default', gulp.parallel('sdk'));
 } else {
@@ -481,7 +344,7 @@ if (args.singleBundle) {
 
 gulp.task(
   'server',
-  gulp.series(args.singleBundle ? 'sdk' : 'imp', async function serverRun() {
+  gulp.series(!args.remote ? 'sdk' : 'imp', async function serverRun() {
     const app = await import('./live/app');
     app.run();
   })
