@@ -314,8 +314,8 @@ if (!args.remote) {
       });
     })
   );
-  gulp.task('imp', () => {
-    throw new Error('No separate imp bundle in non-remote bundle mode');
+  gulp.task('remote', () => {
+    throw new Error('No separate remote bundle in non-remote bundle mode');
   });
   gulp.task('default', gulp.parallel('sdk'));
 } else {
@@ -330,7 +330,7 @@ if (!args.remote) {
     });
   });
   gulp.task(
-    'imp',
+    'remote',
     gulp.series('pageWorld', function impBundle() {
       return browserifyTask({
         entry: './src/platform-implementation-js/main.js',
@@ -339,12 +339,12 @@ if (!args.remote) {
       });
     })
   );
-  gulp.task('default', gulp.parallel('sdk', 'imp'));
+  gulp.task('default', gulp.parallel('sdk', 'remote'));
 }
 
 gulp.task(
   'server',
-  gulp.series(!args.remote ? 'sdk' : 'imp', async function serverRun() {
+  gulp.series(!args.remote ? 'sdk' : 'remote', async function serverRun() {
     const app = await import('./live/app');
     app.run();
   })
