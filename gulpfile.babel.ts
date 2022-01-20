@@ -36,7 +36,7 @@ const args = stdio.getopt({
   reloader: { key: 'r', description: 'Automatic extension reloader' },
   hot: { key: 'h', description: 'hot module replacement' },
   remote: {
-    description: 'Remote-loading bundle'
+    description: 'Remote-loading bundle with integrated pageWorld script'
   },
   minify: { key: 'm', description: 'Minify build' },
   production: { key: 'p', description: 'Production build' },
@@ -305,7 +305,7 @@ if (!args.remote) {
     'sdk',
     gulp.series('pageWorld', function sdkBundle() {
       return browserifyTask({
-        entry: './src/inboxsdk-js/inboxsdk-SINGLE.js',
+        entry: './src/inboxsdk-js/inboxsdk-NONREMOTE.js',
         destName: sdkFilename,
         standalone: 'InboxSDK',
         // hotPort: 3140,
@@ -321,7 +321,7 @@ if (!args.remote) {
 } else {
   gulp.task('sdk', () => {
     return browserifyTask({
-      entry: './src/inboxsdk-js/inboxsdk.js',
+      entry: './src/inboxsdk-js/inboxsdk-REMOTE.js',
       destName: sdkFilename,
       standalone: 'InboxSDK',
       disableMinification: true,
@@ -333,7 +333,7 @@ if (!args.remote) {
     'remote',
     gulp.series('pageWorld', function impBundle() {
       return browserifyTask({
-        entry: './src/platform-implementation-js/main.js',
+        entry: './src/platform-implementation-js/main-REMOTE.js',
         destName: 'platform-implementation.js'
         // hotPort: 3141
       });
