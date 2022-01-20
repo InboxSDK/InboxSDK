@@ -1,6 +1,22 @@
-# Public Mailing List
+[**InboxSDK** - Main Site](https://www.inboxsdk.com/)
 
-https://groups.google.com/g/inboxsdk/
+# Documentation
+
+https://inboxsdk.github.io/inboxsdk-docs/
+
+[Original mailing list](https://groups.google.com/g/inboxsdk/) (inactive, superseded by the Issues tracker here) 
+
+# Usage
+
+See https://github.com/InboxSDK/hello-world for an example extension using the InboxSDK.
+
+# Licensing
+
+This release of the InboxSDK is distributed under the terms of both the MIT license and the Apache License (Version 2.0). The InboxSDK may be used and redistributed according to the terms of either license. These are permissive licenses that do not require modifications or embedding applications to be open source themselves. See [LICENSE-APACHE.txt](LICENSE-APACHE.txt), [LICENSE-MIT.txt](LICENSE-MIT.txt), and [COPYRIGHT.txt](COPYRIGHT.txt) for details.
+
+# Contribution Guidelines
+
+Please feel free to open issues or pull requests for bug fixes. For feature requests, please open an issue first so we can decide if and how we may want to support the feature. Many features require ongoing maintenance to support as Gmail changes, and we may not want to commit to supporting every requested feature. If we decide not to implement a feature, we may be able to find a way to implement functionality in the InboxSDK to help applications implement the feature themselves.
 
 # Development Cycle Essentials
 
@@ -24,6 +40,12 @@ isolation in an example extension, and must not depend on Streak (including
 Streak's CSS). Any new features that add elements controlled by the extension
 ought to be styled (positioned) reasonably by the InboxSDK without requiring
 the extension to include its own non-trivial CSS.
+
+## Technology Choices
+
+We're trying to use Typescript as much as possible now. There are still a lot of classic Javascript and Flow Javascript files left over. As needed, you can make `.d.ts` type-def files so Typescript can see them, and you can make `.js.flow` type-def files so Flow can see Typescript files. If you're working on a bit of code that's not in a Typescript file, consider changing the file to be Typescript.
+
+React is done for some UIs, but there's a complication to using it generally: we often need to integrate with elements from Gmail itself or other instances of the InboxSDK. React only works well for the case where there are a lot of elements created and managed by the InboxSDK itself, we have many places where we have to integrate with outside elements, and most of our additions into the page are pretty simple DOM-wise, so we're pretty picky about where we use React.
 
 ## Fixing Unreproducible Bugs
 
@@ -160,12 +182,6 @@ lives in the injected script.
 The file "src/injected-js/main.js" is browserified into "dist/injected.js",
 which is then included by "src/platform-implementation-js/lib/inject-script.js"
 and built into "dist/platform-implementation.js".
-
-## Technology Choices
-
-We're trying to use Typescript as much as possible now. There are still a lot of classic Javascript and Flow Javascript files left over. As needed, you can make `.d.ts` type-def files so Typescript can see them, and you can make `.js.flow` type-def files so Flow can see Typescript files. If you're working on a bit of code that's not in a Typescript file, consider changing the file to be Typescript.
-
-React is done for some UIs, but there's a complication to using it generally: we often need to integrate with elements from Gmail itself or other instances of the InboxSDK. React only works well for the case where there are a lot of elements created and managed by the InboxSDK itself, we have many places where we have to integrate with outside elements, and most of our additions into the page are pretty simple DOM-wise, so we're pretty picky about where we use React.
 
 ## Element Detection Notes
 
