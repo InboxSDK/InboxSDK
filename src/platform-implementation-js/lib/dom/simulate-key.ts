@@ -1,5 +1,3 @@
-/* @flow */
-
 import triggerRelayEvent from './trigger-relay-event';
 
 export default function simulateKey(

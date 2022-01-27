@@ -1,14 +1,12 @@
-/* @flow */
-
-type RelayProps = {
-  type: string,
-  bubbles: boolean,
-  cancelable: boolean,
-  props?: ?Object,
-  dataTransfer?: ?{
-    files: Blob[]
-  }
-};
+interface RelayProps {
+  type: string;
+  bubbles: boolean;
+  cancelable: boolean;
+  props?: any;
+  dataTransfer?: {
+    files: Blob[];
+  } | null;
+}
 
 export default async function triggerRelayEvent(
   element: HTMLElement,

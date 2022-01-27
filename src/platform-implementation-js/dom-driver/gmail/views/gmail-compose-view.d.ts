@@ -98,6 +98,7 @@ export default class GmailComposeView implements ComposeViewDriver {
   public getTextContent(): string;
   public getSelectedBodyHTML(): null | undefined | string;
   public getSelectedBodyText(): null | undefined | string;
+  public getLastSelectionRange(): Range | undefined;
   public getSubject(): string;
   public getToRecipients(): ReadonlyArray<Contact>;
   public getCcRecipients(): ReadonlyArray<Contact>;

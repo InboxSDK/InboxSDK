@@ -1,6 +1,4 @@
-/* @flow */
-
-import type GmailComposeView from '../gmail-compose-view';
+import GmailComposeView from '../gmail-compose-view';
 import Logger from '../../../../lib/logger';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import getRecipients from './get-recipients';
@@ -12,7 +10,7 @@ import {
   getOldRecipientRowForType
 } from './page-parser';
 
-const ADDRESS_TYPES = ['to', 'cc', 'bcc'];
+export type ReceiverType = 'to' | 'cc' | 'bcc';
 
 export default function setRecipients(
   gmailComposeView: GmailComposeView,
@@ -31,7 +29,7 @@ export default function setRecipients(
   );
 
   function needToWaitForCcOrBccButton(button: HTMLElement): boolean {
-    const signalElement: ?HTMLElement = (button.closest('.fX.aiL'): any);
+    const signalElement = button.closest<HTMLElement>('.fX.aiL');
     if (signalElement && signalElement.style.display === 'none') {
       makeMutationObserverChunkedStream(signalElement, {
         attributes: true,
@@ -50,7 +48,7 @@ export default function setRecipients(
   if (addressType === 'cc') {
     const ccButton = gmailComposeView
       .getElement()
-      .querySelector('span.pE[role=link]');
+      .querySelector<HTMLElement>('span.pE[role=link]');
     if (ccButton) {
       if (needToWaitForCcOrBccButton(ccButton)) {
         return;
@@ -64,7 +62,7 @@ export default function setRecipients(
   } else if (addressType === 'bcc') {
     const bccButton = gmailComposeView
       .getElement()
-      .querySelector('span.pB[role=link]');
+      .querySelector<HTMLElement>('span.pB[role=link]');
     if (bccButton) {
       if (needToWaitForCcOrBccButton(bccButton)) {
         return;
@@ -95,7 +93,7 @@ export default function setRecipients(
 
     // Remove existing recipients
     Array.from(
-      contactRow.querySelectorAll(
+      contactRow.querySelectorAll<HTMLElement>(
         'div[role=option][data-name] div.afX[aria-label]'
       )
     ).forEach(el => {
@@ -145,7 +143,7 @@ export default function setRecipients(
 
           // Does it look like our contact chips have all been removed?
           if (
-            contactRow.querySelectorAll(
+            contactRow.querySelectorAll<HTMLElement>(
               'div[role=option][data-name] div.afX[aria-label]'
             ).length === 0
           ) {
@@ -176,7 +174,9 @@ export default function setRecipients(
       return;
     }
 
-    const emailAddressEntry = contactRow.querySelector('textarea.vO');
+    const emailAddressEntry = contactRow.querySelector<HTMLElement>(
+      'textarea.vO'
+    );
 
     if (
       !emailAddressEntry ||
@@ -186,9 +186,11 @@ export default function setRecipients(
     }
 
     // Remove existing recipients
-    Array.from(contactRow.querySelectorAll('.vR .vM')).forEach(el => {
-      simulateClick(el);
-    });
+    Array.from(contactRow.querySelectorAll<HTMLElement>('.vR .vM')).forEach(
+      el => {
+        simulateClick(el);
+      }
+    );
 
     emailAddressEntry.value = emailAddresses.join(',');
 
@@ -217,7 +219,7 @@ export default function setRecipients(
   }
 
   // Then restore focus to what it was before.
-  if (document.activeElement) {
+  if (document.activeElement instanceof HTMLElement) {
     document.activeElement.blur();
   }
   if (oldRange) {
@@ -229,13 +231,14 @@ export default function setRecipients(
 }
 
 function _areContactsEqual(
-  gmailComposeView,
+  gmailComposeView: GmailComposeView,
   addressType: ReceiverType,
-  emailAddresses
+  emailAddresses: string[]
 ) {
-  let existingEmailAddresses = getRecipients(gmailComposeView, addressType).map(
-    c => c.emailAddress
-  );
+  const existingEmailAddresses = getRecipients(
+    gmailComposeView,
+    addressType
+  ).map(c => c.emailAddress);
 
   if (!emailAddresses) {
     return !!existingEmailAddresses;
@@ -250,7 +253,7 @@ function _areContactsEqual(
   }
 
   for (let ii = 0; ii < existingEmailAddresses.length; ii++) {
-    let existingEmailAddress = existingEmailAddresses[ii];
+    const existingEmailAddress = existingEmailAddresses[ii];
 
     if (emailAddresses.indexOf(existingEmailAddress) === -1) {
       return false;
