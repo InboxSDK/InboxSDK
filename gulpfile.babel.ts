@@ -43,7 +43,10 @@ const args = stdio.getopt({
   },
   minify: { key: 'm', description: 'Minify build' },
   production: { key: 'p', description: 'Production build' },
-  copy: { key: 'c', description: 'Also copy to Streak' },
+  copyToStreak: {
+    key: 'c',
+    description: 'Copy dev build to Streak dev build folder'
+  },
   fullPaths: {
     key: 'f',
     description:
@@ -77,15 +80,16 @@ process.env.IMPLEMENTATION_URL = args.production
 async function setupExamples() {
   // Copy inboxsdk.js (and .map) to all subdirs under examples/
   const dirs: string[] = await fg(['examples/*'], { onlyDirectories: true });
-  if (args.copy) {
+  if (args.copyToStreak) {
     dirs.push('../MailFoo/extensions/devBuilds/chrome/');
   }
 
-  let stream = gulp.src([
-    './dist/inboxsdk.js',
-    './dist/pageWorld.js',
-    './packages/core/background.js'
-  ]);
+  const srcs = ['./dist/inboxsdk.js'];
+  if (!args.remote && !args.integratedPageWorld) {
+    srcs.push('./dist/pageWorld.js', './packages/core/background.js');
+  }
+
+  let stream = gulp.src(srcs);
   for (const dir of dirs) {
     stream = stream.pipe(destAtomic(dir));
   }
@@ -323,7 +327,7 @@ if (args.remote) {
       destName: sdkFilename,
       standalone: 'InboxSDK',
       disableMinification: true,
-      // afterBuild: setupExamples,
+      afterBuild: setupExamples,
       noSourceMapComment: true
     });
   });
@@ -348,7 +352,7 @@ if (args.remote) {
         destName: sdkFilename,
         standalone: 'InboxSDK',
         // hotPort: 3140,
-        // afterBuild: setupExamples,
+        afterBuild: setupExamples,
         noSourceMapComment: Boolean(args.production)
       });
     })
