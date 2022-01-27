@@ -108,6 +108,16 @@ module.exports = {
       }
     },
     {
+      files: ['packages/core/background.js'],
+      globals: {
+        chrome: 'readonly'
+      },
+      rules: {
+        'flowtype/define-flow-type': ['off'],
+        'flowtype/require-valid-file-annotation': ['off']
+      }
+    },
+    {
       files: [
         '.eslintrc.js',
         'jest.config.js',

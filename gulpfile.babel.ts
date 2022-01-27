@@ -19,14 +19,10 @@ import uglify from 'gulp-uglify';
 import sourcemaps from 'gulp-sourcemaps';
 import stdio from 'stdio';
 import gutil from 'gulp-util';
-import rename from 'gulp-rename';
 import extReloader from './live/extReloader';
-import rimraf from 'rimraf';
 import Kefir from 'kefir';
 import fg from 'fast-glob';
 import exec from './src/build/exec';
-import escapeShellArg from './src/build/escapeShellArg';
-import dir from 'node-dir';
 import babelify from 'babelify';
 import lazyPipe from 'lazypipe';
 import concat from 'gulp-concat';
@@ -38,13 +34,19 @@ const args = stdio.getopt({
   watch: { key: 'w', description: 'Automatic rebuild' },
   reloader: { key: 'r', description: 'Automatic extension reloader' },
   hot: { key: 'h', description: 'hot module replacement' },
-  singleBundle: {
-    key: 's',
-    description: 'Single bundle build (for development)'
+  remote: {
+    description: 'Remote-loading bundle with integrated pageWorld script'
+  },
+  integratedPageWorld: {
+    description:
+      'Non-remote-loading bundle with integrated pageWorld script, for testing in projects that expect the remote-loading build'
   },
   minify: { key: 'm', description: 'Minify build' },
   production: { key: 'p', description: 'Production build' },
-  copy: { key: 'c', description: 'Also copy to Streak' },
+  copyToStreak: {
+    key: 'c',
+    description: 'Copy dev build to Streak dev build folder'
+  },
   fullPaths: {
     key: 'f',
     description:
@@ -61,9 +63,12 @@ if (args.production && !args.minify) {
 
 // --watch causes Browserify to use full paths in module references. We don't
 // want those visible in production.
-if (args.production && (args.watch || args.singleBundle || args.fullPaths)) {
+if (
+  args.production &&
+  (args.watch || args.fullPaths || args.integratedPageWorld)
+) {
   throw new Error(
-    '--production can not be used with --watch, --singleBundle, or --fullPaths'
+    '--production can not be used with --watch, --fullPaths, or --integratedPageWorld'
   );
 }
 
@@ -75,11 +80,16 @@ process.env.IMPLEMENTATION_URL = args.production
 async function setupExamples() {
   // Copy inboxsdk.js (and .map) to all subdirs under examples/
   const dirs: string[] = await fg(['examples/*'], { onlyDirectories: true });
-  if (args.copy) {
+  if (args.copyToStreak) {
     dirs.push('../MailFoo/extensions/devBuilds/chrome/');
   }
 
-  let stream = gulp.src('./dist/' + sdkFilename).pipe(rename('inboxsdk.js'));
+  const srcs = ['./dist/inboxsdk.js'];
+  if (!args.remote && !args.integratedPageWorld) {
+    srcs.push('./dist/pageWorld.js', './packages/core/background.js');
+  }
+
+  let stream = gulp.src(srcs);
   for (const dir of dirs) {
     stream = stream.pipe(destAtomic(dir));
   }
@@ -121,56 +131,58 @@ async function getVersion(): Promise<string> {
   return version;
 }
 
-async function getBrowserifyHmrOptions(port: number) {
-  const HOME = process.env.HOME;
-  if (!HOME) throw new Error('HOME env variable not set');
-  const keyFile = `${HOME}/stunnel/key.pem`;
-  const certFile = `${HOME}/stunnel/cert.pem`;
+// async function getBrowserifyHmrOptions(port: number) {
+//   const HOME = process.env.HOME;
+//   if (!HOME) throw new Error('HOME env variable not set');
+//   const keyFile = `${HOME}/stunnel/key.pem`;
+//   const certFile = `${HOME}/stunnel/cert.pem`;
 
-  let url, tlskey, tlscert;
+//   let url, tlskey, tlscert;
 
-  async function checkFilesAllExistAndReadable(
-    filenames: string[]
-  ): Promise<boolean> {
-    try {
-      await Promise.all(
-        filenames.map(filename =>
-          fs.promises.access(filename, fs.constants.R_OK)
-        )
-      );
-      return true;
-    } catch (err) {
-      return false;
-    }
-  }
+//   async function checkFilesAllExistAndReadable(
+//     filenames: string[]
+//   ): Promise<boolean> {
+//     try {
+//       await Promise.all(
+//         filenames.map(filename =>
+//           fs.promises.access(filename, fs.constants.R_OK)
+//         )
+//       );
+//       return true;
+//     } catch (err) {
+//       return false;
+//     }
+//   }
 
-  if (await checkFilesAllExistAndReadable([keyFile, certFile])) {
-    url = `https://dev.mailfoogae.appspot.com:${port}`;
-    tlskey = keyFile;
-    tlscert = certFile;
-  }
-  return { url, tlskey, tlscert, port, disableHostCheck: true };
-}
+//   if (await checkFilesAllExistAndReadable([keyFile, certFile])) {
+//     url = `https://dev.mailfoogae.appspot.com:${port}`;
+//     tlskey = keyFile;
+//     tlscert = certFile;
+//   }
+//   return { url, tlskey, tlscert, port, disableHostCheck: true };
+// }
 
 interface BrowserifyTaskOptions {
   entry: string;
   destName: string;
-  hotPort?: number;
+  standalone?: string;
+  // hotPort?: number;
   disableMinification?: boolean;
   afterBuild?: () => Promise<void>;
   noSourceMapComment?: boolean;
   sourceMappingURLPrefix?: string;
+  writeToPackagesCore?: boolean;
 }
 
 async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
-  const { entry, destName, hotPort, disableMinification } = options;
+  const { entry, destName, disableMinification } = options;
 
   const willMinify = args.minify && !disableMinification;
 
   process.env.VERSION = await getVersion();
-  const browserifyHmrOptions = hotPort
-    ? await getBrowserifyHmrOptions(hotPort)
-    : null;
+  // const browserifyHmrOptions = hotPort
+  //   ? await getBrowserifyHmrOptions(hotPort)
+  //   : null;
 
   let bundler = browserify({
     entries: entry,
@@ -178,7 +190,8 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
     extensions: ['.ts', '.tsx'],
     fullPaths: args.fullPaths,
     cache: {},
-    packageCache: {}
+    packageCache: {},
+    standalone: options.standalone
   })
     .transform(
       babelify.configure({
@@ -195,10 +208,10 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
     )
     .transform('redirectify', { global: true });
 
-  if (args.hot && hotPort) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    bundler.plugin(require('browserify-hmr'), browserifyHmrOptions!);
-  }
+  // if (args.hot && hotPort) {
+  //   // eslint-disable-next-line @typescript-eslint/no-var-requires
+  //   bundler.plugin(require('browserify-hmr'), browserifyHmrOptions!);
+  // }
 
   async function buildBundle(): Promise<void> {
     const sourcemapPipeline = lazyPipe()
@@ -230,7 +243,7 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
       });
 
     const bundle = bundler.bundle();
-    const result = bundle
+    let result = bundle
       .pipe(source(destName))
       .pipe(
         gulpif(
@@ -239,6 +252,10 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
         )
       )
       .pipe(destAtomic('./dist/'));
+
+    if (options.writeToPackagesCore) {
+      result = result.pipe(destAtomic('./packages/core/'));
+    }
 
     await new Promise((resolve, reject) => {
       const errCb = _.once(err => {
@@ -283,192 +300,89 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
   return buildBundle();
 }
 
-gulp.task('injected', () => {
+gulp.task('pageWorld', () => {
   return browserifyTask({
-    entry: './src/injected-js/main.js',
-    destName: 'injected.js',
-    hotPort: 3142,
+    entry: './src/injected-js/main',
+    destName: 'pageWorld.js',
+    // hotPort: 3142,
     sourceMappingURLPrefix: 'https://www.inboxsdk.com/build/'
   });
 });
 
-gulp.task('clean', cb => {
-  rimraf('./dist/', cb);
+gulp.task('clean', async () => {
+  await fs.promises.rm('./dist', { force: true, recursive: true });
+  for (const filename of [
+    './packages/core/inboxsdk.js',
+    './packages/core/pageWorld.js'
+  ]) {
+    await fs.promises.rm(filename, { force: true });
+    await fs.promises.rm(filename + '.map', { force: true });
+  }
 });
 
-gulp.task('docs', async () => {
-  const paths: dir.PathsResult = await new Promise((resolve, reject) => {
-    dir.paths(__dirname + '/src', (err, paths) => {
-      if (err) reject(err);
-      else resolve(paths);
-    });
-  });
-
-  const files = await Promise.all(
-    _.chain(paths.files)
-      .filter(isFileEligbleForDocs)
-      .sort()
-      .map(parseCommentsInFile)
-      .value()
-  );
-  const classes = _.chain(files)
-    .filter(Boolean)
-    .map((x: any) => x.classes)
-    .flatten()
-    .filter(Boolean)
-    .map(transformClass)
-    .forEach(checkForDocIssues)
-    .value();
-
-  const docsJson = {
-    classes: _.chain(classes)
-      .map(ele => [ele.name, ele])
-      .fromPairs()
-      .value()
-  };
-
-  const outDir = './dist';
-  try {
-    await fs.promises.stat(outDir);
-  } catch (err) {
-    await fs.promises.mkdir(outDir);
-  }
-
-  await fs.promises.writeFile(
-    'dist/docs.json',
-    JSON.stringify(docsJson, null, 2)
-  );
-});
-
-function checkForDocIssues(c: any) {
-  if (c.functions) {
-    for (const func of c.functions) {
-      if (!func.returns) {
-        throw new Error(
-          'WARNING: ' +
-            func.name +
-            ' in ' +
-            c.name +
-            " doesn't have a return tag"
-        );
-      }
-    }
-  }
-}
-
-async function parseCommentsInFile(file: string): Promise<any> {
-  gutil.log('Parsing: ' + gutil.colors.cyan(file));
-  const { stdout, stderr } = await exec(
-    'node_modules/.bin/jsdoc ' +
-      escapeShellArg(file) +
-      ' -t templates/haruki -d console -q format=json',
-    { passStdErr: true }
-  );
-  if (stderr) {
-    process.stderr.write(stderr);
-    throw new Error('Got stderr');
-  }
-  try {
-    const comments = JSON.parse(stdout);
-    comments['filename'] = file;
-    return comments;
-  } catch (err) {
-    console.error('error in file', file, err);
-    console.error('char count:', stdout.length);
-    throw err;
-  }
-}
-
-function transformClass(c: any) {
-  (c.functions || []).forEach((func: any) => {
-    func.description = (func.description as string).replace(
-      /\n\^(\S+)/g,
-      (m, rule) => {
-        if (rule === 'gmail' || rule === 'inbox') {
-          if (!func.environments) func.environments = [];
-          func.environments.push(rule);
-          return '';
-        }
-        throw new Error(`Unknown rule ^${rule}`);
-      }
-    );
-  });
-
-  (c.properties || []).forEach((prop: any) => {
-    prop.optional = false;
-
-    prop.description = (prop.description as string).replace(
-      /\n\^(\S+)/g,
-      (m, rule) => {
-        if (rule === 'optional') {
-          prop.optional = true;
-          return '';
-        }
-        const defaultM = /^default=(.*)$/.exec(rule);
-        if (defaultM) {
-          prop.default = defaultM[1];
-          return '';
-        }
-        throw new Error(`Unknown property rule ^${rule}`);
-      }
-    );
-  });
-
-  return c;
-}
-
-function isFileEligbleForDocs(filename: string): boolean {
-  return (
-    filename.endsWith('.js') &&
-    (filename.includes('src/docs/') ||
-      filename.endsWith(
-        'src/platform-implementation-js/constants/nav-item-types.js'
-      ))
-  );
-}
-
-if (args.singleBundle) {
-  gulp.task(
-    'sdk',
-    gulp.series('injected', function sdkBundle() {
-      return browserifyTask({
-        entry: './src/inboxsdk-js/main-DEV.js',
-        destName: sdkFilename,
-        hotPort: 3140,
-        afterBuild: setupExamples
-      });
-    })
-  );
-  gulp.task('imp', () => {
-    throw new Error('No separate imp bundle in singleBundle bundle mode');
-  });
-  gulp.task('default', gulp.parallel('sdk'));
-} else {
+if (args.remote) {
   gulp.task('sdk', () => {
     return browserifyTask({
-      entry: './src/inboxsdk-js/main.js',
+      entry: './src/inboxsdk-js/inboxsdk-REMOTE',
       destName: sdkFilename,
+      standalone: 'InboxSDK',
       disableMinification: true,
       afterBuild: setupExamples,
       noSourceMapComment: true
     });
   });
   gulp.task(
-    'imp',
-    gulp.series('injected', function impBundle() {
+    'remote',
+    gulp.series('pageWorld', function impBundle() {
       return browserifyTask({
-        entry: './src/platform-implementation-js/main.js',
-        destName: 'platform-implementation.js',
-        hotPort: 3141
+        entry: './src/platform-implementation-js/main-INTEGRATED-PAGEWORLD',
+        destName: 'platform-implementation.js'
+        // hotPort: 3141
       });
     })
   );
-  gulp.task('default', gulp.parallel('sdk', 'imp'));
+  gulp.task('default', gulp.parallel('sdk', 'remote'));
+} else if (args.integratedPageWorld) {
+  // non-remote bundle built for compatibility with remote bundle
+  gulp.task(
+    'sdk',
+    gulp.series('pageWorld', function sdkBundle() {
+      return browserifyTask({
+        entry: './src/inboxsdk-js/inboxsdk-NONREMOTE-INTEGRATED-PAGEWORLD',
+        destName: sdkFilename,
+        standalone: 'InboxSDK',
+        // hotPort: 3140,
+        afterBuild: setupExamples,
+        noSourceMapComment: Boolean(args.production)
+      });
+    })
+  );
+  gulp.task('remote', () => {
+    throw new Error('No separate remote bundle in non-remote bundle mode');
+  });
+  gulp.task('default', gulp.parallel('sdk'));
+} else {
+  // standard npm non-remote bundle
+  gulp.task('sdk', () => {
+    return browserifyTask({
+      entry: './src/inboxsdk-js/inboxsdk-NONREMOTE',
+      destName: sdkFilename,
+      standalone: 'InboxSDK',
+      // hotPort: 3140,
+      afterBuild: setupExamples,
+      noSourceMapComment: Boolean(args.production),
+      writeToPackagesCore: true
+    });
+  });
+  gulp.task('remote', () => {
+    throw new Error('No separate remote bundle in non-remote bundle mode');
+  });
+  gulp.task('default', gulp.parallel('sdk', 'pageWorld'));
 }
 
 gulp.task(
   'server',
-  gulp.series(args.singleBundle ? 'sdk' : 'imp', async function serverRun() {
+  gulp.series(!args.remote ? 'sdk' : 'remote', async function serverRun() {
     const app = await import('./live/app');
     app.run();
   })

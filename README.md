@@ -100,16 +100,9 @@ it.)
 
 By default, `yarn start` runs the following command:
 
-    yarn gulp default --singleBundle --watch --reloader
+    yarn gulp default --watch --reloader
 
-which builds the SDK into a single bundle (`--singleBundle`), watches all of its
-source files for changes to trigger rebuilds of the bundle automatically
-(`--watch`), and tells Chrome to reload its extensions after SDK rebuilds
-(`--reload`).
-
-The `-h` (`--hot`) flag is also available, which uses
-[Browserify-HMR](https://github.com/Macil/browserify-hmr) to make code
-changes be hot-reloadable into a running extension.
+which builds the SDK, watches all of its source files for changes to trigger rebuilds of the bundle automatically (`--watch`), and tells Chrome to reload its extensions after SDK rebuilds (`--reload`).
 
 Separate SDK and implementation bundles can be built and a local test server
 which hosts the remote implementation bundle can be started by running:
@@ -141,7 +134,7 @@ tests can be run with `yarn puppeteer`.
 
 ## Build
 
-When the `--singleBundle` flag isn't used, two javascript files are created:
+When the `--remote` flag is used, two main javascript files are created:
 inboxsdk.js and platform-implementation.js. inboxsdk.js implements the InboxSDK
 object with the load method. It triggers an AJAX request for
 platform-implementation.js which is evaluated and creates a

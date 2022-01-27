@@ -9,3 +9,5 @@
 /examples
 #/examples/*/inboxsdk.js*
 /chromeTestOutput
+/packages/core/inboxsdk.js*
+/packages/core/pageWorld.js*

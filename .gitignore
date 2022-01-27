@@ -3,6 +3,8 @@
 /dist
 /coverage
 /examples/*/inboxsdk.js*
+/examples/*/pageWorld.js*
+/examples/*/background.js*
 *~
 npm-debug.log
 yarn-debug.log

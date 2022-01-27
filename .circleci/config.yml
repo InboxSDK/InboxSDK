@@ -62,15 +62,15 @@ workflows:
   all_workflow:
     jobs:
       - unit_tests
-      - integration
-  nightly_workflow:
-    triggers:
-      - schedule:
-          cron: '0 0 * * *'
-          filters:
-            branches:
-              only:
-                - master
-    jobs:
-      - unit_tests
-      - integration
+  #     - integration
+  # nightly_workflow:
+  #   triggers:
+  #     - schedule:
+  #         cron: '0 0 * * *'
+  #         filters:
+  #           branches:
+  #             only:
+  #               - master
+  #   jobs:
+  #     - unit_tests
+  #     - integration
