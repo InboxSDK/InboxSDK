@@ -16,5 +16,10 @@
     "https://mail.google.com/",
     "https://inbox.google.com/"
   ],
+  "web_accessible_resources": [ "pageWorld.js" ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
   "manifest_version": 2
 }

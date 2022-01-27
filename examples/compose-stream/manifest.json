@@ -19,10 +19,16 @@
   ],
   "web_accessible_resources": [
     "inboxsdk.js.map",
+    "pageWorld.js",
+    "pageWorld.js.map",
     "monkey.png",
     "monkey-face.jpg",
     "lion.png"
   ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
 
   "manifest_version": 2
 }

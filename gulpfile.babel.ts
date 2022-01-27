@@ -19,7 +19,6 @@ import uglify from 'gulp-uglify';
 import sourcemaps from 'gulp-sourcemaps';
 import stdio from 'stdio';
 import gutil from 'gulp-util';
-import rename from 'gulp-rename';
 import extReloader from './live/extReloader';
 import Kefir from 'kefir';
 import fg from 'fast-glob';
@@ -37,6 +36,10 @@ const args = stdio.getopt({
   hot: { key: 'h', description: 'hot module replacement' },
   remote: {
     description: 'Remote-loading bundle with integrated pageWorld script'
+  },
+  integratedPageWorld: {
+    description:
+      'Non-remote-loading bundle with integrated pageWorld script, for testing in projects that expect the remote-loading build'
   },
   minify: { key: 'm', description: 'Minify build' },
   production: { key: 'p', description: 'Production build' },
@@ -57,8 +60,13 @@ if (args.production && !args.minify) {
 
 // --watch causes Browserify to use full paths in module references. We don't
 // want those visible in production.
-if (args.production && (args.watch || args.fullPaths)) {
-  throw new Error('--production can not be used with --watch or --fullPaths');
+if (
+  args.production &&
+  (args.watch || args.fullPaths || args.integratedPageWorld)
+) {
+  throw new Error(
+    '--production can not be used with --watch, --fullPaths, or --integratedPageWorld'
+  );
 }
 
 process.env.NODE_ENV = args.production ? 'production' : 'development';
@@ -73,7 +81,11 @@ async function setupExamples() {
     dirs.push('../MailFoo/extensions/devBuilds/chrome/');
   }
 
-  let stream = gulp.src('./dist/' + sdkFilename).pipe(rename('inboxsdk.js'));
+  let stream = gulp.src([
+    './dist/inboxsdk.js',
+    './dist/pageWorld.js',
+    './packages/core/background.js'
+  ]);
   for (const dir of dirs) {
     stream = stream.pipe(destAtomic(dir));
   }
@@ -155,6 +167,7 @@ interface BrowserifyTaskOptions {
   afterBuild?: () => Promise<void>;
   noSourceMapComment?: boolean;
   sourceMappingURLPrefix?: string;
+  writeToPackagesCore?: boolean;
 }
 
 async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
@@ -226,7 +239,7 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
       });
 
     const bundle = bundler.bundle();
-    const result = bundle
+    let result = bundle
       .pipe(source(destName))
       .pipe(
         gulpif(
@@ -234,8 +247,11 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
           streamify(sourcemapPipeline())
         )
       )
-      .pipe(destAtomic('./dist/'))
-      .pipe(destAtomic('./packages/core/'));
+      .pipe(destAtomic('./dist/'));
+
+    if (options.writeToPackagesCore) {
+      result = result.pipe(destAtomic('./packages/core/'));
+    }
 
     await new Promise((resolve, reject) => {
       const errCb = _.once(err => {
@@ -282,7 +298,7 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
 
 gulp.task('pageWorld', () => {
   return browserifyTask({
-    entry: './src/injected-js/main.js',
+    entry: './src/injected-js/main',
     destName: 'pageWorld.js',
     // hotPort: 3142,
     sourceMappingURLPrefix: 'https://www.inboxsdk.com/build/'
@@ -300,16 +316,39 @@ gulp.task('clean', async () => {
   }
 });
 
-if (!args.remote) {
+if (args.remote) {
+  gulp.task('sdk', () => {
+    return browserifyTask({
+      entry: './src/inboxsdk-js/inboxsdk-REMOTE',
+      destName: sdkFilename,
+      standalone: 'InboxSDK',
+      disableMinification: true,
+      // afterBuild: setupExamples,
+      noSourceMapComment: true
+    });
+  });
+  gulp.task(
+    'remote',
+    gulp.series('pageWorld', function impBundle() {
+      return browserifyTask({
+        entry: './src/platform-implementation-js/main-INTEGRATED-PAGEWORLD',
+        destName: 'platform-implementation.js'
+        // hotPort: 3141
+      });
+    })
+  );
+  gulp.task('default', gulp.parallel('sdk', 'remote'));
+} else if (args.integratedPageWorld) {
+  // non-remote bundle built for compatibility with remote bundle
   gulp.task(
     'sdk',
     gulp.series('pageWorld', function sdkBundle() {
       return browserifyTask({
-        entry: './src/inboxsdk-js/inboxsdk-NONREMOTE.js',
+        entry: './src/inboxsdk-js/inboxsdk-NONREMOTE-INTEGRATED-PAGEWORLD',
         destName: sdkFilename,
         standalone: 'InboxSDK',
         // hotPort: 3140,
-        afterBuild: setupExamples,
+        // afterBuild: setupExamples,
         noSourceMapComment: Boolean(args.production)
       });
     })
@@ -319,27 +358,22 @@ if (!args.remote) {
   });
   gulp.task('default', gulp.parallel('sdk'));
 } else {
+  // standard npm non-remote bundle
   gulp.task('sdk', () => {
     return browserifyTask({
-      entry: './src/inboxsdk-js/inboxsdk-REMOTE.js',
+      entry: './src/inboxsdk-js/inboxsdk-NONREMOTE',
       destName: sdkFilename,
       standalone: 'InboxSDK',
-      disableMinification: true,
+      // hotPort: 3140,
       afterBuild: setupExamples,
-      noSourceMapComment: true
+      noSourceMapComment: Boolean(args.production),
+      writeToPackagesCore: true
     });
   });
-  gulp.task(
-    'remote',
-    gulp.series('pageWorld', function impBundle() {
-      return browserifyTask({
-        entry: './src/platform-implementation-js/main-REMOTE.js',
-        destName: 'platform-implementation.js'
-        // hotPort: 3141
-      });
-    })
-  );
-  gulp.task('default', gulp.parallel('sdk', 'remote'));
+  gulp.task('remote', () => {
+    throw new Error('No separate remote bundle in non-remote bundle mode');
+  });
+  gulp.task('default', gulp.parallel('sdk', 'pageWorld'));
 }
 
 gulp.task(

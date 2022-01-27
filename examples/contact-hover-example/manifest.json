@@ -17,7 +17,13 @@
     "https://inbox.google.com/"
   ],
   "web_accessible_resources": [
-    "inboxsdk.js.map", "monkey-face.jpg"
+    "inboxsdk.js.map", "monkey-face.jpg",
+    "pageWorld.js",
+    "pageWorld.js.map"
   ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
   "manifest_version": 2
 }
