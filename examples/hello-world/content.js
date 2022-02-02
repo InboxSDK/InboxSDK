@@ -22,7 +22,7 @@ InboxSDK.load(2, 'Hello World!').then(function(sdk){
 			},
 		});
 
-    const metaForm = composeView.getMetadataFormElement();
+    const metaForm = composeView.getMetadataForm();
     if (metaForm) {
       const bb = metaForm.getBoundingClientRect();
       const div = document.createElement('div');
@@ -37,7 +37,7 @@ InboxSDK.load(2, 'Hello World!').then(function(sdk){
       div.style.zIndex = 999;
       div.style.left = (bb.left - div.clientWidth - 20) + "px";
       div.style.top = bb.top + "px";
-      
+
       const btn = document.createElement('button');
       btn.textContent = "Close";
       btn.onclick = (e) => {
