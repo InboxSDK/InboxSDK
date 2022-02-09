@@ -792,10 +792,6 @@ table + .inboxsdk__compose_statusbar {
   margin-top: -8px;
 }
 
-.inboxsdk__compose_statusbarActive .aoI {
-  height: auto !important;
-}
-
 .inboxsdk__compose_statusbarActive .aDl {
   z-index: unset;
 }
