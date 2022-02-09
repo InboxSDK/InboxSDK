@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 import * as Kefir from 'kefir';
+import TypedEmitter from 'typed-emitter';
 
 export const LOADER_VERSION: string;
 export interface LoadScriptOptions {
@@ -464,7 +465,37 @@ export interface ContentPanelDescriptor {
   orderHint?: number;
 }
 
+export interface MessageAttachmentIconDescriptor {
+  iconUrl: string;
+  iconClass?: string;
+  iconHtml?: string | null;
+  tooltip: string | HTMLElement;
+  onClick: () => void;
+}
+
+export type AttachmentIcon = TypedEmitter<{
+  tooltipHidden: () => void;
+  tooltipShown: () => void;
+}>;
+
+export type MessageViewToolbarSectionNames = 'MORE';
+
+export interface MessageViewToolbarButtonDescriptor {
+  section: MessageViewToolbarSectionNames;
+  title: string;
+  iconUrl: string;
+  iconClass?: string;
+  onClick: (e: MouseEvent) => void;
+  orderHint: number;
+}
+
 export interface MessageView extends EventEmitter {
+  addAttachmentIcon(
+    opts:
+      | MessageAttachmentIconDescriptor
+      | Kefir.Stream<MessageAttachmentIconDescriptor, never>
+  ): AttachmentIcon;
+  addToolbarButton(opts?: MessageViewToolbarButtonDescriptor): void;
   getBodyElement(): HTMLElement;
   isElementInQuotedArea(element: HTMLElement): boolean;
   isLoaded(): boolean;

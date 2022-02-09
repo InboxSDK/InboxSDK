@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "@types/kefir": "^3.8.6",
-    "@types/node": "*"
+    "@types/node": "*",
+    "typed-emitter": "^2.1.0"
   }
 }
