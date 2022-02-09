@@ -550,6 +550,7 @@ export interface ComposeView extends EventEmitter {
       | Kefir.Observable<RecipientRowOptions, any>
   ): { destroy(): void };
   addStatusBar(statusBarDescriptor: StatusBarDescriptor): StatusBarView;
+  addToLinkPopup(): HTMLElement;
   close(): void;
   ensureAppButtonToolbarsAreClosed(): void;
   ensureFormattingToolbarIsHidden(): void;

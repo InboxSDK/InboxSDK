@@ -252,6 +252,10 @@ export default class ComposeView extends EventEmitter {
     return get(memberMap, this).composeViewImplementation.getToRecipients();
   }
 
+  public addToLinkPopup(): HTMLElement {
+    return get(memberMap, this).composeViewImplementation.addToLinkPopup();
+  }
+
   public getCcRecipients(): Contact[] {
     return get(memberMap, this).composeViewImplementation.getCcRecipients();
   }
