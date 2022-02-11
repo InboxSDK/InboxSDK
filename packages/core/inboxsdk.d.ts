@@ -472,6 +472,9 @@ export interface ThreadView extends EventEmitter {
   getMessageViews(): Array<MessageView>;
   getMessageViewsAll(): Array<MessageView>;
   getSubject(): string;
+  /**
+   * @deprecated
+   */
   getThreadID(): string;
   getThreadIDAsync(): Promise<string>;
   addNoticeBar(): SimpleElementView;
