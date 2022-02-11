@@ -67,7 +67,7 @@ import getResponseTypeChangesStream from './gmail-compose-view/get-response-type
 import getPresendingStream from '../../../driver-common/compose/getPresendingStream';
 import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
 import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
-import insertLinkPopover from './gmail-compose-view/link-edit-bar';
+import setupLinkPopovers from './gmail-compose-view/setupLinkPopovers';
 import getFormattingAreaOffsetLeft from './gmail-compose-view/get-formatting-area-offset-left';
 import overrideEditSubject from './gmail-compose-view/override-edit-subject';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
@@ -123,6 +123,7 @@ class GmailComposeView {
   _closedProgrammatically: boolean = false;
   _destroyed: boolean = false;
   _removedFromDOMStopper: Stopper;
+  _hasSetupLinkPopovers: boolean = false;
   _page: PageParserTree;
   tagTree: TagTree<HTMLElement>;
   ready: () => Kefir.Observable<GmailComposeView>;
@@ -1237,10 +1238,6 @@ class GmailComposeView {
     updateInsertMoreAreaLeft(this, oldFormattingAreaOffsetLeft);
   }
 
-  addToLinkPopup(): HTMLElement {
-    return insertLinkPopover(this);
-  }
-
   _getFormattingAreaOffsetLeft(): number {
     return getFormattingAreaOffsetLeft(this);
   }
@@ -1298,12 +1295,6 @@ class GmailComposeView {
 
   getInsertLinkButton(): HTMLElement {
     return querySelector(this._element, '.e5.aaA.aMZ');
-  }
-
-  getLinkEditPopover(): HTMLElement {
-    const popovers = document.querySelectorAll('.Lf.a5s');
-    console.log(popovers);
-    return popovers[0];
   }
 
   getSendButton(): HTMLElement {
@@ -1918,6 +1909,13 @@ class GmailComposeView {
       });
 
     this._isListeningToAjaxInterceptStream = true;
+  }
+
+  setupLinkPopovers(): void {
+    if (!this._hasSetupLinkPopovers) {
+      this._hasSetupLinkPopovers = true;
+      this._eventStream.plug(setupLinkPopovers(this));
+    }
   }
 }
 export default ud.defn(module, GmailComposeView);

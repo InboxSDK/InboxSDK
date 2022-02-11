@@ -61,6 +61,8 @@ export default class ComposeView extends EventEmitter {
             'The composeView messageIDChange event was removed after API version 1'
           );
         }
+      } else if (eventName === 'linkPopOver') {
+        composeViewImplementation.setupLinkPopovers();
       }
     });
 
@@ -250,10 +252,6 @@ export default class ComposeView extends EventEmitter {
 
   public getToRecipients(): Contact[] {
     return get(memberMap, this).composeViewImplementation.getToRecipients();
-  }
-
-  public addToLinkPopup(): HTMLElement {
-    return get(memberMap, this).composeViewImplementation.addToLinkPopup();
   }
 
   public getCcRecipients(): Contact[] {

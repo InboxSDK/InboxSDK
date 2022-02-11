@@ -130,4 +130,5 @@ export interface ComposeViewDriver {
     tooltipDescriptor: TooltipDescriptor
   ): void;
   closeButtonTooltip(buttonViewController: object): void;
+  setupLinkPopovers(): void;
 }
