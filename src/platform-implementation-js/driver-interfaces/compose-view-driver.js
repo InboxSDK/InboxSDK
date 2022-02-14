@@ -71,7 +71,6 @@ export type ComposeViewDriver = {
     extraOnClickOptions: Object
   ): Promise<?Object>,
   addRecipientRow(options: Kefir.Observable<?Object>): () => void,
-  addToLinkPopup(): HTMLElement,
   forceRecipientRowsOpen(): () => void,
   hideNativeRecipientRows(): () => void,
   hideRecipientArea(): () => void,

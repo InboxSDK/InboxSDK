@@ -38,7 +38,6 @@ export default class GmailComposeView implements ComposeViewDriver {
     url: string;
     text: string;
   }): HTMLElement;
-  public addToLinkPopup(): HTMLElement;
   public setSubject(text: string): void;
   public setBodyHTML(html: string): void;
   public setBodyText(text: string): void;

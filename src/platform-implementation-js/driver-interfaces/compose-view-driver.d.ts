@@ -102,7 +102,6 @@ export interface ComposeViewDriver {
     orderHint?: number;
     addAboveNativeStatusBar?: boolean;
   }): StatusBar;
-  addToLinkPopup(): HTMLElement;
   hideNativeStatusBar(): () => void;
   isForward(): boolean;
   isReply(): boolean;
