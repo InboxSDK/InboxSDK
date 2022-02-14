@@ -60,19 +60,19 @@ function getSelectedLink(): HTMLAnchorElement | null {
   return null;
 }
 
-export default function setupLinkPopovers(gmailComposeView: GmailComposeView): Kefir.Observable<any, never> {
+export default function setupLinkPopOvers(gmailComposeView: GmailComposeView): Kefir.Observable<any, never> {
   return toItemWithLifetimeStream(
-    gmailComposeView.getGmailDriver().getTagTree().getAllByTag('composeLinkPopoverContainer')
+    gmailComposeView.getGmailDriver().getTagTree().getAllByTag('composeLinkPopOverContainer')
   )
     .flatMap(({el, removalStream}: ItemWithLifetime<TagTreeNode<HTMLElement>>) => {
       const popOverEl = el.getValue();
 
-      let existingLinkPopover: LinkPopOver | null = null;
+      let existingLinkPopOver: LinkPopOver | null = null;
 
       removalStream.onValue(() => {
-        if (existingLinkPopover) {
-          existingLinkPopover.emit('close');
-          existingLinkPopover = null;
+        if (existingLinkPopOver) {
+          existingLinkPopOver.emit('close');
+          existingLinkPopOver = null;
         }
       });
 
@@ -80,16 +80,16 @@ export default function setupLinkPopovers(gmailComposeView: GmailComposeView): K
         .toProperty(() => null)
         .takeUntilBy(removalStream)
         .flatMap(() => {
-          if (existingLinkPopover) {
-            existingLinkPopover.emit('close');
-            existingLinkPopover = null;
+          if (existingLinkPopOver) {
+            existingLinkPopOver.emit('close');
+            existingLinkPopOver = null;
           }
 
           if (popOverEl.style.visibility === 'visible') {
             const linkEl = getSelectedLink();
             if (linkEl && gmailComposeView.getElement().contains(linkEl)) {
               const linkPopOver = new LinkPopOver(linkEl, popOverEl);
-              existingLinkPopover = linkPopOver;
+              existingLinkPopOver = linkPopOver;
               return Kefir.constant({
                 eventName: 'linkPopOver',
                 data: linkPopOver

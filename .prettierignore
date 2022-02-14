@@ -7,3 +7,4 @@
 *.snap
 /packages/core/inboxsdk.js*
 /packages/core/pageWorld.js*
+/src/platform-implementation-js/dom-driver/gmail/views/gmail-compose-view/setupLinkPopOvers.ts

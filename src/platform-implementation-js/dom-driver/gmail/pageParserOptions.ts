@@ -5,7 +5,7 @@ const pageParserOptions: PageParserTreeOptions = {
   watchers: [
     {
       sources: [null],
-      tag: 'composeLinkPopoverContainer',
+      tag: 'composeLinkPopOverContainer',
       selectors: ['body', '.Lf.a5s']
     }
   ],
@@ -16,7 +16,7 @@ const pageParserOptions: PageParserTreeOptions = {
           'header[role=banner] div:not([aria-label]):not([data-ogsr-up]) > div:not(.inboxsdk__appButton) > div[data-tooltip] + div[role=menu]'
         )
     },
-    composeLinkPopoverContainer: {
+    composeLinkPopOverContainer: {
       fn: root => root.querySelectorAll('body > .Lf.a5s')
     }
   }

@@ -62,7 +62,7 @@ export default class ComposeView extends EventEmitter {
           );
         }
       } else if (eventName === 'linkPopOver') {
-        composeViewImplementation.setupLinkPopovers();
+        composeViewImplementation.setupLinkPopOvers();
       }
     });
 
