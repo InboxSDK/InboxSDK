@@ -67,7 +67,7 @@ import getResponseTypeChangesStream from './gmail-compose-view/get-response-type
 import getPresendingStream from '../../../driver-common/compose/getPresendingStream';
 import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
 import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
-import setupLinkPopOvers from './gmail-compose-view/setupLinkPopOvers';
+import setupLinkPopOvers from './gmail-compose-view/setupLinkPopovers';
 import getFormattingAreaOffsetLeft from './gmail-compose-view/get-formatting-area-offset-left';
 import overrideEditSubject from './gmail-compose-view/override-edit-subject';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
