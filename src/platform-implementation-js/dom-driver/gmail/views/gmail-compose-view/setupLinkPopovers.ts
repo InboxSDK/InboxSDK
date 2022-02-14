@@ -100,27 +100,4 @@ export default function setupLinkPopovers(gmailComposeView: GmailComposeView): K
           return Kefir.never();
         });
     });
-
-
-  // let newPopover = document.createElement('div');
-
-  // // Mimic the gmail container styles
-  // newPopover.style.cssText = `
-  //   position: absolute;
-  //   top: 35px;
-  //   left: 0;
-  //   height: 50px;
-  //   width: 100%;
-  //   background: #fff;
-  //   border: 1px solid #a8a8a8;
-  //   font: 13px arial,sans-serif;
-  //   padding: 5px 8px;
-  //   box-sizing: border-box;
-  //   box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
-  // `;
-
-  // newPopover.textContent = 'Test test streak stuff goes here';
-
-  // insert to that div
-  // gmailLinkPopover.appendChild(newPopover);
 }
