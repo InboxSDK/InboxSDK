@@ -20,11 +20,11 @@ class LinkPopOver extends SafeEventEmitter {
   }
 
   addSection() {
-    let containerEl = this._popOverEl.querySelector<HTMLElement>('inboxsdk__section_container');
+    let containerEl = this._popOverEl.querySelector<HTMLElement>('.inboxsdk__linkPopOver_section_container');
     if (!containerEl) {
       containerEl = document.createElement('div');
       containerEl.className = 'inboxsdk__linkPopOver_section_container';
-      // this._popOverEl.appendChild(containerEl); TODO put in right spot
+      this._popOverEl.appendChild(containerEl);
     }
     return new LinkPopOverSection(this, containerEl);
   }

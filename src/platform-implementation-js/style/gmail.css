@@ -2367,3 +2367,24 @@ table[role='presentation'].inboxsdk__thread_view_with_custom_view > tr {
 .inboxsdk__compose_addressList {
   display: flex !important;
 }
+
+/* end support menu item */
+
+/* compose popover */
+.inboxsdk__linkPopOver_section_container {
+  position: absolute;
+  width: 100%;
+  top: 35px;
+  left: 0;
+}
+
+.inboxsdk__linkPopOver_section {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #a8a8a8;
+  font: 13px arial,sans-serif;
+  padding: 5px 8px;
+  margin-bottom: 5px;
+  box-sizing: border-box;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
+}
