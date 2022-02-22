@@ -67,6 +67,7 @@ import getResponseTypeChangesStream from './gmail-compose-view/get-response-type
 import getPresendingStream from '../../../driver-common/compose/getPresendingStream';
 import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
 import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
+import setupLinkPopOvers from './gmail-compose-view/setupLinkPopovers';
 import getFormattingAreaOffsetLeft from './gmail-compose-view/get-formatting-area-offset-left';
 import overrideEditSubject from './gmail-compose-view/override-edit-subject';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
@@ -122,6 +123,7 @@ class GmailComposeView {
   _closedProgrammatically: boolean = false;
   _destroyed: boolean = false;
   _removedFromDOMStopper: Stopper;
+  _hasSetupLinkPopOvers: boolean = false;
   _page: PageParserTree;
   tagTree: TagTree<HTMLElement>;
   ready: () => Kefir.Observable<GmailComposeView>;
@@ -1907,6 +1909,13 @@ class GmailComposeView {
       });
 
     this._isListeningToAjaxInterceptStream = true;
+  }
+
+  setupLinkPopOvers(): void {
+    if (!this._hasSetupLinkPopOvers) {
+      this._hasSetupLinkPopOvers = true;
+      this._eventStream.plug(setupLinkPopOvers(this));
+    }
   }
 }
 export default ud.defn(module, GmailComposeView);

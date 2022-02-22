@@ -114,4 +114,5 @@ export default class GmailComposeView implements ComposeViewDriver {
     tooltipDescriptor: TooltipDescriptor
   ): void;
   public closeButtonTooltip(buttonViewController: object): void;
+  public setupLinkPopOvers(): void;
 }
