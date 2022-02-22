@@ -475,27 +475,30 @@ export interface ThreadView extends EventEmitter {
   getThreadID(): string;
   getThreadIDAsync(): Promise<string>;
   addNoticeBar(): SimpleElementView;
+}
+
+export interface UNSTABLE_ThreadView extends ThreadView {
   //#region Undocumented methods
   /**
    * @internal
    */
-  // addCustomMessage: (descriptor: {
-  //   collapsedEl: HTMLElement;
-  //   headerEl: HTMLElement;
-  //   bodyEl: HTMLElement;
-  //   iconUrl: string;
-  //   sortDate: Date;
-  // }) => CustomMessageView;
+  addCustomMessage: (descriptor: {
+    collapsedEl: HTMLElement;
+    headerEl: HTMLElement;
+    bodyEl: HTMLElement;
+    iconUrl: string;
+    sortDate: Date;
+  }) => CustomMessageView;
   /**
    * @internal
    */
-  // registerHiddenCustomMessageNoticeProvider: (
-  //   provider: (
-  //     numCustomHidden: number,
-  //     numberNativeHidden: number,
-  //     unmountPromise: Promise<void>
-  //   ) => HTMLElement | null
-  // ) => void;
+  registerHiddenCustomMessageNoticeProvider: (
+    provider: (
+      numCustomHidden: number,
+      numberNativeHidden: number,
+      unmountPromise: Promise<void>
+    ) => HTMLElement | null
+  ) => void;
   //#endregion
 }
 
