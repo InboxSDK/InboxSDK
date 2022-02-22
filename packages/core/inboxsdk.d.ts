@@ -43,8 +43,6 @@ export interface InboxSDK {
   Keyboard: Keyboard;
   Search: Search;
   Global: Global;
-  load: typeof load;
-  loadScript: typeof loadScript;
 }
 
 export interface Global {
@@ -366,7 +364,6 @@ export interface CollapsibleSectionView extends SectionView {
 }
 
 export interface RouteView extends EventEmitter {
-  getElement(): HTMLElement;
   getRouteID(): string | null;
   getRouteType(): string;
   getParams(): { [key: string]: string };
@@ -482,23 +479,23 @@ export interface ThreadView extends EventEmitter {
   /**
    * @internal
    */
-  addCustomMessage: (descriptor: {
-    collapsedEl: HTMLElement;
-    headerEl: HTMLElement;
-    bodyEl: HTMLElement;
-    iconUrl: string;
-    sortDate: Date;
-  }) => CustomMessageView;
+  // addCustomMessage: (descriptor: {
+  //   collapsedEl: HTMLElement;
+  //   headerEl: HTMLElement;
+  //   bodyEl: HTMLElement;
+  //   iconUrl: string;
+  //   sortDate: Date;
+  // }) => CustomMessageView;
   /**
    * @internal
    */
-  registerHiddenCustomMessageNoticeProvider: (
-    provider: (
-      numCustomHidden: number,
-      numberNativeHidden: number,
-      unmountPromise: Promise<void>
-    ) => HTMLElement | null
-  ) => void;
+  // registerHiddenCustomMessageNoticeProvider: (
+  //   provider: (
+  //     numCustomHidden: number,
+  //     numberNativeHidden: number,
+  //     unmountPromise: Promise<void>
+  //   ) => HTMLElement | null
+  // ) => void;
   //#endregion
 }
 
@@ -690,10 +687,6 @@ export interface ComposeView extends EventEmitter {
 
 export interface SendOptions {
   sendAndArchive?: boolean;
-}
-
-export declare class ComposeViewEvents {
-  destroy: (destroyEvent: ComposeViewDestroyEvent) => void;
 }
 
 export interface ComposeViewDestroyEvent {
