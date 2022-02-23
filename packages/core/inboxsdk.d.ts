@@ -1,5 +1,6 @@
 import { EventEmitter } from 'events';
 import * as Kefir from 'kefir';
+import TypedEmitter from 'typed-emitter';
 
 export const LOADER_VERSION: string;
 export interface LoadScriptOptions {
@@ -27,6 +28,13 @@ export interface InboxSDK {
   Compose: Compose;
   ButterBar: ButterBar;
   Lists: Lists;
+  Logger: {
+    event(name: string, extras: any): void;
+    error: (
+      err: Error & { details?: Record<string, any> },
+      options: Record<string, any>
+    ) => void;
+  };
   NavMenu: NavMenu;
   Router: Router;
   Widgets: Widgets;
@@ -143,8 +151,23 @@ export interface Router {
   handleListRoute(
     routeID: string,
     handler: (listRouteView: ListRouteView) => void
-  ): void;
+  ): () => void;
   NativeRouteIDs: Record<NativeRouteIdTypes, string>;
+  NativeListRouteIDs: Record<
+    | 'ALL_MAIL'
+    | 'ANY_LIST'
+    | 'DRAFTS'
+    | 'IMPORTANT'
+    | 'INBOX'
+    | 'LABEL'
+    | 'SEARCH'
+    | 'SEARCH'
+    | 'SENT'
+    | 'SPAM'
+    | 'STARRED'
+    | 'TRASH',
+    string
+  >;
   RouteTypes: Record<RouteTypes, string>;
 }
 
@@ -182,9 +205,15 @@ export interface Widgets {
   showModalView(descriptor: ModalDescriptor): ModalView;
   showMoleView(descriptor: MoleDescriptor): MoleView;
   showDrawerView(descriptor: DrawerDescriptor): DrawerView;
+  showTopMessageBarView(opts: { el: Element }): Element;
 }
 
 export interface Toolbars {
+  addToolbarButtonForApp(
+    descriptor:
+      | AppToolbarButtonDescriptor
+      | Kefir.Stream<AppToolbarButtonDescriptor, any>
+  ): AppToolbarButtonView;
   registerThreadButton(descriptor: ToolbarButtonDescriptor): () => void;
   registerToolbarButtonForThreadView(
     descriptor: LegacyToolbarButtonDescriptor
@@ -195,6 +224,21 @@ export interface Toolbars {
     OTHER: 'OTHER';
   };
 }
+
+export interface AppToolbarButtonDescriptor {
+  title: string;
+  titleClass?: string;
+  iconUrl: string;
+  iconClass?: string;
+  onClick: (e: MouseEvent) => void;
+  arrowColor?: string | null;
+}
+
+export type AppToolbarButtonView = {
+  open(): void;
+  close(): void;
+  remove(): void;
+} & TypedEmitter<{ destroy: () => void }>;
 
 export interface Keyboard {
   createShortcutHandle(
@@ -222,6 +266,7 @@ export interface Lists {
 }
 
 export interface User {
+  getAccountSwitcherContactList(): Contact[];
   getEmailAddress(): string;
   getLanguage(): string;
   isConversationViewDisabled(): Promise<boolean>;
@@ -327,6 +372,7 @@ export interface RouteView extends EventEmitter {
 export interface ListRouteView extends RouteView {
   addCollapsibleSection(options: any): CollapsibleSectionView;
   addSection(options: any): SectionView;
+  refresh(): void;
 }
 
 export interface CustomRouteView extends RouteView {
@@ -363,14 +409,16 @@ export interface ModalButtonDescriptor {
 
 export interface ModalView extends EventEmitter {
   close(): void;
+  setTitle(s: string): void;
 }
 
 export interface DrawerView extends EventEmitter {
   close(): void;
   associateComposeView(
     composeView: ComposeView,
-    closeWithCompose: boolean
+    closeWithCompose?: boolean
   ): void;
+  disassociateComposeView(): void;
 }
 
 export interface DrawerDescriptor {
@@ -421,24 +469,37 @@ export interface ThreadView extends EventEmitter {
   getMessageViews(): Array<MessageView>;
   getMessageViewsAll(): Array<MessageView>;
   getSubject(): string;
+  /**
+   * @deprecated
+   */
   getThreadID(): string;
   getThreadIDAsync(): Promise<string>;
   addNoticeBar(): SimpleElementView;
-  // Undocumented methods
-  // addCustomMessage(descriptor: {
-  //   collapsedEl: HTMLElement;
-  //   headerEl: HTMLElement;
-  //   bodyEl: HTMLElement;
-  //   iconUrl: string;
-  //   sortDate: Date;
-  // }): CustomMessageView;
-  // registerHiddenCustomMessageNoticeProvider(
-  //   provider: (
-  //     numCustomHidden: number,
-  //     numberNativeHidden: number,
-  //     unmountPromise: Promise<void>
-  //   ) => HTMLElement | null
-  // ): void;
+}
+
+export interface UNSTABLE_ThreadView extends ThreadView {
+  //#region Undocumented methods
+  /**
+   * @internal
+   */
+  addCustomMessage: (descriptor: {
+    collapsedEl: HTMLElement;
+    headerEl: HTMLElement;
+    bodyEl: HTMLElement;
+    iconUrl: string;
+    sortDate: Date;
+  }) => CustomMessageView;
+  /**
+   * @internal
+   */
+  registerHiddenCustomMessageNoticeProvider: (
+    provider: (
+      numCustomHidden: number,
+      numberNativeHidden: number,
+      unmountPromise: Promise<void>
+    ) => HTMLElement | null
+  ) => void;
+  //#endregion
 }
 
 export interface CustomMessageView extends EventEmitter {
@@ -464,7 +525,37 @@ export interface ContentPanelDescriptor {
   orderHint?: number;
 }
 
+export interface MessageAttachmentIconDescriptor {
+  iconUrl: string;
+  iconClass?: string;
+  iconHtml?: string | null;
+  tooltip: string | HTMLElement;
+  onClick: () => void;
+}
+
+export type AttachmentIcon = TypedEmitter<{
+  tooltipHidden: () => void;
+  tooltipShown: () => void;
+}>;
+
+export type MessageViewToolbarSectionNames = 'MORE';
+
+export interface MessageViewToolbarButtonDescriptor {
+  section: MessageViewToolbarSectionNames;
+  title: string;
+  iconUrl?: string;
+  iconClass?: string;
+  onClick: (e: MouseEvent) => void;
+  orderHint?: number;
+}
+
 export interface MessageView extends EventEmitter {
+  addAttachmentIcon(
+    opts:
+      | MessageAttachmentIconDescriptor
+      | Kefir.Stream<MessageAttachmentIconDescriptor, never>
+  ): AttachmentIcon;
+  addToolbarButton(opts?: MessageViewToolbarButtonDescriptor): void;
   getBodyElement(): HTMLElement;
   isElementInQuotedArea(element: HTMLElement): boolean;
   isLoaded(): boolean;
@@ -512,12 +603,14 @@ export interface LegacyToolbarButtonDescriptor {
   hasDropdown?: boolean;
   hideFor?: (routeView: RouteView) => boolean;
   keyboardShortcutHandle?: KeyboardShortcutHandle;
+  orderHint?: number;
 }
 
 export interface ToolbarButtonOnClickEvent {
   selectedThreadViews: Array<ThreadView>;
   selectedThreadRowViews: Array<ThreadRowView>;
   dropdown?: DropdownView;
+  threadView?: ThreadView;
 }
 
 export interface KeyboardShortcutDescriptor {
@@ -553,17 +646,22 @@ export interface ComposeView extends EventEmitter {
   close(): void;
   ensureAppButtonToolbarsAreClosed(): void;
   ensureFormattingToolbarIsHidden(): void;
+  forceRecipientRowsOpen(): () => void;
   getBccRecipients(): Array<Contact>;
   getBodyElement(): HTMLElement;
   getCcRecipients(): Array<Contact>;
   getCurrentDraftID(): Promise<string | null>;
   getElement(): HTMLElement;
   getDraftID(): Promise<string | null>;
+  getMessageIDAsync(): Promise<string>;
   getSubject(): string;
+  getSubjectInput(): HTMLInputElement | null;
   getThreadID(): string;
   getToRecipients(): Array<Contact>;
   getHTMLContent(): string;
   getTextContent(): string;
+  hideDiscardButton(): () => void;
+  hideNativeRecipientRows(): () => void;
   isMinimized(): boolean;
   setMinimized(minimized: boolean): void;
   isFullScreen(): boolean;
@@ -572,21 +670,31 @@ export interface ComposeView extends EventEmitter {
   isInlineReplyForm(): boolean;
   isReply(): boolean;
   overrideEditSubject(): void;
+  registerRequestModifier(
+    cb: (composeParams: { isPlainText?: boolean; body: string }) => void
+  ): void;
   replaceSendButton({ el }: { el: HTMLElement }): () => void;
   setBccRecipients(emails: string[]): void;
   setBodyHTML(html: string): void;
+  setBodyText(to: string): void;
   setCcRecipients(emails: string[]): void;
   setFullscreen(isFullScreen: boolean): void;
   setSubject(subject: string): void;
   setTitleBarColor(color: string): () => void;
+  setTitleBarText(to: string): () => void;
   setToRecipients(recipients: string[]): void;
-  send(options: SendOptions): void;
+  send(options?: SendOptions): void;
   getFromContact(): Contact;
   getFromContactChoices(): Contact[];
 }
 
 export interface SendOptions {
   sendAndArchive?: boolean;
+}
+
+export interface ComposeViewDestroyEvent {
+  messageID: string | null;
+  closedByInboxSDK: boolean;
 }
 
 export interface ComposeButtonDescriptor {
