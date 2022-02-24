@@ -228,6 +228,10 @@ class GmailThreadRowView {
     this._elements.length = 0;
   }
 
+  getElement(): HTMLElement {
+    return this._elements[0];
+  }
+
   _removeUnclaimedModifications() {
     _removeThreadRowUnclaimedModifications(this._modifications);
 
