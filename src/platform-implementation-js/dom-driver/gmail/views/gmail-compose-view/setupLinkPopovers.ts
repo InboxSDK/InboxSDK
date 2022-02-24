@@ -55,6 +55,10 @@ function getSelectedLink(): HTMLAnchorElement | null {
   if (focusNode instanceof Text) {
     if (focusNode.parentElement instanceof HTMLAnchorElement) {
       return focusNode.parentElement;
+    } else if (focusNode.nextSibling instanceof HTMLAnchorElement) {
+      return focusNode.nextSibling;
+    } else if (focusNode.previousSibling instanceof HTMLAnchorElement) {
+      return focusNode.previousSibling;
     }
   }
   return null;
