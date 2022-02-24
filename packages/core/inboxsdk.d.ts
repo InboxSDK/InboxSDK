@@ -266,6 +266,7 @@ export interface Lists {
 }
 
 export interface User {
+  /** @deprecated */
   getAccountSwitcherContactList(): Contact[];
   getEmailAddress(): string;
   getLanguage(): string;
@@ -299,6 +300,7 @@ export interface ThreadRowView extends Destroyable {
       | ImageDescriptor
       | Kefir.Observable<ImageDescriptor | null, any>
   ): void;
+  getElement(): HTMLElement;
   getVisibleDraftCount(): number;
   getThreadIDIfStable(): string | null;
   getThreadIDIfStableAsync(): Promise<string | null>;
