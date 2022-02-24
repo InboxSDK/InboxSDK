@@ -70,6 +70,7 @@ import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-ar
 import setupLinkPopOvers from './gmail-compose-view/setupLinkPopovers';
 import getFormattingAreaOffsetLeft from './gmail-compose-view/get-formatting-area-offset-left';
 import overrideEditSubject from './gmail-compose-view/override-edit-subject';
+import detectClassicRecipientsArea from './gmail-compose-view/detectClassicRecipientsArea';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
 import {
   makePageParser,
@@ -500,6 +501,8 @@ class GmailComposeView {
     } else {
       this._removedFromDOMStopper.onValue(() => this._destroy());
     }
+
+    detectClassicRecipientsArea();
   }
 
   destroy() {

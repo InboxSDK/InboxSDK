@@ -792,6 +792,15 @@ table + .inboxsdk__compose_statusbar {
   margin-top: -8px;
 }
 
+/* Necessary in pre-new-recipients-area Gmail to stop the compose body
+from resizing and pushing the statusbars off-screen when the recipients
+area is focused. */
+body.inboxsdk__classic_gmail_recipients_area
+  .inboxsdk__compose_statusbarActive
+  .aoI {
+  height: auto !important;
+}
+
 .inboxsdk__compose_statusbarActive .aDl {
   z-index: unset;
 }
