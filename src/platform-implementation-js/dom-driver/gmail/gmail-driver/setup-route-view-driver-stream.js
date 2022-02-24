@@ -83,11 +83,18 @@ export default function setupRouteViewDriverStream(
     customAndCustomListRouteHashChanges,
     revertNativeHashChanges,
 
-    //when native gmail changes main view there's a div that takes on role=main
-    GmailElementGetter.getMainContentElementChangedStream().map(event => ({
-      urlObject: getURLObject(document.location.href),
-      type: 'NATIVE'
-    }))
+    // when native gmail changes main view there's a div that takes on role=main.
+    // getMainContentElementChangedStream doesn't respect custom views so filter
+    // out events from it. This filter is needed if the user is already at a custom
+    // view of another InboxSDK instance while this starts up.
+    GmailElementGetter.getMainContentElementChangedStream()
+      .map(event => ({
+        urlObject: getURLObject(document.location.href),
+        type: 'NATIVE'
+      }))
+      .filter(options =>
+        gmailRouteProcessor.isNativeRoute(options.urlObject.name)
+      )
   ])
     .map(options => {
       const { type, urlObject } = options;
