@@ -49,12 +49,15 @@ class LinkPopOverSection {
 
 function getSelectedLink(): HTMLAnchorElement | null {
   const focusNode = document.getSelection()?.focusNode;
+
   if (!focusNode) {
     return null;
   }
   if (focusNode instanceof Text) {
     if (focusNode.parentElement instanceof HTMLAnchorElement) {
       return focusNode.parentElement;
+    } else if (focusNode.nextSibling instanceof HTMLAnchorElement) {
+      return focusNode.nextSibling;
     }
   }
   return null;
