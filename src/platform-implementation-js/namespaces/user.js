@@ -46,7 +46,14 @@ class User {
   }
 
   getAccountSwitcherContactList() {
-    let list = get(memberMap, this).driver.getAccountSwitcherContactList();
+    const { driver } = get(memberMap, this);
+    driver
+      .getLogger()
+      .deprecationWarning(
+        'User.getAccountSwitcherContactList',
+        'User.getEmailAddress'
+      );
+    let list = driver.getAccountSwitcherContactList();
     const userEmail = this.getEmailAddress();
     const listHasUser = !!find(list, item => item.emailAddress === userEmail);
     if (!listHasUser) {
