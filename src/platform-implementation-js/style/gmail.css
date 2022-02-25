@@ -2386,8 +2386,9 @@ table[role='presentation'].inboxsdk__thread_view_with_custom_view > tr {
 .inboxsdk__linkPopOver_section {
   width: 100%;
   background: #fff;
-  border: 1px solid #a8a8a8;
-  font: 13px arial,sans-serif;
+  border: 1px solid;
+  border-color: #bbb #bbb #a8a8a8;
+  font: 13px arial, sans-serif;
   padding: 5px 8px;
   margin-bottom: 5px;
   box-sizing: border-box;
