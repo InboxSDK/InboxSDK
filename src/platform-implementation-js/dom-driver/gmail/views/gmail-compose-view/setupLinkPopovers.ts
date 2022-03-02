@@ -47,15 +47,13 @@ class LinkPopOverSection {
   }
 }
 
-function getSelectedLink(): HTMLAnchorElement | null {
+function getSelectedLink(gmailComposeView: GmailComposeView): HTMLAnchorElement | null {
   const focusNode = document.getSelection()?.focusNode;
   if (!focusNode) {
     return null;
   }
   if (focusNode instanceof Text) {
-    if (focusNode.parentElement instanceof HTMLAnchorElement) {
-      return focusNode.parentElement;
-    } else if (focusNode.previousSibling instanceof HTMLAnchorElement && document.getSelection()?.anchorOffset === 0) {
+    if (focusNode.previousSibling instanceof HTMLAnchorElement && document.getSelection()?.anchorOffset === 0) {
       // For capturing link creation cases where the cursor ends up behind the link
       return focusNode.previousSibling;
     } else if (focusNode.nextSibling instanceof HTMLAnchorElement) {
@@ -63,7 +61,17 @@ function getSelectedLink(): HTMLAnchorElement | null {
       return focusNode.nextSibling;
     }
   }
-  return null;
+  return findLinkParent(focusNode, gmailComposeView.getBodyElement());
+}
+
+function findLinkParent(node: Node | null, composeBody: HTMLElement): HTMLAnchorElement | null {
+  if (node instanceof HTMLAnchorElement) {
+    return node;
+  } else if (!node || node === composeBody) {
+    return null;
+  } else {
+    return findLinkParent(node.parentElement, composeBody);
+  }
 }
 
 export default function setupLinkPopOvers(gmailComposeView: GmailComposeView): Kefir.Observable<any, never> {
@@ -92,7 +100,7 @@ export default function setupLinkPopOvers(gmailComposeView: GmailComposeView): K
           }
 
           if (popOverEl.style.visibility === 'visible') {
-            const linkEl = getSelectedLink();
+            const linkEl = getSelectedLink(gmailComposeView);
             if (linkEl && gmailComposeView.getElement().contains(linkEl)) {
               const linkPopOver = new LinkPopOver(linkEl, popOverEl);
               existingLinkPopOver = linkPopOver;
