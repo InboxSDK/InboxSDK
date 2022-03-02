@@ -55,6 +55,12 @@ function getSelectedLink(): HTMLAnchorElement | null {
   if (focusNode instanceof Text) {
     if (focusNode.parentElement instanceof HTMLAnchorElement) {
       return focusNode.parentElement;
+    } else if (focusNode.previousSibling instanceof HTMLAnchorElement && document.getSelection()?.anchorOffset === 0) {
+      // For capturing link creation cases where the cursor ends up behind the link
+      return focusNode.previousSibling;
+    } else if (focusNode.nextSibling instanceof HTMLAnchorElement) {
+      // google's popover appears when clicking just in front of a link as well
+      return focusNode.nextSibling;
     }
   }
   return null;
