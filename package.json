@@ -151,7 +151,7 @@
     "dir": "overrides"
   },
   "scripts": {
-    "publish-npm": "gulp --production --minify && cd packages/core/ && yarn publish",
+    "publish-npm": "gulp clean && gulp --production --minify && cd packages/core/ && yarn publish && git push --follow-tags",
     "flow_check": "flow check",
     "jest": "jest",
     "lint": "eslint . --ext js,jsx,ts,tsx,flow",

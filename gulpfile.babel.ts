@@ -305,7 +305,8 @@ gulp.task('pageWorld', () => {
     entry: './src/injected-js/main',
     destName: 'pageWorld.js',
     // hotPort: 3142,
-    sourceMappingURLPrefix: 'https://www.inboxsdk.com/build/'
+    sourceMappingURLPrefix: 'https://www.inboxsdk.com/build/',
+    writeToPackagesCore: true
   });
 });
 
