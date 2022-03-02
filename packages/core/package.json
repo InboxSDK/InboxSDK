@@ -1,6 +1,6 @@
 {
   "name": "@inboxsdk/core",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Library for building browser extensions for Gmail",
   "main": "inboxsdk.js",
   "author": "Streak",
