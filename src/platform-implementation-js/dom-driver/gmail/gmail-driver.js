@@ -974,6 +974,17 @@ class GmailDriver {
       this._threadRowViewSelectionChanges.offValue(handler);
     };
   }
+
+  getLoadEventDetails(): any {
+    let isGmailIntegratedView = null;
+    const nav = document.querySelector('div[role=navigation]');
+    if (nav) {
+      isGmailIntegratedView = !nav.classList.contains('nn');
+    }
+    return {
+      isGmailIntegratedView
+    };
+  }
 }
 
 export default defn(module, GmailDriver);
