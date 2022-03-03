@@ -120,6 +120,8 @@ export interface Driver {
 
   getSelectedThreadRowViewDrivers(): ReadonlyArray<ThreadRowViewDriver>;
   registerThreadRowViewSelectionHandler(handler: () => any): () => void;
+
+  getLoadEventDetails(): any;
 }
 
 export interface ButterBarDriver {

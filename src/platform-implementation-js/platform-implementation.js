@@ -298,7 +298,9 @@ https://www.inboxsdk.com/docs/#RequiredSetup
     }
     if (!loadedAppIds.has(appId)) {
       loadedAppIds.add(appId);
-      logger.eventSdkPassive('load');
+      logger.eventSdkPassive('load', {
+        ...driver.getLoadEventDetails()
+      });
     }
 
     // Enable sourcemaps on future loads by default for Streak employees.
