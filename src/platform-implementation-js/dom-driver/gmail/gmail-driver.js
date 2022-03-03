@@ -979,7 +979,8 @@ class GmailDriver {
     let isGmailIntegratedView = null;
     const nav = document.querySelector('div[role=navigation]');
     if (nav) {
-      isGmailIntegratedView = !nav.classList.contains('nn');
+      isGmailIntegratedView =
+        nav.firstElementChild && nav.firstElementChild.classList.contains('Xa');
     }
     return {
       isGmailIntegratedView
