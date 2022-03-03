@@ -666,7 +666,7 @@ export interface ComposeView extends EventEmitter {
   hideNativeRecipientRows(): () => void;
   isMinimized(): boolean;
   setMinimized(minimized: boolean): void;
-  isFullScreen(): boolean;
+  isFullscreen(): boolean;
   insertHTMLIntoBodyAtCursor(html: string): HTMLElement;
   isForward(): boolean;
   isInlineReplyForm(): boolean;
@@ -680,7 +680,7 @@ export interface ComposeView extends EventEmitter {
   setBodyHTML(html: string): void;
   setBodyText(to: string): void;
   setCcRecipients(emails: string[]): void;
-  setFullscreen(isFullScreen: boolean): void;
+  setFullscreen(isFullscreen: boolean): void;
   setSubject(subject: string): void;
   setTitleBarColor(color: string): () => void;
   setTitleBarText(to: string): () => void;
