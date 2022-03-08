@@ -47,6 +47,13 @@ const GmailElementGetter = {
   },
 
   getContentSectionElement(): HTMLElement | undefined {
+    // Necessary for Gmail integrated view support, but works on old gmail.
+    const el = document.querySelector<HTMLElement>('div.nH.bkK > .nH');
+    if (el) {
+      return el;
+    }
+
+    // Leaving the old code as a fallback for now. TODO figure out if we can kill in favor of above.
     const leftNavContainer = GmailElementGetter.getLeftNavContainerElement();
     if (leftNavContainer) {
       return leftNavContainer.nextElementSibling!.children[0] as HTMLElement;
