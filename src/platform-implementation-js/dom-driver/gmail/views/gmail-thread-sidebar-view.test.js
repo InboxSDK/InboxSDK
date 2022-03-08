@@ -12,14 +12,12 @@ import ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelV
 import GmailElementGetter from '../gmail-element-getter';
 import MockWebStorage from 'mock-webstorage';
 
-const mockKefirBus = kefirBus;
-
 jest.mock('../../../lib/dom/make-element-child-stream', () => {
-  return () => mockKefirBus();
+  return () => require('kefir-bus')();
 });
 
 jest.mock('../../../lib/dom/make-mutation-observer-chunked-stream', () => {
-  return () => mockKefirBus();
+  return () => require('kefir-bus')();
 });
 
 global.localStorage = new MockWebStorage();
