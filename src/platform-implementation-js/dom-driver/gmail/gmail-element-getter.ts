@@ -134,10 +134,14 @@ const GmailElementGetter = {
   // inline among Gmail's nav items (as opposed to the newer style where we put our nav items
   // in their own sections at the bottom of the leftnav).
   shouldAddNavItemsInline(): boolean {
-    // There's two cases this function should return true:
+    // There's three cases this function should return true:
     // - The user is in a pre-Google-Chat Hangouts-only version of Gmail (the Gmail Settings ->
     //   Chat and Meet -> Chat menu only has the options "Hangouts On" and "Hangouts Off").
     // - The user has "Classic Hangouts" picked in Gmail Settings -> Chat and Meet -> Chat.
+    // - Integrated view gmail.
+    if (isIntegratedViewGmail()) {
+      return true;
+    }
 
     const leftNavElement = document.querySelector(
       '.aeN[role=navigation], .aeN [role=navigation]'
@@ -174,7 +178,11 @@ const GmailElementGetter = {
   },
 
   getSameSectionNavItemMenuInjectionContainer(): HTMLElement | null {
-    return document.querySelector('.aeN .n3');
+    if (isIntegratedViewGmail()) {
+      return document.querySelector('.yJ .wT > .n3');
+    } else {
+      return document.querySelector('.aeN .n3');
+    }
   },
 
   getRowListElements(): HTMLElement[] {
