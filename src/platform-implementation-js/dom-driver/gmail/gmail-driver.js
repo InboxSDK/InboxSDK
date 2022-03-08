@@ -64,6 +64,7 @@ import registerSearchQueryRewriter from './gmail-driver/register-search-query-re
 import openComposeWindow from './gmail-driver/open-compose-window';
 import GmailAppSidebarView from './views/gmail-app-sidebar-view';
 import suppressAddon from './gmail-driver/suppressAddon';
+import isIntegratedViewGmail from './gmail-driver/isIntegratedViewGmail';
 
 import getSyncThreadFromSyncThreadId from './gmail-driver/getSyncThreadFromSyncThreadId';
 import getSyncThreadForOldGmailThreadId from './gmail-driver/getSyncThreadForOldGmailThreadId';
@@ -976,14 +977,8 @@ class GmailDriver {
   }
 
   getLoadEventDetails(): any {
-    let isGmailIntegratedView = null;
-    const nav = document.querySelector('div[role=navigation]');
-    if (nav) {
-      isGmailIntegratedView =
-        nav.firstElementChild && nav.firstElementChild.classList.contains('Xa');
-    }
     return {
-      isGmailIntegratedView
+      isGmailIntegratedView: isIntegratedViewGmail()
     };
   }
 }

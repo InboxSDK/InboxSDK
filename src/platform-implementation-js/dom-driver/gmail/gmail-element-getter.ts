@@ -7,6 +7,8 @@ import querySelector from '../../lib/dom/querySelectorOrFail';
 import waitForGmailModeToSettle from './gmail-element-getter/wait-for-gmail-mode-to-settle';
 
 import getMainContentElementChangedStream from './gmail-element-getter/get-main-content-element-changed-stream';
+import isIntegratedViewGmail from './gmail-driver/isIntegratedViewGmail';
+import Logger from '../../lib/logger';
 
 // TODO Figure out if these functions can and should be able to return null
 const GmailElementGetter = {
@@ -46,19 +48,33 @@ const GmailElementGetter = {
     return document.querySelector('.dw .nH > .nH > .no');
   },
 
-  getContentSectionElement(): HTMLElement | undefined {
-    // Necessary for Gmail integrated view support, but works on old gmail.
+  getContentSectionElement(): HTMLElement | undefined | null {
+    // New method for finding the content section element that also supports
+    // Gmail integrated view. Use it if we're in Gmail integrated view.
+    // Otherwise, use the old method, but log a warning if the old method
+    // finds something different than the old method, so that way we can
+    // figure out if it's okay to swap over.
     const el = document.querySelector<HTMLElement>('div.nH.bkK > .nH');
-    if (el) {
-      return el;
-    }
 
-    // Leaving the old code as a fallback for now. TODO figure out if we can kill in favor of above.
-    const leftNavContainer = GmailElementGetter.getLeftNavContainerElement();
-    if (leftNavContainer) {
-      return leftNavContainer.nextElementSibling!.children[0] as HTMLElement;
+    if (isIntegratedViewGmail()) {
+      return el;
     } else {
-      return undefined;
+      const leftNavContainer = GmailElementGetter.getLeftNavContainerElement();
+      const oldMethodEl = leftNavContainer
+        ? (leftNavContainer.nextElementSibling!.children[0] as HTMLElement)
+        : null;
+      if (el !== oldMethodEl) {
+        Logger.error(
+          new Error(
+            'getContentSectionElement old and new method inconsistency'
+          ),
+          {
+            elClassName: el?.className,
+            oldMethodClassName: oldMethodEl?.className
+          }
+        );
+      }
+      return oldMethodEl;
     }
   },
 
