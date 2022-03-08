@@ -7,6 +7,8 @@ import querySelector from '../../lib/dom/querySelectorOrFail';
 import waitForGmailModeToSettle from './gmail-element-getter/wait-for-gmail-mode-to-settle';
 
 import getMainContentElementChangedStream from './gmail-element-getter/get-main-content-element-changed-stream';
+import isIntegratedViewGmail from './gmail-driver/isIntegratedViewGmail';
+import Logger from '../../lib/logger';
 
 // TODO Figure out if these functions can and should be able to return null
 const GmailElementGetter = {
@@ -46,12 +48,33 @@ const GmailElementGetter = {
     return document.querySelector('.dw .nH > .nH > .no');
   },
 
-  getContentSectionElement(): HTMLElement | undefined {
-    const leftNavContainer = GmailElementGetter.getLeftNavContainerElement();
-    if (leftNavContainer) {
-      return leftNavContainer.nextElementSibling!.children[0] as HTMLElement;
+  getContentSectionElement(): HTMLElement | undefined | null {
+    // New method for finding the content section element that also supports
+    // Gmail integrated view. Use it if we're in Gmail integrated view.
+    // Otherwise, use the old method, but log a warning if the old method
+    // finds something different than the old method, so that way we can
+    // figure out if it's okay to swap over.
+    const el = document.querySelector<HTMLElement>('div.nH.bkK > .nH');
+
+    if (isIntegratedViewGmail()) {
+      return el;
     } else {
-      return undefined;
+      const leftNavContainer = GmailElementGetter.getLeftNavContainerElement();
+      const oldMethodEl = leftNavContainer
+        ? (leftNavContainer.nextElementSibling!.children[0] as HTMLElement)
+        : null;
+      if (el !== oldMethodEl) {
+        Logger.error(
+          new Error(
+            'getContentSectionElement old and new method inconsistency'
+          ),
+          {
+            elClassName: el?.className,
+            oldMethodClassName: oldMethodEl?.className
+          }
+        );
+      }
+      return oldMethodEl;
     }
   },
 
@@ -111,10 +134,14 @@ const GmailElementGetter = {
   // inline among Gmail's nav items (as opposed to the newer style where we put our nav items
   // in their own sections at the bottom of the leftnav).
   shouldAddNavItemsInline(): boolean {
-    // There's two cases this function should return true:
+    // There's three cases this function should return true:
     // - The user is in a pre-Google-Chat Hangouts-only version of Gmail (the Gmail Settings ->
     //   Chat and Meet -> Chat menu only has the options "Hangouts On" and "Hangouts Off").
     // - The user has "Classic Hangouts" picked in Gmail Settings -> Chat and Meet -> Chat.
+    // - Integrated view gmail.
+    if (isIntegratedViewGmail()) {
+      return true;
+    }
 
     const leftNavElement = document.querySelector(
       '.aeN[role=navigation], .aeN [role=navigation]'
@@ -151,7 +178,11 @@ const GmailElementGetter = {
   },
 
   getSameSectionNavItemMenuInjectionContainer(): HTMLElement | null {
-    return document.querySelector('.aeN .n3');
+    if (isIntegratedViewGmail()) {
+      return document.querySelector('.yJ .wT > .n3');
+    } else {
+      return document.querySelector('.aeN .n3');
+    }
   },
 
   getRowListElements(): HTMLElement[] {
