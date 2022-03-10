@@ -41,6 +41,9 @@ const GmailElementGetter = {
   },
 
   getComposeButton(): HTMLElement | null {
+    if (isIntegratedViewGmail()) {
+      return document.querySelector('.aqn .aic div[role=button].L3');
+    }
     return document.querySelector('[gh=cm]');
   },
 
