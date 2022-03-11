@@ -1,4 +1,4 @@
-export function error(err: Error, details?: any) {
+export function error(err: Error | unknown, details?: any) {
   if (!err) {
     err = new Error('No error given');
   }
@@ -10,7 +10,7 @@ export function error(err: Error, details?: any) {
   }
 
   const errorProperties: any = {};
-  for (const name in err) {
+  for (const name in err as any) {
     if (Object.prototype.hasOwnProperty.call(err, name)) {
       try {
         const value = (err as any)[name];
@@ -30,8 +30,8 @@ export function error(err: Error, details?: any) {
       bubbles: false,
       cancelable: false,
       detail: {
-        message: err && err.message,
-        stack: err && err.stack,
+        message: err && (err as any).message,
+        stack: err && (err as any).stack,
         details,
       },
     })

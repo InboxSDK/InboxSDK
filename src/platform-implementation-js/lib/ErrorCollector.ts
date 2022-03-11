@@ -25,7 +25,7 @@ export default class ErrorCollector {
     } catch (e) {
       this._errorLogs.push({
         name,
-        message: e.message,
+        message: (e as Error).message,
       });
       return null;
     }

@@ -94,7 +94,7 @@ export default function makeElementChildStream(
 // Throw error at a later time where our error-logger can pick it up. This
 // avoids having this module depend on logger.js which we can't import because
 // this module is used in the injected script too.
-function throwLater(err: Error) {
+function throwLater(err: unknown) {
   setTimeout(() => {
     throw err;
   }, 1);

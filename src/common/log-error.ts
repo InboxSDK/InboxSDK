@@ -21,7 +21,7 @@ const sessionId = getSessionId();
 // code inside the platform-implementation should use logger.js instead of
 // interacting with this directly!
 export default function logError(
-  err: Error,
+  err: Error | unknown,
   details: any,
   context: LogErrorContext
 ) {
@@ -54,7 +54,7 @@ export default function logError(
     const sentByApp = !!context.sentByApp;
 
     const errorProperties: any = {};
-    for (const name in err) {
+    for (const name in err as any) {
       if (Object.prototype.hasOwnProperty.call(err, name)) {
         try {
           const value = (err as any)[name];
@@ -74,8 +74,8 @@ export default function logError(
     const nowStack = getStackTrace();
 
     const stuffToLog: any[] = ['Error logged:', err];
-    if (err && err.stack) {
-      stuffToLog.push('\n\nOriginal error stack:\n' + err.stack);
+    if (err && (err as any).stack) {
+      stuffToLog.push('\n\nOriginal error stack:\n' + (err as any).stack);
     }
     stuffToLog.push('\n\nError logged from:\n' + nowStack);
     if (details) {
@@ -93,8 +93,8 @@ export default function logError(
     console.error(...stuffToLog);
 
     const report = {
-      message: (err && err.message) || err,
-      stack: err && err.stack,
+      message: (err && (err as any).message) || err,
+      stack: err && (err as any).stack,
       loggedFrom: nowStack,
       details,
       appIds,
@@ -120,8 +120,8 @@ export default function logError(
           bubbles: false,
           cancelable: false,
           detail: {
-            message: (err && err.message) || err,
-            stack: err && err.stack,
+            message: (err && (err as any).message) || err,
+            stack: err && (err as any).stack,
             loggedFrom: nowStack,
             details,
             sentByApp,
@@ -135,8 +135,8 @@ export default function logError(
 }
 
 const _extensionSeenErrors: {
-  has(e: Error): boolean;
-  add(e: Error): void;
+  has(e: unknown): boolean;
+  add(e: unknown): void;
 } = (() => {
   // Safari <9 doesn't have WeakSet and we don't want to pull in the polyfill,
   // so we make one out of a WeakMap.
@@ -146,7 +146,7 @@ const _extensionSeenErrors: {
     });
   }
   return {
-    has(e: Error): boolean {
+    has(e: unknown): boolean {
       if ((global as any).__inboxsdk_extensionSeenErrors) {
         return (global as any).__inboxsdk_extensionSeenErrors.has(e);
       } else {
@@ -159,7 +159,7 @@ const _extensionSeenErrors: {
         }
       }
     },
-    add(e: Error) {
+    add(e: unknown) {
       if (
         (global as any).__inboxsdk_extensionSeenErrors &&
         (global as any).__inboxsdk_extensionSeenErrors.set
@@ -187,14 +187,14 @@ const _extensionSeenErrors: {
   };
 })();
 
-function haveWeSeenThisErrorAlready(error: Error): boolean {
+function haveWeSeenThisErrorAlready(error: unknown): boolean {
   if (isObject(error)) {
     return _extensionSeenErrors.has(error);
   }
   return false;
 }
 
-function markErrorAsSeen(error: Error) {
+function markErrorAsSeen(error: unknown) {
   if (isObject(error)) {
     _extensionSeenErrors.add(error);
   }
@@ -222,7 +222,7 @@ const sendError = rateLimit(
   10
 );
 
-function tooManyErrors(err2: Error, originalArgs: any) {
+function tooManyErrors(err2: unknown, originalArgs: any) {
   // eslint-disable-next-line no-console
   console.error('ERROR REPORTING ERROR', err2);
   // eslint-disable-next-line no-console

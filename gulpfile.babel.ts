@@ -281,7 +281,7 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
             gutil.log(
               "Finished rebuild of '" + gutil.colors.cyan(destName) + "'"
             );
-          } catch (err) {
+          } catch (err: any) {
             gutil.log(
               gutil.colors.red('Error') +
                 " rebuilding '" +
