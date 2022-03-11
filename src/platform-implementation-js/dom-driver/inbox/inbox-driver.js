@@ -24,7 +24,7 @@ import makePageParserTree from './makePageParserTree';
 
 import Logger from '../../lib/logger';
 import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
-import injectScript from '../../lib/inject-script';
+import { injectScript } from '../../lib/inject-script';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 import BiMapCache from 'bimapcache';
 import getInboxMessageIdForInboxThreadId from './getInboxMessageIdForInboxThreadId';
@@ -1157,6 +1157,10 @@ class InboxDriver {
 
   registerThreadRowViewSelectionHandler(handler: () => any): () => void {
     return () => {};
+  }
+
+  getLoadEventDetails(): any {
+    return {};
   }
 }
 

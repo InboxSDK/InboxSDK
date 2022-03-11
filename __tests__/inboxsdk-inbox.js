@@ -20,7 +20,7 @@ global.__test_origin = 'https://inbox.google.com';
 );
 (document.head: any).setAttribute('data-inboxsdk-user-name', 'Foo Bar');
 
-const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST').default;
+const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST');
 //preload implementation
 require('../src/platform-implementation-js/platform-implementation');
 

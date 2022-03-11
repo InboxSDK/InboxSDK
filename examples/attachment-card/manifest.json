@@ -19,9 +19,16 @@
   ],
   "web_accessible_resources": [
     "inboxsdk.js.map",
+    "pageWorld.js",
+    "pageWorld.js.map",
     "partycat.jpg",
     "zipicon.png"
   ],
+
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
 
   "manifest_version": 2
 }

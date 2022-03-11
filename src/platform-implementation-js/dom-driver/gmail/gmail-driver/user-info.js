@@ -31,6 +31,7 @@ export default class UserInfo {
     return this._userEmail;
   }
 
+  // deprecated
   getAccountSwitcherContactList(): Contact[] {
     const main: Contact[] = Array.from(
       document.querySelectorAll(
@@ -64,24 +65,5 @@ export default class UserInfo {
       };
     });
     return uniqBy(main.concat(extras), x => x.emailAddress.toLowerCase());
-  }
-
-  waitForAccountSwitcherReady(): Promise<void> {
-    return waitFor(
-      () => this.getAccountSwitcherContactList().length > 0,
-      10 * 1000
-    )
-      .then(() => undefined)
-      .catch(err => {
-        this._failedWaitFor = true;
-        Logger.error(err, {
-          reason: 'waiting for user account switcher',
-          switcherHTML: Array.from(
-            document.querySelectorAll(
-              'div.gb_w[aria-label], div.gb_va[aria-label]'
-            )
-          ).map((el: HTMLElement) => censorHTMLstring(el.outerHTML))
-        });
-      });
   }
 }

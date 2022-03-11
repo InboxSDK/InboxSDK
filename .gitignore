@@ -3,6 +3,8 @@
 /dist
 /coverage
 /examples/*/inboxsdk.js*
+/examples/*/pageWorld.js*
+/examples/*/background.js*
 *~
 npm-debug.log
 yarn-debug.log
@@ -10,4 +12,5 @@ yarn-debug.log
 /chromeTestOutput
 /.inboxsdk_test_secret
 yarn-error.log
-/packages/core/inboxsdk.js
+/packages/core/inboxsdk.js*
+/packages/core/pageWorld.js*

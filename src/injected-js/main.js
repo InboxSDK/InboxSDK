@@ -12,6 +12,7 @@ if (!global.__InboxSDKInjected) {
       oldDefine = define;
       define = null;
     }
+    const extCorbWorkaroundPageWorld = require('ext-corb-workaround/dist/src/pageWorld');
     const xhrHelper = require('./xhr-helper').default;
     const setupDataExposer = require('./setup-data-exposer').default;
     const setupEventReemitter = require('./setup-event-reemitter').default;
@@ -51,6 +52,7 @@ if (!global.__InboxSDKInjected) {
       throw new Error('Should not happen');
     }
 
+    extCorbWorkaroundPageWorld.init();
     xhrHelper();
     setupDataExposer();
     setupEventReemitter();

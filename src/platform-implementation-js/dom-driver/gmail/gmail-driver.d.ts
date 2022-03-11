@@ -94,4 +94,5 @@ export default class GmailDriver implements Driver {
 
   public getSelectedThreadRowViewDrivers(): ReadonlyArray<GmailThreadRowView>;
   public registerThreadRowViewSelectionHandler(handler: () => any): () => void;
+  public getLoadEventDetails(): any;
 }

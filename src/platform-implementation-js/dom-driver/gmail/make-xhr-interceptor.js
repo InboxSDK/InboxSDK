@@ -4,7 +4,7 @@ import Kefir from 'kefir';
 import { parse } from 'querystring';
 import PageCommunicator from './gmail-page-communicator';
 
-import injectScript from '../../lib/inject-script';
+import { injectScript } from '../../lib/inject-script';
 
 export default function makeXhrInterceptor(): {
   xhrInterceptStream: Kefir.Observable<Object>,

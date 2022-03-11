@@ -24,14 +24,14 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     customRouteView.getElement().appendChild(focusTest);
 
     const list = document.createElement('ul');
-    // threadIds.forEach(function(threadId) {
-    //   const link = document.createElement('a');
-    //   link.href = sdk.Router.createLink(sdk.Router.NativeRouteIDs.THREAD, {threadID: threadId});
-    //   link.textContent = threadId;
-    //   const item = document.createElement('li');
-    //   item.appendChild(link);
-    //   list.appendChild(item);
-    // });
+    threadIds.forEach(function(threadId) {
+      const link = document.createElement('a');
+      link.href = sdk.Router.createLink(sdk.Router.NativeRouteIDs.THREAD, {threadID: threadId});
+      link.textContent = threadId;
+      const item = document.createElement('li');
+      item.appendChild(link);
+      list.appendChild(item);
+    });
 
     {
       const link = document.createElement('a');

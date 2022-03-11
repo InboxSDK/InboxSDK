@@ -11,7 +11,7 @@ const membersMap = new WeakMap();
 export default class ThreadRowView extends EventEmitter {
   destroyed: boolean;
 
-  constructor(threadRowViewDriver: GmailThreadRowView | InboxThreadRowView) {
+  constructor(threadRowViewDriver: GmailThreadRowView) {
     super();
     const members = { threadRowViewDriver };
     membersMap.set(this, members);
@@ -59,6 +59,10 @@ export default class ThreadRowView extends EventEmitter {
     get(membersMap, this).threadRowViewDriver.replaceDraftLabel(
       draftLabelDescriptor
     );
+  }
+
+  getElement(): HTMLElement {
+    return get(membersMap, this).threadRowViewDriver.getElement();
   }
 
   getSubject(): string {

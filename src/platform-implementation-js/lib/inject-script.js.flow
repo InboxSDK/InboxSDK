@@ -1,0 +1,5 @@
+/* @flow */
+
+declare export function injectScript(): Promise<null>;
+
+declare export function setInjectScriptImplementation(fn: () => void): void;

@@ -1,0 +1,23 @@
+{
+  "name": "@inboxsdk/core",
+  "version": "0.2.4",
+  "description": "Library for building browser extensions for Gmail",
+  "main": "inboxsdk.js",
+  "author": "Streak",
+  "license": "All Rights Reserved",
+  "private": false,
+  "sideEffects": true,
+  "files": [
+    "inboxsdk.js",
+    "inboxsdk.d.ts",
+    "background.js",
+    "background.d.ts",
+    "pageWorld.js",
+    "pageWorld.d.ts"
+  ],
+  "dependencies": {
+    "@types/kefir": "^3.8.6",
+    "@types/node": "*",
+    "typed-emitter": "^2.1.0"
+  }
+}
