@@ -1,5 +1,4 @@
-/* @flow */
-
+import { Contact } from '../driver-interfaces/compose-view-driver';
 import isValidEmail from './is-valid-email';
 
 export default function extractContactFromEmailContactString(
@@ -20,7 +19,7 @@ export default function extractContactFromEmailContactString(
     if (isValidEmail(firstPartTrimmed)) {
       emailAddress = firstPartTrimmed;
     } else {
-      throw Object.assign((new Error('Invalid email address'): any), {
+      throw Object.assign(new Error('Invalid email address'), {
         firstPartTrimmed
       });
     }

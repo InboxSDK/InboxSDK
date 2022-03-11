@@ -1,11 +1,10 @@
-/* @flow */
-
 import Logger from '../../../../lib/logger';
 import extractContactFromEmailContactString from '../../../../lib/extract-contact-from-email-contact-string';
 
 import censorHTMLstring from '../../../../../common/censorHTMLstring';
 
-import type GmailComposeView from '../gmail-compose-view';
+import GmailComposeView from '../gmail-compose-view';
+import { Contact } from '../../../../driver-interfaces/compose-view-driver';
 
 export default function getAddressInformationExtractor(
   addressType: string,
@@ -18,11 +17,8 @@ export default function getAddressInformationExtractor(
         ? node
         : node.querySelector(`input[name='${addressType}']`);
 
-    var emailAddress = null;
-    var name = null;
-
     if (contactNode) {
-      var contactInfoString = (contactNode: any).value;
+      var contactInfoString = (contactNode as any).value;
 
       try {
         return extractContactFromEmailContactString(contactInfoString);

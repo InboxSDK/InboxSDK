@@ -1,0 +1,8 @@
+/* @flow */
+
+import GmailComposeView from '../gmail-compose-view';
+
+declare export default function getRecipients(
+  gmailComposeView: GmailComposeView,
+  addressType: ReceiverType
+): Contact[];
