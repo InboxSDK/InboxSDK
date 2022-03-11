@@ -22,10 +22,10 @@ export default function parser(el: HTMLElement) {
   return {
     elements,
     attributes: {
-      type
+      type,
     },
     score,
-    errors: ec.getErrorLogs()
+    errors: ec.getErrorLogs(),
   };
 }
 

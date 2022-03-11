@@ -11,7 +11,7 @@ it('handler called on existing targets asynchronously', async () => {
   reg.addTarget(target2);
 
   const needToSee = new Set([target1, target2]);
-  reg.registerHandler(target => {
+  reg.registerHandler((target) => {
     expect(needToSee.delete(target)).toBe(true);
   });
   expect(needToSee.size).toBe(2);
@@ -28,7 +28,7 @@ it('handler called on new targets', async () => {
   reg.addTarget(target1);
 
   let calls = 0;
-  reg.registerHandler(target => {
+  reg.registerHandler((target) => {
     switch (calls++) {
       case 0:
         expect(target).toBe(target1);
@@ -65,7 +65,7 @@ it('handler not called on removed targets', async () => {
   reg.removeTarget(target1);
 
   let calls = 0;
-  reg.registerHandler(target => {
+  reg.registerHandler((target) => {
     calls++;
     expect(target).toBe(target3);
   });

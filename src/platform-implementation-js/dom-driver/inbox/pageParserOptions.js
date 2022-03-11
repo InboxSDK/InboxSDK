@@ -12,14 +12,14 @@ import closest from 'closest-ng';
 const pageParserOptions: PageParserTreeOptions = {
   tags: {
     message: {
-      ownedBy: ['thread']
+      ownedBy: ['thread'],
     },
     attachmentCard: {
-      ownedBy: ['message', 'threadRow', 'bundleRow']
+      ownedBy: ['message', 'threadRow', 'bundleRow'],
     },
     inlineCompose: {
-      ownedBy: ['thread']
-    }
+      ownedBy: ['thread'],
+    },
   },
   finders: {
     leftNav: {
@@ -29,21 +29,21 @@ const pageParserOptions: PageParserTreeOptions = {
         return root.querySelectorAll(
           'nav[aria-hidden]:not([role]) div[role=menu]'
         );
-      }
+      },
     },
     thread: {
       fn(root) {
         return root.querySelectorAll(
           'div[aria-expanded=true][data-item-id*="thread-"], div.scroll-list-item-open[data-item-id*="thread-"]'
         );
-      }
+      },
     },
     message: {
       fn(root) {
         return root.querySelectorAll(
           'div[role=listitem][aria-expanded][data-msg-id*="msg-"]'
         );
-      }
+      },
     },
     attachmentCard: {
       fn(root) {
@@ -51,13 +51,13 @@ const pageParserOptions: PageParserTreeOptions = {
           div[data-msg-id] section > div > div[tabindex][title],
           div[jsaction*="update_chip_carousel_arrows"] div[role=listitem][tabindex][jsaction]
         `);
-      }
+      },
     },
     attachmentOverlay: {
-      fn: (function() {
+      fn: (function () {
         const _t = t.compose(
-          t.filter(iframe => iframe.style.display !== 'none'),
-          t.mapcat(iframe =>
+          t.filter((iframe) => iframe.style.display !== 'none'),
+          t.mapcat((iframe) =>
             Array.prototype.slice.call(
               iframe.contentDocument.querySelectorAll(
                 'div[role=dialog]:not([aria-hidden=true])'
@@ -66,7 +66,7 @@ const pageParserOptions: PageParserTreeOptions = {
           )
         );
 
-        return root => {
+        return (root) => {
           return t.toArray(
             Array.prototype.slice.call(
               root.querySelectorAll('iframe[frameborder]:not([src])')
@@ -74,7 +74,7 @@ const pageParserOptions: PageParserTreeOptions = {
             _t
           );
         };
-      })()
+      })(),
     },
     nativeDrawer: {
       fn(root) {
@@ -86,7 +86,7 @@ const pageParserOptions: PageParserTreeOptions = {
           if (drawer) return [drawer];
         }
         return [];
-      }
+      },
     },
     searchBar: {
       interval: (count, timeRunning) =>
@@ -95,20 +95,20 @@ const pageParserOptions: PageParserTreeOptions = {
         return root.querySelectorAll(
           'nav[role=banner] div[jsaction*="scroll_to_top"] > :last-child > div:empty + div:not(:empty)'
         );
-      }
+      },
     },
     searchAutocompleteResults: {
       fn(root) {
         return root.querySelectorAll(
           'div[jsaction*="clickonly:global.empty_space_click"] div[role=listbox] ul:last-of-type'
         );
-      }
+      },
     },
     chatSidebar: {
-      interval: count => (count === 0 ? 5 * 1000 : 120 * 1000),
+      interval: (count) => (count === 0 ? 5 * 1000 : 120 * 1000),
       fn(root) {
         return [root.querySelector('#in')].filter(Boolean);
-      }
+      },
     },
     appToolbarLocation: {
       interval: (count, timeRunning) =>
@@ -121,7 +121,7 @@ const pageParserOptions: PageParserTreeOptions = {
           ? (chatToggle: any).parentElement.parentElement.parentElement
           : null;
         return appToolbarLocation ? [appToolbarLocation] : [];
-      }
+      },
     },
 
     inlineCompose: {
@@ -131,15 +131,15 @@ const pageParserOptions: PageParserTreeOptions = {
             root.querySelectorAll(
               'div[role=main] div[role=list] div[role=listitem] div[jsvs] button[jsaction$=".quick_compose_popout_mole"]'
             ),
-            el => el.style.display !== 'none'
+            (el) => el.style.display !== 'none'
           )
-          .map(el => closest(el, '[jsvs]'));
+          .map((el) => closest(el, '[jsvs]'));
 
         const inlineComposesByBody = Array.prototype.map.call(
           root.querySelectorAll(
             'div[role=main] div[role=list] ~ div div[jsvs] div[role=textbox][contenteditable=true][tabindex="0"], div[role=main] div[role=listitem][aria-multiselectable] div[jsvs] div[role=textbox][contenteditable=true][tabindex="0"]'
           ),
-          el => closest(el, '[jsvs]')
+          (el) => closest(el, '[jsvs]')
         );
 
         // The above are currently expected to match, though they don't match
@@ -149,18 +149,18 @@ const pageParserOptions: PageParserTreeOptions = {
           inlineComposesByPopoutBtn.concat(inlineComposesByBody)
         );
         return inlineComposes;
-      }
+      },
     },
     regularCompose: {
       fn(root) {
         return Array.prototype.filter.call(
           root.querySelectorAll('div[role=dialog]:not(.inboxsdk__mole_view)'),
-          el =>
+          (el) =>
             el.querySelector(
               'div[jsaction^="compose"][jsaction$=".focus_mole"]'
             ) && !closest(el, 'div[tabindex][jsaction*="exit_full_screen"]')
         );
-      }
+      },
     },
     fullscreenCompose: {
       fn(root) {
@@ -168,13 +168,13 @@ const pageParserOptions: PageParserTreeOptions = {
           root.querySelectorAll(
             'div[tabindex][jsaction*="exit_full_screen"] div[role=dialog]'
           ),
-          el =>
+          (el) =>
             el.querySelector(
               'div[jsaction^="compose"][jsaction$=".focus_mole"]'
             )
         );
-      }
-    }
+      },
+    },
   },
   watchers: [
     {
@@ -184,8 +184,8 @@ const pageParserOptions: PageParserTreeOptions = {
         'body',
         '[id][jsaction]',
         'nav[aria-hidden]:not([role])',
-        'div[role=menu]'
-      ]
+        'div[role=menu]',
+      ],
     },
     {
       sources: [null],
@@ -201,24 +201,28 @@ const pageParserOptions: PageParserTreeOptions = {
         '*',
         '*',
         '.scroll-list-section-body',
-        '[role=listitem]'
-      ]
+        '[role=listitem]',
+      ],
     },
     {
       sources: ['topRow'],
       tag: 'bundleRow',
       selectors: [
         {
-          $filter: el => !/thread-/.test(el.getAttribute('data-item-id') || '')
-        }
-      ]
+          $filter: (el) =>
+            !/thread-/.test(el.getAttribute('data-item-id') || ''),
+        },
+      ],
     },
     {
       sources: ['topRow'],
       tag: 'threadRow',
       selectors: [
-        { $filter: el => /thread-/.test(el.getAttribute('data-item-id') || '') }
-      ]
+        {
+          $filter: (el) =>
+            /thread-/.test(el.getAttribute('data-item-id') || ''),
+        },
+      ],
     },
     {
       sources: ['bundleRow'],
@@ -227,16 +231,16 @@ const pageParserOptions: PageParserTreeOptions = {
         {
           $watch: {
             attributeFilter: ['aria-expanded'],
-            cond: '[aria-expanded=true]'
-          }
+            cond: '[aria-expanded=true]',
+          },
         },
         '[role=list]',
         '*',
         ':not([id])',
         '*',
         '*',
-        '[role=listitem]'
-      ]
+        '[role=listitem]',
+      ],
     },
     {
       sources: ['threadRow'],
@@ -245,22 +249,24 @@ const pageParserOptions: PageParserTreeOptions = {
         {
           $watch: {
             attributeFilter: ['class'],
-            cond:
-              ':not(.scroll-list-item-open), .scroll-list-item-measuring-open'
-          }
+            cond: ':not(.scroll-list-item-open), .scroll-list-item-measuring-open',
+          },
         },
         ':first-child',
-        { $map: el => (el: any).parentElement }
-      ]
+        { $map: (el) => (el: any).parentElement },
+      ],
     },
     {
       sources: ['threadRow'],
       tag: 'thread',
       selectors: [
         {
-          $watch: { attributeFilter: ['class'], cond: '.scroll-list-item-open' }
-        }
-      ]
+          $watch: {
+            attributeFilter: ['class'],
+            cond: '.scroll-list-item-open',
+          },
+        },
+      ],
     },
     {
       sources: ['thread'],
@@ -273,10 +279,10 @@ const pageParserOptions: PageParserTreeOptions = {
         {
           $watch: {
             attributeFilter: ['role', 'data-msg-id'],
-            cond: '[role=listitem][data-msg-id]'
-          }
-        }
-      ]
+            cond: '[role=listitem][data-msg-id]',
+          },
+        },
+      ],
     },
 
     {
@@ -287,10 +293,10 @@ const pageParserOptions: PageParserTreeOptions = {
         '*',
         'section',
         '*',
-        { $filter: el => el.style.display !== 'none' },
+        { $filter: (el) => el.style.display !== 'none' },
         'div[tabindex]',
-        { $filter: el => el.style.display !== 'none' }
-      ]
+        { $filter: (el) => el.style.display !== 'none' },
+      ],
     },
     {
       sources: ['bundleRow', 'threadRow'],
@@ -302,8 +308,8 @@ const pageParserOptions: PageParserTreeOptions = {
         '*',
         'div[role=listitem]',
         { $watch: { attributeFilter: ['tabindex'], cond: '[tabindex]' } },
-        { $filter: el => el.style.display !== 'none' }
-      ]
+        { $filter: (el) => el.style.display !== 'none' },
+      ],
     },
     {
       sources: [null],
@@ -312,17 +318,17 @@ const pageParserOptions: PageParserTreeOptions = {
         'body',
         'iframe[id][frameborder]:not([src])',
         {
-          $map: el =>
-            (el: any).contentDocument && (el: any).contentDocument.body
+          $map: (el) =>
+            (el: any).contentDocument && (el: any).contentDocument.body,
         },
         'div[aria-label][role=dialog]',
         {
           $watch: {
             attributeFilter: ['aria-hidden'],
-            cond: ':not([aria-hidden=true])'
-          }
-        }
-      ]
+            cond: ':not([aria-hidden=true])',
+          },
+        },
+      ],
     },
 
     {
@@ -333,8 +339,8 @@ const pageParserOptions: PageParserTreeOptions = {
         '[id][jsaction]',
         'div[id]',
         'div[class]',
-        'div.in#in'
-      ]
+        'div.in#in',
+      ],
     },
 
     {
@@ -347,8 +353,8 @@ const pageParserOptions: PageParserTreeOptions = {
         'div[class]',
         'div[class]',
         '[role=listbox]',
-        'ul:last-of-type'
-      ]
+        'ul:last-of-type',
+      ],
     },
 
     {
@@ -365,7 +371,7 @@ const pageParserOptions: PageParserTreeOptions = {
             // <2016-11-02 support
             const oldButton = find(
               el.children,
-              child => child.nodeName === 'BUTTON'
+              (child) => child.nodeName === 'BUTTON'
             );
             if (oldButton) return oldButton;
 
@@ -376,18 +382,18 @@ const pageParserOptions: PageParserTreeOptions = {
 
             Logger.error(new Error('inline compose button not found'), {
               el,
-              html: censorHTMLtree(el)
+              html: censorHTMLtree(el),
             });
-          }
+          },
         },
         {
           $watch: {
             attributeFilter: ['style'],
-            cond: el => el.style.display !== 'none'
-          }
+            cond: (el) => el.style.display !== 'none',
+          },
         },
-        { $map: el => (el.parentElement: any) }
-      ]
+        { $map: (el) => (el.parentElement: any) },
+      ],
     },
     {
       sources: [null],
@@ -406,13 +412,13 @@ const pageParserOptions: PageParserTreeOptions = {
             );
             if (!composeEl) {
               Logger.error(new Error('compose dialog element not found'), {
-                html: censorHTMLtree(el)
+                html: censorHTMLtree(el),
               });
             }
             return composeEl;
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
     {
       sources: [null],
@@ -427,20 +433,20 @@ const pageParserOptions: PageParserTreeOptions = {
         '*',
         '*',
         '*',
-        '[role=dialog]:not(.inboxsdk__drawer_view)'
-      ]
+        '[role=dialog]:not(.inboxsdk__drawer_view)',
+      ],
     },
 
     {
       sources: ['searchBar'],
       tag: 'listToolBar',
       selectors: [
-        { $map: el => (el.parentElement: any) },
+        { $map: (el) => (el.parentElement: any) },
         'div:empty + div:not(:empty) + div',
-        'ul[jsaction]'
-      ]
-    }
-  ]
+        'ul[jsaction]',
+      ],
+    },
+  ],
 };
 
 export default pageParserOptions;

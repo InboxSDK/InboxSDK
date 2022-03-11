@@ -5,7 +5,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       chrome.scripting.executeScript({
         target: { tabId: sender.tab.id },
         world: 'MAIN',
-        files: ['pageWorld.js']
+        files: ['pageWorld.js'],
       });
       sendResponse(true);
     } else {

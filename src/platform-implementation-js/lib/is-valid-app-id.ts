@@ -14,7 +14,7 @@ const whitelist = new Set([
   '5140e277522fd95ece3d540c94b97f443bcc3256', // docsend
   'b56a2d6e6f650ed6eae78774d3b1f02d969d8485', // giphy
   'bc6308648a588258f31f8f4b64f7c4652b6fcaac', // stripe
-  '4cb8e6bd1aab0b4b05c7f07fbe8332b842009358' // godMode
+  '4cb8e6bd1aab0b4b05c7f07fbe8332b842009358', // godMode
 ]);
 
 const appIdRegex = /^sdk_(.{5,15})_([0-9a-f]{10})$/;

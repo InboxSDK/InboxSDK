@@ -23,7 +23,7 @@ function parser(el: HTMLElement) {
     elements,
     attributes: {},
     score,
-    errors: ec.getErrorLogs()
+    errors: ec.getErrorLogs(),
   };
 }
 

@@ -19,7 +19,7 @@ export default function arrayToLifetimes<T>(
   input: Kefir.Observable<Array<T> | NodeList<T>>,
   keyFn?: (value: T) => any
 ): Kefir.Observable<ItemWithLifetime<T>> {
-  return Kefir.stream(emitter => {
+  return Kefir.stream((emitter) => {
     const items: Map<any, { el: T, removalStream: Stopper }> = new Map();
 
     function listener(event) {

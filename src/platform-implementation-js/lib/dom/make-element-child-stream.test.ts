@@ -15,7 +15,7 @@ function fakeEl(name: string): any {
   return { name, nodeType: 1 };
 }
 
-it('should work', done => {
+it('should work', (done) => {
   const child1 = fakeEl('child1'),
     child2 = fakeEl('child2'),
     child3 = fakeEl('child3');
@@ -23,14 +23,14 @@ it('should work', done => {
     _.toPairs({
       child1,
       child2,
-      child3
+      child3,
     }).map(([name, el]) => [el, name])
   );
 
   const target = new MockElementParent([child1, child2]);
 
   const calls: any[][] = [];
-  kefirMakeElementChildStream(target as any).onValue(event => {
+  kefirMakeElementChildStream(target as any).onValue((event) => {
     const name = childrenToNames.get(event.el);
     calls.push(['add', name]);
     event.removalStream.onValue(() => {
@@ -50,20 +50,20 @@ it('should work', done => {
         ['add', 'child1'],
         ['add', 'child2'],
         ['remove', 'child1'],
-        ['add', 'child3']
+        ['add', 'child3'],
       ]);
       done();
     }
   });
 });
 
-it('triggers removals when no longer listened on', done => {
+it('triggers removals when no longer listened on', (done) => {
   const child1 = fakeEl('child1'),
     child2 = fakeEl('child2');
   const childrenToNames = new Map(
     _.toPairs({
       child1,
-      child2
+      child2,
     }).map(([name, el]) => [el, name])
   );
 
@@ -75,7 +75,7 @@ it('triggers removals when no longer listened on', done => {
   const stream = kefirMakeElementChildStream(target as any).takeUntilBy(
     stopper
   );
-  stream.onValue(event => {
+  stream.onValue((event) => {
     const name = childrenToNames.get(event.el);
     calls.push(['add', name]);
     event.removalStream.onValue(() => {
@@ -87,7 +87,7 @@ it('triggers removals when no longer listened on', done => {
           ['add', 'child2'],
           ['stopper'],
           ['remove', 'child1'],
-          ['remove', 'child2']
+          ['remove', 'child2'],
         ]);
         done();
       }
@@ -102,7 +102,7 @@ it('triggers removals when no longer listened on', done => {
   });
 });
 
-it("doesn't miss children added during initial emits", done => {
+it("doesn't miss children added during initial emits", (done) => {
   const child1 = fakeEl('child1'),
     child2 = fakeEl('child2');
 
@@ -110,7 +110,7 @@ it("doesn't miss children added during initial emits", done => {
 
   let i = 0;
   const stream = kefirMakeElementChildStream(target as any);
-  stream.onValue(event => {
+  stream.onValue((event) => {
     switch (++i) {
       case 1:
         expect(event.el).toBe(child1);
@@ -126,7 +126,7 @@ it("doesn't miss children added during initial emits", done => {
   });
 });
 
-it("doesn't miss children if some are removed during initial emits", done => {
+it("doesn't miss children if some are removed during initial emits", (done) => {
   const child1 = fakeEl('child1'),
     child2 = fakeEl('child2');
 
@@ -134,7 +134,7 @@ it("doesn't miss children if some are removed during initial emits", done => {
 
   let i = 0;
   const stream = kefirMakeElementChildStream(target as any);
-  stream.onValue(event => {
+  stream.onValue((event) => {
     switch (++i) {
       case 1:
         expect(event.el).toBe(child1);
@@ -152,7 +152,7 @@ it("doesn't miss children if some are removed during initial emits", done => {
 
 it(
   'is exception-safe while emitting',
-  sinonTest(async function(this: any) {
+  sinonTest(async function (this: any) {
     let testErrorCatchCount = 0;
     const testErrorDefer = defer();
     const testError = new Error('child2 test error');
@@ -161,7 +161,7 @@ it(
       this.stub(global, 'setTimeout').callsFake(
         (fn: Function, delay: number, ...args: any[]) => {
           return _setTimeout(
-            function(this: any, ...args: any[]) {
+            function (this: any, ...args: any[]) {
               try {
                 return fn.apply(this, args);
               } catch (err) {
@@ -187,7 +187,7 @@ it(
       _.toPairs({
         child1,
         child2,
-        child3
+        child3,
       }).map(([name, el]) => [el, name])
     );
 
@@ -196,8 +196,8 @@ it(
     const calls: any[][] = [];
     const stream = kefirMakeElementChildStream(target as any);
 
-    await new Promise(resolve => {
-      stream.onValue(event => {
+    await new Promise((resolve) => {
+      stream.onValue((event) => {
         const name = childrenToNames.get(event.el);
         calls.push(['add', name]);
         event.removalStream.onValue(() => {
@@ -226,7 +226,7 @@ it(
       ['add', 'child2'],
       ['add', 'child3'],
       ['remove', 'child1'],
-      ['remove', 'child3']
+      ['remove', 'child3'],
     ]);
   })
 );

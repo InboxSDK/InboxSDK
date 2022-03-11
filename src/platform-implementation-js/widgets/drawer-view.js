@@ -25,7 +25,7 @@ class DrawerView extends EventEmitter {
       this.destroyed = true;
       this.emit('destroy');
     });
-    this._driver.getPreAutoCloseStream().onValue(event => {
+    this._driver.getPreAutoCloseStream().onValue((event) => {
       this.emit('preautoclose', event);
     });
 
@@ -33,7 +33,7 @@ class DrawerView extends EventEmitter {
       new CustomEvent('inboxSDKcloseDrawers', {
         bubbles: false,
         cancelable: false,
-        detail: null
+        detail: null,
       })
     );
     Kefir.fromEvents(document, 'inboxSDKcloseDrawers')

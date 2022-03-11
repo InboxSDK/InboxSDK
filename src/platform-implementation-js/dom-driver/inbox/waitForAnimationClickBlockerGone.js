@@ -7,7 +7,7 @@ import Kefir from 'kefir';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
 const getAnimationClickBlocker: () => HTMLElement = once(() =>
-  find(((document.body: any): HTMLElement).children, el => {
+  find(((document.body: any): HTMLElement).children, (el) => {
     const c = window.getComputedStyle(el);
     return (
       c.position === 'fixed' &&

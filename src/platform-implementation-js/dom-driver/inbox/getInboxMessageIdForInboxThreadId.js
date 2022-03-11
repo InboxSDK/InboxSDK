@@ -20,16 +20,16 @@ async function getInboxMessageIdForInboxThreadId(
         .getPageCommunicator()
         .getXsrfToken(),
       'X-Gmail-BTAI': await driver.getPageCommunicator().getBtaiHeader(),
-      'X-Google-BTD': '1'
+      'X-Google-BTD': '1',
     },
     data: JSON.stringify({
       '1': [
         {
           '1': inboxThreadId,
-          '3': []
-        }
-      ]
-    })
+          '3': [],
+        },
+      ],
+    }),
   });
 
   const [firstMessageId] = extractMessageIdsFromThreadResponse(text);

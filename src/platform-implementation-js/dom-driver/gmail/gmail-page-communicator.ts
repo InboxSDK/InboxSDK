@@ -55,8 +55,8 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
             threadId,
             ikValue: this.getIkValue(),
             btaiHeader,
-            xsrfToken
-          }
+            xsrfToken,
+          },
         })
       );
 
@@ -64,7 +64,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       if (!data) {
         await makeMutationObserverChunkedStream(message, {
           attributes: true,
-          attributeFilter: [attribute]
+          attributeFilter: [attribute],
         })
           .take(1)
           .toPromise();
@@ -85,7 +85,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
         new CustomEvent('inboxSDKtellMeThisThreadIdByDatabase', {
           bubbles: true,
           cancelable: false,
-          detail: null
+          detail: null,
         })
       );
       threadid = threadRow.getAttribute('data-inboxsdk-threadid');
@@ -100,7 +100,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
         new CustomEvent('inboxSDKtellMeThisThreadIdByClick', {
           bubbles: true,
           cancelable: false,
-          detail: null
+          detail: null,
         })
       );
       threadid = threadRow.getAttribute('data-inboxsdk-threadid');
@@ -116,7 +116,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       new CustomEvent('inboxSDKtellMeCurrentThreadId', {
         bubbles: true,
         cancelable: false,
-        detail: { isPreviewedThread }
+        detail: { isPreviewedThread },
       })
     );
 
@@ -144,10 +144,10 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
   }
 
   public isConversationViewDisabled(): Promise<boolean> {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       Kefir.fromEvents<any, never>(document, 'inboxSDKgmonkeyResponse')
         .take(1)
-        .onValue(event => {
+        .onValue((event) => {
           resolve(event.detail);
         });
 
@@ -155,7 +155,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
         new CustomEvent('inboxSDKtellMeIsConversationViewDisabled', {
           bubbles: false,
           cancelable: false,
-          detail: null
+          detail: null,
         })
       );
     });
@@ -166,7 +166,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       new CustomEvent('inboxSDKregisterSuggestionsModifier', {
         bubbles: false,
         cancelable: false,
-        detail: { providerID }
+        detail: { providerID },
       })
     );
   }
@@ -184,8 +184,8 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
           providerID,
           query,
           // Filter out non-JSONifiable things
-          suggestions: JSON.parse(JSON.stringify(suggestions))
-        }
+          suggestions: JSON.parse(JSON.stringify(suggestions)),
+        },
       })
     );
   }
@@ -195,7 +195,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       new CustomEvent('inboxSDKcustomListRegisterQuery', {
         bubbles: false,
         cancelable: false,
-        detail: { query }
+        detail: { query },
       })
     );
   }
@@ -210,7 +210,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       new CustomEvent('inboxSDKcustomListNewQuery', {
         bubbles: false,
         cancelable: false,
-        detail
+        detail,
       })
     );
   }
@@ -220,7 +220,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       new CustomEvent('inboxSDKcustomListResults', {
         bubbles: false,
         cancelable: false,
-        detail: { query, newResults }
+        detail: { query, newResults },
       })
     );
   }
@@ -230,7 +230,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       new CustomEvent('inboxSDKcreateCustomSearchTerm', {
         bubbles: false,
         cancelable: false,
-        detail: { term }
+        detail: { term },
       })
     );
   }
@@ -240,7 +240,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       new CustomEvent('inboxSDKsearchReplacementReady', {
         bubbles: false,
         cancelable: false,
-        detail: { query, newQuery }
+        detail: { query, newQuery },
       })
     );
   }
@@ -259,7 +259,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       new CustomEvent('inboxSDKregisterComposeRequestModifier', {
         detail,
         bubbles: false,
-        cancelable: false
+        cancelable: false,
       })
     );
 
@@ -271,7 +271,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       new CustomEvent('inboxSDKunregisterComposeRequestModifier', {
         detail: { keyId, modifierId },
         bubbles: false,
-        cancelable: false
+        cancelable: false,
       })
     );
   }
@@ -289,7 +289,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       new CustomEvent('inboxSDKcomposeRequestModified', {
         detail,
         bubbles: false,
-        cancelable: false
+        cancelable: false,
       })
     );
   }

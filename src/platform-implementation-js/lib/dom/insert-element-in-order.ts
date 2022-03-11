@@ -3,7 +3,7 @@ import t from 'transducers.js';
 const DEFAULT_ORDER_ATTRS = [
   'data-group-order-hint',
   'data-order-hint',
-  'data-insertion-order-hint'
+  'data-insertion-order-hint',
 ];
 
 export default function insertElementInOrder(

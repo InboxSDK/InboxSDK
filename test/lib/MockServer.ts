@@ -6,13 +6,13 @@ function makeEvent(self: any, isProgressEvent?: boolean) {
     target: { value: self },
     srcElement: { value: self },
     timeStamp: { value: Date.now() },
-    type: { value: 'readystatechange' }
+    type: { value: 'readystatechange' },
   };
   if (isProgressEvent) {
     _.assign(props, {
       lengthComputable: { value: self._lengthComputable },
       loaded: { value: self._loaded },
-      total: { value: self._total }
+      total: { value: self._total },
     });
   }
   return Object.freeze(Object.defineProperties({}, props));
@@ -59,13 +59,13 @@ const defaultResponder = {
   headers: { 'Content-Type': 'text/plain' },
   response: 'Content not found',
   delay: null as null | number,
-  noDelay: false
+  noDelay: false,
 };
 
 const statusTextCodes: { [status: string]: string } = {
   '0': 'unknown',
   '200': 'OK',
-  '404': 'not found'
+  '404': 'not found',
 };
 
 function selectResponder(
@@ -76,7 +76,7 @@ function selectResponder(
   requestHeaders: { [name: string]: any },
   body: string | undefined
 ) {
-  const foundPair = _.find(responders, pair =>
+  const foundPair = _.find(responders, (pair) =>
     checkResponderFilter(
       pair.filter,
       method,
@@ -140,8 +140,8 @@ export default class MockServer {
           'responseText',
           'responseXML',
           'status',
-          'statusText'
-        ].forEach(prop => {
+          'statusText',
+        ].forEach((prop) => {
           Object.defineProperty(this, prop, {
             configurable: false,
             enumerable: true,
@@ -168,7 +168,7 @@ export default class MockServer {
             },
             set() {
               throw new Error('Can not modify read-only property ' + prop);
-            }
+            },
           });
         });
       }
@@ -308,7 +308,7 @@ export default class MockServer {
       private _callListeners(name: string, event: any) {
         if ((this as any)['on' + name]) (this as any)['on' + name](event);
 
-        _.each(this._listeners[name], listener => {
+        _.each(this._listeners[name], (listener) => {
           listener.call(this, event);
         });
       }
@@ -354,13 +354,13 @@ export default class MockServer {
       }
     } as any;
 
-    [this.XMLHttpRequest, this.XMLHttpRequest.prototype].forEach(obj => {
+    [this.XMLHttpRequest, this.XMLHttpRequest.prototype].forEach((obj) => {
       Object.assign(obj, {
         UNSENT: 0,
         OPENED: 1,
         HEADERS_RECEIVED: 2,
         LOADING: 3,
-        DONE: 4
+        DONE: 4,
       });
     });
   }

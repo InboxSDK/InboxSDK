@@ -20,14 +20,14 @@ class InboxBackdrop {
     el.style.zIndex = String(zIndex);
 
     Kefir.fromEvents(el, 'click')
-      .filter(event => {
+      .filter((event) => {
         let isCanceled = false;
         const appEvent = {
           type: 'outsideInteraction',
           cause: event,
           cancel: () => {
             isCanceled = true;
-          }
+          },
         };
         this._preAutoCloseStream.emit(appEvent);
         return !isCanceled;

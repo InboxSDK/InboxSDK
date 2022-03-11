@@ -21,7 +21,7 @@ const blockedAnyModKeys = [
   'PageDown',
   'Home',
   'End',
-  'Enter'
+  'Enter',
 ];
 
 // These are only necessary for Safari
@@ -83,7 +83,7 @@ function shouldBlockEvent(event: KeyboardEvent): boolean {
   return false;
 }
 
-const handler = defn(module, function(event: KeyboardEvent) {
+const handler = defn(module, function (event: KeyboardEvent) {
   try {
     // If the key is in a blacklist and it originated while a custom view is
     // present, then maim the event object before Gmail or Inbox sees it.
@@ -98,7 +98,7 @@ const handler = defn(module, function(event: KeyboardEvent) {
         code: md('Backslash'),
         key: md('\\'),
         keyCode: md(92),
-        which: md(92)
+        which: md(92),
       });
     }
   } catch (err) {

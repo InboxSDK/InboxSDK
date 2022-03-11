@@ -23,9 +23,8 @@ export default function getAdditionalActionToolbar(
 
   actionToolbar = composeViewActionToolbars.get(gmailComposeView);
   if (!actionToolbar) {
-    const _actionToolbar = (actionToolbar = _addActionToolbar(
-      gmailComposeView
-    ));
+    const _actionToolbar = (actionToolbar =
+      _addActionToolbar(gmailComposeView));
     gmailComposeView.getStopper().onValue(() => {
       _actionToolbar.remove();
     });

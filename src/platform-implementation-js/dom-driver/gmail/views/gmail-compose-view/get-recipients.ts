@@ -15,13 +15,13 @@ export default function getRecipients(
     addressType
   );
   return Array.from(contactNodes)
-    .map(contactNode => {
+    .map((contactNode) => {
       if (contactNode.getAttribute('role') === 'option') {
         // new recipient
         // https://workspaceupdates.googleblog.com/2021/10/visual-updates-for-composing-email-in-gmail.html
         return {
           name: contactNode.getAttribute('data-name'),
-          emailAddress: contactNode.getAttribute('data-hovercard-id')!
+          emailAddress: contactNode.getAttribute('data-hovercard-id')!,
         };
       } else {
         // old

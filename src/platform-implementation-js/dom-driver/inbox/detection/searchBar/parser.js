@@ -20,7 +20,7 @@ export default function parser(el: HTMLElement) {
   return {
     elements: { searchInput },
     score: 1 - collector.errorCount() / collector.runCount(),
-    errors: collector.getErrorLogs()
+    errors: collector.getErrorLogs(),
   };
 }
 

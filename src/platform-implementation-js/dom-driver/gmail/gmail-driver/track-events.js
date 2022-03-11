@@ -11,7 +11,7 @@ export default function trackEvents(gmailDriver: GmailDriver) {
 }
 
 function _setupComposeMonitoring(gmailDriver: GmailDriver) {
-  gmailDriver.getComposeViewDriverStream().onValue(composeViewDriver => {
+  gmailDriver.getComposeViewDriverStream().onValue((composeViewDriver) => {
     var logFunction = _getLogFunction(gmailDriver, composeViewDriver);
     logFunction('compose open');
 
@@ -23,10 +23,10 @@ function _getLogFunction(gmailDriver, composeViewDriver) {
   var logger = gmailDriver.getLogger();
   var composeStats = {
     isInlineReply: composeViewDriver.isInlineReplyForm(),
-    isReply: composeViewDriver.isReply()
+    isReply: composeViewDriver.isReply(),
   };
 
-  return function(eventName, extraOptions) {
+  return function (eventName, extraOptions) {
     logger.eventSite(eventName, { ...composeStats, ...extraOptions });
   };
 }
@@ -50,10 +50,10 @@ function _monitorAttachmentButton(composeViewDriver, logFunction) {
 
 function _monitorAttachmentAdded(composeViewDriver, logFunction) {
   makeElementChildStream(((document.body: any): HTMLElement))
-    .map(event => event.el)
-    .filter(node => node && (node: any).type === 'file')
+    .map((event) => event.el)
+    .filter((node) => node && (node: any).type === 'file')
     .take(1)
-    .flatMap(node => {
+    .flatMap((node) => {
       return Kefir.fromEvents(node, 'change')
         .map(() => true)
         .merge(
@@ -86,10 +86,10 @@ function _monitorDriveFileAdded(composeViewDriver, logFunction) {
     .querySelectorAll('.gmail_drive_chip').length;
 
   makeElementChildStream(((document.body: any): HTMLElement))
-    .map(event => event.el)
-    .filter(node => node && node.classList.contains('picker-dialog'))
+    .map((event) => event.el)
+    .filter((node) => node && node.classList.contains('picker-dialog'))
     .take(1)
-    .flatMap(node => {
+    .flatMap((node) => {
       return Kefir.fromEvents(composeViewDriver.getBodyElement(), 'focus')
         .delay(1000)
         .map(() => {
@@ -101,7 +101,7 @@ function _monitorDriveFileAdded(composeViewDriver, logFunction) {
 
           return 0;
         })
-        .map(newNumber => numberCurrentDriveChips < newNumber)
+        .map((newNumber) => numberCurrentDriveChips < newNumber)
         .take(1);
     })
     .take(1)
@@ -112,12 +112,12 @@ function _monitorDriveFileAdded(composeViewDriver, logFunction) {
 
 function _setupAttachmentModalMonitoring(gmailDriver: GmailDriver) {
   makeElementChildStream(((document.body: any): HTMLElement))
-    .map(event => event.el)
+    .map((event) => event.el)
     .filter(
-      node => node.getAttribute && node.getAttribute('role') === 'alertdialog'
+      (node) => node.getAttribute && node.getAttribute('role') === 'alertdialog'
     )
     .takeUntilBy(gmailDriver.getStopper())
-    .onValue(node => {
+    .onValue((node) => {
       var heading = node.querySelector('[role=heading]');
       if (heading) {
         if (heading.textContent.indexOf('exceeds the 25MB') > -1) {
@@ -143,9 +143,9 @@ function _setupDragDropMonitoring(gmailDriver: GmailDriver) {
     .getComposeViewDriverStream()
     .flatMapLatest(() => {
       return Kefir.fromEvents((document.body: any), 'dragenter')
-        .filter(event => event.toElement) // ignore events caused by dragFilesIntoCompose
+        .filter((event) => event.toElement) // ignore events caused by dragFilesIntoCompose
         .filter(
-          event =>
+          (event) =>
             event.toElement.classList.contains('aC7') ||
             event.toElement.classList.contains('aC9')
         )
@@ -158,9 +158,9 @@ function _setupDragDropMonitoring(gmailDriver: GmailDriver) {
     .getComposeViewDriverStream()
     .flatMapLatest(() => {
       return Kefir.fromEvents((document.body: any), 'drop')
-        .filter(event => event.toElement)
+        .filter((event) => event.toElement)
         .filter(
-          event =>
+          (event) =>
             event.toElement.classList.contains('aC7') ||
             event.toElement.classList.contains('aC9')
         )

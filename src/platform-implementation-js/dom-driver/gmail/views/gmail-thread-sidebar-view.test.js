@@ -23,7 +23,7 @@ jest.mock('../../../lib/dom/make-mutation-observer-chunked-stream', () => {
 global.localStorage = new MockWebStorage();
 global._APP_SIDEBAR_TEST = true;
 
-(Element: any).prototype.insertAdjacentElement = function(position, el) {
+(Element: any).prototype.insertAdjacentElement = function (position, el) {
   switch (position) {
     case 'beforebegin':
       this.parentElement.insertBefore(el, this);
@@ -41,7 +41,7 @@ global._APP_SIDEBAR_TEST = true;
   }
 };
 
-describe('Without add-ons', function() {
+describe('Without add-ons', function () {
   it('construction works', () => {
     const gmailThreadSidebarView = new GmailThreadSidebarView(
       makeDriver(),
@@ -60,7 +60,7 @@ describe('Without add-ons', function() {
       Kefir.constant({
         title: 'foo',
         iconUrl: '/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
 
@@ -88,7 +88,7 @@ describe('Without add-ons', function() {
       Kefir.constant({
         title: 'foo1',
         iconUrl: '/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
 
@@ -96,7 +96,7 @@ describe('Without add-ons', function() {
       Kefir.constant({
         title: 'foo2',
         iconUrl: '/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
 
@@ -108,7 +108,7 @@ describe('Without add-ons', function() {
   });
 });
 
-describe('With new add-ons html', function() {
+describe('With new add-ons html', function () {
   it('construction works', () => {
     const sidebarContainer = makeAddonSidebarWithV2HTML();
     const gmailThreadSidebarView = new GmailThreadSidebarView(
@@ -130,7 +130,7 @@ describe('With new add-ons html', function() {
       Kefir.constant({
         title: 'foo',
         iconUrl: '/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
 
@@ -170,7 +170,7 @@ describe('With new add-ons html', function() {
         appName: 'foo',
         title: 'foo 1',
         iconUrl: '/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
 
@@ -179,7 +179,7 @@ describe('With new add-ons html', function() {
         appName: 'foo',
         title: 'foo 2',
         iconUrl: '/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
 
@@ -188,7 +188,7 @@ describe('With new add-ons html', function() {
         appName: 'bar',
         title: 'bar 2',
         iconUrl: '/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
 
@@ -205,7 +205,7 @@ describe('With new add-ons html', function() {
   });
 });
 
-describe('With old add-ons html', function() {
+describe('With old add-ons html', function () {
   it('construction works', () => {
     const sidebarContainer = makeAddonSidebarWithV1HTML();
     const gmailThreadSidebarView = new GmailThreadSidebarView(
@@ -227,7 +227,7 @@ describe('With old add-ons html', function() {
       Kefir.constant({
         title: 'foo',
         iconUrl: '/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
 
@@ -267,7 +267,7 @@ describe('With old add-ons html', function() {
         appName: 'foo',
         title: 'foo 1',
         iconUrl: '/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
 
@@ -276,7 +276,7 @@ describe('With old add-ons html', function() {
         appName: 'foo',
         title: 'foo 2',
         iconUrl: '/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
 
@@ -285,7 +285,7 @@ describe('With old add-ons html', function() {
         appName: 'bar',
         title: 'bar 2',
         iconUrl: '/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
 
@@ -312,9 +312,9 @@ function makeDriver(appId, opts): any {
         error(err, details) {
           console.error('logger.error called:', err, details); //eslint-disable-line no-console
           throw err;
-        }
+        },
       };
-    }
+    },
   };
 }
 

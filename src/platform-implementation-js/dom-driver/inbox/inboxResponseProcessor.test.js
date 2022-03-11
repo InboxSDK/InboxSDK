@@ -12,7 +12,7 @@ describe('extractMessageIdsFromThreadResponse()', () => {
     );
     expect(extractMessageIdsFromThreadResponse(threadResponse)).toEqual([
       'msg-a:r1490146031346228540',
-      'msg-f:1572844139423482218'
+      'msg-f:1572844139423482218',
     ]);
   });
 

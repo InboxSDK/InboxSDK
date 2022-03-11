@@ -35,11 +35,11 @@ beforeEach(async () => {
     });
   }
   // reset all counters
-  await page.$eval('head', head => {
+  await page.$eval('head', (head) => {
     head
       .getAttributeNames()
-      .filter(name => name.startsWith('data-test-'))
-      .forEach(name => {
+      .filter((name) => name.startsWith('data-test-'))
+      .forEach((name) => {
         head.removeAttribute(name);
       });
   });
@@ -72,7 +72,7 @@ async function openThread() {
   await attemptWithRetries(async () => {
     await page
       .waitForSelector('tr.zA[id] span.bog', { visible: true })
-      .then(el => el!.click());
+      .then((el) => el!.click());
   }, 3);
   await page.waitForFunction(() => document.location.hash !== '#inbox');
 }
@@ -88,9 +88,9 @@ describe('compose', () => {
             // reply button
             await page
               .waitForSelector('span.ams.bkH[role=link]', {
-                visible: true
+                visible: true,
               })
-              .then(el => el!.click());
+              .then((el) => el!.click());
             break;
           }
           case 'full': {
@@ -104,11 +104,11 @@ describe('compose', () => {
       test('compose button, discard', async () => {
         await page.waitForSelector('.test__tooltipButton');
         expect(
-          await page.$eval('.test__tooltipButton', el => el.textContent)
+          await page.$eval('.test__tooltipButton', (el) => el.textContent)
         ).toBe('Counter: 0');
         await page.click('.test__tooltipButton');
         expect(
-          await page.$eval('.test__tooltipButton', el => el.textContent)
+          await page.$eval('.test__tooltipButton', (el) => el.textContent)
         ).toBe('Counter: 1');
 
         await page.click('.inboxsdk__composeButton[aria-label="Monkeys!"]');
@@ -163,7 +163,7 @@ describe('compose', () => {
 
         await page.$eval(
           '.inboxsdk__compose div[contenteditable=true][aria-label="Message Body"]',
-          input => {
+          (input) => {
             input.textContent = '';
           }
         );
@@ -222,20 +222,20 @@ describe('sidebar', () => {
         'button.inboxsdk__button_icon[data-tooltip="Test Sidebar"]'
       );
       await page.waitForSelector('button.test__sidebarCounterButton', {
-        visible: true
+        visible: true,
       });
     }
     expect(
       await page.$eval(
         'button.test__sidebarCounterButton',
-        el => el.textContent
+        (el) => el.textContent
       )
     ).toBe('Counter: 0');
     await page.click('button.test__sidebarCounterButton');
     expect(
       await page.$eval(
         'button.test__sidebarCounterButton',
-        el => el.textContent
+        (el) => el.textContent
       )
     ).toBe('Counter: 1');
 
@@ -244,7 +244,7 @@ describe('sidebar', () => {
       'button.inboxsdk__button_icon[data-tooltip="Test Sidebar"]'
     );
     await page.waitForSelector('button.test__sidebarCounterButton', {
-      hidden: true
+      hidden: true,
     });
 
     // open
@@ -252,20 +252,20 @@ describe('sidebar', () => {
       'button.inboxsdk__button_icon[data-tooltip="Test Sidebar"]'
     );
     await page.waitForSelector('button.test__sidebarCounterButton', {
-      visible: true
+      visible: true,
     });
 
     expect(
       await page.$eval(
         'button.test__sidebarCounterButton',
-        el => el.textContent
+        (el) => el.textContent
       )
     ).toBe('Counter: 1');
     await page.click('button.test__sidebarCounterButton');
     expect(
       await page.$eval(
         'button.test__sidebarCounterButton',
-        el => el.textContent
+        (el) => el.textContent
       )
     ).toBe('Counter: 2');
   });
@@ -279,7 +279,7 @@ describe('custom view', () => {
       '.inboxsdk__navItem .inboxsdk__navItem_name[title="custom view"]'
     );
     expect(
-      await page.$eval('.test__customRouteElement', el => el.textContent)
+      await page.$eval('.test__customRouteElement', (el) => el.textContent)
     ).toBe('beep 123');
   });
 });

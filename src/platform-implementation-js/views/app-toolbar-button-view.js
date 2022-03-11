@@ -24,13 +24,13 @@ export default class AppToolbarButtonView extends EventEmitter {
     super();
     const members = {
       appToolbarButtonViewDriverPromise,
-      appToolbarButtonViewDriver: (null: ?AppToolbarButtonViewDriver)
+      appToolbarButtonViewDriver: (null: ?AppToolbarButtonViewDriver),
     };
     memberMap.set(this, members);
 
     this.destroyed = false;
     members.appToolbarButtonViewDriverPromise.then(
-      appToolbarButtonViewDriver => {
+      (appToolbarButtonViewDriver) => {
         members.appToolbarButtonViewDriver = appToolbarButtonViewDriver;
         appToolbarButtonViewDriver.getStopper().onValue(() => {
           this.destroyed = true;
@@ -46,7 +46,7 @@ export default class AppToolbarButtonView extends EventEmitter {
 
   open() {
     const members = get(memberMap, this);
-    members.appToolbarButtonViewDriverPromise.then(function(
+    members.appToolbarButtonViewDriverPromise.then(function (
       appToolbarButtonViewDriver
     ) {
       appToolbarButtonViewDriver.open();
@@ -55,7 +55,7 @@ export default class AppToolbarButtonView extends EventEmitter {
 
   close() {
     const members = get(memberMap, this);
-    members.appToolbarButtonViewDriverPromise.then(function(
+    members.appToolbarButtonViewDriverPromise.then(function (
       appToolbarButtonViewDriver
     ) {
       appToolbarButtonViewDriver.close();
@@ -64,7 +64,7 @@ export default class AppToolbarButtonView extends EventEmitter {
 
   remove() {
     const members = get(memberMap, this);
-    members.appToolbarButtonViewDriverPromise.then(function(
+    members.appToolbarButtonViewDriverPromise.then(function (
       appToolbarButtonViewDriver
     ) {
       appToolbarButtonViewDriver.destroy();

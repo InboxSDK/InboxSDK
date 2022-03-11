@@ -8,14 +8,14 @@ export type MoleViewDriver = {
   setMinimized(minimized: boolean): void,
   getMinimized(): boolean,
   getEventStream(): Kefir.Observable<Object>,
-  destroy(): void
+  destroy(): void,
 };
 
 export type MoleButtonDescriptor = {
   title: string,
   iconUrl: string,
   iconClass?: string,
-  onClick: Function
+  onClick: Function,
 };
 
 export type MoleOptions = {
@@ -25,5 +25,5 @@ export type MoleOptions = {
   titleEl?: HTMLElement,
   minimizedTitleEl?: HTMLElement,
   titleButtons?: MoleButtonDescriptor[],
-  chrome?: boolean
+  chrome?: boolean,
 };

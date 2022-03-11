@@ -23,7 +23,7 @@ class ModalView extends EventEmitter {
     this._modalViewDriver = options.modalViewDriver;
     options.modalViewDriver
       .getEventStream()
-      .filter(event => event.eventName === 'closeClick')
+      .filter((event) => event.eventName === 'closeClick')
       .onValue(() => {
         this.close();
       });
@@ -43,7 +43,7 @@ class ModalView extends EventEmitter {
 
     const hideAndDestroyStream = Kefir.merge([
       Kefir.fromEvents(this, 'destroy'),
-      hideStream.filter(modalView => modalView === this)
+      hideStream.filter((modalView) => modalView === this),
     ]);
 
     ((document.body: any): HTMLElement).appendChild(
@@ -53,9 +53,9 @@ class ModalView extends EventEmitter {
     modalViewDriver.getModalContainerElement().focus();
 
     Kefir.fromEvents((document.body: any), 'keydown')
-      .filter(domEvent => domEvent.keyCode === 27)
+      .filter((domEvent) => domEvent.keyCode === 27)
       .takeUntilBy(hideAndDestroyStream)
-      .onValue(domEvent => {
+      .onValue((domEvent) => {
         domEvent.stopImmediatePropagation();
         domEvent.stopPropagation();
         domEvent.preventDefault();
@@ -87,7 +87,7 @@ class ModalView extends EventEmitter {
 let activeBackdrop: ?Backdrop = null;
 let currentlyShowingModal: ?{
   modalView: ModalView,
-  modalViewDriver: ModalViewDriver
+  modalViewDriver: ModalViewDriver,
 } = null;
 const hideStream: Bus<ModalView> = kefirBus();
 const hiddenModalStack: Array<ModalView> = [];
@@ -118,7 +118,7 @@ function _replaceCurrentlyShowingModal(modalView, modalViewDriver) {
       activeBackdrop = modalView._driver.createBackdrop(502);
       activeBackdrop.getStopper().onValue(() => {
         activeBackdrop = null;
-        hiddenModalStack.slice().forEach(modalView => {
+        hiddenModalStack.slice().forEach((modalView) => {
           modalView.close();
         });
         if (currentlyShowingModal) {

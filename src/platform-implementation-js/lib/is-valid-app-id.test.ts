@@ -19,13 +19,13 @@ const grandfathered = [
   'docsend',
   'giphy',
   'stripe',
-  'godMode'
+  'godMode',
 ];
 
 describe('passes', () => {
   shouldPass('streak', 'streak');
   it('all grandfathered appIds', () => {
-    grandfathered.forEach(name => {
+    grandfathered.forEach((name) => {
       expect(isValidAppId(name)).toBe(true);
     });
   });

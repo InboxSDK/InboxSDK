@@ -21,7 +21,7 @@ function makeMockDriver(): Object {
   return {
     getStopper: _.constant(stopper),
     getCustomRouteIDs: _.constant(new Set()),
-    showNativeRouteView: jest.fn()
+    showNativeRouteView: jest.fn(),
   };
 }
 
@@ -32,7 +32,7 @@ test('test', async () => {
   driver.getCustomRouteIDs().add('bar/:id/blah');
   setupRouteViewDriverStream(driver)
     .takeUntilBy(stopper)
-    .onValue(item => {
+    .onValue((item) => {
       items.push(item);
     });
 
@@ -52,9 +52,9 @@ test('test', async () => {
         args: [
           '%5B1%2C%5B%5B11%2C0%2Cfalse%2Cnull%2Cnull%2C0%5D%5D%5D',
           '',
-          '/u/0/snoozed'
-        ]
-      }
+          '/u/0/snoozed',
+        ],
+      },
     })
   );
 
@@ -83,9 +83,9 @@ test('test', async () => {
         args: [
           '%5B1%2C%5B%5B2%2C0%2Cfalse%2Cnull%2Cnull%2C0%5D%5D%5D',
           '',
-          '/u/0/done'
-        ]
-      }
+          '/u/0/done',
+        ],
+      },
     })
   );
 

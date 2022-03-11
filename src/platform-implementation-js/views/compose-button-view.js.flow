@@ -9,12 +9,12 @@ export type TooltipDescriptor = {
   title?: ?string,
   subtitle?: ?string,
   imageUrl?: ?string,
-  button?: ?{ onClick?: Function, title: string }
+  button?: ?{ onClick?: Function, title: string },
 };
 
 type Options = {
   buttonDescriptor: Object,
-  buttonViewController: Object
+  buttonViewController: Object,
 };
 
 declare export default class ComposeButtonView extends EventEmitter {

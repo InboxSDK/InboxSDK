@@ -46,7 +46,7 @@ export default class UserInfo {
         if (!nameEl || !emailAddressEl) return null;
         return {
           name: nameEl.textContent,
-          emailAddress: emailAddressEl.textContent
+          emailAddress: emailAddressEl.textContent,
         };
       })
       .filter(Boolean);
@@ -61,9 +61,9 @@ export default class UserInfo {
       }
       return {
         name: el.children[0].textContent,
-        emailAddress: match[0]
+        emailAddress: match[0],
       };
     });
-    return uniqBy(main.concat(extras), x => x.emailAddress.toLowerCase());
+    return uniqBy(main.concat(extras), (x) => x.emailAddress.toLowerCase());
   }
 }

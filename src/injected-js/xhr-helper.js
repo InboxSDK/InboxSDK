@@ -3,14 +3,14 @@
 import ajax from '../common/ajax';
 
 export default function xhrHelper() {
-  document.addEventListener('inboxSDKpageAjax', function(event: any) {
+  document.addEventListener('inboxSDKpageAjax', function (event: any) {
     const id = event.detail.id;
     const opts = {
       url: event.detail.url,
       method: event.detail.method,
       headers: event.detail.headers,
       xhrFields: event.detail.xhrFields,
-      data: event.detail.data
+      data: event.detail.data,
     };
 
     // It's important to use fetch when possible because it's needed for
@@ -20,7 +20,7 @@ export default function xhrHelper() {
       (async () => {
         const response = await fetch(opts.url, {
           method: opts.method || 'GET',
-          credentials: 'include'
+          credentials: 'include',
         });
         document.dispatchEvent(
           new CustomEvent('inboxSDKpageAjaxDone', {
@@ -30,11 +30,11 @@ export default function xhrHelper() {
               id,
               error: false,
               text: await response.text(),
-              responseURL: response.url
-            }
+              responseURL: response.url,
+            },
           })
         );
-      })().catch(err => {
+      })().catch((err) => {
         document.dispatchEvent(
           new CustomEvent('inboxSDKpageAjaxDone', {
             bubbles: false,
@@ -44,8 +44,8 @@ export default function xhrHelper() {
               error: true,
               message: err && err.message,
               stack: err && err.stack,
-              status: err && err.xhr && err.xhr.status
-            }
+              status: err && err.xhr && err.xhr.status,
+            },
           })
         );
       });
@@ -60,12 +60,12 @@ export default function xhrHelper() {
                 id,
                 error: false,
                 text,
-                responseURL: (xhr: any).responseURL
-              }
+                responseURL: (xhr: any).responseURL,
+              },
             })
           );
         },
-        err => {
+        (err) => {
           document.dispatchEvent(
             new CustomEvent('inboxSDKpageAjaxDone', {
               bubbles: false,
@@ -75,8 +75,8 @@ export default function xhrHelper() {
                 error: true,
                 message: err && err.message,
                 stack: err && err.stack,
-                status: err && err.xhr && err.xhr.status
-              }
+                status: err && err.xhr && err.xhr.status,
+              },
             })
           );
         }

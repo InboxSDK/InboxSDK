@@ -27,7 +27,7 @@ export default async function openDraftByMessageID(
 
     const thread = threads[0];
     const syncMessageData = thread.extraMetaData.syncMessageData.find(
-      m => m.oldMessageID === messageID
+      (m) => m.oldMessageID === messageID
     );
     if (!syncMessageData) {
       throw new Error('Failed to find syncMessageData');

@@ -23,7 +23,7 @@ async function main() {
   console.log(ciphertext);
 }
 
-main().catch(err => {
+main().catch((err) => {
   console.error(err);
   process.exit(1);
 });

@@ -18,7 +18,7 @@ class RouteView extends EventEmitter {
       routeID: (null: ?string),
       routeType: (null: ?string),
       params: (null: ?{ [ix: string]: string }),
-      routeViewDriver
+      routeViewDriver,
     };
     membersMap.set(this, members);
 

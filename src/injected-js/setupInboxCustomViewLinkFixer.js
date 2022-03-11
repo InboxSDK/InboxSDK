@@ -7,7 +7,7 @@ export default function setupInboxCustomViewLinkFixer() {
 
   document.addEventListener(
     'inboxSDKregisterAllowedHashLinkStartTerm',
-    function(event: Event) {
+    function (event: Event) {
       const term = (event: any).detail.term;
       allowedStartTerms.add(term);
     }
@@ -15,7 +15,7 @@ export default function setupInboxCustomViewLinkFixer() {
 
   document.addEventListener(
     'click',
-    function(event: MouseEvent) {
+    function (event: MouseEvent) {
       const target = event.target;
       if (!(target instanceof HTMLElement)) return;
       const anchor = closest(target, 'a[href^="#"]');

@@ -4,7 +4,7 @@
 
 https://inboxsdk.github.io/inboxsdk-docs/
 
-[Original mailing list](https://groups.google.com/g/inboxsdk/) (inactive, superseded by the Issues tracker here) 
+[Original mailing list](https://groups.google.com/g/inboxsdk/) (inactive, superseded by the Issues tracker here)
 
 # Usage
 

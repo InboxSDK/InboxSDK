@@ -71,7 +71,7 @@ export type PiOpts = {
   inboxBeta: boolean,
   REQUESTED_API_VERSION: number,
   primaryColor?: string,
-  secondaryColor?: string
+  secondaryColor?: string,
 };
 
 export class PlatformImplementation extends SafeEventEmitter {
@@ -108,57 +108,57 @@ export class PlatformImplementation extends SafeEventEmitter {
     const membrane = new Membrane([
       [
         GmailComposeView,
-        viewDriver => new ComposeView(driver, viewDriver, membrane)
+        (viewDriver) => new ComposeView(driver, viewDriver, membrane),
       ],
       [
         InboxComposeView,
-        viewDriver => new ComposeView(driver, viewDriver, membrane)
+        (viewDriver) => new ComposeView(driver, viewDriver, membrane),
       ],
       [
         GmailAttachmentCardView,
-        viewDriver => new AttachmentCardView(viewDriver, driver, membrane)
+        (viewDriver) => new AttachmentCardView(viewDriver, driver, membrane),
       ],
       [
         InboxAttachmentCardView,
-        viewDriver => new AttachmentCardView(viewDriver, driver, membrane)
+        (viewDriver) => new AttachmentCardView(viewDriver, driver, membrane),
       ],
       [
         GmailMessageView,
-        viewDriver =>
+        (viewDriver) =>
           new MessageView(
             viewDriver,
             appId,
             membrane,
             this.Conversations,
             driver
-          )
+          ),
       ],
       [
         InboxMessageView,
-        viewDriver =>
+        (viewDriver) =>
           new MessageView(
             viewDriver,
             appId,
             membrane,
             this.Conversations,
             driver
-          )
+          ),
       ],
       [
         GmailThreadView,
-        viewDriver => new ThreadView(viewDriver, appId, driver, membrane)
+        (viewDriver) => new ThreadView(viewDriver, appId, driver, membrane),
       ],
       [
         InboxThreadView,
-        viewDriver => new ThreadView(viewDriver, appId, driver, membrane)
+        (viewDriver) => new ThreadView(viewDriver, appId, driver, membrane),
       ],
-      [GmailThreadRowView, viewDriver => new ThreadRowView(viewDriver)],
-      [InboxThreadRowView, viewDriver => new ThreadRowView(viewDriver)],
-      [GmailRouteView, viewDriver => new RouteView(viewDriver)],
-      [InboxRouteView, viewDriver => new RouteView(viewDriver)],
-      [InboxDummyRouteView, viewDriver => new RouteView(viewDriver)],
-      [InboxCustomRouteView, viewDriver => new RouteView(viewDriver)],
-      [DummyRouteViewDriver, viewDriver => new RouteView(viewDriver)]
+      [GmailThreadRowView, (viewDriver) => new ThreadRowView(viewDriver)],
+      [InboxThreadRowView, (viewDriver) => new ThreadRowView(viewDriver)],
+      [GmailRouteView, (viewDriver) => new RouteView(viewDriver)],
+      [InboxRouteView, (viewDriver) => new RouteView(viewDriver)],
+      [InboxDummyRouteView, (viewDriver) => new RouteView(viewDriver)],
+      [InboxCustomRouteView, (viewDriver) => new RouteView(viewDriver)],
+      [DummyRouteViewDriver, (viewDriver) => new RouteView(viewDriver)],
     ]);
     this.destroyed = false;
     this.LOADER_VERSION = LOADER_VERSION;
@@ -203,7 +203,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 export type EnvData = {
   piMainStarted: number,
   piLoadStarted: number,
-  wasAccountSwitcherReadyAtStart: boolean
+  wasAccountSwitcherReadyAtStart: boolean,
 };
 
 // returns a promise for the PlatformImplementation object
@@ -221,7 +221,7 @@ export function makePlatformImplementation(
     globalErrorLogging: true,
     eventTracking: true,
     inboxBeta: false,
-    ..._opts
+    ..._opts,
   };
 
   opts.REQUESTED_API_VERSION = +opts.REQUESTED_API_VERSION;
@@ -239,7 +239,7 @@ export function makePlatformImplementation(
 
   const DRIVERS_BY_ORIGIN: { [name: string]: * } = {
     'https://mail.google.com': GmailDriver,
-    'https://inbox.google.com': InboxDriver
+    'https://inbox.google.com': InboxDriver,
   };
 
   const LOADER_VERSION: string = opts.VERSION;
@@ -299,7 +299,7 @@ https://www.inboxsdk.com/docs/#RequiredSetup
     if (!loadedAppIds.has(appId)) {
       loadedAppIds.add(appId);
       logger.eventSdkPassive('load', {
-        ...driver.getLoadEventDetails()
+        ...driver.getLoadEventDetails(),
       });
     }
 

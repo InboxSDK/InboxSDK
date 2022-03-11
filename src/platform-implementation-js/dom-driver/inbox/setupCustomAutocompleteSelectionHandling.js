@@ -19,10 +19,9 @@ const getSelectedNativeResult = (resultsEl: HTMLElement) => {
 
   // Unfortunately there are no distinguishable features of a selected
   // native result besides its background color... (ಥ﹏ಥ)
-  return Array.from(nativeResults).find(result => {
-    const { backgroundColor }: { backgroundColor: string } = getComputedStyle(
-      result
-    );
+  return Array.from(nativeResults).find((result) => {
+    const { backgroundColor }: { backgroundColor: string } =
+      getComputedStyle(result);
 
     const colorValues = backgroundColor.match(/([\d.]+)/g);
 
@@ -46,14 +45,14 @@ const setupCustomResultHoverListeners = (resultsEl, resultsElRemovalStream) => {
       closest(target, '.inboxsdk__search_suggestion:not(.inboxsdk__selected)')
     )
     .filter(Boolean)
-    .onValue(el => {
+    .onValue((el) => {
       const customResults = resultsEl.querySelectorAll(
         '.inboxsdk__search_suggestion.inboxsdk__selected'
       );
 
       // Needed to ensure custom results selected via keyboard events
       // have their selected state removed (since no mouseout event fires).
-      Array.from(customResults).forEach(result =>
+      Array.from(customResults).forEach((result) =>
         result.classList.remove('inboxsdk__selected')
       );
 
@@ -66,17 +65,17 @@ const setupCustomResultHoverListeners = (resultsEl, resultsElRemovalStream) => {
       closest(target, '.inboxsdk__search_suggestion.inboxsdk__selected')
     )
     .filter(Boolean)
-    .onValue(el => el.classList.remove('inboxsdk__selected'));
+    .onValue((el) => el.classList.remove('inboxsdk__selected'));
 };
 
 export default function setupCustomAutocompleteSelectionHandling({
   resultsEl,
   resultsElRemovalStream,
-  searchInput
+  searchInput,
 }: {
   resultsEl: HTMLElement,
   resultsElRemovalStream: Kefir.Observable<any>,
-  searchInput: HTMLInputElement
+  searchInput: HTMLInputElement,
 }): void {
   if (resultsEl.hasAttribute(SELECTION_MASTER_ATTR)) {
     return;
@@ -94,10 +93,10 @@ export default function setupCustomAutocompleteSelectionHandling({
     throw new Error();
   }
 
-  const keyboardEvents: Kefir.Observable<KeyboardEvent> = fromEventTargetCapture(
-    searchInputParent,
-    'keydown'
-  ).takeUntilBy(resultsElRemovalStream);
+  const keyboardEvents: Kefir.Observable<KeyboardEvent> =
+    fromEventTargetCapture(searchInputParent, 'keydown').takeUntilBy(
+      resultsElRemovalStream
+    );
 
   const upArrowPresses = keyboardEvents.filter(({ keyCode }) => keyCode === 38);
   const downArrowPresses = keyboardEvents.filter(
@@ -105,7 +104,7 @@ export default function setupCustomAutocompleteSelectionHandling({
   );
   const enterPresses = keyboardEvents.filter(({ keyCode }) => keyCode === 13);
 
-  upArrowPresses.onValue(event => {
+  upArrowPresses.onValue((event) => {
     const selectedNativeResult = getSelectedNativeResult(resultsEl);
     const selectedCustomResult = resultsEl.querySelector(
       '.inboxsdk__search_suggestion.inboxsdk__selected'
@@ -166,7 +165,7 @@ export default function setupCustomAutocompleteSelectionHandling({
     }
   });
 
-  downArrowPresses.onValue(event => {
+  downArrowPresses.onValue((event) => {
     const selectedNativeResult = getSelectedNativeResult(resultsEl);
     const selectedCustomResult = resultsEl.querySelector(
       '.inboxsdk__search_suggestion.inboxsdk__selected'
@@ -231,7 +230,7 @@ export default function setupCustomAutocompleteSelectionHandling({
     }
   });
 
-  enterPresses.onValue(event => {
+  enterPresses.onValue((event) => {
     const selectedCustomResult = resultsEl.querySelector(
       '.inboxsdk__search_suggestion.inboxsdk__selected'
     );

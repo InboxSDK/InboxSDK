@@ -17,7 +17,7 @@ async function getRfcMessageIdForSyncMessageId(
   syncMessageID: string
 ): Promise<string> {
   const text = await getOriginalMessagePage(driver, {
-    syncMessageID: syncMessageID
+    syncMessageID: syncMessageID,
   });
 
   const match = text.match(/^Message-ID:\s+(\S+)\s*$/im);

@@ -15,7 +15,7 @@ describe('extractMetadataFromThreadRow', () => {
     expect(parsed).toEqual({
       timeString: 'Thu, Dec 4, 2014 at 2:02 PM',
       subject: 'test merge again',
-      peopleHtml: '<span email="cowan@streak.com" name="me">me</span> (15)'
+      peopleHtml: '<span email="cowan@streak.com" name="me">me</span> (15)',
     });
   });
 
@@ -33,7 +33,7 @@ describe('extractMetadataFromThreadRow', () => {
     expect(parsed).toEqual({
       timeString: 'Thu, Dec 4, 2014 at 2:02 PM',
       subject: 'test merge again',
-      peopleHtml: '<span email="cowan@streak.com" name="me">me</span> (15)'
+      peopleHtml: '<span email="cowan@streak.com" name="me">me</span> (15)',
     });
   });
 
@@ -51,7 +51,7 @@ describe('extractMetadataFromThreadRow', () => {
       timeString: 'Mon, Jan 5, 2015 at 11:02 AM',
       subject: 'lordprogrammer finished a deploy (fed8a27)',
       peopleHtml:
-        '<span email="notifications@mailfoogae.appspotmail.com" name="Streak Bot">Streak Bot</span>'
+        '<span email="notifications@mailfoogae.appspotmail.com" name="Streak Bot">Streak Bot</span>',
     });
   });
 });

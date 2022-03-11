@@ -39,9 +39,9 @@ declare var GmailElementGetter: {
   isStandaloneComposeWindow(): boolean,
   isStandaloneThreadWindow(): boolean,
   StandaloneCompose: {
-    getComposeWindowContainer(): ?HTMLElement
+    getComposeWindowContainer(): ?HTMLElement,
   },
-  waitForGmailModeToSettle(): Promise<void>
+  waitForGmailModeToSettle(): Promise<void>,
 };
 
 export default GmailElementGetter;

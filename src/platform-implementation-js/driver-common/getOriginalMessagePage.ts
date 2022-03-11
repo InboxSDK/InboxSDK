@@ -18,7 +18,7 @@ async function getOriginalMessagePage(
 ): Promise<string> {
   const data: any = {
     ik: driver.getPageCommunicator().getIkValue(),
-    view: 'om'
+    view: 'om',
   };
 
   if (options.oldGmailMessageID) {
@@ -28,9 +28,8 @@ async function getOriginalMessagePage(
   }
 
   let url;
-  const delegatedAccountMatch = document.location.pathname.match(
-    /\/b\/(.+?)\/u\/(\d+)/
-  );
+  const delegatedAccountMatch =
+    document.location.pathname.match(/\/b\/(.+?)\/u\/(\d+)/);
   if (delegatedAccountMatch) {
     url = document.location.origin + document.location.pathname;
   } else {
@@ -44,7 +43,7 @@ async function getOriginalMessagePage(
     url,
     method: 'GET',
     canRetry: true,
-    data
+    data,
   });
 
   return text;

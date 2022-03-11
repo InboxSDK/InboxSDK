@@ -22,7 +22,7 @@ class Keyboard {
 
   createShortcutHandle(shortcutDescriptor: {
     chord: string,
-    description: string
+    description: string,
   }) {
     const members = get(memberMap, this);
 

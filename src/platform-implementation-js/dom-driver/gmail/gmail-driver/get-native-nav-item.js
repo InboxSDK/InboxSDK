@@ -16,8 +16,8 @@ export default function getNativeNavItem(
     if (!navContainer) return null;
     return navContainer.querySelector(`.aim a[href*="#${label}"]`);
   }, 300 * 1000)
-    .then(labelLinkElement => {
-      const labelElement = findParent(labelLinkElement, el =>
+    .then((labelLinkElement) => {
+      const labelElement = findParent(labelLinkElement, (el) =>
         el.classList.contains('aim')
       );
 
@@ -26,16 +26,13 @@ export default function getNativeNavItem(
       }
 
       if (!(labelElement: any).__nativeGmailNavItemView) {
-        (labelElement: any).__nativeGmailNavItemView = new NativeGmailNavItemView(
-          driver,
-          labelElement,
-          label
-        );
+        (labelElement: any).__nativeGmailNavItemView =
+          new NativeGmailNavItemView(driver, labelElement, label);
       }
 
       return (labelElement: any).__nativeGmailNavItemView;
     })
-    .catch(err => {
+    .catch((err) => {
       if (GmailElementGetter.isStandalone()) {
         // never resolve
         return new Promise((resolve, reject) => {});

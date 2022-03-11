@@ -33,7 +33,7 @@ class SectionView extends EventEmitter {
 }
 
 function _bindToEventStream(sectionView, sectionViewDriver, driver) {
-  sectionViewDriver.getEventStream().onValue(e => {
+  sectionViewDriver.getEventStream().onValue((e) => {
     sectionView.emit(e.eventName);
   });
 

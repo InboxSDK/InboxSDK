@@ -8,7 +8,7 @@ type ComposeView = any;
 type RouteViewDriver = any;
 import CommonPageCommunicator from '../lib/common-page-communicator';
 import GmailSupportItemView, {
-  SupportItemDescriptor
+  SupportItemDescriptor,
 } from '../dom-driver/gmail/views/gmail-support-item-view';
 
 // import GmailBackdrop from '../dom-driver/gmail/views/gmail-backdrop';

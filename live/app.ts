@@ -7,7 +7,7 @@ export function run() {
     cache: 2,
     showDir: 'false',
     cors: true,
-    robots: true
+    robots: true,
   });
   server.listen(4567, 'localhost');
 }

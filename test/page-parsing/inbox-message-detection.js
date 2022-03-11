@@ -23,7 +23,7 @@ import {
   page20160810,
   page20160810_2,
   page20160818_2,
-  page20160819
+  page20160819,
 } from '../lib/pages';
 
 describe('Inbox Message Detection', () => {
@@ -172,7 +172,7 @@ describe('Inbox Message Detection', () => {
       );
       expect(liveSet.values().size).toBe(1);
       expect(
-        lsMap(liveSet, x => x.getValue())
+        lsMap(liveSet, (x) => x.getValue())
           .values()
           .has(message)
       ).toBe(true);
@@ -191,7 +191,7 @@ describe('Inbox Message Detection', () => {
       );
       expect(liveSet.values().size).toBe(1);
       expect(
-        lsMap(liveSet, x => x.getValue())
+        lsMap(liveSet, (x) => x.getValue())
           .values()
           .has(message)
       ).toBe(true);
@@ -207,7 +207,7 @@ describe('Inbox Message Detection', () => {
       );
       expect(liveSet.values().size).toBe(1);
       expect(
-        lsMap(liveSet, x => x.getValue())
+        lsMap(liveSet, (x) => x.getValue())
           .values()
           .has(message)
       ).toBe(true);
@@ -223,7 +223,7 @@ describe('Inbox Message Detection', () => {
       );
       expect(liveSet.values().size).toBe(1);
       expect(
-        lsMap(liveSet, x => x.getValue())
+        lsMap(liveSet, (x) => x.getValue())
           .values()
           .has(message)
       ).toBe(true);
@@ -239,7 +239,7 @@ describe('Inbox Message Detection', () => {
       );
       expect(liveSet.values().size).toBe(1);
       expect(
-        lsMap(liveSet, x => x.getValue())
+        lsMap(liveSet, (x) => x.getValue())
           .values()
           .has(message)
       ).toBe(true);
@@ -255,7 +255,7 @@ describe('Inbox Message Detection', () => {
       );
       expect(liveSet.values().size).toBe(1);
       expect(
-        lsMap(liveSet, x => x.getValue())
+        lsMap(liveSet, (x) => x.getValue())
           .values()
           .has(message)
       ).toBe(true);

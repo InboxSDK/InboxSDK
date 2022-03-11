@@ -55,7 +55,7 @@ class User {
       );
     let list = driver.getAccountSwitcherContactList();
     const userEmail = this.getEmailAddress();
-    const listHasUser = !!find(list, item => item.emailAddress === userEmail);
+    const listHasUser = !!find(list, (item) => item.emailAddress === userEmail);
     if (!listHasUser) {
       // This happens for delegated accounts.
       list = list.concat([{ name: userEmail, emailAddress: userEmail }]);

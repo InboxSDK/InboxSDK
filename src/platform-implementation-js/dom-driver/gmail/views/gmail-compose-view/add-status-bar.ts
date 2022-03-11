@@ -26,7 +26,7 @@ function addStatusBar(
     height: 40,
     orderHint: 0,
     addAboveNativeStatusBar: false,
-    ...options
+    ...options,
   };
 
   const statusbar = new StatusBar(
@@ -47,7 +47,7 @@ function addStatusBar(
 function createElement(orderHint: number, addAboveNativeStatusBar: boolean) {
   const el = document.createElement('div');
   el.className = cx('aDh', 'inboxsdk__compose_statusbar', {
-    inboxsdk__addAboveNative: addAboveNativeStatusBar
+    inboxsdk__addAboveNative: addAboveNativeStatusBar,
   });
   el.style.fontFamily = 'Roboto,RobotoDraft,Helvetica,Arial,sans-serif';
   el.style.fontSize = '15.6px';
@@ -108,7 +108,7 @@ class StatusBar extends SimpleElementView implements IStatusBar {
         .getElement()
         .querySelectorAll<HTMLElement>('.inboxsdk__compose_statusbar')
     )
-      .map(el => el.getBoundingClientRect().height)
+      .map((el) => el.getBoundingClientRect().height)
       .reduce((a, b) => a + b, 0);
 
     this._gmailComposeView

@@ -21,7 +21,7 @@ import {
   pageFullscreen20160620,
   page20160727,
   page20160823,
-  page20170317
+  page20170317,
 } from '../lib/pages';
 
 describe('Inbox Thread Detection', () => {
@@ -138,7 +138,7 @@ describe('Inbox Thread Detection', () => {
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       expect(liveSet.values().size).toBe(1);
       expect(
-        lsMap(liveSet, x => x.getValue())
+        lsMap(liveSet, (x) => x.getValue())
           .values()
           .has(thread)
       ).toBe(true);
@@ -154,7 +154,7 @@ describe('Inbox Thread Detection', () => {
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       expect(liveSet.values().size).toBe(1);
       expect(
-        lsMap(liveSet, x => x.getValue())
+        lsMap(liveSet, (x) => x.getValue())
           .values()
           .has(thread)
       ).toBe(true);
@@ -167,7 +167,7 @@ describe('Inbox Thread Detection', () => {
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       expect(liveSet.values().size).toBe(1);
       expect(
-        lsMap(liveSet, x => x.getValue())
+        lsMap(liveSet, (x) => x.getValue())
           .values()
           .has(thread)
       ).toBe(true);
@@ -180,7 +180,7 @@ describe('Inbox Thread Detection', () => {
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       expect(liveSet.values().size).toBe(1);
       expect(
-        lsMap(liveSet, x => x.getValue())
+        lsMap(liveSet, (x) => x.getValue())
           .values()
           .has(thread)
       ).toBe(true);
@@ -193,7 +193,7 @@ describe('Inbox Thread Detection', () => {
       const liveSet = makePageParserTree(null, root).tree.getAllByTag('thread');
       expect(liveSet.values().size).toBe(1);
       expect(
-        lsMap(liveSet, x => x.getValue())
+        lsMap(liveSet, (x) => x.getValue())
           .values()
           .has(thread)
       ).toBe(true);

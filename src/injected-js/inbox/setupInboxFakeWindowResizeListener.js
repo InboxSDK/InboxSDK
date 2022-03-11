@@ -7,7 +7,7 @@ export default function setupInboxFakeWindowResizeListener() {
 function fakeWindowResize() {
   (Object: any).defineProperty(document.documentElement, 'clientWidth', {
     configurable: true,
-    value: window.innerWidth - 1
+    value: window.innerWidth - 1,
   });
 
   {
@@ -18,7 +18,7 @@ function fakeWindowResize() {
 
   (Object: any).defineProperty(document.documentElement, 'clientWidth', {
     configurable: true,
-    get: () => window.innerWidth
+    get: () => window.innerWidth,
   });
 
   {

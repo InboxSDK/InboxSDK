@@ -66,7 +66,7 @@ class InboxThreadRowView {
     const button = new InboxToolbarButtonView(
       {
         ...options,
-        onClick: event => {
+        onClick: (event) => {
           if (event.dropdown) {
             toolbar.classList.add('inboxsdk__thread_row_force_toolbar_visible');
             event.dropdown.once('destroy', () => {
@@ -76,7 +76,7 @@ class InboxThreadRowView {
             });
           }
           if (options.onClick) options.onClick(event);
-        }
+        },
       },
       this._driver.getAppId(),
       toolbar
@@ -114,7 +114,7 @@ class InboxThreadRowView {
 
     let imageMod = null;
 
-    prop.onValue(iconDescriptor => {
+    prop.onValue((iconDescriptor) => {
       if (!iconDescriptor) {
         if (imageMod) {
           imageMod.remove();
@@ -127,7 +127,7 @@ class InboxThreadRowView {
             iconWrapper: document.createElement('div'),
             remove() {
               this.iconWrapper.remove();
-            }
+            },
           };
           imageMod.iconWrapper.className = 'inboxsdk__thread_row_icon_wrapper';
         }
@@ -180,7 +180,7 @@ class InboxThreadRowView {
       .toProperty();
     let labelMod = null;
 
-    prop.onValue(labelDescriptor => {
+    prop.onValue((labelDescriptor) => {
       if (!labelDescriptor) {
         if (labelMod) {
           labelMod.remove();
@@ -192,7 +192,7 @@ class InboxThreadRowView {
           const el = inboxLabelView.getElement();
           labelMod = {
             inboxLabelView,
-            remove: el.remove.bind(el)
+            remove: el.remove.bind(el),
           };
         }
 
@@ -251,12 +251,10 @@ class InboxThreadRowView {
       // Get the inbox message id of any message in the thread, convert it to
       // a gmail message id, and then use that id in a request
       // to a gmail endpoint to get the id of the thread that message is in.
-      const inboxMessageId = await this._driver.getInboxMessageIdForInboxThreadId(
-        inboxThreadId
-      );
-      const gmailMessageId = await this._driver.getGmailMessageIdForSyncMessageId(
-        inboxMessageId
-      );
+      const inboxMessageId =
+        await this._driver.getInboxMessageIdForInboxThreadId(inboxThreadId);
+      const gmailMessageId =
+        await this._driver.getGmailMessageIdForSyncMessageId(inboxMessageId);
 
       return await this._driver.getThreadIdFromMessageId(gmailMessageId);
     } else {
@@ -321,7 +319,7 @@ class InboxThreadRowView {
       .toProperty();
     let labelMod = null;
 
-    prop.onValue(labelDescriptor => {
+    prop.onValue((labelDescriptor) => {
       if (!labelDescriptor) {
         if (labelMod) {
           labelMod.remove();
@@ -351,7 +349,7 @@ class InboxThreadRowView {
               ) {
                 ((messageCountParent: any): HTMLElement).style.display = 'none';
               }
-            }
+            },
           };
 
           labelMod.draftEl.className =

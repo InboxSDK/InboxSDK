@@ -22,7 +22,7 @@ import {
   page20160816,
   page20160817,
   page20160830,
-  page20170209
+  page20170209,
 } from '../lib/pages';
 
 describe('Inbox Attachment Overlay Detection', () => {
@@ -96,7 +96,7 @@ describe('Inbox Attachment Overlay Detection', () => {
       );
       expect(liveSet.values().size).toBe(1);
       expect(
-        lsMap(liveSet, x => x.getValue())
+        lsMap(liveSet, (x) => x.getValue())
           .values()
           .has(overlay)
       ).toBe(true);

@@ -53,7 +53,7 @@ class GmailRowListView {
     this._element = rootElement;
     this._routeViewDriver = routeViewDriver;
 
-    this._selectionMutationObserver = new MutationObserver(mutations => {
+    this._selectionMutationObserver = new MutationObserver((mutations) => {
       let changed = false;
       for (let i = 0, len = mutations.length; i < len; i++) {
         const mutation = mutations[i];
@@ -86,7 +86,7 @@ class GmailRowListView {
     this._pendingExpansionsSignal = kefirBus();
     this._pendingExpansionsSignal
       .bufferBy(this._pendingExpansionsSignal.flatMap(delayAsap))
-      .filter(x => x.length > 0)
+      .filter((x) => x.length > 0)
       .takeUntilBy(this._stopper)
       .onValue(this._expandColumnJob.bind(this));
 
@@ -96,7 +96,7 @@ class GmailRowListView {
 
   destroy() {
     this._selectionMutationObserver.disconnect();
-    this._threadRowViewDrivers.forEach(threadRow => threadRow.destroy());
+    this._threadRowViewDrivers.forEach((threadRow) => threadRow.destroy());
     this._eventStreamBus.end();
     if (this._toolbarView) {
       this._toolbarView.destroy();
@@ -158,7 +158,7 @@ class GmailRowListView {
     }
     const el = find(
       document.querySelectorAll('[gh=tm]'),
-      toolbarContainerElement =>
+      (toolbarContainerElement) =>
         toolbarContainerElement.parentElement.parentElement ===
           (this._element: any).parentElement.parentElement.parentElement
             .parentElement.parentElement ||
@@ -203,7 +203,7 @@ class GmailRowListView {
     this._pendingExpansions.forEach((width, colSelector) => {
       Array.prototype.forEach.call(
         this._element.querySelectorAll('table.cf > colgroup > ' + colSelector),
-        col => {
+        (col) => {
           const currentWidth = parseInt(col.style.width, 10);
           if (isNaN(currentWidth) || currentWidth < width) {
             col.style.width = width + 'px';
@@ -235,7 +235,7 @@ class GmailRowListView {
 
     const elementStream: Kefir.Observable<ElementWithLifetime> = Kefir.merge(
       tableDivParents.map(makeElementChildStream)
-    ).flatMap(event => {
+    ).flatMap((event) => {
       this._fixColumnWidths(event.el);
       const tbody = querySelector(event.el, 'table > tbody');
 
@@ -244,18 +244,18 @@ class GmailRowListView {
       // GmailThreadRowView().
       return makeElementChildStream(tbody)
         .takeUntilBy(event.removalStream)
-        .filter(rowEvent => rowEvent.el.id);
+        .filter((rowEvent) => rowEvent.el.id);
     });
 
     const laterStream = Kefir.later(2);
 
     this._rowViewDriverStream = elementStream
-      .map(event => {
+      .map((event) => {
         const element = event.el;
         this._selectionMutationObserver.observe(element, {
           attributes: true,
           attributeFilter: ['class'],
-          attributeOldValue: true
+          attributeOldValue: true,
         });
 
         const view = new GmailThreadRowView(element, this, this._gmailDriver);
@@ -274,7 +274,7 @@ class GmailRowListView {
         });
         return view;
       })
-      .flatMap(threadRowView => {
+      .flatMap((threadRowView) => {
         if (threadRowView.getAlreadyHadModifications()) {
           // Performance hack: If the row already has old modifications on it, wait
           // a moment before we re-emit the thread row and process our new
@@ -291,7 +291,7 @@ class GmailRowListView {
       })
       .takeUntilBy(this._stopper);
 
-    this._rowViewDriverStream.onValue(x => this._addThreadRowView(x));
+    this._rowViewDriverStream.onValue((x) => this._addThreadRowView(x));
   }
 
   _addThreadRowView(gmailThreadRowView: GmailThreadRowView) {

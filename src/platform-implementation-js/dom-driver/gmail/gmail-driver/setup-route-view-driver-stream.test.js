@@ -44,7 +44,7 @@ function makeMockDriver(): Object {
     getCustomListSearchStringsToRouteIds: _.constant(new Map()),
     hashChangeNoViewChange: jest.fn(),
     showNativeRouteView: jest.fn(),
-    showCustomThreadList: jest.fn()
+    showCustomThreadList: jest.fn(),
   };
 }
 
@@ -54,7 +54,7 @@ test('role=main changes are seen', async () => {
 
   setupRouteViewDriverStream(new GmailRouteProcessor(), makeMockDriver())
     .takeUntilBy(stopper)
-    .onValue(item => {
+    .onValue((item) => {
       items.push(item);
     });
 
@@ -87,7 +87,7 @@ test('custom view hashchanges are seen', async () => {
 
   setupRouteViewDriverStream(new GmailRouteProcessor(), driver)
     .takeUntilBy(stopper)
-    .onValue(item => {
+    .onValue((item) => {
       items.push(item);
     });
 
@@ -130,7 +130,7 @@ test('native hash changes are ignored', async () => {
 
   setupRouteViewDriverStream(new GmailRouteProcessor(), driver)
     .takeUntilBy(stopper)
-    .onValue(item => {
+    .onValue((item) => {
       items.push(item);
     });
 
@@ -153,7 +153,7 @@ test('revertNativeHashChanges works', async () => {
 
   setupRouteViewDriverStream(new GmailRouteProcessor(), driver)
     .takeUntilBy(stopper)
-    .onValue(item => {
+    .onValue((item) => {
       items.push(item);
     });
 
@@ -204,7 +204,7 @@ test('revertNativeHashChanges and ?compose parameter play nicely together', asyn
 
   setupRouteViewDriverStream(new GmailRouteProcessor(), driver)
     .takeUntilBy(stopper)
-    .onValue(item => {
+    .onValue((item) => {
       items.push(item);
     });
 

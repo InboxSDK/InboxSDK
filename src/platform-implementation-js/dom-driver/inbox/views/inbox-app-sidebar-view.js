@@ -48,7 +48,7 @@ class InboxAppSidebarView {
 
     const mainParent = findParent(
       querySelector(document, '[role=application]'),
-      el => el.parentElement === document.body
+      (el) => el.parentElement === document.body
     );
     if (!mainParent) {
       const err = new Error('Failed to find main parent');
@@ -59,7 +59,7 @@ class InboxAppSidebarView {
 
     this._openOrOpeningProp = makeMutationObserverChunkedStream(this._el, {
       attributes: true,
-      attributeFilter: ['data-open', 'data-is-opening']
+      attributeFilter: ['data-open', 'data-is-opening'],
     })
       .toProperty(() => null)
       .map(
@@ -133,7 +133,7 @@ class InboxAppSidebarView {
           this._driver.getCurrentChatSidebarView().getMode() === 'SIDEBAR'
       )
       .takeUntilBy(this._stopper)
-      .onValue(event => {
+      .onValue((event) => {
         event.stopImmediatePropagation();
         this._setShouldAppSidebarOpen(false);
         this._setOpenedNow(false);
@@ -144,7 +144,7 @@ class InboxAppSidebarView {
       .getModeStream()
       .changes()
       .takeUntilBy(this._stopper)
-      .onValue(mode => {
+      .onValue((mode) => {
         if (mode === 'SIDEBAR') {
           // If the user clicks the chat button while the chat sidebar is
           // closed and the app sidebar is open, and Inbox opens the chat
@@ -183,11 +183,11 @@ class InboxAppSidebarView {
         } catch (err) {
           console.error('failed to set sidebar order data', err); //eslint-disable-line no-console
         }
-      }
+      },
     });
     let component: AppSidebar;
 
-    const _appSidebarRefSetter = threadSidebarComponent => {
+    const _appSidebarRefSetter = (threadSidebarComponent) => {
       if (threadSidebarComponent) {
         component = threadSidebarComponent;
       }
@@ -197,7 +197,7 @@ class InboxAppSidebarView {
       ReactDOM.render(
         <AppSidebar
           ref={_appSidebarRefSetter}
-          panels={orderManager.getOrderedItems().map(x => x.value)}
+          panels={orderManager.getOrderedItems().map((x) => x.value)}
           onClose={() => {
             this._setShouldAppSidebarOpen(false);
             this._setOpenedNow(false);
@@ -216,7 +216,7 @@ class InboxAppSidebarView {
     render();
 
     Kefir.fromEvents(window, 'storage')
-      .filter(e => e.key === 'inboxsdk__sidebar_ordering')
+      .filter((e) => e.key === 'inboxsdk__sidebar_ordering')
       .takeUntilBy(this._stopper)
       .onValue(() => {
         orderManager.reload();
@@ -230,7 +230,7 @@ class InboxAppSidebarView {
 
     Kefir.fromEvents((document.body: any), 'inboxsdkNewSidebarPanel')
       .takeUntilBy(this._stopper)
-      .onValue(event => {
+      .onValue((event) => {
         let id = event.detail.id;
         while (currentIds.has(id)) {
           id = incrementName(id);
@@ -248,18 +248,18 @@ class InboxAppSidebarView {
             iconClass: event.detail.iconClass,
             iconUrl: event.detail.iconUrl,
             hideTitleBar: event.detail.hideTitleBar,
-            el: event.target
-          }
+            el: event.target,
+          },
         });
         render();
       });
     Kefir.fromEvents((document.body: any), 'inboxsdkUpdateSidebarPanel')
       .takeUntilBy(this._stopper)
-      .onValue(event => {
+      .onValue((event) => {
         const orderedItems = orderManager.getOrderedItems();
         const index = findIndex(
           orderedItems,
-          x => x.value.instanceId === event.detail.instanceId
+          (x) => x.value.instanceId === event.detail.instanceId
         );
         if (index === -1)
           throw new Error('should not happen: failed to find orderItem');
@@ -271,17 +271,17 @@ class InboxAppSidebarView {
           iconClass: event.detail.iconClass,
           iconUrl: event.detail.iconUrl,
           hideTitleBar: event.detail.hideTitleBar,
-          el: event.target
+          el: event.target,
         });
         render();
       });
     Kefir.fromEvents((document.body: any), 'inboxsdkRemoveSidebarPanel')
       .takeUntilBy(this._stopper)
-      .onValue(event => {
+      .onValue((event) => {
         const orderedItems = orderManager.getOrderedItems();
         const index = findIndex(
           orderedItems,
-          x => x.value.instanceId === event.detail.instanceId
+          (x) => x.value.instanceId === event.detail.instanceId
         );
         if (index === -1)
           throw new Error('should not happen: failed to find orderItem');
@@ -294,7 +294,7 @@ class InboxAppSidebarView {
       });
     Kefir.fromEvents((document.body: any), 'inboxsdkSidebarPanelScrollIntoView')
       .takeUntilBy(this._stopper)
-      .onValue(event => {
+      .onValue((event) => {
         component.scrollPanelIntoView(event.detail.instanceId);
       });
   }
@@ -329,7 +329,7 @@ class InboxAppSidebarView {
       .takeUntilBy(
         makeMutationObserverChunkedStream(this._el, {
           attributes: true,
-          attributeFilter: ['data-open']
+          attributeFilter: ['data-open'],
         })
       )
       .onValue(() => {

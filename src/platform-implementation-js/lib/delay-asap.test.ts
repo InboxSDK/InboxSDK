@@ -7,7 +7,7 @@ function shouldNotBeCalled() {
   throw new Error('Should not be called');
 }
 
-it('should work in simple case', done => {
+it('should work in simple case', (done) => {
   let tooLate = false;
   setTimeout(() => {
     tooLate = true;
@@ -16,7 +16,7 @@ it('should work in simple case', done => {
   let calls = 0;
   Kefir.constant(shouldNotBeCalled)
     .flatMap(delayAsap)
-    .onAny(event => {
+    .onAny((event) => {
       switch (++calls) {
         case 1:
           expect(tooEarly).toBe(false);
@@ -39,13 +39,13 @@ it('should work in simple case', done => {
   tooEarly = false;
 });
 
-it('works with bufferBy', done => {
+it('works with bufferBy', (done) => {
   const emitter = kefirBus();
   let step = 0;
   emitter
     .bufferBy(emitter.flatMap(() => delayAsap(null)))
-    .filter(x => x.length > 0)
-    .onValue(x => {
+    .filter((x) => x.length > 0)
+    .onValue((x) => {
       switch (step) {
         case 1:
           expect(x).toEqual([5, 6]);

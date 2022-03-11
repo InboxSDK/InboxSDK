@@ -31,7 +31,7 @@ export default class MockElementParent extends EventEmitter {
     }
     this.emit('mutation', {
       addedNodes: toAdd,
-      removedNodes: presentTargets
+      removedNodes: presentTargets,
     });
   }
 

@@ -18,56 +18,58 @@ import get from '../../../../../common/get-or-fail';
 
 const memberMap = defonce(module, () => new Map());
 
-export default defn(module, function manageButtonGrouping(
-  gmailComposeView: GmailComposeView
-) {
-  if (
+export default defn(
+  module,
+  function manageButtonGrouping(gmailComposeView: GmailComposeView) {
+    if (
+      gmailComposeView
+        .getElement()
+        .getAttribute('data-button-grouping-managed') === 'true'
+    ) {
+      return;
+    }
+
+    var members = {};
+    memberMap.set(gmailComposeView, members);
+
     gmailComposeView
       .getElement()
-      .getAttribute('data-button-grouping-managed') === 'true'
-  ) {
-    return;
+      .setAttribute('data-button-grouping-managed', 'true');
+
+    gmailComposeView
+      .getEventStream()
+      .filter((event) => event.eventName === 'fullscreenChanged')
+      .debounce(10)
+      .onValue(() => {
+        _handleComposeFullscreenStateChanged(gmailComposeView);
+      });
+
+    gmailComposeView
+      .getEventStream()
+      .filter(function (event) {
+        return event.eventName === 'buttonAdded';
+      })
+      .onValue(() => {
+        _handleButtonAdded(gmailComposeView);
+      });
+
+    gmailComposeView
+      .getEventStream()
+      .filter(
+        (event) =>
+          event.eventName === 'resize' || event.eventName === 'restored'
+      )
+      .onValue(() => {
+        _handleButtonAdded(gmailComposeView);
+      });
+
+    var el = gmailComposeView.getElement();
+    gmailComposeView.getStopper().onValue(function () {
+      memberMap.delete(gmailComposeView);
+      el.setAttribute('data-button-grouping-managed', 'false');
+    });
   }
-
-  var members = {};
-  memberMap.set(gmailComposeView, members);
-
-  gmailComposeView
-    .getElement()
-    .setAttribute('data-button-grouping-managed', 'true');
-
-  gmailComposeView
-    .getEventStream()
-    .filter(event => event.eventName === 'fullscreenChanged')
-    .debounce(10)
-    .onValue(() => {
-      _handleComposeFullscreenStateChanged(gmailComposeView);
-    });
-
-  gmailComposeView
-    .getEventStream()
-    .filter(function(event) {
-      return event.eventName === 'buttonAdded';
-    })
-    .onValue(() => {
-      _handleButtonAdded(gmailComposeView);
-    });
-
-  gmailComposeView
-    .getEventStream()
-    .filter(
-      event => event.eventName === 'resize' || event.eventName === 'restored'
-    )
-    .onValue(() => {
-      _handleButtonAdded(gmailComposeView);
-    });
-
-  var el = gmailComposeView.getElement();
-  gmailComposeView.getStopper().onValue(function() {
-    memberMap.delete(gmailComposeView);
-    el.setAttribute('data-button-grouping-managed', 'false');
-  });
-});
+);
 
 function _handleComposeFullscreenStateChanged(gmailComposeView) {
   if (
@@ -123,12 +125,10 @@ function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView) {
     _narrowButtonsIfNeeded(gmailComposeView);
 
     if (_doButtonsNeedToGroup(gmailComposeView)) {
-      var groupedActionToolbarContainer = _createGroupedActionToolbarContainer(
-        gmailComposeView
-      );
-      var groupToggleButtonViewController = _createGroupToggleButtonViewController(
-        gmailComposeView
-      );
+      var groupedActionToolbarContainer =
+        _createGroupedActionToolbarContainer(gmailComposeView);
+      var groupToggleButtonViewController =
+        _createGroupToggleButtonViewController(gmailComposeView);
 
       _swapToActionToolbar(gmailComposeView, groupToggleButtonViewController);
       _checkAndSetInitialState(
@@ -148,7 +148,7 @@ function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView) {
       // see if we should narrow buttons again
       _narrowButtonsIfNeeded(gmailComposeView);
 
-      gmailComposeView.getStopper().onValue(function() {
+      gmailComposeView.getStopper().onValue(function () {
         (groupedActionToolbarContainer: any).remove();
         groupToggleButtonViewController.destroy();
       });
@@ -208,19 +208,16 @@ function _getBottomBarTableWidth(gmailComposeView: GmailComposeView): number {
 function _createGroupedActionToolbarContainer(
   gmailComposeView: GmailComposeView
 ): HTMLElement {
-  var groupedActionToolbarContainer: HTMLElement = document.createElement(
-    'div'
-  );
+  var groupedActionToolbarContainer: HTMLElement =
+    document.createElement('div');
   groupedActionToolbarContainer.classList.add(
     'inboxsdk__compose_groupedActionToolbar'
   );
   groupedActionToolbarContainer.innerHTML =
     '<div class="inboxsdk__compose_groupedActionToolbar_arrow"> </div>';
 
-  get(
-    memberMap,
-    gmailComposeView
-  ).groupedActionToolbarContainer = groupedActionToolbarContainer;
+  get(memberMap, gmailComposeView).groupedActionToolbarContainer =
+    groupedActionToolbarContainer;
 
   groupedActionToolbarContainer.style.display = 'none';
 
@@ -236,7 +233,7 @@ function _createGroupToggleButtonViewController(
 
   var buttonViewController = new BasicButtonViewController({
     buttonView: buttonView,
-    activateFunction: function() {
+    activateFunction: function () {
       _toggleGroupButtonToolbar(gmailComposeView, buttonViewController);
 
       if (_isToggleExpanded()) {
@@ -246,12 +243,12 @@ function _createGroupToggleButtonViewController(
           )[0]
           .focus();
       }
-    }
+    },
   });
 
   members.groupedActionToolbarContainer.addEventListener(
     'keydown',
-    (function(event) {
+    (function (event) {
       if (event.which === 27) {
         //escape
         buttonViewController.activate();
@@ -264,10 +261,8 @@ function _createGroupToggleButtonViewController(
     }: any)
   );
 
-  get(
-    memberMap,
-    gmailComposeView
-  ).groupedToolbarButtonViewController = buttonViewController;
+  get(memberMap, gmailComposeView).groupedToolbarButtonViewController =
+    buttonViewController;
 
   return buttonViewController;
 }
@@ -276,7 +271,7 @@ function _createGroupToggleButtonView() {
   var buttonView = new GmailComposeButtonView({
     tooltip: 'More Tools',
     iconUrl:
-      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAEJGlDQ1BJQ0MgUHJvZmlsZQAAOBGFVd9v21QUPolvUqQWPyBYR4eKxa9VU1u5GxqtxgZJk6XtShal6dgqJOQ6N4mpGwfb6baqT3uBNwb8AUDZAw9IPCENBmJ72fbAtElThyqqSUh76MQPISbtBVXhu3ZiJ1PEXPX6yznfOec7517bRD1fabWaGVWIlquunc8klZOnFpSeTYrSs9RLA9Sr6U4tkcvNEi7BFffO6+EdigjL7ZHu/k72I796i9zRiSJPwG4VHX0Z+AxRzNRrtksUvwf7+Gm3BtzzHPDTNgQCqwKXfZwSeNHHJz1OIT8JjtAq6xWtCLwGPLzYZi+3YV8DGMiT4VVuG7oiZpGzrZJhcs/hL49xtzH/Dy6bdfTsXYNY+5yluWO4D4neK/ZUvok/17X0HPBLsF+vuUlhfwX4j/rSfAJ4H1H0qZJ9dN7nR19frRTeBt4Fe9FwpwtN+2p1MXscGLHR9SXrmMgjONd1ZxKzpBeA71b4tNhj6JGoyFNp4GHgwUp9qplfmnFW5oTdy7NamcwCI49kv6fN5IAHgD+0rbyoBc3SOjczohbyS1drbq6pQdqumllRC/0ymTtej8gpbbuVwpQfyw66dqEZyxZKxtHpJn+tZnpnEdrYBbueF9qQn93S7HQGGHnYP7w6L+YGHNtd1FJitqPAR+hERCNOFi1i1alKO6RQnjKUxL1GNjwlMsiEhcPLYTEiT9ISbN15OY/jx4SMshe9LaJRpTvHr3C/ybFYP1PZAfwfYrPsMBtnE6SwN9ib7AhLwTrBDgUKcm06FSrTfSj187xPdVQWOk5Q8vxAfSiIUc7Z7xr6zY/+hpqwSyv0I0/QMTRb7RMgBxNodTfSPqdraz/sDjzKBrv4zu2+a2t0/HHzjd2Lbcc2sG7GtsL42K+xLfxtUgI7YHqKlqHK8HbCCXgjHT1cAdMlDetv4FnQ2lLasaOl6vmB0CMmwT/IPszSueHQqv6i/qluqF+oF9TfO2qEGTumJH0qfSv9KH0nfS/9TIp0Wboi/SRdlb6RLgU5u++9nyXYe69fYRPdil1o1WufNSdTTsp75BfllPy8/LI8G7AUuV8ek6fkvfDsCfbNDP0dvRh0CrNqTbV7LfEEGDQPJQadBtfGVMWEq3QWWdufk6ZSNsjG2PQjp3ZcnOWWing6noonSInvi0/Ex+IzAreevPhe+CawpgP1/pMTMDo64G0sTCXIM+KdOnFWRfQKdJvQzV1+Bt8OokmrdtY2yhVX2a+qrykJfMq4Ml3VR4cVzTQVz+UoNne4vcKLoyS+gyKO6EHe+75Fdt0Mbe5bRIf/wjvrVmhbqBN97RD1vxrahvBOfOYzoosH9bq94uejSOQGkVM6sN/7HelL4t10t9F4gPdVzydEOx83Gv+uNxo7XyL/FtFl8z9ZAHF4bBsrEwAAADxJREFUOBFjYKASYISa8x/NPJLFmdAMIJs7+Awi2ys000hy7EBdghHLgy+wqeYimgU+2QaPxhrZQUe6RgBYwgkWqJftAwAAAABJRU5ErkJggg=='
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAEJGlDQ1BJQ0MgUHJvZmlsZQAAOBGFVd9v21QUPolvUqQWPyBYR4eKxa9VU1u5GxqtxgZJk6XtShal6dgqJOQ6N4mpGwfb6baqT3uBNwb8AUDZAw9IPCENBmJ72fbAtElThyqqSUh76MQPISbtBVXhu3ZiJ1PEXPX6yznfOec7517bRD1fabWaGVWIlquunc8klZOnFpSeTYrSs9RLA9Sr6U4tkcvNEi7BFffO6+EdigjL7ZHu/k72I796i9zRiSJPwG4VHX0Z+AxRzNRrtksUvwf7+Gm3BtzzHPDTNgQCqwKXfZwSeNHHJz1OIT8JjtAq6xWtCLwGPLzYZi+3YV8DGMiT4VVuG7oiZpGzrZJhcs/hL49xtzH/Dy6bdfTsXYNY+5yluWO4D4neK/ZUvok/17X0HPBLsF+vuUlhfwX4j/rSfAJ4H1H0qZJ9dN7nR19frRTeBt4Fe9FwpwtN+2p1MXscGLHR9SXrmMgjONd1ZxKzpBeA71b4tNhj6JGoyFNp4GHgwUp9qplfmnFW5oTdy7NamcwCI49kv6fN5IAHgD+0rbyoBc3SOjczohbyS1drbq6pQdqumllRC/0ymTtej8gpbbuVwpQfyw66dqEZyxZKxtHpJn+tZnpnEdrYBbueF9qQn93S7HQGGHnYP7w6L+YGHNtd1FJitqPAR+hERCNOFi1i1alKO6RQnjKUxL1GNjwlMsiEhcPLYTEiT9ISbN15OY/jx4SMshe9LaJRpTvHr3C/ybFYP1PZAfwfYrPsMBtnE6SwN9ib7AhLwTrBDgUKcm06FSrTfSj187xPdVQWOk5Q8vxAfSiIUc7Z7xr6zY/+hpqwSyv0I0/QMTRb7RMgBxNodTfSPqdraz/sDjzKBrv4zu2+a2t0/HHzjd2Lbcc2sG7GtsL42K+xLfxtUgI7YHqKlqHK8HbCCXgjHT1cAdMlDetv4FnQ2lLasaOl6vmB0CMmwT/IPszSueHQqv6i/qluqF+oF9TfO2qEGTumJH0qfSv9KH0nfS/9TIp0Wboi/SRdlb6RLgU5u++9nyXYe69fYRPdil1o1WufNSdTTsp75BfllPy8/LI8G7AUuV8ek6fkvfDsCfbNDP0dvRh0CrNqTbV7LfEEGDQPJQadBtfGVMWEq3QWWdufk6ZSNsjG2PQjp3ZcnOWWing6noonSInvi0/Ex+IzAreevPhe+CawpgP1/pMTMDo64G0sTCXIM+KdOnFWRfQKdJvQzV1+Bt8OokmrdtY2yhVX2a+qrykJfMq4Ml3VR4cVzTQVz+UoNne4vcKLoyS+gyKO6EHe+75Fdt0Mbe5bRIf/wjvrVmhbqBN97RD1vxrahvBOfOYzoosH9bq94uejSOQGkVM6sN/7HelL4t10t9F4gPdVzydEOx83Gv+uNxo7XyL/FtFl8z9ZAHF4bBsrEwAAADxJREFUOBFjYKASYISa8x/NPJLFmdAMIJs7+Awi2ys000hy7EBdghHLgy+wqeYimgU+2QaPxhrZQUe6RgBYwgkWqJftAwAAAABJRU5ErkJggg==',
   });
 
   buttonView.addClass('inboxsdk__compose_groupedActionButton');
@@ -290,7 +285,8 @@ function _swapToActionToolbar(gmailComposeView, buttonViewController) {
     gmailComposeView.getElement(),
     '.inboxsdk__compose_actionToolbar > div'
   );
-  const actionToolbarContainer: HTMLElement = (actionToolbar.parentElement: any);
+  const actionToolbarContainer: HTMLElement =
+    (actionToolbar.parentElement: any);
 
   const newActionToolbar = document.createElement('div');
   newActionToolbar.appendChild(buttonViewController.getView().getElement());
@@ -488,8 +484,8 @@ function _positionGroupToolbar(gmailComposeView) {
     const heElements = gmailComposeView.getElement().querySelectorAll('td.HE');
     Logger.error(new Error('bottom toolbar had bad height'), {
       bottomToolbarHeight,
-      heElementHeights: Array.from(heElements).map(el => el.clientHeight),
-      heElementsHTML: Array.from(heElements).map(censorHTMLtree)
+      heElementHeights: Array.from(heElements).map((el) => el.clientHeight),
+      heElementsHTML: Array.from(heElements).map(censorHTMLtree),
     });
   }
 }
@@ -498,13 +494,13 @@ function _startMonitoringFormattingToolbar(
   gmailComposeView,
   groupToggleButtonViewController
 ) {
-  waitFor(function() {
+  waitFor(function () {
     if (gmailComposeView.isDestroyed()) throw 'skip';
 
     return gmailComposeView.getFormattingToolbar();
   })
-    .then(formattingToolbar => {
-      const mutationObserver = new MutationObserver(function(mutations) {
+    .then((formattingToolbar) => {
+      const mutationObserver = new MutationObserver(function (mutations) {
         const target = mutations[0].target;
         if (
           target instanceof HTMLElement &&
@@ -518,19 +514,17 @@ function _startMonitoringFormattingToolbar(
 
       mutationObserver.observe(formattingToolbar, {
         attributes: true,
-        attributeFilter: ['style']
+        attributeFilter: ['style'],
       });
 
-      get(
-        memberMap,
-        gmailComposeView
-      ).formattingToolbarMutationObserver = mutationObserver;
+      get(memberMap, gmailComposeView).formattingToolbarMutationObserver =
+        mutationObserver;
 
       gmailComposeView
         .getStopper()
         .onValue(() => mutationObserver.disconnect());
     })
-    .catch(err => {
+    .catch((err) => {
       if (err !== 'skip') {
         Logger.error(err);
         throw err;

@@ -10,7 +10,7 @@ export default function getAddressInformationExtractor(
   addressType: string,
   composeView: GmailComposeView
 ): (node: HTMLElement) => Contact | null {
-  return function(node: HTMLElement): Contact | null {
+  return function (node: HTMLElement): Contact | null {
     const contactNode =
       node instanceof HTMLInputElement &&
       node.getAttribute('name') === addressType
@@ -29,7 +29,7 @@ export default function getAddressInformationExtractor(
     } else {
       Logger.error(new Error(`contactNode can't be found`), {
         addressType,
-        composeViewHtml: censorHTMLstring(composeView.getElement().outerHTML)
+        composeViewHtml: censorHTMLstring(composeView.getElement().outerHTML),
       });
 
       return null;

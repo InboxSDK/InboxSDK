@@ -3,9 +3,11 @@
 type InjectedMutationEvent = {
   attributeName?: ?string,
   addedNodes?: HTMLElement[] | HTMLCollection<HTMLElement>,
-  removedNodes?: HTMLElement[] | HTMLCollection<HTMLElement>
+  removedNodes?: HTMLElement[] | HTMLCollection<HTMLElement>,
 };
 
 // This function takes a MockElementParent and returns a function for making it emit mutation
 // events.
-declare export default function makeMutationEventInjector(el: HTMLElement): InjectedMutationEvent => void;
+declare export default function makeMutationEventInjector(
+  el: HTMLElement
+): (InjectedMutationEvent) => void;

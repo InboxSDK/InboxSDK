@@ -38,7 +38,7 @@ export default function addTooltipToButton(
   gmailComposeView
     .getEventStream()
     .filter(
-      event =>
+      (event) =>
         event.eventName === 'buttonAdded' ||
         event.eventName === 'fullscreenChanged'
     )
@@ -63,14 +63,13 @@ export default function addTooltipToButton(
     .getView()
     .getEventStream()
     .takeUntilBy(tooltipStopperStream)
-    .filter(function(event) {
+    .filter(function (event) {
       return event.eventName === 'click';
     })
     .onValue(gmailTooltipView.destroy.bind(gmailTooltipView));
 
-  var stoppedIntervalStream = Kefir.interval(50).takeUntilBy(
-    tooltipStopperStream
-  );
+  var stoppedIntervalStream =
+    Kefir.interval(50).takeUntilBy(tooltipStopperStream);
 
   var left = 0;
   var top = 0;
@@ -80,13 +79,10 @@ export default function addTooltipToButton(
       () => !!buttonViewController.getView() && !!gmailTooltipView.getElement()
     )
     .map(() =>
-      buttonViewController
-        .getView()
-        .getElement()
-        .getBoundingClientRect()
+      buttonViewController.getView().getElement().getBoundingClientRect()
     )
-    .filter(rect => rect.left !== left || rect.top !== top)
-    .map(rect => {
+    .filter((rect) => rect.left !== left || rect.top !== top)
+    .map((rect) => {
       left = rect.left;
       top = rect.top;
       return rect;
@@ -118,9 +114,9 @@ function _anchorTooltip(
 ) {
   try {
     gmailComposeView.ensureGroupingIsOpen(buttonDescriptor.type);
-    setTimeout(function() {
+    setTimeout(function () {
       gmailTooltipView.anchor(buttonViewController.getView().getElement(), {
-        position: 'top'
+        position: 'top',
       });
     }, 10);
   } catch (err) {

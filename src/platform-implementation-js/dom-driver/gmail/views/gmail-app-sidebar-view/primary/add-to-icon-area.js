@@ -13,7 +13,7 @@ function addToIconArea(
   iconArea: HTMLElement
 ) {
   //first set icon order hints
-  [...iconArea.querySelectorAll('[data-app-name]')].forEach(el => {
+  [...iconArea.querySelectorAll('[data-app-name]')].forEach((el) => {
     const elAppName = el.getAttribute('data-app-name');
     const index = findIndex(
       orderManager.getOrderedItems(),

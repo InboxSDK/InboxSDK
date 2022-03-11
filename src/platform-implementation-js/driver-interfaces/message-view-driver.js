@@ -11,7 +11,7 @@ export type MessageViewLinkDescriptor = {
   html: string,
   element: HTMLElement,
   href: string,
-  isInQuotedArea: boolean
+  isInQuotedArea: boolean,
 };
 
 export type MessageViewToolbarButtonDescriptor = {
@@ -20,7 +20,7 @@ export type MessageViewToolbarButtonDescriptor = {
   iconUrl?: ?string,
   iconClass?: ?string,
   onClick(): void,
-  orderHint?: ?number
+  orderHint?: ?number,
 };
 
 export type AttachmentIcon = SafeEventEmitter & {};
@@ -45,5 +45,5 @@ export type MessageViewDriver = {
   getRecipientsFull(): Promise<Array<Contact>>,
   getThreadViewDriver(): Object,
   isLoaded(): boolean,
-  hasOpenReply(): boolean
+  hasOpenReply(): boolean,
 };

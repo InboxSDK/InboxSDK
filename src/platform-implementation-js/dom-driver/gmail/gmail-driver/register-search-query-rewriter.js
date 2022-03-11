@@ -9,13 +9,13 @@ export default function registerSearchQueryRewriter(
   pageCommunicator.createCustomSearchTerm(obj.term);
 
   pageCommunicator.ajaxInterceptStream
-    .filter(event => {
+    .filter((event) => {
       return (
         event.type === 'searchQueryForReplacement' && event.term === obj.term
       );
     })
-    .onValue(event => {
-      Promise.resolve(obj.termReplacer({})).then(result => {
+    .onValue((event) => {
+      Promise.resolve(obj.termReplacer({})).then((result) => {
         if (typeof result != 'string') {
           throw new Error('termReplacer response must be a string');
         }

@@ -30,7 +30,7 @@ export default async function getSyncThreadForOldGmailThreadId(
     );
     driver.getLogger().error(err, {
       oldGmailThreadId: isStreak ? oldGmailThreadId : null,
-      responseText: isStreak ? _text : null
+      responseText: isStreak ? _text : null,
     });
     throw err;
   }

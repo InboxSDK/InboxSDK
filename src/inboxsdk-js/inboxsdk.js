@@ -13,14 +13,14 @@ export function load(version: any, appId: string, opts: ?Object) {
   opts = Object.assign(
     {
       // defaults
-      globalErrorLogging: true
+      globalErrorLogging: true,
     },
     opts,
     {
       // stuff that can't be overridden, such as extra stuff this file passes to
       // the implementation script.
       VERSION: LOADER_VERSION,
-      REQUESTED_API_VERSION: version
+      REQUESTED_API_VERSION: version,
     }
   );
 

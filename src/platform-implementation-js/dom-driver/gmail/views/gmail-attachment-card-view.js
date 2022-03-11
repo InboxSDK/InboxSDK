@@ -101,18 +101,18 @@ class GmailAttachmentCardView {
   addButton(options: Object) {
     var buttonView = new ButtonView({
       iconUrl: options.iconUrl,
-      tooltip: options.tooltip
+      tooltip: options.tooltip,
     });
 
     var basicButtonViewController = new BasicButtonViewController({
       activateFunction: () => {
         if (options.onClick) {
           options.onClick({
-            getDownloadURL: () => this.getDownloadURL()
+            getDownloadURL: () => this.getDownloadURL(),
           });
         }
       },
-      buttonView: buttonView
+      buttonView: buttonView,
     });
 
     this._addButton(buttonView);
@@ -162,7 +162,7 @@ class GmailAttachmentCardView {
           console.error('getDownloadURL returned unexpected url', finalUrl); //eslint-disable-line
           const err = new Error('getDownloadURL returned unexpected url');
           this._driver.getLogger().error(err, {
-            finalUrlCensored: finalUrl.replace(/\?[^/]+$/, '?[...]')
+            finalUrlCensored: finalUrl.replace(/\?[^/]+$/, '?[...]'),
           });
           if (/^https:\/\/mail\.google\.com\//.test(finalUrl)) {
             // This URL definitely isn't right: these URLs generally require
@@ -204,7 +204,7 @@ class GmailAttachmentCardView {
 					<div class="aVY aZn">
 						<div class="aZm"></div>
 					</div>
-					<div class="aSH">`
+					<div class="aSH">`,
     ];
 
     if (options.iconThumbnailUrl) {
@@ -212,13 +212,13 @@ class GmailAttachmentCardView {
         autoHtml`
 				<div class="aYv">
 					<img class="aZG aYw" src="${options.iconThumbnailUrl}">
-				</div>`
+				</div>`,
       ]);
     } else {
       htmlArray = htmlArray.concat([
         autoHtml`
 				<img class="aQG aYB inboxsdk__attachmentCard_previewThumbnailUrl"
-					src="${options.previewThumbnailUrl}">`
+					src="${options.previewThumbnailUrl}">`,
       ]);
     }
 
@@ -245,7 +245,7 @@ class GmailAttachmentCardView {
 		</div>
 	</div>
 </a>
-<div class="aQw"></div>`
+<div class="aQw"></div>`,
     ]);
 
     this._element.innerHTML = htmlArray.join('');
@@ -265,7 +265,7 @@ class GmailAttachmentCardView {
     this._addHoverEvents();
 
     if (options.buttons) {
-      const downloadButton = find(options.buttons, function(button) {
+      const downloadButton = find(options.buttons, function (button) {
         return button.downloadUrl;
       });
 
@@ -279,8 +279,8 @@ class GmailAttachmentCardView {
     var self = this;
     // :any to work around https://github.com/facebook/flow/issues/1155
     this._previewClicks.plug(
-      Kefir.fromEvents(this._element, 'click').map(event => ({
-        preventDefault: () => event.preventDefault()
+      Kefir.fromEvents(this._element, 'click').map((event) => ({
+        preventDefault: () => event.preventDefault(),
       }))
     );
 
@@ -289,7 +289,7 @@ class GmailAttachmentCardView {
         this._element,
         '.inboxsdk__attachmentCard_previewThumbnailUrl'
       );
-      previewThumbnailUrlImage.onerror = e => {
+      previewThumbnailUrlImage.onerror = (e) => {
         var iconDiv = document.createElement('div');
         iconDiv.classList.add('aYv');
         iconDiv.innerHTML =
@@ -309,14 +309,14 @@ class GmailAttachmentCardView {
   _addHoverEvents() {
     Kefir.merge([
       Kefir.fromEvents(this._element, 'mouseenter'),
-      fromEventTargetCapture(this._element, 'focus')
+      fromEventTargetCapture(this._element, 'focus'),
     ]).onValue(() => {
       this._element.classList.add('aZp');
     });
 
     Kefir.merge([
       Kefir.fromEvents(this._element, 'mouseleave'),
-      fromEventTargetCapture(this._element, 'blur')
+      fromEventTargetCapture(this._element, 'blur'),
     ]).onValue(() => {
       this._element.classList.remove('aZp');
     });
@@ -333,7 +333,7 @@ class GmailAttachmentCardView {
   _addDownloadButton(options: Object) {
     const buttonView = new ButtonView({
       tooltip: 'Download',
-      iconClass: 'aSK J-J5-Ji aYr'
+      iconClass: 'aSK J-J5-Ji aYr',
     });
 
     buttonView
@@ -341,14 +341,14 @@ class GmailAttachmentCardView {
       .setAttribute('data-inboxsdk-download-url', options.downloadUrl);
 
     const basicButtonViewController = new BasicButtonViewController({
-      activateFunction: function() {
+      activateFunction: function () {
         let prevented = false;
 
         if (options.onClick) {
           options.onClick({
-            preventDefault: function() {
+            preventDefault: function () {
               prevented = true;
-            }
+            },
           });
         }
 
@@ -364,7 +364,7 @@ class GmailAttachmentCardView {
 
         downloadLink.addEventListener(
           'click',
-          function(e: MouseEvent) {
+          function (e: MouseEvent) {
             e.stopPropagation();
           },
           true
@@ -379,7 +379,7 @@ class GmailAttachmentCardView {
         simulateClick(downloadLink);
         downloadLink.remove();
       },
-      buttonView: buttonView
+      buttonView: buttonView,
     });
 
     this._addButton(buttonView);
@@ -387,10 +387,10 @@ class GmailAttachmentCardView {
 
   _addMoreButtons(buttonDescriptors: ?(Object[])) {
     (buttonDescriptors || [])
-      .filter(function(buttonDescriptor) {
+      .filter(function (buttonDescriptor) {
         return !buttonDescriptor.downloadUrl;
       })
-      .forEach(desc => {
+      .forEach((desc) => {
         this.addButton(desc);
       });
   }

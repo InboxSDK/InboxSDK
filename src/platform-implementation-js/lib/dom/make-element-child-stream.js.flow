@@ -4,7 +4,7 @@ import Kefir from 'kefir';
 
 export type ItemWithLifetime<T> = {
   el: T,
-  removalStream: Kefir.Observable<null>
+  removalStream: Kefir.Observable<null>,
 };
 export type ElementWithLifetime = ItemWithLifetime<HTMLElement>;
 

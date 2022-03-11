@@ -40,7 +40,7 @@ class ContentPanelViewDriver {
 
     this._eventStream.plug(
       Kefir.fromEvents((document.body: any), 'inboxsdkSidebarPanelActivated')
-        .filter(e => e.detail.instanceId === this._instanceId)
+        .filter((e) => e.detail.instanceId === this._instanceId)
         .map(() => {
           this._isActive = true;
           return { eventName: 'activate' };
@@ -48,7 +48,7 @@ class ContentPanelViewDriver {
     );
     this._eventStream.plug(
       Kefir.fromEvents((document.body: any), 'inboxsdkSidebarPanelDeactivated')
-        .filter(e => e.detail.instanceId === this._instanceId)
+        .filter((e) => e.detail.instanceId === this._instanceId)
         .map(() => {
           this._isActive = false;
           return { eventName: 'deactivate' };
@@ -69,9 +69,9 @@ class ContentPanelViewDriver {
     );
 
     descriptor
-      .flatMap(x => afterAsap.map(() => x))
+      .flatMap((x) => afterAsap.map(() => x))
       .takeUntilBy(this._stopper)
-      .onValue(descriptor => {
+      .onValue((descriptor) => {
         const {
           el,
           iconUrl,
@@ -82,7 +82,7 @@ class ContentPanelViewDriver {
           hideTitleBar,
           appIconUrl,
           primaryColor,
-          secondaryColor
+          secondaryColor,
         } = descriptor;
         appName =
           descriptor.appName || driver.getOpts().appName || descriptor.title;
@@ -114,8 +114,8 @@ class ContentPanelViewDriver {
               secondaryColor:
                 secondaryColor || this._driver.getOpts().secondaryColor,
               sidebarId: this._sidebarId,
-              title
-            }
+              title,
+            },
           })
         );
       });
@@ -129,8 +129,8 @@ class ContentPanelViewDriver {
           detail: {
             appName,
             sidebarId: this._sidebarId,
-            instanceId: this._instanceId
-          }
+            instanceId: this._instanceId,
+          },
         })
       );
     });
@@ -151,8 +151,8 @@ class ContentPanelViewDriver {
         cancelable: false,
         detail: {
           instanceId: this._instanceId,
-          sidebarId: this._sidebarId
-        }
+          sidebarId: this._sidebarId,
+        },
       })
     );
   }
@@ -165,8 +165,8 @@ class ContentPanelViewDriver {
         detail: {
           instanceId: this._instanceId,
           isGlobal: this._isGlobal,
-          sidebarId: this._sidebarId
-        }
+          sidebarId: this._sidebarId,
+        },
       })
     );
   }
@@ -179,8 +179,8 @@ class ContentPanelViewDriver {
         detail: {
           instanceId: this._instanceId,
           isGlobal: this._isGlobal,
-          sidebarId: this._sidebarId
-        }
+          sidebarId: this._sidebarId,
+        },
       })
     );
   }

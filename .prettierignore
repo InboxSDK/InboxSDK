@@ -7,5 +7,3 @@
 *.snap
 /packages/core/inboxsdk.js*
 /packages/core/pageWorld.js*
-/src/platform-implementation-js/dom-driver/gmail/views/gmail-compose-view/setupLinkPopovers.ts
-/src/platform-implementation-js/lib/toItemWithLifetimeStream.d.ts

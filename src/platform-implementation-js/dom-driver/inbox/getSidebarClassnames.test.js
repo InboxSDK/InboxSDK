@@ -69,6 +69,6 @@ test('works', () => {
   expect(getSidebarClassnames()).toEqual({
     chat: 'm',
     nav: 'M',
-    centerList: 'bz'
+    centerList: 'bz',
   });
 });

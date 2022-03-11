@@ -27,21 +27,21 @@ export default function setupRouteViewDriverStream(
   return Kefir.merge([
     Kefir.merge([
       Kefir.fromEvents(document, 'inboxSDKpushState'),
-      Kefir.fromEvents(window, 'popstate')
+      Kefir.fromEvents(window, 'popstate'),
     ]).map(
-      e =>
+      (e) =>
         (process.env.NODE_ENV === 'test' && e.detail && e.detail.__test_url) ||
         document.location.href
     ),
     Kefir.fromEvents(window, 'hashchange')
-      .map(e => e.newURL)
+      .map((e) => e.newURL)
       // When the user hits back and leaves a hash URL, a hashchange *and*
       // popstate events are emitted. Let's just process the popstate event
       // alone.
-      .filter(href => /#/.test(href))
+      .filter((href) => /#/.test(href)),
   ])
     .toProperty(() => document.location.href)
-    .map(href => {
+    .map((href) => {
       const m = /#([^?]*)/.exec(href);
       if (!m) return { type: 'NATIVE' };
       const hash = m[1];
@@ -53,7 +53,7 @@ export default function setupRouteViewDriverStream(
       }
       return { type: 'OTHER_APP_CUSTOM' };
     })
-    .map(detail => {
+    .map((detail) => {
       if (detail.type === 'CUSTOM') {
         return new InboxCustomRouteView(detail.routeID, detail.hash);
       } else if (detail.type === 'NATIVE') {
@@ -66,7 +66,7 @@ export default function setupRouteViewDriverStream(
         return new InboxDummyRouteView('UNKNOWN');
       }
     })
-    .map(routeView => {
+    .map((routeView) => {
       if (lastRouteView) {
         lastRouteView.destroy();
       }

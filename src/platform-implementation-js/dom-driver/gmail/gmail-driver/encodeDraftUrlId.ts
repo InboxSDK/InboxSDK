@@ -9,8 +9,6 @@ export default function encodeDraftUrlId(
   syncMessageId: string
 ): string {
   const raw = `${syncThreadId.replace(/^thread-/, '')}+${syncMessageId}`;
-  const b64 = Buffer.from(raw)
-    .toString('base64')
-    .replace(/=/g, '');
+  const b64 = Buffer.from(raw).toString('base64').replace(/=/g, '');
   return convertBase(b64, B64_ALPHABET, GMAIL_ALPHABET);
 }

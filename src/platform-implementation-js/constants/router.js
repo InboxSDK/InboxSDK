@@ -20,7 +20,7 @@ export const NATIVE_ROUTE_IDS: { [k: string]: string } = Object.freeze({
   CONTACTS: 'contacts/:page',
   CONTACT: 'contacts/:contactID',
   SETTINGS: 'settings/:section',
-  ANY_LIST: '*'
+  ANY_LIST: '*',
 });
 
 export const NATIVE_LIST_ROUTE_IDS: { [k: string]: string } = Object.freeze({
@@ -37,7 +37,7 @@ export const NATIVE_LIST_ROUTE_IDS: { [k: string]: string } = Object.freeze({
   SPAM: NATIVE_ROUTE_IDS.SPAM,
   IMPORTANT: NATIVE_ROUTE_IDS.IMPORTANT,
   SEARCH: NATIVE_ROUTE_IDS.SEARCH,
-  ANY_LIST: NATIVE_ROUTE_IDS.ANY_LIST
+  ANY_LIST: NATIVE_ROUTE_IDS.ANY_LIST,
 });
 
 export const ROUTE_TYPES: { [k: string]: string } = Object.freeze({
@@ -46,5 +46,5 @@ export const ROUTE_TYPES: { [k: string]: string } = Object.freeze({
   SETTINGS: 'SETTINGS',
   CHAT: 'CHAT',
   CUSTOM: 'CUSTOM',
-  UNKNOWN: 'UNKNOWN'
+  UNKNOWN: 'UNKNOWN',
 });

@@ -12,48 +12,49 @@ const extId = '' + Math.random();
 const Z_SPACE_CHAR = '\u200b';
 const X_URL = 'https://ssl.gstatic.com/ui/v1/icons/common/x_8px.png';
 
-const handleComposeLinkChips = defn(module, function(
-  composeView: ComposeViewDriver
-) {
-  // Abort if we're missing elements we'll need.
-  try {
-    composeView.getBodyElement();
-  } catch (err) {
-    return;
-  }
+const handleComposeLinkChips = defn(
+  module,
+  function (composeView: ComposeViewDriver) {
+    // Abort if we're missing elements we'll need.
+    try {
+      composeView.getBodyElement();
+    } catch (err) {
+      return;
+    }
 
-  const mainElement = composeView.getElement();
-  _waitToClaim(mainElement)
-    .takeUntilBy(composeView.getStopper())
-    .onValue(() => {
-      mainElement.classList.add('inboxsdk__ensure_link_active');
-      composeView.getStopper().onValue(() => {
-        mainElement.classList.remove('inboxsdk__ensure_link_active');
+    const mainElement = composeView.getElement();
+    _waitToClaim(mainElement)
+      .takeUntilBy(composeView.getStopper())
+      .onValue(() => {
+        mainElement.classList.add('inboxsdk__ensure_link_active');
+        composeView.getStopper().onValue(() => {
+          mainElement.classList.remove('inboxsdk__ensure_link_active');
+        });
+
+        composeView
+          .getEventStream()
+          .filter((event) => event.eventName === 'bodyChanged')
+          .toProperty(() => null)
+          .debounce(100, { immediate: true })
+          .takeUntilBy(composeView.getStopper())
+          .onValue(() => {
+            doFixing(composeView);
+          });
+
+        composeView
+          .getEventStream()
+          .filter((event) => event.eventName === 'presending')
+          .onValue(() => {
+            doPresendFixing(composeView);
+          });
       });
-
-      composeView
-        .getEventStream()
-        .filter(event => event.eventName === 'bodyChanged')
-        .toProperty(() => null)
-        .debounce(100, { immediate: true })
-        .takeUntilBy(composeView.getStopper())
-        .onValue(() => {
-          doFixing(composeView);
-        });
-
-      composeView
-        .getEventStream()
-        .filter(event => event.eventName === 'presending')
-        .onValue(() => {
-          doPresendFixing(composeView);
-        });
-    });
-});
+  }
+);
 export default handleComposeLinkChips;
 
 const doFixing = defn(
   module,
-  function(composeView: ComposeViewDriver) {
+  function (composeView: ComposeViewDriver) {
     const bodyElement = composeView.getBodyElement();
     const chips = _getChipElements(bodyElement);
 
@@ -64,10 +65,10 @@ const doFixing = defn(
 
 const doPresendFixing = defn(
   module,
-  function(composeView: ComposeViewDriver) {
+  function (composeView: ComposeViewDriver) {
     const bodyElement = composeView.getBodyElement();
     const chips = _getChipElements(bodyElement);
-    chips.filter(_isOurEnhanced).forEach(chip => {
+    chips.filter(_isOurEnhanced).forEach((chip) => {
       const xBtn = chip.querySelector(`img[src="${X_URL}"]`);
       if (xBtn) {
         xBtn.remove();
@@ -84,8 +85,8 @@ const doPresendFixing = defn(
 function _getChipElements(bodyElement: HTMLElement): HTMLElement[] {
   const chipInnerEls = bodyElement.querySelectorAll('[hspace=inboxsdk__chip]');
   return [
-    ...Array.from(chipInnerEls).map(x => (x.parentElement: any)),
-    ...Array.from(bodyElement.querySelectorAll('[hspace=inboxsdk__chip_main]'))
+    ...Array.from(chipInnerEls).map((x) => (x.parentElement: any)),
+    ...Array.from(bodyElement.querySelectorAll('[hspace=inboxsdk__chip_main]')),
   ];
 }
 
@@ -94,7 +95,7 @@ function _waitToClaim(el: HTMLElement): Kefir.Observable<boolean> {
     .merge(
       makeMutationObserverChunkedStream(el, {
         attributes: true,
-        attributeFilter: ['class']
+        attributeFilter: ['class'],
       })
     )
     .map(() => !el.classList.contains('inboxsdk__ensure_link_active'))
@@ -120,14 +121,14 @@ function _addEnhancements(chipElement: HTMLElement) {
   if (anchor) {
     anchor.addEventListener(
       'mousedown',
-      function(e: MouseEvent) {
+      function (e: MouseEvent) {
         e.stopImmediatePropagation();
       },
       true
     );
     anchor.addEventListener(
       'click',
-      function(e: MouseEvent) {
+      function (e: MouseEvent) {
         e.stopImmediatePropagation();
       },
       true
@@ -143,7 +144,7 @@ function _addEnhancements(chipElement: HTMLElement) {
 
   xElement.addEventListener(
     'mousedown',
-    function(e: MouseEvent) {
+    function (e: MouseEvent) {
       chipElement.remove();
     },
     true
@@ -151,24 +152,24 @@ function _addEnhancements(chipElement: HTMLElement) {
 
   xElement.addEventListener(
     'click',
-    function(e: MouseEvent) {
+    function (e: MouseEvent) {
       e.stopImmediatePropagation();
       e.preventDefault();
     },
     true
   );
 
-  chipElement.addEventListener('mouseenter', function() {
+  chipElement.addEventListener('mouseenter', function () {
     chipElement.appendChild(xElement);
     querySelector(chipElement, 'a > span').style.textDecoration = 'underline';
   });
 
-  chipElement.addEventListener('mouseleave', function() {
+  chipElement.addEventListener('mouseleave', function () {
     (xElement: any).remove();
     querySelector(chipElement, 'a > span').style.textDecoration = 'none';
   });
 
-  chipElement.addEventListener('mousedown', function(e: MouseEvent) {
+  chipElement.addEventListener('mousedown', function (e: MouseEvent) {
     e.preventDefault();
   });
 

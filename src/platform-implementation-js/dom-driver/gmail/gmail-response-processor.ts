@@ -5,9 +5,10 @@ import mapIndexed from 'map-indexed-xf';
 import assert from 'assert';
 import htmlToText from '../../../common/html-to-text';
 
-export function interpretSentEmailResponse(
-  responseString: string
-): { threadID: string; messageID: string } {
+export function interpretSentEmailResponse(responseString: string): {
+  threadID: string;
+  messageID: string;
+} {
   const emailSentArray = deserialize(responseString).value;
 
   const gmailMessageId = extractGmailMessageIdFromSentEmail(emailSentArray);
@@ -18,7 +19,7 @@ export function interpretSentEmailResponse(
   }
   return {
     threadID: gmailThreadId,
-    messageID: gmailMessageId
+    messageID: gmailMessageId,
   };
 }
 
@@ -29,7 +30,7 @@ export function extractGmailMessageIdFromSentEmail(
   const messageIdArray = _searchArray(
     emailSentArray,
     messageIdArrayMarker,
-    markerArray =>
+    (markerArray) =>
       markerArray.length > 3 &&
       Array.isArray(markerArray[3]) &&
       markerArray[3].length > 0
@@ -49,7 +50,7 @@ export function extractGmailThreadIdFromSentEmail(
   const threadIdArray = _searchArray(
     emailSentArray,
     threadIdArrayMarker,
-    function(markerArray) {
+    function (markerArray) {
       return (
         markerArray.length == 3 &&
         Array.isArray(markerArray[2]) &&
@@ -73,7 +74,7 @@ export function extractGmailThreadIdFromMessageIdSearch(
   const threadIdArray = _searchArray(
     threadResponseArray,
     threadIdArrayMarker,
-    markerArray => markerArray[0] === 'cs' && markerArray.length > 20
+    (markerArray) => markerArray[0] === 'cs' && markerArray.length > 20
   );
 
   if (!threadIdArray) {
@@ -171,14 +172,15 @@ export interface MessageOptions {
   includeExplicitNulls: boolean;
 }
 
-export function deserialize(
-  threadResponseString: string
-): { value: any[]; options: MessageOptions } {
+export function deserialize(threadResponseString: string): {
+  value: any[];
+  options: MessageOptions;
+} {
   const options = {
     includeLengths: false,
     suggestionMode: /^5\n/.test(threadResponseString),
     noArrayNewLines: !/^[,\]]/m.test(threadResponseString),
-    includeExplicitNulls: true
+    includeExplicitNulls: true,
   };
 
   const value = [];
@@ -262,7 +264,7 @@ export function deserializeArray(value: string): any[] {
   // format). Make sure we don't modify any data inside of strings!
   value = transformUnquotedSections(
     value,
-    match =>
+    (match) =>
       match
         .replace(/,\s*(?=,|\])/g, ',null') // fix implied nulls
         .replace(/\[\s*(?=,)/g, '[null') // "
@@ -558,7 +560,7 @@ export function extractThreadsFromDeserialized(value: any[]): Thread[] {
   ) {
     value = [value[0][0]];
   }
-  return _extractThreadArraysFromResponseArray(value).map(thread =>
+  return _extractThreadArraysFromResponseArray(value).map((thread) =>
     Object.freeze(
       Object.defineProperty(
         {
@@ -571,7 +573,7 @@ export function extractThreadsFromDeserialized(value: any[]): Thread[] {
           lastEmailAddress: thread[28],
           bodyPreviewHtml: thread[10],
           someGmailMessageIds: [thread[1], thread[2]],
-          gmailThreadId: thread[0]
+          gmailThreadId: thread[0],
         },
         '_originalGmailFormat',
         { value: thread }
@@ -586,9 +588,9 @@ const _extractMessageIdsFromThreadBatchRequestXf = t.compose(
   t.filter((item: any) => item[0] === 'cs'),
   t.map((item: any) => [item[1], item[2]])
 );
-export function extractMessageIdsFromThreadBatchRequest(
-  response: string
-): { [threadId: string]: string } {
+export function extractMessageIdsFromThreadBatchRequest(response: string): {
+  [threadId: string]: string;
+} {
   const { value } = deserialize(response);
   return t.toObj(value, _extractMessageIdsFromThreadBatchRequestXf);
 }
@@ -630,7 +632,7 @@ const _extractThreadsFromConversationViewResponseArrayXf = t.compose(
   t.filter((item: any) => item[0] === 'cs'),
   t.map((item: any) => ({
     threadID: item[1],
-    messageIDs: item[8]
+    messageIDs: item[8],
   }))
 );
 
@@ -639,7 +641,7 @@ const _extractMessagesFromResponseArrayXf = t.compose(
   t.filter((item: any) => item[0] === 'ms'),
   t.map((item: any) => ({
     messageID: item[1],
-    date: item[7]
+    date: item[7],
   }))
 );
 
@@ -665,7 +667,7 @@ export function extractMessages(
 
   return threads.map(({ threadID, messageIDs }) => ({
     threadID,
-    messages: messageIDs.map(messageID => messageMap[messageID])
+    messages: messageIDs.map((messageID) => messageMap[messageID]),
   }));
 }
 
@@ -702,7 +704,7 @@ function _searchObject(element: any, query: string, maxDepth: number): any {
   const retVal = [];
   const initialNode = {
     el: element,
-    path: [] as string[]
+    path: [] as string[],
   };
   const nodeList = [initialNode];
 
@@ -715,7 +717,7 @@ function _searchObject(element: any, query: string, maxDepth: number): any {
           const key = keys[i];
           const newNode = {
             el: node.el[key],
-            path: node.path.concat([key])
+            path: node.path.concat([key]),
           };
           nodeList.push(newNode);
         }

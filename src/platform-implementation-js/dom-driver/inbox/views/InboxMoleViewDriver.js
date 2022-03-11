@@ -14,7 +14,7 @@ import ElementContainer from '../../../lib/react/ElementContainer';
 import type {
   MoleViewDriver,
   MoleOptions,
-  MoleButtonDescriptor
+  MoleButtonDescriptor,
 } from '../../../driver-interfaces/mole-view-driver';
 import reemitClickEvent from '../../../lib/dom/reemitClickEventForReact';
 import type InboxDriver from '../inbox-driver';
@@ -44,7 +44,7 @@ class InboxMoleViewDriver {
 
     Kefir.fromEvents(this._element, 'click')
       .takeUntilBy(this._stopper)
-      .onValue(event => {
+      .onValue((event) => {
         reemitClickEvent(event);
       });
   }
@@ -65,7 +65,7 @@ class InboxMoleViewDriver {
             this.destroy();
           });
         }}
-        onSetMinimize={minimized => this.setMinimized(minimized)}
+        onSetMinimize={(minimized) => this.setMinimized(minimized)}
       />,
       this._element
     );
@@ -91,11 +91,11 @@ class InboxMoleViewDriver {
     // Keep the mole as the first item in the list
     makeMutationObserverChunkedStream(container, { childList: true })
       .takeUntilBy(this._stopper)
-      .onValue(muts => {
-        const composeWasAdded = muts.some(mutation =>
+      .onValue((muts) => {
+        const composeWasAdded = muts.some((mutation) =>
           Array.prototype.some.call(
             mutation.addedNodes,
-            node =>
+            (node) =>
               node.nodeType === 1 &&
               !node.classList.contains('inboxsdk__mole_view')
           )
@@ -108,7 +108,7 @@ class InboxMoleViewDriver {
       });
     makeMutationObserverChunkedStream(this._options.el, {
       attributes: true,
-      attributeFilter: ['class', 'style']
+      attributeFilter: ['class', 'style'],
     })
       .takeUntilBy(this._stopper)
       .onValue(() => {
@@ -172,7 +172,7 @@ class InboxMoleViewDriver {
       if (child !== this._element) {
         child.classList.remove('inboxsdk__mole_at_front');
       }
-      const zIndexedChild = find(child.children, child => child.style.zIndex);
+      const zIndexedChild = find(child.children, (child) => child.style.zIndex);
       if (!zIndexedChild) return;
       zIndexedChild.style.zIndex = String(
         i > selfIndex ? count - (i - selfIndex) : count
@@ -194,22 +194,22 @@ class InboxMoleViewDriver {
 
         // A new compose was added.
         makeMutationObserverChunkedStream(container, {
-          childList: true
-        }).filter(mutations =>
-          mutations.some(mutation => mutation.addedNodes.length > 0)
-        )
+          childList: true,
+        }).filter((mutations) =>
+          mutations.some((mutation) => mutation.addedNodes.length > 0)
+        ),
       ]
         .concat(
-          Array.prototype.map.call(container.children, el => {
+          Array.prototype.map.call(container.children, (el) => {
             const zIndexedChild = find(
               el.children,
-              child => child.style.zIndex
+              (child) => child.style.zIndex
             );
             if (!zIndexedChild) return null;
             const currentZindex = zIndexedChild.style.zIndex;
             return makeMutationObserverChunkedStream(zIndexedChild, {
               attributes: true,
-              attributeFilter: ['style']
+              attributeFilter: ['style'],
             }).filter(() => zIndexedChild.style.zIndex !== currentZindex);
           })
         )
@@ -220,11 +220,11 @@ class InboxMoleViewDriver {
       .onValue(() => {
         if (this._element.classList.contains('inboxsdk__mole_at_front')) {
           this._element.classList.remove('inboxsdk__mole_at_front');
-          Array.prototype.forEach.call(container.children, child => {
+          Array.prototype.forEach.call(container.children, (child) => {
             if (isComposeParentElement(child)) return;
             const zIndexedChild = find(
               child.children,
-              child => child.style.zIndex
+              (child) => child.style.zIndex
             );
             if (!zIndexedChild) return;
             zIndexedChild.style.zIndex = '1';
@@ -278,7 +278,7 @@ type MoleViewContentsProps = {
   titleButtons?: ?Array<MoleButtonDescriptor>,
   minimized: boolean,
   onClose: () => void,
-  onSetMinimize: (minimized: boolean) => void
+  onSetMinimize: (minimized: boolean) => void,
 };
 
 class MoleViewContents extends React.Component<MoleViewContentsProps> {
@@ -314,7 +314,7 @@ class MoleViewContents extends React.Component<MoleViewContentsProps> {
               key={i}
               title={descriptor.title}
               className="inboxsdk__mole_custom_title_button"
-              onClick={event => {
+              onClick={(event) => {
                 event.stopPropagation();
                 descriptor.onClick();
               }}

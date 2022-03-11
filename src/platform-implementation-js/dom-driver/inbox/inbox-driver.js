@@ -44,7 +44,7 @@ import addNavItem from './addNavItem';
 
 import type {
   ItemWithLifetime,
-  ElementWithLifetime
+  ElementWithLifetime,
 } from '../../lib/dom/make-element-child-stream';
 import querySelectorOne from '../../lib/dom/querySelectorOne';
 import idMap from '../../lib/idMap';
@@ -131,8 +131,8 @@ class InboxDriver {
       totalCalls: number,
       threadsWithoutGmailId: Set<string>,
       callsWithoutGmailId: number,
-      threadsWithFetch: number
-    }
+      threadsWithFetch: number,
+    },
   };
 
   getGmailMessageIdForSyncMessageId: (
@@ -181,9 +181,9 @@ class InboxDriver {
           getGmailMessageIdForSyncMessageId(this, inboxMessageId),
         getBfromA() {
           throw new Error('should not happen');
-        }
+        },
       });
-      this.getGmailMessageIdForSyncMessageId = inboxMessageId =>
+      this.getGmailMessageIdForSyncMessageId = (inboxMessageId) =>
         gmailMessageIdForInboxMessageIdCache.getAfromB(inboxMessageId);
     }
 
@@ -196,9 +196,9 @@ class InboxDriver {
         },
         getBfromA() {
           throw new Error('should not happen');
-        }
+        },
       });
-      this.getInboxMessageIdForInboxThreadId = inboxThreadId =>
+      this.getInboxMessageIdForInboxThreadId = (inboxThreadId) =>
         inboxMessageIdForInboxThreadIdCache.getAfromB(inboxThreadId);
     }
 
@@ -209,9 +209,9 @@ class InboxDriver {
           getThreadIdFromMessageId(this, messageId),
         getBfromA() {
           throw new Error('should not happen');
-        }
+        },
       });
-      this.getThreadIdFromMessageId = messageId =>
+      this.getThreadIdFromMessageId = (messageId) =>
         threadIdFromMessageIdCache.getAfromB(messageId);
     }
 
@@ -224,7 +224,7 @@ class InboxDriver {
           this._logger.errorSite(new Error('parse errors (threadRow)'), {
             score: parsed.score,
             errors: parsed.errors,
-            html: censorHTMLtree(el)
+            html: censorHTMLtree(el),
           });
         }
         const view = new InboxThreadRowView(el, this, parsed);
@@ -237,14 +237,14 @@ class InboxDriver {
 
     this._threadViewDriverLiveSet = lsFlatMap(
       this._page.tree.getAllByTag('thread'),
-      node => {
+      (node) => {
         const el = node.getValue();
         let parsed = threadParser(el);
         if (parsed.errors.length) {
           this._logger.errorSite(new Error('parse errors (thread)'), {
             score: parsed.score,
             errors: parsed.errors,
-            html: censorHTMLtree(el)
+            html: censorHTMLtree(el),
           });
         }
         return new LiveSet({
@@ -257,14 +257,14 @@ class InboxDriver {
 
             // If the InboxThreadView is destroyed before the element is removed,
             // then make a new InboxThreadView out of the same element.
-            const newView = firstRun => {
+            const newView = (firstRun) => {
               if (!firstRun) {
                 parsed = threadParser(el);
                 if (parsed.errors.length > 0) {
                   this._logger.errorSite(new Error('thread reparse errors'), {
                     score: parsed.score,
                     errors: parsed.errors,
-                    html: censorHTMLtree(el)
+                    html: censorHTMLtree(el),
                   });
                 }
               }
@@ -287,21 +287,21 @@ class InboxDriver {
             return () => {
               unsub.destroy();
             };
-          }
+          },
         });
       }
     );
 
     this._messageViewDriverLiveSet = lsFlatMap(
       this._page.tree.getAllByTag('message'),
-      node => {
+      (node) => {
         const el = node.getValue();
         let parsed = messageParser(el);
         if (parsed.errors.length > 0) {
           this._logger.errorSite(new Error('parse errors (message)'), {
             score: parsed.score,
             errors: parsed.errors,
-            html: censorHTMLtree(el)
+            html: censorHTMLtree(el),
           });
         }
         if (parsed.attributes.isDraft) return LiveSet.constant(new Set());
@@ -316,14 +316,14 @@ class InboxDriver {
             // If the InboxMessageView is destroyed before the element is removed,
             // then make a new InboxMessageView out of the same element. Inbox re-uses
             // elements for different messages in some cases.
-            const newView = firstRun => {
+            const newView = (firstRun) => {
               if (!firstRun) {
                 parsed = messageParser(el);
                 if (parsed.errors.length > 0) {
                   this._logger.errorSite(new Error(`message reparse errors`), {
                     score: parsed.score,
                     errors: parsed.errors,
-                    html: censorHTMLtree(el)
+                    html: censorHTMLtree(el),
                   });
                 }
               }
@@ -346,7 +346,7 @@ class InboxDriver {
             return () => {
               unsub.destroy();
             };
-          }
+          },
         });
       }
     );
@@ -360,7 +360,7 @@ class InboxDriver {
           this._logger.errorSite(new Error('parse errors (attachmentCard)'), {
             score: parsed.score,
             errors: parsed.errors,
-            html: censorHTMLtree(el)
+            html: censorHTMLtree(el),
           });
         }
         const view = new InboxAttachmentCardView({ element: el, parsed }, this);
@@ -373,7 +373,7 @@ class InboxDriver {
 
     this._attachmentOverlayViewDriverLiveSet = lsFlatMap(
       this._page.tree.getAllByTag('attachmentOverlay'),
-      node => {
+      (node) => {
         const el = node.getValue();
         const parsed = attachmentOverlayParser(el);
         if (parsed.errors.length) {
@@ -382,7 +382,7 @@ class InboxDriver {
             {
               score: parsed.score,
               errors: parsed.errors,
-              html: censorHTMLtree(el)
+              html: censorHTMLtree(el),
             }
           );
         }
@@ -398,7 +398,7 @@ class InboxDriver {
           read() {
             throw new Error();
           },
-          listen: setValues => {
+          listen: (setValues) => {
             const view = new InboxAttachmentOverlayView(
               this,
               el,
@@ -409,7 +409,7 @@ class InboxDriver {
             return () => {
               view.destroy();
             };
-          }
+          },
         });
       }
     );
@@ -431,7 +431,7 @@ class InboxDriver {
           this._logger.errorSite(new Error('parse errors (chatSidebar)'), {
             score: parsed.score,
             errors: parsed.errors,
-            html: censorHTMLtree(el)
+            html: censorHTMLtree(el),
           });
         }
         const view = new InboxChatSidebarView(el, parsed);
@@ -448,7 +448,7 @@ class InboxDriver {
     this._routeViewDriverStream = setupRouteViewDriverStream(this);
     this._routeViewDriverStream
       .takeUntilBy(this._stopper)
-      .onValue(routeViewDriver => {
+      .onValue((routeViewDriver) => {
         this._currentRouteViewDriver = routeViewDriver;
       });
 
@@ -472,7 +472,7 @@ class InboxDriver {
           this._logger.errorSite(new Error('parse errors (searchBar)'), {
             score: parsed.score,
             errors: parsed.errors,
-            html: censorHTMLtree(el)
+            html: censorHTMLtree(el),
           });
         }
       }
@@ -494,7 +494,7 @@ class InboxDriver {
           this._logger.errorSite(new Error('parse errors (nativeDrawer)'), {
             score: parsed.score,
             errors: parsed.errors,
-            html: censorHTMLtree(el)
+            html: censorHTMLtree(el),
           });
         }
       }
@@ -505,8 +505,8 @@ class InboxDriver {
     // animating out. We need to clear the old thread view's sidebar
     // immediately when a new thread view comes in.
     let _currentThreadView = null;
-    this._threadViewDriverLiveSet.subscribe(changes => {
-      changes.forEach(change => {
+    this._threadViewDriverLiveSet.subscribe((changes) => {
+      changes.forEach((change) => {
         if (change.type === 'add') {
           const threadView = change.value;
           if (_currentThreadView) {
@@ -539,7 +539,7 @@ class InboxDriver {
           });
           return view;
         }
-      )
+      ),
     ]);
   }
 
@@ -553,7 +553,7 @@ class InboxDriver {
       const stats = {};
       stats.threadRows = Object.assign({}, threadRows, {
         totalThreads: threadRows.totalThreads.size,
-        threadsWithoutGmailId: threadRows.threadsWithoutGmailId.size
+        threadsWithoutGmailId: threadRows.threadsWithoutGmailId.size,
       });
 
       this._logger.eventSdkPassive('inboxThreadIdStats', stats);
@@ -569,8 +569,8 @@ class InboxDriver {
         totalCalls: 0,
         threadsWithoutGmailId: new Set(),
         callsWithoutGmailId: 0,
-        threadsWithFetch: 0
-      }
+        threadsWithFetch: 0,
+      },
     };
   }
 
@@ -725,11 +725,11 @@ class InboxDriver {
   getNextComposeViewDriver(
     timeout: number = 10 * 1000
   ): Promise<InboxComposeView> {
-    const s = Kefir.stream(em => {
+    const s = Kefir.stream((em) => {
       const subscription = this._composeViewDriverLiveSet.subscribe({
-        next: changes => {
+        next: (changes) => {
           const newComposeChange = changes.filter(
-            change => change.type === 'add'
+            (change) => change.type === 'add'
           )[0];
           if (newComposeChange) {
             // make flow happy
@@ -739,7 +739,7 @@ class InboxDriver {
             em.value(newComposeChange.value);
           }
         },
-        complete: em.end
+        complete: em.end,
       });
       return () => subscription.unsubscribe();
     });
@@ -756,7 +756,7 @@ class InboxDriver {
       .beforeEnd(
         () => new Error('Driver was shut down before a new compose was found')
       )
-      .flatMap(x =>
+      .flatMap((x) =>
         x instanceof Error ? Kefir.constantError(x) : Kefir.constant(x)
       )
       .take(1)
@@ -777,9 +777,9 @@ class InboxDriver {
     const response = await gmailAjax({
       url: `https://mail.google.com/mail${getAccountUrlPart()}/`,
       xhrFields: {
-        withCredentials: true
+        withCredentials: true,
       },
-      canRetry: true
+      canRetry: true,
     });
     const tokenVarMatch = response.text.match(/var GM_ACTION_TOKEN=("[^"]+")/);
     if (!tokenVarMatch) {
@@ -807,7 +807,7 @@ class InboxDriver {
   getUserContact(): Contact {
     return {
       emailAddress: this.getUserEmailAddress(),
-      name: this.getUserEmailAddress()
+      name: this.getUserEmailAddress(),
     };
   }
 
@@ -820,7 +820,7 @@ class InboxDriver {
   registerThreadButton(options: Object) {
     const unregister = kefirStopper();
 
-    const removeButtonOnUnregister = button => {
+    const removeButtonOnUnregister = (button) => {
       unregister.takeUntilBy(button.getStopper()).onValue(() => {
         button.destroy();
       });
@@ -841,16 +841,16 @@ class InboxDriver {
           removeButtonOnUnregister(
             inboxToolbarView.addButton({
               ...options,
-              onClick: event => {
+              onClick: (event) => {
                 options.onClick({
                   position: 'THREAD',
                   dropdown: event.dropdown,
                   selectedThreadViewDrivers: [
-                    inboxToolbarView.getThreadViewDriver()
+                    inboxToolbarView.getThreadViewDriver(),
                   ],
-                  selectedThreadRowViewDrivers: []
+                  selectedThreadRowViewDrivers: [],
                 });
-              }
+              },
             })
           );
         }
@@ -866,14 +866,15 @@ class InboxDriver {
           removeButtonOnUnregister(
             inboxToolbarView.addButton({
               ...options,
-              onClick: event => {
+              onClick: (event) => {
                 options.onClick({
                   position: 'LIST',
                   dropdown: event.dropdown,
                   selectedThreadViewDrivers: [],
-                  selectedThreadRowViewDrivers: this.getSelectedThreadRowViewDrivers()
+                  selectedThreadRowViewDrivers:
+                    this.getSelectedThreadRowViewDrivers(),
                 });
-              }
+              },
             })
           );
         }
@@ -891,14 +892,14 @@ class InboxDriver {
           removeButtonOnUnregister(
             inboxThreadRowView.addToolbarButton({
               ...options,
-              onClick: event => {
+              onClick: (event) => {
                 options.onClick({
                   position: 'ROW',
                   dropdown: event.dropdown,
                   selectedThreadViewDrivers: [],
-                  selectedThreadRowViewDrivers: [inboxThreadRowView]
+                  selectedThreadRowViewDrivers: [inboxThreadRowView],
                 });
-              }
+              },
             })
           );
         }
@@ -914,9 +915,9 @@ class InboxDriver {
   }
 
   getSelectedThreadRowViewDrivers(): Array<InboxThreadRowView> {
-    return Array.from(
-      this.getThreadRowViewDriverLiveSet().values()
-    ).filter(threadRowViewDriver => threadRowViewDriver.isSelected());
+    return Array.from(this.getThreadRowViewDriverLiveSet().values()).filter(
+      (threadRowViewDriver) => threadRowViewDriver.isSelected()
+    );
   }
 
   addNavItem(
@@ -1000,11 +1001,11 @@ class InboxDriver {
       );
       makeMutationObserverChunkedStream(main, {
         attributes: true,
-        attributeFilter: ['class']
+        attributeFilter: ['class'],
       })
         .toProperty(() => null)
         .onValue(() => {
-          [chat, nav].filter(Boolean).forEach(className => {
+          [chat, nav].filter(Boolean).forEach((className) => {
             if (main.classList.contains(className)) {
               _customViewBase.classList.add(className);
             } else {
@@ -1105,7 +1106,7 @@ class InboxDriver {
 
     const closeBtn = topDiv.querySelector('.inboxsdk__close_button');
     if (!closeBtn) throw new Error('Should not happen');
-    closeBtn.addEventListener('click', function(e: MouseEvent) {
+    closeBtn.addEventListener('click', function (e: MouseEvent) {
       topDiv.remove();
     });
   }
@@ -1135,7 +1136,7 @@ class InboxDriver {
     // the SDK drawer.
     Kefir.fromESObservable(this._page.tree.getAllByTag('nativeDrawer'))
       .takeUntilBy(drawerView.getClosingStream())
-      .onValue(changes => {
+      .onValue((changes) => {
         for (let change of changes) {
           if (change.type === 'add') {
             drawerView.close();

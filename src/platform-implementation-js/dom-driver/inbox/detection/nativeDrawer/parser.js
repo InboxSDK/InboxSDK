@@ -22,7 +22,7 @@ export default function parser(el: HTMLElement) {
   return {
     elements: {},
     score: errors.length === 0 ? 1 : 0,
-    errors
+    errors,
   };
 }
 

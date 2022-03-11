@@ -4,7 +4,7 @@ import logError from './log-error';
 import ajax from './ajax';
 import delay from 'pdelay';
 
-const isContentScript: () => boolean = once(function() {
+const isContentScript: () => boolean = once(function () {
   if ((global as any).chrome && (global as any).chrome.extension) return true;
   if ((global as any).safari && (global as any).safari.extension) return true;
   return false;
@@ -20,7 +20,7 @@ function addScriptToPage(url: string, cors: boolean): Promise<void> {
   const promise: Promise<void> = new Promise((resolve, reject) => {
     script.addEventListener(
       'error',
-      function(event: any) {
+      function (event: any) {
         reject(
           event.error ||
             new (Error as any)(
@@ -35,7 +35,7 @@ function addScriptToPage(url: string, cors: boolean): Promise<void> {
     );
     script.addEventListener(
       'load',
-      function() {
+      function () {
         // Make sure the script has a moment to execute before this promise
         // resolves.
         setTimeout(resolve, 1);
@@ -65,20 +65,22 @@ export default function loadScript(
 ): Promise<void> {
   let pr;
   if (isContentScript()) {
-    const attempt = function(
+    const attempt = function (
       retryNum: number,
       lastErr: Error | null
     ): Promise<void> {
       if (retryNum > 3) {
-        throw lastErr ||
-          new Error('Ran out of loadScript attempts for unknown reason');
+        throw (
+          lastErr ||
+          new Error('Ran out of loadScript attempts for unknown reason')
+        );
       }
 
       return ajax({
         url,
         cachebust: retryNum > 0,
-        XMLHttpRequest: opts ? opts.XMLHttpRequest : undefined
-      }).then(response => {
+        XMLHttpRequest: opts ? opts.XMLHttpRequest : undefined,
+      }).then((response) => {
         // Q: Why put the code into a function before executing it instead of
         //    evaling it immediately?
         // A: Chrome would execute it before applying any remembered
@@ -125,7 +127,7 @@ export default function loadScript(
                 retryNum,
                 caughtSyntaxError: true,
                 url,
-                message: `SyntaxError in loading ${url}. Did we not load it fully? Trying again...`
+                message: `SyntaxError in loading ${url}. Did we not load it fully? Trying again...`,
               },
               {}
             );
@@ -157,8 +159,8 @@ export default function loadScript(
       });
     });
   }
-  pr.catch(err => {
-    return connectivityTest().then(connectivityTestResults => {
+  pr.catch((err) => {
+    return connectivityTest().then((connectivityTestResults) => {
       logError(
         err,
         {
@@ -166,7 +168,7 @@ export default function loadScript(
           connectivityTestResults,
           status: err && err.status,
           response: err && err.xhr ? err.xhr.responseText : null,
-          message: 'Failed to load script'
+          message: 'Failed to load script',
         },
         {}
       );

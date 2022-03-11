@@ -7,13 +7,13 @@ import sinon from 'sinon';
 
 import arrayToLifetimes from './array-to-lifetimes';
 
-it('works', cb => {
+it('works', (cb) => {
   const events = [];
   arrayToLifetimes(
     Kefir.sequentially(0, [
       ['a', 'b'],
       ['b', 'd'],
-      ['a', 'b', 'c']
+      ['a', 'b', 'c'],
     ])
   )
     .onValue(({ el, removalStream }) => {
@@ -34,32 +34,32 @@ it('works', cb => {
           ['add', 'c'],
           ['remove', 'b'],
           ['remove', 'a'],
-          ['remove', 'c']
+          ['remove', 'c'],
         ]);
         cb();
       });
     });
 });
 
-it('keyFn works', cb => {
+it('keyFn works', (cb) => {
   const events = [];
   arrayToLifetimes(
     Kefir.sequentially(0, [
       [
         { v: 'a', k: 1 },
-        { v: 'b', k: 2 }
+        { v: 'b', k: 2 },
       ],
       [
         { v: 'B', k: 2 },
-        { v: 'd', k: 4 }
+        { v: 'd', k: 4 },
       ],
       [
         { v: 'A', k: 1 },
         { v: 'b', k: 2 },
-        { v: 'c', k: 3 }
-      ]
+        { v: 'c', k: 3 },
+      ],
     ]),
-    el => el.k
+    (el) => el.k
   )
     .onValue(({ el, removalStream }) => {
       events.push(['add', el]);
@@ -79,14 +79,14 @@ it('keyFn works', cb => {
           ['add', { v: 'c', k: 3 }],
           ['remove', { v: 'b', k: 2 }],
           ['remove', { v: 'A', k: 1 }],
-          ['remove', { v: 'c', k: 3 }]
+          ['remove', { v: 'c', k: 3 }],
         ]);
         cb();
       });
     });
 });
 
-it('unsubscription triggers removal', cb => {
+it('unsubscription triggers removal', (cb) => {
   const events = [];
   const stopper = kefirStopper();
   arrayToLifetimes(Kefir.sequentially(50, [['a', 'b'], ['a'], ['a', 'b', 'c']]))
@@ -104,14 +104,14 @@ it('unsubscription triggers removal', cb => {
           ['add', 'a'],
           ['add', 'b'],
           ['remove', 'b'],
-          ['remove', 'a']
+          ['remove', 'a'],
         ]);
         cb();
       });
     });
 });
 
-it('works with properties', cb => {
+it('works with properties', (cb) => {
   const events = [];
   arrayToLifetimes(
     Kefir.sequentially(0, [['a', 'c']]).toProperty(() => ['a', 'b'])
@@ -130,22 +130,22 @@ it('works with properties', cb => {
           ['remove', 'b'],
           ['add', 'c'],
           ['remove', 'a'],
-          ['remove', 'c']
+          ['remove', 'c'],
         ]);
         cb();
       });
     });
 });
 
-it('passes errors', cb => {
+it('passes errors', (cb) => {
   const events = [];
   arrayToLifetimes(
     Kefir.merge([
       Kefir.constantError('foo'),
-      Kefir.sequentially(0, [['a', 'b'], ['a']])
+      Kefir.sequentially(0, [['a', 'b'], ['a']]),
     ])
   )
-    .onAny(event => {
+    .onAny((event) => {
       if (event.type === 'value') {
         const { el, removalStream } = event.value;
         events.push(['add', el]);
@@ -163,7 +163,7 @@ it('passes errors', cb => {
           ['add', 'a'],
           ['add', 'b'],
           ['remove', 'b'],
-          ['remove', 'a']
+          ['remove', 'a'],
         ]);
         cb();
       });

@@ -9,11 +9,10 @@ import Kefir from 'kefir';
 // on the injected script, and if it's not instantiated elsewhere, you know that
 // if you have an instance of this, then the injected script is present and this
 // will work.
-declare export default class GmailPageCommunicator extends CommonPageCommunicator {
-  getMessageDate(
-    threadId: string,
-    message: HTMLElement
-  ): Promise<?number>;
+declare export default class GmailPageCommunicator
+  extends CommonPageCommunicator
+{
+  getMessageDate(threadId: string, message: HTMLElement): Promise<?number>;
   getMessageRecipients(
     threadId: string,
     message: HTMLElement
@@ -39,7 +38,7 @@ declare export default class GmailPageCommunicator extends CommonPageCommunicato
     query: string,
     start: number,
     newQuery: string,
-    newStart: number
+    newStart: number,
   }): void;
   setCustomListResults(query: string, newResults: string | null): void;
   createCustomSearchTerm(term: string): void;

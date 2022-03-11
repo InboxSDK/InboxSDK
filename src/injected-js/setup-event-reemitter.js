@@ -7,7 +7,7 @@ export default function setupEventReemitter() {
   // properties.
   // https://bugs.webkit.org/show_bug.cgi?id=16735
   // https://code.google.com/p/chromium/issues/detail?id=327853
-  document.addEventListener('inboxsdk_event_relay', function(event: Object) {
+  document.addEventListener('inboxsdk_event_relay', function (event: Object) {
     const newEvent = document.createEvent('Events');
     (newEvent: any).initEvent(
       event.detail.type,
@@ -37,14 +37,14 @@ export default function setupEventReemitter() {
           },
           getAsString() {
             throw new Error('getAsString not supported');
-          }
+          },
         })),
         types: ['Files'],
         getData() {
           return '';
         },
         setData() {},
-        setDragImage() {}
+        setDragImage() {},
       };
     }
     event.target.dispatchEvent(newEvent);

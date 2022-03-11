@@ -8,7 +8,7 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
     logError(err, el) {
       const details = {
         el,
-        html: el ? censorHTMLtree(el) : null
+        html: el ? censorHTMLtree(el) : null,
       };
       logger.errorSite(err, details);
     },
@@ -33,8 +33,8 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
           'tr.bzf',
           'td.eV',
           'div',
-          'div'
-        ]
+          'div',
+        ],
       },
       {
         sources: ['recipientsCommon'],
@@ -51,26 +51,26 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
                 '[role=listbox]',
                 'div',
                 'div',
-                'div[role=option][data-name]'
+                'div[role=option][data-name]',
               ],
               [
                 {
-                  $map: el =>
+                  $map: (el) =>
                     el.querySelector<HTMLElement>(
                       'textarea.vO[name=to], input[name=to]'
-                    )
+                    ),
                 },
-                { $map: el => el.closest('tr') },
+                { $map: (el) => el.closest('tr') },
                 'td.eV',
                 'div',
                 'div',
                 '.vR',
                 'input[type=hidden]',
-                { $map: el => el.parentElement }
-              ]
-            ]
-          }
-        ]
+                { $map: (el) => el.parentElement },
+              ],
+            ],
+          },
+        ],
       },
       {
         sources: ['recipientsCommon'],
@@ -87,26 +87,26 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
                 '[role=listbox]',
                 'div',
                 'div',
-                'div[role=option][data-name]'
+                'div[role=option][data-name]',
               ],
               [
                 {
-                  $map: el =>
+                  $map: (el) =>
                     el.querySelector<HTMLElement>(
                       'textarea.vO[name=cc], input[name=cc]'
-                    )
+                    ),
                 },
-                { $map: el => el.closest('tr') },
+                { $map: (el) => el.closest('tr') },
                 'td.eV',
                 'div',
                 'div',
                 '.vR',
                 'input[type=hidden]',
-                { $map: el => el.parentElement }
-              ]
-            ]
-          }
-        ]
+                { $map: (el) => el.parentElement },
+              ],
+            ],
+          },
+        ],
       },
       {
         sources: ['recipientsCommon'],
@@ -123,39 +123,39 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
                 '[role=listbox]',
                 'div',
                 'div',
-                'div[role=option][data-name]'
+                'div[role=option][data-name]',
               ],
               [
                 {
-                  $map: el =>
+                  $map: (el) =>
                     el.querySelector<HTMLElement>(
                       'textarea.vO[name=bcc], input[name=bcc]'
-                    )
+                    ),
                 },
-                { $map: el => el.closest('tr') },
+                { $map: (el) => el.closest('tr') },
                 'td.eV',
                 'div',
                 'div',
                 '.vR',
                 'input[type=hidden]',
-                { $map: el => el.parentElement }
-              ]
-            ]
-          }
-        ]
-      }
+                { $map: (el) => el.parentElement },
+              ],
+            ],
+          },
+        ],
+      },
     ],
     finders: {
       toRecipient: {
-        fn: root => getRecipientChips(root, 'to')
+        fn: (root) => getRecipientChips(root, 'to'),
       },
       ccRecipient: {
-        fn: root => getRecipientChips(root, 'cc')
+        fn: (root) => getRecipientChips(root, 'cc'),
       },
       bccRecipient: {
-        fn: root => getRecipientChips(root, 'bcc')
-      }
-    }
+        fn: (root) => getRecipientChips(root, 'bcc'),
+      },
+    },
   });
 }
 
@@ -166,7 +166,7 @@ export function getRecipientChips(
   const oldRow = getOldRecipientRowForType(element, addressType);
   if (oldRow) {
     return Array.from(oldRow.querySelectorAll('.vR > input[type=hidden]')).map(
-      el => el.parentElement!
+      (el) => el.parentElement!
     );
   } else {
     return element.querySelectorAll<HTMLElement>(
@@ -181,7 +181,7 @@ export function getRecipientRowElements(element: HTMLElement): HTMLElement[] {
     element.querySelectorAll<HTMLElement>(
       '.GS tr, .GS .anm[name] [role=listbox]'
     ),
-    tr => !tr.classList.contains('inboxsdk__recipient_row')
+    (tr) => !tr.classList.contains('inboxsdk__recipient_row')
   );
 }
 

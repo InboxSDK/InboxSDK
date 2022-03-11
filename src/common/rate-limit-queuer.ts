@@ -31,7 +31,7 @@ export default function rateLimitQueuer<
   function getTimeToUnqueueItem(): number {
     const now = Date.now();
     const periodAgo = now - period;
-    callTimestamps = callTimestamps.filter(time => time > periodAgo);
+    callTimestamps = callTimestamps.filter((time) => time > periodAgo);
 
     if (callTimestamps.length >= count) {
       return callTimestamps[0] - periodAgo;

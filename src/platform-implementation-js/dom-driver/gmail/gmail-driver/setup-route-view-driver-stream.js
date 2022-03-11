@@ -17,7 +17,8 @@ export default function setupRouteViewDriverStream(
 ): Kefir.Observable<GmailRouteView> {
   const customRouteIDs = driver.getCustomRouteIDs();
   const customListRouteIDs = driver.getCustomListRouteIDs();
-  const customListSearchStringsToRouteIds = driver.getCustomListSearchStringsToRouteIds();
+  const customListSearchStringsToRouteIds =
+    driver.getCustomListSearchStringsToRouteIds();
 
   let lastNativeHash = getURLObject(document.location.href).hash;
   let latestGmailRouteView = null;
@@ -33,14 +34,14 @@ export default function setupRouteViewDriverStream(
   let sameRouteData = {};
 
   const eligibleHashChanges = Kefir.fromEvents(window, 'hashchange')
-    .filter(event => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
-    .map(event => ({
+    .filter((event) => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
+    .map((event) => ({
       new: getURLObject(event.newURL),
-      old: getURLObject(event.oldURL)
+      old: getURLObject(event.oldURL),
     }))
-    .filter(event => event.new.hash !== event.old.hash)
-    .map(event => event.new)
-    .map(urlObject => {
+    .filter((event) => event.new.hash !== event.old.hash)
+    .map((event) => event.new)
+    .map((urlObject) => {
       const { hash, name } = urlObject;
       for (let routeIDs of customRouteIDs) {
         let routeID = routeIDmatchesHash(routeIDs, hash);
@@ -88,15 +89,15 @@ export default function setupRouteViewDriverStream(
     // out events from it. This filter is needed if the user is already at a custom
     // view of another InboxSDK instance while this starts up.
     GmailElementGetter.getMainContentElementChangedStream()
-      .map(event => ({
+      .map((event) => ({
         urlObject: getURLObject(document.location.href),
-        type: 'NATIVE'
+        type: 'NATIVE',
       }))
-      .filter(options =>
+      .filter((options) =>
         gmailRouteProcessor.isNativeRoute(options.urlObject.name)
-      )
+      ),
   ])
-    .map(options => {
+    .map((options) => {
       const { type, urlObject } = options;
       if (type === 'NATIVE' && urlObject.name === 'search') {
         const customListRouteId = customListSearchStringsToRouteIds.get(
@@ -126,20 +127,20 @@ export default function setupRouteViewDriverStream(
             return {
               type: 'CUSTOM_LIST',
               urlObject,
-              routeID: customListRouteId
+              routeID: customListRouteId,
             };
           }
         }
       }
       return options;
     })
-    .map(options => {
+    .map((options) => {
       const MAX_KEY_CACHE = 50;
       const { urlObject } = options;
 
       if (!sameRouteData[urlObject.hash]) {
         sameRouteData[urlObject.hash] = {
-          data: {}
+          data: {},
         };
       }
       sameRouteData[urlObject.hash].lastUsedTimestamp = Date.now();
@@ -157,10 +158,10 @@ export default function setupRouteViewDriverStream(
 
       return {
         ...options,
-        cachedRouteData: sameRouteData[urlObject.hash].data
+        cachedRouteData: sameRouteData[urlObject.hash].data,
       };
     })
-    .map(options => {
+    .map((options) => {
       if (options.type === 'NATIVE' || options.type === 'CUSTOM_LIST') {
         driver.showNativeRouteView();
       } else if (options.type === 'CUSTOM_LIST_TRIGGER') {
@@ -174,7 +175,7 @@ export default function setupRouteViewDriverStream(
       return new GmailRouteView(options, gmailRouteProcessor, driver);
     })
     .filter(Boolean)
-    .map(gmailRouteView => {
+    .map((gmailRouteView) => {
       if (latestGmailRouteView) {
         latestGmailRouteView.destroy();
       }

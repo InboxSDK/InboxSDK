@@ -9,9 +9,9 @@ import { Driver, ButterBarMessage } from '../driver-interfaces/driver';
 
 const ancientComplainTime = 2 * 60 * 1000;
 const dummyPacket = Object.freeze({
-  destroy: Object.freeze(function() {
+  destroy: Object.freeze(function () {
     // do nothing
-  })
+  }),
 });
 
 const memberMap = new WeakMap<
@@ -29,7 +29,7 @@ export default class ButterBar {
     const members = {
       driver,
       messagesByKey: new Map(),
-      queuedPackets: []
+      queuedPackets: [],
     };
     memberMap.set(this, members);
   }
@@ -39,7 +39,7 @@ export default class ButterBar {
       priority: 0,
       time: 15 * 1000,
       hideOnViewChanged: true,
-      persistent: false
+      persistent: false,
     });
     this.hideMessage(options.messageKey);
 
@@ -52,13 +52,13 @@ export default class ButterBar {
       queue.unshift({
         messageId,
         priority: options.priority,
-        persistent: options.persistent
+        persistent: options.persistent,
       });
-      queue = sortBy(queue, item => -item.priority);
+      queue = sortBy(queue, (item) => -item.priority);
       queue = queue.filter((item, i) => i === 0 || item.persistent);
       butterBarDriver.setSharedMessageQueue(queue);
 
-      if (!find(queue, item => item.messageId === messageId)) {
+      if (!find(queue, (item) => item.messageId === messageId)) {
         return dummyPacket;
       }
     }
@@ -85,7 +85,7 @@ export default class ButterBar {
     // Error made here for sensible stack
     const timeoutErr = new Error('Butter bar message timed out');
     stopper.plug(
-      Kefir.later(ancientComplainTime, null).map(x => {
+      Kefir.later(ancientComplainTime, null).map((x) => {
         members.driver.getLogger().errorApp(timeoutErr);
         return x;
       })
@@ -97,7 +97,7 @@ export default class ButterBar {
       }
       const queue = butterBarDriver.getSharedMessageQueue();
       butterBarDriver.setSharedMessageQueue(
-        queue.filter(item => item.messageId !== messageId)
+        queue.filter((item) => item.messageId !== messageId)
       );
     });
 
@@ -120,7 +120,7 @@ export default class ButterBar {
     const message = {
       destroy() {
         stopper.value(undefined);
-      }
+      },
     };
     if (options.messageKey) {
       members.messagesByKey.set(options.messageKey, message);
@@ -134,7 +134,7 @@ export default class ButterBar {
       priority: -3,
       time: Infinity,
       persistent: true,
-      hideOnViewChanged: true
+      hideOnViewChanged: true,
     });
 
     options.time = Infinity; // Loading messages should exist until destroyed.
@@ -145,7 +145,7 @@ export default class ButterBar {
   public showError(options: any): ButterBarMessage {
     defaults(options, {
       priority: 100,
-      className: 'inboxsdk__butterbar_error'
+      className: 'inboxsdk__butterbar_error',
     });
     return this.showMessage(options);
   }
@@ -159,7 +159,7 @@ export default class ButterBar {
       time: Infinity,
       persistent: true,
       hideOnViewChanged: false,
-      showConfirmation: true
+      showConfirmation: true,
     });
     const savingMessage = this.showMessage(options);
 
@@ -173,7 +173,7 @@ export default class ButterBar {
             text: options.confirmationText,
             messageKey: options.messageKey,
             time: options.confirmationTime,
-            priority: 200
+            priority: 200,
           });
         }
       },

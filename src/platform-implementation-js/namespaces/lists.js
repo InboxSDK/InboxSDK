@@ -17,7 +17,7 @@ export default class Lists {
       appId,
       driver,
       membrane,
-      threadRowViewRegistry: new HandlerRegistry()
+      threadRowViewRegistry: new HandlerRegistry(),
     };
     memberMap.set(this, members);
 
@@ -25,7 +25,7 @@ export default class Lists {
       members.threadRowViewRegistry.dumpHandlers();
     });
 
-    members.driver.getThreadRowViewDriverStream().onValue(viewDriver => {
+    members.driver.getThreadRowViewDriverStream().onValue((viewDriver) => {
       const view = membrane.get(viewDriver);
       members.threadRowViewRegistry.addTarget(view);
     });
@@ -37,8 +37,9 @@ export default class Lists {
 
   getSelectedThreadRowViews() {
     const members = get(memberMap, this);
-    const threadRowViewDrivers = members.driver.getSelectedThreadRowViewDrivers();
-    const threadRowViews = threadRowViewDrivers.map(d =>
+    const threadRowViewDrivers =
+      members.driver.getSelectedThreadRowViewDrivers();
+    const threadRowViews = threadRowViewDrivers.map((d) =>
       members.membrane.get(d)
     );
     return threadRowViews;
@@ -53,5 +54,5 @@ export default class Lists {
 const ActionButtonTypes = Object.freeze({
   LINK: 'LINK',
   DROPDOWN: 'DROPDOWN',
-  ACTION: 'ACTION'
+  ACTION: 'ACTION',
 });

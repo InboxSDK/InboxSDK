@@ -1,7 +1,7 @@
 import once from 'lodash/once';
 import * as Kefir from 'kefir';
 import makeElementChildStream, {
-  ElementWithLifetime
+  ElementWithLifetime,
 } from '../../lib/dom/make-element-child-stream';
 import querySelector from '../../lib/dom/querySelectorOrFail';
 import waitForGmailModeToSettle from './gmail-element-getter/wait-for-gmail-mode-to-settle';
@@ -73,7 +73,7 @@ const GmailElementGetter = {
           ),
           {
             elClassName: el?.className,
-            oldMethodClassName: oldMethodEl?.className
+            oldMethodClassName: oldMethodEl?.className,
           }
         );
       }
@@ -123,7 +123,7 @@ const GmailElementGetter = {
     return document.querySelector('div.aeF > div.nH');
   },
 
-  getMainContentElementChangedStream: once(function(
+  getMainContentElementChangedStream: once(function (
     this: any
   ): Kefir.Observable<HTMLElement, never> {
     return getMainContentElementChangedStream(this);
@@ -274,12 +274,12 @@ const GmailElementGetter = {
   StandaloneCompose: {
     getComposeWindowContainer(): HTMLElement | null {
       return document.querySelector('[role=main]');
-    }
+    },
   },
 
   waitForGmailModeToSettle(): Promise<void> {
     return waitForGmailModeToSettle().toPromise();
-  }
+  },
 };
 
 export default GmailElementGetter;

@@ -1,5 +1,5 @@
 import GmailSupportItemView, {
-  SupportItemDescriptor
+  SupportItemDescriptor,
 } from '../views/gmail-support-item-view';
 import GmailDriver from '../gmail-driver';
 

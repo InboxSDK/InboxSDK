@@ -9,7 +9,7 @@ import isStreakAppId from '../../../lib/isStreakAppId';
 
 export type GetDraftIdResult = {
   draftID: ?string,
-  debugData: ?Object
+  debugData: ?Object,
 };
 
 async function uncachedGetDraftIDForMessageID(
@@ -28,8 +28,8 @@ async function uncachedGetDraftIDForMessageID(
       nsc: '1',
       mb: '0',
       rt: 'j',
-      search: 'drafts'
-    }
+      search: 'drafts',
+    },
   });
   try {
     const draftID = readDraftId(response.text, messageID);
@@ -40,7 +40,7 @@ async function uncachedGetDraftIDForMessageID(
       driver.getLogger().error(err, {
         message: 'failed to read draft ID',
         messageID,
-        text: response.text
+        text: response.text,
       });
     }
     throw err;

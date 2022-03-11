@@ -35,7 +35,7 @@ export type DrawerViewOptions = {
   chrome?: boolean,
   composeView?: ComposeView,
   closeWithCompose?: boolean,
-  matchSidebarContentPanelWidth?: boolean
+  matchSidebarContentPanelWidth?: boolean,
 };
 import type InboxDrawerView from '../dom-driver/inbox/views/inbox-drawer-view';
 export type DrawerViewDriver = InboxDrawerView;
@@ -108,7 +108,7 @@ export type Driver = {
   getSelectedThreadRowViewDrivers(): $ReadOnlyArray<ThreadRowViewDriver>,
   registerThreadRowViewSelectionHandler(handler: () => any): () => void,
 
-  getLoadEventDetails(): any
+  getLoadEventDetails(): any,
 };
 
 export type ButterBarDriver = {
@@ -116,9 +116,9 @@ export type ButterBarDriver = {
   getSharedMessageQueue(): any[],
   setSharedMessageQueue(queue: any[]): void,
   showMessage(rawOptions: any): ButterBarMessage,
-  hideGmailMessage(): void
+  hideGmailMessage(): void,
 };
 
 export type ButterBarMessage = {
-  destroy(): void
+  destroy(): void,
 };

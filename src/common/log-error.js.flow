@@ -7,7 +7,7 @@ export type LogErrorContext = {
   loaderVersion?: ?string,
   implVersion?: ?string,
   userEmailHash?: ?string,
-  isUsingSyncAPI?: ?boolean
+  isUsingSyncAPI?: ?boolean,
 };
 
 // code inside the platform-implementation should use logger.js instead of

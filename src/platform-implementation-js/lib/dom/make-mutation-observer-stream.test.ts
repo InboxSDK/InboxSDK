@@ -10,7 +10,7 @@ function fakeEl(name: string): object {
   return { name, nodeType: 1 };
 }
 
-it('works with MockElementParent', done => {
+it('works with MockElementParent', (done) => {
   const child1 = fakeEl('child1'),
     child2 = fakeEl('child2'),
     child3 = fakeEl('child3');
@@ -19,7 +19,7 @@ it('works with MockElementParent', done => {
 
   let call = 0;
   makeMutationObserverStream(target as any, { childList: true }).onValue(
-    event => {
+    (event) => {
       switch (++call) {
         case 1:
           expect(event.addedNodes).toEqual([]);
@@ -40,7 +40,7 @@ it('works with MockElementParent', done => {
   target.removeChild(child1);
 });
 
-it("doesn't emit events while current events are processed", done => {
+it("doesn't emit events while current events are processed", (done) => {
   const child1 = fakeEl('child1'),
     child2 = fakeEl('child2');
 
@@ -53,7 +53,7 @@ it("doesn't emit events while current events are processed", done => {
   let call = 0;
   let criticalSection = false;
   makeMutationObserverStream(target as any, { childList: true }).onValue(
-    event => {
+    (event) => {
       if (criticalSection) {
         throw new Error('Re-entrance detected!');
       }

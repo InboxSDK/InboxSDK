@@ -8,7 +8,7 @@ export default function makeElementStreamMerger<T>(): (
 ) => Kefir.Observable<ItemWithLifetime<T>, never> {
   const knownElementStopperPools: Map<T, StopperPool<null, never>> = new Map();
 
-  return event => {
+  return (event) => {
     let stopperPool = knownElementStopperPools.get(event.el);
     if (stopperPool) {
       if (stopperPool.getSize() > 1) {
@@ -23,13 +23,13 @@ export default function makeElementStreamMerger<T>(): (
       return Kefir.never();
     } else {
       stopperPool = new StopperPool(event.removalStream.flatMap(delayAsap));
-      stopperPool.stream.onValue(function() {
+      stopperPool.stream.onValue(function () {
         knownElementStopperPools.delete(event.el);
       });
       knownElementStopperPools.set(event.el, stopperPool);
       return Kefir.constant({
         el: event.el,
-        removalStream: stopperPool.stream
+        removalStream: stopperPool.stream,
       });
     }
   };

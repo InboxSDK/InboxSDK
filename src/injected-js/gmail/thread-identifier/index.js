@@ -15,31 +15,33 @@ export function setup() {
     logger.error(err, 'Failed to process preloaded thread identifiers');
   }
 
-  document.addEventListener('inboxSDKtellMeThisThreadIdByDatabase', function(
-    event: any
-  ) {
-    try {
-      const threadId = getGmailThreadIdForThreadRowByDatabase(event.target);
-      if (threadId) {
-        event.target.setAttribute('data-inboxsdk-threadid', threadId);
+  document.addEventListener(
+    'inboxSDKtellMeThisThreadIdByDatabase',
+    function (event: any) {
+      try {
+        const threadId = getGmailThreadIdForThreadRowByDatabase(event.target);
+        if (threadId) {
+          event.target.setAttribute('data-inboxsdk-threadid', threadId);
+        }
+      } catch (err) {
+        logger.error(err, 'Error in inboxSDKtellMeThisThreadIdByDatabase');
       }
-    } catch (err) {
-      logger.error(err, 'Error in inboxSDKtellMeThisThreadIdByDatabase');
     }
-  });
+  );
 
-  document.addEventListener('inboxSDKtellMeThisThreadIdByClick', function(
-    event: any
-  ) {
-    try {
-      const threadId = getGmailThreadIdForThreadRowByClick(event.target);
-      if (threadId) {
-        event.target.setAttribute('data-inboxsdk-threadid', threadId);
+  document.addEventListener(
+    'inboxSDKtellMeThisThreadIdByClick',
+    function (event: any) {
+      try {
+        const threadId = getGmailThreadIdForThreadRowByClick(event.target);
+        if (threadId) {
+          event.target.setAttribute('data-inboxsdk-threadid', threadId);
+        }
+      } catch (err) {
+        logger.error(err, 'Error in inboxSDKtellMeThisThreadIdByClick');
       }
-    } catch (err) {
-      logger.error(err, 'Error in inboxSDKtellMeThisThreadIdByClick');
     }
-  });
+  );
 }
 
 export function processThreadListResponse(threadListResponse: string) {
@@ -80,7 +82,7 @@ function threadMetadataKey(
 function processPreloadedThreads() {
   const preloadScript = find(
     document.querySelectorAll('script:not([src])'),
-    script =>
+    (script) =>
       script.text && script.text.slice(0, 500).indexOf('var VIEW_DATA=[[') > -1
   );
   if (!preloadScript) {
@@ -95,7 +97,7 @@ function processPreloadedThreads() {
     );
     processThreads(
       GmailResponseProcessor.extractThreadsFromDeserialized([
-        GmailResponseProcessor.deserializeArray(viewDataString)
+        GmailResponseProcessor.deserializeArray(viewDataString),
       ])
     );
   }
@@ -122,9 +124,8 @@ function getThreadIdFromUrl(url: string): ?string {
 function getGmailThreadIdForThreadRowByDatabase(
   threadRow: HTMLElement
 ): ?string {
-  const domRowMetadata = threadRowParser.extractMetadataFromThreadRow(
-    threadRow
-  );
+  const domRowMetadata =
+    threadRowParser.extractMetadataFromThreadRow(threadRow);
   const key = threadMetadataKey(domRowMetadata);
   const value = threadIdsByKey.get(key);
   if (typeof value === 'string') {
@@ -136,12 +137,11 @@ function getGmailThreadIdForThreadRowByClick(threadRow: HTMLElement): ?string {
   // Simulate a ctrl-click on the thread row to get the thread id, then
   // simulate a ctrl-click on the previously selected thread row (or the
   // first thread row) to put the cursor back where it was.
-  const domRowMetadata = threadRowParser.extractMetadataFromThreadRow(
-    threadRow
-  );
+  const domRowMetadata =
+    threadRowParser.extractMetadataFromThreadRow(threadRow);
   const parent = findParent(
     threadRow,
-    el => el.nodeName === 'DIV' && el.getAttribute('role') === 'main'
+    (el) => el.nodeName === 'DIV' && el.getAttribute('role') === 'main'
   );
   if (!parent) {
     throw new Error("Can't operate on disconnected thread row");

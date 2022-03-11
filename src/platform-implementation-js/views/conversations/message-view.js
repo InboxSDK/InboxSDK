@@ -12,7 +12,7 @@ import type {
   MessageViewDriver,
   VIEW_STATE,
   MessageViewLinkDescriptor,
-  MessageViewToolbarButtonDescriptor
+  MessageViewToolbarButtonDescriptor,
 } from '../../driver-interfaces/message-view-driver';
 import type { Driver } from '../../driver-interfaces/driver';
 
@@ -36,7 +36,7 @@ class MessageView extends EventEmitter {
       membrane,
       Conversations,
       driver,
-      linksInBody: (null: ?Array<MessageViewLinkDescriptor>)
+      linksInBody: (null: ?Array<MessageViewLinkDescriptor>),
     };
     memberMap.set(this, members);
 
@@ -49,16 +49,15 @@ class MessageView extends EventEmitter {
 
   addAttachmentCardView(cardOptions: Object): AttachmentCardView {
     const { messageViewImplementation, membrane } = get(memberMap, this);
-    const attachmentCardViewDriver = messageViewImplementation.addAttachmentCard(
-      cardOptions
-    );
+    const attachmentCardViewDriver =
+      messageViewImplementation.addAttachmentCard(cardOptions);
     const attachmentCardView = membrane.get(attachmentCardViewDriver);
 
-    attachmentCardViewDriver.getPreviewClicks().onValue(e => {
+    attachmentCardViewDriver.getPreviewClicks().onValue((e) => {
       if (cardOptions.previewOnClick) {
         cardOptions.previewOnClick({
           attachmentCardView,
-          preventDefault: () => e.preventDefault()
+          preventDefault: () => e.preventDefault(),
         });
       }
     });
@@ -79,9 +78,9 @@ class MessageView extends EventEmitter {
       onClick: () => {
         const attachmentCardViews = messageViewImplementation
           .getAttachmentCardViewDrivers()
-          .map(cardDriver => membrane.get(cardDriver));
+          .map((cardDriver) => membrane.get(cardDriver));
         buttonOptions.onClick({ attachmentCardViews });
-      }
+      },
     });
   }
 
@@ -127,8 +126,10 @@ class MessageView extends EventEmitter {
     const { messageViewImplementation, membrane } = get(memberMap, this);
     return messageViewImplementation
       .getAttachmentCardViewDrivers()
-      .filter(cardDriver => cardDriver.getAttachmentType() === 'FILE')
-      .map(attachmentCardViewDriver => membrane.get(attachmentCardViewDriver));
+      .filter((cardDriver) => cardDriver.getAttachmentType() === 'FILE')
+      .map((attachmentCardViewDriver) =>
+        membrane.get(attachmentCardViewDriver)
+      );
   }
 
   // Deprecated name
@@ -166,7 +167,7 @@ class MessageView extends EventEmitter {
           html: anchor.innerHTML,
           href: anchor.href,
           element: anchor,
-          isInQuotedArea: this.isElementInQuotedArea(anchor)
+          isInQuotedArea: this.isElementInQuotedArea(anchor),
         })
       );
     }
@@ -185,9 +186,9 @@ class MessageView extends EventEmitter {
         'MessageView.getRecipients',
         'MessageView.getRecipientEmailAddresses() or MessageView.getRecipientsFull()'
       );
-    return this.getRecipientEmailAddresses().map(emailAddress => ({
+    return this.getRecipientEmailAddresses().map((emailAddress) => ({
       emailAddress,
-      name: null
+      name: null,
     }));
   }
 
@@ -235,7 +236,7 @@ class MessageView extends EventEmitter {
 }
 
 function _bindToEventStream(messageView, members, stream) {
-  stream.onEnd(function() {
+  stream.onEnd(function () {
     messageView.destroyed = true;
     messageView.emit('destroy');
 
@@ -243,15 +244,15 @@ function _bindToEventStream(messageView, members, stream) {
   });
 
   stream
-    .filter(function(event) {
+    .filter(function (event) {
       return event.type !== 'internal' && event.eventName === 'contactHover';
     })
-    .onValue(function(event) {
+    .onValue(function (event) {
       messageView.emit(event.eventName, {
         contactType: event.contactType,
         contact: event.contact,
         messageView: messageView,
-        threadView: messageView.getThreadView()
+        threadView: messageView.getThreadView(),
       });
     });
 
@@ -261,25 +262,25 @@ function _bindToEventStream(messageView, members, stream) {
     });
   } else {
     stream
-      .filter(event => event.eventName === 'messageLoad')
-      .onValue(event => {
+      .filter((event) => event.eventName === 'messageLoad')
+      .onValue((event) => {
         messageView.emit('load', {
-          messageView: messageView
+          messageView: messageView,
         });
       });
   }
 
   stream
-    .filter(function(event) {
+    .filter(function (event) {
       return event.eventName === 'viewStateChange';
     })
-    .onValue(function(event) {
+    .onValue(function (event) {
       messageView.emit('viewStateChange', {
         oldViewState:
           members.Conversations.MessageViewViewStates[event.oldValue],
         newViewState:
           members.Conversations.MessageViewViewStates[event.newValue],
-        messageView: messageView
+        messageView: messageView,
       });
     });
 }

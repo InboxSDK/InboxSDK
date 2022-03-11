@@ -17,7 +17,7 @@ const navItemTypes = Object.freeze({
   GROUPER: 'GROUPER',
 
   // Old alias for LINK
-  MANAGE: 'MANAGE'
+  MANAGE: 'MANAGE',
 } as const);
 
 export default navItemTypes;

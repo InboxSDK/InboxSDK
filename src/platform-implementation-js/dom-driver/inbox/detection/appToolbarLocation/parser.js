@@ -38,10 +38,10 @@ export default function parser(el: HTMLElement) {
   const score = 1 - ec.errorCount() / ec.runCount();
   return {
     elements: {
-      chatSidebarButton
+      chatSidebarButton,
     },
     score,
-    errors: ec.getErrorLogs()
+    errors: ec.getErrorLogs(),
   };
 }
 

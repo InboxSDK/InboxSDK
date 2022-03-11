@@ -26,10 +26,10 @@ const searchCollection = (
   return null;
 };
 
-const findDraftID = target => {
+const findDraftID = (target) => {
   const match = searchCollection(
     target.__cdn.context,
-    value => typeof value === 'string' && value.indexOf('#msg-a:') > -1,
+    (value) => typeof value === 'string' && value.indexOf('#msg-a:') > -1,
     MAX_SEARCH_DEPTH
   );
   return match ? match.replace('#msg-a:', '') : null;

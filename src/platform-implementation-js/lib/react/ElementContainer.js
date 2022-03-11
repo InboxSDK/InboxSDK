@@ -4,7 +4,7 @@ import React from 'react';
 
 type Props = {
   className?: ?string,
-  el: HTMLElement
+  el: HTMLElement,
 };
 export default class ElementContainer extends React.Component<Props> {
   props: Props;

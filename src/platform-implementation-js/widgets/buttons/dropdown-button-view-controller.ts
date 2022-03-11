@@ -95,7 +95,7 @@ export default class DropdownButtonViewController {
     if (!this._view) throw new Error('Already destroyed');
     this._view
       .getEventStream()
-      .filter(event => event.eventName === 'click')
+      .filter((event) => event.eventName === 'click')
       .onValue(() => {
         this._toggleDropdownState();
       });

@@ -9,7 +9,9 @@ import Kefir from 'kefir';
 declare export default class StopperPool {
   stream: Kefir.Observable<any>;
 
-  constructor(streams: Kefir.Observable<any> | Kefir.Observable<any>[]): StopperPool;
+  constructor(
+    streams: Kefir.Observable<any> | Kefir.Observable<any>[]
+  ): StopperPool;
   add(newStreams: Kefir.Observable<any> | Kefir.Observable<any>[]): void;
   getSize(): number;
 }

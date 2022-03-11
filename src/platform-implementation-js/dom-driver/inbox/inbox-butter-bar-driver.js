@@ -30,11 +30,11 @@ const elements = streamWaitFor(() =>
 const sdkNoticeIdChanges = elements.flatMapLatest(({ sdkNotice }) =>
   makeMutationObserverChunkedStream(sdkNotice, {
     attributes: true,
-    attributeFilter: ['data-inboxsdk-id']
+    attributeFilter: ['data-inboxsdk-id'],
   }).map(() => sdkNotice.getAttribute('data-inboxsdk-id'))
 );
 
-const sdkRemovedNotice = sdkNoticeIdChanges.filter(id => id == null);
+const sdkRemovedNotice = sdkNoticeIdChanges.filter((id) => id == null);
 
 const noticeAvailableStream = sdkRemovedNotice;
 
@@ -42,17 +42,17 @@ function hideMessage(noticeContainer, googleNotice, sdkNotice) {
   Object.assign(sdkNotice.style, {
     opacity: '0',
     transform: '',
-    transition: 'opacity 100ms'
+    transition: 'opacity 100ms',
   });
   sdkNotice.removeAttribute('data-inboxsdk-id');
   Kefir.fromEvents(sdkNotice, 'transitionend')
     .merge(Kefir.later(200)) // transition might not finish if element is hidden
-    .takeUntilBy(sdkNoticeIdChanges.filter(id => id != null))
+    .takeUntilBy(sdkNoticeIdChanges.filter((id) => id != null))
     .onValue(() => {
       Object.assign(sdkNotice.style, {
         display: 'none',
         opacity: '',
-        transition: ''
+        transition: '',
       });
     });
 }
@@ -111,24 +111,24 @@ export default class InboxButterBarDriver {
         Object.assign(sdkNotice.style, {
           opacity: '0',
           transform: 'none',
-          transition: 'none'
+          transition: 'none',
         });
         sdkNotice.offsetHeight; // force relayout
         Object.assign(sdkNotice.style, {
           opacity: '1',
-          transition: ''
+          transition: '',
         });
       } else {
         Object.assign(sdkNotice.style, {
           opacity: '0',
           transform: '',
           transition: '',
-          display: 'block'
+          display: 'block',
         });
         sdkNotice.offsetHeight; // force relayout
         Object.assign(sdkNotice.style, {
           opacity: '1',
-          transform: 'none'
+          transform: 'none',
         });
       }
 
@@ -146,7 +146,7 @@ export default class InboxButterBarDriver {
               hideMessage(noticeContainer, googleNotice, sdkNotice);
             }
           });
-      }
+      },
     };
   }
 

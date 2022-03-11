@@ -35,7 +35,7 @@ function byId(id: string): string {
 
 function getAdjustedHeightRules(scrollBody, unexpectedHeight, minimumHeight) {
   return ['height', 'min-height', 'max-height']
-    .map(property => {
+    .map((property) => {
       const currentValue = parseInt(
         scrollBody.style.getPropertyValue(property),
         10
@@ -87,7 +87,7 @@ export default function sizeFixer(
   var composeEvents = gmailComposeView.getEventStream();
   var stopper = composeEvents.filter(() => false).beforeEnd(() => null);
   var resizeEvents = composeEvents
-    .filter(e => includes(['resize', 'fullscreenChanged'], e.eventName))
+    .filter((e) => includes(['resize', 'fullscreenChanged'], e.eventName))
     .merge(delayAsap(null));
 
   var statusAreaParent: HTMLElement = (gmailComposeView.getStatusArea()
@@ -98,7 +98,8 @@ export default function sizeFixer(
   var topForm = gmailComposeView.getTopFormElement();
   var composeId = gmailComposeView.getElement().id;
   if (!composeId) {
-    composeId = gmailComposeView.getElement().id = `x${Math.random()}x${Date.now()}`;
+    composeId =
+      gmailComposeView.getElement().id = `x${Math.random()}x${Date.now()}`;
   }
 
   function setRuleForSelector(selector: string, rule: string) {
@@ -106,7 +107,7 @@ export default function sizeFixer(
       SELECTOR_ESCAPE_HATCH_PREFIX + byId(composeId) + ' ' + selector;
     const ix = findIndex(
       sheet.cssRules,
-      cssRule => cssRule.selectorText === fullSelector
+      (cssRule) => cssRule.selectorText === fullSelector
     );
     if (ix !== -1) {
       sheet.deleteRule(ix);
@@ -122,14 +123,14 @@ export default function sizeFixer(
         new CustomEvent('resize', {
           bubbles: false,
           cancelable: false,
-          detail: null
+          detail: null,
         })
       );
     });
 
   resizeEvents
-    .bufferBy(resizeEvents.flatMap(x => delayAsap(null)))
-    .filter(x => x.length > 0)
+    .bufferBy(resizeEvents.flatMap((x) => delayAsap(null)))
+    .filter((x) => x.length > 0)
     .merge(makeMutationObserverChunkedStream(scrollBody, { attributes: true }))
     .takeUntilBy(stopper)
     .onValue(() => {

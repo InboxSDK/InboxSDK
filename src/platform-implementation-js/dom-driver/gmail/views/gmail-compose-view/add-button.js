@@ -37,7 +37,7 @@ export default function addButton(
             );
             resolve({
               buttonViewController: buttonViewController,
-              buttonDescriptor: buttonDescriptor
+              buttonDescriptor: buttonDescriptor,
             });
           }
         } else {
@@ -81,7 +81,7 @@ function _addButton(
     new CustomEvent('buttonAdded', {
       bubbles: false,
       cancelable: false,
-      detail: null
+      detail: null,
     })
   );
 
@@ -94,10 +94,7 @@ function _addButtonToModifierArea(
   groupOrderHint: string
 ) {
   var buttonViewController = _getButtonViewController(buttonDescriptor);
-  buttonViewController
-    .getView()
-    .getElement()
-    .setAttribute('tabindex', '1');
+  buttonViewController.getView().getElement().setAttribute('tabindex', '1');
   buttonViewController
     .getView()
     .getElement()
@@ -107,9 +104,11 @@ function _addButtonToModifierArea(
     .getElement()
     .setAttribute('data-group-order-hint', groupOrderHint);
 
-  var formattingAreaOffsetLeft = gmailComposeView._getFormattingAreaOffsetLeft();
+  var formattingAreaOffsetLeft =
+    gmailComposeView._getFormattingAreaOffsetLeft();
   var element: HTMLElement = buttonViewController.getView().getElement();
-  var actionToolbar: HTMLElement = gmailComposeView.getAdditionalActionToolbar();
+  var actionToolbar: HTMLElement =
+    gmailComposeView.getAdditionalActionToolbar();
 
   insertElementInOrder(actionToolbar, element);
   gmailComposeView.updateInsertMoreAreaLeft(formattingAreaOffsetLeft);
@@ -123,10 +122,7 @@ function _addButtonToSendActionArea(gmailComposeView, buttonDescriptor) {
   const buttonViewController = _getButtonViewController(buttonDescriptor);
   buttonViewController.getView().removeClass('inboxsdk__composeButton');
   buttonViewController.getView().addClass('inboxsdk__compose_sendButton');
-  buttonViewController
-    .getView()
-    .getElement()
-    .setAttribute('tabindex', '1');
+  buttonViewController.getView().getElement().setAttribute('tabindex', '1');
 
   const sendButtonGroupElement = gmailComposeView.getSendButtonGroup();
 
@@ -149,7 +145,7 @@ function _getButtonViewController(buttonDescriptor: Object) {
   if (buttonDescriptor.hasDropdown) {
     Object.assign(options, {
       dropdownViewDriverClass: GmailDropdownView,
-      dropdownPositionOptions: { vAlign: 'top' }
+      dropdownPositionOptions: { vAlign: 'top' },
     });
 
     buttonViewController = new DropdownButtonViewController(options);
@@ -172,11 +168,11 @@ function _processButtonDescriptor(
 
   const buttonOptions = {
     type: 'MODIFIER',
-    ...buttonDescriptor
+    ...buttonDescriptor,
   };
 
   const oldOnClick = buttonOptions.onClick;
-  buttonOptions.onClick = function(event) {
+  buttonOptions.onClick = function (event) {
     driver.getLogger().eventSdkActive('composeView.addedButton.click');
     oldOnClick({ ...extraOnClickOptions, ...event });
   };

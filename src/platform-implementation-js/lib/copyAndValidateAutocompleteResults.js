@@ -11,7 +11,7 @@ export default function copyAndValidateAutocompleteResults(
     throw new Error('suggestions must be an array');
   }
 
-  return results.map(result => {
+  return results.map((result) => {
     const resultCopy = { ...result };
     if (
       typeof resultCopy.name !== 'string' &&

@@ -4,7 +4,7 @@ import Kefir from 'kefir';
 
 type OutsideEvent = {|
   type: 'outsideInteraction' | 'escape',
-  cause: Event
+  cause: Event,
 |};
 
 declare export default function outsideClicksAndEscape(

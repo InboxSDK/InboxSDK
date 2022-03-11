@@ -71,7 +71,7 @@ class GmailThreadView {
     this._eventStream = kefirBus();
     this._messageViewDrivers = [];
 
-    this._logAddonElementInfo().catch(err =>
+    this._logAddonElementInfo().catch((err) =>
       this._driver.getLogger().error(err)
     );
 
@@ -88,7 +88,7 @@ class GmailThreadView {
       )
       .take(1)
       .takeErrors(1)
-      .flatMapErrors(err => {
+      .flatMapErrors((err) => {
         this._driver.getLogger().error(err);
         return Kefir.constant(null);
       })
@@ -101,7 +101,7 @@ class GmailThreadView {
     ) {
       combinedReadyStream = Kefir.combine([
         waitForSidebarReady,
-        Kefir.fromPromise(this.getThreadIDAsync())
+        Kefir.fromPromise(this.getThreadIDAsync()),
       ]);
     } else {
       combinedReadyStream = waitForSidebarReady;
@@ -131,10 +131,10 @@ class GmailThreadView {
       .merge(
         this._eventStream
           .filter(
-            event =>
+            (event) =>
               event.type === 'internal' && event.eventName === 'messageCreated'
           )
-          .map(event => event.view)
+          .map((event) => event.view)
       );
   }
 
@@ -169,7 +169,7 @@ class GmailThreadView {
     if (this._toolbarView) this._toolbarView.destroy();
     if (this._threadSidebar) this._threadSidebar.destroy();
 
-    this._messageViewDrivers.forEach(messageView => {
+    this._messageViewDrivers.forEach((messageView) => {
       messageView.destroy();
     });
     this._messageViewDrivers.length = 0;
@@ -229,20 +229,20 @@ class GmailThreadView {
 
         const messages = [
           ...(await Promise.all(
-            this._messageViewDrivers.map(async messageView => ({
+            this._messageViewDrivers.map(async (messageView) => ({
               sortDatetime: (await messageView.getDate()) || 0,
               isHidden: messageView.getViewState() === 'HIDDEN',
-              element: messageView.getElement()
+              element: messageView.getElement(),
             }))
           )),
           ...Array.from(this._customMessageViews)
             .filter(
-              cmv =>
+              (cmv) =>
                 cmv !== customMessageView &&
                 cmv.getElement()
                   .parentElement /* it has been inserted into dom */
             )
-            .map(cmv => {
+            .map((cmv) => {
               const date = cmv.getSortDate();
               const datetime = date ? date.getTime() : null;
 
@@ -251,9 +251,9 @@ class GmailThreadView {
                 isHidden: cmv
                   .getElement()
                   .classList.contains('inboxsdk__custom_message_view_hidden'),
-                element: cmv.getElement()
+                element: cmv.getElement(),
               };
-            })
+            }),
         ].sort((a, b) => a.sortDatetime - b.sortDatetime);
 
         const messageDate = customMessageView.getSortDate();
@@ -330,12 +330,12 @@ class GmailThreadView {
     // listen for a class change on that message which occurs when it becomes visible
     makeMutationObserverChunkedStream(hiddenNoticeMessageElement, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ['class'],
     })
       .takeUntilBy(
         Kefir.merge([
           this._stopper,
-          Kefir.fromEvents(customMessageView, 'destroy')
+          Kefir.fromEvents(customMessageView, 'destroy'),
         ])
       )
       .filter(
@@ -386,9 +386,8 @@ class GmailThreadView {
     const noticeProvider = this._hiddenCustomMessageNoticeProvider;
     if (!noticeProvider) return;
 
-    const appNoticeContainerElement = (this._hiddenCustomMessageNoticeElement = document.createElement(
-      'span'
-    ));
+    const appNoticeContainerElement = (this._hiddenCustomMessageNoticeElement =
+      document.createElement('span'));
     appNoticeContainerElement.classList.add(
       'inboxsdk__custom_message_view_app_notice_content'
     );
@@ -414,7 +413,7 @@ class GmailThreadView {
     const appNoticeElement = noticeProvider(
       numberCustomHiddenMessages,
       numberNativeHiddenMessages,
-      new Promise(resolve => {
+      new Promise((resolve) => {
         this._resolveUnmountHiddenNoticePromise = resolve;
       })
     );
@@ -521,9 +520,8 @@ class GmailThreadView {
         'data-legacy-thread-id'
       );
       if (!threadID) {
-        this._threadID = threadID = await this._driver.getOldGmailThreadIdFromSyncThreadId(
-          syncThreadID
-        );
+        this._threadID = threadID =
+          await this._driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
       }
     } else {
       if (this._isPreviewedThread) {
@@ -561,10 +559,10 @@ class GmailThreadView {
     labelContainer.appendChild(el);
     const view = new SimpleElementView(el);
 
-    const observer = new MutationObserver(mutationsList => {
+    const observer = new MutationObserver((mutationsList) => {
       if (
         mutationsList.some(
-          mutation =>
+          (mutation) =>
             mutation.type === 'childList' &&
             mutation.removedNodes &&
             mutation.removedNodes.length &&
@@ -651,7 +649,7 @@ class GmailThreadView {
 
     if (!openMessage) {
       var self = this;
-      setTimeout(function() {
+      setTimeout(function () {
         if (self._element) {
           self._setupMessageViewStream();
         }
@@ -668,7 +666,7 @@ class GmailThreadView {
   _initializeExistingMessages(messageContainer: any) {
     var self = this;
     var children = messageContainer.children;
-    Array.prototype.forEach.call(children, function(childElement) {
+    Array.prototype.forEach.call(children, function (childElement) {
       self._createMessageView(childElement);
     });
   }
@@ -678,14 +676,14 @@ class GmailThreadView {
       this._handleNewMessageMutations.bind(this)
     ): any);
     this._newMessageMutationObserver.observe(messageContainer, {
-      childList: true
+      childList: true,
     });
   }
 
   _handleNewMessageMutations(mutations: MutationRecord[]) {
     var self = this;
-    mutations.forEach(function(mutation) {
-      Array.prototype.forEach.call(mutation.addedNodes, function(addedNode) {
+    mutations.forEach(function (mutation) {
+      Array.prototype.forEach.call(mutation.addedNodes, function (addedNode) {
         if (!addedNode.classList.contains('inboxsdk__custom_message_view'))
           self._createMessageView(addedNode);
       });
@@ -701,18 +699,20 @@ class GmailThreadView {
     this._eventStream.emit({
       type: 'internal',
       eventName: 'messageCreated',
-      view: messageView
+      view: messageView,
     });
   }
 
   _setupWidthManager() {
     let widthManager = this._widthManager;
     if (!widthManager) {
-      const addonSidebarElement = GmailElementGetter.getAddonSidebarContainerElement();
+      const addonSidebarElement =
+        GmailElementGetter.getAddonSidebarContainerElement();
       if (!addonSidebarElement)
         throw new Error('addonSidebarElement not found');
 
-      const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
+      const mainContentBodyContainerElement =
+        GmailElementGetter.getMainContentBodyContainerElement();
       if (!mainContentBodyContainerElement)
         throw new Error('mainContentBodyContainerElement not found');
       const contentContainer = mainContentBodyContainerElement.parentElement;
@@ -746,15 +746,15 @@ class GmailThreadView {
           ? (container.parentElement: any).style.display === 'none'
           : null,
         self: container.style.display === 'none',
-        children: Array.from(container.children).map(el =>
+        children: Array.from(container.children).map((el) =>
           el.style ? el.style.display === 'none' : null
-        )
+        ),
       };
 
       const rect = container.getBoundingClientRect();
       const size = {
         width: rect.width,
-        height: rect.height
+        height: rect.height,
       };
       return { isDisplayNone, size };
     }
@@ -763,7 +763,7 @@ class GmailThreadView {
     eventData.time[0] = readInfo();
 
     await Promise.all(
-      [30, 5000].map(async time => {
+      [30, 5000].map(async (time) => {
         await delay(time);
         if (this._stopper.stopped) return;
         eventData.time[time] = readInfo();
@@ -784,15 +784,15 @@ class GmailThreadView {
     if (expandAllElementImg) {
       const expandAllElement = findParent(
         expandAllElementImg,
-        el => el.getAttribute('role') === 'button'
+        (el) => el.getAttribute('role') === 'button'
       );
 
       if (expandAllElement) {
         Kefir.merge([
           Kefir.fromEvents(expandAllElement, 'click'),
           Kefir.fromEvents(expandAllElement, 'keydown').filter(
-            e => e.which === 13 /* enter */
-          )
+            (e) => e.which === 13 /* enter */
+          ),
         ])
           .takeUntilBy(this._stopper)
           .onValue(() => {
@@ -808,14 +808,14 @@ class GmailThreadView {
     if (collapseAllElementImg) {
       const collapseAllElement = findParent(
         collapseAllElementImg,
-        el => el.getAttribute('role') === 'button'
+        (el) => el.getAttribute('role') === 'button'
       );
       if (collapseAllElement) {
         Kefir.merge([
           Kefir.fromEvents(collapseAllElement, 'click'),
           Kefir.fromEvents(collapseAllElement, 'keydown').filter(
-            e => e.which === 13 /* enter */
-          )
+            (e) => e.which === 13 /* enter */
+          ),
         ])
           .takeUntilBy(this._stopper)
           .onValue(() => {

@@ -6,7 +6,7 @@ const readline = require('readline');
 
 const rl = readline.createInterface({
   input: process.stdin,
-  output: process.stdout
+  output: process.stdout,
 });
 
 const encryptor = createEncryptor(
@@ -14,7 +14,7 @@ const encryptor = createEncryptor(
     fs.readFileSync(__dirname + '/../.inboxsdk_test_secret', 'utf8').trim()
 );
 
-rl.question('Enter ciphertext: ', ciphertext => {
+rl.question('Enter ciphertext: ', (ciphertext) => {
   const result = encryptor.decrypt(ciphertext);
   console.log(JSON.stringify(result, null, 2));
   rl.close();

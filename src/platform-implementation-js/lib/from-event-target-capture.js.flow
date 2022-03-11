@@ -4,7 +4,7 @@ import Kefir from 'kefir';
 
 type Emitter = {
   +addEventListener: Function,
-  +removeEventListener: Function
+  +removeEventListener: Function,
 };
 
 declare export default function fromEventTargetCapture(

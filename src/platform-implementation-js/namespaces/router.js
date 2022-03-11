@@ -14,7 +14,7 @@ import type Membrane from '../lib/Membrane';
 import {
   NATIVE_ROUTE_IDS,
   NATIVE_LIST_ROUTE_IDS,
-  ROUTE_TYPES
+  ROUTE_TYPES,
 } from '../constants/router';
 
 import type { Driver } from '../driver-interfaces/driver';
@@ -40,14 +40,14 @@ class Router {
       allRoutesHandlerRegistry: new HandlerRegistry(),
       customRoutes: [],
       membrane,
-      listRouteHandlerRegistries: {}
+      listRouteHandlerRegistries: {},
     };
     Object.values(NATIVE_LIST_ROUTE_IDS).forEach((value: any) => {
       members.listRouteHandlerRegistries[value] = new HandlerRegistry();
     });
     memberMap.set(this, members);
 
-    driver.getRouteViewDriverStream().onValue(routeViewDriver => {
+    driver.getRouteViewDriverStream().onValue((routeViewDriver) => {
       driver
         .getLogger()
         .trackFunctionPerformance(
@@ -55,12 +55,12 @@ class Router {
           SAMPLE_RATE,
           {
             type: 'handleRouteViewChange',
-            routeID: routeViewDriver.getRouteID()
+            routeID: routeViewDriver.getRouteID(),
           }
         );
     });
 
-    driver.getStopper().onValue(function() {
+    driver.getStopper().onValue(function () {
       members.allRoutesHandlerRegistry.dumpHandlers();
       Object.values(members.listRouteHandlerRegistries).forEach((reg: any) => {
         reg.dumpHandlers();
@@ -94,7 +94,7 @@ class Router {
   ): () => void {
     const customRouteDescriptor = {
       routeID: routeID,
-      onActivate: handler
+      onActivate: handler,
     };
 
     const removeCustomRouteFromDriver = get(
@@ -107,7 +107,7 @@ class Router {
 
     driver.getLogger().eventSdkPassive('Router.handleCustomRoute');
 
-    return function() {
+    return function () {
       removeCustomRouteFromDriver();
       const index = customRoutes.indexOf(customRouteDescriptor);
       if (index > -1) {
@@ -183,7 +183,7 @@ function _informRelevantCustomRoutes(members, routeViewDriver, routeView) {
   const routeIDArray = Array.isArray(routeID) ? routeID : [routeID];
   const relevantCustomRoute = find(
     members.customRoutes,
-    customRoute =>
+    (customRoute) =>
       intersection(
         Array.isArray(customRoute.routeID)
           ? customRoute.routeID

@@ -31,7 +31,7 @@ export default class InboxCustomRouteView {
       getSidebarClassnames().centerList || 'UNKNOWN_centerList';
     this._customViewElement.className = cx(idMap('custom_view_container'), {
       [idMap('custom_view_min_margins')]: fullWidth,
-      [centerListClassName]: !fullWidth
+      [centerListClassName]: !fullWidth,
     });
   }
 

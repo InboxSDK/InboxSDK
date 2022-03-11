@@ -143,7 +143,7 @@ class GmailToolbarView {
         this._addToOpenMoreMenu(buttonDescriptor);
         buttonStopper.onValue(() => {
           this._moreMenuItems = this._moreMenuItems.filter(
-            _entry => _entry !== entry
+            (_entry) => _entry !== entry
           );
           this._addMoreItems();
         });
@@ -153,9 +153,8 @@ class GmailToolbarView {
           toolbarSections
         );
         if (sectionElement) {
-          const buttonViewController = this._createButtonViewController(
-            buttonDescriptor
-          );
+          const buttonViewController =
+            this._createButtonViewController(buttonDescriptor);
           this._buttonViewControllers.add(buttonViewController);
           buttonStopper.onValue(() => {
             this._buttonViewControllers.delete(buttonViewController);
@@ -175,7 +174,7 @@ class GmailToolbarView {
                 id,
                 title: buttonDescriptor.title,
                 hasThreadViewDriver: this.isForThread(),
-                hasRowListViewDriver: this.isForRowList()
+                hasRowListViewDriver: this.isForRowList(),
               })
             );
 
@@ -192,10 +191,10 @@ class GmailToolbarView {
           );
 
           Kefir.merge([Kefir.constant(-1), Kefir.later(1000, 1000)])
-            .map(delay => {
+            .map((delay) => {
               const duplicates: Object[] = Array.from(sectionElement.children)
                 .filter(
-                  el =>
+                  (el) =>
                     buttonViewController
                       .getView()
                       .getElement()
@@ -207,11 +206,12 @@ class GmailToolbarView {
                       .getAttribute('data-toolbar-expanded') ===
                       el.getAttribute('data-toolbar-expanded')
                 )
-                .filter(el => el.hasAttribute('data-add-button-debug'))
-                .map(el =>
+                .filter((el) => el.hasAttribute('data-add-button-debug'))
+                .map((el) =>
                   Object.assign(
                     {
-                      ownedByExtension: !!(el: any).__addButton_ownedByExtension
+                      ownedByExtension: !!(el: any)
+                        .__addButton_ownedByExtension,
                     },
                     JSON.parse(
                       el.getAttribute('data-add-button-debug') || 'null'
@@ -233,7 +233,7 @@ class GmailToolbarView {
                 ),
                 dataRowlistToolbar: this._element.getAttribute(
                   'data-rowlist-toolbar'
-                )
+                ),
               });
             });
 
@@ -249,7 +249,7 @@ class GmailToolbarView {
       getStopper: () => buttonStopper,
       destroy: () => {
         buttonStopper.destroy();
-      }
+      },
     };
   }
 
@@ -271,8 +271,8 @@ class GmailToolbarView {
         dropdownShowFunction: buttonDescriptor.onClick,
         dropdownPositionOptions: {
           position: 'bottom',
-          hAlign: 'left'
-        }
+          hAlign: 'left',
+        },
       });
     } else {
       buttonViewController = new BasicButtonViewController(buttonDescriptor);
@@ -284,7 +284,7 @@ class GmailToolbarView {
   _getButtonView(buttonDescriptor: Object): Object {
     const buttonView = new ButtonView({
       ...buttonDescriptor,
-      noArrow: true
+      noArrow: true,
     });
 
     if (this._rowListViewDriver) {
@@ -307,12 +307,12 @@ class GmailToolbarView {
 
     makeMutationObserverStream(moreButtonElement, {
       attributes: true,
-      attributeFilter: ['aria-expanded']
+      attributeFilter: ['aria-expanded'],
     })
       .toProperty(() => null)
       .takeUntilBy(this._stopper)
       .map(() => moreButtonElement.getAttribute('aria-expanded'))
-      .onValue(ariaExpanded => {
+      .onValue((ariaExpanded) => {
         if (ariaExpanded !== 'true') {
           this._clearMoreItems();
         } else {
@@ -340,7 +340,7 @@ class GmailToolbarView {
         '[role=button]:not(.inboxsdk__button)'
       )
     ).some(
-      buttonElement =>
+      (buttonElement) =>
         buttonElement.hasAttribute('title') ||
         buttonElement.hasAttribute('data-tooltip')
     );
@@ -355,10 +355,10 @@ class GmailToolbarView {
     if (!moveSectionElement) throw new Error('No move section element');
     makeMutationObserverStream(moveSectionElement, {
       attributes: true,
-      attributeFilter: ['style']
+      attributeFilter: ['style'],
     })
       .takeUntilBy(this._stopper)
-      .onValue(mutation => {
+      .onValue((mutation) => {
         if (
           mutation.target instanceof HTMLElement &&
           mutation.target.style.display === 'none'
@@ -428,7 +428,7 @@ class GmailToolbarView {
 
       const buttons = element.querySelectorAll('.G-Ni > [role=button]');
 
-      Array.prototype.forEach.call(buttons, button => {
+      Array.prototype.forEach.call(buttons, (button) => {
         let current = button;
         for (let ii = 0; ii < 100000; ii++) {
           if (current.previousElementSibling) {
@@ -482,7 +482,7 @@ class GmailToolbarView {
 
   _updateButtonEnabledState() {
     const enabled = this._toolbarState === 'EXPANDED';
-    this._buttonViewControllers.forEach(buttonViewController => {
+    this._buttonViewControllers.forEach((buttonViewController) => {
       buttonViewController.getView().setEnabled(enabled);
     });
   }
@@ -494,7 +494,7 @@ class GmailToolbarView {
       return;
     }
 
-    this._moreMenuItems.forEach(item => {
+    this._moreMenuItems.forEach((item) => {
       this._addToOpenMoreMenu(item.buttonDescriptor);
     });
   }
@@ -523,9 +523,8 @@ class GmailToolbarView {
       return this._moreMenuItemsContainer;
     }
 
-    const container = (this._moreMenuItemsContainer = document.createElement(
-      'div'
-    ));
+    const container = (this._moreMenuItemsContainer =
+      document.createElement('div'));
     container.setAttribute('data-group-order-hint', this._driver.getAppId());
     container.innerHTML = '<div class="J-Kh"></div>';
 
@@ -556,7 +555,7 @@ class GmailToolbarView {
           '"></span>'
         : '',
       escape(buttonDescriptor.title),
-      '</div>'
+      '</div>',
     ].join('');
 
     itemElement.addEventListener('mouseenter', (e: MouseEvent) =>

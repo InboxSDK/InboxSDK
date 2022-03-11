@@ -8,7 +8,7 @@ import { injectScript } from '../../lib/inject-script';
 
 export default function makeXhrInterceptor(): {
   xhrInterceptStream: Kefir.Observable<Object>,
-  pageCommunicatorPromise: Promise<PageCommunicator>
+  pageCommunicatorPromise: Promise<PageCommunicator>,
 } {
   var pageCommunicator = new PageCommunicator();
   var rawInterceptStream = pageCommunicator.ajaxInterceptStream;
@@ -17,10 +17,10 @@ export default function makeXhrInterceptor(): {
 
   var interceptStream = Kefir.merge([
     rawInterceptStream
-      .filter(function(detail) {
+      .filter(function (detail) {
         return detail.type === 'emailSending';
       })
-      .map(function(detail) {
+      .map(function (detail) {
         if (detail.draftID) {
           return detail;
         } else {
@@ -29,15 +29,15 @@ export default function makeXhrInterceptor(): {
           return {
             type: 'emailSending',
             composeId: body.composeid,
-            draft: body.draft
+            draft: body.draft,
           };
         }
       }),
     rawInterceptStream
-      .filter(function(detail) {
+      .filter(function (detail) {
         return detail.type === 'emailSent';
       })
-      .map(function(detail) {
+      .map(function (detail) {
         if (detail.draftID) {
           return detail;
         } else {
@@ -48,15 +48,15 @@ export default function makeXhrInterceptor(): {
             type: 'emailSent',
             composeId: body.composeid,
             draft: body.draft,
-            response: response
+            response: response,
           };
         }
       }),
     rawInterceptStream
-      .filter(function(detail) {
+      .filter(function (detail) {
         return detail.type === 'emailDraftSaveSending';
       })
-      .map(function(detail) {
+      .map(function (detail) {
         if (detail.draftID) {
           return detail;
         } else {
@@ -65,15 +65,15 @@ export default function makeXhrInterceptor(): {
           return {
             type: 'emailDraftSaveSending',
             composeId: body.composeid,
-            draft: body.draft
+            draft: body.draft,
           };
         }
       }),
     rawInterceptStream
-      .filter(function(detail) {
+      .filter(function (detail) {
         return detail.type === 'emailDraftReceived';
       })
-      .map(function(detail) {
+      .map(function (detail) {
         if (detail.draftID) {
           return detail;
         } else {
@@ -85,14 +85,14 @@ export default function makeXhrInterceptor(): {
             composeId: body.composeid,
             draft: body.draft,
             response: response,
-            connectionDetails: detail.connectionDetails
+            connectionDetails: detail.connectionDetails,
           };
         }
-      })
+      }),
   ]);
 
   return {
     xhrInterceptStream: interceptStream,
-    pageCommunicatorPromise
+    pageCommunicatorPromise,
   };
 }

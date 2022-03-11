@@ -3,11 +3,11 @@
 import type { PlatformImplementation } from '../../platform-implementation-js/platform-implementation';
 
 declare export var PlatformImplementationLoader: {
-  load(appId: string, opts: Object): Promise<PlatformImplementation>;
+  load(appId: string, opts: Object): Promise<PlatformImplementation>,
 
-  _loadScript: () => Promise<void>;
+  _loadScript: () => Promise<void>,
 
-  preload(): void;
+  preload(): void,
 };
 
 export default PlatformImplementationLoader;

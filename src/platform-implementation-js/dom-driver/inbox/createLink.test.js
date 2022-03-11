@@ -5,7 +5,7 @@ import createLink from './createLink';
 function makeDriver(): any {
   const customRouteIDs = new Set();
   return {
-    getCustomRouteIDs: () => customRouteIDs
+    getCustomRouteIDs: () => customRouteIDs,
   };
 }
 

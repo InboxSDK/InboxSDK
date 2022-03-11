@@ -26,7 +26,7 @@ export function getSelectedTextInElement(
   return t.toArray(
     [
       selection && selection.rangeCount ? selection.getRangeAt(0) : null,
-      lastRange
+      lastRange,
     ],
     t.compose(
       t.keep(),
@@ -45,7 +45,7 @@ export function getSelectedHTMLInElement(
   return t.toArray(
     [
       selection && selection.rangeCount ? selection.getRangeAt(0) : null,
-      lastRange
+      lastRange,
     ],
     t.compose(
       t.keep(),

@@ -4,20 +4,20 @@ module.exports = {
   env: {
     browser: true,
     node: true,
-    es6: true
+    es6: true,
   },
   extends: [
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:no-dupe-class-fields/recommended',
-    'plugin:@typescript-eslint/eslint-recommended'
+    'plugin:@typescript-eslint/eslint-recommended',
   ],
   parserOptions: {
     ecmaFeatures: {
       experimentalObjectRestSpread: true,
-      jsx: true
+      jsx: true,
     },
-    sourceType: 'module'
+    sourceType: 'module',
   },
   plugins: ['deprecate'],
   rules: {
@@ -30,7 +30,7 @@ module.exports = {
     'no-spaced-func': ['error'],
     'no-whitespace-before-property': ['error'],
     'space-before-blocks': ['off'], //["error", "always"],
-    'keyword-spacing': ['off'] //["error"],
+    'keyword-spacing': ['off'], //["error"],
   },
   overrides: [
     // Flow config
@@ -40,8 +40,8 @@ module.exports = {
       rules: {
         'flowtype/define-flow-type': 1,
         'flowtype/require-valid-file-annotation': ['error', 'always'],
-        'no-unused-vars': ['off']
-      }
+        'no-unused-vars': ['off'],
+      },
     },
     // Start typescript config. We commit some atrocities here because we want to use
     // ESLint for Flow too, not just Typescript.
@@ -50,11 +50,11 @@ module.exports = {
       ...(() => {
         const result = {
           ...require('@typescript-eslint/eslint-plugin/dist/configs/base'),
-          ...require('@typescript-eslint/eslint-plugin/dist/configs/recommended')
+          ...require('@typescript-eslint/eslint-plugin/dist/configs/recommended'),
         };
         delete result.extends;
         return result;
-      })()
+      })(),
     },
     {
       files: ['*.ts', '*.tsx'],
@@ -71,14 +71,14 @@ module.exports = {
         '@typescript-eslint/no-unused-vars': [
           'warn',
           {
-            argsIgnorePattern: '^_'
-          }
+            argsIgnorePattern: '^_',
+          },
         ],
 
         // TODO maybe remove these
         '@typescript-eslint/no-inferrable-types': ['off'],
-        '@typescript-eslint/no-this-alias': ['off']
-      }
+        '@typescript-eslint/no-this-alias': ['off'],
+      },
     },
     // End typescript config
 
@@ -86,52 +86,52 @@ module.exports = {
       files: ['src/**'],
       excludedFiles: ['*.test.*', '*.d.ts'],
       rules: {
-        'deprecate/import': ['error', 'lodash', 'crypto']
-      }
+        'deprecate/import': ['error', 'lodash', 'crypto'],
+      },
     },
     {
       files: ['__tests__/**', '**/*.test.*', 'test/**'],
       env: {
-        jest: true
-      }
+        jest: true,
+      },
     },
     {
       files: ['test/chrome/**'],
       rules: {
-        'no-console': ['off']
+        'no-console': ['off'],
       },
       globals: {
         page: 'readonly',
         browser: 'readonly',
         context: 'readonly',
-        jestPuppeteer: 'readonly'
-      }
+        jestPuppeteer: 'readonly',
+      },
     },
     {
       files: ['packages/core/background.js'],
       globals: {
-        chrome: 'readonly'
+        chrome: 'readonly',
       },
       rules: {
         'flowtype/define-flow-type': ['off'],
-        'flowtype/require-valid-file-annotation': ['off']
-      }
+        'flowtype/require-valid-file-annotation': ['off'],
+      },
     },
     {
       files: [
         '.eslintrc.js',
         'jest.config.js',
         'jest-puppeteer.config.js',
-        'tools/**'
+        'tools/**',
       ],
       rules: {
-        'flowtype/require-valid-file-annotation': ['off']
-      }
-    }
+        'flowtype/require-valid-file-annotation': ['off'],
+      },
+    },
   ],
   settings: {
     react: {
-      version: '16.8'
-    }
-  }
+      version: '16.8',
+    },
+  },
 };

@@ -17,7 +17,7 @@ export type ButtonViewOptions = {
   hasDropdown?: ?boolean,
   buttonColor?: ?string,
   keyboardShortcutHandle?: ?KeyboardShortcutHandle,
-  noArrow?: ?boolean
+  noArrow?: ?boolean,
 };
 
 declare export default class ButtonView {

@@ -1,8 +1,9 @@
 /* @flow */
 
-declare export function interpretSentEmailResponse(
-  responseString: string
-): { threadID: string, messageID: string };
+declare export function interpretSentEmailResponse(responseString: string): {
+  threadID: string,
+  messageID: string,
+};
 
 declare export function extractGmailMessageIdFromSentEmail(
   emailSentArray: any
@@ -20,16 +21,20 @@ export type MessageOptions = {
   includeLengths: boolean,
   suggestionMode: boolean,
   noArrayNewLines: boolean,
-  includeExplicitNulls: boolean
+  includeExplicitNulls: boolean,
 };
 
-declare export function deserialize(
-  threadResponseString: string
-): { value: any[], options: MessageOptions };
+declare export function deserialize(threadResponseString: string): {
+  value: any[],
+  options: MessageOptions,
+};
 
 declare export function deserializeArray(value: string): any[];
 
-declare export function serialize(value: any[], options: MessageOptions): string;
+declare export function serialize(
+  value: any[],
+  options: MessageOptions
+): string;
 
 export type Thread = {
   subject: string,
@@ -41,10 +46,13 @@ export type Thread = {
   lastEmailAddress: ?string,
   bodyPreviewHtml: string,
   someGmailMessageIds: string[],
-  gmailThreadId: string
+  gmailThreadId: string,
 };
 
-declare export function readDraftId(response: string, messageID: string): ?string;
+declare export function readDraftId(
+  response: string,
+  messageID: string
+): ?string;
 declare export function replaceThreadsInResponse(
   response: string,
   replacementThreads: Thread[],
@@ -65,8 +73,8 @@ export type Message = {
   messageID?: string,
   recipients?: Array<{
     emailAddress: string,
-    name: ?string
-  }>
+    name: ?string,
+  }>,
 };
 
 declare export function extractMessages(

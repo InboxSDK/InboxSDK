@@ -8,7 +8,7 @@ import type Membrane from '../../lib/Membrane';
 import type MessageView from './message-view';
 import type {
   Driver,
-  AttachmentCardViewDriver
+  AttachmentCardViewDriver,
 } from '../../driver-interfaces/driver';
 
 // documented in src/docs/
@@ -60,7 +60,8 @@ class AttachmentCardView extends EventEmitter {
   }
 
   getMessageView(): ?MessageView {
-    const messageViewDriver = this._attachmentCardImplementation.getMessageViewDriver();
+    const messageViewDriver =
+      this._attachmentCardImplementation.getMessageViewDriver();
     return messageViewDriver ? this._membrane.get(messageViewDriver) : null;
   }
 }

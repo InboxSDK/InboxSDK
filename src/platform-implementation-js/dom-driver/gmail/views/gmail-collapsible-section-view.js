@@ -83,8 +83,8 @@ class GmailCollapsibleSectionView {
       this._eventStream.filter(() => false).beforeEnd(() => null)
     );
 
-    stoppedProperty.onValue(x => this._updateValues(x));
-    stoppedProperty.take(1).onValue(x => this._isReadyDeferred.resolve(this));
+    stoppedProperty.onValue((x) => this._updateValues(x));
+    stoppedProperty.take(1).onValue((x) => this._isReadyDeferred.resolve(this));
   }
 
   setCollapsed(value: boolean) {
@@ -154,19 +154,16 @@ class GmailCollapsibleSectionView {
 
     element.appendChild(bodyElement);
 
-    const contentElement = (this._contentElement = document.createElement(
-      'div'
-    ));
+    const contentElement = (this._contentElement =
+      document.createElement('div'));
     bodyContentsElement.appendChild(contentElement);
 
-    const messageElement = (this._messageElement = document.createElement(
-      'div'
-    ));
+    const messageElement = (this._messageElement =
+      document.createElement('div'));
     bodyContentsElement.appendChild(messageElement);
 
-    const tableBodyElement = (this._tableBodyElement = document.createElement(
-      'div'
-    ));
+    const tableBodyElement = (this._tableBodyElement =
+      document.createElement('div'));
     bodyContentsElement.appendChild(tableBodyElement);
 
     this._setupFooter(collapsibleSectionDescriptor);
@@ -187,7 +184,7 @@ class GmailCollapsibleSectionView {
     this._eventStream.emit({
       type: 'update',
       property: 'orderHint',
-      sectionDescriptor: collapsibleSectionDescriptor
+      sectionDescriptor: collapsibleSectionDescriptor,
     });
   }
 
@@ -213,7 +210,7 @@ class GmailCollapsibleSectionView {
       '<div class="Wn">',
       escape(collapsibleSectionDescriptor.title),
       '</div>',
-      '</h3>'
+      '</h3>',
     ].join('');
 
     const floatRightElement = document.createElement('div');
@@ -248,7 +245,7 @@ class GmailCollapsibleSectionView {
 
       this._eventStream.emit({
         type: 'update',
-        property: 'orderHint'
+        property: 'orderHint',
       });
     }
   }
@@ -347,22 +344,22 @@ class GmailCollapsibleSectionView {
           '</span>',
           '&nbsp;',
           '</div>',
-          '</span>'
+          '</span>',
         ].join('');
 
         this._eventStream.plug(
           Kefir.fromEvents(summaryTextElement, 'click').map(() => ({
             eventName: 'titleLinkClicked',
-            sectionDescriptor: this._collapsibleSectionDescriptor
+            sectionDescriptor: this._collapsibleSectionDescriptor,
           }))
         );
 
         const _summaryTextElement = summaryTextElement;
-        summaryTextElement.addEventListener('mouseenter', function() {
+        summaryTextElement.addEventListener('mouseenter', function () {
           _summaryTextElement.classList.add('aqi');
         });
 
-        summaryTextElement.addEventListener('mouseleave', function() {
+        summaryTextElement.addEventListener('mouseleave', function () {
           _summaryTextElement.classList.remove('aqi');
         });
 
@@ -392,11 +389,12 @@ class GmailCollapsibleSectionView {
       collapsibleSectionDescriptor.onDropdownClick
     ) {
       if (!this._inboxDropdownButtonView || !this._dropdownViewController) {
-        const inboxDropdownButtonView = (this._inboxDropdownButtonView = new InboxDropdownButtonView());
+        const inboxDropdownButtonView = (this._inboxDropdownButtonView =
+          new InboxDropdownButtonView());
         this._dropdownViewController = new DropdownButtonViewController({
           buttonView: inboxDropdownButtonView,
           dropdownViewDriverClass: GmailDropdownView,
-          dropdownShowFunction: collapsibleSectionDescriptor.onDropdownClick
+          dropdownShowFunction: collapsibleSectionDescriptor.onDropdownClick,
         });
 
         const headerElement = this._headerElement;
@@ -457,7 +455,7 @@ class GmailCollapsibleSectionView {
     const tbody = tableElement.querySelector('tbody');
     const eventStream = this._eventStream;
 
-    tableRows.forEach(result => {
+    tableRows.forEach((result) => {
       const rowElement = document.createElement('tr');
       rowElement.setAttribute(
         'class',
@@ -471,7 +469,7 @@ class GmailCollapsibleSectionView {
       eventStream.plug(
         Kefir.fromEvents(rowElement, 'click').map(() => ({
           eventName: 'rowClicked',
-          rowDescriptor: result
+          rowDescriptor: result,
         }))
       );
     });
@@ -542,7 +540,7 @@ class GmailCollapsibleSectionView {
         Kefir.fromEvents(footerLinkElement, 'click').map(() => {
           return {
             eventName: 'footerClicked',
-            sectionDescriptor: this._collapsibleSectionDescriptor
+            sectionDescriptor: this._collapsibleSectionDescriptor,
           };
         })
       );
@@ -585,7 +583,7 @@ class GmailCollapsibleSectionView {
     this._isCollapsed = true;
 
     this._eventStream.emit({
-      eventName: 'collapsed'
+      eventName: 'collapsed',
     });
   }
 
@@ -614,7 +612,7 @@ class GmailCollapsibleSectionView {
     this._isCollapsed = false;
 
     this._eventStream.emit({
-      eventName: 'expanded'
+      eventName: 'expanded',
     });
   }
 
@@ -675,19 +673,19 @@ class GmailCollapsibleSectionView {
     this._pulloutSectionsFromCollapsedContainer((container: any));
     this._destroyCollapsedContainer();
 
-    this._recollapse(elementsToRecollapse.filter(child => child !== element));
+    this._recollapse(elementsToRecollapse.filter((child) => child !== element));
   }
 
   _pulloutSectionsFromCollapsedContainer(container: HTMLElement) {
     const prependedChildren = Array.from(container.children[0].children);
-    prependedChildren.forEach(child =>
+    prependedChildren.forEach((child) =>
       (container: any).insertAdjacentElement('beforebegin', child)
     );
 
     const appendedChildren = Array.from(
       container.children[1].children
     ).reverse();
-    appendedChildren.forEach(child =>
+    appendedChildren.forEach((child) =>
       (container: any).insertAdjacentElement('afterend', child)
     );
   }
@@ -737,7 +735,7 @@ class GmailCollapsibleSectionView {
   }
 
   _recollapse(children: Array<Object>) {
-    children.forEach(child => {
+    children.forEach((child) => {
       const removeEvent = document.createEvent('CustomEvent');
       (removeEvent: any).initCustomEvent(
         'removeCollapsedContainer',
@@ -759,9 +757,8 @@ class GmailCollapsibleSectionView {
   }
 
   _createCollapsedContainer() {
-    const collapsedContainer = (this._collapsedContainer = document.createElement(
-      'div'
-    ));
+    const collapsedContainer = (this._collapsedContainer =
+      document.createElement('div'));
     collapsedContainer.setAttribute(
       'class',
       'inboxsdk__results_collapsedContainer Wg'
@@ -794,7 +791,7 @@ function _getTableHTML() {
     '<col class="xX">',
     '</colgroup>',
     '<tbody>',
-    '</tbody>'
+    '</tbody>',
   ].join('');
 }
 
@@ -805,8 +802,9 @@ function _getRowHTML(result) {
         ${{ __html: result.iconHtml }}
       </div>`;
   } else if (result.iconUrl) {
-    iconHtml = autoHtml`<img class="inboxsdk__resultsSection_result_icon ${result.iconClass ||
-      ''}" src="${result.iconUrl}">`;
+    iconHtml = autoHtml`<img class="inboxsdk__resultsSection_result_icon ${
+      result.iconClass || ''
+    }" src="${result.iconUrl}">`;
   } else if (result.iconClass)
     iconHtml = autoHtml`<div class="${result.iconClass}"></div>`;
 
@@ -848,7 +846,7 @@ function _getRowHTML(result) {
     '<span' + (result.isRead ? '' : ' class="bq3"') + '>',
     escape(result.shortDetailText || ''),
     '</span>',
-    '</td>'
+    '</td>',
   ];
 
   return rowArr.join('');
@@ -862,7 +860,7 @@ function _getLabelHTML(label) {
   const retArray = [
     autoHtml`<div class="ar as" data-tooltip="${label.title}">
       <div class="at" style="background-color: ${backgroundColor}; border-color: ${backgroundColor};">
-        <div class="au" style="border-color: ${backgroundColor};">`
+        <div class="au" style="border-color: ${backgroundColor};">`,
   ];
 
   const styleHtml = label.iconBackgroundColor

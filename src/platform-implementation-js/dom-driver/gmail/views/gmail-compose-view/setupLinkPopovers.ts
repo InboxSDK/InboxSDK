@@ -20,7 +20,9 @@ class LinkPopOver extends SafeEventEmitter {
   }
 
   addSection() {
-    let containerEl = this._popOverEl.querySelector<HTMLElement>('.inboxsdk__linkPopOver_section_container');
+    let containerEl = this._popOverEl.querySelector<HTMLElement>(
+      '.inboxsdk__linkPopOver_section_container'
+    );
     if (!containerEl) {
       containerEl = document.createElement('div');
       containerEl.className = 'inboxsdk__linkPopOver_section_container';
@@ -47,13 +49,18 @@ class LinkPopOverSection {
   }
 }
 
-function getSelectedLink(gmailComposeView: GmailComposeView): HTMLAnchorElement | null {
+function getSelectedLink(
+  gmailComposeView: GmailComposeView
+): HTMLAnchorElement | null {
   const focusNode = document.getSelection()?.focusNode;
   if (!focusNode) {
     return null;
   }
   if (focusNode instanceof Text) {
-    if (focusNode.previousSibling instanceof HTMLAnchorElement && document.getSelection()?.anchorOffset === 0) {
+    if (
+      focusNode.previousSibling instanceof HTMLAnchorElement &&
+      document.getSelection()?.anchorOffset === 0
+    ) {
       // For capturing link creation cases where the cursor ends up behind the link
       return focusNode.previousSibling;
     } else if (focusNode.nextSibling instanceof HTMLAnchorElement) {
@@ -64,7 +71,10 @@ function getSelectedLink(gmailComposeView: GmailComposeView): HTMLAnchorElement 
   return findLinkParent(focusNode, gmailComposeView.getBodyElement());
 }
 
-function findLinkParent(node: Node | null, composeBody: HTMLElement): HTMLAnchorElement | null {
+function findLinkParent(
+  node: Node | null,
+  composeBody: HTMLElement
+): HTMLAnchorElement | null {
   if (node instanceof HTMLAnchorElement) {
     return node;
   } else if (!node || node === composeBody) {
@@ -74,11 +84,16 @@ function findLinkParent(node: Node | null, composeBody: HTMLElement): HTMLAnchor
   }
 }
 
-export default function setupLinkPopOvers(gmailComposeView: GmailComposeView): Kefir.Observable<any, never> {
+export default function setupLinkPopOvers(
+  gmailComposeView: GmailComposeView
+): Kefir.Observable<any, never> {
   return toItemWithLifetimeStream(
-    gmailComposeView.getGmailDriver().getTagTree().getAllByTag('composeLinkPopOverContainer')
-  )
-    .flatMap(({el, removalStream}: ItemWithLifetime<TagTreeNode<HTMLElement>>) => {
+    gmailComposeView
+      .getGmailDriver()
+      .getTagTree()
+      .getAllByTag('composeLinkPopOverContainer')
+  ).flatMap(
+    ({ el, removalStream }: ItemWithLifetime<TagTreeNode<HTMLElement>>) => {
       const popOverEl = el.getValue();
 
       let existingLinkPopOver: LinkPopOver | null = null;
@@ -90,7 +105,10 @@ export default function setupLinkPopOvers(gmailComposeView: GmailComposeView): K
         }
       });
 
-      return makeMutationObserverChunkedStream(popOverEl, {attributes: true, attributeFilter: ['style']})
+      return makeMutationObserverChunkedStream(popOverEl, {
+        attributes: true,
+        attributeFilter: ['style'],
+      })
         .toProperty(() => null)
         .takeUntilBy(removalStream)
         .flatMap(() => {
@@ -106,12 +124,13 @@ export default function setupLinkPopOvers(gmailComposeView: GmailComposeView): K
               existingLinkPopOver = linkPopOver;
               return Kefir.constant({
                 eventName: 'linkPopOver',
-                data: linkPopOver
+                data: linkPopOver,
               });
             }
           }
 
           return Kefir.never();
         });
-    });
+    }
+  );
 }

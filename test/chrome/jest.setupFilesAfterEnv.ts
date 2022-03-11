@@ -10,11 +10,11 @@ page.removeAllListeners('pageerror');
 // functions, make a new function which if any of its parameter functions throw an error,
 // they call jestPuppeteer.debug() before failing.
 function makeFunctionWrapTestArgs<F extends Function>(fn: F): F {
-  const newFn: any = function(this: any, ...args: any[]) {
+  const newFn: any = function (this: any, ...args: any[]) {
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];
       if (typeof arg === 'function') {
-        args[i] = async function(this: any, ...args: any[]) {
+        args[i] = async function (this: any, ...args: any[]) {
           try {
             return await arg.apply(this, args);
           } catch (err) {
@@ -50,7 +50,7 @@ if (process.env.DISABLE_FAIL_PAUSE !== 'true' && process.env.CI !== 'true') {
     'beforeEach',
     'it',
     'fit',
-    'test'
+    'test',
   ]) {
     (global as any)[methodName] = makeFunctionWrapTestArgs(
       (global as any)[methodName]

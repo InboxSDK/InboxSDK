@@ -15,7 +15,7 @@ async function getGmailMessageIdForSyncMessageId(
   syncMessageID: string
 ): Promise<string> {
   const text = await getOriginalMessagePage(driver, {
-    syncMessageID: syncMessageID
+    syncMessageID: syncMessageID,
   });
 
   const messageIdMatch = text.match(

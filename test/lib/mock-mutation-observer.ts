@@ -36,7 +36,7 @@ export default class MockMutationObserver {
           }
           return newEvent;
         })
-        .filter(event => Object.keys(event).length > 1)
+        .filter((event) => Object.keys(event).length > 1)
         .onValue(this._queueMutation.bind(this));
     }
   }

@@ -7,8 +7,8 @@ import extractContactFromEmailContactString from '../../../../lib/extract-contac
 const cache: {
   [key: string]: ?{
     headerContact: Contact,
-    modalContact: Contact
-  }
+    modalContact: Contact,
+  },
 } = {};
 
 export default function getUpdatedContact(
@@ -33,7 +33,7 @@ export default function getUpdatedContact(
     const block = (event: MouseEvent) => {
       event.stopPropagation();
     };
-    const modifyFocusEvent = event => {
+    const modifyFocusEvent = (event) => {
       event.shouldIgnore = true;
     };
     element.addEventListener('click', block);

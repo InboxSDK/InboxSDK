@@ -106,7 +106,7 @@ export default function logError(
       implementationVersion: implVersion,
       isUsingSyncAPI,
       origin: document.location.origin,
-      timestamp: Date.now() * 1000
+      timestamp: Date.now() * 1000,
     };
 
     sendError(report);
@@ -124,8 +124,8 @@ export default function logError(
             stack: err && err.stack,
             loggedFrom: nowStack,
             details,
-            sentByApp
-          }
+            sentByApp,
+          },
         })
       );
     }
@@ -142,7 +142,7 @@ const _extensionSeenErrors: {
   // so we make one out of a WeakMap.
   if (!(global as any).__inboxsdk_extensionSeenErrors && global.WeakMap) {
     Object.defineProperty(global, '__inboxsdk_extensionSeenErrors', {
-      value: new global.WeakMap()
+      value: new global.WeakMap(),
     });
   }
   return {
@@ -176,14 +176,14 @@ const _extensionSeenErrors: {
       } else {
         try {
           Object.defineProperty(e as any, '__inboxsdk_extensionHasSeenError', {
-            value: true
+            value: true,
           });
         } catch (err) {
           // eslint-disable-next-line no-console
           console.error(err);
         }
       }
-    }
+    },
   };
 })();
 
@@ -202,16 +202,16 @@ function markErrorAsSeen(error: Error) {
 
 // Only let 10 errors be sent per minute.
 const sendError = rateLimit(
-  function(report: object) {
+  function (report: object) {
     try {
       ajax({
         url: 'https://www.inboxsdk.com/api/v2/errors',
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
-        data: JSON.stringify(report)
-      }).catch(err2 => {
+        data: JSON.stringify(report),
+      }).catch((err2) => {
         tooManyErrors(err2, [report]);
       });
     } catch (err2) {

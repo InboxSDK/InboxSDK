@@ -16,17 +16,18 @@ const memberMap = new WeakMap();
 export const MessageViewViewStates = Object.freeze({
   HIDDEN: 'HIDDEN',
   COLLAPSED: 'COLLAPSED',
-  EXPANDED: 'EXPANDED'
+  EXPANDED: 'EXPANDED',
 });
 
 export const MessageViewToolbarSectionNames = Object.freeze({
-  MORE: 'MORE'
+  MORE: 'MORE',
 });
 
 // documented in src/docs/
 class Conversations {
   MessageViewViewStates: typeof MessageViewViewStates = MessageViewViewStates;
-  MessageViewToolbarSectionNames: typeof MessageViewToolbarSectionNames = MessageViewToolbarSectionNames;
+  MessageViewToolbarSectionNames: typeof MessageViewToolbarSectionNames =
+    MessageViewToolbarSectionNames;
 
   constructor(appId: string, driver: Driver, membrane: Membrane) {
     const members = {
@@ -35,9 +36,9 @@ class Conversations {
       threadViewHandlerRegistry: new HandlerRegistry(),
       messageViewHandlerRegistries: {
         all: new HandlerRegistry(),
-        loaded: new HandlerRegistry()
+        loaded: new HandlerRegistry(),
       },
-      attachmentCardViewHandlerRegistry: new HandlerRegistry()
+      attachmentCardViewHandlerRegistry: new HandlerRegistry(),
     };
     memberMap.set(this, members);
 
@@ -49,15 +50,15 @@ class Conversations {
 
     driver
       .getAttachmentCardViewDriverStream()
-      .filter(cardDriver => cardDriver.getAttachmentType() === 'FILE')
-      .onValue(attachmentCardViewDriver => {
+      .filter((cardDriver) => cardDriver.getAttachmentType() === 'FILE')
+      .onValue((attachmentCardViewDriver) => {
         const attachmentCardView = membrane.get(attachmentCardViewDriver);
         members.attachmentCardViewHandlerRegistry.addTarget(attachmentCardView);
       });
 
     _setupViewDriverWatcher(
       appId,
-      driver.getThreadViewDriverStream().filter(t => !t.isLoadingStub()),
+      driver.getThreadViewDriverStream().filter((t) => !t.isLoadingStub()),
       ThreadView,
       members.threadViewHandlerRegistry,
       this,
@@ -76,12 +77,12 @@ class Conversations {
 
     _setupViewDriverWatcher(
       appId,
-      driver.getMessageViewDriverStream().flatMap(messageViewDriver =>
+      driver.getMessageViewDriverStream().flatMap((messageViewDriver) =>
         messageViewDriver.isLoaded()
           ? Kefir.constant(messageViewDriver)
           : messageViewDriver
               .getEventStream()
-              .filter(event => event.eventName === 'messageLoad')
+              .filter((event) => event.eventName === 'messageLoad')
               .map(() => messageViewDriver)
               .take(1)
       ),
@@ -132,7 +133,7 @@ function _setupViewDriverWatcher(
   membrane,
   driver
 ) {
-  var combinedStream: Kefir.Observable<Object> = stream.map(function(
+  var combinedStream: Kefir.Observable<Object> = stream.map(function (
     viewDriver
   ) {
     const view = membrane.get(viewDriver);
@@ -141,13 +142,13 @@ function _setupViewDriverWatcher(
 
   // A delay is currently necessary so that ThreadView can wait for its MessageViews.
   combinedStream
-    .flatMap(event =>
+    .flatMap((event) =>
       event.viewDriver
         .getReadyStream()
         .map(() => event)
         .takeUntilBy(Kefir.fromEvents(event.view, 'destroy'))
     )
-    .onValue(function(event) {
+    .onValue(function (event) {
       handlerRegistry.addTarget(event.view);
     });
 }

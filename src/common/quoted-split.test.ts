@@ -27,6 +27,6 @@ it('works with multiple quoted parts', () => {
     '"b  cccc"',
     'd',
     '" f gh"',
-    '"i"'
+    '"i"',
   ]);
 });

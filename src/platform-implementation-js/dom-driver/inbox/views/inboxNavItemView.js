@@ -38,7 +38,7 @@ export default class InboxNavItemView {
     name: HTMLElement,
     subNav: HTMLElement,
     subNavInner: HTMLElement,
-    accessory: HTMLElement
+    accessory: HTMLElement,
   };
 
   constructor(navItemDescriptor: Kefir.Observable<Object>, level: number) {
@@ -50,7 +50,7 @@ export default class InboxNavItemView {
       name: document.createElement('span'),
       subNav: document.createElement('div'),
       subNavInner: document.createElement('div'),
-      accessory: document.createElement('div')
+      accessory: document.createElement('div'),
     };
 
     if (this._level > 2) {
@@ -64,7 +64,7 @@ export default class InboxNavItemView {
 
     this._setupElements();
 
-    navItemDescriptor.takeUntilBy(this._stopper).onValue(descriptor => {
+    navItemDescriptor.takeUntilBy(this._stopper).onValue((descriptor) => {
       this._update(descriptor);
       this._navItemDescriptor = descriptor;
     });
@@ -81,7 +81,7 @@ export default class InboxNavItemView {
 
     childNavItemView
       .getEventStream()
-      .filter(event => event.eventName === 'orderChanged')
+      .filter((event) => event.eventName === 'orderChanged')
       .onValue(() =>
         insertElementInOrder(
           this._elements.subNavInner,
@@ -150,15 +150,8 @@ export default class InboxNavItemView {
   }
 
   _setupElements() {
-    const {
-      wrapper,
-      expander,
-      navItem,
-      name,
-      subNav,
-      subNavInner,
-      accessory
-    } = this._elements;
+    const { wrapper, expander, navItem, name, subNav, subNavInner, accessory } =
+      this._elements;
 
     wrapper.className = `inboxsdk__navItem_wrapper inboxsdk__navItem_level${this._level}`;
     wrapper.setAttribute('tabindex', '-1');
@@ -221,7 +214,7 @@ export default class InboxNavItemView {
       });
 
     this._eventStream.emit({
-      eventName: 'collapsed'
+      eventName: 'collapsed',
     });
   }
 
@@ -242,7 +235,7 @@ export default class InboxNavItemView {
       });
 
     this._eventStream.emit({
-      eventName: 'expanded'
+      eventName: 'expanded',
     });
   }
 
@@ -367,7 +360,7 @@ export default class InboxNavItemView {
     return this._createIconButtonAccessory({
       onClick,
       iconUrl:
-        '//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/ic_add-cluster_24px_g60_r3_2x.png'
+        '//ssl.gstatic.com/bt/C3341AA7A1A076756462EE2E5CD71C11/2x/ic_add-cluster_24px_g60_r3_2x.png',
     });
   }
 
@@ -377,7 +370,7 @@ export default class InboxNavItemView {
       {
         onClick,
         iconUrl:
-          '//www.gstatic.com/images/icons/material/system/2x/settings_black_18dp.png'
+          '//www.gstatic.com/images/icons/material/system/2x/settings_black_18dp.png',
       },
       true
     );
@@ -411,7 +404,7 @@ export default class InboxNavItemView {
     Kefir.fromEvents(this._elements.accessory, 'click')
       .takeUntilBy(this._stopper)
       .takeUntilBy(destroyStopper)
-      .onValue(event => {
+      .onValue((event) => {
         event.preventDefault();
         event.stopPropagation();
         if (hasDropdown) {
@@ -429,7 +422,7 @@ export default class InboxNavItemView {
               position: 'right',
               hAlign: 'left',
               vAlign: 'top',
-              buffer: 10
+              buffer: 10,
             });
             dropdown.on('destroy', () => {
               iconEl.classList.remove('inboxsdk__active');

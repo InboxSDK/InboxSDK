@@ -12,7 +12,7 @@ export default class InboxPageCommunicator extends CommonPageCommunicator {
         new CustomEvent('inboxSDKgetDraftIDforComposeView', {
           bubbles: true,
           cancelable: false,
-          detail: null
+          detail: null,
         })
       );
     }
@@ -27,7 +27,7 @@ export default class InboxPageCommunicator extends CommonPageCommunicator {
       new CustomEvent('inboxSDKcomposeViewIsSending', {
         bubbles: false,
         cancelable: false,
-        detail: null
+        detail: null,
       })
     );
   }
@@ -36,7 +36,7 @@ export default class InboxPageCommunicator extends CommonPageCommunicator {
       new CustomEvent('inboxSDKcomposeViewSendCanceled', {
         bubbles: false,
         cancelable: false,
-        detail: null
+        detail: null,
       })
     );
   }
@@ -57,7 +57,7 @@ export default class InboxPageCommunicator extends CommonPageCommunicator {
       new CustomEvent('inboxSDKclickAndGetNewIframeSrc', {
         bubbles: true,
         cancelable: false,
-        detail: null
+        detail: null,
       })
     );
     return pr;
@@ -68,7 +68,7 @@ export default class InboxPageCommunicator extends CommonPageCommunicator {
       new CustomEvent('inboxSDKinboxFakeWindowResize', {
         bubbles: false,
         cancelable: false,
-        detail: null
+        detail: null,
       })
     );
   }

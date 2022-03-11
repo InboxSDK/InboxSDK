@@ -17,7 +17,7 @@ export default function makeElementChildStream(
     throw new Error('Expected element, got ' + String(element));
   }
 
-  return Kefir.stream(emitter => {
+  return Kefir.stream((emitter) => {
     const removalStreams: Map<HTMLElement, Stopper> = new Map();
     let ended = false;
 
@@ -62,8 +62,8 @@ export default function makeElementChildStream(
       }
     }
 
-    const observer = new MutationObserver(function(mutations) {
-      mutations.forEach(mutation => {
+    const observer = new MutationObserver(function (mutations) {
+      mutations.forEach((mutation) => {
         Array.prototype.forEach.call(mutation.addedNodes, newEl);
         Array.prototype.forEach.call(mutation.removedNodes, removedEl);
       });
@@ -79,11 +79,11 @@ export default function makeElementChildStream(
       }
     });
 
-    return function() {
+    return function () {
       ended = true;
       observer.disconnect();
       asap(() => {
-        removalStreams.forEach(removalStream => {
+        removalStreams.forEach((removalStream) => {
           removalStream.destroy();
         });
       });

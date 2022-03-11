@@ -4,7 +4,7 @@ const navItemTypes = Object.freeze({
   NAVIGATION: 'NAVIGATION',
   LINK: 'LINK',
   GROUPER: 'GROUPER',
-  MANAGE: 'MANAGE'
+  MANAGE: 'MANAGE',
 });
 
 export default navItemTypes;

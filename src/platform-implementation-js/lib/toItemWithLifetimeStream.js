@@ -9,7 +9,7 @@ export default function toItemWithLifetimeStream<T>(
   liveSet: LiveSet<T>
 ): Kefir.Observable<ItemWithLifetime<T>> {
   return Kefir.fromESObservable(
-    toValueObservable(liveSet).map(event => {
+    toValueObservable(liveSet).map((event) => {
       const removal: Promise<void> = event.removal;
       const removalStream = Kefir.fromPromise(removal);
       return { el: event.value, removalStream };

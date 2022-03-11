@@ -7,5 +7,5 @@ export type ThreadRowViewDriver = {
   replaceDate(opts: Object): void,
   getSubject(): string,
   getDateString(): string,
-  getThreadID(): string
+  getThreadID(): string,
 };

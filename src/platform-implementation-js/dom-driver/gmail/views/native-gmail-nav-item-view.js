@@ -13,7 +13,7 @@ import findParent from '../../../../common/find-parent';
 import GmailElementGetter from '../gmail-element-getter';
 
 import GmailNavItemView, {
-  getLeftIndentationPaddingValue
+  getLeftIndentationPaddingValue,
 } from './gmail-nav-item-view';
 
 import type GmailDriver from '../gmail-driver';
@@ -48,16 +48,16 @@ export default class NativeGmailNavItemView {
     const parentElement = this._element.parentElement;
     if (parentElement) {
       makeMutationObserverChunkedStream((parentElement: any), {
-        childList: true
+        childList: true,
       })
         .map(() =>
           parentElement.querySelector(`.aim a[href*="#${this._navItemName}"]`)
         )
         .filter(Boolean)
-        .map(link => findParent(link, el => el.classList.contains('aim')))
+        .map((link) => findParent(link, (el) => el.classList.contains('aim')))
         .filter(Boolean)
-        .filter(newElement => newElement !== this._element)
-        .onValue(newElement => {
+        .filter((newElement) => newElement !== this._element)
+        .onValue((newElement) => {
           if (newElement) {
             const currentContainerElement = this._itemContainerElement;
             if (currentContainerElement) {
@@ -71,7 +71,7 @@ export default class NativeGmailNavItemView {
         });
     }
 
-    this._elementStream.onValue(element => {
+    this._elementStream.onValue((element) => {
       this._element = element;
       this._monitorElementForActiveChanges();
       this.setActive(this._isActive);
@@ -100,9 +100,9 @@ export default class NativeGmailNavItemView {
     Kefir.merge([
       gmailNavItemView
         .getEventStream()
-        .filter(event => event.eventName === 'orderChanged'),
+        .filter((event) => event.eventName === 'orderChanged'),
 
-      this._elementStream
+      this._elementStream,
     ]).onValue(() => this._addNavItemElement(gmailNavItemView));
 
     gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
@@ -153,18 +153,18 @@ export default class NativeGmailNavItemView {
     const element = this._element;
     const classChangeStream = makeMutationObserverChunkedStream(element, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ['class'],
     })
       .takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null))
       .toProperty(() => [])
       .map(() => element);
 
     classChangeStream
-      .filter(el => el.classList.contains('ain'))
+      .filter((el) => el.classList.contains('ain'))
       .onValue(() => this._createActiveMarkerElement());
 
     classChangeStream
-      .filter(el => !el.classList.contains('ain'))
+      .filter((el) => !el.classList.contains('ain'))
       .onValue(() => this._removeActiveMarkerElement());
   }
 
@@ -191,9 +191,8 @@ export default class NativeGmailNavItemView {
   _getItemContainerElement(): HTMLElement {
     let itemContainerElement = this._itemContainerElement;
     if (!itemContainerElement) {
-      itemContainerElement = this._itemContainerElement = this._element.querySelector(
-        '.inboxsdk__navItem_container'
-      );
+      itemContainerElement = this._itemContainerElement =
+        this._element.querySelector('.inboxsdk__navItem_container');
       if (!itemContainerElement) {
         itemContainerElement = this._createItemContainerElement();
         this._createExpando();
@@ -204,9 +203,8 @@ export default class NativeGmailNavItemView {
   }
 
   _createItemContainerElement(): HTMLElement {
-    const itemContainerElement = (this._itemContainerElement = document.createElement(
-      'div'
-    ));
+    const itemContainerElement = (this._itemContainerElement =
+      document.createElement('div'));
     itemContainerElement.classList.add('inboxsdk__navItem_container');
 
     this._element.appendChild(itemContainerElement);
@@ -288,7 +286,7 @@ export default class NativeGmailNavItemView {
     );
 
     this._eventStream.emit({
-      eventName: 'collapsed'
+      eventName: 'collapsed',
     });
 
     this._setHeights();
@@ -308,7 +306,7 @@ export default class NativeGmailNavItemView {
     );
 
     this._eventStream.emit({
-      eventName: 'expanded'
+      eventName: 'expanded',
     });
 
     this._setHeights();
@@ -340,9 +338,8 @@ export default class NativeGmailNavItemView {
   _createActiveMarkerElement() {
     this._removeActiveMarkerElement();
 
-    const activeMarkerElement = (this._activeMarkerElement = document.createElement(
-      'div'
-    ));
+    const activeMarkerElement = (this._activeMarkerElement =
+      document.createElement('div'));
     activeMarkerElement.classList.add('inboxsdk__navItem_marker');
     activeMarkerElement.classList.add('ain');
     activeMarkerElement.innerHTML = '&nbsp;';

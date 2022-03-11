@@ -46,7 +46,7 @@ export default function parser(el: HTMLElement) {
 
     // We have to locate draft labels via text color because it's impossible
     // to locate them with reliable CSS selectors
-    return Array.from(recipientCandidates).filter(candidate => {
+    return Array.from(recipientCandidates).filter((candidate) => {
       const colorString = getComputedStyle(candidate).getPropertyValue('color');
       const colorMatch = RGB_REGEX.exec(colorString);
       if (!colorMatch) throw new Error('Failed to read color string');
@@ -105,7 +105,7 @@ export default function parser(el: HTMLElement) {
     if (!recipients) return null;
 
     return Array.from(recipients)
-      .map(recipientEl => {
+      .map((recipientEl) => {
         const emailAddress = recipientEl.getAttribute('email');
         if (!emailAddress) return null;
 
@@ -131,7 +131,7 @@ export default function parser(el: HTMLElement) {
     labelParent,
     toolbar,
     recipientParent,
-    messageCountParent
+    messageCountParent,
   };
   const score = 1 - ec.errorCount() / ec.runCount();
   return {
@@ -142,10 +142,10 @@ export default function parser(el: HTMLElement) {
       inboxThreadId,
       visibleMessageCount,
       visibleDraftCount,
-      contacts
+      contacts,
     },
     score,
-    errors: ec.getErrorLogs()
+    errors: ec.getErrorLogs(),
   };
 }
 

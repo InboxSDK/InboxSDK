@@ -22,11 +22,11 @@ function parser(el: HTMLElement) {
       ),
       t.compose(
         t.filter(
-          el =>
+          (el) =>
             el.childElementCount === 1 &&
             el.firstElementChild.childElementCount === 0
         ),
-        t.filter(el => {
+        t.filter((el) => {
           if (global.document) {
             const rect = el.getBoundingClientRect();
             if (rect.top > 100) return false;
@@ -39,7 +39,7 @@ function parser(el: HTMLElement) {
             );
           }
         }),
-        t.filter(el => {
+        t.filter((el) => {
           const elIx = Array.prototype.indexOf.call(
             el.parentElement.children,
             el
@@ -68,14 +68,14 @@ function parser(el: HTMLElement) {
 
   const elements = {
     downloadButton,
-    buttonContainer
+    buttonContainer,
   };
   const score = 1 - ec.errorCount() / ec.runCount();
   return {
     elements,
     attributes: {},
     score,
-    errors: ec.getErrorLogs()
+    errors: ec.getErrorLogs(),
   };
 }
 

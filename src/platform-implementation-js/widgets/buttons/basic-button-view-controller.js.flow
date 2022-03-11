@@ -5,7 +5,7 @@ import type Kefir from 'kefir';
 export type Options = {
   activateFunction?: ?() => void,
   onClick?: ?() => void,
-  buttonView: Object
+  buttonView: Object,
 };
 
 declare export default class BasicButtonViewController {

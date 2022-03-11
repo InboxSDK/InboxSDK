@@ -11,7 +11,7 @@ const fnStream = udKefir(module, getMinimizedStream_);
 export default function getMinimizedStream(
   gmailComposeView: GmailComposeView
 ): Kefir.Observable<boolean> {
-  return fnStream.flatMapLatest(fn => fn(gmailComposeView));
+  return fnStream.flatMapLatest((fn) => fn(gmailComposeView));
 }
 
 function getMinimizedStream_(
@@ -19,12 +19,12 @@ function getMinimizedStream_(
 ): Kefir.Observable<boolean> {
   const element = gmailComposeView.getElement();
   const bodyElement = gmailComposeView.getBodyElement();
-  const bodyContainer = find(element.children, child =>
+  const bodyContainer = find(element.children, (child) =>
     child.contains(bodyElement)
   );
 
   return makeMutationObserverStream(bodyContainer, {
     attributes: true,
-    attributeFilter: ['style']
+    attributeFilter: ['style'],
   }).map(() => gmailComposeView.isMinimized());
 }

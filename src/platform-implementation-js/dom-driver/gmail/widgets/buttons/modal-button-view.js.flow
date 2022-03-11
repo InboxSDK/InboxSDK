@@ -11,7 +11,7 @@ export type ButtonViewOptions = {
   tooltip?: ?string,
   enabled?: ?boolean,
   buttonColor?: ?string,
-  isPrimary?: boolean
+  isPrimary?: boolean,
 };
 
 declare export default class ModalButtonView {

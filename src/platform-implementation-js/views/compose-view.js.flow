@@ -6,7 +6,11 @@ import ComposeButtonView from './compose-button-view';
 
 import type Membrane from '../lib/Membrane';
 import type { Driver } from '../driver-interfaces/driver';
-import type { ComposeViewDriver, ComposeNotice, StatusBar } from '../driver-interfaces/compose-view-driver';
+import type {
+  ComposeViewDriver,
+  ComposeNotice,
+  StatusBar,
+} from '../driver-interfaces/compose-view-driver';
 
 // documented in src/docs/
 declare export default class ComposeView extends EventEmitter {
@@ -20,22 +24,20 @@ declare export default class ComposeView extends EventEmitter {
   addButton(buttonDescriptor: any): ComposeButtonView;
   addComposeNotice(composeNoticeDescriptor?: {
     height?: number,
-    orderHint?: number
+    orderHint?: number,
   }): ComposeNotice;
   addStatusBar(statusBarDescriptor?: {
     height?: number,
     orderHint?: number,
-    addAboveNativeStatusBar?: boolean
+    addAboveNativeStatusBar?: boolean,
   }): StatusBar;
   hideNativeStatusBar(): () => void;
-  addRecipientRow(options: ?Object): {destroy(): void};
+  addRecipientRow(options: ?Object): { destroy(): void };
   forceRecipientRowsOpen(): () => void;
   hideNativeRecipientRows(): () => void;
   hideRecipientArea(): () => void;
   close(): void;
-  send(
-    options?: { sendAndArchive: boolean }
-  ): void;
+  send(options?: { sendAndArchive: boolean }): void;
   discard(): void;
   getMetadataForm(): HTMLElement;
   getSubjectInput(): HTMLInputElement;
@@ -60,8 +62,15 @@ declare export default class ComposeView extends EventEmitter {
   getBccRecipients(): Contact[];
   insertTextIntoBodyAtCursor(text: string): HTMLElement | null | void;
   insertHTMLIntoBodyAtCursor(html: string): HTMLElement | null | void;
-  insertLinkChipIntoBodyAtCursor(text: string, url: string, iconUrl: string): HTMLElement | void;
-  insertLinkIntoBodyAtCursor(text: string, url: string): HTMLElement | null | void;
+  insertLinkChipIntoBodyAtCursor(
+    text: string,
+    url: string,
+    iconUrl: string
+  ): HTMLElement | void;
+  insertLinkIntoBodyAtCursor(
+    text: string,
+    url: string
+  ): HTMLElement | null | void;
   isForward(): boolean;
   isInlineReplyForm(): boolean;
   isFullscreen(): boolean;

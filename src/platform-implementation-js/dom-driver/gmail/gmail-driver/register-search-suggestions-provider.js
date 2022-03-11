@@ -13,7 +13,7 @@ import copyAndValidateAutocompleteResults from '../../../lib/copyAndValidateAuto
 import type GmailDriver from '../gmail-driver';
 import type {
   AutocompleteSearchResult,
-  AutocompleteSearchResultWithId
+  AutocompleteSearchResultWithId,
 } from '../../../../injected-js/gmail/modify-suggestions';
 
 export default function registerSearchSuggestionsProvider(
@@ -34,7 +34,7 @@ export default function registerSearchSuggestionsProvider(
   // give the application's suggestions back to the pageCommunicator for it to
   // inject into the AJAX responses.
   const suggestionsStream = pageCommunicator.ajaxInterceptStream
-    .filter(event => event.type === 'suggestionsRequest')
+    .filter((event) => event.type === 'suggestionsRequest')
     .flatMapLatest(({ query }) =>
       Kefir.fromPromise(Promise.resolve(handler(query)))
         .flatMap((results: Array<AutocompleteSearchResult>) => {
@@ -44,10 +44,10 @@ export default function registerSearchSuggestionsProvider(
               results
             );
 
-            const validatedResultsWithIds = validatedResults.map(result => ({
+            const validatedResultsWithIds = validatedResults.map((result) => ({
               ...result,
               providerId,
-              id: `${Date.now()}-${Math.random()}`
+              id: `${Date.now()}-${Math.random()}`,
             }));
 
             return Kefir.constant(validatedResultsWithIds);
@@ -55,22 +55,22 @@ export default function registerSearchSuggestionsProvider(
             return Kefir.constantError(e);
           }
         })
-        .mapErrors(err => {
+        .mapErrors((err) => {
           driver.getLogger().error(err);
           return [];
         })
-        .map(suggestions => {
+        .map((suggestions) => {
           return { query, suggestions };
         })
     )
-    .onValue(event => {
+    .onValue((event) => {
       pageCommunicator.provideAutocompleteSuggestions(
         providerId,
         event.query,
         event.suggestions
       );
     })
-    .map(event => event.suggestions);
+    .map((event) => event.suggestions);
 
   // Wait for the first routeViewDriver to happen before looking for the search box.
   const searchBoxStream: Kefir.Observable<HTMLInputElement> = driver
@@ -81,45 +81,45 @@ export default function registerSearchSuggestionsProvider(
     .take(1);
 
   // Wait for the search box to be focused before looking for the suggestions box.
-  const suggestionsBoxTbodyStream: Kefir.Observable<HTMLElement> = searchBoxStream
-    .flatMapLatest(searchBox => Kefir.fromEvents(searchBox, 'focus'))
-    .map(() => gmailElementGetter.getSearchSuggestionsBoxParent())
-    .filter(Boolean)
-    .flatMapLatest(makeElementChildStream)
-    .map(x => (x.el: any).firstElementChild)
-    .take(1)
-    .toProperty();
+  const suggestionsBoxTbodyStream: Kefir.Observable<HTMLElement> =
+    searchBoxStream
+      .flatMapLatest((searchBox) => Kefir.fromEvents(searchBox, 'focus'))
+      .map(() => gmailElementGetter.getSearchSuggestionsBoxParent())
+      .filter(Boolean)
+      .flatMapLatest(makeElementChildStream)
+      .map((x) => (x.el: any).firstElementChild)
+      .take(1)
+      .toProperty();
 
   // This stream emits an event after every time Gmail changes the suggestions
   // list.
   const suggestionsBoxGmailChanges = suggestionsBoxTbodyStream
-    .flatMap(suggestionsBoxTbody =>
+    .flatMap((suggestionsBoxTbody) =>
       makeMutationObserverChunkedStream(suggestionsBoxTbody, {
-        childList: true
+        childList: true,
       }).toProperty(() => null)
     )
     .map(() => null);
 
   // We listen to the event on the document node so that the event can be
   // canceled before Gmail receives it.
-  const suggestionsBoxEnterPresses = searchBoxStream.flatMap(searchBox =>
+  const suggestionsBoxEnterPresses = searchBoxStream.flatMap((searchBox) =>
     fromEventTargetCapture(document, 'keydown').filter(
-      event => event.keyCode == 13 && event.target === searchBox
+      (event) => event.keyCode == 13 && event.target === searchBox
     )
   );
 
   // Stream of arrays of row elements belonging to this provider.
-  const providedRows: Kefir.Observable<
-    HTMLElement[]
-  > = suggestionsBoxTbodyStream
-    .sampledBy(suggestionsBoxGmailChanges)
-    .map(suggestionsBoxTbody =>
-      Array.from(suggestionsBoxTbody.children).filter(
-        row => row.getElementsByClassName(providerId).length > 0
-      )
-    );
+  const providedRows: Kefir.Observable<HTMLElement[]> =
+    suggestionsBoxTbodyStream
+      .sampledBy(suggestionsBoxGmailChanges)
+      .map((suggestionsBoxTbody) =>
+        Array.from(suggestionsBoxTbody.children).filter(
+          (row) => row.getElementsByClassName(providerId).length > 0
+        )
+      );
 
-  providedRows.onValue(rows => {
+  providedRows.onValue((rows) => {
     if (rows[0] && rows[0].previousElementSibling) {
       const prevFirstChild = rows[0].previousElementSibling.firstElementChild;
       if (prevFirstChild) {
@@ -134,16 +134,16 @@ export default function registerSearchSuggestionsProvider(
 
   const rowSelectionEvents: Kefir.Observable<{
     event: Object,
-    row: HTMLElement
-  }> = providedRows.flatMapLatest(rows =>
+    row: HTMLElement,
+  }> = providedRows.flatMapLatest((rows) =>
     Kefir.merge(
-      rows.map(row =>
+      rows.map((row) =>
         Kefir.merge([
           fromEventTargetCapture(row, 'click'),
           suggestionsBoxEnterPresses.filter(() =>
             row.classList.contains('gssb_i')
-          )
-        ]).map(event => ({ event, row }))
+          ),
+        ]).map((event) => ({ event, row }))
       )
     )
   );
@@ -153,8 +153,8 @@ export default function registerSearchSuggestionsProvider(
   > = Kefir.merge([
     suggestionsStream,
     searchBoxStream
-      .flatMapLatest(searchBox => Kefir.fromEvents(searchBox, 'blur'))
-      .map(() => [])
+      .flatMapLatest((searchBox) => Kefir.fromEvents(searchBox, 'blur'))
+      .map(() => []),
   ]).toProperty();
 
   Kefir.combine(
@@ -183,7 +183,7 @@ export default function registerSearchSuggestionsProvider(
 
     if (itemData) {
       const { id } = itemData;
-      const suggestion = find(suggestions, s => s.id === id);
+      const suggestion = find(suggestions, (s) => s.id === id);
       if (!suggestion) {
         // I can imagine this happening if Gmail caches old suggestions
         // results. Unknown if it does that so let's log. If it does, then

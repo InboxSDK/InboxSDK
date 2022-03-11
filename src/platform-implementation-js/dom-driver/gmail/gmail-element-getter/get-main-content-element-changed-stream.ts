@@ -11,20 +11,20 @@ export default function getMainContentElementChangedStream(
   GmailElementGetter: typeof _GmailElementGetter
 ): Kefir.Observable<HTMLElement, never> {
   const s = waitForMainContentContainer(GmailElementGetter)
-    .flatMap(mainContentContainer =>
+    .flatMap((mainContentContainer) =>
       makeElementChildStream(mainContentContainer)
         .filter(({ el }) => el.classList.contains('nH'))
         .flatMap(({ el, removalStream }) =>
           makeMutationObserverChunkedStream(el, {
             attributes: true,
-            attributeFilter: ['style']
+            attributeFilter: ['style'],
           })
-            .map(x => last(x)!)
+            .map((x) => last(x)!)
             .toProperty(() => {
               return { target: el };
             })
             .filter(_isNowVisible)
-            .map(e => e.target)
+            .map((e) => e.target)
             .takeUntilBy(removalStream)
         )
     )

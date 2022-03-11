@@ -32,8 +32,8 @@ export function error(err: Error, details?: any) {
       detail: {
         message: err && err.message,
         stack: err && err.stack,
-        details
-      }
+        details,
+      },
     })
   );
 }
@@ -49,7 +49,7 @@ export function eventSdkPassive(name: string, details?: any) {
     new CustomEvent('inboxSDKinjectedEventSdkPassive', {
       bubbles: false,
       cancelable: false,
-      detail: { name, details }
+      detail: { name, details },
     })
   );
 }

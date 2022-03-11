@@ -13,7 +13,7 @@ import { ElementWithLifetime } from './make-element-child-stream';
 export default function makeElementViewStream<T extends View>(
   viewFn: (el: HTMLElement) => T | null | undefined
 ): (event: ElementWithLifetime) => Kefir.Observable<T, never> {
-  return event => {
+  return (event) => {
     const view = viewFn(event.el);
     if (view) {
       event.removalStream.take(1).onValue(() => {

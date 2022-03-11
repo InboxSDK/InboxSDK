@@ -42,7 +42,7 @@ export default async function signIn(testEmail: string) {
           'input[type=email]:not([aria-hidden=true])',
           testEmail,
           {
-            delay: 10 + Math.random() * 10
+            delay: 10 + Math.random() * 10,
           }
         );
         await page.click('div#identifierNext');
@@ -54,7 +54,7 @@ export default async function signIn(testEmail: string) {
     const fillOutPassword = async () => {
       await delay(3000); // wait for animation to finish
       await page.type('input[type=password]', authInfo[testEmail].password, {
-        delay: 10 + Math.random() * 10
+        delay: 10 + Math.random() * 10,
       });
       await page.click('div#passwordNext');
 
@@ -87,7 +87,7 @@ export default async function signIn(testEmail: string) {
         const twoFACode = googleTotp(authInfo[testEmail].twofactor);
         await page.click('input[type=tel]#totpPin', { clickCount: 3 });
         await page.type('input[type=tel]#totpPin', twoFACode, {
-          delay: 10 + Math.random() * 10
+          delay: 10 + Math.random() * 10,
         });
         await page.click('div#totpNext');
         await page.waitForFunction(

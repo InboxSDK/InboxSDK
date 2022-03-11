@@ -2,7 +2,7 @@
 
 import type GmailComposeView from '../gmail-compose-view';
 
-export default function(gmailComposeView: GmailComposeView) {
+export default function (gmailComposeView: GmailComposeView) {
   gmailComposeView.getBodyElement().focus();
 
   const lastSelectionRange = gmailComposeView.getLastSelectionRange();

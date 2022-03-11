@@ -23,7 +23,7 @@ export default function setupComposeViewDriverStream(
   messageViewDriverStream: Kefir.Observable<GmailMessageView>,
   xhrInterceptorStream: Kefir.Observable<Object>
 ): Kefir.Observable<GmailComposeView> {
-  return impStream.flatMapLatest(imp =>
+  return impStream.flatMapLatest((imp) =>
     imp(gmailDriver, messageViewDriverStream, xhrInterceptorStream)
   );
 }
@@ -49,22 +49,22 @@ function imp(
 
       return elementStream.map(
         elementViewMapper(
-          el =>
+          (el) =>
             new GmailComposeView(el, xhrInterceptorStream, gmailDriver, {
               isStandalone,
-              isInlineReplyForm: false
+              isInlineReplyForm: false,
             })
         )
       );
     })
     .merge(
-      messageViewDriverStream.flatMap(gmailMessageView =>
+      messageViewDriverStream.flatMap((gmailMessageView) =>
         gmailMessageView.getReplyElementStream().map(
           elementViewMapper(
-            el =>
+            (el) =>
               new GmailComposeView(el, xhrInterceptorStream, gmailDriver, {
                 isStandalone: false,
-                isInlineReplyForm: true
+                isInlineReplyForm: true,
               })
           )
         )
@@ -77,7 +77,7 @@ function _setupStandardComposeElementStream() {
   return _waitForContainerAndMonitorChildrenStream(() =>
     GmailElementGetter.getComposeWindowContainer()
   )
-    .flatMap(composeGrandParent => {
+    .flatMap((composeGrandParent) => {
       var composeParentEl = composeGrandParent.el.querySelector('div.AD');
       if (composeParentEl) {
         return makeElementChildStream(composeParentEl)
@@ -100,18 +100,18 @@ function _setupStandardComposeElementStream() {
           const targetEl = el.querySelector('[role=dialog] div.aaZ');
           if (!targetEl) return null;
           var hiddenStream = kefirMakeMutationObserverChunkedStream(targetEl, {
-            childList: true
+            childList: true,
           })
             .filter(() => targetEl.childElementCount === 0)
             .map(() => null);
           return {
             el,
-            removalStream: removalStream.merge(hiddenStream).take(1)
+            removalStream: removalStream.merge(hiddenStream).take(1),
           };
         })
         .filter(Boolean)
     )
-    .flatMap(event => {
+    .flatMap((event) => {
       if (!event) throw new Error('Should not happen');
       const el = event.el.querySelector('[role=dialog]');
       if (!el || !el.querySelector('form')) {
@@ -119,7 +119,7 @@ function _setupStandardComposeElementStream() {
       }
       return Kefir.constant({
         el,
-        removalStream: event.removalStream
+        removalStream: event.removalStream,
       });
     })
     .flatMap(makeElementStreamMerger());
@@ -138,11 +138,11 @@ function _waitForContainerAndMonitorChildrenStream(
     .map(containerFn)
     .filter()
     .take(1)
-    .flatMap(containerEl => makeElementChildStream(containerEl));
+    .flatMap((containerEl) => makeElementChildStream(containerEl));
 }
 
 function _informElement(eventName) {
-  return function(event) {
+  return function (event) {
     const composeEl =
       event &&
       event.el &&
@@ -153,7 +153,7 @@ function _informElement(eventName) {
         new CustomEvent(eventName, {
           bubbles: false,
           cancelable: false,
-          detail: null
+          detail: null,
         })
       );
     }

@@ -9,7 +9,7 @@ export default class TopMessageBarView extends EventEmitter {
   constructor(options: { topMessageBarViewDriver: Object }) {
     super();
     const members = {
-      driver: options.topMessageBarViewDriver
+      driver: options.topMessageBarViewDriver,
     };
     memberMap.set(this, members);
   }

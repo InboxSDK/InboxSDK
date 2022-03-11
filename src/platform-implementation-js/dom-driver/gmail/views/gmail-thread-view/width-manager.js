@@ -19,9 +19,8 @@ export default class WidthManager {
     // there are no icons sdk or native and adds/removes some styling
     // classes accordingly
 
-    const tabList = this._addonSidebarContainerEl.querySelector(
-      '[role=tablist]'
-    );
+    const tabList =
+      this._addonSidebarContainerEl.querySelector('[role=tablist]');
     if (!tabList) return;
 
     if (
@@ -36,7 +35,7 @@ export default class WidthManager {
     }
 
     const noIconsVisible = ![...tabList.children].some(
-      child => child.style.display !== 'none'
+      (child) => child.style.display !== 'none'
     );
     if (noIconsVisible)
       this._contentContainerEl.classList.add(

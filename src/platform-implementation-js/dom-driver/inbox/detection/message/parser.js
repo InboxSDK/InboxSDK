@@ -76,7 +76,7 @@ export default function parser(el: HTMLElement) {
     body,
     sender,
     toggleCollapse,
-    attachmentsArea
+    attachmentsArea,
   };
   const score = 1 - ec.errorCount() / ec.runCount();
   return {
@@ -86,10 +86,10 @@ export default function parser(el: HTMLElement) {
       viewState,
       inboxMessageId,
       recipientElements,
-      isDraft
+      isDraft,
     },
     score,
-    errors: ec.getErrorLogs()
+    errors: ec.getErrorLogs(),
   };
 }
 

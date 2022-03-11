@@ -43,17 +43,17 @@ export default function parser(el: HTMLElement) {
     heading,
     stickyHeading,
     toolbar,
-    list
+    list,
   };
   const score = 1 - ec.errorCount() / ec.runCount();
   return {
     elements,
     attributes: {
       inBundle,
-      inboxThreadId
+      inboxThreadId,
     },
     score,
-    errors: ec.getErrorLogs()
+    errors: ec.getErrorLogs(),
   };
 }
 

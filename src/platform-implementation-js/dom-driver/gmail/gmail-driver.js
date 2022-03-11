@@ -163,14 +163,14 @@ class GmailDriver {
     {
       const rfcIdCache = new BiMapCache({
         key: 'inboxsdk__cached_thread_ids',
-        getAfromB: gmailThreadId =>
+        getAfromB: (gmailThreadId) =>
           getRfcMessageIdForGmailThreadId(this, gmailThreadId),
-        getBfromA: rfcMessageId =>
-          getGmailThreadIdForRfcMessageId(this, rfcMessageId)
+        getBfromA: (rfcMessageId) =>
+          getGmailThreadIdForRfcMessageId(this, rfcMessageId),
       });
-      this.getGmailThreadIdForRfcMessageId = rfcMessageId =>
+      this.getGmailThreadIdForRfcMessageId = (rfcMessageId) =>
         rfcIdCache.getBfromA(rfcMessageId);
-      this.getRfcMessageIdForGmailThreadId = gmailThreadId =>
+      this.getRfcMessageIdForGmailThreadId = (gmailThreadId) =>
         rfcIdCache.getAfromB(gmailThreadId);
     }
 
@@ -185,20 +185,20 @@ class GmailDriver {
         },
         getBfromA: (syncThreadID: string) => {
           return getSyncThreadFromSyncThreadId(this, syncThreadID).then(
-            syncThread => {
+            (syncThread) => {
               if (syncThread) return syncThread.oldGmailThreadID;
               else throw new Error('syncThread not found');
             }
           );
-        }
+        },
       });
-      this.getSyncThreadIdForOldGmailThreadId = oldGmailThreadId =>
+      this.getSyncThreadIdForOldGmailThreadId = (oldGmailThreadId) =>
         syncThreadIdToOldGmailThreadIdCache.getAfromB(oldGmailThreadId);
 
-      this.getOldGmailThreadIdFromSyncThreadId = syncThreadId =>
+      this.getOldGmailThreadIdFromSyncThreadId = (syncThreadId) =>
         syncThreadIdToOldGmailThreadIdCache.getBfromA(syncThreadId);
 
-      this.removeCachedOldGmailThreadIdFromSyncThreadId = syncThreadId =>
+      this.removeCachedOldGmailThreadIdFromSyncThreadId = (syncThreadId) =>
         syncThreadIdToOldGmailThreadIdCache.removeAfromCache(syncThreadId);
     }
 
@@ -220,17 +220,17 @@ class GmailDriver {
           getGmailMessageIdForSyncMessageId(this, sync),
         getBfromA() {
           throw new Error('should not happen');
-        }
+        },
       });
-      this.getGmailMessageIdForSyncMessageId = syncMessageId =>
+      this.getGmailMessageIdForSyncMessageId = (syncMessageId) =>
         gmailMessageIdForSyncMessageIdCache.getAfromB(syncMessageId);
-      this.removeCachedGmailMessageIdForSyncMessageId = syncMessageId =>
+      this.removeCachedGmailMessageIdForSyncMessageId = (syncMessageId) =>
         gmailMessageIdForSyncMessageIdCache.removeBfromCache(syncMessageId);
 
       // It's important that this doesn't use the same cache for looking up
       // sync message IDs, because the legacy ID of a draft changes when it's
       // sent. It doesn't really need to be cached so it's not here.
-      this.getGmailMessageIdForSyncDraftId = syncDraftId =>
+      this.getGmailMessageIdForSyncDraftId = (syncDraftId) =>
         getGmailMessageIdForSyncMessageId(this, syncDraftId);
     }
 
@@ -259,7 +259,7 @@ class GmailDriver {
           suppressAddon(this, opts.suppressAddonTitle);
         }
       })
-      .catch(err => {
+      .catch((err) => {
         this._logger.error(err);
       });
   }
@@ -330,16 +330,16 @@ class GmailDriver {
   }
   getAttachmentCardViewDriverStream() {
     return this._messageViewDriverStream
-      .flatMap(messageViewDriver =>
+      .flatMap((messageViewDriver) =>
         messageViewDriver.isLoaded()
           ? Kefir.constant(messageViewDriver)
           : messageViewDriver
               .getEventStream()
-              .filter(event => event.eventName === 'messageLoad')
+              .filter((event) => event.eventName === 'messageLoad')
               .map(() => messageViewDriver)
               .take(1)
       )
-      .map(messageView => messageView.getAttachmentCardViewDrivers())
+      .map((messageView) => messageView.getAttachmentCardViewDrivers())
       .flatten();
   }
   getComposeViewDriverStream() {
@@ -380,14 +380,14 @@ class GmailDriver {
       piLoadStarted: this._envData.piLoadStarted,
       globalsFound: this._timestampGlobalsFound,
       accountSwitcherReady: this._timestampAccountSwitcherReady,
-      onready: this._timestampOnready
+      onready: this._timestampOnready,
     };
   }
 
   registerThreadButton(options: Object) {
     const unregister = kefirStopper();
 
-    const removeButtonOnUnregister = button => {
+    const removeButtonOnUnregister = (button) => {
       unregister.takeUntilBy(button.getStopper()).onValue(() => {
         button.destroy();
       });
@@ -402,16 +402,16 @@ class GmailDriver {
             gmailToolbarView.addButton({
               ...options,
               section: options.threadSection || 'METADATA_STATE',
-              onClick: event => {
+              onClick: (event) => {
                 options.onClick({
                   position: 'THREAD',
                   dropdown: event.dropdown,
                   selectedThreadViewDrivers: [
-                    gmailToolbarView.getThreadViewDriver()
+                    gmailToolbarView.getThreadViewDriver(),
                   ],
-                  selectedThreadRowViewDrivers: []
+                  selectedThreadRowViewDrivers: [],
                 });
-              }
+              },
             })
           );
         }
@@ -421,18 +421,18 @@ class GmailDriver {
             gmailToolbarView.addButton({
               ...options,
               section: options.listSection || 'METADATA_STATE',
-              onClick: event => {
+              onClick: (event) => {
                 const selectedThreadRowViewDrivers = Array.from(
                   gmailToolbarView.getThreadRowViewDrivers()
-                ).filter(gmailThreadRow => gmailThreadRow.isSelected());
+                ).filter((gmailThreadRow) => gmailThreadRow.isSelected());
 
                 options.onClick({
                   position: 'LIST',
                   dropdown: event.dropdown,
                   selectedThreadViewDrivers: [],
-                  selectedThreadRowViewDrivers
+                  selectedThreadRowViewDrivers,
                 });
-              }
+              },
             })
           );
         }
@@ -450,15 +450,15 @@ class GmailDriver {
             iconClass: options.iconClass,
             iconUrl: options.iconUrl,
             orderHint: options.orderHint,
-            onClick: event => {
+            onClick: (event) => {
               if (!options.onClick) return;
               options.onClick({
                 position: 'ROW',
                 dropdown: event.dropdown,
                 selectedThreadViewDrivers: [],
-                selectedThreadRowViewDrivers: [gmailThreadRow]
+                selectedThreadRowViewDrivers: [gmailThreadRow],
               });
-            }
+            },
           }).merge(unregister)
         );
       };
@@ -466,12 +466,12 @@ class GmailDriver {
       if (this._currentRouteViewDriver) {
         this._currentRouteViewDriver
           .getRowListViews()
-          .forEach(gmailRowListView => {
+          .forEach((gmailRowListView) => {
             gmailRowListView.getThreadRowViewDrivers().forEach(perThreadRow);
           });
       }
       const threadRowViewSub = this._threadRowViewDriverKefirStream.observe({
-        value: perThreadRow
+        value: perThreadRow,
       });
       unregister.onValue(() => {
         threadRowViewSub.unsubscribe();
@@ -491,7 +491,7 @@ class GmailDriver {
     var hce = new (window: any).HashChangeEvent('hashchange', {
       oldURL:
         document.location.href.replace(/#.*$/, '') + '#inboxsdk-fake-no-vc',
-      newURL: document.location.href.replace(/#.*$/, '') + hash
+      newURL: document.location.href.replace(/#.*$/, '') + hash,
     });
     window.dispatchEvent(hce);
   }
@@ -519,7 +519,7 @@ class GmailDriver {
   signalCustomThreadListActivity(customRouteID: string) {
     this._lastCustomThreadListActivity = {
       customRouteID,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
   }
 
@@ -527,7 +527,7 @@ class GmailDriver {
   // out or we got a response, and the customRouteID for that.
   getLastCustomThreadListActivity(): ?{
     customRouteID: string,
-    timestamp: Date
+    timestamp: Date,
   } {
     return this._lastCustomThreadListActivity;
   }
@@ -557,7 +557,7 @@ class GmailDriver {
   }
 
   resolveUrlRedirects(url: string): Promise<string> {
-    return this._pageCommunicatorPromise.then(pageCommunicator =>
+    return this._pageCommunicatorPromise.then((pageCommunicator) =>
       pageCommunicator.resolveUrlRedirects(url)
     );
   }
@@ -603,7 +603,7 @@ class GmailDriver {
       .beforeEnd(
         () => new Error('Driver was shut down before a new compose was found')
       )
-      .flatMap(x =>
+      .flatMap((x) =>
         x instanceof Error ? Kefir.constantError(x) : Kefir.constant(x)
       )
       .take(1)
@@ -646,13 +646,14 @@ class GmailDriver {
 
   getSentMailNativeNavItem(): Promise<NativeGmailNavItemView> {
     const p = getNativeNavItem(this, 'sent');
-    p.catch(err => this._logger.error(err));
+    p.catch((err) => this._logger.error(err));
     return p;
   }
 
   setShowNativeNavMarker(isNative: boolean) {
     this._navMarkerHiddenChanged.emit(null);
-    const leftNavContainerElement = GmailElementGetter.getLeftNavContainerElement();
+    const leftNavContainerElement =
+      GmailElementGetter.getLeftNavContainerElement();
     if (leftNavContainerElement) {
       if (isNative) {
         leftNavContainerElement.classList.remove(
@@ -671,8 +672,10 @@ class GmailDriver {
 
   setShowNativeAddonSidebar(isNative: boolean) {
     this._addonSidebarHiddenChanged.emit(null);
-    const addonContainerElement = GmailElementGetter.getAddonSidebarContainerElement();
-    const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
+    const addonContainerElement =
+      GmailElementGetter.getAddonSidebarContainerElement();
+    const mainContentBodyContainerElement =
+      GmailElementGetter.getMainContentBodyContainerElement();
 
     if (addonContainerElement && mainContentBodyContainerElement) {
       const parent = mainContentBodyContainerElement.parentElement;
@@ -710,7 +713,7 @@ class GmailDriver {
   getUserContact(): Contact {
     return {
       emailAddress: this.getUserEmailAddress(),
-      name: this._userInfo.getUserName()
+      name: this._userInfo.getUserName(),
     };
   }
 
@@ -743,7 +746,7 @@ class GmailDriver {
 
     this._pageCommunicatorPromise = result.pageCommunicatorPromise;
 
-    this.onready = this._pageCommunicatorPromise.then(pageCommunicator => {
+    this.onready = this._pageCommunicatorPromise.then((pageCommunicator) => {
       this._timestampGlobalsFound = Date.now();
       this._pageCommunicator = pageCommunicator;
       this._logger.setUserEmailAddress(this.getUserEmailAddress());
@@ -759,7 +762,7 @@ class GmailDriver {
         .takeUntilBy(this._stopper)
         .toProperty();
 
-      this._routeViewDriverStream.onValue(gmailRouteView => {
+      this._routeViewDriverStream.onValue((gmailRouteView) => {
         this._currentRouteViewDriver = gmailRouteView;
       });
 
@@ -771,12 +774,12 @@ class GmailDriver {
       this._threadViewDriverLiveSet = toLiveSet(
         this._setupRouteSubViewDriver('newGmailThreadView')
           .takeUntilBy(this._stopper)
-          .flatMap(gmailThreadView =>
+          .flatMap((gmailThreadView) =>
             gmailThreadView.getReadyStream().map(() => gmailThreadView)
           )
-          .map(gmailThreadView => ({
+          .map((gmailThreadView) => ({
             el: gmailThreadView,
-            removalStream: gmailThreadView.getStopper()
+            removalStream: gmailThreadView.getStopper(),
           }))
       );
 
@@ -799,35 +802,37 @@ class GmailDriver {
   }
 
   _setupRouteSubViewDriver(viewName: string): Kefir.Observable<Object> {
-    return this._routeViewDriverStream.flatMap(gmailRouteView => {
+    return this._routeViewDriverStream.flatMap((gmailRouteView) => {
       return gmailRouteView
         .getEventStream()
-        .filter(event => event.eventName === viewName)
-        .map(event => event.view);
+        .filter((event) => event.eventName === viewName)
+        .map((event) => event.view);
     });
   }
 
   _setupThreadRowViewDriverKefirStream() {
     this._threadRowViewDriverKefirStream = this._rowListViewDriverStream
-      .flatMap(rowListViewDriver => rowListViewDriver.getRowViewDriverStream())
+      .flatMap((rowListViewDriver) =>
+        rowListViewDriver.getRowViewDriverStream()
+      )
       .takeUntilBy(this._stopper);
   }
 
   _setupToolbarViewDriverStream() {
     this._toolbarViewDriverLiveSet = toLiveSet(
       Kefir.merge([
-        this._rowListViewDriverStream.map(gmailRowListView =>
+        this._rowListViewDriverStream.map((gmailRowListView) =>
           gmailRowListView.getToolbarView()
         ),
-        this.getThreadViewDriverStream().map(gmailThreadView =>
+        this.getThreadViewDriverStream().map((gmailThreadView) =>
           gmailThreadView.getToolbarView()
-        )
+        ),
       ])
         .filter(Boolean)
-        .flatMap(gmailToolbarView => gmailToolbarView.waitForReady())
-        .map(gmailToolbarView => ({
+        .flatMap((gmailToolbarView) => gmailToolbarView.waitForReady())
+        .map((gmailToolbarView) => ({
           el: gmailToolbarView,
-          removalStream: gmailToolbarView.getStopper()
+          removalStream: gmailToolbarView.getStopper(),
         }))
         .takeUntilBy(this._stopper)
     );
@@ -836,7 +841,9 @@ class GmailDriver {
 
   _setupMessageViewDriverStream() {
     this._messageViewDriverStream = this.getThreadViewDriverStream()
-      .flatMap(gmailThreadView => gmailThreadView.getMessageViewDriverStream())
+      .flatMap((gmailThreadView) =>
+        gmailThreadView.getMessageViewDriverStream()
+      )
       .takeUntilBy(this._stopper);
   }
 
@@ -870,7 +877,8 @@ class GmailDriver {
   getGlobalSidebar(): GmailAppSidebarView {
     let appSidebarView = this._appSidebarView;
     if (!appSidebarView) {
-      const companionSidebarContentContainerEl = GmailElementGetter.getCompanionSidebarContentContainerElement();
+      const companionSidebarContentContainerEl =
+        GmailElementGetter.getCompanionSidebarContentContainerElement();
       if (!companionSidebarContentContainerEl)
         throw new Error('did not find companionSidebarContentContainerEl');
       appSidebarView = this._appSidebarView = new GmailAppSidebarView(
@@ -933,7 +941,7 @@ class GmailDriver {
           this._logger.error(
             new Error('_recentSyncDraftIds count had unexpected value'),
             {
-              count
+              count,
             }
           );
         } else {
@@ -978,7 +986,7 @@ class GmailDriver {
 
   getLoadEventDetails(): any {
     return {
-      isGmailIntegratedView: isIntegratedViewGmail()
+      isGmailIntegratedView: isIntegratedViewGmail(),
     };
   }
 }

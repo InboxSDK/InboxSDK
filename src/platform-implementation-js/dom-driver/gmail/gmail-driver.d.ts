@@ -5,7 +5,7 @@ import {
   PiOpts,
   ContentPanelViewDriver,
   DrawerViewOptions,
-  DrawerViewDriver
+  DrawerViewDriver,
 } from '../../driver-interfaces/driver';
 import Logger from '../../lib/logger';
 import GmailComposeView from './views/gmail-compose-view';
@@ -13,7 +13,7 @@ import KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import GmailPageCommunicator from './gmail-page-communicator';
 import { Contact } from '../../driver-interfaces/compose-view-driver';
 import GmailSupportItemView, {
-  SupportItemDescriptor
+  SupportItemDescriptor,
 } from './views/gmail-support-item-view';
 type GmailRouteView = any;
 type GmailThreadView = any;

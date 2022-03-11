@@ -37,42 +37,44 @@ test('loads in gmail mock', () => {
 
   expect(InboxSDK.LOADER_VERSION).toBe('beep');
 
-  return InboxSDK.load(1, 'sdk_testfoo_2a9c68f994', appOpts).then(inboxsdk => {
-    const newGlobals = _.difference(
-      Object.keys(window),
-      originalWindowProperties,
-      [
-        '__InboxSDKImpLoader',
-        'inboxsdk__style',
-        'inboxsdk__shared_style',
-        '__inboxsdk_extensionSeenErrors',
-        '__coverage__'
-      ]
-    ).map(x => `window.${x}`);
-    expect(newGlobals).toEqual([]);
+  return InboxSDK.load(1, 'sdk_testfoo_2a9c68f994', appOpts).then(
+    (inboxsdk) => {
+      const newGlobals = _.difference(
+        Object.keys(window),
+        originalWindowProperties,
+        [
+          '__InboxSDKImpLoader',
+          'inboxsdk__style',
+          'inboxsdk__shared_style',
+          '__inboxsdk_extensionSeenErrors',
+          '__coverage__',
+        ]
+      ).map((x) => `window.${x}`);
+      expect(newGlobals).toEqual([]);
 
-    expect(inboxsdk.LOADER_VERSION).toBe('beep');
-    expect(inboxsdk.IMPL_VERSION).toBe('beep');
-    expect(inboxsdk.User.getAccountSwitcherContactList()).toEqual([
-      { name: 'Chris Cowan', emailAddress: 'cowan@streak.com' },
-      { name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com' }
-    ]);
+      expect(inboxsdk.LOADER_VERSION).toBe('beep');
+      expect(inboxsdk.IMPL_VERSION).toBe('beep');
+      expect(inboxsdk.User.getAccountSwitcherContactList()).toEqual([
+        { name: 'Chris Cowan', emailAddress: 'cowan@streak.com' },
+        { name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com' },
+      ]);
 
-    expect(inboxsdk.User.getEmailAddress()).toBe('cowan@streak.com');
+      expect(inboxsdk.User.getEmailAddress()).toBe('cowan@streak.com');
 
-    expect(inboxsdk.Router.getCurrentRouteView().getRouteType()).toBe(
-      'UNKNOWN'
-    );
+      expect(inboxsdk.Router.getCurrentRouteView().getRouteType()).toBe(
+        'UNKNOWN'
+      );
 
-    return Promise.all([
-      InboxSDK.load(1, 'sdk_testfoo2_c65cc8c168', appOpts),
-      InboxSDK.load(1, 'sdk_testfoo3_fc90e29e45', appOpts)
-    ]).then(apps => {
-      expect(apps[0]).not.toBe(apps[1]);
-      expect(apps[0].LOADER_VERSION).toBe('beep');
-      expect(apps[0].IMPL_VERSION).toBe('beep');
-      expect(apps[1].LOADER_VERSION).toBe('beep');
-      expect(apps[1].IMPL_VERSION).toBe('beep');
-    });
-  });
+      return Promise.all([
+        InboxSDK.load(1, 'sdk_testfoo2_c65cc8c168', appOpts),
+        InboxSDK.load(1, 'sdk_testfoo3_fc90e29e45', appOpts),
+      ]).then((apps) => {
+        expect(apps[0]).not.toBe(apps[1]);
+        expect(apps[0].LOADER_VERSION).toBe('beep');
+        expect(apps[0].IMPL_VERSION).toBe('beep');
+        expect(apps[1].LOADER_VERSION).toBe('beep');
+        expect(apps[1].IMPL_VERSION).toBe('beep');
+      });
+    }
+  );
 });

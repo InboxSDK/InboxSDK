@@ -46,11 +46,11 @@ export default function createLink(
   } catch (error) {
     Logger.error(error, {
       routeID,
-      paramsKey: Object.keys(params)
+      paramsKey: Object.keys(params),
     });
 
     processedRoute = parts
-      .map(function(part) {
+      .map(function (part) {
         if (part.indexOf(':') === -1) {
           return part;
         }

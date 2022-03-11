@@ -138,7 +138,8 @@ class GmailAppSidebarView {
     });
 
     if (_addonSidebarContainerEl) {
-      const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
+      const mainContentBodyContainerElement =
+        GmailElementGetter.getMainContentBodyContainerElement();
       if (mainContentBodyContainerElement) {
         contentContainer = mainContentBodyContainerElement.parentElement;
         if (!contentContainer) throw new Error('should not happen');
@@ -184,12 +185,12 @@ class GmailAppSidebarView {
                   left: elRect.left,
                   right: elRect.right,
                   width: elRect.width,
-                  height: elRect.height
+                  height: elRect.height,
                 },
                 window: {
                   innerWidth: window.innerWidth,
-                  innerHeight: window.innerHeight
-                }
+                  innerHeight: window.innerHeight,
+                },
               }
             );
         } else {
@@ -234,7 +235,7 @@ class GmailAppSidebarView {
     } else {
       const containerEl = findParent(
         sidebarContainerEl,
-        el => window.getComputedStyle(el).overflowY !== 'visible'
+        (el) => window.getComputedStyle(el).overflowY !== 'visible'
       );
       container = containerEl ? () => containerEl : undefined;
     }
@@ -259,12 +260,12 @@ class GmailAppSidebarView {
         } catch (err) {
           console.error('failed to set sidebar order data', err); //eslint-disable-line no-console
         }
-      }
+      },
     });
 
     updateHighlightedAppIconBus
       .bufferWithTimeOrCount(150, 100)
-      .filter(events => events.length > 0)
+      .filter((events) => events.length > 0)
       .takeUntilBy(this._stopper)
       .onValue(() => {
         const elBoundingBox = el.getBoundingClientRect();
@@ -279,7 +280,7 @@ class GmailAppSidebarView {
           )
         );
 
-        const titleBar = titleBars.find(t => {
+        const titleBar = titleBars.find((t) => {
           const tBoundingBox = t.getBoundingClientRect();
           return (
             tBoundingBox.bottom > boundingTop &&
@@ -307,7 +308,7 @@ class GmailAppSidebarView {
         }
       });
 
-    const _appSidebarRefSetter = threadSidebarComponent => {
+    const _appSidebarRefSetter = (threadSidebarComponent) => {
       if (threadSidebarComponent) {
         component = threadSidebarComponent;
       }
@@ -317,7 +318,7 @@ class GmailAppSidebarView {
       ReactDOM.render(
         <AppSidebar
           ref={_appSidebarRefSetter}
-          panels={orderManager.getOrderedItems().map(x => x.value)}
+          panels={orderManager.getOrderedItems().map((x) => x.value)}
           onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
             orderManager.moveItem(oldIndex, newIndex);
             render();
@@ -336,7 +337,7 @@ class GmailAppSidebarView {
     render();
 
     Kefir.fromEvents(window, 'storage')
-      .filter(e => e.key === 'inboxsdk__sidebar_ordering')
+      .filter((e) => e.key === 'inboxsdk__sidebar_ordering')
       .takeUntilBy(this._stopper)
       .onValue(() => {
         orderManager.reload();
@@ -350,7 +351,8 @@ class GmailAppSidebarView {
       sidebarContainerEl.classList.remove('app_sidebar_visible');
       if (iconArea) iconArea.remove();
 
-      const mainContentBodyContainerElement = GmailElementGetter.getMainContentBodyContainerElement();
+      const mainContentBodyContainerElement =
+        GmailElementGetter.getMainContentBodyContainerElement();
       if (mainContentBodyContainerElement) {
         contentContainer = mainContentBodyContainerElement.parentElement;
         if (contentContainer) {
@@ -361,9 +363,9 @@ class GmailAppSidebarView {
     });
 
     Kefir.fromEvents((document.body: any), 'inboxsdkNewSidebarPanel')
-      .filter(e => e.detail.sidebarId === this._instanceId)
+      .filter((e) => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
-      .onValue(event => {
+      .onValue((event) => {
         let id = event.detail.id;
         while (currentIds.has(id)) {
           id = incrementName(id);
@@ -384,8 +386,8 @@ class GmailAppSidebarView {
             iconClass: event.detail.iconClass,
             iconUrl: event.detail.iconUrl,
             hideTitleBar: event.detail.hideTitleBar,
-            el: event.target
-          }
+            el: event.target,
+          },
         });
         render();
 
@@ -485,9 +487,10 @@ class GmailAppSidebarView {
 
                   if (addonSidebarContainerEl) {
                     // check and deactivate add-on sidebar
-                    const activeAddOnIcon = addonSidebarContainerEl.querySelector(
-                      ACTIVE_ADD_ON_ICON_SELECTOR
-                    );
+                    const activeAddOnIcon =
+                      addonSidebarContainerEl.querySelector(
+                        ACTIVE_ADD_ON_ICON_SELECTOR
+                      );
                     if (activeAddOnIcon) simulateClick(activeAddOnIcon);
 
                     //fake resize to get gmail to fix any heights that are messed up
@@ -510,7 +513,7 @@ class GmailAppSidebarView {
                       activatedWhileLoading = true;
                       makeMutationObserverChunkedStream(loadingHolder, {
                         attributes: true,
-                        attributeFilter: ['style']
+                        attributeFilter: ['style'],
                       })
                         .toProperty(() => null)
                         .map(() => loadingHolder.style.display === 'none')
@@ -563,13 +566,13 @@ class GmailAppSidebarView {
       });
 
     Kefir.fromEvents((document.body: any), 'inboxsdkUpdateSidebarPanel')
-      .filter(e => e.detail.sidebarId === this._instanceId)
+      .filter((e) => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
-      .onValue(event => {
+      .onValue((event) => {
         const orderedItems = orderManager.getOrderedItems();
         const index = findIndex(
           orderedItems,
-          x => x.value.instanceId === event.detail.instanceId
+          (x) => x.value.instanceId === event.detail.instanceId
         );
         if (index === -1)
           throw new Error('should not happen: failed to find orderItem');
@@ -582,19 +585,19 @@ class GmailAppSidebarView {
           iconClass: event.detail.iconClass,
           iconUrl: event.detail.iconUrl,
           hideTitleBar: event.detail.hideTitleBar,
-          el: event.target
+          el: event.target,
         });
         render();
       });
 
     Kefir.fromEvents((document.body: any), 'inboxsdkRemoveSidebarPanel')
-      .filter(e => e.detail.sidebarId === this._instanceId)
+      .filter((e) => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
-      .onValue(event => {
+      .onValue((event) => {
         const orderedItems = orderManager.getOrderedItems();
         const index = findIndex(
           orderedItems,
-          x => x.value.instanceId === event.detail.instanceId
+          (x) => x.value.instanceId === event.detail.instanceId
         );
         if (index === -1)
           throw new Error('should not happen: failed to find orderItem');
@@ -647,13 +650,13 @@ class GmailAppSidebarView {
 
     Kefir.fromEvents((document.body: any), 'inboxsdkSidebarPanelScrollIntoView')
       .takeUntilBy(this._stopper)
-      .onValue(event => {
+      .onValue((event) => {
         component.scrollPanelIntoView(event.detail.instanceId);
       });
 
     Kefir.fromEvents((document.body: any), 'inboxsdkSidebarPanelClose')
       .takeUntilBy(this._stopper)
-      .onValue(event => {
+      .onValue((event) => {
         component.closePanel(event.detail.instanceId);
       });
 
@@ -669,13 +672,13 @@ class GmailAppSidebarView {
         .flatMap(({ el, removalStream }) =>
           makeMutationObserverChunkedStream(el, {
             attributes: true,
-            attributeFilter: ['style']
+            attributeFilter: ['style'],
           })
             .toProperty(() => null)
             .map(() => el.style.display !== 'none')
         )
         .takeUntilBy(this._stopper)
-        .onValue(isDisplayingGmailAddonSidebar => {
+        .onValue((isDisplayingGmailAddonSidebar) => {
           if (isDisplayingGmailAddonSidebar) {
             if (contentContainer)
               contentContainer.classList.add('container_addon_sidebar_visible');

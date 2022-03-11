@@ -19,7 +19,7 @@ import type {
   MessageViewDriver,
   MessageViewToolbarButtonDescriptor,
   MessageViewLinkDescriptor,
-  VIEW_STATE
+  VIEW_STATE,
 } from '../../../driver-interfaces/message-view-driver';
 import SafeEventEmitter from '../../../lib/safe-event-emitter';
 
@@ -46,7 +46,7 @@ class InboxMessageView {
     // getMessageViewDriverStream() will create a new view for this element.
     makeMutationObserverChunkedStream(this._element, {
       attributes: true,
-      attributeFilter: ['data-msg-id']
+      attributeFilter: ['data-msg-id'],
     })
       .toProperty(() => null)
       .map(() => this._element.getAttribute('data-msg-id'))
@@ -58,14 +58,14 @@ class InboxMessageView {
 
     makeMutationObserverChunkedStream(this._element, {
       attributes: true,
-      attributeFilter: ['aria-expanded']
+      attributeFilter: ['aria-expanded'],
     })
       .toProperty(() => null)
       .map(() => this._element.getAttribute('aria-expanded') === 'true')
       .skipDuplicates()
       .changes()
       .takeUntilBy(this._stopper)
-      .onValue(expanded => {
+      .onValue((expanded) => {
         if (expanded) {
           this._reparse();
         } else {
@@ -87,7 +87,7 @@ class InboxMessageView {
 
   _findThreadView(): ?InboxThreadView {
     const map = this._driver.getThreadViewElementsMap();
-    const threadViewElement = findParent(this._element, el =>
+    const threadViewElement = findParent(this._element, (el) =>
       map.has((el: any))
     );
     if (!threadViewElement) return null;
@@ -101,21 +101,21 @@ class InboxMessageView {
       this._driver.getLogger().errorSite(new Error('message reparse errors'), {
         score: this._p.score,
         errors: this._p.errors,
-        html: censorHTMLtree(this._element)
+        html: censorHTMLtree(this._element),
       });
     }
 
     if (!oldParsed.attributes.loaded && this._p.attributes.loaded) {
       this._eventStream.emit({
         type: 'internal',
-        eventName: 'messageLoad'
+        eventName: 'messageLoad',
       });
     }
     if (oldParsed.attributes.viewState !== this._p.attributes.viewState) {
       this._eventStream.emit({
         eventName: 'viewStateChange',
         oldValue: oldParsed.attributes.viewState,
-        newValue: this._p.attributes.viewState
+        newValue: this._p.attributes.viewState,
       });
     }
   }
@@ -123,12 +123,12 @@ class InboxMessageView {
   _monitorEmailAddressHovering() {
     this._eventStream.plug(
       Kefir.fromEvents(this._element, 'mouseover')
-        .map(e => e.target)
-        .filter(element => element && element.getAttribute('email'))
-        .map(element => {
+        .map((e) => e.target)
+        .filter((element) => element && element.getAttribute('email'))
+        .map((element) => {
           const contact = {
             name: element.textContent,
-            emailAddress: element.getAttribute('email')
+            emailAddress: element.getAttribute('email'),
           };
 
           let contactType;
@@ -139,7 +139,7 @@ class InboxMessageView {
             contactType = 'sender';
           } else if (
             this._p.attributes.recipientElements &&
-            Array.from(this._p.attributes.recipientElements).some(el =>
+            Array.from(this._p.attributes.recipientElements).some((el) =>
               el.contains(element)
             )
           ) {
@@ -152,7 +152,7 @@ class InboxMessageView {
             eventName: 'contactHover',
             messageViewDriver: this,
             contact,
-            contactType
+            contactType,
           };
         })
         .filter()
@@ -166,7 +166,7 @@ class InboxMessageView {
       .takeUntilBy(this._stopper)
       .onValue(() => {
         this._attachmentCardViews = this._attachmentCardViews.filter(
-          v => v !== card
+          (v) => v !== card
         );
       });
   }
@@ -219,10 +219,7 @@ class InboxMessageView {
         .values()) {
         const draftId = await inboxComposeView.getDraftID();
         if (draftId && `msg-a:${draftId}` === inboxMessageId) {
-          await inboxComposeView
-            .getStopper()
-            .take(1)
-            .toPromise();
+          await inboxComposeView.getStopper().take(1).toPromise();
           break;
         }
       }
@@ -245,7 +242,7 @@ class InboxMessageView {
     throw new Error('not implemented yet');
   }
   isElementInQuotedArea(el: HTMLElement): boolean {
-    const quotedArea = findParent(el, el =>
+    const quotedArea = findParent(el, (el) =>
       el.classList.contains('gmail_extra')
     );
     return quotedArea != null;
@@ -296,21 +293,21 @@ class InboxMessageView {
     if (!emailAddress) throw new Error('could not find email address');
     return {
       emailAddress,
-      name: sender.textContent
+      name: sender.textContent,
     };
   }
   getRecipients(): Array<Contact> {
     const userContact = this._driver.getUserContact();
     return Array.prototype.map.call(
       this._p.attributes.recipientElements,
-      el => {
+      (el) => {
         const emailAddress = el.getAttribute('email');
         if (emailAddress === userContact.emailAddress) {
           return userContact;
         }
         return {
           emailAddress,
-          name: el.textContent
+          name: el.textContent,
         };
       }
     );
@@ -335,14 +332,14 @@ class InboxMessageView {
     // The cards are emitted several microtasks after the message, so we delay
     // by about 10 microtasks here. An integration test tests this at least.
     // TODO something else.
-    return Kefir.repeat(i => (i > 10 ? null : delayAsap(null)))
+    return Kefir.repeat((i) => (i > 10 ? null : delayAsap(null)))
       .ignoreValues()
       .beforeEnd(() => null);
   }
 
   destroy() {
     this._eventStream.end();
-    this._attachmentCardViews.slice().forEach(card => {
+    this._attachmentCardViews.slice().forEach((card) => {
       card.destroy();
     });
   }
