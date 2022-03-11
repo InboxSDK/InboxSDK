@@ -25,7 +25,7 @@ export default class ErrorCollector {
     } catch (e) {
       this._errorLogs.push({
         name,
-        message: e.message
+        message: e.message,
       });
       return null;
     }
@@ -39,7 +39,7 @@ export default class ErrorCollector {
     if (this._errorLogs.length) {
       Logger.error(new Error(`Error Collector: ${this._name}`), {
         errorLogs: this._errorLogs,
-        extra: errorDataCb()
+        extra: errorDataCb(),
       });
     }
   }

@@ -21,14 +21,14 @@ class Widgets {
 
   showModalView(options: Object): ModalView {
     if (options.buttons) {
-      options.buttons = options.buttons.map(button => {
+      options.buttons = options.buttons.map((button) => {
         if (button.onClick) {
           const appOnClick = button.onClick;
           return {
             ...button,
             onClick() {
               appOnClick({ modalView });
-            }
+            },
           };
         }
         return button;
@@ -59,7 +59,7 @@ class Widgets {
     ).driver.createTopMessageBarDriver(kefirCast((Kefir: any), options));
 
     return new TopMessageBarView({
-      topMessageBarViewDriver
+      topMessageBarViewDriver,
     });
   }
 
@@ -67,7 +67,7 @@ class Widgets {
     get(memberMap, this)
       .driver.getLogger()
       .eventSdkActive('Widgets.showDrawerView used', {
-        keys: Object.keys(options)
+        keys: Object.keys(options),
       });
 
     if (options.composeView && !(options.composeView instanceof ComposeView))

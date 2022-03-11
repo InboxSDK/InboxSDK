@@ -6,7 +6,7 @@ import type { Options as ContainByScreenOptions } from 'contain-by-screen';
 
 type Options = {
   manualPosition?: boolean,
-  extraElementsToIgnore?: HTMLElement[]
+  extraElementsToIgnore?: HTMLElement[],
 };
 
 declare export default class DropdownView extends EventEmitter {

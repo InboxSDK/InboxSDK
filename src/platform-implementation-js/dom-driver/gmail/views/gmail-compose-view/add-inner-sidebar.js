@@ -4,7 +4,7 @@ import type GmailComposeView from '../gmail-compose-view';
 
 type Options = {
   title: string,
-  el: HTMLElement
+  el: HTMLElement,
 };
 
 export default function addInnerSidebar(

@@ -3,7 +3,7 @@
 import triggerRelayEvent from './trigger-relay-event';
 
 function makeDataTransferObj(files: Array<Blob | File>) {
-  const fileNames: Array<?string> = Array.from(files).map(file =>
+  const fileNames: Array<?string> = Array.from(files).map((file) =>
     typeof file.name === 'string' ? file.name : undefined
   );
   return { files, fileNames };
@@ -21,7 +21,7 @@ export function simulateDragOver(element: HTMLElement, files: Blob[]) {
     shiftKey: false,
     altKey: false,
     metaKey: false,
-    detail: 0
+    detail: 0,
   };
 
   triggerRelayEvent(element, {
@@ -29,7 +29,7 @@ export function simulateDragOver(element: HTMLElement, files: Blob[]) {
     bubbles: true,
     cancelable: false,
     props,
-    dataTransfer
+    dataTransfer,
   });
 
   triggerRelayEvent(element, {
@@ -37,7 +37,7 @@ export function simulateDragOver(element: HTMLElement, files: Blob[]) {
     bubbles: true,
     cancelable: false,
     props,
-    dataTransfer
+    dataTransfer,
   });
 }
 
@@ -53,7 +53,7 @@ export function simulateDrop(element: HTMLElement, files: Blob[]) {
     shiftKey: false,
     altKey: false,
     metaKey: false,
-    detail: 0
+    detail: 0,
   };
 
   triggerRelayEvent(element, {
@@ -61,7 +61,7 @@ export function simulateDrop(element: HTMLElement, files: Blob[]) {
     bubbles: true,
     cancelable: false,
     props,
-    dataTransfer
+    dataTransfer,
   });
 }
 
@@ -77,7 +77,7 @@ export function simulateDragEnd(element: HTMLElement, files: Blob[]) {
     shiftKey: false,
     altKey: false,
     metaKey: false,
-    detail: 0
+    detail: 0,
   };
 
   triggerRelayEvent(element, {
@@ -85,7 +85,7 @@ export function simulateDragEnd(element: HTMLElement, files: Blob[]) {
     bubbles: true,
     cancelable: false,
     props,
-    dataTransfer
+    dataTransfer,
   });
 
   triggerRelayEvent(element, {
@@ -93,6 +93,6 @@ export function simulateDragEnd(element: HTMLElement, files: Blob[]) {
     bubbles: true,
     cancelable: false,
     props,
-    dataTransfer
+    dataTransfer,
   });
 }

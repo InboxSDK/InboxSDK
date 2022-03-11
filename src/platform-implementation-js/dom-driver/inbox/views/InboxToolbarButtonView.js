@@ -31,15 +31,15 @@ class InboxToolbarButtonView {
     buttonEl.className = 'inboxsdk__button_icon';
     const img = document.createElement('img');
     img.className = 'inboxsdk__button_iconImg';
-    let onClick = ignored => {};
+    let onClick = (ignored) => {};
     let hasDropdown = false;
     let dropdown = null;
     Kefir.merge([
       Kefir.fromEvents(buttonEl, 'click'),
-      fromEventTargetCapture(buttonEl, 'keyup').filter(e =>
+      fromEventTargetCapture(buttonEl, 'keyup').filter((e) =>
         includes([32 /*space*/, 13 /*enter*/], e.which)
-      )
-    ]).onValue(event => {
+      ),
+    ]).onValue((event) => {
       event.preventDefault();
       event.stopPropagation();
       if (hasDropdown) {
@@ -53,7 +53,7 @@ class InboxToolbarButtonView {
             position: 'bottom',
             hAlign: 'right',
             vAlign: 'top',
-            buffer: 10
+            buffer: 10,
           });
           dropdown.on('destroy', () => {
             this._buttonEl.classList.remove('inboxsdk__active');

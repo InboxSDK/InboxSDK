@@ -54,7 +54,7 @@ class InboxThreadView {
     if (this.isLoadingStub()) {
       makeMutationObserverChunkedStream(this._element, {
         attributes: true,
-        attributeFilter: ['aria-busy']
+        attributeFilter: ['aria-busy'],
       })
         .takeUntilBy(this._stopper)
         .onValue(() => {
@@ -82,13 +82,15 @@ class InboxThreadView {
     this._eventStream.plug(
       messageView
         .getEventStream()
-        .filter(event => event.eventName === 'contactHover')
+        .filter((event) => event.eventName === 'contactHover')
     );
     messageView
       .getStopper()
       .takeUntilBy(this._stopper)
       .onValue(() => {
-        this._messageViews = this._messageViews.filter(m => m !== messageView);
+        this._messageViews = this._messageViews.filter(
+          (m) => m !== messageView
+        );
       });
     this._receivedMessageView.destroy();
   }
@@ -179,7 +181,7 @@ class InboxThreadView {
       .takeUntilBy(this._stopper)
       .takeUntilBy(panel.getStopper())
       .take(1)
-      .onValue(descriptor => {
+      .onValue((descriptor) => {
         const { stickyHeading } = this._p.elements;
         if (!stickyHeading) return;
 
@@ -194,7 +196,7 @@ class InboxThreadView {
             .getAppSidebarView()
             .getOpenOrOpeningStream()
             .takeUntilBy(this._stopper)
-            .onValue(open => {
+            .onValue((open) => {
               _iconArea.style.display = open ? 'none' : '';
             });
 
@@ -214,7 +216,7 @@ class InboxThreadView {
         // data-count attribute instead of adding a new button.
         const existingButtonContainer = find(
           iconArea.querySelectorAll('.' + idMap('sidebar_button_container')),
-          el => {
+          (el) => {
             const button = el.querySelector('button');
             if (!button || button.title !== appName) return false;
             const img = button.querySelector('img');
@@ -265,7 +267,7 @@ class InboxThreadView {
   }
 
   removePanels() {
-    this._sidebarPanels.forEach(panel => {
+    this._sidebarPanels.forEach((panel) => {
       panel.remove();
     });
   }

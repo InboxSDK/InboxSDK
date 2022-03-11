@@ -15,7 +15,7 @@ export default function addRecipientRow(
 
   recipientRowOptionStream
     .takeUntilBy(gmailComposeView.getStopper())
-    .onValue(options => {
+    .onValue((options) => {
       if (row) {
         row.remove();
         row = null;
@@ -29,7 +29,7 @@ export default function addRecipientRow(
         new CustomEvent('resize', {
           bubbles: false,
           cancelable: false,
-          detail: null
+          detail: null,
         })
       );
     });
@@ -42,7 +42,7 @@ export default function addRecipientRow(
         new CustomEvent('resize', {
           bubbles: false,
           cancelable: false,
-          detail: null
+          detail: null,
         })
       );
     }

@@ -8,7 +8,7 @@ it('works', () => {
     add: (x, y = 0) => {
       adder.value += x + y;
       return adder.value;
-    }
+    },
   };
 
   const { fn, revoke } = makeRevocableFunction(adder.add);
@@ -40,7 +40,7 @@ it('revokedFn parameter works', () => {
     subtract: (x, y = 0) => {
       adder.value -= x + y;
       return adder.value;
-    }
+    },
   };
 
   const { fn, revoke } = makeRevocableFunction(adder.add, adder.subtract);

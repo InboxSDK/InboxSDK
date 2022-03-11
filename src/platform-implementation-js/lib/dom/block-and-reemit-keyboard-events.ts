@@ -10,7 +10,7 @@ export default function blockAndReemiteKeyboardEvents(element: HTMLElement) {
   Kefir.merge<KeyboardEvent, any>([
     Kefir.fromEvents(element, 'keypress'),
     Kefir.fromEvents(element, 'keydown'),
-    Kefir.fromEvents(element, 'keyup')
+    Kefir.fromEvents(element, 'keyup'),
   ]).onValue((event: KeyboardEvent) => {
     event.stopPropagation();
 
@@ -31,7 +31,7 @@ export default function blockAndReemiteKeyboardEvents(element: HTMLElement) {
       isComposing: { value: (event as any).isComposing },
       charCode: { value: event.charCode },
       keyCode: { value: event.keyCode },
-      which: { value: event.which }
+      which: { value: event.which },
     });
     document.dispatchEvent(fakeEvent);
   });

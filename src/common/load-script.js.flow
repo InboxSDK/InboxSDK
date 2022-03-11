@@ -5,7 +5,7 @@ export type LoadScriptOptions = {
   // variables defined in it don't become global variables. Setting nowrap to
   // true disables this behavior.
   nowrap?: boolean,
-  disableSourceMappingURL?: boolean
+  disableSourceMappingURL?: boolean,
 };
 
 declare export default function loadScript(

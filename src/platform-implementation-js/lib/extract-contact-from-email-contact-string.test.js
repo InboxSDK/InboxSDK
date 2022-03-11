@@ -5,7 +5,7 @@ import extractContactFromEmailContactString from './extract-contact-from-email-c
 it('should work with just an email address', () => {
   expect(extractContactFromEmailContactString('monkeys@monkeys.com')).toEqual({
     name: null,
-    emailAddress: 'monkeys@monkeys.com'
+    emailAddress: 'monkeys@monkeys.com',
   });
 });
 

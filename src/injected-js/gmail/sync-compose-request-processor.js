@@ -8,7 +8,7 @@ type ComposeRequest = {
   draftID: string,
   body: string,
   subject: string,
-  type: ComposeRequestType
+  type: ComposeRequestType,
 };
 
 const SEND_ACTIONS = ['^pfg'];
@@ -20,7 +20,7 @@ export function getDetailsOfComposeRequest(request: string): ?ComposeRequest {
   const updateList = parsed[2] && parsed[2][1];
   if (!updateList) return null;
 
-  const messageUpdates = updateList.filter(update => {
+  const messageUpdates = updateList.filter((update) => {
     const updateWrapper =
       update[2] && update[2][2] && (update[2][2][14] || update[2][2][2]);
     return (
@@ -32,7 +32,7 @@ export function getDetailsOfComposeRequest(request: string): ?ComposeRequest {
   });
 
   if (messageUpdates.length) {
-    const sendUpdateMatch = messageUpdates.find(update => {
+    const sendUpdateMatch = messageUpdates.find((update) => {
       const updateWrapper =
         update[2] && update[2][2] && (update[2][2][14] || update[2][2][2]);
 
@@ -69,7 +69,7 @@ export function getDetailsOfComposeRequest(request: string): ?ComposeRequest {
     // the first time a draft is saved it has a different response format
     const messageUpdates = updateList
       .map(
-        update =>
+        (update) =>
           update[2] &&
           update[2][2] &&
           update[2][2][3] &&
@@ -99,7 +99,7 @@ function getComposeRequestFromUpdate(
     body,
     type,
     draftID: update[1].replace('msg-a:', ''),
-    subject: update[8]
+    subject: update[8],
   };
 }
 
@@ -114,7 +114,7 @@ export function replaceEmailBodyForSendRequest(
   const updateList = parsed[2] && parsed[2][1];
   if (!updateList) return request;
 
-  const messageUpdates = updateList.filter(update => {
+  const messageUpdates = updateList.filter((update) => {
     const updateWrapper =
       update[2] && update[2][2] && (update[2][2][14] || update[2][2][2]);
     return (
@@ -126,7 +126,7 @@ export function replaceEmailBodyForSendRequest(
   });
 
   if (!messageUpdates.length) return request;
-  const sendUpdateMatch = messageUpdates.find(update => {
+  const sendUpdateMatch = messageUpdates.find((update) => {
     const updateWrapper =
       update[2] && update[2][2] && (update[2][2][14] || update[2][2][2]);
 

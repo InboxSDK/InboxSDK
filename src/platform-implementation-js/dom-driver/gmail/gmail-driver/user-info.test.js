@@ -20,7 +20,7 @@ describe('old', () => {
     expect(userInfo.getAccountSwitcherContactList()).toEqual([
       { name: 'Chris Cowan', emailAddress: 'cowan@streak.com' },
       { name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com' },
-      { name: 'Nikola Tesla', emailAddress: 'tesla@streak.com' }
+      { name: 'Nikola Tesla', emailAddress: 'tesla@streak.com' },
     ]);
   });
 
@@ -32,7 +32,7 @@ describe('old', () => {
     const userInfo = new UserInfo(driver);
     expect(userInfo.getAccountSwitcherContactList()).toEqual([
       { name: 'Chris Cowan', emailAddress: 'cowan@streak.com' },
-      { name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com' }
+      { name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com' },
     ]);
   });
 });
@@ -47,7 +47,7 @@ describe('new', () => {
     expect(userInfo.getAccountSwitcherContactList()).toEqual([
       { name: 'Chris Cowan', emailAddress: 'cowan@streak.com' },
       { name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com' },
-      { name: 'Nikola Tesla', emailAddress: 'tesla@streak.com' }
+      { name: 'Nikola Tesla', emailAddress: 'tesla@streak.com' },
     ]);
   });
 
@@ -59,7 +59,7 @@ describe('new', () => {
     const userInfo = new UserInfo(driver);
     expect(userInfo.getAccountSwitcherContactList()).toEqual([
       { name: 'Chris Cowan', emailAddress: 'cowan@streak.com' },
-      { name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com' }
+      { name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com' },
     ]);
   });
 
@@ -72,8 +72,8 @@ describe('new', () => {
     expect(userInfo.getAccountSwitcherContactList()).toEqual([
       {
         name: 'PeopleAggregate Test',
-        emailAddress: 'peopleaggregatetest@gmail.com'
-      }
+        emailAddress: 'peopleaggregatetest@gmail.com',
+      },
     ]);
   });
 });

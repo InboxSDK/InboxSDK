@@ -33,18 +33,18 @@ class ShowCustomThreadListTester {
         // eslint-disable-next-line no-console
         console.error(e);
         throw e;
-      }
+      },
     })),
     getCustomListSearchStringsToRouteIds: once(() => new Map()),
     getPageCommunicator: once(() => ({
       ajaxInterceptStream: this._ajaxInterceptStream,
       setupCustomListResultsQuery: jest.fn(),
-      setCustomListNewQuery: jest.fn(value => {
+      setCustomListNewQuery: jest.fn((value) => {
         this._customListNewQueryBus.value(value);
       }),
-      setCustomListResults: jest.fn(value => {
+      setCustomListResults: jest.fn((value) => {
         this._customListResultsBus.value(value);
-      })
+      }),
     })),
     signalCustomThreadListActivity: jest.fn(),
     getRfcMessageIdForGmailThreadId: jest.fn(async (gmailThreadId: string) => {
@@ -59,7 +59,7 @@ class ShowCustomThreadListTester {
       }
       await this._allowGmailThreadIdLookup.take(1).toPromise();
       return this._rfcIdsToThreadIds.get(rfcId);
-    })
+    }),
   };
 
   _customRouteID = 'tlbeep';
@@ -79,7 +79,7 @@ class ShowCustomThreadListTester {
     threadAndRfcIds: Array<[string, string]>,
     expectedSearchQuery: string,
     start: number,
-    getOriginalSearchResponse: () => Promise<string>
+    getOriginalSearchResponse: () => Promise<string>,
   |}) {
     this._onActivate = options.onActivate;
 
@@ -106,7 +106,8 @@ class ShowCustomThreadListTester {
       this._driver.getPageCommunicator().setupCustomListResultsQuery.mock.calls
         .length
     ).toBe(1);
-    this._newQuery = this._driver.getPageCommunicator().setupCustomListResultsQuery.mock.calls[0][0];
+    this._newQuery =
+      this._driver.getPageCommunicator().setupCustomListResultsQuery.mock.calls[0][0];
     expect(typeof this._newQuery).toBe('string');
 
     expect(this._driver.getCustomListSearchStringsToRouteIds().size).toBe(1);
@@ -121,10 +122,10 @@ class ShowCustomThreadListTester {
     this._ajaxInterceptStream.value({
       type: 'searchForReplacement',
       query: this._newQuery,
-      start: this._start
+      start: this._start,
     });
     expect(this._driver.signalCustomThreadListActivity.mock.calls).toEqual([
-      [this._customRouteID]
+      [this._customRouteID],
     ]);
     await this._customListNewQueryBus.take(1).toPromise();
     expect(
@@ -135,9 +136,9 @@ class ShowCustomThreadListTester {
           newQuery: this._expectedSearchQuery,
           newStart: 0,
           query: this._newQuery,
-          start: this._start
-        }
-      ]
+          start: this._start,
+        },
+      ],
     ]);
 
     const originalSearchResponse = await this._getOriginalSearchResponse();
@@ -146,7 +147,7 @@ class ShowCustomThreadListTester {
       type: 'searchResultsResponse',
       query: this._newQuery,
       start: this._start,
-      response: originalSearchResponse
+      response: originalSearchResponse,
     });
 
     expect(
@@ -181,31 +182,31 @@ test('works', async () => {
         hasMore: false,
         threads: [
           '168ab8987a3b61b3',
-          '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>'
-        ]
+          '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>',
+        ],
       };
     },
     threadAndRfcIds: [
       [
         '168ab8987a3b61b3',
-        '<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com>'
+        '<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com>',
       ],
       [
         '168a6018f86576ac',
-        '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>'
-      ]
+        '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>',
+      ],
     ],
     expectedSearchQuery:
       'rfc822msgid:<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com> OR rfc822msgid:<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>',
     start: 0,
-    getOriginalSearchResponse
+    getOriginalSearchResponse,
   });
   const setCustomListResults = await tester.runAndGetSetCustomListResults();
 
   function ignoreRawResponses(syncThreads: GSRP.SyncThread[]) {
-    return syncThreads.map(o => ({
+    return syncThreads.map((o) => ({
       ...o,
-      rawResponse: 'ignored'
+      rawResponse: 'ignored',
     }));
   }
 
@@ -234,38 +235,38 @@ test('can reorder list', async () => {
         hasMore: false,
         threads: [
           '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>',
-          '168ab8987a3b61b3'
-        ]
+          '168ab8987a3b61b3',
+        ],
       };
     },
     threadAndRfcIds: [
       [
         '168ab8987a3b61b3',
-        '<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com>'
+        '<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com>',
       ],
       [
         '168a6018f86576ac',
-        '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>'
-      ]
+        '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>',
+      ],
     ],
     expectedSearchQuery:
       'rfc822msgid:<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com> OR rfc822msgid:<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com>',
     start: 0,
-    getOriginalSearchResponse
+    getOriginalSearchResponse,
   });
   const setCustomListResults = await tester.runAndGetSetCustomListResults();
 
   function ignoreSomeFields(syncThreads: GSRP.SyncThread[]) {
-    return syncThreads.map(o => ({
+    return syncThreads.map((o) => ({
       ...o,
       rawResponse: 'ignored',
       extraMetaData: {
         ...o.extraMetaData,
-        syncMessageData: o.extraMetaData.syncMessageData.map(s => ({
+        syncMessageData: o.extraMetaData.syncMessageData.map((s) => ({
           ...s,
-          date: 'ignored'
-        }))
-      }
+          date: 'ignored',
+        })),
+      },
     }));
   }
 
@@ -297,38 +298,38 @@ test('missing thread id', async () => {
           '168ab8987a3b61b3',
           '1111111111111111',
           '1111111111111112',
-          '<a@b.com>'
-        ]
+          '<a@b.com>',
+        ],
       };
     },
     threadAndRfcIds: [
       [
         '168ab8987a3b61b3',
-        '<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com>'
+        '<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com>',
       ],
       [
         '168a6018f86576ac',
-        '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>'
-      ]
+        '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>',
+      ],
     ],
     expectedSearchQuery:
       'rfc822msgid:<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com> OR rfc822msgid:<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com> OR rfc822msgid:<a@b.com>',
     start: 0,
-    getOriginalSearchResponse
+    getOriginalSearchResponse,
   });
   const setCustomListResults = await tester.runAndGetSetCustomListResults();
 
   function ignoreSomeFields(syncThreads: GSRP.SyncThread[]) {
-    return syncThreads.map(o => ({
+    return syncThreads.map((o) => ({
       ...o,
       rawResponse: 'ignored',
       extraMetaData: {
         ...o.extraMetaData,
-        syncMessageData: o.extraMetaData.syncMessageData.map(s => ({
+        syncMessageData: o.extraMetaData.syncMessageData.map((s) => ({
           ...s,
-          date: 'ignored'
-        }))
-      }
+          date: 'ignored',
+        })),
+      },
     }));
   }
 
@@ -360,34 +361,34 @@ test('missing threads in response', async () => {
           '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>',
           '1111111111111111',
           '1111111111111112',
-          '<a@b.com>'
-        ]
+          '<a@b.com>',
+        ],
       };
     },
     threadAndRfcIds: [
       [
         '168ab8987a3b61b3',
-        '<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com>'
+        '<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com>',
       ],
       [
         '168a6018f86576ac',
-        '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>'
+        '<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com>',
       ],
       ['1111111111111111', '<ones@example.com>'],
       ['1111111111111112', '<onesandatwo@example.com>'],
-      ['abab111111111111', '<a@b.com>']
+      ['abab111111111111', '<a@b.com>'],
     ],
     expectedSearchQuery:
       'rfc822msgid:<CAL_Ays_RcwA0U8-43zY8JYPRsyQ5EOavXjrYZx7=EqVTx9Jz3g@mail.gmail.com> OR rfc822msgid:<CAL_Ays8e-3FpHxkJ8qWNXKMHKnysR2XTeSakv_yvQNUjZsSSdw@mail.gmail.com> OR rfc822msgid:<ones@example.com> OR rfc822msgid:<onesandatwo@example.com> OR rfc822msgid:<a@b.com>',
     start: 0,
-    getOriginalSearchResponse
+    getOriginalSearchResponse,
   });
   const setCustomListResults = await tester.runAndGetSetCustomListResults();
 
   function ignoreRawResponses(syncThreads: GSRP.SyncThread[]) {
-    return syncThreads.map(o => ({
+    return syncThreads.map((o) => ({
       ...o,
-      rawResponse: 'ignored'
+      rawResponse: 'ignored',
     }));
   }
 

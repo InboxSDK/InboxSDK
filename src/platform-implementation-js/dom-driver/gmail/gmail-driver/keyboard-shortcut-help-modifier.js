@@ -62,19 +62,19 @@ export default class KeyboardShortcutHelpModifier {
 
   _monitorKeyboardHelp() {
     makeElementChildStream(((document.body: any): HTMLElement))
-      .map(event => event.el)
-      .filter(node => node && node.classList && node.classList.contains('wa'))
-      .flatMap(node =>
+      .map((event) => event.el)
+      .filter((node) => node && node.classList && node.classList.contains('wa'))
+      .flatMap((node) =>
         makeMutationObserverChunkedStream(node, {
           attributes: true,
-          attributeFilter: ['class']
+          attributeFilter: ['class'],
         })
           .filter(() => !node.classList.contains('aou'))
           .toProperty(() => null)
           .map(() => node)
       )
       .takeUntilBy(this._stopper)
-      .onValue(node => this._renderHelp(node));
+      .onValue((node) => this._renderHelp(node));
   }
 
   _renderHelp(node: HTMLElement) {
@@ -90,7 +90,7 @@ export default class KeyboardShortcutHelpModifier {
     var bodies = table.querySelectorAll('tbody tbody');
 
     var index = 0;
-    this._shortcuts.forEach(keyboardShortcutHandle => {
+    this._shortcuts.forEach((keyboardShortcutHandle) => {
       this._renderShortcut(bodies[index % 2], keyboardShortcutHandle);
       index++;
     });
@@ -110,7 +110,7 @@ export default class KeyboardShortcutHelpModifier {
       '<span class="inboxsdk__shortcutHelp_title">',
       escape(this._appName || this._appId) + ' keyboard shortcuts',
       '</span>',
-      '</div>'
+      '</div>',
     ].join('');
 
     if (this._appIconUrl) {
@@ -150,7 +150,7 @@ export default class KeyboardShortcutHelpModifier {
       '</table>',
       '</td>',
       '</tr',
-      '</tbody>'
+      '</tbody>',
     ].join('');
 
     return table;
@@ -167,7 +167,7 @@ export default class KeyboardShortcutHelpModifier {
       '</td>',
       '<td class="we Dn"> ',
       escape(keyboardShortcutHandle.description || ''),
-      '</td>'
+      '</td>',
     ].join('');
 
     tableBody.appendChild(shortcutRow);

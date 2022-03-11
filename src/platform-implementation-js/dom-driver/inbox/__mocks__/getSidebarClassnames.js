@@ -4,6 +4,6 @@ export default function getSidebarClassnames() {
   return {
     chat: 'm',
     nav: 'M',
-    centerList: 'bz'
+    centerList: 'bz',
   };
 }

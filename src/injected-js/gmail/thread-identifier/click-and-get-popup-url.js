@@ -26,7 +26,7 @@ export default function clickAndGetPopupUrl(element: HTMLElement): ?string {
     ctrlKey: true,
     altKey: false,
     shiftKey: false,
-    metaKey: true
+    metaKey: true,
   };
   (event: any).initMouseEvent(
     'click',
@@ -55,14 +55,14 @@ export default function clickAndGetPopupUrl(element: HTMLElement): ?string {
     window.HTMLElement.prototype.focus = noop;
     window.HTMLElement.prototype.blur = noop;
     window.onerror = ignoreErrors;
-    const newOpen = function(_url, _title, _options) {
+    const newOpen = function (_url, _title, _options) {
       url = _url;
       // Gmail checks the returned object for these two values specifically.
       const newWin = {
         closed: false,
-        focus: noop
+        focus: noop,
       };
-      setTimeout(function() {
+      setTimeout(function () {
         newWin.closed = true;
       }, 5);
       return newWin;

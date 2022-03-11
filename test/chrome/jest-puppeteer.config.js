@@ -12,8 +12,8 @@ module.exports = {
     headless: false,
     args: [
       `--disable-extensions-except=${pathToExtension}`,
-      `--load-extension=${pathToExtension}`
+      `--load-extension=${pathToExtension}`,
     ],
-    userDataDir
-  }
+    userDataDir,
+  },
 };

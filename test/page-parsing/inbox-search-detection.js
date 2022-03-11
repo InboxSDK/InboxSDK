@@ -23,7 +23,7 @@ import {
   page20160614,
   pageWithSidebar20160614,
   pageWithNav20170303,
-  pageWithAutocomplete20170306
+  pageWithAutocomplete20170306,
 } from '../lib/pages';
 
 describe('Inbox Search Detection', () => {
@@ -85,7 +85,7 @@ describe('Inbox Search Detection', () => {
         );
         expect(liveSet.values().size).toBe(1);
         expect(
-          lsMap(liveSet, x => x.getValue())
+          lsMap(liveSet, (x) => x.getValue())
             .values()
             .has(results)
         ).toBe(true);

@@ -3,7 +3,7 @@ import * as Kefir from 'kefir';
 import {
   Options,
   addEventListener,
-  removeEventListener
+  removeEventListener,
 } from 'event-listener-with-options';
 
 export default function fromEventsWithOptions(
@@ -11,7 +11,7 @@ export default function fromEventsWithOptions(
   eventName: string,
   options: Options | boolean
 ): Kefir.Observable<any, never> {
-  return Kefir.stream(emitter => {
+  return Kefir.stream((emitter) => {
     addEventListener(target, eventName, emitter.emit, options);
     return () => {
       removeEventListener(target, eventName, emitter.emit, options);

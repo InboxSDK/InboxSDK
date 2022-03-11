@@ -21,7 +21,7 @@ export default function censorHTMLtree(target: HTMLElement): string {
       target !== parent && footerElCount ? `[${footerElCount}]` : '';
     openers.push(
       autoHtml`<${parent.nodeName.toLowerCase()}${{
-        __html: attrHtml
+        __html: attrHtml,
       }}>${headers}`
     );
     closers.push(autoHtml`${footers}</${parent.nodeName.toLowerCase()}>`);

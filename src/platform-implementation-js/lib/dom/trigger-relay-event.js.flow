@@ -6,8 +6,8 @@ type RelayProps = {
   cancelable: boolean,
   props?: ?Object,
   dataTransfer?: ?{
-    files: Blob[]
-  }
+    files: Blob[],
+  },
 };
 
 declare export default function triggerRelayEvent(

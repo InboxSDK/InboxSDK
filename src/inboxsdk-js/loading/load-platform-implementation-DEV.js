@@ -2,7 +2,7 @@
 
 import once from 'lodash/once';
 
-module.exports = function(delay: number): () => Promise<void> {
+module.exports = function (delay: number): () => Promise<void> {
   return once(
     () =>
       new Promise((resolve, reject) => {

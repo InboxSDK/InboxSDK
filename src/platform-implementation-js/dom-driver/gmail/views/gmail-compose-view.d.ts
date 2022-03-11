@@ -7,7 +7,7 @@ import {
   ComposeViewDriver,
   StatusBar,
   ComposeButtonDescriptor,
-  TooltipDescriptor
+  TooltipDescriptor,
 } from '../../../driver-interfaces/compose-view-driver';
 
 export default class GmailComposeView implements ComposeViewDriver {

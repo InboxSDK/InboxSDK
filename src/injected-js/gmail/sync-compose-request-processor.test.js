@@ -16,7 +16,7 @@ it('handles first draft save', () => {
     body: '<div dir="ltr">new new draft</div>',
     type: 'FIRST_DRAFT_SAVE',
     draftID: 'r-5205311597211900881',
-    subject: 'new draft'
+    subject: 'new draft',
   });
 });
 
@@ -32,7 +32,7 @@ it('handles regular draft save', () => {
     body: '<div dir="ltr">new new draft 2</div>',
     type: 'DRAFT_SAVE',
     draftID: 'r-5205311597211900881',
-    subject: 'new draft'
+    subject: 'new draft',
   });
 });
 
@@ -48,6 +48,6 @@ it('handles sending', () => {
     body: '<div dir="ltr">new new draft 2</div>',
     type: 'SEND',
     draftID: 'r-5205311597211900881',
-    subject: 'new draft'
+    subject: 'new draft',
   });
 });

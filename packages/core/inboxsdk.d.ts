@@ -79,13 +79,11 @@ export interface Compose {
 
 export interface ButterBar {
   showMessage(messageDescriptor: MessageDescriptor): { destroy: () => void };
-  showLoading(
-    messageDescriptor: LoadingMessageDescriptor
-  ): { destroy: () => void };
+  showLoading(messageDescriptor: LoadingMessageDescriptor): {
+    destroy: () => void;
+  };
   showError(messageDescriptor: MessageDescriptor): { destroy: () => void };
-  showSaving(
-    messageDescriptor: SavingMessageDescriptor
-  ): {
+  showSaving(messageDescriptor: SavingMessageDescriptor): {
     resolve: () => void;
     reject: () => void;
     promise: Promise<any>;

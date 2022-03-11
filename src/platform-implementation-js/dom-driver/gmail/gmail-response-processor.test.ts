@@ -161,11 +161,10 @@ describe('extractThreads', () => {
 describe('extractMessageIdsFromThreadBatchRequest', () => {
   it('works', () => {
     const data = require('../../../../__tests__/gmail-response-processor/batch-thread-response.json');
-    const results = GmailResponseProcessor.extractMessageIdsFromThreadBatchRequest(
-      data
-    );
+    const results =
+      GmailResponseProcessor.extractMessageIdsFromThreadBatchRequest(data);
     expect(results).toEqual({
-      '15b687e66fbea0d2': '15b687ed739cae6c'
+      '15b687e66fbea0d2': '15b687ed739cae6c',
     });
   });
 });
@@ -173,9 +172,8 @@ describe('extractMessageIdsFromThreadBatchRequest', () => {
 describe('extractGmailThreadIdFromMessageIdSearch', () => {
   it('works', () => {
     const data = require('../../../../__tests__/gmail-response-processor/message-id-search-response.json');
-    const results = GmailResponseProcessor.extractGmailThreadIdFromMessageIdSearch(
-      data
-    );
+    const results =
+      GmailResponseProcessor.extractGmailThreadIdFromMessageIdSearch(data);
     expect(results).toBe('15ca89549b92098b');
   });
 });
@@ -194,7 +192,7 @@ describe('replaceThreadsInResponse', () => {
 
     expect(
       GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {
-        start: 0
+        start: 0,
       })
     ).toBe(data.input);
 
@@ -212,7 +210,7 @@ describe('replaceThreadsInResponse', () => {
     threads.unshift(threads.pop()!);
     expect(
       GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, {
-        start: 0
+        start: 0,
       })
     ).toEqual(data.input);
   });
@@ -230,7 +228,7 @@ describe('replaceThreadsInResponse', () => {
 
     expect(
       GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {
-        start: 0
+        start: 0,
       })
     ).toEqual(data.input);
 
@@ -248,7 +246,7 @@ describe('replaceThreadsInResponse', () => {
     threads.unshift(threads.pop()!);
     expect(
       GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, {
-        start: 0
+        start: 0,
       })
     ).toBe(data.input);
   });
@@ -267,7 +265,7 @@ describe('replaceThreadsInResponse', () => {
 
     expect(
       GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {
-        start: 0
+        start: 0,
       })
     ).toBe(data.input);
 
@@ -285,7 +283,7 @@ describe('replaceThreadsInResponse', () => {
     threads.unshift(threads.pop()!);
     expect(
       GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, {
-        start: 0
+        start: 0,
       })
     ).toBe(data.input);
   });
@@ -326,7 +324,7 @@ describe('replaceThreadsInResponse', () => {
 
     expect(
       GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {
-        start: 0
+        start: 0,
       })
     ).toBe(data.input);
   });
@@ -341,7 +339,7 @@ describe('replaceThreadsInResponse', () => {
         includeLengths: true,
         noArrayNewLines: true,
         suggestionMode: false,
-        includeExplicitNulls: true
+        includeExplicitNulls: true,
       }
     );
     const serializedWithStart50 = GmailResponseProcessor.serialize(
@@ -350,13 +348,12 @@ describe('replaceThreadsInResponse', () => {
         includeLengths: true,
         noArrayNewLines: true,
         suggestionMode: false,
-        includeExplicitNulls: true
+        includeExplicitNulls: true,
       }
     );
 
-    const threadsWithStart0 = GmailResponseProcessor.extractThreads(
-      serializedWithStart0
-    );
+    const threadsWithStart0 =
+      GmailResponseProcessor.extractThreads(serializedWithStart0);
     const threadsWithStart50 = GmailResponseProcessor.extractThreads(
       serializedWithStart50
     );
@@ -400,7 +397,7 @@ describe('replaceThreadsInResponse', () => {
         includeLengths: true,
         noArrayNewLines: true,
         suggestionMode: false,
-        includeExplicitNulls: true
+        includeExplicitNulls: true,
       }
     );
     const serializedWithTotal50 = GmailResponseProcessor.serialize(
@@ -409,7 +406,7 @@ describe('replaceThreadsInResponse', () => {
         includeLengths: true,
         noArrayNewLines: true,
         suggestionMode: false,
-        includeExplicitNulls: true
+        includeExplicitNulls: true,
       }
     );
     const serializedWithTotalMany = GmailResponseProcessor.serialize(
@@ -418,13 +415,12 @@ describe('replaceThreadsInResponse', () => {
         includeLengths: true,
         noArrayNewLines: true,
         suggestionMode: false,
-        includeExplicitNulls: true
+        includeExplicitNulls: true,
       }
     );
 
-    const threadsWithTotal1 = GmailResponseProcessor.extractThreads(
-      serializedWithTotal1
-    );
+    const threadsWithTotal1 =
+      GmailResponseProcessor.extractThreads(serializedWithTotal1);
     const threadsWithTotal50 = GmailResponseProcessor.extractThreads(
       serializedWithTotal50
     );
@@ -486,7 +482,7 @@ describe('replaceThreadsInResponse', () => {
     expect(threads.length).not.toBe(0);
     expect(
       GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {
-        start: 0
+        start: 0,
       })
     ).toBe(data.input);
 
@@ -504,7 +500,7 @@ describe('replaceThreadsInResponse', () => {
     threads.unshift(threads.pop()!);
     expect(
       GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, {
-        start: 0
+        start: 0,
       })
     ).toBe(data.input);
   });
@@ -544,7 +540,7 @@ describe('replaceThreadsInResponse', () => {
     expect(threads.length).not.toBe(0);
     expect(
       GmailResponseProcessor.replaceThreadsInResponse(data.input, threads, {
-        start: 0
+        start: 0,
       })
     ).toBe(data.input);
 
@@ -562,7 +558,7 @@ describe('replaceThreadsInResponse', () => {
     threads.unshift(threads.pop()!);
     expect(
       GmailResponseProcessor.replaceThreadsInResponse(swapped, threads, {
-        start: 0
+        start: 0,
       })
     ).toBe(data.input);
   });
@@ -611,9 +607,8 @@ describe('interpretSentEmailResponse', () => {
         '/../../../../__tests__/gmail-response-processor/sent-response.txt',
       'utf8'
     );
-    const response = GmailResponseProcessor.interpretSentEmailResponse(
-      rawResponse
-    );
+    const response =
+      GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
     expect(response.messageID).toBe('14a08f7810935cb3');
     expect(response.threadID).toBe('14a08f7810935cb3');
   });
@@ -624,9 +619,8 @@ describe('interpretSentEmailResponse', () => {
         '/../../../../__tests__/gmail-response-processor/sent-response2.txt',
       'utf8'
     );
-    const response = GmailResponseProcessor.interpretSentEmailResponse(
-      rawResponse
-    );
+    const response =
+      GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
     expect(response.messageID).toBe('14a090139a3835a4');
     expect(response.threadID).toBe('14a08f7810935cb3');
   });

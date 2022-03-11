@@ -8,7 +8,7 @@ import GmailElementGetter from '../gmail-element-getter';
 
 export default function suppressAddon(driver: GmailDriver, addonTitle: string) {
   waitFor(() => GmailElementGetter.getCompanionSidebarIconContainerElement())
-    .map(iconContainerElement => {
+    .map((iconContainerElement) => {
       // .J-KU-Jg is pre-2018-07-30 element?
       const elementToWatch = iconContainerElement.querySelector(
         '.J-KU-Jg, [role=tablist], .brC-bsf-aT5-aOt'
@@ -44,7 +44,7 @@ export default function suppressAddon(driver: GmailDriver, addonTitle: string) {
 
       el.style.display = 'none';
     })
-    .onError(err => {
+    .onError((err) => {
       driver.getLogger().error(err, 'error in suppressAddon');
     });
 }

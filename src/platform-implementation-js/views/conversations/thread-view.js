@@ -12,7 +12,7 @@ import type MessageView from './message-view';
 import type { Driver, ThreadViewDriver } from '../../driver-interfaces/driver';
 
 import type CustomMessageView, {
-  CustomMessageDescriptor
+  CustomMessageDescriptor,
 } from '../../views/conversations/custom-message-view';
 
 const memberMap = defonce(module, () => new WeakMap());
@@ -46,9 +46,10 @@ class ThreadView extends EventEmitter {
       .getLogger()
       .eventSdkPassive('threadView.addSidebarContentPanel');
 
-    const contentPanelImplementation = members.threadViewImplementation.addSidebarContentPanel(
-      descriptorPropertyStream
-    );
+    const contentPanelImplementation =
+      members.threadViewImplementation.addSidebarContentPanel(
+        descriptorPropertyStream
+      );
     if (contentPanelImplementation) {
       return new ContentPanelView(contentPanelImplementation);
     }
@@ -93,8 +94,8 @@ class ThreadView extends EventEmitter {
 
     return threadViewImplementation
       .getMessageViewDrivers()
-      .filter(messageViewDriver => messageViewDriver.isLoaded())
-      .map(messageViewDriver => membrane.get(messageViewDriver));
+      .filter((messageViewDriver) => messageViewDriver.isLoaded())
+      .map((messageViewDriver) => membrane.get(messageViewDriver));
   }
 
   getMessageViewsAll(): Array<MessageView> {
@@ -102,7 +103,7 @@ class ThreadView extends EventEmitter {
 
     return threadViewImplementation
       .getMessageViewDrivers()
-      .map(messageViewDriver => membrane.get(messageViewDriver));
+      .map((messageViewDriver) => membrane.get(messageViewDriver));
   }
 
   getSubject(): string {
@@ -131,7 +132,7 @@ class ThreadView extends EventEmitter {
 export default defn(module, ThreadView);
 
 function _bindToStreamEvents(threadView, threadViewImplementation) {
-  threadViewImplementation.getEventStream().onEnd(function() {
+  threadViewImplementation.getEventStream().onEnd(function () {
     threadView.destroyed = true;
     threadView.emit('destroy');
 
@@ -140,16 +141,16 @@ function _bindToStreamEvents(threadView, threadViewImplementation) {
 
   threadViewImplementation
     .getEventStream()
-    .filter(function(event) {
+    .filter(function (event) {
       return event.type !== 'internal' && event.eventName === 'contactHover';
     })
-    .onValue(function(event) {
+    .onValue(function (event) {
       const { membrane } = get(memberMap, threadView);
       threadView.emit(event.eventName, {
         contactType: event.contactType,
         messageView: membrane.get(event.messageViewDriver),
         contact: event.contact,
-        threadView: threadView
+        threadView: threadView,
       });
     });
 }

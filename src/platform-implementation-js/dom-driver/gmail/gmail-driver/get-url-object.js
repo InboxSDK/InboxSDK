@@ -4,7 +4,7 @@ export type URLObject = {
   name: string,
   params: string[],
   query: ?string,
-  hash: string
+  hash: string,
 };
 
 export default function getURLObject(url: string): URLObject {
@@ -14,7 +14,7 @@ export default function getURLObject(url: string): URLObject {
       name: 'inbox',
       params: [],
       hash: '',
-      query: undefined
+      query: undefined,
     };
   }
 
@@ -25,9 +25,9 @@ export default function getURLObject(url: string): URLObject {
     name: decodeURIComponent(hashParts[0]),
     params: hashParts
       .slice(1)
-      .map(part => part.replace(/\+/g, ' '))
+      .map((part) => part.replace(/\+/g, ' '))
       .map(decodeURIComponent),
     query: m[2],
-    hash
+    hash,
   };
 }

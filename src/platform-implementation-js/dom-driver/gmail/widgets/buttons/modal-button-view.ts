@@ -91,7 +91,7 @@ export default class ModalButtonView implements ButtonViewI {
 
     this._eventStream.emit({
       eventName: 'enabledChanged',
-      isEnabled: this._isEnabled
+      isEnabled: this._isEnabled,
     });
   }
 
@@ -101,7 +101,7 @@ export default class ModalButtonView implements ButtonViewI {
       'click'
     );
 
-    clickEventStream.onValue(function(event) {
+    clickEventStream.onValue(function (event) {
       event.stopPropagation();
       event.preventDefault();
     });
@@ -109,10 +109,10 @@ export default class ModalButtonView implements ButtonViewI {
     this._eventStream.plug(
       clickEventStream
         .filter(() => this.isEnabled())
-        .map(function(event) {
+        .map(function (event) {
           return {
             eventName: 'click',
-            domEvent: event
+            domEvent: event,
           };
         })
     );
@@ -126,15 +126,15 @@ export default class ModalButtonView implements ButtonViewI {
     const enterEventStream = keydownEventStream.filter(isEnterOrSpace);
 
     this._eventStream.plug(
-      enterEventStream.map(function(event) {
+      enterEventStream.map(function (event) {
         return {
           eventName: 'click',
-          domEvent: event
+          domEvent: event,
         };
       })
     );
 
-    enterEventStream.onValue(function(event) {
+    enterEventStream.onValue(function (event) {
       event.stopPropagation();
       event.preventDefault();
     });

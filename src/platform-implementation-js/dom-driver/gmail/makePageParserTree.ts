@@ -24,15 +24,15 @@ export default function makePageParserTree(
           logError(err: Error, el: undefined | HTMLElement) {
             const details = {
               el,
-              html: el ? censorHTMLtree(el) : null
+              html: el ? censorHTMLtree(el) : null,
             };
             _driver.getLogger().errorSite(err, details);
-          }
+          },
         };
   }
 
   const page = new PageParserTree(root, transformOptions(pageParserOptions));
-  pageParserOptionsStream.changes().onValue(pageParserOptions => {
+  pageParserOptionsStream.changes().onValue((pageParserOptions) => {
     console.log('replacing PageParserTree options'); //eslint-disable-line no-console
     page.replaceOptions(transformOptions(pageParserOptions));
   });

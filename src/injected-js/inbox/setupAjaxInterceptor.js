@@ -12,7 +12,7 @@ function logErrorExceptEventListeners(err, details) {
   if (details !== 'XMLHttpRequest event listener error') {
     logger.error(err, details);
   } else {
-    setTimeout(function() {
+    setTimeout(function () {
       // let window.onerror log this
       throw err;
     }, 1);
@@ -24,7 +24,7 @@ function triggerEvent(detail) {
     new CustomEvent('inboxSDKajaxIntercept', {
       bubbles: true,
       cancelable: false,
-      detail
+      detail,
     })
   );
 }
@@ -65,7 +65,7 @@ export default function setupAjaxInterceptor() {
           // enough to be safe to hard-code. The search query lives inside the
           // property the latter property.
           const queryKey = Object.keys(originalRequest).find(
-            key => key !== '1'
+            (key) => key !== '1'
           );
           // Descend into the object that has the query inside it.
           const queryObj = originalRequest[queryKey];
@@ -83,7 +83,7 @@ export default function setupAjaxInterceptor() {
             triggerEvent({ type: 'searchSuggestionsReceieved', query });
           }
         }
-      }
+      },
     });
   }
 
@@ -98,7 +98,7 @@ export default function setupAjaxInterceptor() {
       isComposeViewSending = false;
       sendRequestMisses = [];
     });
-    const logIfParseFailed = request => {
+    const logIfParseFailed = (request) => {
       if (!isComposeViewSending) return;
 
       sendRequestMisses.push(request);
@@ -106,7 +106,7 @@ export default function setupAjaxInterceptor() {
       if (sendRequestMisses.length < 3) return;
 
       logger.error(new Error('Failed to identify outgoing send request'), {
-        requestPayloadList: censorJSONTree(sendRequestMisses)
+        requestPayloadList: censorJSONTree(sendRequestMisses),
       });
 
       isComposeViewSending = false;
@@ -114,10 +114,8 @@ export default function setupAjaxInterceptor() {
     };
 
     const SEND_ACTIONS = ['^pfg', '^f_bt', '^f_btns', '^f_cl'];
-    const currentConnectionIDs: WeakMap<
-      XHRProxyConnectionDetails,
-      string
-    > = new WeakMap();
+    const currentConnectionIDs: WeakMap<XHRProxyConnectionDetails, string> =
+      new WeakMap();
     main_wrappers.push({
       isRelevantTo(connection) {
         return /sync(?:\/u\/\d+)?\/i\/s/.test(connection.url);
@@ -132,7 +130,7 @@ export default function setupAjaxInterceptor() {
             return;
           }
 
-          const sendUpdateMatch = updateList.find(update => {
+          const sendUpdateMatch = updateList.find((update) => {
             const updateWrapper =
               update[2] &&
               update[2][2] &&
@@ -193,7 +191,7 @@ export default function setupAjaxInterceptor() {
           }
 
           const sendUpdateMatch = updateList.find(
-            update =>
+            (update) =>
               update[1] &&
               update[1][3] &&
               update[1][3][7] &&
@@ -220,18 +218,18 @@ export default function setupAjaxInterceptor() {
           triggerEvent({
             type: 'emailSent',
             rfcID,
-            draftID
+            draftID,
           });
 
           currentConnectionIDs.delete(connection);
         }
-      }
+      },
     });
   }
 
   // sync token savers
   {
-    const saveBTAIHeader = header => {
+    const saveBTAIHeader = (header) => {
       (document.head: any).setAttribute('data-inboxsdk-btai-header', header);
       triggerEvent({ type: 'btaiHeaderReceived' });
     };
@@ -246,10 +244,10 @@ export default function setupAjaxInterceptor() {
         if (connection.headers['X-Gmail-BTAI']) {
           saveBTAIHeader(connection.headers['X-Gmail-BTAI']);
         }
-      }
+      },
     });
 
-    const saveXsrfTokenHeader = header => {
+    const saveXsrfTokenHeader = (header) => {
       (document.head: any).setAttribute('data-inboxsdk-xsrf-token', header);
       triggerEvent({ type: 'xsrfTokenHeaderReceived' });
     };
@@ -264,7 +262,7 @@ export default function setupAjaxInterceptor() {
         if (connection.headers['X-Framework-Xsrf-Token']) {
           saveXsrfTokenHeader(connection.headers['X-Framework-Xsrf-Token']);
         }
-      }
+      },
     });
   }
 }

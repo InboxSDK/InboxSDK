@@ -4,6 +4,8 @@ import Kefir from 'kefir';
 
 import CreateParentAccessoryButtonView from './create-accessory-button-view';
 
-declare export default class MoreParentAccessoryButtonView extends CreateParentAccessoryButtonView {
+declare export default class MoreParentAccessoryButtonView
+  extends CreateParentAccessoryButtonView
+{
   constructor(): MoreParentAccessoryButtonView;
 }

@@ -37,7 +37,7 @@ export default function idMap(name: string): string {
     newId = hasher
       .digest('hex')
       .slice(0, 16)
-      .replace(/[0-9]/g, match =>
+      .replace(/[0-9]/g, (match) =>
         String.fromCharCode('A'.charCodeAt(0) + Number(match))
       );
   }

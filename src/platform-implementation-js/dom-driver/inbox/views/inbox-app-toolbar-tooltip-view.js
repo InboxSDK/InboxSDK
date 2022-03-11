@@ -38,23 +38,24 @@ class InboxAppToolbarTooltipView {
     const buttonPos = this._anchorElement.getBoundingClientRect();
     const buttonCenter = buttonPos.left + buttonPos.width / 2;
     this._arrowEl.style.top = `${buttonPos.bottom + 18}px`;
-    this._arrowEl.style.right = `${window.innerWidth -
+    this._arrowEl.style.right = `${
+      window.innerWidth -
       buttonPos.right +
       buttonPos.width / 2 -
       this._arrowEl.offsetWidth / 2 -
-      1}px`;
+      1
+    }px`;
 
     this._containerEl.style.top = `${buttonPos.bottom + 17}px`;
-    this._containerEl.style.minWidth = `${(window.innerWidth -
-      buttonCenter -
-      30) *
-      2}px`;
+    this._containerEl.style.minWidth = `${
+      (window.innerWidth - buttonCenter - 30) * 2
+    }px`;
   }
 
   getDropdownOptions() {
     return {
       manualPosition: true,
-      extraElementsToIgnore: [this._arrowEl]
+      extraElementsToIgnore: [this._arrowEl],
     };
   }
   getContentElement() {

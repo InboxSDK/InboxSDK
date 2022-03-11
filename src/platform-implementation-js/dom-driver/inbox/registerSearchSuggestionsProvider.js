@@ -56,14 +56,14 @@ const renderResultsList = ({
   searchInput,
   removalStream,
   results,
-  providerOrder
+  providerOrder,
 }) => {
   const container = document.createElement('div');
 
   container.setAttribute('data-order-hint', providerOrder);
   container.classList.add('inboxsdk__search_suggestion_group');
 
-  results.forEach(result => {
+  results.forEach((result) => {
     const listItem = document.createElement('li');
 
     const description =
@@ -100,7 +100,7 @@ const renderResultsList = ({
 
 export default function registerSearchSuggestionsProvider(
   driver: InboxDriver,
-  handler: string => Promise<Array<AutocompleteSearchResult>>
+  handler: (string) => Promise<Array<AutocompleteSearchResult>>
 ) {
   const stopper = kefirStopper();
   const providerOrder = getProviderOrder();
@@ -111,7 +111,7 @@ export default function registerSearchSuggestionsProvider(
       if (searchInput instanceof HTMLInputElement) {
         return Kefir.constant({
           searchInput,
-          searchInputRemovalStream: removalStream
+          searchInputRemovalStream: removalStream,
         });
       } else {
         return Kefir.never();
@@ -126,7 +126,7 @@ export default function registerSearchSuggestionsProvider(
           searchInput,
           searchInputRemovalStream,
           resultsEl: el.getValue(),
-          resultsElRemovalStream: removalStream
+          resultsElRemovalStream: removalStream,
         }))
     )
     .flatMap(
@@ -134,33 +134,30 @@ export default function registerSearchSuggestionsProvider(
         searchInput,
         searchInputRemovalStream,
         resultsEl,
-        resultsElRemovalStream
+        resultsElRemovalStream,
       }) => {
-        const inputs: Kefir.Observable<
-          { target: HTMLInputElement } & Event
-        > = Kefir.fromEvents(searchInput, 'input')
-          .takeUntilBy(searchInputRemovalStream)
-          .takeUntilBy(resultsElRemovalStream);
+        const inputs: Kefir.Observable<{ target: HTMLInputElement } & Event> =
+          Kefir.fromEvents(searchInput, 'input')
+            .takeUntilBy(searchInputRemovalStream)
+            .takeUntilBy(resultsElRemovalStream);
 
-        const enterAndTabPresses: Kefir.Observable<KeyboardEvent> = Kefir.fromEvents(
-          searchInput,
-          'keydown'
-        )
-          .filter(({ keyCode }) => keyCode === 13 || keyCode === 9)
-          .takeUntilBy(searchInputRemovalStream)
-          .takeUntilBy(resultsElRemovalStream);
+        const enterAndTabPresses: Kefir.Observable<KeyboardEvent> =
+          Kefir.fromEvents(searchInput, 'keydown')
+            .filter(({ keyCode }) => keyCode === 13 || keyCode === 9)
+            .takeUntilBy(searchInputRemovalStream)
+            .takeUntilBy(resultsElRemovalStream);
 
-        return inputs.map(event => ({
+        return inputs.map((event) => ({
           event,
           searchInput,
           resultsEl,
           inputStream: inputs,
           enterAndTabPresses,
-          resultsElRemovalStream
+          resultsElRemovalStream,
         }));
       }
     )
-    .flatMapLatest(item => {
+    .flatMapLatest((item) => {
       const suggestionsResponse = driver
         .getPageCommunicator()
         .ajaxInterceptStream.filter(
@@ -180,20 +177,20 @@ export default function registerSearchSuggestionsProvider(
 
         // Handle cleanup when the user deletes their entire search query.
         item.inputStream.filter(({ target: { value } }) => value === ''),
-        item.resultsElRemovalStream
+        item.resultsElRemovalStream,
       ]).take(1);
 
       return Kefir.combine([
         Kefir.fromPromise(Promise.resolve(handler(item.event.target.value))),
         // Wait to send results to the UI until Inbox's results have come back
         // to avoid rendering too soon.
-        suggestionsResponse.take(1)
+        suggestionsResponse.take(1),
       ])
         .takeUntilBy(removalStream)
         .map(([results, _ignored]: [Array<AutocompleteSearchResult>, any]) => ({
           ...item,
           removalStream,
-          results
+          results,
         }));
     })
     .takeUntilBy(stopper)
@@ -204,7 +201,7 @@ export default function registerSearchSuggestionsProvider(
         resultsElRemovalStream,
         removalStream,
         enterAndTabPresses,
-        results
+        results,
       }) => {
         try {
           const validatedResults = copyAndValidateAutocompleteResults(
@@ -218,7 +215,7 @@ export default function registerSearchSuggestionsProvider(
             resultsElRemovalStream,
             removalStream,
             enterAndTabPresses,
-            results: validatedResults
+            results: validatedResults,
           });
         } catch (error) {
           return Kefir.constantError(error);
@@ -226,7 +223,7 @@ export default function registerSearchSuggestionsProvider(
       }
     )
     .filter(({ results }) => results.length > 0)
-    .onError(error => driver.getLogger().error(error))
+    .onError((error) => driver.getLogger().error(error))
     .onValue(
       ({
         resultsEl,
@@ -234,12 +231,12 @@ export default function registerSearchSuggestionsProvider(
         resultsElRemovalStream,
         removalStream,
         enterAndTabPresses,
-        results
+        results,
       }) => {
         setupCustomAutocompleteSelectionHandling({
           resultsEl,
           resultsElRemovalStream,
-          searchInput
+          searchInput,
         });
 
         const suggestionsElement = renderResultsList({
@@ -247,7 +244,7 @@ export default function registerSearchSuggestionsProvider(
           searchInput,
           removalStream,
           results,
-          providerOrder
+          providerOrder,
         });
 
         insertElementInOrder(resultsEl, suggestionsElement);

@@ -65,13 +65,13 @@ export default class CreateParentAccessoryButtonView implements ButtonViewI {
       'click'
     );
 
-    clickEventStream.onValue(event => {
+    clickEventStream.onValue((event) => {
       event.stopPropagation();
       event.preventDefault();
     });
 
     this._eventStream.plug(
-      clickEventStream.map(event => ({ eventName: 'click', domEvent: event }))
+      clickEventStream.map((event) => ({ eventName: 'click', domEvent: event }))
     );
   }
 }

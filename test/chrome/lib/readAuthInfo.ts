@@ -15,16 +15,14 @@ interface AuthInfo {
   };
 }
 
-const readAuthInfo = once(
-  async (): Promise<AuthInfo> => {
-    const encryptor = createEncryptor(
-      process.env.INBOXSDK_TEST_SECRET ||
-        fs
-          .readFileSync(__dirname + '/../../../.inboxsdk_test_secret', 'utf8')
-          .trim()
-    );
-    return encryptor.decrypt(ciphertext)!;
-  }
-);
+const readAuthInfo = once(async (): Promise<AuthInfo> => {
+  const encryptor = createEncryptor(
+    process.env.INBOXSDK_TEST_SECRET ||
+      fs
+        .readFileSync(__dirname + '/../../../.inboxsdk_test_secret', 'utf8')
+        .trim()
+  );
+  return encryptor.decrypt(ciphertext)!;
+});
 
 export default readAuthInfo;

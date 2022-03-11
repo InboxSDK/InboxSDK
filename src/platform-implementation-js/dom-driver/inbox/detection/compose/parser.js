@@ -201,16 +201,16 @@ function parser(el: HTMLElement) {
     toRow,
     ccRow,
     bccRow,
-    toggleCcBccButton
+    toggleCcBccButton,
   };
   const score = 1 - ec.errorCount() / ec.runCount();
   return {
     elements,
     attributes: {
-      isInline
+      isInline,
     },
     score,
-    errors: ec.getErrorLogs()
+    errors: ec.getErrorLogs(),
   };
 }
 

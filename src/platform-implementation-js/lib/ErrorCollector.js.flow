@@ -6,7 +6,7 @@ declare export default class ErrorCollector {
   report(errorDataCb: () => any): void;
   getErrorLogs(): $ReadOnlyArray<{
     name: string,
-    message: string
+    message: string,
   }>;
   runCount(): number;
   errorCount(): number;

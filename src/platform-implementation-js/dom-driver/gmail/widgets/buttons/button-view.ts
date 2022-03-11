@@ -249,9 +249,8 @@ export default class ButtonView implements ButtonViewI {
       iconElement.innerHTML = '';
     }
 
-    const iconImgElement = (this._iconImgElement = document.createElement(
-      'img'
-    ));
+    const iconImgElement = (this._iconImgElement =
+      document.createElement('img'));
     iconImgElement.classList.add('inboxsdk__button_iconImg');
 
     if (this._iconUrl) {
@@ -345,7 +344,7 @@ export default class ButtonView implements ButtonViewI {
 
     this._eventStream.emit({
       eventName: 'enabledChanged',
-      isEnabled: this._isEnabled
+      isEnabled: this._isEnabled,
     });
 
     if (this._isEnabled) {
@@ -359,7 +358,7 @@ export default class ButtonView implements ButtonViewI {
       'click'
     );
 
-    clickEventStream.onValue(function(event) {
+    clickEventStream.onValue(function (event) {
       event.stopPropagation();
       event.preventDefault();
     });
@@ -367,10 +366,10 @@ export default class ButtonView implements ButtonViewI {
     this._eventStream.plug(
       clickEventStream
         .filter(() => this.isEnabled())
-        .map(function(event) {
+        .map(function (event) {
           return {
             eventName: 'click',
-            domEvent: event
+            domEvent: event,
           };
         })
     );
@@ -384,15 +383,15 @@ export default class ButtonView implements ButtonViewI {
     const enterEventStream = keydownEventStream.filter(isEnterOrSpace);
 
     this._eventStream.plug(
-      enterEventStream.map(function(event) {
+      enterEventStream.map(function (event) {
         return {
           eventName: 'click',
-          domEvent: event
+          domEvent: event,
         };
       })
     );
 
-    enterEventStream.onValue(function(event) {
+    enterEventStream.onValue(function (event) {
       event.stopPropagation();
       event.preventDefault();
     });
@@ -404,17 +403,17 @@ export default class ButtonView implements ButtonViewI {
       this._eventStream.plug(
         keyboardShortcutStream(keyboardShortcutHandle.chord)
           .takeUntilBy(
-            this._eventStream.filter(function(event) {
+            this._eventStream.filter(function (event) {
               return (
                 event.eventName === 'enabledChanged' &&
                 event.isEnabled === false
               );
             })
           )
-          .map(function(domEvent) {
+          .map(function (domEvent) {
             return {
               eventName: 'click',
-              domEvent: domEvent
+              domEvent: domEvent,
             };
           })
       );

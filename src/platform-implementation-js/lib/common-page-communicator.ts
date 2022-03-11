@@ -11,7 +11,7 @@ export default class CommonPageCommunicator {
     this.ajaxInterceptStream = Kefir.fromEvents<any, never>(
       document,
       'inboxSDKajaxIntercept'
-    ).map(x => x.detail);
+    ).map((x) => x.detail);
   }
 
   public getUserEmailAddress(): string {
@@ -87,7 +87,7 @@ export default class CommonPageCommunicator {
 
   public resolveUrlRedirects(url: string): Promise<string> {
     return this.pageAjax({ url, method: 'HEAD' }).then(
-      result => result.responseURL
+      (result) => result.responseURL
     );
   }
 
@@ -111,7 +111,7 @@ export default class CommonPageCommunicator {
         } else {
           return Kefir.constant({
             text: event.detail.text,
-            responseURL: event.detail.responseURL
+            responseURL: event.detail.responseURL,
           });
         }
       })
@@ -121,7 +121,7 @@ export default class CommonPageCommunicator {
       new CustomEvent('inboxSDKpageAjax', {
         bubbles: false,
         cancelable: false,
-        detail: Object.assign({}, opts, { id })
+        detail: Object.assign({}, opts, { id }),
       })
     );
 
@@ -133,7 +133,7 @@ export default class CommonPageCommunicator {
       new CustomEvent('inboxSDKsilencePageErrors', {
         bubbles: false,
         cancelable: false,
-        detail: null
+        detail: null,
       })
     );
     // create error here for stacktrace
@@ -145,7 +145,7 @@ export default class CommonPageCommunicator {
         new CustomEvent('inboxSDKunsilencePageErrors', {
           bubbles: false,
           cancelable: false,
-          detail: null
+          detail: null,
         })
       );
     });
@@ -163,7 +163,7 @@ export default class CommonPageCommunicator {
       new CustomEvent('inboxSDKregisterAllowedHashLinkStartTerm', {
         bubbles: false,
         cancelable: false,
-        detail: { term }
+        detail: { term },
       })
     );
   }

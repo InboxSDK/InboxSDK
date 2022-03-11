@@ -3,12 +3,12 @@ import kefirBus from 'kefir-bus';
 
 import StopperPool from './stopper-pool';
 
-it('should work with one stream', done => {
+it('should work with one stream', (done) => {
   let hasReachedEnd = false;
   let i = 0;
   const b1 = kefirBus<any, any>();
   const ender = new StopperPool(b1);
-  ender.stream.onAny(event => {
+  ender.stream.onAny((event) => {
     switch (++i) {
       case 1:
         expect(event.type).toBe('value');
@@ -29,12 +29,12 @@ it('should work with one stream', done => {
   b1.end();
 });
 
-it('should work with two streams', done => {
+it('should work with two streams', (done) => {
   let hasReachedEnd = false;
   let i = 0;
   const b1 = kefirBus<any, any>();
   const ender = new StopperPool(b1);
-  ender.stream.onAny(event => {
+  ender.stream.onAny((event) => {
     switch (++i) {
       case 1:
         expect(event.type).toBe('value');
@@ -60,7 +60,7 @@ it('should work with two streams', done => {
   b2.end();
 });
 
-it('handles stream ending synchronously', done => {
+it('handles stream ending synchronously', (done) => {
   const ender = new StopperPool(Kefir.constant(null));
   ender.stream.onEnd(done);
 });
@@ -72,26 +72,26 @@ it('throws error if you try to add a stream after end', () => {
   }).toThrowError();
 });
 
-it('stops listening to streams after first event', done => {
+it('stops listening to streams after first event', (done) => {
   const ender = new StopperPool<number, never>(kefirBus());
   ender.stream.onAny(() => {
     throw new Error('Should not happen');
   });
   ender.add(
-    Kefir.stream(emitter => {
+    Kefir.stream((emitter) => {
       emitter.value(1);
       return done;
     })
   );
 });
 
-it('supports arrays of streams', done => {
+it('supports arrays of streams', (done) => {
   let hasReachedEnd = false;
   const b1 = kefirBus();
   const b2 = kefirBus();
   const ender = new StopperPool([
     Kefir.constant(null),
-    b1.beforeEnd(() => null)
+    b1.beforeEnd(() => null),
   ]);
   ender.stream.onValue(() => {
     expect(hasReachedEnd).toBe(true);

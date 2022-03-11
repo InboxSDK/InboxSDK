@@ -69,26 +69,26 @@ class InboxDrawerView {
     // drawer for any escape keypresses which weren't preventDefaulted by the
     // current extension.
     fromEventTargetCapture(document, 'keydown')
-      .filter(e => (e.key ? e.key === 'Escape' : e.which === 27))
+      .filter((e) => (e.key ? e.key === 'Escape' : e.which === 27))
       .takeUntilBy(this._closing)
-      .onValue(e => {
+      .onValue((e) => {
         const origPreventDefault = e.preventDefault;
-        e.preventDefault = function() {
+        e.preventDefault = function () {
           this._defaultPreventedInContext = true;
           return origPreventDefault.call(this);
         };
       });
     Kefir.fromEvents(document, 'keydown')
-      .filter(e => (e.key ? e.key === 'Escape' : e.which === 27))
-      .filter(e => !e._defaultPreventedInContext)
-      .filter(event => {
+      .filter((e) => (e.key ? e.key === 'Escape' : e.which === 27))
+      .filter((e) => !e._defaultPreventedInContext)
+      .filter((event) => {
         let isCanceled = false;
         const appEvent = {
           type: 'escape',
           cause: event,
           cancel: () => {
             isCanceled = true;
-          }
+          },
         };
         this._preAutoCloseStream.emit(appEvent);
         return !isCanceled;
@@ -116,7 +116,7 @@ class InboxDrawerView {
       Kefir.fromEvents(composeView, 'restored'),
       Kefir.later(10).flatMap(() =>
         Kefir.fromEvents(composeView, 'fullscreenChanged')
-      )
+      ),
     ];
     if (closeWithCompose) {
       closeEvents.push(
@@ -152,7 +152,7 @@ class InboxDrawerView {
     const insertionTarget =
       findParent(
         composeOffsetParent,
-        el =>
+        (el) =>
           window.getComputedStyle(el).getPropertyValue('z-index') !== 'auto' &&
           el.getBoundingClientRect().left === 0
       ) || ((document.body: any): HTMLElement);
@@ -161,21 +161,21 @@ class InboxDrawerView {
       new CustomEvent(TAKE_OVER_EVENT, {
         bubbles: false,
         cancelable: false,
-        detail: null
+        detail: null,
       })
     );
     composeOffsetParent.dispatchEvent(
       new CustomEvent(TAKE_OVER_EVENT, {
         bubbles: false,
         cancelable: false,
-        detail: null
+        detail: null,
       })
     );
     insertionTarget.dispatchEvent(
       new CustomEvent(TAKE_OVER_EVENT, {
         bubbles: false,
         cancelable: false,
-        detail: null
+        detail: null,
       })
     );
 

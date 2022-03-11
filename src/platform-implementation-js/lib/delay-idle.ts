@@ -10,7 +10,7 @@ export default function delayIdle<T>(
   timeout: number | null,
   value: T
 ): Kefir.Observable<T, never> {
-  return Kefir.stream(emitter => {
+  return Kefir.stream((emitter) => {
     const t = requestIdleCallback(
       () => {
         emitter.emit(value);

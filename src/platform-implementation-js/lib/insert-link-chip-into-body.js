@@ -4,37 +4,40 @@ import * as ud from 'ud';
 import type { ComposeViewDriver } from '../driver-interfaces/compose-view-driver';
 import autoHtml from 'auto-html';
 
-var insertLinkChipIntoBody = ud.defn(module, function(
-  composeViewDriver: ComposeViewDriver,
-  options: Object
-): HTMLElement {
-  composeViewDriver.focus();
+var insertLinkChipIntoBody = ud.defn(
+  module,
+  function (
+    composeViewDriver: ComposeViewDriver,
+    options: Object
+  ): HTMLElement {
+    composeViewDriver.focus();
 
-  var chipElement = _getChipElement(options);
+    var chipElement = _getChipElement(options);
 
-  // Gmail compose treats text directly bordering the chipElement weirdly in
-  // regards to cursor movement, so surround the chip with newlines which
-  // makes Gmail act up a little less.
-  var frag = (document: any).createDocumentFragment();
-  frag.appendChild(document.createTextNode('\u200b'));
-  frag.appendChild(chipElement);
-  frag.appendChild(document.createTextNode('\u200b'));
+    // Gmail compose treats text directly bordering the chipElement weirdly in
+    // regards to cursor movement, so surround the chip with newlines which
+    // makes Gmail act up a little less.
+    var frag = (document: any).createDocumentFragment();
+    frag.appendChild(document.createTextNode('\u200b'));
+    frag.appendChild(chipElement);
+    frag.appendChild(document.createTextNode('\u200b'));
 
-  composeViewDriver.insertBodyHTMLAtCursor(frag);
+    composeViewDriver.insertBodyHTMLAtCursor(frag);
 
-  if (
-    !composeViewDriver.isFullscreen() &&
-    !composeViewDriver.isInlineReplyForm() &&
-    document.activeElement !== composeViewDriver.getBodyElement()
-  ) {
-    composeViewDriver.setMinimized(true);
-    composeViewDriver.setMinimized(false);
+    if (
+      !composeViewDriver.isFullscreen() &&
+      !composeViewDriver.isInlineReplyForm() &&
+      document.activeElement !== composeViewDriver.getBodyElement()
+    ) {
+      composeViewDriver.setMinimized(true);
+      composeViewDriver.setMinimized(false);
+    }
+
+    composeViewDriver.focus();
+
+    return chipElement;
   }
-
-  composeViewDriver.focus();
-
-  return chipElement;
-});
+);
 export default insertLinkChipIntoBody;
 
 function _getChipElement(options: Object): HTMLElement {

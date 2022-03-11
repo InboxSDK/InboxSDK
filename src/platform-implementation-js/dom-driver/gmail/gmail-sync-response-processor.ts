@@ -67,9 +67,9 @@ export function extractThreadsFromSearchResponse(
           syncMessageData: descriptor[5].map((md: any) => ({
             syncMessageID: md[1],
             oldMessageID: md[56],
-            date: +md[7]
-          }))
-        }
+            date: +md[7],
+          })),
+        },
       };
     })
     .filter(isNotNil);
@@ -85,7 +85,7 @@ export function extractThreadsFromThreadResponse(
   if (!threadDescriptors) throw new Error('Failed to process thread response');
 
   return threadDescriptors
-    .map(descriptorWrapper => {
+    .map((descriptorWrapper) => {
       if (
         typeof descriptorWrapper[1] === 'string' &&
         Array.isArray(descriptorWrapper[3]) &&
@@ -110,13 +110,13 @@ export function extractThreadsFromThreadResponse(
                 descriptorWrapper[2][1][3]) ||
               undefined,
             syncMessageData: (descriptorWrapper[3] || [])
-              .filter(md => Boolean(md[2]))
-              .map(md => ({
+              .filter((md) => Boolean(md[2]))
+              .map((md) => ({
                 syncMessageID: md[1],
                 date: +md[2][17],
-                recipients: getRecipientsFromMessageDescriptor(md)
-              }))
-          }
+                recipients: getRecipientsFromMessageDescriptor(md),
+              })),
+          },
         } as MinimalSyncThread;
       } else {
         const threadDescriptor =
@@ -129,10 +129,10 @@ export function extractThreadsFromThreadResponse(
           Array.isArray(descriptorWrapper[3]) && descriptorWrapper[3];
 
         if (fullMessageDescriptors) {
-          syncMessageData = fullMessageDescriptors.map(md => ({
+          syncMessageData = fullMessageDescriptors.map((md) => ({
             syncMessageID: md[1],
             date: +md[2][17],
-            recipients: getRecipientsFromMessageDescriptor(md)
+            recipients: getRecipientsFromMessageDescriptor(md),
           }));
         } else {
           const messageDescriptors =
@@ -140,7 +140,7 @@ export function extractThreadsFromThreadResponse(
 
           syncMessageData = messageDescriptors.map((md: any) => ({
             syncMessageId: md[1],
-            date: +md[16]
+            date: +md[16],
           }));
         }
 
@@ -152,8 +152,8 @@ export function extractThreadsFromThreadResponse(
           rawResponse: descriptorWrapper,
           extraMetaData: {
             syncMessageData,
-            snippet: ''
-          }
+            snippet: '',
+          },
         } as SyncThread;
       }
     })
@@ -174,7 +174,7 @@ function getRecipientsFromMessageDescriptor(
     .concat(bcc)
     .map((recipientDescriptor: any) => ({
       emailAddress: recipientDescriptor[2],
-      name: recipientDescriptor[3]
+      name: recipientDescriptor[3],
     }));
 }
 
@@ -188,7 +188,7 @@ export function replaceThreadsInSearchResponse(
   if (parsedResponse[3] || replacementThreads.length) {
     parsedResponse[3] = replacementThreads.map(({ rawResponse }, index) => ({
       ...rawResponse,
-      '2': index
+      '2': index,
     }));
   }
 
@@ -198,7 +198,7 @@ export function replaceThreadsInSearchResponse(
       '1': replacementThreads.map(({ extraMetaData }) => extraMetaData.snippet),
       '2': replacementThreads.map(({ extraMetaData }) =>
         extraMetaData.syncMessageData.map(({ syncMessageID }) => syncMessageID)
-      )
+      ),
     };
   }
 

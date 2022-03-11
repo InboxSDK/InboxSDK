@@ -10,7 +10,7 @@ import type { ElementWithLifetime } from './make-element-child-stream';
 export default function elementViewMapper<T: View>(
   viewFn: (el: HTMLElement) => T
 ): (event: ElementWithLifetime) => T {
-  return event => {
+  return (event) => {
     const view = viewFn(event.el);
     event.removalStream.take(1).onValue(() => {
       view.destroy();

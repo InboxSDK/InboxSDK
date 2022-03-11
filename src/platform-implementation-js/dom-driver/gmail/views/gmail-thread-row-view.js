@@ -34,17 +34,17 @@ import updateIcon from '../../../driver-common/update-icon';
 type LabelMod = { gmailLabelView: Object, remove(): void };
 type ActionButtonMod = {
   gmailActionButtonView: GmailActionButtonView,
-  remove(): void
+  remove(): void,
 };
 type ButtonMod = {
   buttonSpan: HTMLElement,
   iconSettings: Object,
-  remove(): void
+  remove(): void,
 };
 type ImageMod = {
   iconSettings: Object,
   iconWrapper: HTMLElement,
-  remove(): void
+  remove(): void,
 };
 type ReplacedDateMod = { el: HTMLElement, remove(): void };
 type ReplacedDraftLabelMod = ReplacedDateMod;
@@ -57,8 +57,8 @@ type Mods = {
   replacedDate: { unclaimed: ReplacedDateMod[], claimed: ReplacedDateMod[] },
   replacedDraftLabel: {
     unclaimed: ReplacedDraftLabelMod[],
-    claimed: ReplacedDraftLabelMod[]
-  }
+    claimed: ReplacedDraftLabelMod[],
+  },
 };
 
 const cachedModificationsByRow: WeakMap<HTMLElement, Mods> = defonce(
@@ -102,7 +102,7 @@ function starGroupEventInterceptor(event) {
 
 type Counts = {
   messageCount: number,
-  draftCount: number
+  draftCount: number,
 };
 
 class GmailThreadRowView {
@@ -144,7 +144,7 @@ class GmailThreadRowView {
         ? [
             element,
             (element: any).nextElementSibling,
-            (element: any).nextElementSibling.nextElementSibling
+            (element: any).nextElementSibling.nextElementSibling,
           ]
         : [element, (element: any).nextElementSibling];
     } else {
@@ -160,7 +160,7 @@ class GmailThreadRowView {
         button: { unclaimed: [], claimed: [] },
         image: { unclaimed: [], claimed: [] },
         replacedDate: { unclaimed: [], claimed: [] },
-        replacedDraftLabel: { unclaimed: [], claimed: [] }
+        replacedDraftLabel: { unclaimed: [], claimed: [] },
       };
       cachedModificationsByRow.set(this._elements[0], this._modifications);
     } else {
@@ -188,39 +188,45 @@ class GmailThreadRowView {
 
     this._isDestroyed = true;
 
-    this._modifications.label.unclaimed = this._modifications.label.claimed.concat(
-      this._modifications.label.unclaimed
-    );
+    this._modifications.label.unclaimed =
+      this._modifications.label.claimed.concat(
+        this._modifications.label.unclaimed
+      );
     this._modifications.label.claimed.length = 0;
 
-    this._modifications.action.unclaimed = this._modifications.action.claimed.concat(
-      this._modifications.action.unclaimed
-    );
+    this._modifications.action.unclaimed =
+      this._modifications.action.claimed.concat(
+        this._modifications.action.unclaimed
+      );
     this._modifications.action.claimed.length = 0;
 
-    this._modifications.button.unclaimed = this._modifications.button.claimed.concat(
-      this._modifications.button.unclaimed
-    );
+    this._modifications.button.unclaimed =
+      this._modifications.button.claimed.concat(
+        this._modifications.button.unclaimed
+      );
     this._modifications.button.claimed.length = 0;
 
-    this._modifications.image.unclaimed = this._modifications.image.claimed.concat(
-      this._modifications.image.unclaimed
-    );
+    this._modifications.image.unclaimed =
+      this._modifications.image.claimed.concat(
+        this._modifications.image.unclaimed
+      );
     this._modifications.image.claimed.length = 0;
 
-    this._modifications.replacedDate.unclaimed = this._modifications.replacedDate.claimed.concat(
-      this._modifications.replacedDate.unclaimed
-    );
+    this._modifications.replacedDate.unclaimed =
+      this._modifications.replacedDate.claimed.concat(
+        this._modifications.replacedDate.unclaimed
+      );
     this._modifications.replacedDate.claimed.length = 0;
 
-    this._modifications.replacedDraftLabel.unclaimed = this._modifications.replacedDraftLabel.claimed.concat(
-      this._modifications.replacedDraftLabel.unclaimed
-    );
+    this._modifications.replacedDraftLabel.unclaimed =
+      this._modifications.replacedDraftLabel.claimed.concat(
+        this._modifications.replacedDraftLabel.unclaimed
+      );
     this._modifications.replacedDraftLabel.claimed.length = 0;
 
-    flatMap(this._elements, el =>
+    flatMap(this._elements, (el) =>
       Array.from(el.getElementsByClassName('inboxsdk__thread_row_addition'))
-    ).forEach(el => {
+    ).forEach((el) => {
       el.remove();
     });
 
@@ -355,12 +361,12 @@ class GmailThreadRowView {
             labelMod = this._modifications.label.unclaimed.shift();
             if (!labelMod) {
               const gmailLabelView = new GmailLabelView({
-                classes: ['inboxsdk__thread_row_label']
+                classes: ['inboxsdk__thread_row_label'],
               });
               const el = gmailLabelView.getElement();
               labelMod = {
                 gmailLabelView,
-                remove: el.remove.bind(el)
+                remove: el.remove.bind(el),
               };
             }
             this._modifications.label.claimed.push(labelMod);
@@ -394,7 +400,7 @@ class GmailThreadRowView {
         Kefir.merge([
           this._getRefresher(),
           this._getSubjectRefresher(),
-          this._getImageContainerRefresher()
+          this._getImageContainerRefresher(),
         ])
       )
       .takeUntilBy(this._stopper);
@@ -420,7 +426,7 @@ class GmailThreadRowView {
               iconWrapper: document.createElement('div'),
               remove() {
                 this.iconWrapper.remove();
-              }
+              },
             };
             imageMod.iconWrapper.className =
               'inboxsdk__thread_row_icon_wrapper';
@@ -473,7 +479,7 @@ class GmailThreadRowView {
       .toProperty()
       .takeUntilBy(this._stopper);
 
-    prop.merge(this._stopper).onValue(buttonDescriptor => {
+    prop.merge(this._stopper).onValue((buttonDescriptor) => {
       if (!buttonDescriptor) {
         if (activeDropdown) {
           activeDropdown.close();
@@ -507,9 +513,8 @@ class GmailThreadRowView {
         }
 
         let buttonSpan, iconSettings;
-        const buttonToolbar = this._elements[0].querySelector(
-          'ul[role=toolbar]'
-        );
+        const buttonToolbar =
+          this._elements[0].querySelector('ul[role=toolbar]');
 
         if (!buttonMod) {
           buttonMod = this._modifications.button.unclaimed.shift();
@@ -545,7 +550,7 @@ class GmailThreadRowView {
             buttonMod = {
               buttonSpan,
               iconSettings,
-              remove: buttonSpan.remove.bind(buttonSpan)
+              remove: buttonSpan.remove.bind(buttonSpan),
             };
           }
           this._modifications.button.claimed.push(buttonMod);
@@ -559,10 +564,10 @@ class GmailThreadRowView {
         iconSettings = buttonMod.iconSettings;
 
         if (buttonDescriptor.onClick) {
-          (buttonSpan: any).onclick = event => {
+          (buttonSpan: any).onclick = (event) => {
             const appEvent = {
               dropdown: (null: ?DropdownView),
-              threadRowView: this._userView
+              threadRowView: this._userView,
             };
             if (buttonDescriptor.hasDropdown) {
               if (activeDropdown) {
@@ -582,7 +587,7 @@ class GmailThreadRowView {
                 activeDropdown.setPlacementOptions({
                   position: 'bottom',
                   hAlign: 'left',
-                  vAlign: 'top'
+                  vAlign: 'top',
                 });
                 activeDropdown.on('destroy', () => {
                   setTimeout(() => {
@@ -620,7 +625,8 @@ class GmailThreadRowView {
           // Click events that are on one of our buttons should be stopped. Click events
           // that aren't on the star button or our buttons should be re-emitted from the
           // thread row so it counts as clicking on the thread.
-          (starGroup: any).onmouseover = (starGroup: any).onclick = starGroupEventInterceptor;
+          (starGroup: any).onmouseover = (starGroup: any).onclick =
+            starGroupEventInterceptor;
         }
       }
     });
@@ -644,7 +650,7 @@ class GmailThreadRowView {
       }
     });
 
-    prop.takeUntilBy(this._stopper).onValue(actionButtonDescriptor => {
+    prop.takeUntilBy(this._stopper).onValue((actionButtonDescriptor) => {
       if (actionButtonDescriptor && actionButtonDescriptor.type !== 'LINK') {
         console.error('Only type=LINK is currently supported');
         return;
@@ -667,7 +673,7 @@ class GmailThreadRowView {
             const el = gmailActionButtonView.getElement();
             actionMod = {
               gmailActionButtonView,
-              remove: el.remove.bind(el)
+              remove: el.remove.bind(el),
             };
           }
           this._modifications.action.claimed.push(actionMod);
@@ -677,7 +683,7 @@ class GmailThreadRowView {
           actionButtonDescriptor
         );
         const { url, onClick } = actionButtonDescriptor;
-        actionMod.gmailActionButtonView.setOnClick(event => {
+        actionMod.gmailActionButtonView.setOnClick((event) => {
           event.stopPropagation();
           window.open(url, '_blank');
           if (onClick) {
@@ -807,9 +813,8 @@ class GmailThreadRowView {
       if (!visibleDateSpan || !(visibleDateSpan instanceof HTMLElement)) return;
 
       // Attachment icons are only in the date column in vertical preivew pane.
-      const dateColumnAttachmentIconCount = this._elements[0].querySelectorAll(
-        'td.yf > img'
-      ).length;
+      const dateColumnAttachmentIconCount =
+        this._elements[0].querySelectorAll('td.yf > img').length;
       this._expandColumn(
         'col.xX',
         visibleDateSpan.offsetWidth +
@@ -854,11 +859,11 @@ class GmailThreadRowView {
             if (!labelMod) {
               labelMod = {
                 el: Object.assign(document.createElement('span'), {
-                  className: 'inboxsdk__thread_row_custom_draft_label'
+                  className: 'inboxsdk__thread_row_custom_draft_label',
                 }),
                 remove() {
                   this.el.remove();
-                }
+                },
               };
             }
             this._modifications.replacedDraftLabel.claimed.push(labelMod);
@@ -875,9 +880,9 @@ class GmailThreadRowView {
               labelMod.el.querySelectorAll('.boq')
             );
             if (materiaUIlDraftElements.length > 0) {
-              materiaUIlDraftElements.forEach(el => el.remove());
+              materiaUIlDraftElements.forEach((el) => el.remove());
               draftElement = Object.assign(document.createElement('span'), {
-                className: 'boq'
+                className: 'boq',
               });
               labelMod.el.appendChild(draftElement);
             } else {
@@ -897,7 +902,7 @@ class GmailThreadRowView {
             );
 
             countElement = Object.assign(document.createElement('span'), {
-              className: 'inboxsdk__thread_row_custom_draft_count'
+              className: 'inboxsdk__thread_row_custom_draft_count',
             });
             labelMod.el.appendChild(countElement);
           }
@@ -944,14 +949,14 @@ class GmailThreadRowView {
             if (!dateMod) {
               dateMod = {
                 el: Object.assign(document.createElement('span'), {
-                  className: 'inboxsdk__thread_row_custom_date'
+                  className: 'inboxsdk__thread_row_custom_date',
                 }),
                 remove() {
                   this.el.remove();
                   dateContainer.classList.remove(
                     'inboxsdk__thread_row_custom_date_container'
                   );
-                }
+                },
               };
             }
             this._modifications.replacedDate.claimed.push(dateMod);
@@ -1017,7 +1022,7 @@ class GmailThreadRowView {
 
     if (this._driver.isUsingSyncAPI()) {
       const elementWithId = flatten(
-        this._elements.map(el =>
+        this._elements.map((el) =>
           Array.from(
             el.querySelectorAll('[data-thread-id][data-legacy-thread-id]')
           )
@@ -1042,7 +1047,7 @@ class GmailThreadRowView {
         if (threadID) {
           this._driver
             .getOldGmailThreadIdFromSyncThreadId(threadID)
-            .then(oldGmailThreadID => {
+            .then((oldGmailThreadID) => {
               this._cachedThreadID = oldGmailThreadID;
             });
         }
@@ -1077,7 +1082,7 @@ class GmailThreadRowView {
 
     if (this._driver.isUsingSyncAPI()) {
       const elementWithId = flatten(
-        this._elements.map(el =>
+        this._elements.map((el) =>
           Array.from(el.querySelectorAll('[data-standalone-draft-id]'))
         )
       ).filter(Boolean)[0];
@@ -1109,12 +1114,12 @@ class GmailThreadRowView {
   getContacts(): Contact[] {
     const senderSpans = this._elements[0].querySelectorAll('[email]');
 
-    const contacts = Array.from(senderSpans).map(span => ({
+    const contacts = Array.from(senderSpans).map((span) => ({
       emailAddress: span.getAttribute('email'),
-      name: span.getAttribute('name')
+      name: span.getAttribute('name'),
     }));
 
-    return uniqBy(contacts, contact => contact.emailAddress);
+    return uniqBy(contacts, (contact) => contact.emailAddress);
   }
 
   isSelected(): boolean {
@@ -1152,7 +1157,7 @@ class GmailThreadRowView {
       refresher = this._refresher = makeMutationObserverChunkedStream(
         this._getWatchElement(),
         {
-          childList: true
+          childList: true,
         }
       )
         .map(() => null)
@@ -1172,15 +1177,13 @@ class GmailThreadRowView {
       } else {
         const watchElement = this._getWatchElement();
         const subjectElement = querySelector(watchElement, '.y6');
-        subjectRefresher = this._subjectRefresher = makeMutationObserverChunkedStream(
-          subjectElement,
-          {
-            childList: true
-          }
-        )
-          .map(() => null)
-          .takeUntilBy(this._stopper)
-          .toProperty(() => null);
+        subjectRefresher = this._subjectRefresher =
+          makeMutationObserverChunkedStream(subjectElement, {
+            childList: true,
+          })
+            .map(() => null)
+            .takeUntilBy(this._stopper)
+            .toProperty(() => null);
       }
     }
 
@@ -1197,7 +1200,7 @@ class GmailThreadRowView {
           containerRow,
           {
             attributes: true,
-            attributeFilter: ['class']
+            attributeFilter: ['class'],
           }
         );
 
@@ -1233,7 +1236,7 @@ export function removeAllThreadRowUnclaimedModifications() {
     const modifiedRows = document.querySelectorAll(
       'tr[data-inboxsdk-thread-row]'
     );
-    Array.prototype.forEach.call(modifiedRows, row => {
+    Array.prototype.forEach.call(modifiedRows, (row) => {
       const modifications = cachedModificationsByRow.get(row);
       if (modifications) {
         _removeThreadRowUnclaimedModifications(modifications);

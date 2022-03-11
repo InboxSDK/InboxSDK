@@ -8,7 +8,7 @@ export default function gmailLoadEvent(driver: GmailDriver) {
 
   pageCommunicator
     .isConversationViewDisabled()
-    .then(isConversationViewDisabled => {
+    .then((isConversationViewDisabled) => {
       driver.getLogger().eventSite('gmailSettings', {
         screenWidth: window.screen && window.screen.width,
         screenHeight: window.screen && window.screen.height,
@@ -18,8 +18,8 @@ export default function gmailLoadEvent(driver: GmailDriver) {
         isUsingSyncAPI: pageCommunicator.isUsingSyncAPI(),
         previewPane: pageCommunicator.getUserOriginalPreviewPaneMode(),
         isConversationViewDisabled,
-        wasAccountSwitcherReadyAtStart: driver.getEnvData()
-          .wasAccountSwitcherReadyAtStart,
+        wasAccountSwitcherReadyAtStart:
+          driver.getEnvData().wasAccountSwitcherReadyAtStart,
         timings: Object.assign(
           ({
             responseStart:
@@ -51,10 +51,10 @@ export default function gmailLoadEvent(driver: GmailDriver) {
             navigationStart:
               global.performance && global.performance.timing.navigationStart,
             requestStart:
-              global.performance && global.performance.timing.requestStart
+              global.performance && global.performance.timing.requestStart,
           }: any),
           driver.getTimings()
-        )
+        ),
       });
     });
 }

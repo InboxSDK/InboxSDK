@@ -8,7 +8,7 @@ import { cleanupPeopleLine } from '../../../platform-implementation-js/dom-drive
 export type ThreadRowMetadata = {
   timeString: string,
   subject: string,
-  peopleHtml: string
+  peopleHtml: string,
 };
 
 export function extractMetadataFromThreadRow(
@@ -67,6 +67,6 @@ export function extractMetadataFromThreadRow(
   return {
     timeString: timeSpan ? timeSpan.getAttribute('title') || '' : '',
     subject: subjectSpan ? subjectSpan.textContent : '',
-    peopleHtml: peopleDiv ? cleanupPeopleLine(peopleDiv.innerHTML) : ''
+    peopleHtml: peopleDiv ? cleanupPeopleLine(peopleDiv.innerHTML) : '',
   };
 }

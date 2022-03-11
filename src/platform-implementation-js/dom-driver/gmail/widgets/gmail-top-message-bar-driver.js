@@ -22,7 +22,7 @@ export default class GmailTopMessageBarDriver {
 
     optionStream
       .takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null))
-      .onValue(option => {
+      .onValue((option) => {
         if (!option) {
           if (this._element) {
             (this._element: any).remove();
@@ -94,7 +94,7 @@ export default class GmailTopMessageBarDriver {
 
   setTopMessageBarHeight() {
     const topMessageBars = [
-      ...document.querySelectorAll('.inboxsdk__topMessageBar')
+      ...document.querySelectorAll('.inboxsdk__topMessageBar'),
     ];
     const height = topMessageBars.reduce(
       (acc, currValue) => acc + currValue.offsetHeight,

@@ -26,7 +26,7 @@ const _loggedDeprecatedMessages = new Set();
 
 // The logger master is the first InboxSDK extension to load. This
 // first extension is tasked with reporting tracked events to the server.
-const _extensionIsLoggerMaster = (function() {
+const _extensionIsLoggerMaster = (function () {
   if (typeof document === 'undefined') {
     return true; // for unit tests
   }
@@ -206,7 +206,7 @@ export default class Logger {
   public getAppLogger(): AppLogger {
     return {
       error: (err, details) => this.errorApp(err, details),
-      event: (name, details) => this.eventApp(name, details)
+      event: (name, details) => this.eventApp(name, details),
     };
   }
 
@@ -227,7 +227,7 @@ export default class Logger {
         this.eventSdkPassive('function performance result', {
           value: now - start,
           timeSinceFirstLoad: now - FIRST_LOADED_TIME,
-          ...details
+          ...details,
         });
       }, 10);
     } else {
@@ -245,7 +245,7 @@ function _extensionLoggerSetup(
   _extensionAppIds.push(
     Object.freeze({
       appId: appId,
-      version: opts.appVersion || undefined
+      version: opts.appVersion || undefined,
     })
   );
   document.documentElement.setAttribute(
@@ -254,8 +254,8 @@ function _extensionLoggerSetup(
       getAllAppIds().concat([
         {
           appId: appId,
-          version: opts.appVersion || undefined
-        }
+          version: opts.appVersion || undefined,
+        },
       ])
     )
   );
@@ -273,7 +273,7 @@ function _extensionLoggerSetup(
       Error.stackTraceLimit = 40;
     }
 
-    window.addEventListener('error', function(event) {
+    window.addEventListener('error', function (event) {
       // Ugh, currently Chrome makes this pretty useless. Once Chrome fixes
       // this, we can remove the logged function wrappers around setTimeout and
       // things.
@@ -282,7 +282,7 @@ function _extensionLoggerSetup(
       }
     });
 
-    replaceFunction(window, 'setTimeout', function(original) {
+    replaceFunction(window, 'setTimeout', function (original) {
       return function wrappedSetTimeout(this: any, ...args: any[]) {
         if (typeof args[0] == 'function') {
           args[0] = makeLoggedFunction(args[0], 'setTimeout callback');
@@ -291,7 +291,7 @@ function _extensionLoggerSetup(
       };
     });
 
-    replaceFunction(window, 'setInterval', function(original) {
+    replaceFunction(window, 'setInterval', function (original) {
       return function wrappedSetInterval(this: any, ...args: any[]) {
         if (typeof args[0] == 'function') {
           args[0] = makeLoggedFunction(args[0], 'setInterval callback');
@@ -303,7 +303,7 @@ function _extensionLoggerSetup(
     const ETp =
       ((window as any).EventTarget && (window as any).EventTarget.prototype) ||
       (window as any).Node.prototype;
-    replaceFunction(ETp, 'addEventListener', function(original) {
+    replaceFunction(ETp, 'addEventListener', function (original) {
       return function wrappedAddEventListener(this: any, ...args: any[]) {
         if (typeof args[1] == 'function') {
           try {
@@ -328,7 +328,7 @@ function _extensionLoggerSetup(
       };
     });
 
-    replaceFunction(ETp, 'removeEventListener', function(original) {
+    replaceFunction(ETp, 'removeEventListener', function (original) {
       return function wrappedRemoveEventListener(this: any, ...args: any[]) {
         if (typeof args[1] == 'function' && args[1].__inboxsdk_logged) {
           args[1] = args[1].__inboxsdk_logged;
@@ -337,7 +337,7 @@ function _extensionLoggerSetup(
       };
     });
 
-    replaceFunction(window, 'MutationObserver', function(Original: any) {
+    replaceFunction(window, 'MutationObserver', function (Original: any) {
       Original = Original || (window as any).WebKitMutationObserver;
 
       function WrappedMutationObserver(this: any, ...args: any[]) {
@@ -401,13 +401,13 @@ function _logError(
     loaderVersion: _extensionLoaderVersion,
     implVersion: _extensionImplVersion,
     userEmailHash: _extensionUserEmailHash,
-    isUsingSyncAPI: _isUsingSyncAPI
+    isUsingSyncAPI: _isUsingSyncAPI,
   });
 }
 
 function makeLoggedFunction<F extends Function>(func: F, name?: string): F {
   const msg = name ? 'Uncaught error in ' + name : 'Uncaught error';
-  return function(this: any, ...args: any[]) {
+  return function (this: any, ...args: any[]) {
     return Logger.run(() => func.apply(this, args), msg);
   } as any;
 }
@@ -447,17 +447,17 @@ function _trackEvent(
     loaderVersion: _extensionLoaderVersion,
     implementationVersion: _extensionImplVersion,
     isUsingSyncAPI: _isUsingSyncAPI,
-    properties: properties
+    properties: properties,
   };
 
   if (type != 'gmail') {
     Object.assign(event, {
       extensionId: getExtensionId(),
-      appIds: getAppIdsProperty(appId)
+      appIds: getAppIdsProperty(appId),
     });
   } else {
     Object.assign(event, {
-      appIds: getAppIdsProperty(null, false)
+      appIds: getAppIdsProperty(null, false),
     });
   }
 
@@ -491,7 +491,7 @@ async function retrieveNewEventsAccessToken(): Promise<{
   const { text } = await ajax({
     url: 'https://www.inboxsdk.com/api/v2/events/oauth',
     // Work around CORB for extensions that have permissions to inboxsdk.com
-    XMLHttpRequest: getXMLHttpRequest()
+    XMLHttpRequest: getXMLHttpRequest(),
   });
   const accessToken: any = JSON.parse(text);
   if (isTimestampExpired(accessToken.expirationDate)) {
@@ -522,11 +522,11 @@ if (
 ) {
   makeMutationObserverStream(document.documentElement, {
     attributes: true,
-    attributeFilter: ['data-inboxsdk-last-event']
+    attributeFilter: ['data-inboxsdk-last-event'],
   })
     .map(() => null)
     .throttle(120 * 1000)
-    .onValue(function() {
+    .onValue(function () {
       const events: any[] = _trackedEventsQueue.removeAll();
 
       // The trackedEventsQueue is in localStorage, which is shared between
@@ -535,7 +535,7 @@ if (
         return;
       }
 
-      (async function() {
+      (async function () {
         const { oauthToken } = await getEventsAccessToken();
         const apiKey = 'AIzaSyAwlvUR2x3OnCeas8hW8NDzVMswL5hZGg8';
 
@@ -547,7 +547,7 @@ if (
           method: 'POST',
           headers: {
             Authorization: `Bearer ${oauthToken}`,
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
           data: JSON.stringify({
             messages: [
@@ -555,16 +555,16 @@ if (
                 data: Buffer.from(
                   JSON.stringify({
                     data: events,
-                    timestamp: Date.now() * 1000
+                    timestamp: Date.now() * 1000,
                   })
-                ).toString('base64')
-              }
-            ]
-          })
+                ).toString('base64'),
+              },
+            ],
+          }),
         });
-      })().catch(err => {
+      })().catch((err) => {
         Logger.error(err, {
-          type: 'Failed to log events'
+          type: 'Failed to log events',
         });
       });
     });

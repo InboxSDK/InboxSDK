@@ -69,7 +69,7 @@ function addIconArea(
   // emits when the tablist div gets role=tablist
   const tabListRoleStream = makeMutationObserverChunkedStream(tabList, {
     attributes: true,
-    attributeFilter: ['role']
+    attributeFilter: ['role'],
   })
     .toProperty(() => null)
     .filter(() => tabList.getAttribute('role') === 'tablist')
@@ -81,8 +81,8 @@ function addIconArea(
   // now we wait for loading to be hidden and tablist to be formed, and then we
   // add sdk icon container to tablist
   Kefir.combine([
-    loadingDivIsDisplayedStream.filter(value => !value),
-    tabListRoleStream
+    loadingDivIsDisplayedStream.filter((value) => !value),
+    tabListRoleStream,
   ]).onValue(() => {
     tabList.insertAdjacentElement('afterbegin', iconArea);
     maintainIconArea(
@@ -102,7 +102,10 @@ function addIconArea(
     tabList.insertAdjacentElement('beforebegin', iconArea);
     iconArea.insertAdjacentElement('afterend', loadingClone);
 
-    Kefir.merge([loadingDivIsDisplayedStream.filter(value => !value), stopper])
+    Kefir.merge([
+      loadingDivIsDisplayedStream.filter((value) => !value),
+      stopper,
+    ])
       .take(1)
       .onValue(() => {
         loadingClone.remove();

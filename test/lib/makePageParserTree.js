@@ -13,7 +13,7 @@ beforeEach(() => {
   }
 });
 afterEach(() => {
-  activePageParserTrees.forEach(page => {
+  activePageParserTrees.forEach((page) => {
     page.dump();
   });
   activePageParserTrees.length = 0;

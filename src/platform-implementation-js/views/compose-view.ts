@@ -13,7 +13,7 @@ import {
   ComposeViewDriver,
   ComposeNotice,
   StatusBar,
-  Contact
+  Contact,
 } from '../driver-interfaces/compose-view-driver';
 
 const memberMap = ud.defonce(module, () => new WeakMap());
@@ -32,11 +32,11 @@ export default class ComposeView extends EventEmitter {
     const members = {
       driver,
       membrane,
-      composeViewImplementation
+      composeViewImplementation,
     };
     memberMap.set(this, members);
 
-    this.on('newListener', eventName => {
+    this.on('newListener', (eventName) => {
       if (eventName === 'close') {
         driver
           .getLogger()
@@ -66,7 +66,7 @@ export default class ComposeView extends EventEmitter {
       }
     });
 
-    members.composeViewImplementation.getEventStream().onValue(event => {
+    members.composeViewImplementation.getEventStream().onValue((event) => {
       if (event.eventName === 'destroy') {
         this.destroyed = true;
         if (driver.getOpts().REQUESTED_API_VERSION === 1) {
@@ -136,7 +136,7 @@ export default class ComposeView extends EventEmitter {
     return {
       destroy: get(memberMap, this).composeViewImplementation.addRecipientRow(
         kefirCast(Kefir, options)
-      )
+      ),
     };
   }
 
@@ -296,7 +296,7 @@ export default class ComposeView extends EventEmitter {
     ).composeViewImplementation.insertLinkChipIntoBody({
       text: text,
       url: url,
-      iconUrl: iconUrl
+      iconUrl: iconUrl,
     });
   }
 

@@ -11,7 +11,7 @@ function fakeEl(name: string): any {
   return { name, nodeType: 1 };
 }
 
-it('should work with makeElementChildStream', done => {
+it('should work with makeElementChildStream', (done) => {
   const child1 = fakeEl('child1'),
     child2 = fakeEl('child2'),
     child3 = fakeEl('child3');
@@ -25,7 +25,7 @@ it('should work with makeElementChildStream', done => {
   makeElementChildStream(target as any)
     .takeUntilBy(stopper)
     .flatMap(
-      makeElementViewStream(el => {
+      makeElementViewStream((el) => {
         activeViewCount++;
         return {
           el: el,
@@ -36,11 +36,11 @@ it('should work with makeElementChildStream', done => {
             } else if (activeViewCount === 0) {
               done();
             }
-          }
+          },
         };
       })
     )
-    .onValue(view => {
+    .onValue((view) => {
       switch (++call) {
         case 1:
           expect(view.el).toBe(child1);

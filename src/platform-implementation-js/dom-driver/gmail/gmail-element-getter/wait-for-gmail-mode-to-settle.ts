@@ -4,7 +4,7 @@ import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-ob
 const waitForGmailModeToSettle = once(() =>
   makeMutationObserverChunkedStream(document.body, {
     attributes: true,
-    attributeFilter: ['class']
+    attributeFilter: ['class'],
   })
     .toProperty(() => undefined)
     .filter(() => document.body.classList.length > 0)

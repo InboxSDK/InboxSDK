@@ -17,7 +17,7 @@ export default async function getRfcMessageIdForGmailThreadId(
     nsc: 1,
     mb: 0,
     rt: 'j',
-    search: 'all'
+    search: 'all',
   };
 
   const gmailMessageIdResponse = await gmailAjax({
@@ -27,12 +27,13 @@ export default async function getRfcMessageIdForGmailThreadId(
       document.location.pathname +
       '?' +
       querystring.stringify(messageIdQuery),
-    canRetry: true
+    canRetry: true,
   });
 
-  const extractedIds = GmailResponseProcessor.extractMessageIdsFromThreadBatchRequest(
-    gmailMessageIdResponse.text
-  );
+  const extractedIds =
+    GmailResponseProcessor.extractMessageIdsFromThreadBatchRequest(
+      gmailMessageIdResponse.text
+    );
 
   if (Object.keys(extractedIds).length !== 1) {
     throw new Error(

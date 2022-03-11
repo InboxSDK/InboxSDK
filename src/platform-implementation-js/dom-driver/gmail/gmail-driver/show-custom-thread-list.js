@@ -14,7 +14,7 @@ type ThreadDescriptor =
   | string
   | {
       gmailThreadId?: ?string,
-      rfcMessageId?: ?string
+      rfcMessageId?: ?string,
     };
 
 type InitialIDPair =
@@ -27,7 +27,7 @@ type CompletedIDPair = { rfcId: string, gtid: string };
 type HandlerResult = {
   total?: number,
   hasMore?: boolean,
-  threads: Array<ThreadDescriptor>
+  threads: Array<ThreadDescriptor>,
 };
 
 const threadListHandlersToSearchStrings: Map<Function, string> = new Map();
@@ -116,7 +116,7 @@ function parseOnActivateResult(
     return {
       // default to one page since arrays can't be paginated
       total: threads.length,
-      threads
+      threads,
     };
   } else if (typeof result === 'object') {
     const { total, hasMore, threads } = result;
@@ -139,13 +139,13 @@ function parseOnActivateResult(
     if (typeof total === 'number') {
       return {
         total,
-        threads: copyAndOmitExcessThreads(threads, logger)
+        threads: copyAndOmitExcessThreads(threads, logger),
       };
     } else if (typeof hasMore === 'boolean') {
       const threadsWithoutExcess = copyAndOmitExcessThreads(threads, logger);
       return {
         total: hasMore ? 'MANY' : start + threads.length,
-        threads: threadsWithoutExcess
+        threads: threadsWithoutExcess,
       };
     } else {
       throw new Error(
@@ -171,7 +171,7 @@ function threadDescriptorToInitialIDPair(id: ThreadDescriptor): ?InitialIDPair {
   } else if (id) {
     const obj = {
       gtid: typeof id.gmailThreadId === 'string' && id.gmailThreadId,
-      rfcId: typeof id.rfcMessageId === 'string' && id.rfcMessageId
+      rfcId: typeof id.rfcMessageId === 'string' && id.rfcMessageId,
     };
     if (obj.gtid || obj.rfcId) {
       return (obj: any);
@@ -189,8 +189,8 @@ function initialIDPairToIDPairWithRFC(
   } else if (typeof pair.gtid === 'string') {
     const gtid = pair.gtid;
     return driver.getRfcMessageIdForGmailThreadId(gtid).then(
-      rfcId => ({ gtid, rfcId }),
-      err => findIdFailure(gtid, err)
+      (rfcId) => ({ gtid, rfcId }),
+      (err) => findIdFailure(gtid, err)
     );
   }
   throw new Error('Should not happen');
@@ -204,8 +204,8 @@ function idPairWithRFCToCompletedIDPair(
   return typeof pair.gtid === 'string'
     ? Promise.resolve(((pair: any): CompletedIDPair))
     : driver.getGmailThreadIdForRfcMessageId(pair.rfcId).then(
-        gtid => ({ gtid, rfcId: pair.rfcId }),
-        err => findIdFailure(pair.rfcId, err)
+        (gtid) => ({ gtid, rfcId: pair.rfcId }),
+        (err) => findIdFailure(pair.rfcId, err)
       );
 }
 
@@ -225,7 +225,7 @@ const setupSearchReplacing = (
   driver
     .getPageCommunicator()
     .ajaxInterceptStream.filter(
-      e => e.type === 'searchForReplacement' && e.query === newQuery
+      (e) => e.type === 'searchForReplacement' && e.query === newQuery
     )
     .onValue(({ start }: { start: number }) => {
       (async () => {
@@ -234,11 +234,8 @@ const setupSearchReplacing = (
         let total: number | 'MANY';
         let threadDescriptors: ThreadDescriptor[];
         try {
-          const onActivateResult:
-            | HandlerResult
-            | Array<ThreadDescriptor> = await Promise.resolve(
-            onActivate(start, MAX_THREADS_PER_PAGE)
-          );
+          const onActivateResult: HandlerResult | Array<ThreadDescriptor> =
+            await Promise.resolve(onActivate(start, MAX_THREADS_PER_PAGE));
           const parsed = parseOnActivateResult(
             driver.getLogger(),
             start,
@@ -258,7 +255,7 @@ const setupSearchReplacing = (
 
         const idPairsWithRFC: IDPairWithRFC[] = (
           await Promise.all(
-            initialIDPairs.map(pair =>
+            initialIDPairs.map((pair) =>
               initialIDPairToIDPairWithRFC(driver, pair, findIdFailure)
             )
           )
@@ -279,25 +276,25 @@ const setupSearchReplacing = (
           newQuery: messageIDQuery,
           newStart: 0,
           query: newQuery,
-          start
+          start,
         });
 
         const searchResultsResponse_promise = driver
           .getPageCommunicator()
           .ajaxInterceptStream.filter(
-            e =>
+            (e) =>
               e.type === 'searchResultsResponse' &&
               e.query === newQuery &&
               e.start === start
           )
-          .map(x => x.response)
+          .map((x) => x.response)
           .take(1)
           .toPromise();
 
         // Figure out any gmail thread ids we don't know yet.
         const completedIDPairs: Array<CompletedIDPair> = (
           await Promise.all(
-            idPairsWithRFC.map(pair =>
+            idPairsWithRFC.map((pair) =>
               idPairWithRFCToCompletedIDPair(driver, pair, findIdFailure)
             )
           )
@@ -312,13 +309,12 @@ const setupSearchReplacing = (
         let newResponse;
         try {
           if (driver.isUsingSyncAPI()) {
-            const extractedThreads = SyncGRP.extractThreadsFromSearchResponse(
-              response
-            );
+            const extractedThreads =
+              SyncGRP.extractThreadsFromSearchResponse(response);
 
             const extractedThreadsInCompletedIDPairsOrder = completedIDPairs
               .map(({ gtid }) =>
-                find(extractedThreads, t => t.oldGmailThreadID === gtid)
+                find(extractedThreads, (t) => t.oldGmailThreadID === gtid)
               )
               .filter(Boolean);
 
@@ -341,23 +337,23 @@ const setupSearchReplacing = (
                     rawResponse: {
                       '1': {
                         '3': { $set: newTime },
-                        '8': { $set: newTime }
-                      }
-                    }
+                        '8': { $set: newTime },
+                      },
+                    },
                   });
                   if (extractedThread.rawResponse[1][5]) {
                     newThread = update(newThread, {
                       rawResponse: {
                         '1': {
-                          '5': oldVal =>
-                            oldVal.map(md => ({
+                          '5': (oldVal) =>
+                            oldVal.map((md) => ({
                               ...md,
                               '7': newTime,
                               '18': newTime,
-                              '31': newTime
-                            }))
-                        }
-                      }
+                              '31': newTime,
+                            })),
+                        },
+                      },
                     });
                   }
                   return newThread;
@@ -377,7 +373,7 @@ const setupSearchReplacing = (
 
             const reorderedThreads: typeof extractedThreads = completedIDPairs
               .map(({ gtid }) =>
-                find(extractedThreads, t => t.gmailThreadId === gtid)
+                find(extractedThreads, (t) => t.gmailThreadId === gtid)
               )
               .filter(Boolean);
 
@@ -395,12 +391,12 @@ const setupSearchReplacing = (
           driver.getLogger().error(e, {
             responseReplacementFailure: true,
             //response: isStreakAppId(driver.getAppId()) ? response : null,
-            idPairsLength: completedIDPairs.length
+            idPairsLength: completedIDPairs.length,
           });
           const butterBar = driver.getButterBar();
           if (butterBar) {
             butterBar.showError({
-              text: 'Failed to load custom thread list'
+              text: 'Failed to load custom thread list',
             });
           }
           try {
@@ -409,7 +405,7 @@ const setupSearchReplacing = (
                 newQuery,
                 SyncGRP.replaceThreadsInSearchResponse(response, [], {
                   start,
-                  total
+                  total,
                 })
               );
             } else {
@@ -442,11 +438,11 @@ const setupSearchReplacing = (
                 message: errorBar.textContent,
                 completedIDPairsLength: completedIDPairs.length,
                 response: isStreak ? response : null,
-                newResponse: isStreak ? newResponse : null
+                newResponse: isStreak ? newResponse : null,
               });
           }
         }, 1000);
-      })().catch(err => driver.getLogger().error(err));
+      })().catch((err) => driver.getLogger().error(err));
     });
 
   driver.getCustomListSearchStringsToRouteIds().set(newQuery, customRouteID);
@@ -469,9 +465,8 @@ export default function showCustomThreadList(
   );
   const customHash = document.location.hash;
 
-  const nextMainContentElementChange = GmailElementGetter.getMainContentElementChangedStream()
-    .changes()
-    .take(1);
+  const nextMainContentElementChange =
+    GmailElementGetter.getMainContentElementChangedStream().changes().take(1);
 
   const searchInput = GmailElementGetter.getSearchInput();
   if (!searchInput) throw new Error('could not find search input');
@@ -489,7 +484,7 @@ export default function showCustomThreadList(
   // Create a hashchange event so setup-route-view-driver-stream sees this event.
   const hce = new (window: any).HashChangeEvent('hashchange', {
     oldURL: document.location.href.replace(/#.*$/, '') + customHash,
-    newURL: document.location.href.replace(/#.*$/, '') + searchHash
+    newURL: document.location.href.replace(/#.*$/, '') + searchHash,
   });
   window.dispatchEvent(hce);
 }

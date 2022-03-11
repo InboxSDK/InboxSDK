@@ -28,7 +28,7 @@ function getParams(path) {
     return {};
   }
   return {
-    query: decodeURIComponent(parts[1])
+    query: decodeURIComponent(parts[1]),
   };
 }
 

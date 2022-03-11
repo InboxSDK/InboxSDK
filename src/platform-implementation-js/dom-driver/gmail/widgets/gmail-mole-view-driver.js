@@ -10,7 +10,7 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import findParent from '../../../../common/find-parent';
 import type {
   MoleViewDriver,
-  MoleOptions
+  MoleOptions,
 } from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
@@ -26,7 +26,7 @@ class GmailMoleViewDriver {
     this._driver = driver;
     this._element = Object.assign(document.createElement('div'), {
       className: 'inboxsdk__mole_view ' + (options.className || ''),
-      innerHTML: getHTMLString(options)
+      innerHTML: getHTMLString(options),
     });
 
     if (options.chrome === false) {
@@ -77,8 +77,9 @@ class GmailMoleViewDriver {
           this._element,
           '.inboxsdk__mole_title_buttons'
         );
-        const lastChild: HTMLElement = (titleButtonContainer.lastElementChild: any);
-        titleButtons.forEach(titleButton => {
+        const lastChild: HTMLElement =
+          (titleButtonContainer.lastElementChild: any);
+        titleButtons.forEach((titleButton) => {
           const img: HTMLImageElement = (document.createElement('img'): any);
           if (titleButton.iconClass) {
             img.className = titleButton.iconClass;
@@ -101,11 +102,11 @@ class GmailMoleViewDriver {
   }
 
   show() {
-    const doShow = moleParent => {
+    const doShow = (moleParent) => {
       moleParent.insertBefore(this._element, last(moleParent.children));
       const dw = findParent(
         moleParent,
-        el => el.nodeName === 'DIV' && el.classList.contains('dw')
+        (el) => el.nodeName === 'DIV' && el.classList.contains('dw')
       );
       if (dw) {
         dw.classList.add('inboxsdk__moles_in_use');
@@ -137,7 +138,7 @@ class GmailMoleViewDriver {
         .takeUntilBy(this._stopper)
         .onValue(() => {
           this._driver.getLogger().eventSdkActive('mole parent force load');
-          this._driver.openNewComposeViewDriver().then(gmailComposeView => {
+          this._driver.openNewComposeViewDriver().then((gmailComposeView) => {
             gmailComposeView.close();
           });
         });

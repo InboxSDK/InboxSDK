@@ -3,7 +3,7 @@
 type ButtonColors = {
   INACTIVE_CLASS: string,
   HOVER_CLASS: string,
-  ACTIVE_CLASS: string
+  ACTIVE_CLASS: string,
 };
 
 declare var ButtonColorClasses: { [name: string]: ButtonColors };

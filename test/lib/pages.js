@@ -115,7 +115,7 @@ export const page20160817 = once(() => {
     )
   );
   const pageIfrBody = (page.querySelector('#FfJ3bf'): any).contentDocument.body;
-  Array.from((ifrContent.querySelector('body'): any).children).forEach(el => {
+  Array.from((ifrContent.querySelector('body'): any).children).forEach((el) => {
     pageIfrBody.appendChild(el);
   });
   return page;

@@ -7,7 +7,7 @@ import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation
 import simulateKey from '../../../../lib/dom/simulate-key';
 import {
   getRecipientRowForType,
-  getOldRecipientRowForType
+  getOldRecipientRowForType,
 } from './page-parser';
 
 export type ReceiverType = 'to' | 'cc' | 'bcc';
@@ -33,7 +33,7 @@ export default function setRecipients(
     if (signalElement && signalElement.style.display === 'none') {
       makeMutationObserverChunkedStream(signalElement, {
         attributes: true,
-        attributeFilter: ['style']
+        attributeFilter: ['style'],
       })
         .filter(() => signalElement.style.display !== 'none')
         .takeUntilBy(gmailComposeView.getStopper())
@@ -96,7 +96,7 @@ export default function setRecipients(
       contactRow.querySelectorAll<HTMLElement>(
         'div[role=option][data-name] div.afX[aria-label]'
       )
-    ).forEach(el => {
+    ).forEach((el) => {
       el.click();
     });
 
@@ -174,9 +174,8 @@ export default function setRecipients(
       return;
     }
 
-    const emailAddressEntry = contactRow.querySelector<HTMLElement>(
-      'textarea.vO'
-    );
+    const emailAddressEntry =
+      contactRow.querySelector<HTMLElement>('textarea.vO');
 
     if (
       !emailAddressEntry ||
@@ -187,7 +186,7 @@ export default function setRecipients(
 
     // Remove existing recipients
     Array.from(contactRow.querySelectorAll<HTMLElement>('.vR .vM')).forEach(
-      el => {
+      (el) => {
         simulateClick(el);
       }
     );
@@ -238,7 +237,7 @@ function _areContactsEqual(
   const existingEmailAddresses = getRecipients(
     gmailComposeView,
     addressType
-  ).map(c => c.emailAddress);
+  ).map((c) => c.emailAddress);
 
   if (!emailAddresses) {
     return !!existingEmailAddresses;

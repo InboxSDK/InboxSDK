@@ -7,12 +7,12 @@ const combokeys =
 export default function keyboardShortcutStream(
   chord: string
 ): Kefir.Observable<any, never> {
-  return Kefir.stream(emitter => {
+  return Kefir.stream((emitter) => {
     return (
       combokeys &&
       combokeys.bind(
         chord,
-        function(domEvent: any) {
+        function (domEvent: any) {
           emitter.emit(domEvent);
           return false;
         },

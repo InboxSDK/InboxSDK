@@ -28,8 +28,8 @@ export default class HandlerRegistry<T> {
     }
 
     return () => {
-      remove(this._pendingHandlers, h => h === handler);
-      remove(this._handlers, h => h === handler);
+      remove(this._pendingHandlers, (h) => h === handler);
+      remove(this._handlers, (h) => h === handler);
     };
   }
 
@@ -51,7 +51,7 @@ export default class HandlerRegistry<T> {
   }
 
   public removeTarget(target: T) {
-    remove(this._targets, t => t === target);
+    remove(this._targets, (t) => t === target);
   }
 
   public dumpHandlers() {

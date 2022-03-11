@@ -2,7 +2,7 @@
 
 export type AppLogger = {
   error(err: Error, details?: any): void,
-  event(name: string, details?: any): void
+  event(name: string, details?: any): void,
 };
 
 declare export default class Logger {

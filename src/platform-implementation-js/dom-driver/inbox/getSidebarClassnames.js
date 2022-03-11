@@ -23,7 +23,7 @@ const cssProcessor = cssParser();
 const getSidebarClassnames: () => {
   chat: ?string,
   nav: ?string,
-  centerList: ?string
+  centerList: ?string,
 } = once(() => {
   // We know that the page has a CSS rule which looks like
   //   .blah.chat .foo { margin-right: bigger number; margin-left: smaller number; }
@@ -43,14 +43,14 @@ const getSidebarClassnames: () => {
   // regex for each one.
   const classRegexes: RegExp[] = Array.from(
     (querySelector(document, '[role=application]').classList: any)
-  ).map(x => new RegExp('\\.' + x + '\\b'));
+  ).map((x) => new RegExp('\\.' + x + '\\b'));
   if (classRegexes.length === 0) throw new Error('no class names on element');
 
   // rules will contain both the chat and nav sidebar rules.
   const rules = t.toArray(
     Array.prototype.slice.call(document.styleSheets),
     t.compose(
-      t.filter(sheet => {
+      t.filter((sheet) => {
         try {
           return sheet.cssRules && sheet.cssRules.length;
         } catch (err) {
@@ -60,13 +60,15 @@ const getSidebarClassnames: () => {
           return false;
         }
       }),
-      t.mapcat(sheet => Array.prototype.slice.call(sheet.cssRules || [])),
+      t.mapcat((sheet) => Array.prototype.slice.call(sheet.cssRules || [])),
       t.mapcat(rulesToStyleRules),
       // We have all page rules. Filter it down to just rules mentioning one of
       // [role=application]'s classnames.
-      t.filter(rule => classRegexes.some(r => r.test(rule.selectorText))),
+      t.filter((rule) => classRegexes.some((r) => r.test(rule.selectorText))),
       // Now just the rules that contain both margin-left and -right rules.
-      t.filter(rule => rule.style['margin-left'] && rule.style['margin-right'])
+      t.filter(
+        (rule) => rule.style['margin-left'] && rule.style['margin-right']
+      )
     )
   );
 
@@ -74,7 +76,7 @@ const getSidebarClassnames: () => {
     Array.prototype.slice.call(rules),
     t.compose(
       t.filter(
-        rule =>
+        (rule) =>
           parseFloat(rule.style['margin-left']) >
           parseFloat(rule.style['margin-right'])
       ),
@@ -85,7 +87,7 @@ const getSidebarClassnames: () => {
     Array.prototype.slice.call(rules),
     t.compose(
       t.filter(
-        rule =>
+        (rule) =>
           parseFloat(rule.style['margin-left']) <
           parseFloat(rule.style['margin-right'])
       ),
@@ -97,7 +99,7 @@ const getSidebarClassnames: () => {
     Logger.error(err, {
       rulesCount: rules.length,
       hasOnlyNavSidebarRule: !!onlyNavSidebarRule,
-      hasOnlyChatSidebarRule: !!onlyChatSidebarRule
+      hasOnlyChatSidebarRule: !!onlyChatSidebarRule,
     });
     throw err;
   }
@@ -146,14 +148,14 @@ const getSidebarClassnames: () => {
       onlyChatSidebarRuleClassNames,
       chatSidebarClassNames,
       navSidebarClassNames,
-      centerListClassName
+      centerListClassName,
     });
   }
 
   return {
     chat: chatSidebarClassNames[0],
     nav: navSidebarClassNames[0],
-    centerList: centerListClassName
+    centerList: centerListClassName,
   };
 });
 

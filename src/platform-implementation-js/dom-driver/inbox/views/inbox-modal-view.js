@@ -25,7 +25,7 @@ class InboxModalView {
     closeElement.addEventListener('click', (event: MouseEvent) => {
       this._eventStream.emit({
         eventName: 'closeClick',
-        domEvent: event
+        domEvent: event,
       });
     });
   }
@@ -91,9 +91,9 @@ class InboxModalView {
 
     buttonContainer.innerHTML = '';
     sortBy(buttons, [
-      button => (button.type === 'PRIMARY_ACTION' ? 0 : 1),
-      button => button.orderHint || 0
-    ]).forEach(buttonDescriptor => {
+      (button) => (button.type === 'PRIMARY_ACTION' ? 0 : 1),
+      (button) => button.orderHint || 0,
+    ]).forEach((buttonDescriptor) => {
       var buttonEl = document.createElement('input');
       buttonEl.className =
         buttonDescriptor.type === 'PRIMARY_ACTION' ? 'inboxsdk__primary' : '';

@@ -43,7 +43,7 @@ class InboxChatSidebarView {
     const parent: HTMLElement = (this._el.parentElement: any);
     return makeMutationObserverChunkedStream(parent, {
       attributes: true,
-      attributeFilter: ['class']
+      attributeFilter: ['class'],
     })
       .toProperty(() => null)
       .map(() => this.getMode())

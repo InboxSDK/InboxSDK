@@ -8,7 +8,7 @@ import type InboxComposeView from './views/inbox-compose-view';
 
 type Options = {
   labelText?: ?string,
-  el?: ?HTMLElement
+  el?: ?HTMLElement,
 };
 
 const createRowElement = ({ labelText, el }: Options): HTMLElement => {
@@ -45,7 +45,7 @@ export default function addRecipientRow(
   recipientRowOptionStream
     .takeUntilBy(inboxComposeView.getStopper())
     .takeUntilBy(destroyStopper)
-    .onValue(options => {
+    .onValue((options) => {
       if (row) {
         row.remove();
         row = null;

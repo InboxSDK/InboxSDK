@@ -38,7 +38,7 @@ class InboxAttachmentOverlayView {
 
     this._cardView.setOverlay(this);
 
-    this._cardView.getAddedButtonDescriptors().forEach(button => {
+    this._cardView.getAddedButtonDescriptors().forEach((button) => {
       this.addButton(button);
     });
   }
@@ -64,7 +64,7 @@ class InboxAttachmentOverlayView {
       event.preventDefault();
       if (button.onClick) {
         button.onClick({
-          getDownloadURL: () => this.getDownloadURL()
+          getDownloadURL: () => this.getDownloadURL(),
         });
       }
     });

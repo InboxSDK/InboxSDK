@@ -20,7 +20,7 @@ export default function extractContactFromEmailContactString(
       emailAddress = firstPartTrimmed;
     } else {
       throw Object.assign(new Error('Invalid email address'), {
-        firstPartTrimmed
+        firstPartTrimmed,
       });
     }
   }

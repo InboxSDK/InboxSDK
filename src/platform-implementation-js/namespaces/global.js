@@ -29,9 +29,10 @@ export default class Global {
 
     members.driver.getLogger().eventSdkPassive('global.addSidebarContentPanel');
 
-    const contentPanelImplementation = await members.driver.addGlobalSidebarContentPanel(
-      descriptorPropertyStream
-    );
+    const contentPanelImplementation =
+      await members.driver.addGlobalSidebarContentPanel(
+        descriptorPropertyStream
+      );
     if (contentPanelImplementation) {
       return new ContentPanelView(contentPanelImplementation);
     }

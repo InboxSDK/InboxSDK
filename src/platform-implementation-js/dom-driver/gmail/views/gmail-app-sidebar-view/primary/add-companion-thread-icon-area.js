@@ -21,17 +21,15 @@ function addCompanionThreadIconArea(
   iconArea: HTMLElement,
   companionSidebarIconContainerEl: HTMLElement
 ) {
-  const tabList = companionSidebarIconContainerEl.querySelector(
-    TAB_LIST_SELECTOR
-  );
+  const tabList =
+    companionSidebarIconContainerEl.querySelector(TAB_LIST_SELECTOR);
   if (!tabList) {
     logger.error(new Error('addCompanionThreadIconArea: no tablist'));
     return;
   }
 
-  const separator = companionSidebarIconContainerEl.querySelector(
-    '[role=separator]'
-  );
+  const separator =
+    companionSidebarIconContainerEl.querySelector('[role=separator]');
   if (!separator) {
     logger.error(
       new Error('addCompanionThreadIconArea: failed to find separator')

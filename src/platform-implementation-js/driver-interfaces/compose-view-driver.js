@@ -7,14 +7,14 @@ import type { TooltipDescriptor } from '../views/compose-button-view';
 export type ComposeNotice = EventEmitter & {
   destroy(): void,
   destroyed: boolean,
-  el: HTMLElement
+  el: HTMLElement,
 };
 
 export type StatusBar = EventEmitter & {
   destroy(): void,
   destroyed: boolean,
   el: HTMLElement,
-  setHeight(height: number): void
+  setHeight(height: number): void,
 };
 
 export type ComposeButtonDescriptor = {
@@ -25,7 +25,7 @@ export type ComposeButtonDescriptor = {
   hasDropdown?: ?boolean,
   type?: ?string,
   orderHint?: ?number,
-  enabled?: ?boolean
+  enabled?: ?boolean,
 };
 
 export type ComposeViewDriver = {
@@ -38,7 +38,7 @@ export type ComposeViewDriver = {
   insertLinkChipIntoBody(options: {
     iconUrl?: string,
     url: string,
-    text: string
+    text: string,
   }): HTMLElement,
   setSubject(text: string): void,
   setBodyHTML(html: string): void,
@@ -82,7 +82,7 @@ export type ComposeViewDriver = {
   addStatusBar(options?: {
     height?: number,
     orderHint?: number,
-    addAboveNativeStatusBar?: boolean
+    addAboveNativeStatusBar?: boolean,
   }): StatusBar,
   hideNativeStatusBar(): () => void,
   isForward(): boolean,
@@ -110,5 +110,5 @@ export type ComposeViewDriver = {
     buttonDescriptor: Object,
     tooltipDescriptor: TooltipDescriptor
   ): void,
-  closeButtonTooltip(buttonViewController: Object): void
+  closeButtonTooltip(buttonViewController: Object): void,
 };

@@ -18,7 +18,7 @@ async function requestGmailThread(
     mb: 0,
     rt: 'c',
     search: 'inbox',
-    type: threadId
+    type: threadId,
   };
 
   const { text } = await gmailAjax({
@@ -26,7 +26,7 @@ async function requestGmailThread(
     url: `https://mail.google.com/mail${getAccountUrlPart()}?${querystring.stringify(
       queryParameters
     )}`,
-    canRetry: true
+    canRetry: true,
   });
 
   return text;

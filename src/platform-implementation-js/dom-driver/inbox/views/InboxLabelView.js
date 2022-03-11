@@ -37,7 +37,7 @@ class InboxLabelView {
     labelDescriptor = Object.assign(
       {
         foregroundColor: 'rgb(102, 102, 102)', //dark grey
-        backgroundColor: 'rgb(221, 221, 221)' //light grey
+        backgroundColor: 'rgb(221, 221, 221)', //light grey
       },
       labelDescriptor
     );

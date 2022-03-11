@@ -6,7 +6,7 @@ export default function waitFor<T>(
   // make this error here so we have a sensible stack.
   const timeoutError = new Error('waitFor timeout');
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     let waited = 0;
     function step() {
       try {

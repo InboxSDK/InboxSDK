@@ -30,11 +30,11 @@ import InboxComposeButtonView from './inbox-compose-button-view';
 import type {
   ComposeViewDriver,
   StatusBar,
-  ComposeButtonDescriptor
+  ComposeButtonDescriptor,
 } from '../../../driver-interfaces/compose-view-driver';
 import {
   getSelectedHTMLInElement,
-  getSelectedTextInElement
+  getSelectedTextInElement,
 } from '../../../lib/dom/get-selection';
 import getGmailThreadIdForRfcMessageId from '../../../driver-common/getGmailThreadIdForRfcMessageId';
 
@@ -77,7 +77,7 @@ class InboxComposeView {
     this._driver.getLogger().eventSite('compose open', {
       errorCount: this._p.errors.length,
       bottomAreaElementCount,
-      isInline: this._p.attributes.isInline
+      isInline: this._p.attributes.isInline,
     });
 
     const draftSaveTriggerer = kefirBus();
@@ -89,7 +89,7 @@ class InboxComposeView {
     if (bodyEl) {
       draftSaveTriggerer
         .bufferBy(draftSaveTriggerer.flatMap(() => delayAsap(null)))
-        .filter(x => x.length > 0)
+        .filter((x) => x.length > 0)
         .takeUntilBy(this._stopper)
         .onValue(() => {
           var unsilence = this._driver
@@ -104,10 +104,10 @@ class InboxComposeView {
 
       Kefir.merge([
         Kefir.fromEvents((document.body: any), 'mousedown'),
-        Kefir.fromEvents((document.body: any), 'keydown')
+        Kefir.fromEvents((document.body: any), 'keydown'),
       ])
         .takeUntilBy(this.getStopper())
-        .onValue(event => {
+        .onValue((event) => {
           const selection = (document: any).getSelection();
           if (
             selection.rangeCount > 0 &&
@@ -121,7 +121,7 @@ class InboxComposeView {
         makeMutationObserverChunkedStream(bodyEl, {
           childList: true,
           subtree: true,
-          characterData: true
+          characterData: true,
         }).map(() => ({ eventName: 'bodyChanged' }))
       );
     }
@@ -160,7 +160,7 @@ class InboxComposeView {
               ),
               this.getEventStream().filter(
                 ({ eventName }) => eventName === 'sent'
-              )
+              ),
             ]),
             this._ajaxInterceptStream.filter(
               ({ type }) => type === 'emailSendFailed'
@@ -169,7 +169,7 @@ class InboxComposeView {
               Kefir.constantError(
                 new Error('Timed out waiting for ComposeView send')
               )
-            )
+            ),
           ])
             .takeUntilBy(sendCanceledStream)
             .takeUntilBy(this._stopper)
@@ -180,7 +180,7 @@ class InboxComposeView {
             .onValue(() => {
               this._isPresending = false;
             })
-            .onError(error => {
+            .onError((error) => {
               this._driver.getLogger().error(error);
             });
           this._driver.getPageCommunicator().notifyEmailSending();
@@ -218,10 +218,10 @@ class InboxComposeView {
         makeMutationObserverChunkedStream(fromPickerEmailSpan, {
           childList: true,
           subtree: true,
-          characterData: true
+          characterData: true,
         }).map(() => ({
           eventName: 'fromContactChanged',
-          data: { contact: this.getFromContact() }
+          data: { contact: this.getFromContact() },
         }))
       );
     }
@@ -241,7 +241,7 @@ class InboxComposeView {
         });
       this._eventStream.plug(
         minimizeButtonChanges.map(() => ({
-          eventName: isMinimized() ? 'minimized' : 'restored'
+          eventName: isMinimized() ? 'minimized' : 'restored',
         }))
       );
     }
@@ -263,7 +263,7 @@ class InboxComposeView {
       this._eventStream.plug(
         toggleButtonChanges.map(() => ({
           eventName: 'fullscreenChanged',
-          data: { fullscreen: isFullscreenMode() }
+          data: { fullscreen: isFullscreenMode() },
         }))
       );
     }
@@ -276,8 +276,8 @@ class InboxComposeView {
       this._eventStream.emit({
         eventName: 'destroy',
         data: {
-          closedByInboxSDK: this._closedProgrammatically
-        }
+          closedByInboxSDK: this._closedProgrammatically,
+        },
       });
       this._eventStream.end();
       this._stopper.destroy();
@@ -324,24 +324,26 @@ class InboxComposeView {
       )
         .merge(Kefir.later(0))
         .map(cb);
-      return arrayToLifetimes(contactArrayStream, c => c.emailAddress).flatMap(
-        ({ el, removalStream }) =>
-          Kefir.constant({
-            eventName: prefix + 'ContactAdded',
-            data: { contact: el }
-          }).merge(
-            removalStream.map(() => ({
-              eventName: prefix + 'ContactRemoved',
-              data: { contact: el }
-            }))
-          )
+      return arrayToLifetimes(
+        contactArrayStream,
+        (c) => c.emailAddress
+      ).flatMap(({ el, removalStream }) =>
+        Kefir.constant({
+          eventName: prefix + 'ContactAdded',
+          data: { contact: el },
+        }).merge(
+          removalStream.map(() => ({
+            eventName: prefix + 'ContactRemoved',
+            data: { contact: el },
+          }))
+        )
       );
     }
 
     return Kefir.merge([
       makeChangesStream('to', toInput, () => this.getToRecipients()),
       makeChangesStream('cc', ccInput, () => this.getCcRecipients()),
-      makeChangesStream('bcc', bccInput, () => this.getBccRecipients())
+      makeChangesStream('bcc', bccInput, () => this.getBccRecipients()),
     ]).takeUntilBy(this._stopper);
   }
   _setupStreams() {
@@ -350,28 +352,27 @@ class InboxComposeView {
     this._eventStream.plug(
       getPresendingStream({
         element: this.getElement(),
-        sendButton: this.getSendButton()
+        sendButton: this.getSendButton(),
       })
     );
 
     this._eventStream.plug(
       getDiscardStream({
         element: this.getElement(),
-        discardButton: this.getDiscardButton()
+        discardButton: this.getDiscardButton(),
       })
     );
 
     this._eventStream.plug(
       Kefir.fromEvents(this.getElement(), 'inboxSDKsendCanceled').map(() => ({
-        eventName: 'sendCanceled'
+        eventName: 'sendCanceled',
       }))
     );
 
     this._eventStream.plug(
-      Kefir.fromEvents(
-        this.getElement(),
-        'inboxSDKdiscardCanceled'
-      ).map(() => ({ eventName: 'discardCanceled' }))
+      Kefir.fromEvents(this.getElement(), 'inboxSDKdiscardCanceled').map(
+        () => ({ eventName: 'discardCanceled' })
+      )
     );
 
     this._eventStream.plug(
@@ -383,17 +384,17 @@ class InboxComposeView {
     this._eventStream.plug(
       this._ajaxInterceptStream
         .filter(({ type }) => type === 'emailSent')
-        .map(event => {
+        .map((event) => {
           const data = {
             getThreadID: (): Promise<string> =>
               getGmailThreadIdForRfcMessageId(this._driver, event.rfcID),
             getMessageID: (): Promise<string> =>
               this._driver.getGmailMessageIdForSyncMessageId(
                 `msg-a:${event.draftID}`
-              )
+              ),
           };
           ['gmailThreadId', 'gmailMessageId', 'threadID', 'messageID'].forEach(
-            name => {
+            (name) => {
               Object.defineProperty(data, name, {
                 get: () => {
                   this._driver
@@ -403,7 +404,7 @@ class InboxComposeView {
                       'ComposeView sent event.getThreadID() or event.getMessageID()'
                     );
                   throw new Error('Not supported');
-                }
+                },
               });
             }
           );
@@ -419,7 +420,7 @@ class InboxComposeView {
     const email = fromPickerEmailSpan.textContent;
     const contact = find(
       this.getFromContactChoices(),
-      c => c.emailAddress === email
+      (c) => c.emailAddress === email
     );
     if (!contact) {
       throw new Error('Failed to find from contact');
@@ -460,9 +461,9 @@ class InboxComposeView {
         return cachedFromContacts;
       }
 
-      cachedFromContacts = Array.from(fromOptionEls).map(el => ({
+      cachedFromContacts = Array.from(fromOptionEls).map((el) => ({
         name: querySelector(el, 'span[title]').title,
-        emailAddress: querySelector(el, 'span:not([title])').textContent
+        emailAddress: querySelector(el, 'span:not([title])').textContent,
       }));
     } finally {
       if (needToOpenMenu) {
@@ -500,7 +501,7 @@ class InboxComposeView {
       }
       const fromOptionEl = find(
         fromOptionEls,
-        el => el.querySelector('span:not([title])').textContent === email
+        (el) => el.querySelector('span:not([title])').textContent === email
       );
       if (!fromOptionEl) {
         throw new Error('Failed to find from contact to set');
@@ -544,7 +545,7 @@ class InboxComposeView {
   insertLinkChipIntoBody(options: {
     iconUrl?: string,
     url: string,
-    text: string
+    text: string,
   }): HTMLElement {
     var retval = insertLinkChipIntoBody(this, options);
     this._informBodyChanged();
@@ -579,7 +580,7 @@ class InboxComposeView {
       simulateClick(removeButton);
     }
 
-    emails.forEach(email => {
+    emails.forEach((email) => {
       inputElement.value = email;
       inputElement.dispatchEvent(new window.FocusEvent('blur'));
     });
@@ -679,7 +680,7 @@ class InboxComposeView {
         new CustomEvent('closedProgrammatically', {
           bubbles: false,
           cancelable: false,
-          detail: null
+          detail: null,
         })
       );
 
@@ -745,7 +746,7 @@ class InboxComposeView {
     );
     return Promise.resolve({
       buttonViewController,
-      buttonDescriptor: {}
+      buttonDescriptor: {},
     });
   }
   getModifierButtonContainer(): HTMLElement {
@@ -802,12 +803,12 @@ class InboxComposeView {
 
     const rows = [this.getToRow(), this.getCCRow(), this.getBCCRow()];
 
-    rows.forEach(row => {
+    rows.forEach((row) => {
       row.classList.add('inboxsdk__compose_forceRecipientRowHidden');
     });
 
     return () => {
-      rows.forEach(row => {
+      rows.forEach((row) => {
         row.classList.remove('inboxsdk__compose_forceRecipientRowHidden');
       });
     };
@@ -827,7 +828,7 @@ class InboxComposeView {
   addStatusBar(options?: {
     height?: number,
     orderHint?: number,
-    addAboveNativeStatusBar?: boolean
+    addAboveNativeStatusBar?: boolean,
   }): StatusBar {
     throw new Error('Not implemented');
   }
@@ -942,14 +943,14 @@ class InboxComposeView {
 
     return Array.from(chipContainer.children)
       .filter(
-        el =>
+        (el) =>
           el.nodeName === 'DIV' &&
           el.hasAttribute('email') &&
           el.style.display !== 'none'
       )
-      .map(chip => ({
+      .map((chip) => ({
         emailAddress: chip.getAttribute('email') || '',
-        name: chip.textContent
+        name: chip.textContent,
       }));
   }
   getToRecipients(): Contact[] {

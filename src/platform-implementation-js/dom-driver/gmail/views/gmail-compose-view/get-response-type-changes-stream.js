@@ -7,7 +7,7 @@ import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import type GmailComposeView from '../gmail-compose-view';
 
-export default function(
+export default function (
   gmailComposeView: GmailComposeView
 ): Kefir.Observable<Object> {
   let responseTypeEl;
@@ -19,12 +19,12 @@ export default function(
     );
     return makeMutationObserverChunkedStream(responseTypeEl, {
       attributeFilter: ['class'],
-      attributes: true
+      attributes: true,
     }).map(() => ({
       data: {
-        isForward: gmailComposeView.isForward()
+        isForward: gmailComposeView.isForward(),
       },
-      eventName: 'responseTypeChanged'
+      eventName: 'responseTypeChanged',
     }));
   } catch (err) {
     Logger.error(err);

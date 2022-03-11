@@ -28,7 +28,7 @@ if (!global.__InboxSDKImpLoader) {
         resolve(
           Kefir.merge([
             Kefir.fromEvents(document, 'DOMContentLoaded'),
-            Kefir.fromEvents(window, 'load')
+            Kefir.fromEvents(window, 'load'),
           ])
             .take(1)
             .map(() => null)
@@ -38,7 +38,7 @@ if (!global.__InboxSDKImpLoader) {
     });
 
     global.__InboxSDKImpLoader = {
-      load: function(version, appId, opts) {
+      load: function (version, appId, opts) {
         if (version !== '0.1') {
           throw new Error('Unsupported InboxSDK version');
         }
@@ -54,12 +54,12 @@ if (!global.__InboxSDKImpLoader) {
               define = null;
             }
             const {
-              makePlatformImplementation
+              makePlatformImplementation,
             } = require('./platform-implementation');
             return makePlatformImplementation(appId, opts, {
               piMainStarted,
               piLoadStarted,
-              wasAccountSwitcherReadyAtStart
+              wasAccountSwitcherReadyAtStart,
             });
           } finally {
             if (oldDefine) {
@@ -67,7 +67,7 @@ if (!global.__InboxSDKImpLoader) {
             }
           }
         });
-      }
+      },
     };
   } finally {
     if (oldDefine) {

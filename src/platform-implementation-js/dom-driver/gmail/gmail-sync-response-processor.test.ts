@@ -25,15 +25,14 @@ describe('extractThreadsFromSearchResponse', () => {
           {
             date: 1516729798134,
             syncMessageID: 'msg-f:1590406465099407434',
-            oldMessageID: '1777401cdeadbeef'
-          }
-        ]
+            oldMessageID: '1777401cdeadbeef',
+          },
+        ],
       },
       rawResponse: {
         '1': {
           '1': 'Introducing Comment Editing and @Mentions',
-          '2':
-            '@Mentions, Conversations, and Editing for Comments Happy New Year! In 2017, users added millions of new Comments to Streak - the most pouplar type of content to add. In 2018, Comments are significantly',
+          '2': '@Mentions, Conversations, and Editing for Comments Happy New Year! In 2017, users added millions of new Comments to Streak - the most pouplar type of content to add. In 2018, Comments are significantly',
           '3': '1516729798134',
           '4': 'thread-f:1589064200257780346',
           '5': [
@@ -41,23 +40,22 @@ describe('extractThreadsFromSearchResponse', () => {
               '1': 'msg-f:1590406465099407434',
               '2': { '1': 1, '2': 'support@streak.com', '3': 'Streak.com' },
               '7': '1516729798134',
-              '10':
-                '@Mentions, Conversations, and Editing for Comments Happy New Year! In 2017, users added millions of new Comments to Streak - the most pouplar type of content to add. In 2018, Comments are significantly',
+              '10': '@Mentions, Conversations, and Editing for Comments Happy New Year! In 2017, users added millions of new Comments to Streak - the most pouplar type of content to add. In 2018, Comments are significantly',
               '11': ['^a', '^all', '^smartlabel_notification', '^u'],
               '18': '1516729798411',
               '31': '1516729798411',
               '34': 2,
               '44': 0,
               '48': '1590406465099407434',
-              '56': '1777401cdeadbeef'
-            }
+              '56': '1777401cdeadbeef',
+            },
           ],
           '8': '1516731537162',
           '17': 0,
-          '18': '1589064200257780346'
+          '18': '1589064200257780346',
         },
-        '2': '8058'
-      }
+        '2': '8058',
+      },
     });
   });
 
@@ -88,7 +86,7 @@ describe('extractThreadsFromSearchResponse', () => {
               '2': {
                 '1': 1,
                 '2': 'inboxsdktestdataonly@gmail.com',
-                '3': 'Jane Doe'
+                '3': 'Jane Doe',
               },
               '7': '1516850573718',
               '10': 'dsafdsafdsafdsa ᐧ',
@@ -97,26 +95,26 @@ describe('extractThreadsFromSearchResponse', () => {
               '31': '1516850573678',
               '34': 0,
               '44': 3,
-              '48': '1590533107145425147'
-            }
+              '48': '1590533107145425147',
+            },
           ],
           '15': { '1': [{ '1': '', '2': 'oismail+test@gmail.com' }] },
           '17': 0,
-          '18': '1590533107145425147'
+          '18': '1590533107145425147',
         },
-        '2': '9245'
+        '2': '9245',
       },
       extraMetaData: {
         snippet: '',
         syncMessageData: [
-          { date: 1516850573718, syncMessageID: 'msg-f:1590533107145425147' }
-        ]
-      }
+          { date: 1516850573718, syncMessageID: 'msg-f:1590533107145425147' },
+        ],
+      },
     });
   });
 });
 
-describe('extractThreadsFromThreadResponse', function() {
+describe('extractThreadsFromThreadResponse', function () {
   it('works for input triggered ajax request', () => {
     const data = fs.readFileSync(
       __dirname +
@@ -137,12 +135,12 @@ describe('extractThreadsFromThreadResponse', function() {
           recipients: [
             {
               emailAddress: 'billingchanges@streak.com',
-              name: 'Billing Changes'
+              name: 'Billing Changes',
             },
-            { emailAddress: 'sales@streak.com', name: 'Sales Team' }
-          ]
-        }
-      ]
+            { emailAddress: 'sales@streak.com', name: 'Sales Team' },
+          ],
+        },
+      ],
     });
   });
 
@@ -162,8 +160,8 @@ describe('extractThreadsFromThreadResponse', function() {
         { syncMessageID: 'msg-f:1594506202591635145', date: 1520639612762 },
         { syncMessageID: 'msg-f:1594508744604132981', date: 1520642037014 },
         { syncMessageID: 'msg-f:1594509071530617554', date: 1520642348795 },
-        { syncMessageID: 'msg-f:1594959172652759326', date: 1521071598675 }
-      ]
+        { syncMessageID: 'msg-f:1594959172652759326', date: 1521071598675 },
+      ],
     });
   });
 
@@ -181,8 +179,8 @@ describe('extractThreadsFromThreadResponse', function() {
       snippet:
         'Aleem M commented: is it currently implemented but not documented or is it implemwented on the streak side but not in sdk? on the threadRowView.addStatusText() ',
       syncMessageData: [
-        { syncMessageID: 'msg-f:1600484990382419037', date: 1526341429121 }
-      ]
+        { syncMessageID: 'msg-f:1600484990382419037', date: 1526341429121 },
+      ],
     });
   });
 });

@@ -20,12 +20,12 @@ export default function toLiveSet<T>(
           removalStream.take(1).onValue(() => {
             controller.remove(el);
           });
-        }
+        },
       });
 
       return () => {
         sub.unsubscribe();
       };
-    }
+    },
   });
 }

@@ -13,7 +13,7 @@ export default function sharedStyle(root: Document = document) {
   if (!root.getElementById('inboxsdk__shared_style')) {
     const style = root.createElement('style');
     style.id = 'inboxsdk__shared_style';
-    cssContent.onValue(css => {
+    cssContent.onValue((css) => {
       style.textContent = rewriteCssWithIdMap(css);
     });
     if (!root.head) throw new Error('missing head');

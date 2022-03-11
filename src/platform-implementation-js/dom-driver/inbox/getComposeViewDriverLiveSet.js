@@ -17,7 +17,7 @@ export default function getComposeViewDriverLiveSet(
 ): LiveSet<InboxComposeView> {
   const denodeify = ({ el, removalStream }) => ({
     el: el.getValue(),
-    removalStream
+    removalStream,
   });
 
   const inlineCompose = toItemWithLifetimeStream(
@@ -32,24 +32,23 @@ export default function getComposeViewDriverLiveSet(
 
   const compose = Kefir.merge([
     inlineCompose,
-    regularCompose.merge(fullscreenCompose).flatMap(makeElementStreamMerger())
+    regularCompose.merge(fullscreenCompose).flatMap(makeElementStreamMerger()),
   ]);
 
-  const composeViewDriverStream: Kefir.Observable<InboxComposeView> = compose.map(
-    ({ el, removalStream }) => {
+  const composeViewDriverStream: Kefir.Observable<InboxComposeView> =
+    compose.map(({ el, removalStream }) => {
       const parsed = parser(el);
       if (parsed.errors.length) {
         driver.getLogger().errorSite(new Error('parse errors (compose)'), {
           score: parsed.score,
           errors: parsed.errors,
-          html: censorHTMLtree(el)
+          html: censorHTMLtree(el),
         });
       }
       const view = new InboxComposeView(driver, el, parsed);
       removalStream.take(1).onValue(() => view.removedFromDOM());
       return view;
-    }
-  );
+    });
 
   return new LiveSet({
     scheduler: tree.getAllByTag('inlineCompose').getScheduler(),
@@ -97,7 +96,7 @@ export default function getComposeViewDriverLiveSet(
                 document.querySelectorAll(
                   'body > div[id][jsaction] > div[id][class]:not([role]) > div[class] > div[id], div.ek div.md > div'
                 )
-              ).map(el => censorHTMLtree(el))
+              ).map((el) => censorHTMLtree(el)),
             };
           }
 
@@ -109,14 +108,14 @@ export default function getComposeViewDriverLiveSet(
             driver.getLogger().eventSdkPassive('waitfor compose data', {
               startStatus,
               waitTime,
-              laterStatus
+              laterStatus,
             });
           }, waitTime);
-        }
+        },
       });
       return () => {
         sub.unsubscribe();
       };
-    }
+    },
   });
 }

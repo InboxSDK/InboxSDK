@@ -22,7 +22,7 @@ jest.mock('../../../../lib/dom/make-mutation-observer-chunked-stream', () => {
 global.localStorage = new MockWebStorage();
 global._APP_SIDEBAR_TEST = true;
 
-describe('GmailAppSidebarView Primary', function() {
+describe('GmailAppSidebarView Primary', function () {
   beforeEach(() => {
     makeSidebarContainerElement();
   });
@@ -48,11 +48,11 @@ describe('GmailAppSidebarView Primary', function() {
     const descriptor = Kefir.constant({
       title: 'foo',
       iconUrl: '/bar.png',
-      el: document.createElement('div')
+      el: document.createElement('div'),
     });
 
     const fakeThreadView: Object = {
-      getStopper: _.constant(kefirStopper())
+      getStopper: _.constant(kefirStopper()),
     };
 
     const panel = gmailAppSidebarView.addThreadSidebarContentPanel(
@@ -83,17 +83,17 @@ describe('GmailAppSidebarView Primary', function() {
     const descriptor1 = Kefir.constant({
       title: 'foo1',
       iconUrl: '/bar.png',
-      el: document.createElement('div')
+      el: document.createElement('div'),
     });
 
     const descriptor2 = Kefir.constant({
       title: 'foo2',
       iconUrl: '/bar.png',
-      el: document.createElement('div')
+      el: document.createElement('div'),
     });
 
     const fakeThreadView: Object = {
-      getStopper: _.constant(kefirStopper())
+      getStopper: _.constant(kefirStopper()),
     };
 
     gmailAppSidebarView.addThreadSidebarContentPanel(
@@ -124,9 +124,9 @@ function makeDriver(appId, opts): any {
         error(err, details) {
           console.error('logger.error called:', err, details); //eslint-disable-line no-console
           throw err;
-        }
+        },
       };
-    }
+    },
   };
 }
 
@@ -149,7 +149,7 @@ function makeSidebarContainerElement() {
 
 function removeSidebarContainerElement() {
   const oldDivs = Array.from(document.getElementsByClassName('brC-aT5-aOt-Jw'));
-  oldDivs.forEach(oldDiv => {
+  oldDivs.forEach((oldDiv) => {
     const parent = oldDiv.parentNode;
     parent && parent.removeChild(oldDiv);
   });

@@ -13,7 +13,7 @@ export default function customStyle(root: Document = document) {
   if (!root.getElementById('inboxsdk__style')) {
     const style = root.createElement('style');
     style.id = 'inboxsdk__style';
-    cssContent.onValue(css => {
+    cssContent.onValue((css) => {
       style.textContent = rewriteCssWithIdMap(css);
     });
     if (!root.head) throw new Error('missing head');

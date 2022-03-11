@@ -35,23 +35,23 @@ const args = stdio.getopt({
   reloader: { key: 'r', description: 'Automatic extension reloader' },
   hot: { key: 'h', description: 'hot module replacement' },
   remote: {
-    description: 'Remote-loading bundle with integrated pageWorld script'
+    description: 'Remote-loading bundle with integrated pageWorld script',
   },
   integratedPageWorld: {
     description:
-      'Non-remote-loading bundle with integrated pageWorld script, for testing in projects that expect the remote-loading build'
+      'Non-remote-loading bundle with integrated pageWorld script, for testing in projects that expect the remote-loading build',
   },
   minify: { key: 'm', description: 'Minify build' },
   production: { key: 'p', description: 'Production build' },
   copyToStreak: {
     key: 'c',
-    description: 'Copy dev build to Streak dev build folder'
+    description: 'Copy dev build to Streak dev build folder',
   },
   fullPaths: {
     key: 'f',
     description:
-      'Use fullPaths browserify setting (for bundle size checking; recommended to use --minify with this)'
-  }
+      'Use fullPaths browserify setting (for bundle size checking; recommended to use --minify with this)',
+  },
 });
 
 // Don't let production be built without minification.
@@ -113,12 +113,9 @@ gulp.task('noop', () => {
 async function getVersion(): Promise<string> {
   const results = await Promise.all([
     exec('git rev-list HEAD --max-count=1'),
-    exec('git status --porcelain')
+    exec('git status --porcelain'),
   ]);
-  const commit = results[0]
-    .toString()
-    .trim()
-    .slice(0, 16);
+  const commit = results[0].toString().trim().slice(0, 16);
   const isModified = /^\s*M/m.test(results[1].toString());
 
   let version = `${packageJson.version}-${Date.now()}-${commit}`;
@@ -191,7 +188,7 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
     fullPaths: args.fullPaths,
     cache: {},
     packageCache: {},
-    standalone: options.standalone
+    standalone: options.standalone,
   })
     .transform(
       babelify.configure({
@@ -199,10 +196,10 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
           [
             'transform-inline-environment-variables',
             {
-              include: ['NODE_ENV', 'IMPLEMENTATION_URL', 'VERSION']
-            }
-          ]
-        ]
+              include: ['NODE_ENV', 'IMPLEMENTATION_URL', 'VERSION'],
+            },
+          ],
+        ],
       }),
       { extensions: ['.js', '.tsx', '.ts'] }
     )
@@ -230,8 +227,8 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
             // TODO check
             // preserveComments: 'some',
             mangle: {
-              reserved: ['Generator', 'GeneratorFunction']
-            }
+              reserved: ['Generator', 'GeneratorFunction'],
+            },
           })
         )
       )
@@ -239,7 +236,7 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
         // don't include sourcemap comment in the inboxsdk.js file that we
         // distribute to developers since it'd always be broken.
         addComment: !options.noSourceMapComment,
-        sourceMappingURLPrefix: options.sourceMappingURLPrefix
+        sourceMappingURLPrefix: options.sourceMappingURLPrefix,
       });
 
     const bundle = bundler.bundle();
@@ -258,7 +255,7 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
     }
 
     await new Promise((resolve, reject) => {
-      const errCb = _.once(err => {
+      const errCb = _.once((err) => {
         reject(err);
         result.end();
       });
@@ -306,7 +303,7 @@ gulp.task('pageWorld', () => {
     destName: 'pageWorld.js',
     // hotPort: 3142,
     sourceMappingURLPrefix: 'https://www.inboxsdk.com/build/',
-    writeToPackagesCore: true
+    writeToPackagesCore: true,
   });
 });
 
@@ -314,7 +311,7 @@ gulp.task('clean', async () => {
   await fs.promises.rm('./dist', { force: true, recursive: true });
   for (const filename of [
     './packages/core/inboxsdk.js',
-    './packages/core/pageWorld.js'
+    './packages/core/pageWorld.js',
   ]) {
     await fs.promises.rm(filename, { force: true });
     await fs.promises.rm(filename + '.map', { force: true });
@@ -329,7 +326,7 @@ if (args.remote) {
       standalone: 'InboxSDK',
       disableMinification: true,
       afterBuild: setupExamples,
-      noSourceMapComment: true
+      noSourceMapComment: true,
     });
   });
   gulp.task(
@@ -337,7 +334,7 @@ if (args.remote) {
     gulp.series('pageWorld', function impBundle() {
       return browserifyTask({
         entry: './src/platform-implementation-js/main-INTEGRATED-PAGEWORLD',
-        destName: 'platform-implementation.js'
+        destName: 'platform-implementation.js',
         // hotPort: 3141
       });
     })
@@ -354,7 +351,7 @@ if (args.remote) {
         standalone: 'InboxSDK',
         // hotPort: 3140,
         afterBuild: setupExamples,
-        noSourceMapComment: Boolean(args.production)
+        noSourceMapComment: Boolean(args.production),
       });
     })
   );
@@ -372,7 +369,7 @@ if (args.remote) {
       // hotPort: 3140,
       afterBuild: setupExamples,
       noSourceMapComment: Boolean(args.production),
-      writeToPackagesCore: true
+      writeToPackagesCore: true,
     });
   });
   gulp.task('remote', () => {

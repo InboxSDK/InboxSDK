@@ -19,11 +19,11 @@ const ARROW_VERTICAL_WIDTH = 9;
 type BoundingBox = [
   {
     x: number,
-    y: number
+    y: number,
   },
   {
     x: number,
-    y: number
+    y: number,
   }
 ];
 
@@ -32,7 +32,7 @@ type PositionType = 'left' | 'right' | 'top' | 'bottom';
 type BoundingBoxWrapper = {
   type: PositionType,
   value: BoundingBox,
-  smallestDistance?: number
+  smallestDistance?: number,
 };
 
 export default class GmailTooltipView {
@@ -83,7 +83,7 @@ export default class GmailTooltipView {
             value: this._getTopPositionBoundingBox(
               targetBoundingBox,
               tipBoundingBox
-            )
+            ),
           };
           break;
         case 'bottom':
@@ -92,7 +92,7 @@ export default class GmailTooltipView {
             value: this._getBottomPositionBoundingBox(
               targetBoundingBox,
               tipBoundingBox
-            )
+            ),
           };
           break;
       }
@@ -173,7 +173,7 @@ export default class GmailTooltipView {
         '<div class="T-P-atD"></div>',
         '<div class="T-P-atC"></div>',
         '</div>',
-        '</div>'
+        '</div>',
       ].join('');
 
       this._element.innerHTML = html;
@@ -197,7 +197,7 @@ export default class GmailTooltipView {
         image.addEventListener('load', (domEvent: any) => {
           asap(() => {
             this._eventStream.emit({
-              eventName: 'imageLoaded'
+              eventName: 'imageLoaded',
             });
           });
         });
@@ -237,34 +237,33 @@ export default class GmailTooltipView {
         value: this._getTopPositionBoundingBox(
           targetBoundingBox,
           tipBoundingBox
-        )
+        ),
       },
       {
         type: 'left',
         value: this._getLeftPositionBoundingBox(
           targetBoundingBox,
           tipBoundingBox
-        )
+        ),
       },
       {
         type: 'right',
         value: this._getRightPositionBoundingBox(
           targetBoundingBox,
           tipBoundingBox
-        )
+        ),
       },
       {
         type: 'bottom',
         value: this._getBottomPositionBoundingBox(
           targetBoundingBox,
           tipBoundingBox
-        )
-      }
+        ),
+      },
     ];
 
-    var bestBoundingBoxWrapper = this._figureOutBestBoundingBox(
-      boundingBoxWrappers
-    );
+    var bestBoundingBoxWrapper =
+      this._figureOutBestBoundingBox(boundingBoxWrappers);
     return bestBoundingBoxWrapper;
   }
 
@@ -282,12 +281,12 @@ export default class GmailTooltipView {
     return [
       {
         x: left,
-        y: top
+        y: top,
       },
       {
         x: left + tipBoundingBox.width,
-        y: top + tipBoundingBox.height
-      }
+        y: top + tipBoundingBox.height,
+      },
     ];
   }
 
@@ -304,12 +303,12 @@ export default class GmailTooltipView {
     return [
       {
         x: left,
-        y: top
+        y: top,
       },
       {
         x: left + tipBoundingBox.width,
-        y: top + tipBoundingBox.height
-      }
+        y: top + tipBoundingBox.height,
+      },
     ];
   }
 
@@ -326,12 +325,12 @@ export default class GmailTooltipView {
     return [
       {
         x: left,
-        y: top
+        y: top,
       },
       {
         x: left + tipBoundingBox.width,
-        y: top + tipBoundingBox.height
-      }
+        y: top + tipBoundingBox.height,
+      },
     ];
   }
 
@@ -349,12 +348,12 @@ export default class GmailTooltipView {
     return [
       {
         x: left,
-        y: top
+        y: top,
       },
       {
         x: left + tipBoundingBox.width,
-        y: top + tipBoundingBox.height
-      }
+        y: top + tipBoundingBox.height,
+      },
     ];
   }
 
@@ -367,7 +366,7 @@ export default class GmailTooltipView {
       );
     }
 
-    return sortBy(boundingBoxWrappers, function(boundingBoxWrapper) {
+    return sortBy(boundingBoxWrappers, function (boundingBoxWrapper) {
       return boundingBoxWrapper.smallestDistance;
     }).reverse()[0];
   }
@@ -379,10 +378,10 @@ export default class GmailTooltipView {
       ((document.body: any): HTMLElement).clientWidth -
         boundingBoxWrapper.value[1].x, //right
       ((document.body: any): HTMLElement).clientHeight -
-        boundingBoxWrapper.value[1].y //bottom
+        boundingBoxWrapper.value[1].y, //bottom
     ];
 
-    return sortBy(distances, function(distance) {
+    return sortBy(distances, function (distance) {
       return distance;
     })[0];
   }

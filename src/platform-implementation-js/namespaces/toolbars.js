@@ -15,7 +15,7 @@ type Members = {|
   appId: string,
   driver: Driver,
   membrane: Membrane,
-  piOpts: PiOpts
+  piOpts: PiOpts,
 |};
 
 const memberMap: WeakMap<Toolbars, Members> = new WeakMap();
@@ -35,7 +35,7 @@ export default class Toolbars extends EventEmitter {
       appId,
       driver,
       membrane,
-      piOpts
+      piOpts,
     };
     memberMap.set(this, members);
   }
@@ -63,19 +63,19 @@ export default class Toolbars extends EventEmitter {
     const registerThreadButton = () => {
       return members.driver.registerThreadButton({
         ..._buttonDescriptor,
-        onClick: event => {
+        onClick: (event) => {
           if (!_buttonDescriptor.onClick) return;
           _buttonDescriptor.onClick({
             position: event.position,
             dropdown: event.dropdown,
-            selectedThreadViews: event.selectedThreadViewDrivers.map(x =>
+            selectedThreadViews: event.selectedThreadViewDrivers.map((x) =>
               members.membrane.get(x)
             ),
-            selectedThreadRowViews: event.selectedThreadRowViewDrivers.map(x =>
-              members.membrane.get(x)
-            )
+            selectedThreadRowViews: event.selectedThreadRowViewDrivers.map(
+              (x) => members.membrane.get(x)
+            ),
           });
-        }
+        },
       });
     };
 
@@ -87,7 +87,7 @@ export default class Toolbars extends EventEmitter {
       const sub = members.driver
         .getRouteViewDriverStream()
         .takeUntilBy(stopper)
-        .onValue(routeViewDriver => {
+        .onValue((routeViewDriver) => {
           const routeView = members.membrane.get(routeViewDriver);
           if (hideFor(routeView)) {
             if (currentRemover) {
@@ -119,7 +119,7 @@ export default class Toolbars extends EventEmitter {
       title: buttonDescriptor.title,
       iconUrl: buttonDescriptor.iconUrl,
       iconClass: buttonDescriptor.iconClass,
-      onClick: event => {
+      onClick: (event) => {
         if (!buttonDescriptor.onClick) return;
         buttonDescriptor.onClick({
           dropdown: event.dropdown,
@@ -131,13 +131,13 @@ export default class Toolbars extends EventEmitter {
                 'Toolbars.registerToolbarButtonForList onClick event.threadRowViews'
               );
             return event.selectedThreadRowViews;
-          }
+          },
         });
       },
       hasDropdown: buttonDescriptor.hasDropdown,
       orderHint: buttonDescriptor.orderHint,
       hideFor: buttonDescriptor.hideFor,
-      keyboardShortcutHandle: buttonDescriptor.keyboardShortcutHandle
+      keyboardShortcutHandle: buttonDescriptor.keyboardShortcutHandle,
     });
   }
 
@@ -149,19 +149,19 @@ export default class Toolbars extends EventEmitter {
       title: buttonDescriptor.title,
       iconUrl: buttonDescriptor.iconUrl,
       iconClass: buttonDescriptor.iconClass,
-      onClick: event => {
+      onClick: (event) => {
         if (event.selectedThreadViews.length !== 1)
           throw new Error('should not happen');
         if (!buttonDescriptor.onClick) return;
         buttonDescriptor.onClick({
           dropdown: event.dropdown,
-          threadView: event.selectedThreadViews[0]
+          threadView: event.selectedThreadViews[0],
         });
       },
       hasDropdown: buttonDescriptor.hasDropdown,
       orderHint: buttonDescriptor.orderHint,
       hideFor: buttonDescriptor.hideFor,
-      keyboardShortcutHandle: buttonDescriptor.keyboardShortcutHandle
+      keyboardShortcutHandle: buttonDescriptor.keyboardShortcutHandle,
     });
   }
 

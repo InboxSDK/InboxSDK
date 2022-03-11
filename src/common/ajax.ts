@@ -38,7 +38,7 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
   if (!opts || typeof opts.url !== 'string') {
     throw new Error('URL must be given');
   }
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     const method = opts.method ? opts.method : 'GET';
     let url = opts.url;
     let stringData: string | null = null;
@@ -74,7 +74,7 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
     const XMLHttpRequest = opts.XMLHttpRequest || window.XMLHttpRequest;
     const xhr = new XMLHttpRequest();
     Object.assign(xhr, opts.xhrFields);
-    xhr.onerror = function(event) {
+    xhr.onerror = function (event) {
       if ((opts.retryNum || 0) < MAX_RETRIES) {
         if (
           xhr.status === 502 ||
@@ -88,7 +88,7 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
       const err = Object.assign(new Error(`Failed to load ${url}`) as any, {
         event,
         xhr,
-        status: xhr.status
+        status: xhr.status,
       });
 
       // give a way for a server to tell us to go away for now. Good fallback
@@ -98,11 +98,11 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
       }
       reject(err);
     };
-    xhr.onload = function(event) {
+    xhr.onload = function (event) {
       if (xhr.status === 200) {
         resolve({
           xhr,
-          text: xhr.responseText
+          text: xhr.responseText,
         });
       } else {
         xhr.onerror!(event);
@@ -111,7 +111,7 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
     xhr.open(method, url, true);
     if (opts.headers) {
       const { headers } = opts;
-      Object.keys(headers).forEach(name => {
+      Object.keys(headers).forEach((name) => {
         const value = headers[name];
         xhr.setRequestHeader(name, value);
       });

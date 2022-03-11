@@ -5,8 +5,8 @@ export default function makeMutationObserverChunkedStream(
   element: HTMLElement,
   options: MutationObserverInit
 ): Kefir.Observable<MutationRecord[], never> {
-  return Kefir.stream(emitter => {
-    const observer = new MutationObserver(mutations => {
+  return Kefir.stream((emitter) => {
+    const observer = new MutationObserver((mutations) => {
       // Work around Safari bug where sometimes mutations is an instance of a
       // different context's Array.
       emitter.emit(

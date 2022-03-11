@@ -52,7 +52,7 @@ export default class NavMenu {
 function _setupSentMail(appId, driver) {
   const nativeNavItemView = new NativeNavItemView(appId, driver, 'sent');
 
-  driver.getSentMailNativeNavItem().then(function(sentMailNavItemViewDriver) {
+  driver.getSentMailNativeNavItem().then(function (sentMailNavItemViewDriver) {
     nativeNavItemView.setNavItemViewDriver(sentMailNavItemViewDriver);
   });
 

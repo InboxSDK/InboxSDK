@@ -24,7 +24,7 @@ export default function overrideEditSubject(
       gmailDriver
         .getLogger()
         .error(new Error('could not find edit subject item'), {
-          composeElement: censorHTMLtree(gmailComposeView.getElement())
+          composeElement: censorHTMLtree(gmailComposeView.getElement()),
         });
       hasLoggedError = true;
     }
@@ -66,17 +66,19 @@ function _cloneContentToNewCompose(gmailDriver, gmailComposeView) {
     .openNewComposeViewDriver()
     .then((newComposeView: GmailComposeView) => {
       if (toRecipients.length > 0)
-        newComposeView.setToRecipients(toRecipients.map(c => c.emailAddress));
+        newComposeView.setToRecipients(toRecipients.map((c) => c.emailAddress));
       if (ccRecipients.length > 0)
-        newComposeView.setCcRecipients(ccRecipients.map(c => c.emailAddress));
+        newComposeView.setCcRecipients(ccRecipients.map((c) => c.emailAddress));
       if (bccRecipients.length > 0)
-        newComposeView.setBccRecipients(bccRecipients.map(c => c.emailAddress));
+        newComposeView.setBccRecipients(
+          bccRecipients.map((c) => c.emailAddress)
+        );
 
       newComposeView.setFromEmail(fromAddress.emailAddress);
       newComposeView.setSubject(subject);
       newComposeView.setBodyHTML(body);
 
-      setTimeout(function() {
+      setTimeout(function () {
         newComposeView.getSubjectInput().select();
       }, 1);
     });

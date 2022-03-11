@@ -2,7 +2,7 @@
 
 type Recipient = {
   emailAddress: string,
-  name: ?string
+  name: ?string,
 };
 
 export type SyncThread = {|
@@ -16,9 +16,9 @@ export type SyncThread = {|
     syncMessageData: Array<{
       syncMessageID: string,
       date: number,
-      recipients?: Recipient[]
-    }>
-  }
+      recipients?: Recipient[],
+    }>,
+  },
 |};
 
 export type MinimalSyncThread = {|
@@ -27,9 +27,9 @@ export type MinimalSyncThread = {|
     syncMessageData: Array<{
       syncMessageID: string,
       date: number,
-      recipients?: Recipient[]
-    }>
-  }
+      recipients?: Recipient[],
+    }>,
+  },
 |};
 
 declare export function extractThreadsFromSearchResponse(

@@ -95,8 +95,9 @@ export default function updateIcon(
         insertBeforeEl
       );
     } else {
-      (iconSettings.iconImgElement!
-        .firstElementChild! as HTMLImageElement).src = newIconUrl;
+      (
+        iconSettings.iconImgElement!.firstElementChild! as HTMLImageElement
+      ).src = newIconUrl;
     }
 
     iconSettings.iconImgElement.setAttribute(

@@ -16,7 +16,7 @@ export default function reemitClickEvent(event: MouseEvent) {
     ctrlKey: { value: event.ctrlKey },
     shiftKey: { value: event.shiftKey },
     altKey: { value: event.altKey },
-    metaKey: { value: event.metaKey }
+    metaKey: { value: event.metaKey },
   });
   document.dispatchEvent(fakeEvent);
 }

@@ -37,7 +37,7 @@ export default class DropdownView extends EventEmitter {
     this._options = {
       ...(dropdownViewDriver.getDropdownOptions &&
         dropdownViewDriver.getDropdownOptions()),
-      ...options
+      ...options,
     };
     this.el = dropdownViewDriver.getContentElement();
 
@@ -63,14 +63,14 @@ export default class DropdownView extends EventEmitter {
 
     outsideClicksAndEscape(elementsToIgnore)
       .takeUntilBy(onDestroy)
-      .filter(event => {
+      .filter((event) => {
         let isCanceled = false;
         const appEvent = {
           type: event.type,
           cause: event.cause,
           cancel: () => {
             isCanceled = true;
-          }
+          },
         };
         this.emit('preautoclose', appEvent);
         return !isCanceled;
@@ -105,7 +105,7 @@ export default class DropdownView extends EventEmitter {
             childList: true,
             attributes: true,
             characterData: true,
-            subtree: true
+            subtree: true,
           }
         )
           .throttle(200)

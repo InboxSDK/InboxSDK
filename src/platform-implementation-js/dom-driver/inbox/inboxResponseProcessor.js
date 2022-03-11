@@ -11,5 +11,5 @@ export function extractMessageIdsFromThreadResponse(
     threadResponse[2][0][3];
   if (!messageDescriptors) throw new Error('Failed to process thread response');
 
-  return messageDescriptors.map(descriptor => descriptor[1]).filter(Boolean);
+  return messageDescriptors.map((descriptor) => descriptor[1]).filter(Boolean);
 }

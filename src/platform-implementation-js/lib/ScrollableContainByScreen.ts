@@ -19,8 +19,8 @@ export default class ScrollableContainByScreen {
       Kefir.fromEvents(window, 'resize'),
       fromEventsWithOptions(window, 'scroll', {
         capture: true,
-        passive: true
-      }).filter(event => event.target.contains(anchorPoint))
+        passive: true,
+      }).filter((event) => event.target.contains(anchorPoint)),
     ])
       .toProperty(() => null)
       .takeUntilBy(this._stopper)

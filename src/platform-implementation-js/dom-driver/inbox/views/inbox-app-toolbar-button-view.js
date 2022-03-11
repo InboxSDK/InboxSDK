@@ -33,24 +33,24 @@ class InboxAppToolbarButtonView {
     Kefir.combine(
       [
         toItemWithLifetimeStream(searchBarLiveSet).take(1),
-        toItemWithLifetimeStream(appToolbarLocationLiveSet).take(1)
+        toItemWithLifetimeStream(appToolbarLocationLiveSet).take(1),
       ],
       [],
-      searchBar => searchBar
+      (searchBar) => searchBar
     )
       .map(({ el: node }) => node.getValue())
       .takeUntilBy(this._stopper)
-      .onValue(el => this._adjustSearchBarMargin(el));
+      .onValue((el) => this._adjustSearchBarMargin(el));
 
     toItemWithLifetimeStream(appToolbarLocationLiveSet)
       .take(1)
       .map(({ el: node }) => node.getValue())
       .takeUntilBy(this._stopper)
-      .onValue(el => this._setupButton(el));
+      .onValue((el) => this._setupButton(el));
   }
 
   _setupButton(appToolbarLocation: HTMLElement) {
-    let appToolbarButtonContainer = find(appToolbarLocation.children, el =>
+    let appToolbarButtonContainer = find(appToolbarLocation.children, (el) =>
       el.classList.contains('inboxsdk__appButton_container')
     );
     if (!appToolbarButtonContainer) {
@@ -71,22 +71,23 @@ class InboxAppToolbarButtonView {
     buttonImg.className = 'inboxsdk__button_iconImg';
     button.appendChild(buttonImg);
 
-    this._buttonDescriptorStream.onValue(buttonDescriptor => {
+    this._buttonDescriptorStream.onValue((buttonDescriptor) => {
       button.title = buttonDescriptor.title;
       buttonImg.src = buttonDescriptor.iconUrl;
-      buttonImg.className = `inboxsdk__button_iconImg ${buttonDescriptor.iconClass ||
-        ''}`;
+      buttonImg.className = `inboxsdk__button_iconImg ${
+        buttonDescriptor.iconClass || ''
+      }`;
       this._buttonDescriptor = buttonDescriptor;
     });
 
     Kefir.merge([
       Kefir.fromEvents(button, 'click'),
-      Kefir.fromEvents(button, 'keypress').filter(e =>
+      Kefir.fromEvents(button, 'keypress').filter((e) =>
         includes([32 /*space*/, 13 /*enter*/], e.which)
-      )
+      ),
     ])
       .takeUntilBy(this._stopper)
-      .onValue(event => {
+      .onValue((event) => {
         event.preventDefault();
         event.stopPropagation();
         if (this._activeDropdown) {

@@ -4,10 +4,10 @@ import type { Driver } from '../driver-interfaces/driver';
 
 type Options =
   | {
-      oldGmailMessageID: string
+      oldGmailMessageID: string,
     }
   | {
-      syncMessageID: string
+      syncMessageID: string,
     };
 
 declare export default function getOriginalMessagePage(

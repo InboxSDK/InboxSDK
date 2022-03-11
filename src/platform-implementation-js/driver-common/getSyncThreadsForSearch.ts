@@ -19,14 +19,14 @@ async function getSyncThreadsForSearch(
         .getPageCommunicator()
         .getXsrfToken(),
       'X-Gmail-BTAI': await driver.getPageCommunicator().getBtaiHeader(),
-      'X-Google-BTD': '1'
+      'X-Google-BTD': '1',
     },
     data: JSON.stringify({
       '1': {
         '2': 1,
-        '4': searchTerm
-      }
-    })
+        '4': searchTerm,
+      },
+    }),
   });
 
   return { threads: extractThreadsFromSearchResponse(text), _text: text };

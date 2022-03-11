@@ -8,7 +8,7 @@ export default async function getRfcMessageIdForGmailMessageId(
   gmailMessageId: string
 ): Promise<string> {
   const text = await getOriginalMessagePage(driver, {
-    oldGmailMessageID: gmailMessageId
+    oldGmailMessageID: gmailMessageId,
   });
   const match = text.match(/^Message-ID:\s+(\S+)\s*$/im);
   if (!match) {

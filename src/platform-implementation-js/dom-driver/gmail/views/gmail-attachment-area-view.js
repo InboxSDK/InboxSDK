@@ -32,7 +32,7 @@ const GmailAttachmentAreaView = defn(
     }
 
     destroy() {
-      this.getAttachmentCardViews().forEach(view => {
+      this.getAttachmentCardViews().forEach((view) => {
         view.destroy();
       });
     }
@@ -43,7 +43,7 @@ const GmailAttachmentAreaView = defn(
 
     getAttachmentCardViews() {
       const attachments = this._element.querySelectorAll('.aQH > span');
-      return Array.from(attachments).map(attachment => {
+      return Array.from(attachments).map((attachment) => {
         let cardView = this._elsToCardViews.get(attachment);
         if (!cardView) {
           cardView = new GmailAttachmentCardView(
@@ -67,7 +67,7 @@ const GmailAttachmentAreaView = defn(
         '<div></div>',
         '<div class="aQH">',
         '<div class="aZK"></div>',
-        '</div>'
+        '</div>',
       ].join('');
     }
 
@@ -117,7 +117,7 @@ const GmailAttachmentAreaView = defn(
         iconClass: 'T-I-J3',
         iconUrl: options.iconUrl,
         tooltip: options.tooltip,
-        hasButtonToLeft: true
+        hasButtonToLeft: true,
       });
 
       buttonView.addClass('aZj');
@@ -129,7 +129,7 @@ const GmailAttachmentAreaView = defn(
             options.onClick();
           }
         },
-        buttonView: buttonView
+        buttonView: buttonView,
       });
 
       const toolbar = this._createAreaToolbarIfNeeded();

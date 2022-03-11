@@ -108,7 +108,7 @@ class GmailRouteView {
     }
     var rowListViews = this._rowListViews;
     this._rowListViews = [];
-    rowListViews.forEach(view => {
+    rowListViews.forEach((view) => {
       view.destroy();
     });
     if (this._threadView) {
@@ -158,7 +158,7 @@ class GmailRouteView {
       if (routeID) {
         const routeIDParams = this._extractParamKeysFromRouteID(routeID);
         const routeParams = {};
-        routeIDParams.forEach(function(param) {
+        routeIDParams.forEach(function (param) {
           if (params[param]) {
             routeParams[param] = params[param];
           }
@@ -210,10 +210,10 @@ class GmailRouteView {
     var sectionsContainer = this._getSectionsContainer();
     gmailResultsSectionView
       .getEventStream()
-      .filter(function(event) {
+      .filter(function (event) {
         return event.type === 'update' && event.property === 'orderHint';
       })
-      .onValue(function() {
+      .onValue(function () {
         var children = sectionsContainer.children;
         var insertBeforeElement = getInsertBeforeElement(
           gmailResultsSectionView.getElement(),
@@ -254,7 +254,7 @@ class GmailRouteView {
 
     makeMutationObserverChunkedStream(leftNav, {
       attributes: true,
-      attributeFilter: ['style']
+      attributeFilter: ['style'],
     })
       .takeUntilBy(this._stopper)
       .onValue(() => {
@@ -267,8 +267,10 @@ class GmailRouteView {
     const gtalkButtons = GmailElementGetter.getGtalkButtons();
     const customViewEl = this._customViewElement;
     if (!leftNav || !customViewEl) throw new Error('Should not happen');
-    customViewEl.style.height = `${parseInt(leftNav.style.height, 10) +
-      (gtalkButtons ? gtalkButtons.offsetHeight : 0)}px`;
+    customViewEl.style.height = `${
+      parseInt(leftNav.style.height, 10) +
+      (gtalkButtons ? gtalkButtons.offsetHeight : 0)
+    }px`;
   }
 
   _setupSubViews() {
@@ -284,7 +286,7 @@ class GmailRouteView {
   _setupRowListViews() {
     var rowListElements = GmailElementGetter.getRowListElements();
 
-    Array.prototype.forEach.call(rowListElements, rowListElement => {
+    Array.prototype.forEach.call(rowListElements, (rowListElement) => {
       this._processRowListElement(rowListElement);
     });
   }
@@ -302,7 +304,7 @@ class GmailRouteView {
 
     this._eventStream.emit({
       eventName: 'newGmailRowListView',
-      view: gmailRowListView
+      view: gmailRowListView,
     });
   }
 
@@ -319,7 +321,7 @@ class GmailRouteView {
 
       this._eventStream.emit({
         eventName: 'newGmailThreadView',
-        view: gmailThreadView
+        view: gmailThreadView,
       });
     } else {
       // This element is always present in thread lists, but it only has contents
@@ -344,9 +346,9 @@ class GmailRouteView {
       }
       Kefir.fromEvents(scrollContainer, 'scroll')
         .throttle(SCROLL_DEBOUNCE_MS)
-        .map(e => e.target.scrollTop)
+        .map((e) => e.target.scrollTop)
         .takeUntilBy(this._stopper)
-        .onValue(scrollTop => {
+        .onValue((scrollTop) => {
           this._cachedRouteData.scrollTop = scrollTop;
         });
     }
@@ -360,21 +362,21 @@ class GmailRouteView {
 
     const elementStream = makeElementChildStream(
       threadContainerTableElement
-    ).filter(event => !!event.el.querySelector('.if'));
+    ).filter((event) => !!event.el.querySelector('.if'));
 
     this._eventStream.plug(
       elementStream
         .flatMap(
           makeElementViewStream(
-            element =>
+            (element) =>
               new (GmailThreadView: any)(element, this, this._driver, true)
           )
         )
-        .map(view => {
+        .map((view) => {
           this._threadView = view;
           return {
             eventName: 'newGmailThreadView',
-            view: view
+            view: view,
           };
         })
     );
@@ -385,9 +387,8 @@ class GmailRouteView {
     if (!main) throw new Error('should not happen');
     let sectionsContainer = main.querySelector('.inboxsdk__custom_sections');
     if (!sectionsContainer) {
-      sectionsContainer = this._sectionsContainer = document.createElement(
-        'div'
-      );
+      sectionsContainer = this._sectionsContainer =
+        document.createElement('div');
       sectionsContainer.classList.add('inboxsdk__custom_sections');
 
       main.insertBefore(sectionsContainer, main.firstChild);
@@ -481,13 +482,13 @@ class GmailRouteView {
     return {
       query: this._paramsArray[0],
       includesDriveResults: this._name === 'apps',
-      page: this._getPageParam()
+      page: this._getPageParam(),
     };
   }
 
   _getListRouteParams(): Object {
     var params: Object = {
-      page: this._getPageParam()
+      page: this._getPageParam(),
     };
 
     if (
@@ -510,7 +511,7 @@ class GmailRouteView {
           threadID[0] === '#') //new sync style thread id
       ) {
         return {
-          threadID: threadID.replace('#', '')
+          threadID: threadID.replace('#', ''),
         };
       }
     }
@@ -536,7 +537,7 @@ class GmailRouteView {
 
   _getSettingsRouteParams(): Object {
     return {
-      tabName: this._paramsArray[0]
+      tabName: this._paramsArray[0],
     };
   }
 
@@ -583,8 +584,8 @@ class GmailRouteView {
   _extractParamKeysFromRouteID(routeID: string): string[] {
     return routeID
       .split('/')
-      .filter(part => part[0] === ':')
-      .map(part => part.substring(1));
+      .filter((part) => part[0] === ':')
+      .map((part) => part.substring(1));
   }
 
   _getThreadContainerElement: () => ?HTMLElement = once(() => {

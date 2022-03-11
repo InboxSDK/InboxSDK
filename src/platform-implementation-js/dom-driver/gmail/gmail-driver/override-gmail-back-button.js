@@ -12,7 +12,7 @@ export default function overrideGmailBackButton(
   gmailDriver: GmailDriver,
   gmailRouteProcessor: GmailRouteProcessor
 ) {
-  GmailElementGetter.waitForGmailModeToSettle().then(function() {
+  GmailElementGetter.waitForGmailModeToSettle().then(function () {
     if (GmailElementGetter.isStandalone()) {
       return;
     }
@@ -53,20 +53,23 @@ function _setupManagement(gmailDriver, gmailRouteProcessor) {
     });
 }
 
-const handleGmailRouteView = defn(module, function handleGmailRouteView(
-  gmailRouteView: GmailRouteView,
-  lastCustomRouteID: ?string,
-  lastCustomRouteParams: ?Object,
-  gmailDriver: GmailDriver,
-  gmailRouteProcessor: GmailRouteProcessor
-) {
-  if (
-    lastCustomRouteID &&
-    gmailRouteView.getRouteType() === gmailRouteProcessor.RouteTypes.THREAD
+const handleGmailRouteView = defn(
+  module,
+  function handleGmailRouteView(
+    gmailRouteView: GmailRouteView,
+    lastCustomRouteID: ?string,
+    lastCustomRouteParams: ?Object,
+    gmailDriver: GmailDriver,
+    gmailRouteProcessor: GmailRouteProcessor
   ) {
-    _bindToBackButton(gmailDriver, gmailRouteView);
+    if (
+      lastCustomRouteID &&
+      gmailRouteView.getRouteType() === gmailRouteProcessor.RouteTypes.THREAD
+    ) {
+      _bindToBackButton(gmailDriver, gmailRouteView);
+    }
   }
-});
+);
 
 function _bindToBackButton(
   gmailDriver: GmailDriver,
@@ -80,8 +83,8 @@ function _bindToBackButton(
 
   onMouseDownAndUp(backButton)
     .takeUntilBy(gmailRouteView.getStopper())
-    .filter(e => !e.defaultPrevented)
-    .onValue(e => {
+    .filter((e) => !e.defaultPrevented)
+    .onValue((e) => {
       window.history.back();
       e.preventDefault();
       e.stopImmediatePropagation();

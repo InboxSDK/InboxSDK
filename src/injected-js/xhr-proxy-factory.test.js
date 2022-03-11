@@ -20,7 +20,7 @@ function logError(error, label) {
 }
 
 function thrower(err) {
-  return function() {
+  return function () {
     if (typeof err == 'string') {
       throw new Error(err);
     } else if (err) {
@@ -48,7 +48,7 @@ server.respondWith(
     status: 200,
     response: 'Response here!',
     partialResponse: 'Response here',
-    headers: { 'X-Test': 'Header Value' }
+    headers: { 'X-Test': 'Header Value' },
   }
 );
 server.respondWith(
@@ -79,11 +79,11 @@ const XMLHttpRequest = server.XMLHttpRequest;
 
 const constructors: { [name: string]: typeof XMLHttpRequest } = {
   XMLHttpRequest: XMLHttpRequest,
-  XHRProxy: XHRProxyFactory(XMLHttpRequest, [], { logError: logError })
+  XHRProxy: XHRProxyFactory(XMLHttpRequest, [], { logError: logError }),
 };
 
 constructors['XHRProxy²'] = XHRProxyFactory(constructors.XHRProxy, [], {
-  logError: logError
+  logError: logError,
 });
 constructors['XHRProxy with changers'] = XHRProxyFactory(
   XMLHttpRequest,
@@ -95,8 +95,8 @@ constructors['XHRProxy with changers'] = XHRProxyFactory(
       },
       responseTextChanger(connection, response) {
         return Promise.resolve(response);
-      }
-    }
+      },
+    },
   ],
   { logError: logError }
 );
@@ -107,7 +107,7 @@ beforeEach(() => {
 
 // Test both the mock and the instrumented version
 ['XMLHttpRequest', 'XHRProxy', 'XHRProxy²', 'XHRProxy with changers'].forEach(
-  XHRName => {
+  (XHRName) => {
     describe(XHRName, () => {
       let XHRConstructor: typeof XMLHttpRequest;
       let xhr: XMLHttpRequest;
@@ -116,12 +116,12 @@ beforeEach(() => {
         xhr = new XHRConstructor();
       });
 
-      ['onreadystatechange', 'addEventListener'].forEach(method => {
+      ['onreadystatechange', 'addEventListener'].forEach((method) => {
         describe(method, () => {
-          it('should call all states and work on re-used object', done => {
+          it('should call all states and work on re-used object', (done) => {
             const calledForState = { '1': 0, '2': 0, '3': 0, '4': 0 };
             let runCount = 0;
-            const listener = function(event: Object) {
+            const listener = function (event: Object) {
               assert.strictEqual(this, xhr, 'check for correct this binding');
               assert.strictEqual(
                 event.target,
@@ -165,7 +165,7 @@ beforeEach(() => {
                     '1': runCount,
                     '2': runCount,
                     '3': runCount,
-                    '4': runCount
+                    '4': runCount,
                   },
                   'check that listener was called for each state'
                 );
@@ -193,16 +193,16 @@ beforeEach(() => {
       });
 
       describe('multiple event listeners', () => {
-        it('should fire both together', done => {
+        it('should fire both together', (done) => {
           let simpleFired = false,
             addedFired = false;
-          xhr.onreadystatechange = function(event) {
+          xhr.onreadystatechange = function (event) {
             simpleFired = true;
           };
-          xhr.addEventListener('readystatechange', function(event: Object) {
+          xhr.addEventListener('readystatechange', function (event: Object) {
             addedFired = true;
           });
-          xhr.addEventListener('readystatechange', function(event: Object) {
+          xhr.addEventListener('readystatechange', function (event: Object) {
             if (this.readyState == 4) {
               assert(
                 simpleFired && addedFired,
@@ -217,12 +217,12 @@ beforeEach(() => {
       });
 
       describe('removeEventListener', () => {
-        it('should work', done => {
-          const badListener = function(event: Object) {
+        it('should work', (done) => {
+          const badListener = function (event: Object) {
             throw new Error('this listener should have been removed');
           };
           xhr.addEventListener('readystatechange', badListener);
-          xhr.addEventListener('readystatechange', function(event: Object) {
+          xhr.addEventListener('readystatechange', function (event: Object) {
             if (this.readyState == 4) {
               done();
             }
@@ -234,9 +234,9 @@ beforeEach(() => {
       });
 
       describe('abort', () => {
-        it('should work after send', done => {
+        it('should work after send', (done) => {
           let finishCount = 0;
-          xhr.onreadystatechange = function() {
+          xhr.onreadystatechange = function () {
             if (this.readyState == 4) {
               if (finishCount++ === 0) {
                 assert.equal(
@@ -263,7 +263,7 @@ beforeEach(() => {
       });
 
       describe('open', () => {
-        it('should cancel active request but without abort event', done => {
+        it('should cancel active request but without abort event', (done) => {
           xhr.onreadystatechange = sinon.spy();
           xhr.onabort = xhr.onerror = xhr.onload = xhr.onloadend = thrower();
           xhr.open('GET', '/foo');
@@ -276,10 +276,10 @@ beforeEach(() => {
           xhr.open('GET', '/foo2');
           xhr.send();
           const stateCounts = { '1': 0, '2': 0, '3': 0, '4': 0 };
-          xhr.onreadystatechange = function() {
+          xhr.onreadystatechange = function () {
             stateCounts[xhr.readyState]++;
           };
-          xhr.onload = function() {
+          xhr.onload = function () {
             assert.deepEqual(stateCounts, { '1': 0, '2': 1, '3': 1, '4': 1 });
             assert.strictEqual(xhr.responseText, 'foo2 response!');
             done();
@@ -291,7 +291,7 @@ beforeEach(() => {
       describe('sync', () => {
         it('can do synchronous requests', () => {
           const onloadSpy = sinon.spy();
-          xhr.onload = function() {
+          xhr.onload = function () {
             assert.strictEqual(this, xhr, 'this check');
             onloadSpy();
           };
@@ -304,7 +304,7 @@ beforeEach(() => {
 
         it('async arg as undefined counts as false', () => {
           const onloadSpy = sinon.spy();
-          xhr.onload = function() {
+          xhr.onload = function () {
             assert.strictEqual(this, xhr, 'this check');
             onloadSpy();
           };
@@ -317,18 +317,18 @@ beforeEach(() => {
       });
 
       describe('events', () => {
-        it('readystatechange', done => {
+        it('readystatechange', (done) => {
           const step = _.after(2, done);
           function checkEvent(event: Event) {
             assert.strictEqual(event.target, xhr);
             step();
           }
-          xhr.onreadystatechange = function(event) {
+          xhr.onreadystatechange = function (event) {
             if (this.readyState == 4) {
               step();
             }
           };
-          xhr.addEventListener('readystatechange', function(event: Object) {
+          xhr.addEventListener('readystatechange', function (event: Object) {
             if (this.readyState == 4) {
               step();
             }
@@ -337,7 +337,7 @@ beforeEach(() => {
           xhr.send();
         });
 
-        it('load', done => {
+        it('load', (done) => {
           const step = _.after(2, done);
           function checkEvent(event: Object) {
             assert.strictEqual(event.target, xhr);
@@ -353,7 +353,7 @@ beforeEach(() => {
           xhr.send();
         });
 
-        it('loadstart', done => {
+        it('loadstart', (done) => {
           const step = _.after(2, done);
           function checkEvent(event: Object) {
             assert.strictEqual(event.target, xhr);
@@ -369,7 +369,7 @@ beforeEach(() => {
           xhr.abort();
         });
 
-        it('loadend', done => {
+        it('loadend', (done) => {
           const step = _.after(4, done);
           function checkEvent(event: Object) {
             assert.strictEqual(event.target, xhr);
@@ -386,7 +386,7 @@ beforeEach(() => {
           xhr.send();
         });
 
-        it('error', done => {
+        it('error', (done) => {
           const step = _.after(4, done);
           function checkEvent(event: Object) {
             assert.strictEqual(event.target, xhr);
@@ -404,7 +404,7 @@ beforeEach(() => {
           xhr.send();
         });
 
-        it('abort', done => {
+        it('abort', (done) => {
           const step = _.after(2, done);
           function checkEvent(event: Object) {
             assert.strictEqual(event.target, xhr);
@@ -422,18 +422,18 @@ beforeEach(() => {
       });
 
       describe('post', () => {
-        it('works', done => {
+        it('works', (done) => {
           xhr.open('POST', '/foo');
-          xhr.onload = function() {
+          xhr.onload = function () {
             assert.strictEqual(xhr.responseText, 'body received');
             done();
           };
           xhr.send('somedata');
         });
 
-        it('works without body', done => {
+        it('works without body', (done) => {
           xhr.open('POST', '/foo');
-          xhr.onload = function() {
+          xhr.onload = function () {
             assert.strictEqual(xhr.responseText, 'POST request');
             done();
           };
@@ -458,9 +458,9 @@ beforeEach(() => {
       });
 
       describe('responseType', () => {
-        it('supports non-text values', done => {
+        it('supports non-text values', (done) => {
           xhr.responseType = 'testing';
-          xhr.onreadystatechange = function() {
+          xhr.onreadystatechange = function () {
             if (this.readyState == 4) {
               assert.equal(xhr.response, 'testing here!');
               let rt = '';
@@ -477,8 +477,8 @@ beforeEach(() => {
           xhr.send();
         });
 
-        it('supports responseXml', done => {
-          xhr.onload = function() {
+        it('supports responseXml', (done) => {
+          xhr.onload = function () {
             assert.equal(xhr.responseText, 'testing here!');
             assert.deepEqual(xhr.responseXML, { fakeXml: true });
             done();
@@ -489,8 +489,8 @@ beforeEach(() => {
       });
 
       describe('getResponseHeader', () => {
-        it('should work', done => {
-          xhr.onreadystatechange = function() {
+        it('should work', (done) => {
+          xhr.onreadystatechange = function () {
             if (this.readyState < 2) {
               assert.strictEqual(xhr.getResponseHeader('X-Test'), null);
             } else {
@@ -509,15 +509,13 @@ beforeEach(() => {
       });
 
       describe('getAllResponseHeaders', () => {
-        it('should work', done => {
-          xhr.onreadystatechange = function() {
+        it('should work', (done) => {
+          xhr.onreadystatechange = function () {
             if (this.readyState < 2) {
               assert.strictEqual(xhr.getAllResponseHeaders(), null);
             } else {
               assert.equal(
-                this.getAllResponseHeaders()
-                  .trim()
-                  .toLowerCase(),
+                this.getAllResponseHeaders().trim().toLowerCase(),
                 'x-test: header value'
               );
             }
@@ -534,8 +532,8 @@ beforeEach(() => {
       });
 
       describe('setRequestHeader', () => {
-        it('should work', done => {
-          xhr.onreadystatechange = function() {
+        it('should work', (done) => {
+          xhr.onreadystatechange = function () {
             if (this.readyState == 4) {
               assert.equal(this.response, 'header value received');
               done();
@@ -562,7 +560,7 @@ beforeEach(() => {
         // This can result in XHRProxy.prototype.open being called with `this`
         // set to a real XMLHttpRequest object.
 
-        it('works with MailTrack', done => {
+        it('works with MailTrack', (done) => {
           const realXhr = new XMLHttpRequest();
           realXhr.onload = () => done();
           XHRConstructor.prototype.open.call(realXhr, 'GET', '/foo');
@@ -575,7 +573,7 @@ beforeEach(() => {
 
 describe('XHRProxyFactory', () => {
   describe('wrappers', () => {
-    it('should be used with responseTextChanger present and work on re-used object', done => {
+    it('should be used with responseTextChanger present and work on re-used object', (done) => {
       let origResponse;
       let originalSendBodyLoggerRan = 0;
       let originalResponseTextLoggerRan = 0;
@@ -646,7 +644,7 @@ describe('XHRProxyFactory', () => {
           },
           afterListeners(connection) {
             firstAfterListenersRan++;
-          }
+          },
         },
         {
           isRelevantTo(connection) {
@@ -679,7 +677,7 @@ describe('XHRProxyFactory', () => {
             } else {
               done();
             }
-          }
+          },
         },
         {
           isRelevantTo(connection) {
@@ -699,14 +697,14 @@ describe('XHRProxyFactory', () => {
           },
           afterListeners(connection) {
             throw new Error('should not run');
-          }
-        }
+          },
+        },
       ];
       const XHRProxy = XHRProxyFactory(XMLHttpRequest, wrappers, {
-        logError: logError
+        logError: logError,
       });
       const xhr = new XHRProxy();
-      xhr.onreadystatechange = function() {
+      xhr.onreadystatechange = function () {
         if (this.readyState == 3) {
           assert.equal(
             this.response,
@@ -759,7 +757,7 @@ describe('XHRProxyFactory', () => {
       start();
     });
 
-    it('should be used without responseTextChanger present', done => {
+    it('should be used without responseTextChanger present', (done) => {
       let origResponse;
       let originalResponseTextLoggerRan = 0;
       let finalResponseTextLoggerRan = 0;
@@ -777,7 +775,7 @@ describe('XHRProxyFactory', () => {
             assert.strictEqual(this, wrappers[0], 'this check');
             finalResponseTextLoggerRan++;
             assert.equal(response, origResponse);
-          }
+          },
         },
         {
           isRelevantTo(connection) {
@@ -785,14 +783,14 @@ describe('XHRProxyFactory', () => {
           },
           responseTextChanger(connection, response) {
             throw new Error('should not run');
-          }
-        }
+          },
+        },
       ];
       const XHRProxy = XHRProxyFactory(XMLHttpRequest, wrappers, {
-        logError: logError
+        logError: logError,
       });
       const xhr = new XHRProxy();
-      xhr.onreadystatechange = function() {
+      xhr.onreadystatechange = function () {
         assert.equal(this.responseText, this.response, 'check responseText');
         if (this.readyState == 3) {
           assert.equal(this.response, 'Response here', 'check response');
@@ -816,7 +814,7 @@ describe('XHRProxyFactory', () => {
       xhr.send();
     });
 
-    it('should not have errors prevent event listeners', done => {
+    it('should not have errors prevent event listeners', (done) => {
       let loggerRan = 0;
       const wrappers = [
         {
@@ -825,7 +823,7 @@ describe('XHRProxyFactory', () => {
           },
           originalResponseTextLogger(connection, response) {
             throw new Error('should not run');
-          }
+          },
         },
         {
           isRelevantTo(connection) {
@@ -846,7 +844,7 @@ describe('XHRProxyFactory', () => {
           },
           finalResponseTextLogger(connection, response) {
             throw testError;
-          }
+          },
         },
         {
           isRelevantTo(connection) {
@@ -860,14 +858,14 @@ describe('XHRProxyFactory', () => {
           },
           finalResponseTextLogger(connection, response) {
             throw testError;
-          }
-        }
+          },
+        },
       ];
       const XHRProxy = XHRProxyFactory(XMLHttpRequest, wrappers, {
-        logError: logError
+        logError: logError,
       });
       const xhr = new XHRProxy();
-      xhr.onreadystatechange = function() {
+      xhr.onreadystatechange = function () {
         if (this.readyState == 4) {
           assert.equal(
             logErrorTestCalls,
@@ -887,7 +885,7 @@ describe('XHRProxyFactory', () => {
       xhr.send();
     });
 
-    it('can have wrappers changed after construction', done => {
+    it('can have wrappers changed after construction', (done) => {
       const wrappers = [
         {
           isRelevantTo(connection) {
@@ -895,12 +893,12 @@ describe('XHRProxyFactory', () => {
           },
           originalResponseTextLogger(connection, response) {
             throw new Error('should not run');
-          }
-        }
+          },
+        },
       ];
 
       const XHRProxy = XHRProxyFactory(XMLHttpRequest, wrappers, {
-        logError: logError
+        logError: logError,
       });
 
       let loggerRan = 0;
@@ -911,11 +909,11 @@ describe('XHRProxyFactory', () => {
         },
         originalResponseTextLogger(connection, response) {
           loggerRan++;
-        }
+        },
       });
 
       const xhr = new XHRProxy();
-      xhr.onreadystatechange = function() {
+      xhr.onreadystatechange = function () {
         if (this.readyState == 4) {
           assert.equal(
             loggerRan,
@@ -929,7 +927,7 @@ describe('XHRProxyFactory', () => {
       xhr.send();
     });
 
-    it('should support promises for responseTextChanger', done => {
+    it('should support promises for responseTextChanger', (done) => {
       let origResponse;
       let responseTextChangerRan = 0;
       let finalResponseTextLoggerRan = 0;
@@ -967,7 +965,7 @@ describe('XHRProxyFactory', () => {
             checkConnectionParam(connection);
             finalResponseTextLoggerRan++;
             assert.equal(response, origResponse + '-modified');
-          }
+          },
         },
         {
           isRelevantTo(connection) {
@@ -976,7 +974,7 @@ describe('XHRProxyFactory', () => {
           finalResponseTextLogger(connection, response) {
             finalResponseTextLoggerRan++;
             assert.equal(response, origResponse + '-modified');
-          }
+          },
         },
         {
           isRelevantTo(connection) {
@@ -990,11 +988,11 @@ describe('XHRProxyFactory', () => {
           },
           finalResponseTextLogger(connection, response) {
             throw new Error('should not run');
-          }
-        }
+          },
+        },
       ];
       const XHRProxy = XHRProxyFactory(XMLHttpRequest, wrappers, {
-        logError: logError
+        logError: logError,
       });
       const xhr = new XHRProxy();
 
@@ -1016,7 +1014,7 @@ describe('XHRProxyFactory', () => {
         done();
       });
 
-      xhr.onreadystatechange = function() {
+      xhr.onreadystatechange = function () {
         assert.equal(this.responseText, this.response, 'check responseText');
         if (this.readyState == 4) {
           assert.equal(
@@ -1028,7 +1026,7 @@ describe('XHRProxyFactory', () => {
           finishRsc();
         }
       };
-      xhr.addEventListener('readystatechange', function() {
+      xhr.addEventListener('readystatechange', function () {
         if (this.readyState == 4) {
           assert.equal(
             this.response,
@@ -1043,7 +1041,7 @@ describe('XHRProxyFactory', () => {
       xhr.send();
     });
 
-    it('should have responseTextChanger promises respect abort', done => {
+    it('should have responseTextChanger promises respect abort', (done) => {
       const wrappers = [
         {
           isRelevantTo(connection) {
@@ -1061,15 +1059,15 @@ describe('XHRProxyFactory', () => {
           },
           finalResponseTextLogger(connection, response) {
             throw new Error('should not run');
-          }
-        }
+          },
+        },
       ];
       const XHRProxy = XHRProxyFactory(XMLHttpRequest, wrappers, {
-        logError: logError
+        logError: logError,
       });
       const xhr = new XHRProxy();
 
-      xhr.addEventListener('readystatechange', function() {
+      xhr.addEventListener('readystatechange', function () {
         if (this.readyState == 4) {
           assert.equal(this.responseText, 'foo2 response!');
           done();
@@ -1079,7 +1077,7 @@ describe('XHRProxyFactory', () => {
       xhr.send();
     });
 
-    it('supports multiple responseTextChanger wrappers', done => {
+    it('supports multiple responseTextChanger wrappers', (done) => {
       const wrappers = [
         {
           isRelevantTo: () => true,
@@ -1094,7 +1092,7 @@ describe('XHRProxyFactory', () => {
             );
             assert.strictEqual(connection.modifiedResponseText, response);
             return response + 'a';
-          }
+          },
         },
         {
           isRelevantTo: () => true,
@@ -1109,15 +1107,15 @@ describe('XHRProxyFactory', () => {
             );
             assert.strictEqual(connection.modifiedResponseText, response);
             return response + 'b';
-          }
-        }
+          },
+        },
       ];
       const XHRProxy = XHRProxyFactory(XMLHttpRequest, wrappers, {
-        logError: logError
+        logError: logError,
       });
       const xhr = new XHRProxy();
 
-      xhr.onload = function() {
+      xhr.onload = function () {
         assert.strictEqual(this.responseText, 'foo2 response!ab');
         done();
       };
@@ -1125,22 +1123,22 @@ describe('XHRProxyFactory', () => {
       xhr.send();
     });
 
-    it('should ignore invalid responseTextChanger return value', done => {
+    it('should ignore invalid responseTextChanger return value', (done) => {
       const logErrorSpy = sinon.spy();
       const wrappers = [
         {
           isRelevantTo: () => true,
           responseTextChanger(connection, response) {
             return (null: any);
-          }
-        }
+          },
+        },
       ];
       const XHRProxy = XHRProxyFactory(XMLHttpRequest, wrappers, {
-        logError: logErrorSpy
+        logError: logErrorSpy,
       });
       const xhr = new XHRProxy();
 
-      xhr.onload = function() {
+      xhr.onload = function () {
         assert.strictEqual(this.responseText, 'foo2 response!');
         assert(logErrorSpy.calledOnce);
         done();
@@ -1149,7 +1147,7 @@ describe('XHRProxyFactory', () => {
       xhr.send();
     });
 
-    it('requestChanger should work', done => {
+    it('requestChanger should work', (done) => {
       const wrappers = [
         {
           isRelevantTo: () => true,
@@ -1157,9 +1155,9 @@ describe('XHRProxyFactory', () => {
             return Promise.resolve({
               method: request.method + 'a',
               url: request.url + 'A',
-              body: request.body + '1'
+              body: request.body + '1',
             });
-          }
+          },
         },
         {
           isRelevantTo: () => true,
@@ -1167,17 +1165,17 @@ describe('XHRProxyFactory', () => {
             return {
               method: request.method + 'b',
               url: request.url + 'B',
-              body: request.body + '2'
+              body: request.body + '2',
             };
-          }
-        }
+          },
+        },
       ];
       const XHRProxy = XHRProxyFactory(XMLHttpRequest, wrappers, {
-        logError: logError
+        logError: logError,
       });
       const xhr = new XHRProxy();
 
-      xhr.onload = function() {
+      xhr.onload = function () {
         assert.strictEqual(
           this.responseText,
           'fooAB requested, data12 received'
@@ -1189,7 +1187,7 @@ describe('XHRProxyFactory', () => {
       xhr.send('data');
     });
 
-    it('requestChanger should check returned value for sanity', done => {
+    it('requestChanger should check returned value for sanity', (done) => {
       const logErrorSpy = sinon.spy();
       const wrappers = [
         {
@@ -1198,17 +1196,17 @@ describe('XHRProxyFactory', () => {
             return Promise.resolve({
               method: request.method + 'a',
               url: request.url + 'A',
-              _MISSPELL_body: request.body + '1'
+              _MISSPELL_body: request.body + '1',
             });
-          }
-        }
+          },
+        },
       ];
       const XHRProxy = XHRProxyFactory(XMLHttpRequest, wrappers, {
-        logError: logErrorSpy
+        logError: logErrorSpy,
       });
       const xhr = new XHRProxy();
 
-      xhr.onload = function() {
+      xhr.onload = function () {
         assert.strictEqual(this.responseText, 'body received');
         assert(logErrorSpy.calledOnce);
         done();

@@ -23,7 +23,7 @@ import {
   page20160810_2,
   page20160812,
   page20160816,
-  page20160908
+  page20160908,
 } from '../lib/pages';
 
 describe('Inbox Attachment Card Detection', () => {
@@ -185,7 +185,7 @@ describe('Inbox Attachment Card Detection', () => {
         'attachmentCard'
       );
       expect(liveSet.values().size).toBe(5);
-      const elements = lsMap(liveSet, x => x.getValue());
+      const elements = lsMap(liveSet, (x) => x.getValue());
       expect(elements.values().has(attachment1)).toBe(true);
       expect(elements.values().has(attachment2)).toBe(true);
       expect(elements.values().has(attachment3)).toBe(true);
@@ -205,7 +205,7 @@ describe('Inbox Attachment Card Detection', () => {
         'attachmentCard'
       );
       expect(liveSet.values().size).toBe(1);
-      const elements = lsMap(liveSet, x => x.getValue());
+      const elements = lsMap(liveSet, (x) => x.getValue());
       expect(elements.values().has(attachment1)).toBe(true);
     });
 
@@ -221,7 +221,7 @@ describe('Inbox Attachment Card Detection', () => {
         'attachmentCard'
       );
       expect(liveSet.values().size).toBe(1);
-      const elements = lsMap(liveSet, x => x.getValue());
+      const elements = lsMap(liveSet, (x) => x.getValue());
       expect(elements.values().has(attachment1)).toBe(true);
     });
 
@@ -237,7 +237,7 @@ describe('Inbox Attachment Card Detection', () => {
         'attachmentCard'
       );
       expect(liveSet.values().size).toBe(1);
-      const elements = lsMap(liveSet, x => x.getValue());
+      const elements = lsMap(liveSet, (x) => x.getValue());
       expect(elements.values().has(attachment1)).toBe(true);
     });
   });

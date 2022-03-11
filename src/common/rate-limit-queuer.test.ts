@@ -70,36 +70,36 @@ test('going over rate limit simultaneously queues', async () => {
 
   const start = Date.now();
   const p = Promise.all([
-    fn().then(r => {
+    fn().then((r) => {
       expect(r).toBe(5);
       expect(Date.now() - start).toBeLessThan(80);
     }),
-    fn().then(r => {
+    fn().then((r) => {
       expect(r).toBe(6);
       expect(Date.now() - start).toBeLessThan(80);
     }),
 
-    fn().then(r => {
+    fn().then((r) => {
       expect(r).toBe(7);
       expect(Date.now() - start).toBeGreaterThanOrEqual(80);
       expect(Date.now() - start).toBeLessThan(200);
     }),
-    fn().then(r => {
+    fn().then((r) => {
       expect(r).toBe(8);
       expect(Date.now() - start).toBeGreaterThanOrEqual(80);
       expect(Date.now() - start).toBeLessThan(200);
     }),
 
-    fn().then(r => {
+    fn().then((r) => {
       expect(r).toBe(9);
       expect(Date.now() - start).toBeGreaterThanOrEqual(200);
     }),
     delay(15)
       .then(() => fn())
-      .then(r => {
+      .then((r) => {
         expect(r).toBe(10);
         expect(Date.now() - start).toBeGreaterThanOrEqual(200);
-      })
+      }),
   ]);
   for (let i = 0; i < 20; i++) {
     advanceTimers(50);
@@ -110,7 +110,7 @@ test('going over rate limit simultaneously queues', async () => {
 test('recursive rate limited functions work', async () => {
   let x = 0;
   const fn = rateLimitQueuer(
-    async expectedX => {
+    async (expectedX) => {
       expect(expectedX).toBe(x);
       x++;
       if (expectedX === 0) {

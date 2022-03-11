@@ -11,7 +11,7 @@ export type CustomMessageDescriptor = {
   headerEl: HTMLElement,
   bodyEl: HTMLElement,
   iconUrl: string,
-  sortDate: Date
+  sortDate: Date,
 };
 
 export default class CustomMessageView extends SafeEventEmitter {
@@ -35,7 +35,7 @@ export default class CustomMessageView extends SafeEventEmitter {
 
     descriptorStream
       .takeUntilBy(this._stopper)
-      .onValue(descriptor => {
+      .onValue((descriptor) => {
         this._el.setAttribute(
           'data-inboxsdk-sortdate',
           String(descriptor.sortDate.getTime())

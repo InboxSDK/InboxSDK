@@ -24,7 +24,7 @@ export default function showAppIdWarning(driver: GmailDriver) {
 
   const closeBtn = topDiv.querySelector('.inboxsdk__x_close_button');
   if (!closeBtn) throw new Error('Should not happen');
-  closeBtn.addEventListener('click', function(e: MouseEvent) {
+  closeBtn.addEventListener('click', function (e: MouseEvent) {
     topMessageBarDriver.remove();
   });
 }

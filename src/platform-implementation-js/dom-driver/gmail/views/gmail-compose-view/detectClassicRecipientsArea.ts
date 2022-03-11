@@ -1,12 +1,12 @@
 import once from 'lodash/once';
 
 export default once(function detectClassicRecipientsArea() {
-  const styleSheetWithComposeRules = [...document.styleSheets].find(s => {
+  const styleSheetWithComposeRules = [...document.styleSheets].find((s) => {
     try {
       if (s.cssRules) {
         // Both classic and new recipients Gmail should have this rule
         return [...s.cssRules].find(
-          rule =>
+          (rule) =>
             rule instanceof CSSStyleRule &&
             rule.selectorText === '.aoI' &&
             rule.style.fontSize &&
@@ -23,9 +23,9 @@ export default once(function detectClassicRecipientsArea() {
     // Check if we don't have any of these specific rules.
     // If so, we're on classic recipients Gmail.
     const hasOverflowYVisibleRule = [
-      ...styleSheetWithComposeRules.cssRules
+      ...styleSheetWithComposeRules.cssRules,
     ].some(
-      rule =>
+      (rule) =>
         rule instanceof CSSStyleRule &&
         rule.selectorText === '.aoI' &&
         rule.style.overflowY === 'visible'
@@ -34,7 +34,7 @@ export default once(function detectClassicRecipientsArea() {
       return;
     }
     const hasOverflowYAutoRule = [...styleSheetWithComposeRules.cssRules].some(
-      rule =>
+      (rule) =>
         rule instanceof CSSStyleRule &&
         rule.selectorText === '.aaZ > .M9 > .aoI' &&
         rule.style.overflowY === 'auto'

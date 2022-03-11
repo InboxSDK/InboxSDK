@@ -29,23 +29,25 @@ test('loads in inbox mock', () => {
 
   expect(InboxSDK.LOADER_VERSION).toBe('beep');
 
-  return InboxSDK.load(1, 'sdk_testfoo_2a9c68f994', appOpts).then(inboxsdk => {
-    expect(inboxsdk.LOADER_VERSION).toBe('beep');
-    expect(inboxsdk.IMPL_VERSION).toBe('beep');
+  return InboxSDK.load(1, 'sdk_testfoo_2a9c68f994', appOpts).then(
+    (inboxsdk) => {
+      expect(inboxsdk.LOADER_VERSION).toBe('beep');
+      expect(inboxsdk.IMPL_VERSION).toBe('beep');
 
-    expect(inboxsdk.Router.getCurrentRouteView().getRouteType()).toBe(
-      'UNKNOWN'
-    );
+      expect(inboxsdk.Router.getCurrentRouteView().getRouteType()).toBe(
+        'UNKNOWN'
+      );
 
-    return Promise.all([
-      InboxSDK.load(1, 'sdk_testfoo2_c65cc8c168', appOpts),
-      InboxSDK.load(1, 'sdk_testfoo3_fc90e29e45', appOpts)
-    ]).then(apps => {
-      expect(apps[0]).not.toBe(apps[1]);
-      expect(apps[0].LOADER_VERSION).toBe('beep');
-      expect(apps[0].IMPL_VERSION).toBe('beep');
-      expect(apps[1].LOADER_VERSION).toBe('beep');
-      expect(apps[1].IMPL_VERSION).toBe('beep');
-    });
-  });
+      return Promise.all([
+        InboxSDK.load(1, 'sdk_testfoo2_c65cc8c168', appOpts),
+        InboxSDK.load(1, 'sdk_testfoo3_fc90e29e45', appOpts),
+      ]).then((apps) => {
+        expect(apps[0]).not.toBe(apps[1]);
+        expect(apps[0].LOADER_VERSION).toBe('beep');
+        expect(apps[0].IMPL_VERSION).toBe('beep');
+        expect(apps[1].LOADER_VERSION).toBe('beep');
+        expect(apps[1].IMPL_VERSION).toBe('beep');
+      });
+    }
+  );
 });

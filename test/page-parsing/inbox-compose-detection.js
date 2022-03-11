@@ -33,7 +33,7 @@ function finder(documentElement: HTMLHtmlElement) {
   return [
     ...inlineFinder(documentElement),
     ...regularFinder(documentElement),
-    ...fullscreenFinder(documentElement)
+    ...fullscreenFinder(documentElement),
   ];
 }
 
@@ -48,7 +48,7 @@ import {
   page20160629_3,
   page20160818,
   page20161102,
-  page20170302
+  page20170302,
 } from '../lib/pages';
 
 describe('Inbox Compose Detection', () => {
@@ -250,19 +250,19 @@ describe('Inbox Compose Detection', () => {
 
       expect(tree.getAllByTag('regularCompose').values().size).toBe(2);
       expect(
-        lsMap(tree.getAllByTag('regularCompose'), x => x.getValue())
+        lsMap(tree.getAllByTag('regularCompose'), (x) => x.getValue())
           .values()
           .has(compose1)
       ).toBe(true);
       expect(
-        lsMap(tree.getAllByTag('regularCompose'), x => x.getValue())
+        lsMap(tree.getAllByTag('regularCompose'), (x) => x.getValue())
           .values()
           .has(compose2)
       ).toBe(true);
 
       expect(tree.getAllByTag('inlineCompose').values().size).toBe(1);
       expect(
-        lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue())
+        lsMap(tree.getAllByTag('inlineCompose'), (x) => x.getValue())
           .values()
           .has(inlineCompose)
       ).toBe(true);
@@ -282,7 +282,7 @@ describe('Inbox Compose Detection', () => {
 
       expect(tree.getAllByTag('regularCompose').values().size).toBe(1);
       expect(
-        lsMap(tree.getAllByTag('regularCompose'), x => x.getValue())
+        lsMap(tree.getAllByTag('regularCompose'), (x) => x.getValue())
           .values()
           .has(compose1)
       ).toBe(true);
@@ -310,14 +310,14 @@ describe('Inbox Compose Detection', () => {
 
       expect(tree.getAllByTag('inlineCompose').values().size).toBe(1);
       expect(
-        lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue())
+        lsMap(tree.getAllByTag('inlineCompose'), (x) => x.getValue())
           .values()
           .has(bundledInlineCompose)
       ).toBe(true);
 
       expect(tree.getAllByTag('fullscreenCompose').values().size).toBe(1);
       expect(
-        lsMap(tree.getAllByTag('fullscreenCompose'), x => x.getValue())
+        lsMap(tree.getAllByTag('fullscreenCompose'), (x) => x.getValue())
           .values()
           .has(fullscreenCompose)
       ).toBe(true);
@@ -334,7 +334,7 @@ describe('Inbox Compose Detection', () => {
 
       expect(tree.getAllByTag('inlineCompose').values().size).toBe(1);
       expect(
-        lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue())
+        lsMap(tree.getAllByTag('inlineCompose'), (x) => x.getValue())
           .values()
           .has(compose)
       ).toBe(true);
@@ -351,7 +351,7 @@ describe('Inbox Compose Detection', () => {
 
       expect(tree.getAllByTag('regularCompose').values().size).toBe(1);
       expect(
-        lsMap(tree.getAllByTag('regularCompose'), x => x.getValue())
+        lsMap(tree.getAllByTag('regularCompose'), (x) => x.getValue())
           .values()
           .has(compose)
       ).toBe(true);
@@ -372,7 +372,7 @@ describe('Inbox Compose Detection', () => {
 
       expect(tree.getAllByTag('inlineCompose').values().size).toBe(1);
       expect(
-        lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue())
+        lsMap(tree.getAllByTag('inlineCompose'), (x) => x.getValue())
           .values()
           .has(compose)
       ).toBe(true);
@@ -391,7 +391,7 @@ describe('Inbox Compose Detection', () => {
 
       expect(tree.getAllByTag('inlineCompose').values().size).toBe(1);
       expect(
-        lsMap(tree.getAllByTag('inlineCompose'), x => x.getValue())
+        lsMap(tree.getAllByTag('inlineCompose'), (x) => x.getValue())
           .values()
           .has(compose)
       ).toBe(true);

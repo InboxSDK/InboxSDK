@@ -11,7 +11,7 @@ import EventEmitter from 'events';
 import { parse as deparam } from 'querystring';
 
 export type Opts = {
-  logError: (error: Error, details: any) => void
+  logError: (error: Error, details: any) => void,
 };
 
 const WARNING_TIMEOUT = 60 * 1000;
@@ -41,20 +41,22 @@ export type XHRProxyConnectionDetails = {
   params: { [key: string]: string },
   headers: { [name: string]: string },
   responseType: string,
-  originalSendBody: ?string
+  originalSendBody: ?string,
 };
 
-export type XHRProxyConnectionDetailsWithResponse = XHRProxyConnectionDetails & {
-  status: number,
-  originalResponseText: string,
-  modifiedResponseText: string
-};
+export type XHRProxyConnectionDetailsWithResponse =
+  XHRProxyConnectionDetails & {
+    status: number,
+    originalResponseText: string,
+    modifiedResponseText: string,
+  };
 
-export type XHRProxyConnectionDetailsAfterListeners = XHRProxyConnectionDetails & {
-  status: number,
-  originalResponseText: ?string,
-  modifiedResponseText: ?string
-};
+export type XHRProxyConnectionDetailsAfterListeners =
+  XHRProxyConnectionDetails & {
+    status: number,
+    originalResponseText: ?string,
+    modifiedResponseText: ?string,
+  };
 
 /**
  * Thing
@@ -66,7 +68,7 @@ export type XHRProxyConnectionDetailsAfterListeners = XHRProxyConnectionDetails 
 type Request = {|
   method: string,
   url: string,
-  body: string
+  body: string,
 |};
 
 /**
@@ -116,7 +118,9 @@ export type Wrapper = {|
     connection: XHRProxyConnectionDetailsWithResponse,
     finalResponseText: string
   ) => void,
-  afterListeners?: (connection: XHRProxyConnectionDetailsAfterListeners) => void
+  afterListeners?: (
+    connection: XHRProxyConnectionDetailsAfterListeners
+  ) => void,
 |};
 
 /**
@@ -136,8 +140,8 @@ export default function XHRProxyFactory(
 ): typeof XMLHttpRequest {
   const logError =
     (opts && opts.logError) ||
-    function(error, label) {
-      setTimeout(function() {
+    function (error, label) {
+      setTimeout(function () {
         // let window.onerror log this
         throw error;
       }, 1);
@@ -165,10 +169,10 @@ export default function XHRProxyFactory(
         'CAPTURING_PHASE',
         'AT_TARGET',
         'BUBBLING_PHASE',
-        'eventPhase'
+        'eventPhase',
       ])
-      .filter(name => name in event)
-      .forEach(name => {
+      .filter((name) => name in event)
+      .forEach((name) => {
         const value = (event: any)[name];
         if (value === oldTarget) {
           newEvent[name] = newTarget;
@@ -182,7 +186,7 @@ export default function XHRProxyFactory(
   }
 
   function wrapEventListener(oldTarget, newTarget, listener) {
-    return function(event) {
+    return function (event) {
       return listener.call(
         newTarget,
         transformEvent(oldTarget, newTarget, event)
@@ -191,7 +195,7 @@ export default function XHRProxyFactory(
   }
 
   function findApplicableWrappers(wrappers, connection) {
-    return filter(wrappers, function(wrapper) {
+    return filter(wrappers, function (wrapper) {
       try {
         return wrapper.isRelevantTo(connection);
       } catch (e) {
@@ -234,7 +238,7 @@ export default function XHRProxyFactory(
         }
       }
 
-      each(this._boundListeners[name], boundListener => {
+      each(this._boundListeners[name], (boundListener) => {
         try {
           boundListener(event);
         } catch (e) {
@@ -243,11 +247,11 @@ export default function XHRProxyFactory(
       });
     };
 
-    const runRscListeners = event => {
+    const runRscListeners = (event) => {
       triggerEventListeners('readystatechange', event);
     };
 
-    this._fakeRscEvent = function() {
+    this._fakeRscEvent = function () {
       runRscListeners(
         Object.freeze({
           bubbles: false,
@@ -265,12 +269,12 @@ export default function XHRProxyFactory(
           CAPTURING_PHASE: 1,
           AT_TARGET: 2,
           BUBBLING_PHASE: 3,
-          eventPhase: 0
+          eventPhase: 0,
         })
       );
     };
 
-    const deliverFinalRsc = event => {
+    const deliverFinalRsc = (event) => {
       this.readyState = 4;
       // Remember the status now before any event handlers are called, just in
       // case one aborts the request.
@@ -281,7 +285,7 @@ export default function XHRProxyFactory(
         {
           lengthComputable: false,
           loaded: 0,
-          total: 0
+          total: 0,
         }
       );
 
@@ -289,7 +293,7 @@ export default function XHRProxyFactory(
         !this._realxhr.responseType || this._realxhr.responseType == 'text';
 
       if (supportsResponseText) {
-        each(this._activeWrappers, wrapper => {
+        each(this._activeWrappers, (wrapper) => {
           if (wrapper.finalResponseTextLogger) {
             try {
               wrapper.finalResponseTextLogger(
@@ -311,7 +315,7 @@ export default function XHRProxyFactory(
       }
       triggerEventListeners('loadend', progressEvent);
 
-      each(this._activeWrappers, wrapper => {
+      each(this._activeWrappers, (wrapper) => {
         if (wrapper.afterListeners) {
           try {
             wrapper.afterListeners(this._connection);
@@ -342,10 +346,10 @@ export default function XHRProxyFactory(
               enumerable: true,
               writable: false,
               configurable: false,
-              value: self._realxhr.responseText
+              value: self._realxhr.responseText,
             });
 
-            each(this._activeWrappers, wrapper => {
+            each(this._activeWrappers, (wrapper) => {
               if (wrapper.originalResponseTextLogger) {
                 try {
                   wrapper.originalResponseTextLogger(
@@ -402,13 +406,13 @@ export default function XHRProxyFactory(
                 return modifiedResponseText;
               })()
                 .then(
-                  modifiedResponseText => {
+                  (modifiedResponseText) => {
                     if (startConnection === self._connection) {
                       this.responseText = modifiedResponseText;
                       finish();
                     }
                   },
-                  err => {
+                  (err) => {
                     logError(err);
                     if (startConnection === this._connection) {
                       this.responseText = this._realxhr.responseText;
@@ -469,12 +473,12 @@ export default function XHRProxyFactory(
       'onprogress',
       'onabort',
       'upload',
-      'withCredentials'
-    ].forEach(function(prop) {
+      'withCredentials',
+    ].forEach(function (prop) {
       Object.defineProperty(self, prop, {
         enumerable: true,
         configurable: false,
-        get: function() {
+        get: function () {
           // If we give the original native methods directly, they'll be called
           // with `this` as the XHRProxy object, which they aren't made for.
           if (typeof self._realxhr[prop] == 'function') {
@@ -482,19 +486,19 @@ export default function XHRProxyFactory(
           }
           return self._realxhr[prop];
         },
-        set: function(v) {
+        set: function (v) {
           if (typeof v == 'function') {
             v = wrapEventListener(this._realxhr, this, v);
           }
           self._realxhr[prop] = v;
-        }
+        },
       });
     });
 
     (Object: any).defineProperty(self, 'response', {
       enumerable: true,
       configurable: false,
-      get: function() {
+      get: function () {
         if (
           !this._realxhr.responseType ||
           this._realxhr.responseType == 'text'
@@ -504,13 +508,13 @@ export default function XHRProxyFactory(
           // We're not trying to transform non-text responses currently.
           return this._realxhr.response;
         }
-      }
+      },
     });
 
     self.readyState = self._realxhr.readyState;
   }
 
-  XHRProxy.prototype.abort = function() {
+  XHRProxy.prototype.abort = function () {
     // Important: If the request has already been sent, the XHR will change
     // its readyState to 4 after abort. However, we sometimes asynchronously
     // delay send calls. If the application has already called send but we
@@ -526,7 +530,7 @@ export default function XHRProxyFactory(
     this._realxhr.abort();
   };
 
-  XHRProxy.prototype.setRequestHeader = function(name, value) {
+  XHRProxy.prototype.setRequestHeader = function (name, value) {
     var self = this;
     if (this.readyState != 1) {
       // eslint-disable-next-line no-console
@@ -541,7 +545,7 @@ export default function XHRProxyFactory(
     this._connection.headers[name] = value;
 
     if (this._connection.async && this._requestChangers.length) {
-      this._events.once('realOpen', function() {
+      this._events.once('realOpen', function () {
         self._realxhr.setRequestHeader(name, value);
       });
     } else {
@@ -549,7 +553,7 @@ export default function XHRProxyFactory(
     }
   };
 
-  XHRProxy.prototype.addEventListener = function(name, listener) {
+  XHRProxy.prototype.addEventListener = function (name, listener) {
     if (!this._listeners[name]) {
       this._listeners[name] = [];
       this._boundListeners[name] = [];
@@ -566,7 +570,7 @@ export default function XHRProxyFactory(
     }
   };
 
-  XHRProxy.prototype.removeEventListener = function(name, listener) {
+  XHRProxy.prototype.removeEventListener = function (name, listener) {
     if (!this._listeners[name]) {
       return;
     }
@@ -581,7 +585,7 @@ export default function XHRProxyFactory(
     }
   };
 
-  XHRProxy.prototype.open = function(method, url, async) {
+  XHRProxy.prototype.open = function (method, url, async) {
     // Work around MailTrack issue
     if (!(this instanceof XHRProxy)) {
       return XHR.prototype.open.apply(this, arguments);
@@ -593,7 +597,7 @@ export default function XHRProxyFactory(
       url: url,
       params: deparam(url.split('?')[1] || ''),
       headers: {},
-      async: arguments.length < 3 || !!async
+      async: arguments.length < 3 || !!async,
     };
     this._clientStartedSend = false;
     this._realStartedSend = false;
@@ -602,7 +606,7 @@ export default function XHRProxyFactory(
       this._connection
     );
     this._responseTextChangers = this._activeWrappers
-      .map(function(wrapper) {
+      .map(function (wrapper) {
         return (
           wrapper.responseTextChanger &&
           wrapper.responseTextChanger.bind(wrapper)
@@ -618,7 +622,7 @@ export default function XHRProxyFactory(
 
     if (this._connection.async) {
       this._requestChangers = this._activeWrappers
-        .map(function(wrapper) {
+        .map(function (wrapper) {
           return wrapper.requestChanger && wrapper.requestChanger.bind(wrapper);
         })
         .filter(Boolean);
@@ -635,7 +639,7 @@ export default function XHRProxyFactory(
     }
   };
 
-  XHRProxy.prototype.send = function(body) {
+  XHRProxy.prototype.send = function (body) {
     var self = this;
     this._clientStartedSend = true;
     this._openState = false;
@@ -643,11 +647,11 @@ export default function XHRProxyFactory(
       enumerable: true,
       writable: false,
       configurable: false,
-      value: body
+      value: body,
     });
     this._connection.responseType = this._realxhr.responseType || 'text';
 
-    each(self._activeWrappers, function(wrapper) {
+    each(self._activeWrappers, function (wrapper) {
       if (wrapper.originalSendBodyLogger) {
         try {
           wrapper.originalSendBodyLogger(self._connection, body);
@@ -672,7 +676,7 @@ export default function XHRProxyFactory(
       const request = {
         method: this._connection.method,
         url: this._connection.url,
-        body: body
+        body: body,
       };
 
       (async () => {
@@ -705,11 +709,11 @@ export default function XHRProxyFactory(
 
         return modifiedRequest;
       })()
-        .catch(err => {
+        .catch((err) => {
           logError(err);
           return request;
         })
-        .then(modifiedRequest => {
+        .then((modifiedRequest) => {
           if (startConnection === this._connection && !this._realStartedSend) {
             this._realxhr.open(modifiedRequest.method, modifiedRequest.url);
             this._events.emit('realOpen');
@@ -721,13 +725,13 @@ export default function XHRProxyFactory(
     }
   };
 
-  [XHRProxy, XHRProxy.prototype].forEach(function(obj) {
+  [XHRProxy, XHRProxy.prototype].forEach(function (obj) {
     Object.assign(obj, {
       UNSENT: 0,
       OPENED: 1,
       HEADERS_RECEIVED: 2,
       LOADING: 3,
-      DONE: 4
+      DONE: 4,
     });
   });
 

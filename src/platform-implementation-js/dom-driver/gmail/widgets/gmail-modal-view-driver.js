@@ -89,7 +89,7 @@ class GmailModalViewDriver {
       );
     }
 
-    sortBy(buttons, button => button.orderHint || 0).forEach(
+    sortBy(buttons, (button) => button.orderHint || 0).forEach(
       this._addButton.bind(this, buttonsEl)
     );
   }
@@ -170,7 +170,7 @@ class GmailModalViewDriver {
     closeElement.addEventListener('click', (event: MouseEvent) => {
       this._eventStream.emit({
         eventName: 'closeClick',
-        domEvent: event
+        domEvent: event,
       });
     });
   }

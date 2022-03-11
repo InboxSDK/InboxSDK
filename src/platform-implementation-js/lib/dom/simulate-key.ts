@@ -20,8 +20,8 @@ export default function simulateKey(
       ctrlKey,
       metaKey,
       altKey,
-      shiftKey
-    }
+      shiftKey,
+    },
   });
 
   triggerRelayEvent(element, {
@@ -34,8 +34,8 @@ export default function simulateKey(
       ctrlKey,
       metaKey,
       altKey,
-      shiftKey
-    }
+      shiftKey,
+    },
   });
 
   triggerRelayEvent(element, {
@@ -48,7 +48,7 @@ export default function simulateKey(
       ctrlKey,
       metaKey,
       altKey,
-      shiftKey
-    }
+      shiftKey,
+    },
   });
 }

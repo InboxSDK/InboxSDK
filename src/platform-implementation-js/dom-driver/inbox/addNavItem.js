@@ -19,10 +19,10 @@ export default function addNavItem(
   toItemWithLifetimeStream(leftNavLiveSet)
     .take(1)
     .map(({ el: node }) => node.getValue())
-    .onValue(el => {
+    .onValue((el) => {
       inboxNavItemView
         .getEventStream()
-        .filter(event => event.eventName === 'orderChanged')
+        .filter((event) => event.eventName === 'orderChanged')
         .onValue(() =>
           insertElementInOrder(containerEl, inboxNavItemView.getElement())
         );

@@ -1,13 +1,13 @@
 /* @flow */
 
 import type GmailComposeView from '../gmail-compose-view';
-import type {StatusBar} from '../../../../driver-interfaces/compose-view-driver';
+import type { StatusBar } from '../../../../driver-interfaces/compose-view-driver';
 
 declare export default function addStatusBar(
   gmailComposeView: GmailComposeView,
   options: {
     height?: number,
     orderHint?: number,
-    addAboveNativeStatusBar?: boolean
+    addAboveNativeStatusBar?: boolean,
   }
 ): StatusBar;

@@ -20,7 +20,7 @@ export default function makeRevocableFunction<F: Function>(
   let key = {};
 
   return {
-    fn: (function() {
+    fn: (function () {
       if (!key) {
         throw new Error('Should not happen');
       }
@@ -29,12 +29,12 @@ export default function makeRevocableFunction<F: Function>(
       wm.set(key, inputFn);
       inputFn = revokedFn = (null: any);
 
-      return (function() {
+      return (function () {
         return ((key ? wm.get(key) : _revokedFn): any).apply(this, arguments);
       }: any);
     })(),
-    revoke: once(function() {
+    revoke: once(function () {
       key = null;
-    })
+    }),
   };
 }

@@ -19,7 +19,7 @@ function stupidToBool(stupid: any): boolean {
 }
 
 function getSettingValue(settings: any[], name: string): boolean {
-  var entry = find(settings, setting => setting[0] === name);
+  var entry = find(settings, (setting) => setting[0] === name);
   return entry ? stupidToBool(entry[1]) : false;
 }
 
@@ -85,7 +85,7 @@ export default function setupDataExposer() {
 
         var globalSettingsHolder = find(
           context.GLOBALS[17],
-          item => item[0] === 'p'
+          (item) => item[0] === 'p'
         );
 
         if (!globalSettingsHolder) {
@@ -117,7 +117,7 @@ export default function setupDataExposer() {
         const preloadDataSearchString = 'window.BT_EmbeddedAppData=[';
         const preloadScript = find(
           document.querySelectorAll('script:not([src])'),
-          script =>
+          (script) =>
             script.text &&
             script.text.slice(0, 500).indexOf(preloadDataSearchString) > -1
         );
@@ -164,11 +164,11 @@ export default function setupDataExposer() {
         }
       }
     })
-    .catch(err => {
+    .catch((err) => {
       function getStatus() {
         return {
           hasGLOBALS: !!context.GLOBALS,
-          hasGbar: !!context.gbar
+          hasGbar: !!context.gbar,
         };
       }
       var startStatus = getStatus();
@@ -178,7 +178,7 @@ export default function setupDataExposer() {
         logger.eventSdkPassive('waitfor global data', {
           startStatus,
           waitTime,
-          laterStatus
+          laterStatus,
         });
       }, waitTime);
       throw err;

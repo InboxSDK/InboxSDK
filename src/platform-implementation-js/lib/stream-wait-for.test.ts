@@ -5,7 +5,7 @@ import delay from 'pdelay';
 
 import streamWaitFor from './stream-wait-for';
 
-it('should work', cb => {
+it('should work', (cb) => {
   const conditionSpy = sinon.spy();
   let x = 0;
   const s = streamWaitFor(
@@ -20,7 +20,7 @@ it('should work', cb => {
 
   const onValueSpy = sinon.spy();
   let tooEarly = true;
-  s.onValue(result => {
+  s.onValue((result) => {
     expect(tooEarly).toBe(false);
     expect(result).toBe(true);
     expect(x).toBe(2); // check that condition has passed
@@ -47,7 +47,7 @@ it('should not call condition if not subscribed to', async () => {
   await delay(20);
 });
 
-it('should stop calling condition when unsubscribed from inside condition', cb => {
+it('should stop calling condition when unsubscribed from inside condition', (cb) => {
   const stopper = kefirStopper();
   let calls = 0;
   const s = streamWaitFor(

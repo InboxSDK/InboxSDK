@@ -6,7 +6,7 @@ export default function getInsertBeforeElement(
 ): HTMLElement | null {
   const checkValues: { [attr: string]: any } = {};
 
-  dataAttributes.forEach(function(attribute) {
+  dataAttributes.forEach(function (attribute) {
     const stringValue = checkElement.getAttribute(attribute);
     checkValues[attribute] =
       stringValue == null ? null : parseIfNumber(stringValue) ?? stringValue;

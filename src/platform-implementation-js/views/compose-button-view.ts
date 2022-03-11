@@ -36,7 +36,7 @@ export default class ComposeButtonView extends EventEmitter {
     const members = { optionsPromise, composeViewDriver, driver };
     memberMap.set(this, members);
 
-    members.optionsPromise.then(options => {
+    members.optionsPromise.then((options) => {
       if (!options) {
         _destroy(this);
         return;
@@ -53,9 +53,9 @@ export default class ComposeButtonView extends EventEmitter {
     members.driver
       .getLogger()
       .eventSdkPassive('ComposeButtonView.showTooltip', {
-        keys: Object.keys(tooltipDescriptor)
+        keys: Object.keys(tooltipDescriptor),
       });
-    members.optionsPromise.then(options => {
+    members.optionsPromise.then((options) => {
       if (!options) return;
       members.composeViewDriver.addTooltipToButton(
         options.buttonViewController,
@@ -67,7 +67,7 @@ export default class ComposeButtonView extends EventEmitter {
 
   public closeTooltip() {
     const members = get(memberMap, this);
-    members.optionsPromise.then(options => {
+    members.optionsPromise.then((options) => {
       if (!options) return;
       members.composeViewDriver.closeButtonTooltip(
         options.buttonViewController

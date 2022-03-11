@@ -16,7 +16,7 @@ function makeDriver(): Object {
     getAppId: () => 'foo',
     getOpts: _.constant({
       appName: 'driver appName',
-      appIconUrl: 'http://localhost/driver/appIconUrl.png'
+      appIconUrl: 'http://localhost/driver/appIconUrl.png',
     }),
     getThreadViewElementsMap: _.constant(new Map()),
     getAppSidebarView: _.constant({
@@ -37,8 +37,8 @@ function makeDriver(): Object {
       getOpenOrOpeningStream: _.constant(
         _openOrOpeningStreamBus.toProperty(() => false).onValue(() => {})
       ),
-      open: jest.fn()
-    })
+      open: jest.fn(),
+    }),
   };
   return driver;
 }
@@ -47,8 +47,8 @@ function makeElement(): { el: HTMLElement, parsed: Object } {
   const el = document.createElement('div');
   const parsed: Object = {
     elements: {
-      stickyHeading: document.createElement('div')
-    }
+      stickyHeading: document.createElement('div'),
+    },
   };
   return { el, parsed };
 }
@@ -67,7 +67,7 @@ describe('addSidebarContentPanel', () => {
       Kefir.constant({
         title: 'foo',
         iconUrl: 'http://localhost/driver/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
     const { stickyHeading } = parsed.elements;
@@ -96,7 +96,7 @@ describe('addSidebarContentPanel', () => {
       Kefir.constant({
         title: 'foo',
         iconUrl: 'http://localhost/driver/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
     const appSidebarView = driver.getAppSidebarView();
@@ -117,14 +117,14 @@ describe('addSidebarContentPanel', () => {
       Kefir.constant({
         title: 'foo',
         iconUrl: 'http://localhost/driver/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
     threadView.addSidebarContentPanel(
       Kefir.constant({
         title: 'foo2',
         iconUrl: '/bar2.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
     const { stickyHeading } = parsed.elements;
@@ -160,14 +160,14 @@ describe('addSidebarContentPanel', () => {
       Kefir.constant({
         title: 'foo',
         iconUrl: 'http://localhost/driver/bar.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
     threadView.addSidebarContentPanel(
       Kefir.constant({
         title: 'foo2',
         iconUrl: '/bar2.png',
-        el: document.createElement('div')
+        el: document.createElement('div'),
       })
     );
     const { stickyHeading } = parsed.elements;

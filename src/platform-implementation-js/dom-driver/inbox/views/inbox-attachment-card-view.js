@@ -34,7 +34,7 @@ class InboxAttachmentCardView {
 
       Kefir.merge([
         Kefir.fromEvents(this._element, 'click'),
-        Kefir.fromEvents(this._element, 'keydown')
+        Kefir.fromEvents(this._element, 'keydown'),
       ])
         .takeUntilBy(this._stopper)
         .onValue(() => {
@@ -60,7 +60,7 @@ class InboxAttachmentCardView {
 
   _findMessageView(): ?InboxMessageView {
     const map = this._driver.getMessageViewElementsMap();
-    const messageViewElement = findParent(this._element, el =>
+    const messageViewElement = findParent(this._element, (el) =>
       map.has((el: any))
     );
     if (!messageViewElement) return null;
@@ -77,7 +77,7 @@ class InboxAttachmentCardView {
     }
     this._element.title = options.title;
 
-    const setupInnerHtml = options => {
+    const setupInnerHtml = (options) => {
       if (options.previewThumbnailUrl) {
         this._element.className =
           'inboxsdk__attachment_card inboxsdk__attachment_card_with_preview';
@@ -99,7 +99,7 @@ class InboxAttachmentCardView {
               setupInnerHtml({
                 ...options,
                 previewThumbnailUrl: null,
-                iconThumbnailUrl: options.failoverPreviewIconUrl
+                iconThumbnailUrl: options.failoverPreviewIconUrl,
               });
             });
         }
@@ -120,7 +120,7 @@ class InboxAttachmentCardView {
         `;
       }
 
-      options.buttons.forEach(button => {
+      options.buttons.forEach((button) => {
         this.addButton(button);
       });
     };
@@ -128,9 +128,9 @@ class InboxAttachmentCardView {
     this._previewClicks.plug(
       Kefir.merge([
         Kefir.fromEvents(this._element, 'click'),
-        Kefir.fromEvents(this._element, 'keypress').filter(e =>
+        Kefir.fromEvents(this._element, 'keypress').filter((e) =>
           includes([32 /*space*/, 13 /*enter*/], e.which)
-        )
+        ),
       ])
     );
 
@@ -182,7 +182,7 @@ class InboxAttachmentCardView {
             button.onClick({
               preventDefault() {
                 prevented = true;
-              }
+              },
             });
           }
           if (prevented) return;
@@ -193,7 +193,7 @@ class InboxAttachmentCardView {
           }
           downloadLink.addEventListener(
             'click',
-            function(e: MouseEvent) {
+            function (e: MouseEvent) {
               e.stopPropagation();
             },
             true
@@ -218,7 +218,7 @@ class InboxAttachmentCardView {
                 throw new Error(
                   'not implemented for artificial sdk-added cardViews!'
                 );
-              }
+              },
             });
           }
         });

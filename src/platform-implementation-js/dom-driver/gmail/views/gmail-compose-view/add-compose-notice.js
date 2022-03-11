@@ -14,12 +14,12 @@ import type { Stopper } from 'kefir-stopper';
 export default function addComposeNotice(
   gmailComposeView: GmailComposeView,
   options: {
-    orderHint?: number
+    orderHint?: number,
   }
 ) {
   const { orderHint } = {
     orderHint: 0,
-    ...options
+    ...options,
   };
 
   const composeNotice = new ComposeNotice(gmailComposeView, orderHint);

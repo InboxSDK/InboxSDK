@@ -17,24 +17,24 @@ if (!global.__InboxSDKInjected) {
     const setupDataExposer = require('./setup-data-exposer').default;
     const setupEventReemitter = require('./setup-event-reemitter').default;
     const setupErrorSilencer = require('./setup-error-silencer').default;
-    const setupCustomViewEventAssassin = require('./setupCustomViewEventAssassin')
-      .default;
+    const setupCustomViewEventAssassin =
+      require('./setupCustomViewEventAssassin').default;
     const setupPushStateListener = require('./setupPushStateListener').default;
-    const setupInboxCustomViewLinkFixer = require('./setupInboxCustomViewLinkFixer')
-      .default;
+    const setupInboxCustomViewLinkFixer =
+      require('./setupInboxCustomViewLinkFixer').default;
 
     const gmailInterceptor = require('./gmail/setup-gmail-interceptor').default;
-    const setupGmonkeyHandler = require('./gmail/setup-gmonkey-handler')
-      .default;
+    const setupGmonkeyHandler =
+      require('./gmail/setup-gmonkey-handler').default;
 
-    const setupClickAndGetNewIframeSrc = require('./inbox/setupClickAndGetNewIframeSrc')
-      .default;
-    const setupInboxFakeWindowResizeListener = require('./inbox/setupInboxFakeWindowResizeListener')
-      .default;
-    const setupComposeViewDraftIDFinder = require('./inbox/setupComposeViewDraftIDFinder')
-      .default;
-    const setupInboxAjaxInterceptor = require('./inbox/setupAjaxInterceptor')
-      .default;
+    const setupClickAndGetNewIframeSrc =
+      require('./inbox/setupClickAndGetNewIframeSrc').default;
+    const setupInboxFakeWindowResizeListener =
+      require('./inbox/setupInboxFakeWindowResizeListener').default;
+    const setupComposeViewDraftIDFinder =
+      require('./inbox/setupComposeViewDraftIDFinder').default;
+    const setupInboxAjaxInterceptor =
+      require('./inbox/setupAjaxInterceptor').default;
 
     const pageOrigin: string =
       (process.env.NODE_ENV === 'test' && global.__test_origin) ||

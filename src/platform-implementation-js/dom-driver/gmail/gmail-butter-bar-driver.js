@@ -55,25 +55,25 @@ const elements = streamWaitFor(() =>
 const googleNoticeMutationChunks = elements.flatMapLatest(({ googleNotice }) =>
   makeMutationObserverChunkedStream(googleNotice, { childList: true })
 );
-const googleAddedNotice = googleNoticeMutationChunks.filter(mutations =>
-  mutations.some(m => m.addedNodes.length > 0)
+const googleAddedNotice = googleNoticeMutationChunks.filter((mutations) =>
+  mutations.some((m) => m.addedNodes.length > 0)
 );
 const googleRemovedNotice = googleNoticeMutationChunks.filter(
-  mutations => !mutations.some(m => m.addedNodes.length > 0)
+  (mutations) => !mutations.some((m) => m.addedNodes.length > 0)
 );
 
 const sdkRemovedNotice = elements
   .flatMapLatest(({ sdkNotice }) =>
     makeMutationObserverChunkedStream(sdkNotice, {
       attributes: true,
-      attributeFilter: ['data-inboxsdk-id']
+      attributeFilter: ['data-inboxsdk-id'],
     }).map(() => sdkNotice.getAttribute('data-inboxsdk-id'))
   )
-  .filter(id => id == null);
+  .filter((id) => id == null);
 
 const noticeAvailableStream = Kefir.merge([
   googleRemovedNotice,
-  sdkRemovedNotice
+  sdkRemovedNotice,
 ]);
 
 function hideMessage(noticeContainer, googleNotice, sdkNotice) {
@@ -174,10 +174,10 @@ export default class GmailButterBarDriver {
       }
 
       if (rawOptions.buttons) {
-        rawOptions.buttons.forEach(buttonDescriptor => {
+        rawOptions.buttons.forEach((buttonDescriptor) => {
           const button = document.createElement('span');
           button.classList.add('ag', 'a8k');
-          button.onclick = e => buttonDescriptor.onClick(e);
+          button.onclick = (e) => buttonDescriptor.onClick(e);
           button.setAttribute('role', 'button');
           button.tabIndex = 0;
           button.textContent = buttonDescriptor.title;
@@ -190,9 +190,7 @@ export default class GmailButterBarDriver {
         '.inboxsdk__butterbar-close'
       );
       if (closeButton) {
-        Kefir.fromEvents(closeButton, 'click')
-          .take(1)
-          .onValue(destroy);
+        Kefir.fromEvents(closeButton, 'click').take(1).onValue(destroy);
       }
 
       if (rawOptions.className) {

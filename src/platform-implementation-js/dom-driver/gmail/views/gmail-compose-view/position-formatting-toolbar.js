@@ -16,7 +16,8 @@ export default function positionFormattingToolbar(
       arrowElement.offsetWidth / 2;
     arrowElement.style.left = left + 'px';
 
-    const statusBarPrependContainer = gmailComposeView.getStatusBarPrependContainer();
+    const statusBarPrependContainer =
+      gmailComposeView.getStatusBarPrependContainer();
     if (statusBarPrependContainer) {
       formattingToolbar.style.bottom =
         -1 * statusBarPrependContainer.offsetHeight + 'px';

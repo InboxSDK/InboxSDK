@@ -31,7 +31,7 @@ export default class NavItemView extends EventEmitter {
       navItemDescriptorPropertyStream,
       deferred: defer(),
       navItemViews: [],
-      navItemViewDriver: (null: ?Object)
+      navItemViewDriver: (null: ?Object),
     };
     memberMap.set(this, members);
 
@@ -56,7 +56,7 @@ export default class NavItemView extends EventEmitter {
       navItemDescriptorPropertyStream
     );
 
-    members.deferred.promise.then(function(navItemViewDriver) {
+    members.deferred.promise.then(function (navItemViewDriver) {
       var childNavItemViewDriver = navItemViewDriver.addNavItem(
         members.appId,
         navItemDescriptorPropertyStream
@@ -81,7 +81,7 @@ export default class NavItemView extends EventEmitter {
 
     members.navItemDescriptorPropertyStream
       .sampledBy(navItemViewDriver.getEventStream(), (a, b) => [a, b])
-      .onValue(navItemDescriptor =>
+      .onValue((navItemDescriptor) =>
         _handleViewDriverStreamEvent(
           this,
           navItemViewDriver,
@@ -92,7 +92,7 @@ export default class NavItemView extends EventEmitter {
 
     Kefir.combine([
       members.navItemDescriptorPropertyStream,
-      driver.getRouteViewDriverStream()
+      driver.getRouteViewDriverStream(),
     ])
       .takeUntilBy(
         navItemViewDriver
@@ -100,7 +100,7 @@ export default class NavItemView extends EventEmitter {
           .filter(() => false)
           .beforeEnd(() => null)
       )
-      .onValue(x => {
+      .onValue((x) => {
         _handleRouteViewChange(navItemViewDriver, x);
       });
 
@@ -117,11 +117,11 @@ export default class NavItemView extends EventEmitter {
     this.destroyed = true;
     this.emit('destroy');
 
-    navItemViews.forEach(function(navItemView) {
+    navItemViews.forEach(function (navItemView) {
       navItemView.remove();
     });
 
-    members.deferred.promise.then(navItemViewDriver => {
+    members.deferred.promise.then((navItemViewDriver) => {
       navItemViewDriver.destroy();
     });
   }
@@ -138,7 +138,7 @@ export default class NavItemView extends EventEmitter {
   }
 
   setCollapsed(collapseValue: boolean) {
-    get(memberMap, this).deferred.promise.then(navItemViewDriver => {
+    get(memberMap, this).deferred.promise.then((navItemViewDriver) => {
       navItemViewDriver.setCollapsed(collapseValue);
     });
   }
@@ -160,7 +160,7 @@ function _handleViewDriverStreamEvent(
         const syntheticEvent = {
           preventDefault() {
             defaultPrevented = true;
-          }
+          },
         };
 
         navItemDescriptor.onClick(syntheticEvent);

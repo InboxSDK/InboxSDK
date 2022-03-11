@@ -85,7 +85,7 @@
     "gulp-uglify": "^2.0.0",
     "gulp-util": "^3.0.3",
     "http-server": "^0.10.0",
-    "husky": "^2.3.0",
+    "husky": "^7.0.4",
     "immutability-helper": "^3.0.0",
     "jest": "^27.0.4",
     "jest-circus": "^27.0.4",
@@ -95,6 +95,7 @@
     "kefir-cast": "^3.3.0",
     "kefir-stopper": "^2.1.0",
     "lazypipe": "^1.0.1",
+    "lint-staged": "^12.3.5",
     "live-set": "^1.0.0",
     "lodash": "^4.14.0",
     "map-indexed-xf": "^1.0.0",
@@ -105,9 +106,7 @@
     "page-parser-tree": "^0.4.0",
     "pdelay": "^2.0.0",
     "postcss-selector-parser": "^2.2.0",
-    "prettier": "^1.19.1",
-    "prettier-check": "^2.0.0",
-    "pretty-quick": "^2.0.1",
+    "prettier": "2.5.1",
     "puppeteer": "^10.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -134,33 +133,29 @@
     "yarn-deps-check": "^2.0.0"
   },
   "description": "Library for browser extensions to interact with Gmail.",
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged"
-    }
-  },
   "license": "(MIT OR Apache-2.0)",
   "main": "src/inboxsdk-js/inboxsdk.js",
   "name": "inboxsdk",
-  "prettier": {
-    "singleQuote": true
-  },
   "private": true,
   "redirectify": {
     "base": ".",
     "dir": "overrides"
   },
   "scripts": {
+    "prepare": "husky install",
     "publish-npm": "gulp clean && gulp --production --minify && cd packages/core/ && yarn publish && git push --follow-tags",
     "flow_check": "flow check",
     "jest": "jest",
     "lint": "eslint . --ext js,jsx,ts,tsx,flow",
     "lint-fix": "eslint . --ext js,jsx,ts,tsx,flow --fix",
-    "prettier-check": "prettier-check '**/*.{js,jsx,ts,tsx}'",
-    "prettier-fix": "prettier --write '**/*.{js,jsx,ts,tsx}'",
+    "prettier-check": "prettier --check .",
+    "prettier-fix": "prettier --write .",
     "puppeteer": "jest -c test/chrome/jest.config.js --runInBand",
     "start": "gulp default --watch --reloader",
     "test": "yarn run lint && yarn run prettier-check && yarn run flow_check && tsc && jest"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   },
   "version": "0.7.25"
 }

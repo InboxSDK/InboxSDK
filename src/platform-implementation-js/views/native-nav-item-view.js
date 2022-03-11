@@ -21,7 +21,7 @@ export default class NativeNavItemView extends EventEmitter {
       labelName,
       deferred: defer(),
       navItemViews: [],
-      navItemViewDriver: (null: ?Object)
+      navItemViewDriver: (null: ?Object),
     };
     memberMap.set(this, members);
   }
@@ -39,7 +39,7 @@ export default class NativeNavItemView extends EventEmitter {
       navItemDescriptorPropertyStream
     );
 
-    members.deferred.promise.then(navItemViewDriver => {
+    members.deferred.promise.then((navItemViewDriver) => {
       const childNavItemViewDriver = navItemViewDriver.addNavItem(
         members.appId,
         navItemDescriptorPropertyStream
@@ -61,7 +61,7 @@ export default class NativeNavItemView extends EventEmitter {
     members.navItemViewDriver = navItemViewDriver;
     navItemViewDriver
       .getEventStream()
-      .onValue(event => _handleStreamEvent(this, event));
+      .onValue((event) => _handleStreamEvent(this, event));
 
     members.deferred.resolve(navItemViewDriver);
   }

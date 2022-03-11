@@ -38,15 +38,15 @@ class InboxComposeButtonView {
     buttonEl.className = 'inboxsdk__button_icon';
     const img = document.createElement('img');
     img.className = 'inboxsdk__button_iconImg';
-    let onClick = ignored => {};
+    let onClick = (ignored) => {};
     let hasDropdown = false;
     let dropdown = null;
     Kefir.merge([
       Kefir.fromEvents(buttonEl, 'click'),
-      fromEventTargetCapture(buttonEl, 'keyup').filter(e =>
+      fromEventTargetCapture(buttonEl, 'keyup').filter((e) =>
         includes([32 /*space*/, 13 /*enter*/], e.which)
-      )
-    ]).onValue(event => {
+      ),
+    ]).onValue((event) => {
       event.preventDefault();
       event.stopPropagation();
       this.closeTooltip();
@@ -61,7 +61,7 @@ class InboxComposeButtonView {
             position: 'top',
             hAlign: 'left',
             vAlign: 'bottom',
-            buffer: 5
+            buffer: 5,
           });
           dropdown.on('destroy', () => {
             this._buttonEl.classList.remove('inboxsdk__active');
@@ -75,7 +75,7 @@ class InboxComposeButtonView {
 
     buttonDescriptor
       .takeUntilBy(composeView.getStopper())
-      .onValue(buttonDescriptor => {
+      .onValue((buttonDescriptor) => {
         if (!buttonDescriptor) {
           buttonEl.remove();
           lastOrderHint = null;

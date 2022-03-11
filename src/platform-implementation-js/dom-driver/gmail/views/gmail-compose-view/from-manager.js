@@ -19,13 +19,13 @@ export function getFromContact(
   const fromContactChoices = getFromContactChoices(driver, gmailComposeView);
   const matchingContact: ?Contact = find(
     fromContactChoices,
-    contact => contact.emailAddress === emailAddress
+    (contact) => contact.emailAddress === emailAddress
   );
   let name;
   if (!matchingContact) {
     name = emailAddress;
     driver.getLogger().error(new Error('getFromContact failed to find name'), {
-      fromContactChoicesLength: fromContactChoices.length
+      fromContactChoicesLength: fromContactChoices.length,
     });
   } else {
     name = matchingContact.name;
@@ -46,9 +46,9 @@ export function getFromContactChoices(
     // From field isn't present
     return [driver.getUserContact()];
   }
-  return Array.from(choiceEls).map(item => ({
+  return Array.from(choiceEls).map((item) => ({
     emailAddress: item.getAttribute('value') || '',
-    name: item.textContent.replace(/<.*/, '').trim()
+    name: item.textContent.replace(/<.*/, '').trim(),
   }));
 }
 
@@ -73,7 +73,7 @@ export function setFromEmail(
   }
   const chosenChoice = find(
     choiceParent.children,
-    item => item.getAttribute('value') == email
+    (item) => item.getAttribute('value') == email
   );
   if (!chosenChoice) {
     throw new Error('Chosen email from choice was not found');

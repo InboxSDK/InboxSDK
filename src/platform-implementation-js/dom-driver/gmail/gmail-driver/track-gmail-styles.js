@@ -107,16 +107,16 @@ export default function trackGmailStyles() {
       const observer = new MutationObserver(checkStyles);
       const options = {
         characterData: true,
-        childList: true
+        childList: true,
       };
-      Array.from(document.styleSheets).forEach(sheet => {
+      Array.from(document.styleSheets).forEach((sheet) => {
         if ((sheet.ownerNode: any).tagName == 'STYLE') {
           observer.observe(sheet.ownerNode, options);
         }
       });
       checkStyles();
     })
-    .catch(err => {
+    .catch((err) => {
       Logger.error(err);
     });
 }

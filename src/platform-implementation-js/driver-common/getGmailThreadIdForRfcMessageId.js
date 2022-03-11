@@ -38,15 +38,15 @@ async function forOldAPI(
       num: '1',
       rt: 'c',
       search: 'query',
-      q: `rfc822msgid:${rfcMessageId}`
+      q: `rfc822msgid:${rfcMessageId}`,
     },
     xhrFields: {
-      withCredentials: true
+      withCredentials: true,
     },
     canRetry: true,
     headers: {
-      'content-type': 'application/x-www-form-urlencoded;charset=UTF-8'
-    }
+      'content-type': 'application/x-www-form-urlencoded;charset=UTF-8',
+    },
   });
 
   const threads = extractThreads(response.text);

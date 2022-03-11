@@ -26,13 +26,15 @@ export default class GmailAppToolbarButtonView {
     this._driver = driver;
     this._stopper = kefirStopper();
     this._iconSettings = {};
-    inButtonDescriptor.takeUntilBy(this._stopper).onValue(buttonDescriptor => {
-      try {
-        this._handleButtonDescriptor(buttonDescriptor);
-      } catch (err) {
-        this._driver.getLogger().error(err);
-      }
-    });
+    inButtonDescriptor
+      .takeUntilBy(this._stopper)
+      .onValue((buttonDescriptor) => {
+        try {
+          this._handleButtonDescriptor(buttonDescriptor);
+        } catch (err) {
+          this._driver.getLogger().error(err);
+        }
+      });
 
     monitorTopBannerSizeAndReact();
   }
@@ -143,7 +145,7 @@ export default class GmailAppToolbarButtonView {
       if (this._element) {
         tooltipView.anchor(this._element, {
           position: 'bottom',
-          offset: { top: 8 }
+          offset: { top: 8 },
         });
       }
     }
@@ -173,7 +175,7 @@ function _createAppButtonElement(
     driver.getLogger().error(err, {
       type: 'failed to make appToolbarButton',
       gbsfwPresent: !!document.getElementById('gbsfw'),
-      bannerHtml: banner && censorHTMLtree(banner)
+      bannerHtml: banner && censorHTMLtree(banner),
     });
     throw err;
   }
@@ -184,7 +186,7 @@ function _createAppButtonElement(
     const err = new Error('Could not make button');
     driver.getLogger().error(err, {
       type: 'failed to make appToolbarButton',
-      topAccountContainerHTML: censorHTMLtree(topAccountContainer)
+      topAccountContainerHTML: censorHTMLtree(topAccountContainer),
     });
     throw err;
   }
@@ -199,7 +201,7 @@ function _createAppButtonElement(
   } catch (err) {
     driver.getLogger().error(err, {
       type: 'failed to make appToolbarButton',
-      insertionElementHTML: censorHTMLtree(insertionElement)
+      insertionElementHTML: censorHTMLtree(insertionElement),
     });
     throw err;
   }
@@ -207,6 +209,7 @@ function _createAppButtonElement(
 
 function _updateTitle(element: HTMLElement, descriptor: Object) {
   element.textContent = descriptor.title;
-  element.className = `inboxsdk__appButton_title ${descriptor.titleClass ||
-    ''}`;
+  element.className = `inboxsdk__appButton_title ${
+    descriptor.titleClass || ''
+  }`;
 }

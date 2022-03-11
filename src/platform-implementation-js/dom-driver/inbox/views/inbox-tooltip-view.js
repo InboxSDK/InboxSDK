@@ -116,7 +116,7 @@ class InboxTooltipView {
       position: 'top',
       hAlign: 'center',
       vAlign: 'center',
-      buffer: 10
+      buffer: 10,
     });
     containByScreen(this._arrowEl, this._target, {
       position: position,
@@ -125,9 +125,9 @@ class InboxTooltipView {
       forceHAlign: true,
       vAlign: 'center',
       forceVAlign: true,
-      buffer: 11 // needs to overlap 1px of border
+      buffer: 11, // needs to overlap 1px of border
     });
-    ['top', 'bottom', 'left', 'right'].forEach(x => {
+    ['top', 'bottom', 'left', 'right'].forEach((x) => {
       this._arrowEl.classList.remove('inboxsdk__' + x);
     });
     this._arrowEl.classList.add('inboxsdk__' + position);

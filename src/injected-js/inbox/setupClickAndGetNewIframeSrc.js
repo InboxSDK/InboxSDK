@@ -10,33 +10,34 @@ export default function setupClickAndGetNewIframeSrc() {
     .filter(({ el }) => el.nodeName === 'IFRAME' && !el.hasAttribute('src'))
     .onValue(({ el }) => {
       const document = (el: any).contentDocument;
-      document.addEventListener('inboxSDKclickAndGetNewIframeSrc', function(
-        event: Object
-      ) {
-        clickAndGetNewIframeSrc(event.target)
-          .then(src => {
-            event.target.dispatchEvent(
-              new CustomEvent('inboxSDKclickAndGetNewIframeSrcResult', {
-                bubbles: false,
-                cancelable: false,
-                detail: { type: 'success', src }
-              })
-            );
-          })
-          .catch(err => {
-            event.target.dispatchEvent(
-              new CustomEvent('inboxSDKclickAndGetNewIframeSrcResult', {
-                bubbles: false,
-                cancelable: false,
-                detail: {
-                  type: 'error',
-                  message: err.message,
-                  stack: err.stack
-                }
-              })
-            );
-          });
-      });
+      document.addEventListener(
+        'inboxSDKclickAndGetNewIframeSrc',
+        function (event: Object) {
+          clickAndGetNewIframeSrc(event.target)
+            .then((src) => {
+              event.target.dispatchEvent(
+                new CustomEvent('inboxSDKclickAndGetNewIframeSrcResult', {
+                  bubbles: false,
+                  cancelable: false,
+                  detail: { type: 'success', src },
+                })
+              );
+            })
+            .catch((err) => {
+              event.target.dispatchEvent(
+                new CustomEvent('inboxSDKclickAndGetNewIframeSrcResult', {
+                  bubbles: false,
+                  cancelable: false,
+                  detail: {
+                    type: 'error',
+                    message: err.message,
+                    stack: err.stack,
+                  },
+                })
+              );
+            });
+        }
+      );
     });
 }
 
@@ -48,7 +49,7 @@ const getIframeSrcDescriptor = once(() =>
   Object.getOwnPropertyDescriptor(getIframeProto(), 'src')
 );
 
-const iframeSrcSets: Kefir.Observable<string> = Kefir.stream(emitter => {
+const iframeSrcSets: Kefir.Observable<string> = Kefir.stream((emitter) => {
   const iframeProto = getIframeProto();
   const originalDescriptor = getIframeSrcDescriptor();
   (Object: any).defineProperty(iframeProto, 'src', {
@@ -56,7 +57,7 @@ const iframeSrcSets: Kefir.Observable<string> = Kefir.stream(emitter => {
     configurable: true,
     set(src) {
       emitter.emit(src);
-    }
+    },
   });
   return () => {
     (Object: any).defineProperty(iframeProto, 'src', originalDescriptor);
@@ -67,7 +68,7 @@ function clickAndGetNewIframeSrc(el: HTMLElement): Promise<string> {
   const pr = iframeSrcSets
     .merge(Kefir.later(10 * 1000, null))
     .take(1)
-    .flatMap(result =>
+    .flatMap((result) =>
       result
         ? Kefir.constant(result)
         : Kefir.constantError(new Error('timed out waiting for iframe src set'))

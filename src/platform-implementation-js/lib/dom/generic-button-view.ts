@@ -38,16 +38,16 @@ export default class GenericButtonView {
       'click'
     );
 
-    clickEventStream.onValue(event => {
+    clickEventStream.onValue((event) => {
       event.stopPropagation();
       event.preventDefault();
     });
 
     this._eventStream.plug(
-      clickEventStream.map(event => {
+      clickEventStream.map((event) => {
         return {
           eventName: 'click',
-          domEvent: event
+          domEvent: event,
         };
       })
     );

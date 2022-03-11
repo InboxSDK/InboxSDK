@@ -13,7 +13,7 @@ export default async function getThreadFromSyncThreadId(
 ): Promise<?SyncThread> {
   const [btaiHeader, xsrfToken] = await Promise.all([
     driver.getPageCommunicator().getBtaiHeader(),
-    driver.getPageCommunicator().getXsrfToken()
+    driver.getPageCommunicator().getXsrfToken(),
   ]);
   return getThreadFromSyncThreadIdUsingHeaders(
     syncThreadId,
@@ -34,16 +34,16 @@ export async function getThreadFromSyncThreadIdUsingHeaders(
       'Content-Type': 'application/json',
       'X-Framework-Xsrf-Token': xsrfToken,
       'X-Gmail-BTAI': btaiHeader,
-      'X-Google-BTD': '1'
+      'X-Google-BTD': '1',
     },
     data: JSON.stringify({
       '1': [
         {
           '1': syncThreadId,
-          '2': 1
-        }
-      ]
-    })
+          '2': 1,
+        },
+      ],
+    }),
   });
 
   const threadDescriptors = extractThreadsFromThreadResponse(text);

@@ -23,7 +23,7 @@ class Compose {
       handlerRegistry: new HandlerRegistry(),
       composeViewStream: driver
         .getComposeViewDriverStream()
-        .map(viewDriver => (membrane.get(viewDriver): ComposeView))
+        .map((viewDriver) => (membrane.get(viewDriver): ComposeView)),
     };
     memberMap.set(this, members);
 
@@ -31,7 +31,7 @@ class Compose {
       members.handlerRegistry.dumpHandlers();
     });
 
-    members.composeViewStream.onValue(view => {
+    members.composeViewStream.onValue((view) => {
       driver.getLogger().trackFunctionPerformance(
         () => {
           members.handlerRegistry.addTarget(view);
@@ -39,7 +39,7 @@ class Compose {
         SAMPLE_RATE,
         {
           type: 'composeViewHandler',
-          isInlineReplyForm: view.isInlineReplyForm()
+          isInlineReplyForm: view.isInlineReplyForm(),
         }
       );
     });

@@ -11,7 +11,7 @@ test('works', () => {
     parseParamsFromRouteID('test/:id/blah/:foo', 'test/123/blah/456')
   ).toEqual({
     id: '123',
-    foo: '456'
+    foo: '456',
   });
 });
 
@@ -23,6 +23,6 @@ test('decodes URI component', () => {
     )
   ).toEqual({
     id: '123',
-    foo: 'test <>+"\'& _'
+    foo: 'test <>+"\'& _',
   });
 });

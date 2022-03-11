@@ -16,7 +16,7 @@ export default async function triggerRelayEvent(
     new CustomEvent('inboxsdk_event_relay', {
       bubbles: true,
       cancelable: false,
-      detail
+      detail,
     })
   );
 }

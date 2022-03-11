@@ -8,8 +8,8 @@ import fs from 'fs';
 import assert from 'assert';
 import signIn from './lib/signIn';
 
-describe('Inbox', function() {
-  it('works', function() {
+describe('Inbox', function () {
+  it('works', function () {
     try {
       signIn();
 
@@ -23,7 +23,7 @@ describe('Inbox', function() {
           `button[aria-labelledby="${
             Array.prototype.filter.call(
               document.querySelectorAll('button + label'),
-              el => el.textContent === 'Compose'
+              (el) => el.textContent === 'Compose'
             )[0].id
           }"]`
         )
@@ -58,7 +58,7 @@ describe('Inbox', function() {
         );
         const toField = browser
           .$$('div[role=dialog] input[aria-label="To"]')
-          .find(el => el.isVisible());
+          .find((el) => el.isVisible());
         const subject = $('div[role=dialog] input[title="Subject"]');
         const body = $('div[role=dialog] [aria-label="Body, Say something"]');
         toField.click();
@@ -103,7 +103,7 @@ describe('Inbox', function() {
         );
         const toField = browser
           .$$('div[role=dialog] input[aria-label="To"]')
-          .find(el => el.isVisible());
+          .find((el) => el.isVisible());
         const subject = $('div[role=dialog] input[title="Subject"]');
         const body = $('div[role=dialog] [aria-label="Body, Say something"]');
         toField.click();
@@ -319,7 +319,7 @@ describe('Inbox', function() {
       browser.waitUntil(() => browser.getTabIds().length > 1, 5000);
       const externalUrlTabId = browser
         .getTabIds()
-        .find(id => id !== inboxTabId);
+        .find((id) => id !== inboxTabId);
       browser.switchTab(externalUrlTabId);
       browser.waitUntil(() => {
         const currentUrl = browser.execute(() => window.location.origin).value;

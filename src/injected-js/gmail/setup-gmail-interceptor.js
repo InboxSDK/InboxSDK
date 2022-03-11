@@ -21,7 +21,7 @@ import modifySuggestions from './modify-suggestions';
 
 import {
   getDetailsOfComposeRequest,
-  replaceEmailBodyForSendRequest
+  replaceEmailBodyForSendRequest,
 } from './sync-compose-request-processor';
 
 import type { XHRProxyConnectionDetails } from '../xhr-proxy-factory';
@@ -31,7 +31,7 @@ function logErrorExceptEventListeners(err, details) {
   if (details !== 'XMLHttpRequest event listener error') {
     logger.error(err, details);
   } else {
-    setTimeout(function() {
+    setTimeout(function () {
       // let window.onerror log this
       throw err;
     }, 1);
@@ -65,7 +65,7 @@ export function setupGmailInterceptorOnFrames(
       main_originalXHR,
       main_wrappers,
       {
-        logError: logErrorExceptEventListeners
+        logError: logErrorExceptEventListeners,
       }
     );
   }
@@ -103,23 +103,23 @@ export function setupGmailInterceptorOnFrames(
       'inboxSDKunregisterComposeRequestModifier'
     ).onValue(({ detail }) => {
       const { keyId, modifierId } = detail;
-      modifiers[keyId] = modifiers[keyId].filter(item => item !== modifierId);
+      modifiers[keyId] = modifiers[keyId].filter((item) => item !== modifierId);
       if (modifiers[keyId].length === 0) {
         delete modifiers[keyId];
       }
     });
 
     js_frame_wrappers.push({
-      isRelevantTo: function(connection) {
+      isRelevantTo: function (connection) {
         return connection.params.act === 'sm';
       },
-      originalSendBodyLogger: function(connection, body) {
+      originalSendBodyLogger: function (connection, body) {
         triggerEvent({
           type: 'emailSending',
-          body: body
+          body: body,
         });
       },
-      requestChanger: async function(connection, request) {
+      requestChanger: async function (connection, request) {
         let composeParams = querystring.parse(request.body);
         const composeid = composeParams.composeid;
         const composeModifierIds = modifiers[composeParams.composeid];
@@ -150,8 +150,8 @@ export function setupGmailInterceptorOnFrames(
             modifierId,
             composeParams: {
               body: composeParams.body,
-              isPlainText: composeParams.ishtml !== '1'
-            }
+              isPlainText: composeParams.ishtml !== '1',
+            },
           });
 
           let newComposeParams = await modificationPromise;
@@ -159,15 +159,15 @@ export function setupGmailInterceptorOnFrames(
         }
 
         return Object.assign({}, request, {
-          body: stringifyComposeParams(composeParams)
+          body: stringifyComposeParams(composeParams),
         });
       },
-      afterListeners: function(connection) {
+      afterListeners: function (connection) {
         if (connection.status === 200) {
           triggerEvent({
             type: 'emailSent',
             responseText: connection.originalResponseText,
-            originalSendBody: connection.originalSendBody
+            originalSendBody: connection.originalSendBody,
           });
 
           if (connection.originalSendBody) {
@@ -177,20 +177,20 @@ export function setupGmailInterceptorOnFrames(
             delete modifiers[composeParams.composeid];
           }
         }
-      }
+      },
     });
 
     js_frame_wrappers.push({
-      isRelevantTo: function(connection) {
+      isRelevantTo: function (connection) {
         return connection.params.act === 'sd';
       },
-      originalSendBodyLogger: function(connection, body) {
+      originalSendBodyLogger: function (connection, body) {
         triggerEvent({
           type: 'emailDraftSaveSending',
-          body: body
+          body: body,
         });
       },
-      afterListeners: function(connection) {
+      afterListeners: function (connection) {
         if (connection.status === 200) {
           triggerEvent({
             type: 'emailDraftReceived',
@@ -200,11 +200,11 @@ export function setupGmailInterceptorOnFrames(
               method: connection.method,
               url: connection.url,
               params: connection.params,
-              responseType: connection.responseType
-            }
+              responseType: connection.responseType,
+            },
           });
         }
-      }
+      },
     });
 
     {
@@ -248,7 +248,7 @@ export function setupGmailInterceptorOnFrames(
             }
           }
         },
-        requestChanger: async function(connection, request) {
+        requestChanger: async function (connection, request) {
           const composeRequestDetails = getDetailsOfComposeRequest(
             request.body
           );
@@ -283,8 +283,8 @@ export function setupGmailInterceptorOnFrames(
               modifierId,
               composeParams: {
                 body: newEmailBody,
-                isPlainText: false
-              }
+                isPlainText: false,
+              },
             });
 
             const newComposeParams = await modificationPromise;
@@ -292,7 +292,7 @@ export function setupGmailInterceptorOnFrames(
           }
 
           return Object.assign({}, request, {
-            body: replaceEmailBodyForSendRequest(request.body, newEmailBody)
+            body: replaceEmailBodyForSendRequest(request.body, newEmailBody),
           });
         },
         afterListeners(connection) {
@@ -343,7 +343,7 @@ export function setupGmailInterceptorOnFrames(
                     threadID: threadUpdate[4].split('|')[0],
                     messageID: messageUpdate[1],
                     oldMessageID: messageUpdate[56],
-                    oldThreadID: threadUpdate[20]
+                    oldThreadID: threadUpdate[20],
                   });
                 } else {
                   logger.error(new Error('Could not parse draft save'));
@@ -370,7 +370,7 @@ export function setupGmailInterceptorOnFrames(
                       oldMessageID: saveUpdate[48]
                         ? new BigNumber(saveUpdate[48]).toString(16)
                         : saveUpdate[56],
-                      syncThreadID: oldWrapper[1]
+                      syncThreadID: oldWrapper[1],
                     });
                   }
                 }
@@ -383,9 +383,9 @@ export function setupGmailInterceptorOnFrames(
               }
 
               const sendUpdateMatch = updateList.find(
-                update =>
+                (update) =>
                   update[1]?.[3]?.[7]?.[1]?.[5]?.[0]?.[14] &&
-                  update[1][3][7][1][5].find(message =>
+                  update[1][3][7][1][5].find((message) =>
                     includes(message[1], draftID)
                   )
               );
@@ -393,7 +393,7 @@ export function setupGmailInterceptorOnFrames(
               if (!sendUpdateMatch) {
                 if (currentSendConnectionIDs.has(connection)) {
                   const minimalSendUpdates = updateList.filter(
-                    update => update[1]?.[3]?.[5]?.[3]
+                    (update) => update[1]?.[3]?.[5]?.[3]
                   );
 
                   if (minimalSendUpdates.length > 0) {
@@ -407,7 +407,7 @@ export function setupGmailInterceptorOnFrames(
                       messageID:
                         //new compose
                         minimalSendUpdates[0][1][3]?.[5]?.[5]?.[0] || //replies
-                        minimalSendUpdates[0][1][3][5][3]?.[0]
+                        minimalSendUpdates[0][1][3][5][3]?.[0],
                     });
                   } else {
                     sendFailed();
@@ -421,7 +421,7 @@ export function setupGmailInterceptorOnFrames(
 
               const sendUpdateWrapper = sendUpdateMatch[1]?.[3]?.[7]?.[1];
 
-              const sendUpdate = sendUpdateWrapper[5].find(message =>
+              const sendUpdate = sendUpdateWrapper[5].find((message) =>
                 message[1].includes(draftID)
               );
 
@@ -430,9 +430,8 @@ export function setupGmailInterceptorOnFrames(
                 return;
               }
 
-              const isEmailSentResponse = currentSendConnectionIDs.has(
-                connection
-              );
+              const isEmailSentResponse =
+                currentSendConnectionIDs.has(connection);
 
               if (!Array.isArray(sendUpdate[11])) {
                 logger.error(new Error('sendUpdate[11] was not an array'));
@@ -473,7 +472,7 @@ export function setupGmailInterceptorOnFrames(
                 oldThreadID:
                   sendUpdateWrapper[18] != null
                     ? new BigNumber(sendUpdateWrapper[18]).toString(16)
-                    : sendUpdateWrapper[20]
+                    : sendUpdateWrapper[20],
               });
             }
 
@@ -481,7 +480,7 @@ export function setupGmailInterceptorOnFrames(
             currentDraftSaveConnectionIDs.delete(connection);
             currentFirstDraftSaveConnectionIDs.delete(connection);
           }
-        }
+        },
       });
     }
   }
@@ -505,7 +504,7 @@ export function setupGmailInterceptorOnFrames(
 
           threadIdentifier.processThreadListResponse(responseText);
         }
-      }
+      },
     });
   }
 
@@ -525,7 +524,7 @@ export function setupGmailInterceptorOnFrames(
             );
             messageMetadataHolder.add(groupedMessages);
           }
-        }
+        },
       });
     }
 
@@ -533,54 +532,56 @@ export function setupGmailInterceptorOnFrames(
     {
       // search response
       main_wrappers.push({
-        isRelevantTo: function(connection) {
+        isRelevantTo: function (connection) {
           return /sync(?:\/u\/\d+)?\/i\/bv/.test(connection.url);
         },
 
         originalResponseTextLogger(connection) {
           if (connection.status === 200) {
-            const threads = GmailSyncResponseProcessor.extractThreadsFromSearchResponse(
-              connection.originalResponseText
-            );
+            const threads =
+              GmailSyncResponseProcessor.extractThreadsFromSearchResponse(
+                connection.originalResponseText
+              );
             messageMetadataHolder.add(
-              threads.map(syncThread => ({
+              threads.map((syncThread) => ({
                 threadID: syncThread.syncThreadID,
                 messages: syncThread.extraMetaData.syncMessageData.map(
-                  syncMessage => ({
+                  (syncMessage) => ({
                     date: syncMessage.date,
-                    recipients: syncMessage.recipients
+                    recipients: syncMessage.recipients,
                   })
-                )
+                ),
               }))
             );
           }
-        }
+        },
       });
 
       // thread response
       main_wrappers.push({
-        isRelevantTo: function(connection) {
+        isRelevantTo: function (connection) {
           return /sync(?:\/u\/\d+)?\/i\/fd/.test(connection.url);
         },
 
         originalResponseTextLogger(connection) {
           if (connection.status === 200) {
-            const threads = GmailSyncResponseProcessor.extractThreadsFromThreadResponse(
-              connection.originalResponseText
-            );
+            const threads =
+              GmailSyncResponseProcessor.extractThreadsFromThreadResponse(
+                connection.originalResponseText
+              );
             messageMetadataHolder.add(
-              threads.map(syncThread => ({
+              threads.map((syncThread) => ({
                 threadID: syncThread.syncThreadID,
                 messages: syncThread.extraMetaData.syncMessageData.map(
-                  syncMessage => ({
+                  (syncMessage) => ({
                     date: syncMessage.date,
-                    recipients: syncMessage.recipients
+                    recipients: syncMessage.recipients,
                   })
-                )
+                ),
               }))
             );
           }
-        }
+        },
       });
     }
   }
@@ -597,40 +598,42 @@ export function setupGmailInterceptorOnFrames(
     let suggestionModifications;
     let currentQueryDefer;
 
-    document.addEventListener('inboxSDKregisterSuggestionsModifier', function({
-      detail
-    }: any) {
-      providers[detail.providerID] = {
-        position: Object.keys(providers).length
-      };
-    });
+    document.addEventListener(
+      'inboxSDKregisterSuggestionsModifier',
+      function ({ detail }: any) {
+        providers[detail.providerID] = {
+          position: Object.keys(providers).length,
+        };
+      }
+    );
 
-    document.addEventListener('inboxSDKprovideSuggestions', function({
-      detail
-    }: any) {
-      if (detail.query === currentQuery) {
-        const provider = providers[detail.providerID];
-        if (!provider) {
-          throw new Error('provider does not exist for providerID');
-        }
-
-        if (suggestionModifications == null) {
-          throw new Error('tried to modified a null suggestionModifications');
-        }
-
-        suggestionModifications[provider.position] = detail.suggestions;
-        if (
-          suggestionModifications.filter(Boolean).length ===
-          Object.keys(providers).length
-        ) {
-          if (currentQueryDefer == null) {
-            throw new Error('tried to resolve a null currentQueryDefer');
+    document.addEventListener(
+      'inboxSDKprovideSuggestions',
+      function ({ detail }: any) {
+        if (detail.query === currentQuery) {
+          const provider = providers[detail.providerID];
+          if (!provider) {
+            throw new Error('provider does not exist for providerID');
           }
-          currentQueryDefer.resolve(flatten(suggestionModifications));
-          currentQueryDefer = currentQuery = suggestionModifications = null;
+
+          if (suggestionModifications == null) {
+            throw new Error('tried to modified a null suggestionModifications');
+          }
+
+          suggestionModifications[provider.position] = detail.suggestions;
+          if (
+            suggestionModifications.filter(Boolean).length ===
+            Object.keys(providers).length
+          ) {
+            if (currentQueryDefer == null) {
+              throw new Error('tried to resolve a null currentQueryDefer');
+            }
+            currentQueryDefer.resolve(flatten(suggestionModifications));
+            currentQueryDefer = currentQuery = suggestionModifications = null;
+          }
         }
       }
-    });
+    );
 
     main_wrappers.push({
       isRelevantTo(connection) {
@@ -656,7 +659,7 @@ export function setupGmailInterceptorOnFrames(
         suggestionModifications = [];
         triggerEvent({
           type: 'suggestionsRequest',
-          query: currentQuery
+          query: currentQuery,
         });
       },
       async responseTextChanger(connection, responseText) {
@@ -667,7 +670,7 @@ export function setupGmailInterceptorOnFrames(
           }
         }
         return responseText;
-      }
+      },
     });
   }
 
@@ -684,23 +687,25 @@ export function setupGmailInterceptorOnFrames(
     const customSearchTerms = [];
     let queryReplacement;
 
-    document.addEventListener('inboxSDKcreateCustomSearchTerm', function(
-      event: any
-    ) {
-      customSearchTerms.push(event.detail.term);
-    });
-
-    document.addEventListener('inboxSDKsearchReplacementReady', function(
-      event: any
-    ) {
-      if (queryReplacement.query === event.detail.query) {
-        queryReplacement.newQuery.resolve(event.detail.newQuery);
+    document.addEventListener(
+      'inboxSDKcreateCustomSearchTerm',
+      function (event: any) {
+        customSearchTerms.push(event.detail.term);
       }
-    });
+    );
+
+    document.addEventListener(
+      'inboxSDKsearchReplacementReady',
+      function (event: any) {
+        if (queryReplacement.query === event.detail.query) {
+          queryReplacement.newQuery.resolve(event.detail.newQuery);
+        }
+      }
+    );
 
     // classic Gmail API intercept
     js_frame_wrappers.push({
-      isRelevantTo: function(connection) {
+      isRelevantTo: function (connection) {
         let customSearchTerm;
         const params = connection.params;
         if (
@@ -738,43 +743,43 @@ export function setupGmailInterceptorOnFrames(
               term: customSearchTerm,
               query: params.q,
               start: params.start,
-              newQuery: defer()
+              newQuery: defer(),
             };
 
             triggerEvent({
               type: 'searchQueryForReplacement',
               term: customSearchTerm,
-              query: params.q
+              query: params.q,
             });
           }
           return true;
         }
         return false;
       },
-      requestChanger: function(connection, request) {
+      requestChanger: function (connection, request) {
         return (connection: any)._queryReplacement.newQuery.promise.then(
-          function(newQuery) {
+          function (newQuery) {
             let newParams = clone(connection.params);
             newParams.q = newQuery;
             return {
               method: request.method,
               url: '?' + stringify(newParams),
-              body: request.body
+              body: request.body,
             };
           }
         );
-      }
+      },
     });
 
     // newer, sync API based request intercept
     main_wrappers.push({
-      isRelevantTo: function(connection) {
+      isRelevantTo: function (connection) {
         return (
           connection.method === 'POST' &&
           /sync(?:\/u\/\d+)?\/i\/bv/.test(connection.url)
         );
       },
-      requestChanger: function(connection, request) {
+      requestChanger: function (connection, request) {
         let customSearchTerm;
         const body = JSON.parse(request.body);
         const payload = body[1];
@@ -814,27 +819,27 @@ export function setupGmailInterceptorOnFrames(
             term: customSearchTerm,
             query: searchString,
             start: pageOffset,
-            newQuery: defer()
+            newQuery: defer(),
           };
 
           triggerEvent({
             type: 'searchQueryForReplacement',
             term: customSearchTerm,
-            query: searchString
+            query: searchString,
           });
         }
 
         return (connection: any)._queryReplacement.newQuery.promise.then(
-          function(newQuery) {
+          function (newQuery) {
             body[1][4] = newQuery;
             return {
               method: request.method,
               url: request.url,
-              body: JSON.stringify(body)
+              body: JSON.stringify(body),
             };
           }
         );
-      }
+      },
     });
   }
 
@@ -863,7 +868,7 @@ export function setupGmailInterceptorOnFrames(
 
         customListJob.newRequestParams.resolve({
           query: newQuery,
-          start: newStart
+          start: newStart,
         });
       }
     });
@@ -875,7 +880,7 @@ export function setupGmailInterceptorOnFrames(
     });
 
     js_frame_wrappers.push({
-      isRelevantTo: function(connection) {
+      isRelevantTo: function (connection) {
         let customSearchQuery;
         const params = connection.params;
         if (
@@ -885,14 +890,14 @@ export function setupGmailInterceptorOnFrames(
           connection.url.match(/^\?/) &&
           params.q &&
           !params.act &&
-          (customSearchQuery = find(customSearchQueries, x => x === params.q))
+          (customSearchQuery = find(customSearchQueries, (x) => x === params.q))
         ) {
           if (customListJob) {
             // Resolve the old one with something because no one else is going
             // to after it's replaced in a moment.
             customListJob.newRequestParams.resolve({
               query: customListJob.query,
-              start: customListJob.start
+              start: customListJob.start,
             });
             customListJob.newResults.resolve(null);
           }
@@ -900,18 +905,18 @@ export function setupGmailInterceptorOnFrames(
             query: params.q,
             start: +params.start,
             newRequestParams: defer(),
-            newResults: defer()
+            newResults: defer(),
           };
           triggerEvent({
             type: 'searchForReplacement',
             query: customListJob.query,
-            start: customListJob.start
+            start: customListJob.start,
           });
           return true;
         }
         return false;
       },
-      requestChanger: function(connection, request) {
+      requestChanger: function (connection, request) {
         return (connection: any)._customListJob.newRequestParams.promise.then(
           ({ query, start }) => {
             const newParams = clone(connection.params);
@@ -920,34 +925,34 @@ export function setupGmailInterceptorOnFrames(
             return {
               method: request.method,
               url: '?' + stringify(newParams),
-              body: request.body
+              body: request.body,
             };
           }
         );
       },
-      responseTextChanger: function(connection, response) {
+      responseTextChanger: function (connection, response) {
         triggerEvent({
           type: 'searchResultsResponse',
           query: (connection: any)._customListJob.query,
           start: (connection: any)._customListJob.start,
-          response
+          response,
         });
         return (connection: any)._customListJob.newResults.promise.then(
-          newResults => (newResults === null ? response : newResults)
+          (newResults) => (newResults === null ? response : newResults)
         );
-      }
+      },
     });
 
     // Sync API-based custom thread list interception
     main_wrappers.push({
-      isRelevantTo: function(connection) {
+      isRelevantTo: function (connection) {
         if (/sync(?:\/u\/\d+)?\/i\/bv/.test(connection.url)) {
           if (customListJob) {
             // Resolve the old one with something because no one else is going
             // to after it's replaced in a moment.
             customListJob.newRequestParams.resolve({
               query: customListJob.query,
-              start: customListJob.start
+              start: customListJob.start,
             });
             customListJob.newResults.resolve(null);
           }
@@ -955,7 +960,7 @@ export function setupGmailInterceptorOnFrames(
         }
         return false;
       },
-      requestChanger: async function(connection, request) {
+      requestChanger: async function (connection, request) {
         if (request.body) {
           const parsedBody = JSON.parse(request.body);
 
@@ -963,17 +968,17 @@ export function setupGmailInterceptorOnFrames(
           const searchQuery =
             (parsedBody && parsedBody[1] && parsedBody[1][4]) || '';
 
-          if (find(customSearchQueries, x => x === searchQuery)) {
+          if (find(customSearchQueries, (x) => x === searchQuery)) {
             customListJob = (connection: any)._customListJob = {
               query: searchQuery,
               start: parsedBody[1][10],
               newRequestParams: defer(),
-              newResults: defer()
+              newResults: defer(),
             };
             triggerEvent({
               type: 'searchForReplacement',
               query: customListJob.query,
-              start: customListJob.start
+              start: customListJob.start,
             });
 
             return (connection: any)._customListJob.newRequestParams.promise.then(
@@ -984,7 +989,7 @@ export function setupGmailInterceptorOnFrames(
                 return {
                   method: request.method,
                   url: request.url,
-                  body: JSON.stringify(parsedBody)
+                  body: JSON.stringify(parsedBody),
                 };
               }
             );
@@ -993,28 +998,28 @@ export function setupGmailInterceptorOnFrames(
 
         return request;
       },
-      responseTextChanger: async function(connection, response) {
+      responseTextChanger: async function (connection, response) {
         if ((connection: any)._customListJob) {
           triggerEvent({
             type: 'searchResultsResponse',
             query: (connection: any)._customListJob.query,
             start: (connection: any)._customListJob.start,
-            response
+            response,
           });
 
           return (connection: any)._customListJob.newResults.promise.then(
-            newResults => (newResults === null ? response : newResults)
+            (newResults) => (newResults === null ? response : newResults)
           );
         } else {
           return response;
         }
-      }
+      },
     });
   }
 
   // sync token savers
   {
-    const saveBTAIHeader = header => {
+    const saveBTAIHeader = (header) => {
       (document.head: any).setAttribute('data-inboxsdk-btai-header', header);
       triggerEvent({ type: 'btaiHeaderReceived' });
     };
@@ -1029,10 +1034,10 @@ export function setupGmailInterceptorOnFrames(
         if (connection.headers['X-Gmail-BTAI']) {
           saveBTAIHeader(connection.headers['X-Gmail-BTAI']);
         }
-      }
+      },
     });
 
-    const saveXsrfTokenHeader = header => {
+    const saveXsrfTokenHeader = (header) => {
       (document.head: any).setAttribute('data-inboxsdk-xsrf-token', header);
       triggerEvent({ type: 'xsrfTokenHeaderReceived' });
     };
@@ -1047,7 +1052,7 @@ export function setupGmailInterceptorOnFrames(
         if (connection.headers['X-Framework-Xsrf-Token']) {
           saveXsrfTokenHeader(connection.headers['X-Framework-Xsrf-Token']);
         }
-      }
+      },
     });
   }
 }
@@ -1057,7 +1062,7 @@ function triggerEvent(detail) {
     new CustomEvent('inboxSDKajaxIntercept', {
       bubbles: true,
       cancelable: false,
-      detail
+      detail,
     })
   );
 }

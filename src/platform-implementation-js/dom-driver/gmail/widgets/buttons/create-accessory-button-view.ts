@@ -54,7 +54,7 @@ export default class CreateAccessoryButtonView implements ButtonViewI {
       '<div class="p6">',
       '<div class="p8">▼</div>',
       '</div>',
-      '</div>'
+      '</div>',
     ].join('');
   }
 
@@ -64,13 +64,13 @@ export default class CreateAccessoryButtonView implements ButtonViewI {
       'click'
     );
 
-    clickEventStream.onValue(event => {
+    clickEventStream.onValue((event) => {
       event.stopPropagation();
       event.preventDefault();
     });
 
     this._eventStream.plug(
-      clickEventStream.map(event => ({ eventName: 'click', domEvent: event }))
+      clickEventStream.map((event) => ({ eventName: 'click', domEvent: event }))
     );
   }
 }

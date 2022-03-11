@@ -84,7 +84,7 @@ function modifySuggestions(
       id: modification.id,
       routeName: modification.routeName,
       routeParams: modification.routeParams,
-      externalURL: modification.externalURL
+      externalURL: modification.externalURL,
     };
     nameHTML += autoHtml` <span style="display:none" data-inboxsdk-suggestion="${JSON.stringify(
       data
@@ -119,7 +119,7 @@ function modifySuggestions(
         modification.providerId +
         ' ' +
         (modification.iconClass || ''),
-      0
+      0,
     ];
     if (descriptionHTML != null) {
       newItem[3] = ['aso.eme', description, name, descriptionHTML, nameHTML];
@@ -130,7 +130,7 @@ function modifySuggestions(
       // set empty image
       newItem[6] = [
         'aso.thn',
-        'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=='
+        'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
       ];
       newItem[7] += ' inboxsdk__no_bg';
     } else if (modification.iconUrl) {

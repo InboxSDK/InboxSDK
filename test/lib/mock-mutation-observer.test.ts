@@ -7,12 +7,12 @@ function fakeEl(name: string): any {
 }
 
 it('should work', () => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const c1 = fakeEl('c1'),
       c2 = fakeEl('c2'),
       c3 = fakeEl('c3');
 
-    const obs = new MutationObserver(mutations => {
+    const obs = new MutationObserver((mutations) => {
       expect(mutations.length).toBe(2);
       expect(mutations[0].addedNodes).toEqual([c1, c2]);
       expect(mutations[0].removedNodes).toEqual([c3]);
@@ -31,12 +31,12 @@ it('should work', () => {
 });
 
 it('can disconnect', () => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     const c1 = fakeEl('c1'),
       c2 = fakeEl('c2'),
       c3 = fakeEl('c3');
 
-    const obs = new MutationObserver(mutations => {
+    const obs = new MutationObserver((mutations) => {
       expect(mutations.length).toBe(1);
       expect(mutations[0].addedNodes).toEqual([c1]);
       expect(mutations[0].removedNodes).toEqual([]);

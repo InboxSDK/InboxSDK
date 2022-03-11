@@ -18,7 +18,7 @@ const PlatformImplementationLoader = {
       .then(() => (global as any).__InboxSDKImpLoader.load('0.1', appId, opts));
   },
 
-  _loadScript: once(function() {
+  _loadScript: once(function () {
     let disableSourceMappingURL = true;
     if (window.localStorage) {
       try {
@@ -31,14 +31,14 @@ const PlatformImplementationLoader = {
 
     return loadScript(process.env.IMPLEMENTATION_URL!, {
       nowrap: true, // platform-implementation has no top-level vars so no need for function wrapping
-      disableSourceMappingURL
+      disableSourceMappingURL,
     });
   }),
 
   preload() {
     // Prime the load by calling it and letting the promise be memoized.
     PlatformImplementationLoader._loadScript();
-  }
+  },
 };
 
 export default PlatformImplementationLoader;

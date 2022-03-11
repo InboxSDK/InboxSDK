@@ -32,8 +32,8 @@ export default class GmailSupportItemView {
       .getTagTree()
       .getAllByTag('supportMenu');
 
-    const subscription = supportMenuNodes.subscribe(changes => {
-      changes.forEach(change => {
+    const subscription = supportMenuNodes.subscribe((changes) => {
+      changes.forEach((change) => {
         if (change.type === 'add') {
           this._addSupportElement(
             change.value.getValue(),
@@ -89,14 +89,14 @@ export default class GmailSupportItemView {
       supportElement.append(insertElementContainer);
     }
 
-    insertElementContainer.onclick = event => {
+    insertElementContainer.onclick = (event) => {
       event.preventDefault();
       event.stopPropagation();
       supportItemDescriptor.onClick();
       this._closeSupportMenu(supportElement);
     };
 
-    insertElementContainer.onkeypress = event => {
+    insertElementContainer.onkeypress = (event) => {
       if (event.key === 'Enter') {
         supportItemDescriptor.onClick();
         this._closeSupportMenu(supportElement);

@@ -43,7 +43,7 @@ class GmailLabelView {
       {
         foregroundColor: 'rgb(102, 102, 102)', //dark grey
         backgroundColor: 'rgb(221, 221, 221)', //light grey
-        maxWidth: '90px'
+        maxWidth: '90px',
       },
       labelDescriptor
     );
