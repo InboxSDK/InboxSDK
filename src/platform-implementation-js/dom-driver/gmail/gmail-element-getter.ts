@@ -109,6 +109,9 @@ const GmailElementGetter = {
   },
 
   getLeftNavContainerElement(): HTMLElement | null {
+    if (isIntegratedViewGmail()) {
+      return document.querySelector('div[role=navigation] + div.aqn');
+    }
     return document.querySelector('.aeN');
   },
 
