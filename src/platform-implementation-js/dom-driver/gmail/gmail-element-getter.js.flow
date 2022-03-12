@@ -17,6 +17,7 @@ declare var GmailElementGetter: {
   getFullscreenComposeWindowContainerStream(): Kefir.Observable<ElementWithLifetime>,
   getGtalkButtons(): ?HTMLElement,
   getLeftNavContainerElement(): ?HTMLElement,
+  getLeftNavHeightElement(): ?HTMLElement,
   getMainContentBodyContainerElement(): ?HTMLElement,
   getMainContentContainer(): ?HTMLElement,
   getMainContentElementChangedStream(): Kefir.Observable<HTMLElement>,

@@ -8,7 +8,6 @@ import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 import GmailDriver from '../gmail-driver';
-import isIntegratedViewGmail from './isIntegratedViewGmail';
 
 export default function addNavItem(
   driver: GmailDriver,
