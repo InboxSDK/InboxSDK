@@ -28,7 +28,7 @@ async function gmailAjax(opts: AjaxOpts): Promise<AjaxResponse> {
 
   try {
     return await limitedAjax({ ...opts, canRetry: false });
-  } catch (e) {
+  } catch (e: any) {
     if (e && e.status === 0) {
       // The connection failed for an unspecified reason. One possible reason
       // is that we have no Gmail cookies, and the connection tried to redirect

@@ -54,7 +54,7 @@ const _trackedEventsQueue = new PersistentQueue('events');
 const FIRST_LOADED_TIME = Date.now();
 
 export interface AppLogger {
-  error(err: Error, details?: any): void;
+  error(err: Error | unknown, details?: any): void;
   event(name: string, details?: any): void;
 }
 
@@ -140,19 +140,19 @@ export default class Logger {
     }
   }
 
-  public static error(err: Error, details?: any) {
+  public static error(err: Error | unknown, details?: any) {
     _logError(err, details, undefined, false);
   }
 
-  public error(err: Error, details?: any) {
+  public error(err: Error | unknown, details?: any) {
     _logError(err, details, this._appId, false);
   }
 
-  public errorApp(err: Error, details?: any) {
+  public errorApp(err: Error | unknown, details?: any) {
     _logError(err, details, this._appId, true);
   }
 
-  public errorSite(err: Error, details?: any) {
+  public errorSite(err: Error | unknown, details?: any) {
     // Only the first logger instance reports Site errors.
     if (!this._isMaster) {
       return;
@@ -389,7 +389,7 @@ function getAppIdsProperty(
 
 // err should be an Error instance, and details can be any JSON-ifiable value.
 function _logError(
-  err: Error,
+  err: Error | unknown,
   details: any,
   appId: string | undefined,
   sentByApp: boolean

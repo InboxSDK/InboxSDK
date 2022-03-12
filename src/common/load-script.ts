@@ -119,7 +119,7 @@ export default function loadScript(
         let program;
         try {
           program = indirectEval(codeToRun);
-        } catch (err) {
+        } catch (err: any) {
           if (err && err.name === 'SyntaxError') {
             logError(
               err,
