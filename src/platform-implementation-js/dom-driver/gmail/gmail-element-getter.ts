@@ -115,6 +115,10 @@ const GmailElementGetter = {
     return document.querySelector('.aeN');
   },
 
+  getLeftNavHeightElement(): HTMLElement | null {
+    return document.querySelector('.aeN');
+  },
+
   getMainContentBodyContainerElement(): HTMLElement | null {
     return document.querySelector('.no > .nn.bkK');
   },

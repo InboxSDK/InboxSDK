@@ -246,7 +246,7 @@ class GmailRouteView {
   }
 
   _monitorLeftNavHeight() {
-    var leftNav = GmailElementGetter.getLeftNavContainerElement();
+    var leftNav = GmailElementGetter.getLeftNavHeightElement();
 
     if (!leftNav) {
       return;
@@ -263,7 +263,7 @@ class GmailRouteView {
   }
 
   _setCustomViewElementHeight() {
-    const leftNav = GmailElementGetter.getLeftNavContainerElement();
+    const leftNav = GmailElementGetter.getLeftNavHeightElement();
     const gtalkButtons = GmailElementGetter.getGtalkButtons();
     const customViewEl = this._customViewElement;
     if (!leftNav || !customViewEl) throw new Error('Should not happen');
