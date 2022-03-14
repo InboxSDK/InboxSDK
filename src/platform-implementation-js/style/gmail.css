@@ -2394,3 +2394,11 @@ table[role='presentation'].inboxsdk__thread_view_with_custom_view > tr {
   box-sizing: border-box;
   box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
 }
+
+/* end compose popover */
+
+/* toolbar button style fix */
+
+.T-I.J-J5-Ji.T-I-ax7.T-I-Js-IF.inboxsdk__button .asa::after {
+  width: auto;
+}
