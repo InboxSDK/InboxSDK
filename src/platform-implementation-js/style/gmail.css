@@ -2397,7 +2397,10 @@ table[role='presentation'].inboxsdk__thread_view_with_custom_view > tr {
 
 /* end compose popover */
 
-/* toolbar button style fix */
+/*
+ Toolbar/Thread button style fix for
+ when the gmail setting "Button labels" is set to "text"
+*/
 
 .T-I.J-J5-Ji.T-I-ax7.T-I-Js-IF.inboxsdk__button .asa::after {
   width: auto;
