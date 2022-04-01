@@ -11,7 +11,6 @@ import {
 
 export type ReceiverType = 'to' | 'cc' | 'bcc';
 
-// Should this return a promise until it's finished? Is it useful to expose its asynchronousness?
 export default function setRecipients(
   gmailComposeView: GmailComposeView,
   addressType: ReceiverType,
@@ -101,7 +100,6 @@ export default function setRecipients(
     if (
       emailAddresses.length > 0 &&
       nameEl &&
-      !nameEl.hasAttribute('style') &&
       !nameEl.hasAttribute('data-inboxsdk-handled-reset')
     ) {
       // We're in a fresh compose.
