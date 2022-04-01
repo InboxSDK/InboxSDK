@@ -12,6 +12,7 @@ import {
 
 export type ReceiverType = 'to' | 'cc' | 'bcc';
 
+// Should this return a promise until it's finished? Is it useful to expose its asynchronousness?
 export default function setRecipients(
   gmailComposeView: GmailComposeView,
   addressType: ReceiverType,
@@ -21,28 +22,19 @@ export default function setRecipients(
     return;
   }
 
-  let oldRange;
+  const oldRange = gmailComposeView.getLastSelectionRange();
 
   let _contactRow = getRecipientRowForType(
     gmailComposeView.getElement(),
     addressType
   );
 
-  function needToWaitForCcOrBccButton(button: HTMLElement): boolean {
+  function openRecipientsSectionIfNeeded(button: HTMLElement) {
     const signalElement = button.closest<HTMLElement>('.fX.aiL');
     if (signalElement && signalElement.style.display === 'none') {
-      makeMutationObserverChunkedStream(signalElement, {
-        attributes: true,
-        attributeFilter: ['style'],
-      })
-        .filter(() => signalElement.style.display !== 'none')
-        .takeUntilBy(gmailComposeView.getStopper())
-        .onValue(() => {
-          setRecipients(gmailComposeView, addressType, emailAddresses);
-        });
-      return true;
+      const cover = querySelector(gmailComposeView.getElement(), 'div.aoD.hl');
+      cover.dispatchEvent(new FocusEvent('focus'));
     }
-    return false;
   }
 
   if (addressType === 'cc') {
@@ -50,9 +42,7 @@ export default function setRecipients(
       .getElement()
       .querySelector<HTMLElement>('span.pE[role=link]');
     if (ccButton) {
-      if (needToWaitForCcOrBccButton(ccButton)) {
-        return;
-      }
+      openRecipientsSectionIfNeeded(ccButton);
       ccButton.click();
       _contactRow = getRecipientRowForType(
         gmailComposeView.getElement(),
@@ -64,9 +54,7 @@ export default function setRecipients(
       .getElement()
       .querySelector<HTMLElement>('span.pB[role=link]');
     if (bccButton) {
-      if (needToWaitForCcOrBccButton(bccButton)) {
-        return;
-      }
+      openRecipientsSectionIfNeeded(bccButton);
       bccButton.click();
       _contactRow = getRecipientRowForType(
         gmailComposeView.getElement(),
@@ -88,8 +76,6 @@ export default function setRecipients(
     if (!(emailAddressEntry instanceof HTMLInputElement)) {
       throw new Error();
     }
-
-    oldRange = gmailComposeView.getLastSelectionRange();
 
     // Remove existing recipients
     Array.from(
@@ -195,8 +181,6 @@ export default function setRecipients(
 
     // Push enter so Gmail interprets the addresses.
     simulateKey(emailAddressEntry, 13, 0);
-
-    oldRange = gmailComposeView.getLastSelectionRange();
 
     // Focus the recipients preview label so Gmail re-renders it.
     const cover = querySelector(gmailComposeView.getElement(), 'div.aoD.hl');

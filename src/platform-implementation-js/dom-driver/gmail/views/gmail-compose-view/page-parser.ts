@@ -15,6 +15,7 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
     tags: {},
     watchers: [
       {
+        // For regular composes
         sources: [null],
         tag: 'recipientsCommon',
         selectors: [
@@ -37,6 +38,31 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
         ],
       },
       {
+        // For inline composes
+        sources: [null],
+        tag: 'recipientsCommon',
+        selectors: [
+          'div[role=region]',
+          'table',
+          'tbody',
+          'tr',
+          'td',
+          'form',
+          'div',
+          'table[role=presentation]',
+          'tbody',
+          'tr',
+          'td.Iy',
+          'div.fX',
+          'table.GS',
+          'tbody',
+          'tr.bzf',
+          'td.eV',
+          'div',
+          'div',
+        ],
+      },
+      {
         sources: ['recipientsCommon'],
         tag: 'toRecipient',
         selectors: [
@@ -44,6 +70,13 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
             $or: [
               [
                 'div.anm[name="to"]',
+                {
+                  $or: [
+                    [],
+                    // Inline reply compose
+                    ['div.aUy'],
+                  ],
+                },
                 'div',
                 'div',
                 'div',
@@ -80,6 +113,13 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
             $or: [
               [
                 'div.anm[name="cc"]',
+                {
+                  $or: [
+                    [],
+                    // Inline reply compose
+                    ['div.aUy'],
+                  ],
+                },
                 'div',
                 'div',
                 'div',
@@ -116,6 +156,13 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
             $or: [
               [
                 'div.anm[name="bcc"]',
+                {
+                  $or: [
+                    [],
+                    // Inline reply compose
+                    ['div.aUy'],
+                  ],
+                },
                 'div',
                 'div',
                 'div',
