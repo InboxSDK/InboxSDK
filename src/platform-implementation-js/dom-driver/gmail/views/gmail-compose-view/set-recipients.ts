@@ -3,7 +3,6 @@ import Logger from '../../../../lib/logger';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import getRecipients from './get-recipients';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
-import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import simulateKey from '../../../../lib/dom/simulate-key';
 import {
   getRecipientRowForType,
