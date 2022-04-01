@@ -12,6 +12,7 @@ import {
 
 export type ReceiverType = 'to' | 'cc' | 'bcc';
 
+// Should this return a promise until it's finished? Is it useful to expose its asynchronousness?
 export default function setRecipients(
   gmailComposeView: GmailComposeView,
   addressType: ReceiverType,
@@ -37,6 +38,7 @@ export default function setRecipients(
       })
         .filter(() => signalElement.style.display !== 'none')
         .takeUntilBy(gmailComposeView.getStopper())
+        .take(1)
         .onValue(() => {
           setRecipients(gmailComposeView, addressType, emailAddresses);
         });
