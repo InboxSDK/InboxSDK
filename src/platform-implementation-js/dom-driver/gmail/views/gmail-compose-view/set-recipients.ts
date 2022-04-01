@@ -3,7 +3,6 @@ import Logger from '../../../../lib/logger';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import getRecipients from './get-recipients';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
-import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import simulateKey from '../../../../lib/dom/simulate-key';
 import {
   getRecipientRowForType,
@@ -12,7 +11,6 @@ import {
 
 export type ReceiverType = 'to' | 'cc' | 'bcc';
 
-// Should this return a promise until it's finished? Is it useful to expose its asynchronousness?
 export default function setRecipients(
   gmailComposeView: GmailComposeView,
   addressType: ReceiverType,
@@ -96,13 +94,11 @@ export default function setRecipients(
 
     // On fresh composes, if set_Recipients is called immediately, then
     // Gmail asynchronously resets the recipients field. Detect this and
-    // put our change back. Fresh composes lack a style attribute on the
-    // div.anm[name] element.
+    // put our change back.
     const nameEl = contactRow.closest('div.anm[name]');
     if (
       emailAddresses.length > 0 &&
       nameEl &&
-      !nameEl.hasAttribute('style') &&
       !nameEl.hasAttribute('data-inboxsdk-handled-reset')
     ) {
       // We're in a fresh compose.
