@@ -14,16 +14,12 @@ export default async function addNavItem(
   orderGroup: string,
   navItemDescriptor: Kefir.Observable<any, any>
 ): Promise<GmailNavItemView> {
-  if (!GmailElementGetter.isStandalone()) {
-    await GmailElementGetter.waitForGmailModeToSettle();
-    await waitFor(() =>
-      document.querySelector('.aeN[role=navigation], .aeN [role=navigation]')
-    );
-    // Wait for contents of navmenu to load (needed to figure out if it's integrated gmail mode)
-    await waitFor(() => document.querySelector('.Ls77Lb.aZ6 > .pp'));
+  await waitForNavMenuReady();
 
-    const gmailNavItemView = new GmailNavItemView(driver, orderGroup, 1);
-    gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
+  const gmailNavItemView = new GmailNavItemView(driver, orderGroup, 1);
+  gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
+
+  if (!GmailElementGetter.isStandalone()) {
     try {
       const attacher = _attachNavItemView(gmailNavItemView);
 
@@ -36,11 +32,19 @@ export default async function addNavItem(
     } catch (err) {
       Logger.error(err);
     }
-    return gmailNavItemView;
-  } else {
-    const gmailNavItemView = new GmailNavItemView(driver, orderGroup, 1);
-    gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
-    return gmailNavItemView;
+  }
+
+  return gmailNavItemView;
+}
+
+export async function waitForNavMenuReady(): Promise<void> {
+  if (!GmailElementGetter.isStandalone()) {
+    await GmailElementGetter.waitForGmailModeToSettle();
+    await waitFor(() =>
+      document.querySelector('.aeN[role=navigation], .aeN [role=navigation]')
+    );
+    // Wait for contents of navmenu to load (needed to figure out if it's integrated gmail mode)
+    await waitFor(() => document.querySelector('.Ls77Lb.aZ6 > .pp'));
   }
 }
 

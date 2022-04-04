@@ -111,8 +111,6 @@ export type Driver = {
 
   getSelectedThreadRowViewDrivers(): $ReadOnlyArray<ThreadRowViewDriver>,
   registerThreadRowViewSelectionHandler(handler: () => any): () => void,
-
-  getLoadEventDetails(): any,
 };
 
 export type ButterBarDriver = {

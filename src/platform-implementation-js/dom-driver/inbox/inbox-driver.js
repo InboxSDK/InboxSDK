@@ -1159,10 +1159,6 @@ class InboxDriver {
   registerThreadRowViewSelectionHandler(handler: () => any): () => void {
     return () => {};
   }
-
-  getLoadEventDetails(): any {
-    return {};
-  }
 }
 
 export default defn(module, InboxDriver);

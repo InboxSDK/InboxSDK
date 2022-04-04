@@ -10,3 +10,5 @@ declare export default function addNavItem(
   orderGroup: string,
   navItemDescriptor: Kefir.Observable<Object>
 ): Promise<GmailNavItemView>;
+
+declare export function waitForNavMenuReady(): Promise<void>;
