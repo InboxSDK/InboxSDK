@@ -755,10 +755,18 @@ class GmailDriver {
         this._logger.setIsUsingSyncAPI(pageCommunicator.isUsingSyncAPI());
         this._userInfo = new UserInfo(this);
 
-        await promiseWaitFor(
-          () => document.querySelector('div[role=navigation]'),
-          10 * 1000
-        );
+        try {
+          await promiseWaitFor(
+            () =>
+              document.querySelector('.Ls77Lb.aZ6 > .pp') ||
+              GmailElementGetter.isStandalone(),
+            15 * 1000
+          );
+        } catch (err) {
+          this._logger.errorSite(err, {
+            description: 'Failed to find nav menu elements',
+          });
+        }
 
         this._timestampAccountSwitcherReady = Date.now();
 
