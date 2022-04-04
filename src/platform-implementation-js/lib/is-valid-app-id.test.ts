@@ -13,7 +13,6 @@ function shouldFail(description: string, appId: string) {
 
 const grandfathered = [
   'streak',
-  'dropbox',
   'Rockwell',
   'Screenleap',
   'docsend',
