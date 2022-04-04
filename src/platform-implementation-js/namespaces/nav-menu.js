@@ -36,11 +36,11 @@ export default class NavMenu {
       navItemDescriptorPropertyStream
     );
 
-    const navItemViewDriver = members.driver.addNavItem(
-      members.appId,
-      navItemDescriptorPropertyStream
-    );
-    navItemView.setNavItemViewDriver(navItemViewDriver);
+    members.driver
+      .addNavItem(members.appId, navItemDescriptorPropertyStream)
+      .then((navItemViewDriver) => {
+        navItemView.setNavItemViewDriver(navItemViewDriver);
+      });
 
     members.navItemViews.push(navItemView);
     return navItemView;

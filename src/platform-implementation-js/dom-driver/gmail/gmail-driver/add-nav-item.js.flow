@@ -9,4 +9,4 @@ declare export default function addNavItem(
   driver: GmailDriver,
   orderGroup: string,
   navItemDescriptor: Kefir.Observable<Object>
-): GmailNavItemView;
+): Promise<GmailNavItemView>;

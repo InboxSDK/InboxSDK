@@ -9,40 +9,39 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 import GmailDriver from '../gmail-driver';
 
-export default function addNavItem(
+export default async function addNavItem(
   driver: GmailDriver,
   orderGroup: string,
   navItemDescriptor: Kefir.Observable<any, any>
-): GmailNavItemView {
-  const gmailNavItemView = new GmailNavItemView(driver, orderGroup, 1);
-
+): Promise<GmailNavItemView> {
   if (!GmailElementGetter.isStandalone()) {
-    GmailElementGetter.waitForGmailModeToSettle()
-      .then(() => {
-        return waitFor(() =>
-          Boolean(
-            document.querySelector(
-              '.aeN[role=navigation], .aeN [role=navigation]'
-            )
-          )
-        );
-      })
-      .then(() => {
-        const attacher = _attachNavItemView(gmailNavItemView);
+    await GmailElementGetter.waitForGmailModeToSettle();
+    await waitFor(() =>
+      document.querySelector('.aeN[role=navigation], .aeN [role=navigation]')
+    );
+    // Wait for contents of navmenu to load (needed to figure out if it's integrated gmail mode)
+    await waitFor(() => document.querySelector('.Ls77Lb.aZ6 > .pp'));
 
-        attacher();
+    const gmailNavItemView = new GmailNavItemView(driver, orderGroup, 1);
+    gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
+    try {
+      const attacher = _attachNavItemView(gmailNavItemView);
 
-        gmailNavItemView
-          .getEventStream()
-          .filter((event) => event.eventName === 'orderChanged')
-          .onValue(attacher);
-      })
-      .catch((err) => Logger.error(err));
+      attacher();
+
+      gmailNavItemView
+        .getEventStream()
+        .filter((event) => event.eventName === 'orderChanged')
+        .onValue(attacher);
+    } catch (err) {
+      Logger.error(err);
+    }
+    return gmailNavItemView;
+  } else {
+    const gmailNavItemView = new GmailNavItemView(driver, orderGroup, 1);
+    gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
+    return gmailNavItemView;
   }
-
-  gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
-
-  return gmailNavItemView;
 }
 
 function _attachNavItemView(gmailNavItemView: GmailNavItemView) {

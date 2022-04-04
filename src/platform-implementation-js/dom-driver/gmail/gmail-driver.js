@@ -747,66 +747,51 @@ class GmailDriver {
 
     this._pageCommunicatorPromise = result.pageCommunicatorPromise;
 
-    this.onready = this._pageCommunicatorPromise.then(
-      async (pageCommunicator) => {
-        this._timestampGlobalsFound = Date.now();
-        this._pageCommunicator = pageCommunicator;
-        this._logger.setUserEmailAddress(this.getUserEmailAddress());
-        this._logger.setIsUsingSyncAPI(pageCommunicator.isUsingSyncAPI());
-        this._userInfo = new UserInfo(this);
+    this.onready = this._pageCommunicatorPromise.then((pageCommunicator) => {
+      this._timestampGlobalsFound = Date.now();
+      this._pageCommunicator = pageCommunicator;
+      this._logger.setUserEmailAddress(this.getUserEmailAddress());
+      this._logger.setIsUsingSyncAPI(pageCommunicator.isUsingSyncAPI());
+      this._userInfo = new UserInfo(this);
 
-        try {
-          await promiseWaitFor(
-            () =>
-              document.querySelector('.Ls77Lb.aZ6 > .pp') ||
-              GmailElementGetter.isStandalone(),
-            15 * 1000
-          );
-        } catch (err) {
-          this._logger.errorSite(err, {
-            description: 'Failed to find nav menu elements',
-          });
-        }
+      this._timestampAccountSwitcherReady = Date.now();
 
-        this._timestampAccountSwitcherReady = Date.now();
+      this._routeViewDriverStream = setupRouteViewDriverStream(
+        this._gmailRouteProcessor,
+        this
+      )
+        .takeUntilBy(this._stopper)
+        .toProperty();
 
-        this._routeViewDriverStream = setupRouteViewDriverStream(
-          this._gmailRouteProcessor,
-          this
-        )
+      this._routeViewDriverStream.onValue((gmailRouteView) => {
+        this._currentRouteViewDriver = gmailRouteView;
+      });
+
+      this._rowListViewDriverStream = this._setupRouteSubViewDriver(
+        'newGmailRowListView'
+      ).takeUntilBy(this._stopper);
+
+      this._setupThreadRowViewDriverKefirStream();
+      this._threadViewDriverLiveSet = toLiveSet(
+        this._setupRouteSubViewDriver('newGmailThreadView')
           .takeUntilBy(this._stopper)
-          .toProperty();
+          .flatMap((gmailThreadView) =>
+            gmailThreadView.getReadyStream().map(() => gmailThreadView)
+          )
+          .map((gmailThreadView) => ({
+            el: gmailThreadView,
+            removalStream: gmailThreadView.getStopper(),
+          }))
+      );
 
-        this._routeViewDriverStream.onValue((gmailRouteView) => {
-          this._currentRouteViewDriver = gmailRouteView;
-        });
+      this._setupToolbarViewDriverStream();
+      this._setupMessageViewDriverStream();
+      this._setupComposeViewDriverStream();
 
-        this._rowListViewDriverStream = this._setupRouteSubViewDriver(
-          'newGmailRowListView'
-        ).takeUntilBy(this._stopper);
+      this._threadRowIdentifier = new ThreadRowIdentifier(this);
 
-        this._setupThreadRowViewDriverKefirStream();
-        this._threadViewDriverLiveSet = toLiveSet(
-          this._setupRouteSubViewDriver('newGmailThreadView')
-            .takeUntilBy(this._stopper)
-            .flatMap((gmailThreadView) =>
-              gmailThreadView.getReadyStream().map(() => gmailThreadView)
-            )
-            .map((gmailThreadView) => ({
-              el: gmailThreadView,
-              removalStream: gmailThreadView.getStopper(),
-            }))
-        );
-
-        this._setupToolbarViewDriverStream();
-        this._setupMessageViewDriverStream();
-        this._setupComposeViewDriverStream();
-
-        this._threadRowIdentifier = new ThreadRowIdentifier(this);
-
-        this._timestampOnready = Date.now();
-      }
-    );
+      this._timestampOnready = Date.now();
+    });
   }
 
   _setupComposeViewDriverStream() {
