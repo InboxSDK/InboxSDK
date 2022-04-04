@@ -33,14 +33,9 @@ export default class NavMenu {
     const navItemView = new NavItemView(
       members.appId,
       members.driver,
-      navItemDescriptorPropertyStream
+      navItemDescriptorPropertyStream,
+      members.driver.addNavItem(members.appId, navItemDescriptorPropertyStream)
     );
-
-    members.driver
-      .addNavItem(members.appId, navItemDescriptorPropertyStream)
-      .then((navItemViewDriver) => {
-        navItemView.setNavItemViewDriver(navItemViewDriver);
-      });
 
     members.navItemViews.push(navItemView);
     return navItemView;
@@ -50,11 +45,11 @@ export default class NavMenu {
 }
 
 function _setupSentMail(appId, driver) {
-  const nativeNavItemView = new NativeNavItemView(appId, driver, 'sent');
-
-  driver.getSentMailNativeNavItem().then(function (sentMailNavItemViewDriver) {
-    nativeNavItemView.setNavItemViewDriver(sentMailNavItemViewDriver);
-  });
-
+  const nativeNavItemView = new NativeNavItemView(
+    appId,
+    driver,
+    'sent',
+    driver.getSentMailNativeNavItem()
+  );
   return nativeNavItemView;
 }

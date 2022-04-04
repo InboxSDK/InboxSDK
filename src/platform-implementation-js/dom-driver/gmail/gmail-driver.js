@@ -93,6 +93,7 @@ import type { PiOpts, EnvData } from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
 
 import type ContentPanelViewDriver from '../../driver-common/sidebar/ContentPanelViewDriver';
+import GmailNavItemView from './views/gmail-nav-item-view';
 
 class GmailDriver {
   _appId: string;
@@ -635,7 +636,7 @@ class GmailDriver {
   addNavItem(
     appId: string,
     navItemDescriptorPropertyStream: Kefir.Observable<Object>
-  ): Object {
+  ): Promise<GmailNavItemView> {
     return addNavItem(this, appId, navItemDescriptorPropertyStream);
   }
 

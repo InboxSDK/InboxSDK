@@ -10,6 +10,7 @@ import EventEmitter from '../lib/safe-event-emitter';
 import NAV_ITEM_TYPES from '../constants/nav-item-types';
 
 import type { Driver } from '../driver-interfaces/driver';
+import type GmailNavItemView from '../dom-driver/gmail/views/gmail-nav-item-view';
 
 const memberMap = new WeakMap();
 
@@ -21,7 +22,8 @@ export default class NavItemView extends EventEmitter {
   constructor(
     appId: string,
     driver: Driver,
-    navItemDescriptorPropertyStream: Object
+    navItemDescriptorPropertyStream: Object,
+    navItemViewDriverPromise: Promise<GmailNavItemView>
   ) {
     super();
 
@@ -29,13 +31,46 @@ export default class NavItemView extends EventEmitter {
       appId,
       driver,
       navItemDescriptorPropertyStream,
-      deferred: defer(),
       navItemViews: [],
-      navItemViewDriver: (null: ?Object),
+      navItemViewDriver: (null: ?GmailNavItemView),
+      navItemViewDriverPromise,
     };
     memberMap.set(this, members);
 
     driver.getStopper().onValue(this.remove.bind(this));
+
+    navItemViewDriverPromise.then((navItemViewDriver) => {
+      if (this.destroyed || !navItemViewDriver) {
+        return; //we have been removed already
+      }
+      const driver = members.driver;
+      members.navItemViewDriver = navItemViewDriver;
+
+      members.navItemDescriptorPropertyStream
+        .sampledBy(navItemViewDriver.getEventStream(), (a, b) => [a, b])
+        .onValue((navItemDescriptor) =>
+          _handleViewDriverStreamEvent(
+            this,
+            navItemViewDriver,
+            driver,
+            navItemDescriptor
+          )
+        );
+
+      Kefir.combine([
+        members.navItemDescriptorPropertyStream,
+        driver.getRouteViewDriverStream(),
+      ])
+        .takeUntilBy(
+          navItemViewDriver
+            .getEventStream()
+            .filter(() => false)
+            .beforeEnd(() => null)
+        )
+        .onValue((x) => {
+          _handleRouteViewChange(navItemViewDriver, x);
+        });
+    });
   }
 
   addNavItem(navItemDescriptor: Object): NavItemView {
@@ -46,65 +81,25 @@ export default class NavItemView extends EventEmitter {
     const appId = members.appId;
     const navItemViews = members.navItemViews;
 
-    var navItemDescriptorPropertyStream = kefirCast(
+    const navItemDescriptorPropertyStream = kefirCast(
       Kefir,
       navItemDescriptor
     ).toProperty();
-    var navItemView = new NavItemView(
+    const childNavItemView = new NavItemView(
       appId,
       driver,
-      navItemDescriptorPropertyStream
+      navItemDescriptorPropertyStream,
+      members.navItemViewDriverPromise.then((navItemViewDriver) => {
+        const childNavItemViewDriver = navItemViewDriver.addNavItem(
+          members.appId,
+          navItemDescriptorPropertyStream
+        );
+        return childNavItemViewDriver;
+      })
     );
 
-    members.deferred.promise.then(function (navItemViewDriver) {
-      var childNavItemViewDriver = navItemViewDriver.addNavItem(
-        members.appId,
-        navItemDescriptorPropertyStream
-      );
-      navItemView.setNavItemViewDriver(childNavItemViewDriver);
-    });
-
-    navItemViews.push(navItemView);
-    return navItemView;
-  }
-
-  // TODO make this not a public method
-  setNavItemViewDriver(navItemViewDriver: Object) {
-    const members = get(memberMap, this);
-
-    if (this.destroyed) {
-      members.deferred.resolve(navItemViewDriver);
-      return; //we have been removed already
-    }
-    const driver = members.driver;
-    members.navItemViewDriver = navItemViewDriver;
-
-    members.navItemDescriptorPropertyStream
-      .sampledBy(navItemViewDriver.getEventStream(), (a, b) => [a, b])
-      .onValue((navItemDescriptor) =>
-        _handleViewDriverStreamEvent(
-          this,
-          navItemViewDriver,
-          driver,
-          navItemDescriptor
-        )
-      );
-
-    Kefir.combine([
-      members.navItemDescriptorPropertyStream,
-      driver.getRouteViewDriverStream(),
-    ])
-      .takeUntilBy(
-        navItemViewDriver
-          .getEventStream()
-          .filter(() => false)
-          .beforeEnd(() => null)
-      )
-      .onValue((x) => {
-        _handleRouteViewChange(navItemViewDriver, x);
-      });
-
-    members.deferred.resolve(navItemViewDriver);
+    navItemViews.push(childNavItemView);
+    return childNavItemView;
   }
 
   remove() {
@@ -121,7 +116,7 @@ export default class NavItemView extends EventEmitter {
       navItemView.remove();
     });
 
-    members.deferred.promise.then((navItemViewDriver) => {
+    members.navItemViewDriverPromise.then((navItemViewDriver) => {
       navItemViewDriver.destroy();
     });
   }
@@ -138,7 +133,7 @@ export default class NavItemView extends EventEmitter {
   }
 
   setCollapsed(collapseValue: boolean) {
-    get(memberMap, this).deferred.promise.then((navItemViewDriver) => {
+    get(memberMap, this).navItemViewDriverPromise.then((navItemViewDriver) => {
       navItemViewDriver.setCollapsed(collapseValue);
     });
   }
