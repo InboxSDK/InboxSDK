@@ -8,7 +8,6 @@ function grandfatherHash(x: string) {
 
 const whitelist = new Set([
   'b540a2819e4b26823288046869e5577852178d69', // streak
-  '220077d641d018c9707db9e0fa31f52e687bffc3', // dropbox
   '1e9084cb394369dcdfd43cfcd84d17b78b0903dd', // Rockwell
   'a9b816b86b6085eb0b80315da6b2297ff30cf7b6', // Screenleap
   '5140e277522fd95ece3d540c94b97f443bcc3256', // docsend

@@ -43,6 +43,12 @@ if (!global.__InboxSDKImpLoader) {
           throw new Error('Unsupported InboxSDK version');
         }
 
+        // dropbox specially requested this, they have dropped support for their extensions
+        // some users are on old version
+        if (appId === 'dropbox') {
+          throw new Error('No longer supported');
+        }
+
         var piLoadStarted = Date.now();
         return onready.then(() => {
           var oldDefine;
