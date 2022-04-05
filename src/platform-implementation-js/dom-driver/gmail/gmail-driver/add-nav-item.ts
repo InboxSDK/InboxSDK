@@ -8,6 +8,7 @@ import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 import GmailDriver from '../gmail-driver';
+import once from 'lodash/once';
 
 export default async function addNavItem(
   driver: GmailDriver,
@@ -37,7 +38,7 @@ export default async function addNavItem(
   return gmailNavItemView;
 }
 
-export async function waitForNavMenuReady(): Promise<void> {
+export const waitForNavMenuReady = once(async (): Promise<void> => {
   if (!GmailElementGetter.isStandalone()) {
     await GmailElementGetter.waitForGmailModeToSettle();
     await waitFor(() =>
@@ -46,7 +47,7 @@ export async function waitForNavMenuReady(): Promise<void> {
     // Wait for contents of navmenu to load (needed to figure out if it's integrated gmail mode)
     await waitFor(() => document.querySelector('.Ls77Lb.aZ6 > .pp'));
   }
-}
+});
 
 function _attachNavItemView(gmailNavItemView: GmailNavItemView) {
   if (!GmailElementGetter.shouldAddNavItemsInline()) {
