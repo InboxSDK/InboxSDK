@@ -8,22 +8,38 @@ import get from '../../common/get-or-fail';
 import NavItemView from './nav-item-view';
 
 import type { Driver } from '../driver-interfaces/driver';
+import type GmailNavItemView from '../dom-driver/gmail/views/gmail-nav-item-view';
 
 const memberMap = new WeakMap();
 
 export default class NativeNavItemView extends EventEmitter {
-  constructor(appId: string, driver: Driver, labelName: string) {
+  constructor(
+    appId: string,
+    driver: Driver,
+    labelName: string,
+    navItemViewDriverPromise: Promise<GmailNavItemView>
+  ) {
     super();
 
     const members = {
       appId,
       driver,
       labelName,
-      deferred: defer(),
       navItemViews: [],
-      navItemViewDriver: (null: ?Object),
+      navItemViewDriver: (null: ?GmailNavItemView),
+      navItemViewDriverPromise,
     };
     memberMap.set(this, members);
+
+    navItemViewDriverPromise.then((navItemViewDriver) => {
+      if (!navItemViewDriver) {
+        return;
+      }
+      members.navItemViewDriver = navItemViewDriver;
+      navItemViewDriver
+        .getEventStream()
+        .onValue((event) => _handleStreamEvent(this, event));
+    });
   }
 
   addNavItem(navItemDescriptor: Object): NavItemView {
@@ -33,37 +49,21 @@ export default class NativeNavItemView extends EventEmitter {
       (Kefir: any),
       navItemDescriptor
     ).toProperty();
-    const navItemView = new NavItemView(
+    const childNavItemView = new NavItemView(
       members.appId,
       members.driver,
-      navItemDescriptorPropertyStream
+      navItemDescriptorPropertyStream,
+      members.navItemViewDriverPromise.then((navItemViewDriver) => {
+        const childNavItemViewDriver = navItemViewDriver.addNavItem(
+          members.appId,
+          navItemDescriptorPropertyStream
+        );
+        return childNavItemViewDriver;
+      })
     );
 
-    members.deferred.promise.then((navItemViewDriver) => {
-      const childNavItemViewDriver = navItemViewDriver.addNavItem(
-        members.appId,
-        navItemDescriptorPropertyStream
-      );
-      navItemView.setNavItemViewDriver(childNavItemViewDriver);
-    });
-
-    members.navItemViews.push(navItemView);
-    return navItemView;
-  }
-
-  setNavItemViewDriver(navItemViewDriver: Object) {
-    if (!navItemViewDriver) {
-      return;
-    }
-
-    const members = get(memberMap, this);
-
-    members.navItemViewDriver = navItemViewDriver;
-    navItemViewDriver
-      .getEventStream()
-      .onValue((event) => _handleStreamEvent(this, event));
-
-    members.deferred.resolve(navItemViewDriver);
+    members.navItemViews.push(childNavItemView);
+    return childNavItemView;
   }
 
   isCollapsed(): boolean {

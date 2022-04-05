@@ -920,10 +920,10 @@ class InboxDriver {
     );
   }
 
-  addNavItem(
+  async addNavItem(
     appId: string,
     navItemDescriptor: Kefir.Observable<Object>
-  ): Object {
+  ): Promise<any> {
     if (!this._navMenuContainer) {
       this._navMenuContainer = document.createElement('div');
       this._navMenuContainer.classList.add('inboxsdk__navItem_appContainer');
@@ -1158,10 +1158,6 @@ class InboxDriver {
 
   registerThreadRowViewSelectionHandler(handler: () => any): () => void {
     return () => {};
-  }
-
-  getLoadEventDetails(): any {
-    return {};
   }
 }
 

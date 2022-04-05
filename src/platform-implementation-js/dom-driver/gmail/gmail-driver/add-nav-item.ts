@@ -8,42 +8,46 @@ import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 import GmailDriver from '../gmail-driver';
+import once from 'lodash/once';
 
-export default function addNavItem(
+export default async function addNavItem(
   driver: GmailDriver,
   orderGroup: string,
   navItemDescriptor: Kefir.Observable<any, any>
-): GmailNavItemView {
+): Promise<GmailNavItemView> {
+  await waitForNavMenuReady();
+
   const gmailNavItemView = new GmailNavItemView(driver, orderGroup, 1);
+  gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
   if (!GmailElementGetter.isStandalone()) {
-    GmailElementGetter.waitForGmailModeToSettle()
-      .then(() => {
-        return waitFor(() =>
-          Boolean(
-            document.querySelector(
-              '.aeN[role=navigation], .aeN [role=navigation]'
-            )
-          )
-        );
-      })
-      .then(() => {
-        const attacher = _attachNavItemView(gmailNavItemView);
+    try {
+      const attacher = _attachNavItemView(gmailNavItemView);
 
-        attacher();
+      attacher();
 
-        gmailNavItemView
-          .getEventStream()
-          .filter((event) => event.eventName === 'orderChanged')
-          .onValue(attacher);
-      })
-      .catch((err) => Logger.error(err));
+      gmailNavItemView
+        .getEventStream()
+        .filter((event) => event.eventName === 'orderChanged')
+        .onValue(attacher);
+    } catch (err) {
+      Logger.error(err);
+    }
   }
-
-  gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
   return gmailNavItemView;
 }
+
+export const waitForNavMenuReady = once(async (): Promise<void> => {
+  if (!GmailElementGetter.isStandalone()) {
+    await GmailElementGetter.waitForGmailModeToSettle();
+    await waitFor(() =>
+      document.querySelector('.aeN[role=navigation], .aeN [role=navigation]')
+    );
+    // Wait for contents of navmenu to load (needed to figure out if it's integrated gmail mode)
+    await waitFor(() => document.querySelector('.Ls77Lb.aZ6 > .pp'));
+  }
+});
 
 function _attachNavItemView(gmailNavItemView: GmailNavItemView) {
   if (!GmailElementGetter.shouldAddNavItemsInline()) {

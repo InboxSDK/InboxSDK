@@ -64,7 +64,6 @@ import registerSearchQueryRewriter from './gmail-driver/register-search-query-re
 import openComposeWindow from './gmail-driver/open-compose-window';
 import GmailAppSidebarView from './views/gmail-app-sidebar-view';
 import suppressAddon from './gmail-driver/suppressAddon';
-import isIntegratedViewGmail from './gmail-driver/isIntegratedViewGmail';
 
 import getSyncThreadFromSyncThreadId from './gmail-driver/getSyncThreadFromSyncThreadId';
 import getSyncThreadForOldGmailThreadId from './gmail-driver/getSyncThreadForOldGmailThreadId';
@@ -73,6 +72,7 @@ import toItemWithLifetimeStream from '../../lib/toItemWithLifetimeStream';
 import toLiveSet from '../../lib/toLiveSet';
 
 import waitFor from '../../lib/stream-wait-for';
+import promiseWaitFor from '../../lib/wait-for';
 
 import type Logger from '../../lib/logger';
 import type PageCommunicator from './gmail-page-communicator';
@@ -92,6 +92,7 @@ import type { PiOpts, EnvData } from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
 
 import type ContentPanelViewDriver from '../../driver-common/sidebar/ContentPanelViewDriver';
+import GmailNavItemView from './views/gmail-nav-item-view';
 
 class GmailDriver {
   _appId: string;
@@ -634,7 +635,7 @@ class GmailDriver {
   addNavItem(
     appId: string,
     navItemDescriptorPropertyStream: Kefir.Observable<Object>
-  ): Object {
+  ): Promise<GmailNavItemView> {
     return addNavItem(this, appId, navItemDescriptorPropertyStream);
   }
 
@@ -981,12 +982,6 @@ class GmailDriver {
     this._threadRowViewSelectionChanges.onValue(handler);
     return () => {
       this._threadRowViewSelectionChanges.offValue(handler);
-    };
-  }
-
-  getLoadEventDetails(): any {
-    return {
-      isGmailIntegratedView: isIntegratedViewGmail(),
     };
   }
 }

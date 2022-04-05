@@ -187,7 +187,7 @@ export default class Logger {
     if (!this._isMaster) {
       return;
     }
-    _trackEvent(null, 'gmail', name, details);
+    _trackEvent(this._appId, 'gmail', name, details);
   }
 
   public deprecationWarning(name: string, suggestion?: string) {

@@ -43,6 +43,7 @@ export type DrawerViewDriver = InboxDrawerView;
 import type { PiOpts } from '../platform-implementation';
 import type SupportItemDescriptor from '../dom-driver/gmail/views/gmail-support-item-view';
 import type GmailSupportItemView from '../dom-driver/gmail/views/gmail-support-item-view';
+import type GmailNavItemView from '../dom-driver/gmail/views/gmail-nav-item-view';
 
 // TODO fill in some of these any types
 export type Driver = {
@@ -73,7 +74,10 @@ export type Driver = {
   getAccountSwitcherContactList(): Contact[],
   getThreadRowViewDriverStream(): Kefir.Observable<ThreadRowViewDriver>,
   registerThreadButton(options: Object): () => void,
-  addNavItem(appId: string, navItemDescriptor: Object): Object,
+  addNavItem(
+    appId: string,
+    navItemDescriptor: Object
+  ): Promise<GmailNavItemView>,
   addSupportItem(
     supportItemDescriptor: SupportItemDescriptor
   ): GmailSupportItemView,
@@ -107,8 +111,6 @@ export type Driver = {
 
   getSelectedThreadRowViewDrivers(): $ReadOnlyArray<ThreadRowViewDriver>,
   registerThreadRowViewSelectionHandler(handler: () => any): () => void,
-
-  getLoadEventDetails(): any,
 };
 
 export type ButterBarDriver = {
