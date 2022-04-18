@@ -124,19 +124,20 @@ function lowercaseHeaderNames(headers: Headers | undefined) {
 }
 
 export default class MockServer {
-  private _verbose: boolean = false;
+  private _verbose = false;
   private _responders: Array<any> = [];
-  public XMLHttpRequest: typeof XMLHttpRequest;
+  XMLHttpRequest: typeof XMLHttpRequest;
 
-  public constructor() {
+  constructor() {
+    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const server = this;
 
     this.XMLHttpRequest = class XMLHttpRequest {
       private _server: MockServer = server;
-      private _readyState: number = 0;
+      private _readyState = 0;
       private _listeners: { [name: string]: Function[] } = {};
       private _requestHeaders: { [name: string]: string } = {};
-      private _sendFlag: boolean = false;
+      private _sendFlag = false;
 
       private _response: string | undefined = undefined;
       private _responseXML: any = undefined;
@@ -149,13 +150,13 @@ export default class MockServer {
       private _path: string | undefined;
       private _async: boolean | undefined;
       private _body: string | undefined;
-      private _loaded: number = 0;
-      private _total: number = 0;
+      private _loaded = 0;
+      private _total = 0;
       private _lengthComputable: boolean | undefined;
 
-      public responseType: string | null | undefined;
+      responseType: string | null | undefined;
 
-      public constructor() {
+      constructor() {
         [
           'readyState',
           'response',
@@ -195,7 +196,7 @@ export default class MockServer {
         });
       }
 
-      public open(
+      open(
         method: string,
         path: string,
         async: boolean | undefined = undefined
@@ -218,11 +219,11 @@ export default class MockServer {
         }
       }
 
-      public _terminate() {
+      private _terminate() {
         if (this._timer != null) clearTimeout(this._timer);
       }
 
-      public abort() {
+      abort() {
         this._terminate();
         if (this._readyState !== 0 && this._readyState !== 4) {
           this._readyState = 4;
@@ -244,7 +245,7 @@ export default class MockServer {
         }
       }
 
-      public send(body: any) {
+      send(body: any) {
         this._body = body;
         this._sendFlag = true;
         if (this._readyState != 1)
@@ -345,7 +346,7 @@ export default class MockServer {
         }
       }
 
-      public setRequestHeader(header: string, value: string) {
+      setRequestHeader(header: string, value: string) {
         if (this._readyState != 1 || this._sendFlag) {
           throw new Error(
             "Can't set headers now at readyState " + this._readyState
@@ -354,7 +355,7 @@ export default class MockServer {
         this._requestHeaders[header.toLowerCase()] = value;
       }
 
-      public getResponseHeader(header: string) {
+      getResponseHeader(header: string) {
         if (this._readyState < 2) {
           return null;
         }
@@ -365,7 +366,7 @@ export default class MockServer {
         return null;
       }
 
-      public getAllResponseHeaders() {
+      getAllResponseHeaders() {
         if (this._readyState < 2) {
           return null;
         }
@@ -374,7 +375,7 @@ export default class MockServer {
           .join('');
       }
 
-      public addEventListener(name: string, listener: Function) {
+      addEventListener(name: string, listener: Function) {
         if (!this._listeners[name]) {
           this._listeners[name] = [];
         }
@@ -383,7 +384,7 @@ export default class MockServer {
         }
       }
 
-      public removeEventListener(name: string, listener: Function) {
+      removeEventListener(name: string, listener: Function) {
         if (this._listeners[name]) {
           this._listeners[name] = this._listeners[name].filter(
             (l) => l !== listener
@@ -403,14 +404,14 @@ export default class MockServer {
     });
   }
 
-  public respondWith(filter: Filter, responder: Responder) {
+  respondWith(filter: Filter, responder: Responder) {
     filter.headers = lowercaseHeaderNames(filter.headers);
     responder.headers = lowercaseHeaderNames(responder.headers);
 
     this._responders.push({ filter, responder });
   }
 
-  public setVerbose(verbose: boolean) {
+  setVerbose(verbose: boolean) {
     this._verbose = verbose;
   }
 }
