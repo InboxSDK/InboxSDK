@@ -558,16 +558,25 @@ class GmailComposeView {
         sendAndArchive: this.getSendAndArchiveButton(),
       })
     );
+
+    let discardButton;
     try {
+      discardButton = this.getDiscardButton();
+    } catch (err) {
+      // handle failures of this.getDiscardButton()
+      this._driver
+        .getLogger()
+        .errorSite(new Error('Failed to find discard button'), {
+          html: censorHTMLstring(this._element.outerHTML),
+        });
+    }
+    if (discardButton) {
       this._eventStream.plug(
         getDiscardStream({
           element: this.getElement(),
-          discardButton: this.getDiscardButton(),
+          discardButton,
         })
       );
-    } catch (err) {
-      // handle failures of this.getDiscardButton()
-      this._driver.getLogger().errorSite(err);
     }
 
     this._eventStream.plug(
