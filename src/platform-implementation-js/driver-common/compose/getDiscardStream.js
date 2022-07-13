@@ -15,7 +15,7 @@ const dispatchCancel = (element) =>
     )
   );
 
-export default function ({
+export default function getDiscardStream({
   element,
   discardButton,
 }: {

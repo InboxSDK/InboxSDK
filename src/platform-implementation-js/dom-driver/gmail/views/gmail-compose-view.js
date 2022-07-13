@@ -558,12 +558,17 @@ class GmailComposeView {
         sendAndArchive: this.getSendAndArchiveButton(),
       })
     );
-    this._eventStream.plug(
-      getDiscardStream({
-        element: this.getElement(),
-        discardButton: this.getDiscardButton(),
-      })
-    );
+    try {
+      this._eventStream.plug(
+        getDiscardStream({
+          element: this.getElement(),
+          discardButton: this.getDiscardButton(),
+        })
+      );
+    } catch (err) {
+      // handle failures of this.getDiscardButton()
+      this._driver.getLogger().errorSite(err);
+    }
 
     this._eventStream.plug(
       Kefir.fromEvents(this.getElement(), 'inboxSDKsendCanceled').map(() => ({
