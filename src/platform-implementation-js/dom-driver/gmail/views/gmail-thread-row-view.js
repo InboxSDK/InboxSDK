@@ -589,12 +589,15 @@ class GmailThreadRowView {
                   hAlign: 'left',
                   vAlign: 'top',
                 });
+
+                // remember this reference before the destroy event and setTimeout
+                // because this._elements may be cleared by then.
+                const firstEl = this._elements[0];
+
                 activeDropdown.on('destroy', () => {
                   setTimeout(() => {
-                    this._elements[0].classList.remove(
-                      'inboxsdk__dropdown_active'
-                    );
-                    this._elements[0].classList.remove('buL'); // gmail class to force row button toolbar to be visible
+                    firstEl.classList.remove('inboxsdk__dropdown_active');
+                    firstEl.classList.remove('buL'); // gmail class to force row button toolbar to be visible
                     activeDropdown = null;
                   }, 1);
                 });
