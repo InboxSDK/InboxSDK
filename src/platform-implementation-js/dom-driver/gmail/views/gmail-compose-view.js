@@ -1396,7 +1396,7 @@ class GmailComposeView {
   }
 
   getDiscardButton(): HTMLElement {
-    return querySelector(this._element, '.gU.az5 .oh');
+    return querySelector(this._element, '.gU .oh');
   }
 
   getComposeID(): string {
