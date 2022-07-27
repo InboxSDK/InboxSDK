@@ -1229,8 +1229,10 @@ class GmailComposeView {
   }
 
   getMetadataFormElement(): HTMLElement {
-    const container = this.getBodyElement().closest('.aoP.aoC');
-    if (!container) throw new Error('Could not find compose container');
+    const container = this.getBodyElement().closest('.aoP');
+    if (!container) {
+      throw new Error('Could not find compose container');
+    }
     return querySelector(container, 'form.bAs');
   }
 
