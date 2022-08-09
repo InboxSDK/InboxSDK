@@ -11,6 +11,7 @@ import TopMessageBarView from '../widgets/top-message-bar-view';
 import ComposeView from '../views/compose-view';
 import type { Driver, DrawerViewOptions } from '../driver-interfaces/driver';
 import get from '../../common/get-or-fail';
+import isComposeOriginalView from '../dom-driver/gmail/is-compose-original-view';
 
 // documented in src/docs/
 class Widgets {
@@ -76,6 +77,10 @@ class Widgets {
       options
     );
     return new DrawerView(drawerViewDriver);
+  }
+
+  isMoleViewTitleBarLightColor(): boolean {
+    return !isComposeOriginalView();
   }
 }
 
