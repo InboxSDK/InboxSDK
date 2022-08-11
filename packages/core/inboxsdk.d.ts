@@ -200,6 +200,8 @@ type RouteTypes =
   | 'UNKNOWN';
 
 export interface Widgets {
+  /** check whether mole view has light title bar as part of gmail new view / original view  */
+  isMoleViewTitleBarLightColor(): boolean;
   showModalView(descriptor: ModalDescriptor): ModalView;
   showMoleView(descriptor: MoleDescriptor): MoleView;
   showDrawerView(descriptor: DrawerDescriptor): DrawerView;

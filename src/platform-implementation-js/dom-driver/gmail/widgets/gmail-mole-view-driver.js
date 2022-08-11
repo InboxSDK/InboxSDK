@@ -14,6 +14,7 @@ import type {
 } from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
+import isComposeOriginalView from '../../gmail/is-compose-original-view';
 
 class GmailMoleViewDriver {
   _driver: GmailDriver;
@@ -211,10 +212,15 @@ class GmailMoleViewDriver {
 export default defn(module, GmailMoleViewDriver);
 
 function getHTMLString(options: MoleOptions) {
+  const originalView = isComposeOriginalView();
   return `
-    <div class="inboxsdk__mole_view_inner">
+    <div class="inboxsdk__mole_view_inner ${
+      originalView ? 'inboxsdk__original_view' : ''
+    }">
       ${getTitleHTMLString(options)}
-      <div class="inboxsdk__mole_view_content"></div>
+      <div class="inboxsdk__mole_view_content ${
+        originalView ? 'inboxsdk__original_view' : ''
+      }"></div>
     </div>
   `;
 }
@@ -222,13 +228,55 @@ function getHTMLString(options: MoleOptions) {
 function getTitleHTMLString(options: MoleOptions) {
   if (options.chrome === false) {
     return '';
-  } else {
-    return `<div class="inboxsdk__mole_view_titlebar">
-    <div class="inboxsdk__mole_title_buttons">
-      <img class="Hl" src="images/cleardot.gif" alt="Minimize" aria-label="Minimize" data-tooltip-delay="800" data-tooltip="Minimize"><img class="Hk" id=":rp" src="images/cleardot.gif" alt="Minimize" aria-label="Maximize" data-tooltip-delay="800" data-tooltip="Maximize"><!--<img class="Hq aUG" src="images/cleardot.gif" alt="Pop-out" aria-label="Full-screen (Shift for Pop-out)" data-tooltip-delay="800" data-tooltip="Full-screen (Shift for Pop-out)">--><img class="Ha" src="images/cleardot.gif" alt="Close" aria-label="Close" data-tooltip-delay="800" data-tooltip="Close">
-    </div>
-    <h2 class="inboxsdk__mole_default"></h2>
-    <h2 class="inboxsdk__mole_minimized"></h2>
+  } else if (isComposeOriginalView()) {
+    return `
+    <div class="inboxsdk__mole_view_titlebar inboxsdk__original_view">
+      <div class="inboxsdk__mole_title_buttons inboxsdk__original_view">
+        <img class="Hl" src="images/cleardot.gif" alt="Minimize" aria-label="Minimize" data-tooltip-delay="800" data-tooltip="Minimize">
+        <img class="Hk" id=":rp" src="images/cleardot.gif" alt="Minimize" aria-label="Maximize" data-tooltip-delay="800" data-tooltip="Maximize">
+        <!--<img class="Hq aUG" src="images/cleardot.gif" alt="Pop-out" aria-label="Full-screen (Shift for Pop-out)" data-tooltip-delay="800" data-tooltip="Full-screen (Shift for Pop-out)">-->
+        <img class="Ha" src="images/cleardot.gif" alt="Close" aria-label="Close" data-tooltip-delay="800" data-tooltip="Close">
+      </div>
+      <h2 class="inboxsdk__mole_default"></h2>
+      <h2 class="inboxsdk__mole_minimized"></h2>
     </div>`;
+  } else {
+    return `
+    <div class="inboxsdk__mole_view_titlebar">
+
+      <div class="nH Hy aXJ">
+        <div class="nH">
+          <div class="l m">
+            <div class="l n">
+              <div class="k">
+                <div class="aCk">
+                  <div class="nH as2">
+                    <table cellpadding="0" class="cf Ht">
+                      <tbody>
+                        <tr>
+                          <td>
+                            <div class="Hp">
+                              <h2 class="inboxsdk__mole_default"></h2>
+                              <h2 class="inboxsdk__mole_minimized"></h2>
+                              </div>
+                          </td>
+                          <td class="Hm">
+                            <div class="inboxsdk__mole_title_buttons">
+                              <img class="Hl" src="images/cleardot.gif" alt="Minimize" aria-label="Minimize" data-tooltip-delay="800" data-tooltip="Minimize"><img class="Hk" id=":rp" src="images/cleardot.gif" alt="Minimize" aria-label="Maximize" data-tooltip-delay="800" data-tooltip="Maximize"><!--<img class="Hq aUG" src="images/cleardot.gif" alt="Pop-out" aria-label="Full-screen (Shift for Pop-out)" data-tooltip-delay="800" data-tooltip="Full-screen (Shift for Pop-out)">--><img class="Ha" src="images/cleardot.gif" alt="Close" aria-label="Close" data-tooltip-delay="800" data-tooltip="Close">
+                            </div>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+`;
   }
 }

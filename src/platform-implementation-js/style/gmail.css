@@ -1076,21 +1076,24 @@ isn't visible behind it. */
   min-height: 40px;
 }
 
+.inboxsdk__mole_view_inner:not(.inboxsdk__original_view) {
+  border-radius: 8px 8px 0 0;
+}
+
 .inboxsdk__mole_view_titlebar {
   position: absolute;
   left: 0;
   right: 5px;
   color: white;
   font-size: 12.8px;
-  background: #404040;
   box-sizing: border-box;
   height: 36px;
-  padding-top: 7px;
-  padding-left: 11px;
   cursor: pointer;
 }
 
-.inboxsdk__mole_view_titlebar {
+.inboxsdk__mole_view_titlebar.inboxsdk__original_view {
+  background: #404040;
+  padding-left: 11px;
   border-radius: 4px 4px 0 0;
   height: 40px;
   padding-top: 9px;
@@ -1120,9 +1123,22 @@ isn't visible behind it. */
   opacity: 0.6;
 }
 
+.inboxsdk__mole_title_buttons:not(.inboxsdk__original_view) > img {
+  height: 16px;
+  width: 16px;
+  margin-left: 4px;
+}
+
+.inboxsdk__mole_title_buttons:not(.inboxsdk__original_view) > img:hover {
+  background-color: rgba(68, 71, 70, 0.078);
+}
+
+.inboxsdk__mole_title_buttons.inboxsdk__original_view > img:hover {
+  background-color: #737373;
+}
+
 .inboxsdk__mole_title_buttons > img:hover {
   opacity: 1;
-  background-color: #737373;
 }
 
 .inboxsdk__mole_view.inboxsdk__minimized .inboxsdk__mole_view_content,
@@ -1134,6 +1150,11 @@ isn't visible behind it. */
 .inboxsdk__mole_view.inboxsdk__minimized .Hl,
 .inboxsdk__mole_view:not(.inboxsdk__minimized) .Hk {
   display: none;
+}
+
+.inboxsdk__mole_view_content:not(.inboxsdk__original_view) {
+  margin-top: 44px;
+  border: none;
 }
 
 .inboxsdk__mole_view_content {
