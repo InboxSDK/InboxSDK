@@ -1076,6 +1076,7 @@ isn't visible behind it. */
   min-height: 40px;
 }
 
+.inboxsdk__mole_view_titlebar:not(.inboxsdk__original_view),
 .inboxsdk__mole_view_inner:not(.inboxsdk__original_view) {
   border-radius: 8px 8px 0 0;
 }
@@ -1084,19 +1085,23 @@ isn't visible behind it. */
   position: absolute;
   left: 0;
   right: 5px;
-  color: white;
-  font-size: 12.8px;
+  font-size: 14px;
+  font-weight: 500;
   box-sizing: border-box;
-  height: 36px;
+  height: 40px;
   cursor: pointer;
+  padding: 10px 12px 10px 16px;
+  color: #041e49;
+  background: #f2f6fc;
 }
 
 .inboxsdk__mole_view_titlebar.inboxsdk__original_view {
+  color: white;
+  font-size: 12.8px;
+  font-weight: 400;
   background: #404040;
-  padding-left: 11px;
+  padding: 9px 0 0 11px;
   border-radius: 4px 4px 0 0;
-  height: 40px;
-  padding-top: 9px;
 }
 
 .inboxsdk__mole_view_titlebar h2 {
@@ -1112,6 +1117,10 @@ isn't visible behind it. */
   white-space: nowrap;
   float: right;
   padding-right: 5px;
+  margin-top: 1px;
+}
+
+.inboxsdk__mole_title_buttons.inboxsdk__original_view {
   margin-top: -3px;
 }
 
@@ -1153,7 +1162,7 @@ isn't visible behind it. */
 }
 
 .inboxsdk__mole_view_content:not(.inboxsdk__original_view) {
-  margin-top: 44px;
+  margin-top: 40px;
   border: none;
 }
 
