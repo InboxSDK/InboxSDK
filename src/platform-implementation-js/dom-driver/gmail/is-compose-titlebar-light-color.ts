@@ -1,3 +1,4 @@
+import once from 'lodash/once';
 function isGmailRuleForTitlebarWideIcons(): boolean {
   return !![...document.styleSheets].find((s) => {
     try {
@@ -16,7 +17,7 @@ function isGmailRuleForTitlebarWideIcons(): boolean {
     return false;
   });
 }
-
-export default function isComposeTitleBarLightColor(): boolean {
+const isComposeTitleBarLightColor = once(() => {
   return !isGmailRuleForTitlebarWideIcons();
-}
+});
+export default isComposeTitleBarLightColor;
