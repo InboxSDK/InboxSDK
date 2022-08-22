@@ -14,7 +14,7 @@ import type {
 } from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
-import isComposeOriginalView from '../../gmail/is-compose-original-view';
+import isComposeTitleBarLightColor from '../../gmail/is-compose-titlebar-light-color';
 
 class GmailMoleViewDriver {
   _driver: GmailDriver;
@@ -212,7 +212,7 @@ class GmailMoleViewDriver {
 export default defn(module, GmailMoleViewDriver);
 
 function getHTMLString(options: MoleOptions) {
-  const originalView = isComposeOriginalView();
+  const originalView = !isComposeTitleBarLightColor();
   return `
     <div class="inboxsdk__mole_view_inner ${
       originalView ? 'inboxsdk__original_view' : ''
@@ -229,7 +229,7 @@ function getTitleHTMLString(options: MoleOptions) {
   if (options.chrome === false) {
     return '';
   } else {
-    const originalView = isComposeOriginalView();
+    const originalView = !isComposeTitleBarLightColor();
     return `
       <div class="inboxsdk__mole_view_titlebar${
         originalView ? ' inboxsdk__original_view' : ''
