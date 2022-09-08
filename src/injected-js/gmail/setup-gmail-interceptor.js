@@ -349,7 +349,7 @@ export function setupGmailInterceptorOnFrames(
               ) {
                 logger.eventSdkPassive(
                   'connection.originalResponseText_formatChanged',
-                  { sendBody: connection.originalSendBody }
+                  { text: connection.originalResponseText }
                 );
               }
             } catch (err) {
