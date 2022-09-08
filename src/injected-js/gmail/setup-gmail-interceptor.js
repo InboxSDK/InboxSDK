@@ -234,11 +234,20 @@ export function setupGmailInterceptorOnFrames(
             if (!composeRequestDetails) {
               try {
                 // might be because format of the request changed
-                if (connection.originalSendBody && connection.originalSendBody[0] === "[") {
-                  logger.eventSdkPassive('connection.originalSendBody_formatChanged', { sendBody: connection.originalSendBody });
+                if (
+                  connection.originalSendBody &&
+                  connection.originalSendBody[0] === '['
+                ) {
+                  logger.eventSdkPassive(
+                    'connection.originalSendBody_formatChanged',
+                    { sendBody: connection.originalSendBody }
+                  );
                 }
-              } catch(err) {
-                logger.eventSdkPassive('connection.originalSendBody_formatChanged_failedToLog', err);
+              } catch (err) {
+                logger.eventSdkPassive(
+                  'connection.originalSendBody_formatChanged_failedToLog',
+                  err
+                );
               }
 
               return;
@@ -334,11 +343,20 @@ export function setupGmailInterceptorOnFrames(
 
             try {
               // check if the expected format of the response text changed
-              if (connection.originalResponseText && connection.originalResponseText[0] === "[") {
-                logger.eventSdkPassive('connection.originalResponseText_formatChanged', { sendBody: connection.originalSendBody });
+              if (
+                connection.originalResponseText &&
+                connection.originalResponseText[0] === '['
+              ) {
+                logger.eventSdkPassive(
+                  'connection.originalResponseText_formatChanged',
+                  { sendBody: connection.originalSendBody }
+                );
               }
-            } catch(err) {
-              logger.eventSdkPassive('connection.originalResponseText_formatChanged_failedToLog', err);
+            } catch (err) {
+              logger.eventSdkPassive(
+                'connection.originalResponseText_formatChanged_failedToLog',
+                err
+              );
             }
 
             // TODO this function silently fails way too easily. Need to add better logging for it!
