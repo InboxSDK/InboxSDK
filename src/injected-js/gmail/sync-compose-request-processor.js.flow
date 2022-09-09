@@ -1,0 +1,19 @@
+/* @flow */
+
+type ComposeRequestType = 'FIRST_DRAFT_SAVE' | 'DRAFT_SAVE' | 'SEND';
+
+type ComposeRequest = {
+  draftID: string,
+  body: string,
+  subject: string,
+  type: ComposeRequestType,
+};
+
+declare export function getDetailsOfComposeRequest(
+  parsed: any
+): ?ComposeRequest;
+
+declare export function replaceEmailBodyForSendRequest(
+  request: string,
+  newBody: ?string
+): string;
