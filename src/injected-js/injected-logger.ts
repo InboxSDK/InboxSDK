@@ -38,7 +38,11 @@ export function error(err: Error | unknown, details?: any) {
   );
 }
 
-export function eventSdkPassive(name: string, details?: any) {
+export function eventSdkPassive(
+  name: string,
+  details?: any,
+  sensitive?: boolean
+) {
   try {
     JSON.stringify(details);
   } catch (e) {
@@ -49,7 +53,7 @@ export function eventSdkPassive(name: string, details?: any) {
     new CustomEvent('inboxSDKinjectedEventSdkPassive', {
       bubbles: false,
       cancelable: false,
-      detail: { name, details },
+      detail: { name, details, sensitive },
     })
   );
 }

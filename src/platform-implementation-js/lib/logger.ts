@@ -8,6 +8,7 @@ import logError from '../../common/log-error';
 import PersistentQueue from './persistent-queue';
 import makeMutationObserverStream from './dom/make-mutation-observer-stream';
 import { getXMLHttpRequest } from 'ext-corb-workaround';
+import isStreakAppId from './isStreakAppId';
 
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
@@ -101,7 +102,7 @@ export default class Logger {
         'inboxSDKinjectedEventSdkPassive',
         (event: any) => {
           const detail = event.detail;
-          this.eventSdkPassive(detail.name, detail.details);
+          this.eventSdkPassive(detail.name, detail.details, detail.sensitive);
         }
       );
     }
@@ -177,7 +178,12 @@ export default class Logger {
   // Track events unrelated to user activity about how the app uses the SDK.
   // Examples include the app being initialized, and calls to any of the
   // register___ViewHandler functions.
-  public eventSdkPassive(name: string, details?: any) {
+  public eventSdkPassive(name: string, details?: any, sensitive?: boolean) {
+    if (sensitive && !isStreakAppId(this._appId)) {
+      // do not log events if they were marked as sensitive
+      return;
+    }
+
     _trackEvent(this._appId, 'sdkPassive', name, details);
   }
 

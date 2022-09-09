@@ -2,4 +2,8 @@
 
 declare export function error(err: Error, details?: any): void;
 
-declare export function eventSdkPassive(name: string, details?: any): void;
+declare export function eventSdkPassive(
+  name: string,
+  details?: any,
+  sensitive?: boolean
+): void;
