@@ -232,24 +232,6 @@ export function setupGmailInterceptorOnFrames(
             );
 
             if (!composeRequestDetails) {
-              try {
-                // might be because format of the request changed
-                if (
-                  connection.originalSendBody &&
-                  connection.originalSendBody[0] === '['
-                ) {
-                  logger.eventSdkPassive(
-                    'connection.originalSendBody_formatChanged',
-                    { sendBody: connection.originalSendBody }
-                  );
-                }
-              } catch (err) {
-                logger.eventSdkPassive(
-                  'connection.originalSendBody_formatChanged_failedToLog',
-                  err
-                );
-              }
-
               return;
             }
 
@@ -317,6 +299,34 @@ export function setupGmailInterceptorOnFrames(
           });
         },
         afterListeners(connection) {
+          try {
+            // log if request/response format changed
+            const willBeProcessed =
+              currentSendConnectionIDs.has(connection) ||
+              currentDraftSaveConnectionIDs.has(connection) ||
+              currentFirstDraftSaveConnectionIDs.has(connection);
+
+            if (
+              !willBeProcessed &&
+              connection.originalSendBody &&
+              connection.originalSendBody[0] === '['
+            ) {
+              logger.eventSdkPassive(
+                'connection.requestResponseFormatChanged',
+                {
+                  url: connection.url,
+                  request: connection.originalSendBody,
+                  response: connection.originalResponseText,
+                },
+                true
+              );
+            }
+          } catch (err) {
+            logger.eventSdkPassive('connection.requestResponseFormatChanged', {
+              error: err,
+            });
+          }
+
           if (
             currentSendConnectionIDs.has(connection) ||
             currentDraftSaveConnectionIDs.has(connection) ||
@@ -340,24 +350,6 @@ export function setupGmailInterceptorOnFrames(
             const originalResponse = JSON.parse(
               connection.originalResponseText
             );
-
-            try {
-              // check if the expected format of the response text changed
-              if (
-                connection.originalResponseText &&
-                connection.originalResponseText[0] === '['
-              ) {
-                logger.eventSdkPassive(
-                  'connection.originalResponseText_formatChanged',
-                  { text: connection.originalResponseText }
-                );
-              }
-            } catch (err) {
-              logger.eventSdkPassive(
-                'connection.originalResponseText_formatChanged_failedToLog',
-                err
-              );
-            }
 
             // TODO this function silently fails way too easily. Need to add better logging for it!
 
