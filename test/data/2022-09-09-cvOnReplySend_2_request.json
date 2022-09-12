@@ -1,0 +1,131 @@
+[
+  [null, null, 2],
+  [
+    [
+      [
+        8,
+        [
+          "thread-f:1743802434391390786",
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [
+              [
+                "msg-a:r2026878197680476540",
+                [
+                  1,
+                  "test@streak.com",
+                  "Test Test",
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  "test@streak.com"
+                ],
+                [[1, "test@streak.com", "Test Test"]],
+                null,
+                null,
+                null,
+                1663019643605,
+                "Re: hey2",
+                [
+                  null,
+                  [
+                    [0, "<div dir=\"ltr\">hey hey</div>"],
+                    [
+                      2,
+                      "<br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 12, 2022 at 2:53 PM Test Test &lt;test@streak.com&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin: 0px 0px 0px 0.8ex; border-left: 1px solid rgb(204, 204, 204); padding-left: 1ex;\"><div dir=\"ltr\">hey hey 2</div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Mon, Sep 12, 2022 at 2:53 PM Test Test &lt;<a href=\"mailto:test@streak.com\" target=\"_blank\">test@streak.com</a>&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin: 0px 0px 0px 0.8ex; border-left: 1px solid rgb(204, 204, 204); padding-left: 1ex;\"><div dir=\"ltr\">hey2<br clear=\"all\"><div><div dir=\"ltr\"><div dir=\"ltr\"><div><div><img src=\"https://ci6.googleusercontent.com/proxy/yyVKpfVZRWmljx1FfXa1jU7hg-YtDXUQin1Af7ML33AEnjvRq_sM6WcmJ8tHPhtsLEaO8P5iLvCTqzfmlsMn-K3x0xotmsjFPkkaNZx9UlXOtKN7pl2XTrJffpciKMDJeHnWq02y--TtyZwbYPEarzDHohZNYk1GKI04dQnOkTs=s0-d-e1-ft#https://assets-global.website-files.com/5b7f24cc9009731774d7be8e/5c06a15b95c700eebb7b9823_headerLockup_2x.png\"></div></div><div>sdff</div><div>fsd</div><div>fsdf</div></div></div></div></div><div hspace=\"streak-pt-mark\" style=\"max-height: 1px;\"><img alt=\"\" style=\"width: 0px; max-height: 0px; overflow: hidden;\" src=\"https://ci6.googleusercontent.com/proxy/JjZ8_7j4WSjgoS8ZlirhFciWfwE6aLvUpThDxPHIo4EJZVEG9EaV6RWqpk7GmuDmjgnGQwGQO1QIWrHTZN4odjslwz7ifYSpvfi3sc4zVfDzFrW4lk0hzMnhCVDSXU3NzKPUpWB82AMwaovGH-5D8Ko56huAf9J_GbTZ_3ZoQaWvqysj8AP80rbqfLGR-W120lJ1EQ=s0-d-e1-ft#https://mailfoogae.appspot.com/t?sender=aYm9yeXNAc3RyZWFrLmNvbQ%3D%3D&amp;type=zerocontent&amp;guid=4fe8cb95-ca88-4a0e-9167-1852c51d0fd4\"><font color=\"#ffffff\" size=\"1\">ᐧ</font></div>\n</blockquote></div>\n</blockquote></div>"
+                    ]
+                  ],
+                  null,
+                  null,
+                  null,
+                  null,
+                  1
+                ],
+                null,
+                ["^all", "^pfg", "^f_bt", "^f_btns", "^f_cl"],
+                null,
+                null,
+                null,
+                null,
+                "<CAFxDt-Pv7d2eRZ5nzFABppc=gGvLF=AuGyt7CFeYErh14DDtrQ@mail.gmail.com>",
+                null,
+                1663019643605,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0,
+                [0, 0, 7, 0],
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "s:5ccb2f5a68c5178f|#msg-a:r2026878197680476540|0"
+              ],
+              "msg-a:r726552832812233575",
+              1,
+              null,
+              [1663019643617]
+            ]
+          ]
+        ]
+      ],
+      [
+        9,
+        [
+          "thread-f:1743802434391390786",
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [["^io_re"], ["^io_fwd"], ["msg-a:r726552832812233575"]]
+          ]
+        ]
+      ]
+    ]
+  ],
+  null,
+  [1663019639934, 2, 1663019643618, 1, 80],
+  2
+]

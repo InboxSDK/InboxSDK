@@ -509,3 +509,45 @@ describe('sync api', () => {
     ]);
   });
 });
+
+mainServer.respondWith(
+  {
+    method: 'POST',
+    path: 'https://mail.google.com/sync/u/1/i/s?hl=en&c=20220909_04&rt=r&pt=ji',
+  },
+  {
+    status: 200,
+    response: JSON.stringify(
+      require('../../../test/data/2022-09-09-cvOnReplySend_2_response.json')
+    ),
+  }
+);
+
+test('cv:2022-09-09 reply draft 2 sent', async () => {
+  const response = await ajax(mainFrame, {
+    method: 'POST',
+    url: 'https://mail.google.com/sync/u/1/i/s?hl=en&c=20220909_04&rt=r&pt=ji',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: JSON.stringify(
+      require('../../../test/data/2022-09-09-cvOnReplySend_2_request.json')
+    ),
+  });
+  expect(JSON.parse(response.text)).toEqual(
+    require('../../../test/data/2022-09-09-cvOnReplySend_2_response.json')
+  );
+  expect(ajaxInterceptEvents).toEqual([
+    { type: 'emailSending', draftID: 'r2026878197680476540' },
+    {
+      draftID: 'r2026878197680476540',
+      threadID: 'thread-f:1743802434391390786',
+      messageID: 'msg-a:r2026878197680476540',
+      oldMessageID: '18333b1f5712f659',
+      oldThreadID: '18333b13345c3a42',
+      rfcID:
+        '\u003cCAFxDt-NiTcOcChGTdnjfqAW4x-A6VaVkW\u003djd2y8jE1bJajCULg@mail.gmail.com\u003e',
+      type: 'emailSent',
+    },
+  ]);
+});
