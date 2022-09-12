@@ -38,6 +38,15 @@ export function extractThreadsFromSearchResponse(
   response: string
 ): SyncThread[] {
   const parsedResponse = JSON.parse(response);
+
+  if (Array.isArray(parsedResponse)) {
+    try {
+      return extractThreadsFromSearchResponse_20220909(parsedResponse);
+    } catch (err) {
+      return [];
+    }
+  }
+
   const threadDescriptors: any[] | null = parsedResponse && parsedResponse[3];
 
   if (!threadDescriptors) return [];
@@ -68,6 +77,46 @@ export function extractThreadsFromSearchResponse(
             syncMessageID: md[1],
             oldMessageID: md[56],
             date: +md[7],
+          })),
+        },
+      };
+    })
+    .filter(isNotNil);
+}
+
+export function extractThreadsFromSearchResponse_20220909(
+  parsedResponse: any[]
+): SyncThread[] {
+  const threadDescriptors: any[] | null = parsedResponse && parsedResponse[2];
+
+  if (!threadDescriptors) return [];
+
+  return threadDescriptors
+    .map((descriptorWrapper, index) => {
+      const descriptor = descriptorWrapper[0];
+      if (!descriptor) return null;
+
+      return {
+        subject: descriptor[0],
+        snippet: descriptor[1],
+        syncThreadID: descriptor[3],
+        // It seems Gmail is A/B testing including gmailThreadID in descriptor[20] and not including
+        // the encoded version of it in descriptor[18], so pull it from [20] if [18] is not set.
+        oldGmailThreadID:
+          descriptor[17] != null
+            ? new BigNumber(descriptor[17]).toString(16)
+            : descriptor[19],
+        rawResponse: descriptorWrapper,
+        extraMetaData: {
+          snippet:
+            (parsedResponse[14] &&
+              parsedResponse[14][0] &&
+              parsedResponse[14][0][index]) ||
+            '',
+          syncMessageData: descriptor[4].map((md: any) => ({
+            syncMessageID: md[0],
+            oldMessageID: md[55],
+            date: +md[6],
           })),
         },
       };
@@ -290,6 +339,18 @@ export function replaceThreadsInSearchResponse(
 ): string {
   const parsedResponse = JSON.parse(response);
 
+  if (Array.isArray(parsedResponse)) {
+    try {
+      return replaceThreadsInSearchResponse_20220909(
+        parsedResponse,
+        replacementThreads,
+        _unused
+      );
+    } catch (err) {
+      return response;
+    }
+  }
+
   if (parsedResponse[3] || replacementThreads.length) {
     parsedResponse[3] = replacementThreads.map(({ rawResponse }, index) => ({
       ...rawResponse,
@@ -305,6 +366,32 @@ export function replaceThreadsInSearchResponse(
         extraMetaData.syncMessageData.map(({ syncMessageID }) => syncMessageID)
       ),
     };
+  }
+
+  return JSON.stringify(parsedResponse);
+}
+
+export function replaceThreadsInSearchResponse_20220909(
+  parsedResponse: any[],
+  replacementThreads: SyncThread[],
+  _unused: { start: number; total?: number | 'MANY' } // TODO why is this unused?
+): string {
+  if (parsedResponse[2] || replacementThreads.length) {
+    parsedResponse[2] = replacementThreads.map(({ rawResponse }, index) => {
+      const res = [...rawResponse];
+      res[1] = index;
+      return res;
+    });
+  }
+
+  if (parsedResponse[14] || replacementThreads.length) {
+    parsedResponse[14] = [...parsedResponse[14]];
+    parsedResponse[14][0] = replacementThreads.map(
+      ({ extraMetaData }) => extraMetaData.snippet
+    );
+    parsedResponse[14][1] = replacementThreads.map(({ extraMetaData }) =>
+      extraMetaData.syncMessageData.map(({ syncMessageID }) => syncMessageID)
+    );
   }
 
   return JSON.stringify(parsedResponse);
