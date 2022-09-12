@@ -43,7 +43,7 @@ async function getSyncThreadsForSearch(
         'X-Gmail-BTAI': await driver.getPageCommunicator().getBtaiHeader(),
         'X-Google-BTD': '1',
       },
-      data: JSON.stringify([[null, 1, null, searchTerm]]),
+      data: JSON.stringify([[null, 51, null, searchTerm]]),
     });
 
     responseText = text;

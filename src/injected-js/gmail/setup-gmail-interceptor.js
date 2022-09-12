@@ -875,12 +875,24 @@ export function setupGmailInterceptorOnFrames(
       requestChanger: function (connection, request) {
         let customSearchTerm;
         const body = JSON.parse(request.body);
-        const payload = body[1];
-        const searchString = payload[4];
-        const pageOffset = payload[10];
+
+        let newFormat = false;
+        let payload, searchString, pageOffset;
+
+        if (Array.isArray(body)) {
+          newFormat = true;
+
+          payload = body[0];
+          searchString = payload[3];
+          pageOffset = payload[9];
+        } else {
+          payload = body[1];
+          searchString = payload[4];
+          pageOffset = payload[10];
+        }
 
         const isSyncAPISearchWithCustomTerm =
-          payload[1] === 79 &&
+          payload[newFormat ? 0 : 1] === 79 &&
           typeof searchString === 'string' &&
           (customSearchTerm = intersection(
             customSearchTerms,
@@ -924,7 +936,11 @@ export function setupGmailInterceptorOnFrames(
 
         return (connection: any)._queryReplacement.newQuery.promise.then(
           function (newQuery) {
-            body[1][4] = newQuery;
+            if (newFormat) {
+              body[0][3] = newQuery;
+            } else {
+              body[1][4] = newQuery;
+            }
             return {
               method: request.method,
               url: request.url,
@@ -1057,14 +1073,18 @@ export function setupGmailInterceptorOnFrames(
         if (request.body) {
           const parsedBody = JSON.parse(request.body);
 
+          const newFormat = Array.isArray(parsedBody);
+
           // we are a search!
           const searchQuery =
-            (parsedBody && parsedBody[1] && parsedBody[1][4]) || '';
+            (newFormat
+              ? parsedBody && parsedBody[0] && parsedBody[0][3]
+              : parsedBody && parsedBody[1] && parsedBody[1][4]) || '';
 
           if (find(customSearchQueries, (x) => x === searchQuery)) {
             customListJob = (connection: any)._customListJob = {
               query: searchQuery,
-              start: parsedBody[1][10],
+              start: newFormat ? parsedBody[0][9] : parsedBody[1][10],
               newRequestParams: defer(),
               newResults: defer(),
             };
@@ -1076,8 +1096,13 @@ export function setupGmailInterceptorOnFrames(
 
             return (connection: any)._customListJob.newRequestParams.promise.then(
               ({ query, start }) => {
-                parsedBody[1][4] = query;
-                parsedBody[1][10] = start;
+                if (newFormat) {
+                  parsedBody[0][3] = query;
+                  parsedBody[0][9] = start;
+                } else {
+                  parsedBody[1][4] = query;
+                  parsedBody[1][10] = start;
+                }
 
                 return {
                   method: request.method,

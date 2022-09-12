@@ -332,28 +332,54 @@ const setupSearchReplacing = (
               const now = Date.now();
               reorderedThreads = extractedThreadsInCompletedIDPairsOrder.map(
                 (extractedThread, index) => {
+                  const newFormat = Array.isArray(extractedThread.rawResponse);
+
                   const newTime = String(now - index);
                   let newThread = update(extractedThread, {
-                    rawResponse: {
-                      '1': {
-                        '3': { $set: newTime },
-                        '8': { $set: newTime },
-                      },
-                    },
-                  });
-                  if (extractedThread.rawResponse[1][5]) {
-                    newThread = update(newThread, {
-                      rawResponse: {
-                        '1': {
-                          '5': (oldVal) =>
-                            oldVal.map((md) => ({
-                              ...md,
-                              '7': newTime,
-                              '18': newTime,
-                              '31': newTime,
-                            })),
+                    rawResponse: newFormat
+                      ? {
+                          '0': {
+                            '2': { $set: newTime },
+                            '7': { $set: newTime },
+                          },
+                        }
+                      : {
+                          '1': {
+                            '3': { $set: newTime },
+                            '8': { $set: newTime },
+                          },
                         },
-                      },
+                  });
+
+                  if (
+                    newFormat
+                      ? extractedThread.rawResponse[0][4]
+                      : extractedThread.rawResponse[1][5]
+                  ) {
+                    newThread = update(newThread, {
+                      rawResponse: newFormat
+                        ? {
+                            '0': {
+                              '4': (oldVal) =>
+                                oldVal.map((md) => ({
+                                  ...md,
+                                  '6': newTime,
+                                  '17': newTime,
+                                  '30': newTime,
+                                })),
+                            },
+                          }
+                        : {
+                            '1': {
+                              '5': (oldVal) =>
+                                oldVal.map((md) => ({
+                                  ...md,
+                                  '7': newTime,
+                                  '18': newTime,
+                                  '31': newTime,
+                                })),
+                            },
+                          },
                     });
                   }
                   return newThread;
