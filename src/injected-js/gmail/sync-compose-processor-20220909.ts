@@ -283,7 +283,7 @@ function parseSendDraftResponseBody(response: Array<any>) {
   }
 
   const messageId: string = msg[0];
-  if (!messageId.startsWith('msg-a:')) {
+  if (!messageId.startsWith('msg-')) {
     // exit cuz cannot parse
     return null;
   }
