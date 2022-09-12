@@ -75,5 +75,5 @@ export function replaceBodyContentInComposeSendRequestBody(
     });
   }
 
-  return replaceEmailBodyForSendRequest(requestParsed, newBodyHtmlContent);
+  return replaceEmailBodyForSendRequest(request, newBodyHtmlContent);
 }

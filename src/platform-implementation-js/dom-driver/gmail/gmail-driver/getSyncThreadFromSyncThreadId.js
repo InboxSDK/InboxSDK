@@ -27,26 +27,44 @@ export async function getThreadFromSyncThreadIdUsingHeaders(
   btaiHeader: string,
   xsrfToken: string
 ): Promise<?SyncThread> {
-  const { text } = await gmailAjax({
-    method: 'POST',
-    url: `https://mail.google.com/sync${getAccountUrlPart()}/i/fd`,
-    headers: {
-      'Content-Type': 'application/json',
-      'X-Framework-Xsrf-Token': xsrfToken,
-      'X-Gmail-BTAI': btaiHeader,
-      'X-Google-BTD': '1',
-    },
-    data: JSON.stringify({
-      '1': [
-        {
-          '1': syncThreadId,
-          '2': 1,
-        },
-      ],
-    }),
-  });
+  let responseText = null;
+  try {
+    let { text } = await gmailAjax({
+      method: 'POST',
+      url: `https://mail.google.com/sync${getAccountUrlPart()}/i/fd`,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Framework-Xsrf-Token': xsrfToken,
+        'X-Gmail-BTAI': btaiHeader,
+        'X-Google-BTD': '1',
+      },
+      data: JSON.stringify({
+        '1': [
+          {
+            '1': syncThreadId,
+            '2': 1,
+          },
+        ],
+      }),
+    });
+    responseText = text;
+  } catch (err) {
+    // try sending request with new format 2022_09_09
+    let { text } = await gmailAjax({
+      method: 'POST',
+      url: `https://mail.google.com/sync${getAccountUrlPart()}/i/fd`,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Framework-Xsrf-Token': xsrfToken,
+        'X-Gmail-BTAI': btaiHeader,
+        'X-Google-BTD': '1',
+      },
+      data: JSON.stringify([[[syncThreadId, 1]]]),
+    });
+    responseText = text;
+  }
 
-  const threadDescriptors = extractThreadsFromThreadResponse(text);
+  const threadDescriptors = extractThreadsFromThreadResponse(responseText);
   if (threadDescriptors.length > 0) {
     const thread = threadDescriptors[0];
     if (thread.oldGmailThreadID) {
