@@ -27,7 +27,7 @@ export async function getThreadFromSyncThreadIdUsingHeaders(
   btaiHeader: string,
   xsrfToken: string
 ): Promise<?SyncThread> {
-  let responeText = null;
+  let responseText = null;
   try {
     let { text } = await gmailAjax({
       method: 'POST',
@@ -47,7 +47,7 @@ export async function getThreadFromSyncThreadIdUsingHeaders(
         ],
       }),
     });
-    responeText = text;
+    responseText = text;
   } catch (err) {
     // try sending request with new format 2022_09_09
     let { text } = await gmailAjax({
@@ -61,10 +61,10 @@ export async function getThreadFromSyncThreadIdUsingHeaders(
       },
       data: JSON.stringify([[[syncThreadId, 1]]]),
     });
-    responeText = text;
+    responseText = text;
   }
 
-  const threadDescriptors = extractThreadsFromThreadResponse(responeText);
+  const threadDescriptors = extractThreadsFromThreadResponse(responseText);
   if (threadDescriptors.length > 0) {
     const thread = threadDescriptors[0];
     if (thread.oldGmailThreadID) {
