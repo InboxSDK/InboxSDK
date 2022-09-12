@@ -61,7 +61,7 @@ function parseCreateDraftRequestBody(request: Array<any>) {
     }
 
     const subject = msg[7];
-    const body = msg[8][1][1];
+    const body = msg[8][1][0][1];
     const actions = msg[10];
 
     const hasRequiredActions =
@@ -113,7 +113,7 @@ function parseUpdateDraftRequestBody(request: Array<any>) {
     }
 
     const subject = msg[7];
-    const body = msg[8][1][1];
+    const body = msg[8][1][0][1];
     const actions = msg[10];
 
     const hasRequiredActions =
@@ -165,7 +165,7 @@ function parseSendDraftRequestBody(request: Array<any>) {
     }
 
     const subject = msg[7];
-    const body = msg[8][1][1];
+    const body = msg[8][1][0][1];
     const actions = msg[10];
 
     const hasRequiredActions =
@@ -336,7 +336,7 @@ function replaceBodyContentInSendRequestBody(
       return null;
     }
 
-    msg[8][1][1] = newBodyHtmlContent;
+    msg[8][1][0][1] = newBodyHtmlContent;
 
     return request;
   }
