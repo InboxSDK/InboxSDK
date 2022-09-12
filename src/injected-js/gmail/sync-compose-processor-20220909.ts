@@ -36,8 +36,8 @@ function parseCreateDraftRequestBody(request: Array<any>) {
     request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
 
   if (thread) {
-    const threadId = thread[0];
-    if (threadId.indexOf('thread-a:') !== 0) {
+    const threadId: string = thread[0];
+    if (!threadId.startsWith('thread-')) {
       // exit cuz cannot parse
       return null;
     }
@@ -56,7 +56,7 @@ function parseCreateDraftRequestBody(request: Array<any>) {
 
     const messageId: string = msg[0];
 
-    if (messageId.indexOf('msg-a:') !== 0) {
+    if (!messageId.startsWith('msg-')) {
       // exit cuz cannot parse
       return null;
     }
@@ -93,8 +93,8 @@ function parseUpdateDraftRequestBody(request: Array<any>) {
     request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
 
   if (thread) {
-    const threadId = thread[0];
-    if (threadId.indexOf('thread-a:') !== 0) {
+    const threadId: string = thread[0];
+    if (!threadId.startsWith('thread-')) {
       // exit cuz cannot parse
       return null;
     }
@@ -108,7 +108,7 @@ function parseUpdateDraftRequestBody(request: Array<any>) {
 
     const messageId: string = msg[0];
 
-    if (messageId.indexOf('msg-a:') !== 0) {
+    if (!messageId.startsWith('msg-')) {
       // exit cuz cannot parse
       return null;
     }
@@ -145,8 +145,8 @@ function parseSendDraftRequestBody(request: Array<any>) {
     request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
 
   if (thread) {
-    const threadId = thread[0];
-    if (threadId.indexOf('thread-a:') !== 0) {
+    const threadId: string = thread[0];
+    if (!threadId.startsWith('thread-')) {
       // exit cuz cannot parse
       return null;
     }
@@ -162,7 +162,7 @@ function parseSendDraftRequestBody(request: Array<any>) {
 
     const messageId: string = msg[0];
 
-    if (messageId.indexOf('msg-a:') !== 0) {
+    if (!messageId.startsWith('msg-')) {
       // exit cuz cannot parse
       return null;
     }
@@ -201,8 +201,8 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
     return null;
   }
 
-  const threadId = thread[0];
-  if (threadId.indexOf('thread-a:') !== 0) {
+  const threadId: string = thread[0];
+  if (!threadId.startsWith('thread-')) {
     // exit cuz cannot parse
     return null;
   }
@@ -222,7 +222,7 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
   }
 
   const messageId: string = msg[0];
-  if (messageId.indexOf('msg-a:') !== 0) {
+  if (!messageId.startsWith('msg-')) {
     // exit cuz cannot parse
     return null;
   }
@@ -262,8 +262,8 @@ function parseSendDraftResponseBody(response: Array<any>) {
     return null;
   }
 
-  const threadId = thread[0];
-  if (threadId.indexOf('thread-a:') !== 0) {
+  const threadId: string = thread[0];
+  if (!threadId.startsWith('thread-')) {
     // exit cuz cannot parse
     return null;
   }
@@ -282,8 +282,8 @@ function parseSendDraftResponseBody(response: Array<any>) {
     return null;
   }
 
-  const messageId = msg[0];
-  if (messageId.indexOf('msg-a:') !== 0) {
+  const messageId: string = msg[0];
+  if (!messageId.startsWith('msg-a:')) {
     // exit cuz cannot parse
     return null;
   }
@@ -319,8 +319,8 @@ function replaceBodyContentInSendRequestBody(
     request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
 
   if (thread) {
-    const threadId = thread[0];
-    if (threadId.indexOf('thread-a:') !== 0) {
+    const threadId: string = thread[0];
+    if (!threadId.startsWith('thread-')) {
       // exit cuz cannot parse
       return null;
     }
@@ -334,7 +334,7 @@ function replaceBodyContentInSendRequestBody(
 
     const messageId: string = msg[0];
 
-    if (messageId.indexOf('msg-a:') !== 0) {
+    if (!messageId.startsWith('msg-')) {
       // exit cuz cannot parse
       return null;
     }

@@ -57,3 +57,49 @@ it('handles onDraftSave request', () => {
     type: 'SEND',
   });
 });
+
+it('handles onReplySend request', () => {
+  const request = JSON.stringify(
+    require('../../../test/data/2022-09-09-cvOnReplySend_request.json')
+  );
+
+  const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
+    JSON.parse(request)
+  );
+  expect(composeRequest).toMatchObject({
+    threadId: 'thread-a:r-474834441621213468',
+    messageId: 'msg-a:r-414184523264894368',
+    subject: 'Re: tracking test',
+    body: '<div dir="ltr">foo2 (no tracking)</div>',
+    actions: [
+      '^all',
+      '^pfg',
+      '^f_bt',
+      '^f_btns',
+      '^f_cl',
+      '^i',
+      '^u',
+      '^io_im',
+      '^io_imc3',
+    ],
+    type: 'SEND',
+  });
+});
+
+it('handles onReplySend_2 request', () => {
+  const request = JSON.stringify(
+    require('../../../test/data/2022-09-09-cvOnReplySend_2_request.json')
+  );
+
+  const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
+    JSON.parse(request)
+  );
+  expect(composeRequest).toMatchObject({
+    threadId: 'thread-f:1743802434391390786',
+    messageId: 'msg-a:r2026878197680476540',
+    subject: 'Re: hey2',
+    body: '<div dir="ltr">hey hey</div>',
+    actions: ['^all', '^pfg', '^f_bt', '^f_btns', '^f_cl'],
+    type: 'SEND',
+  });
+});
