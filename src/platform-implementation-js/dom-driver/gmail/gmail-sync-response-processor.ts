@@ -80,6 +80,10 @@ export function extractThreadsFromThreadResponse(
 ): Array<SyncThread | MinimalSyncThread> {
   const parsedResponse = JSON.parse(response);
 
+  if (Array.isArray(parsedResponse)) {
+    return extractThreadsFromThreadResponse_20220909(parsedResponse);
+  }
+
   const threadDescriptors: any[] | null = parsedResponse && parsedResponse[2];
 
   if (!threadDescriptors) throw new Error('Failed to process thread response');
@@ -160,6 +164,89 @@ export function extractThreadsFromThreadResponse(
     .filter(isNotNil);
 }
 
+function extractThreadsFromThreadResponse_20220909(
+  parsedResponse: any[]
+): Array<SyncThread | MinimalSyncThread> {
+  const threadDescriptors: any[] | null = parsedResponse && parsedResponse[1];
+
+  if (!threadDescriptors) throw new Error('Failed to process thread response');
+
+  return threadDescriptors
+    .map((descriptorWrapper) => {
+      if (
+        typeof descriptorWrapper[0] === 'string' &&
+        Array.isArray(descriptorWrapper[2]) &&
+        !(
+          descriptorWrapper[1] &&
+          descriptorWrapper[1][0] &&
+          descriptorWrapper[1][0][13] &&
+          Array.isArray(descriptorWrapper[1][1])
+        )
+      ) {
+        return {
+          syncThreadID: descriptorWrapper[0],
+          oldGmailThreadID:
+            (descriptorWrapper[1] &&
+              descriptorWrapper[1][0] &&
+              descriptorWrapper[1][0][15]) ||
+            undefined,
+          extraMetaData: {
+            snippet:
+              (descriptorWrapper[1] &&
+                descriptorWrapper[1][0] &&
+                descriptorWrapper[1][0][2]) ||
+              undefined,
+            syncMessageData: (descriptorWrapper[2] || [])
+              .filter((md) => Boolean(md[1]))
+              .map((md) => ({
+                syncMessageID: md[0],
+                date: +md[1][16],
+                recipients: getRecipientsFromMessageDescriptor_20220909(md),
+              })),
+          },
+        } as MinimalSyncThread;
+      } else {
+        const threadDescriptor =
+          descriptorWrapper[1] && descriptorWrapper[1][0];
+
+        if (!threadDescriptor) return null;
+
+        let syncMessageData;
+        const fullMessageDescriptors =
+          Array.isArray(descriptorWrapper[2]) && descriptorWrapper[2];
+
+        if (fullMessageDescriptors) {
+          syncMessageData = fullMessageDescriptors.map((md) => ({
+            syncMessageID: md[0],
+            date: +md[1][16],
+            recipients: getRecipientsFromMessageDescriptor_20220909(md),
+          }));
+        } else {
+          const messageDescriptors =
+            descriptorWrapper[1] && descriptorWrapper[1][1];
+
+          syncMessageData = messageDescriptors.map((md: any) => ({
+            syncMessageId: md[0],
+            date: +md[15],
+          }));
+        }
+
+        return {
+          subject: threadDescriptor[1],
+          snippet: threadDescriptor[2],
+          syncThreadID: threadDescriptor[0],
+          oldGmailThreadID: new BigNumber(threadDescriptor[13]).toString(16),
+          rawResponse: descriptorWrapper,
+          extraMetaData: {
+            syncMessageData,
+            snippet: '',
+          },
+        } as SyncThread;
+      }
+    })
+    .filter(isNotNil);
+}
+
 function getRecipientsFromMessageDescriptor(
   messageDescriptor: Array<any>
 ): Recipient[] | void {
@@ -175,6 +262,24 @@ function getRecipientsFromMessageDescriptor(
     .map((recipientDescriptor: any) => ({
       emailAddress: recipientDescriptor[2],
       name: recipientDescriptor[3],
+    }));
+}
+
+function getRecipientsFromMessageDescriptor_20220909(
+  messageDescriptor: Array<any>
+): Recipient[] | void {
+  if (!messageDescriptor[1]) return;
+
+  const to = messageDescriptor[1][0] || [];
+  const cc = messageDescriptor[1][1] || [];
+  const bcc = messageDescriptor[1][2] || [];
+
+  return to
+    .concat(cc)
+    .concat(bcc)
+    .map((recipientDescriptor: any) => ({
+      emailAddress: recipientDescriptor[1],
+      name: recipientDescriptor[2],
     }));
 }
 
