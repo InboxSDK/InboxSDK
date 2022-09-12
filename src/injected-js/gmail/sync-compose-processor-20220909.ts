@@ -1,4 +1,5 @@
 import intersection from 'lodash/intersection';
+import last from 'lodash/last';
 import {
   ComposeRequestType,
   DRAFT_SAVING_ACTIONS,
@@ -150,7 +151,9 @@ function parseSendDraftRequestBody(request: Array<any>) {
       return null;
     }
 
-    const msg = thread[1] && thread[1][13] && thread[1][13][0];
+    const msg =
+      (thread[1] && thread[1][13] && thread[1][13][0]) ||
+      /* reply */ (thread[1] && thread[1][1] && thread[1][1][0]);
 
     if (!Array.isArray(msg)) {
       // exit cuz cannot parse
@@ -273,7 +276,7 @@ function parseSendDraftResponseBody(response: Array<any>) {
 
   const oldThreadId = threadInner[threadInner.length - 1];
 
-  const msg = threadInner[4] && threadInner[4][0];
+  const msg = threadInner[4] && last(threadInner[4]);
   if (!Array.isArray(msg)) {
     // exit cuz cannot parse
     return null;
