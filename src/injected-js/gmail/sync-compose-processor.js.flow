@@ -1,0 +1,33 @@
+/* @flow */
+
+type ComposeRequestType = 'FIRST_DRAFT_SAVE' | 'DRAFT_SAVE' | 'SEND';
+
+type ComposeRequest = {
+  draftID: string,
+  body: string,
+  subject: string,
+  type: ComposeRequestType,
+};
+
+declare export function parseComposeRequestBody(
+  request: string
+): ?ComposeRequest;
+
+type ParsedComposeResponse = {
+  threadId: string,
+  messageId: string,
+  actions: string[],
+  rfcID: string,
+  oldMessageId: string,
+  oldThreadId: string,
+  type: ComposeRequestType,
+};
+
+declare export function parseComposeResponseBody(
+  respone: string
+): ?ParsedComposeResponse;
+
+declare export function replaceBodyContentInComposeSendRequestBody(
+  request: string,
+  newBodyHtmlContent: string
+): string;

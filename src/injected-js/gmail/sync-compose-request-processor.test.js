@@ -11,7 +11,7 @@ it('handles first draft save', () => {
     'utf8'
   );
 
-  const composeRequest = SCRP.getDetailsOfComposeRequest(request);
+  const composeRequest = SCRP.getDetailsOfComposeRequest(JSON.parse(request));
   expect(composeRequest).toMatchObject({
     body: '<div dir="ltr">new new draft</div>',
     type: 'FIRST_DRAFT_SAVE',
@@ -27,7 +27,7 @@ it('handles regular draft save', () => {
     'utf8'
   );
 
-  const composeRequest = SCRP.getDetailsOfComposeRequest(request);
+  const composeRequest = SCRP.getDetailsOfComposeRequest(JSON.parse(request));
   expect(composeRequest).toMatchObject({
     body: '<div dir="ltr">new new draft 2</div>',
     type: 'DRAFT_SAVE',
@@ -43,7 +43,7 @@ it('handles sending', () => {
     'utf8'
   );
 
-  const composeRequest = SCRP.getDetailsOfComposeRequest(request);
+  const composeRequest = SCRP.getDetailsOfComposeRequest(JSON.parse(request));
   expect(composeRequest).toMatchObject({
     body: '<div dir="ltr">new new draft 2</div>',
     type: 'SEND',

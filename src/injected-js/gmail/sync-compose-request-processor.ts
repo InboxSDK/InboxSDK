@@ -1,26 +1,15 @@
 /* @flow */
 
 import intersection from 'lodash/intersection';
+import { ComposeRequest, ComposeRequestType, SEND_ACTIONS } from './constants';
 
-type ComposeRequestType = 'FIRST_DRAFT_SAVE' | 'DRAFT_SAVE' | 'SEND';
-
-type ComposeRequest = {
-  draftID: string,
-  body: string,
-  subject: string,
-  type: ComposeRequestType,
-};
-
-const SEND_ACTIONS = ['^pfg'];
-const DRAFT_SAVING_ACTIONS = ['^r', '^r_bt'];
-
-export function getDetailsOfComposeRequest(request: string): ?ComposeRequest {
-  const parsed = JSON.parse(request);
-
+export function getDetailsOfComposeRequest(
+  parsed: Record<any, any>
+): ComposeRequest | null {
   const updateList = parsed[2] && parsed[2][1];
   if (!updateList) return null;
 
-  const messageUpdates = updateList.filter((update) => {
+  const messageUpdates = updateList.filter((update: any) => {
     const updateWrapper =
       update[2] && update[2][2] && (update[2][2][14] || update[2][2][2]);
     return (
@@ -32,7 +21,7 @@ export function getDetailsOfComposeRequest(request: string): ?ComposeRequest {
   });
 
   if (messageUpdates.length) {
-    const sendUpdateMatch = messageUpdates.find((update) => {
+    const sendUpdateMatch = messageUpdates.find((update: any) => {
       const updateWrapper =
         update[2] && update[2][2] && (update[2][2][14] || update[2][2][2]);
 
@@ -69,7 +58,7 @@ export function getDetailsOfComposeRequest(request: string): ?ComposeRequest {
     // the first time a draft is saved it has a different response format
     const messageUpdates = updateList
       .map(
-        (update) =>
+        (update: any) =>
           update[2] &&
           update[2][2] &&
           update[2][2][3] &&
@@ -79,7 +68,7 @@ export function getDetailsOfComposeRequest(request: string): ?ComposeRequest {
       )
       .filter(Boolean);
 
-    if (messageUpdates.length === 0) return;
+    if (messageUpdates.length === 0) return null;
     const firstMessageUpdate = messageUpdates[0];
 
     return getComposeRequestFromUpdate(firstMessageUpdate, 'FIRST_DRAFT_SAVE');
@@ -87,9 +76,9 @@ export function getDetailsOfComposeRequest(request: string): ?ComposeRequest {
 }
 
 function getComposeRequestFromUpdate(
-  update: Object,
+  update: any,
   type: ComposeRequestType
-): ?ComposeRequest {
+): ComposeRequest | null {
   const body =
     update[9] && update[9][2] && update[9][2][0] && update[9][2][0][2];
 
@@ -105,7 +94,7 @@ function getComposeRequestFromUpdate(
 
 export function replaceEmailBodyForSendRequest(
   request: string,
-  newBody: ?string
+  newBody?: string
 ): string {
   if (!newBody) return request;
 
@@ -114,7 +103,7 @@ export function replaceEmailBodyForSendRequest(
   const updateList = parsed[2] && parsed[2][1];
   if (!updateList) return request;
 
-  const messageUpdates = updateList.filter((update) => {
+  const messageUpdates = updateList.filter((update: any) => {
     const updateWrapper =
       update[2] && update[2][2] && (update[2][2][14] || update[2][2][2]);
     return (
@@ -126,7 +115,7 @@ export function replaceEmailBodyForSendRequest(
   });
 
   if (!messageUpdates.length) return request;
-  const sendUpdateMatch = messageUpdates.find((update) => {
+  const sendUpdateMatch = messageUpdates.find((update: any) => {
     const updateWrapper =
       update[2] && update[2][2] && (update[2][2][14] || update[2][2][2]);
 

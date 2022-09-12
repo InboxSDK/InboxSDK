@@ -342,4 +342,130 @@ describe('sync api', () => {
       },
     ]);
   });
+
+  mainServer.respondWith(
+    {
+      method: 'POST',
+      path: 'https://mail.google.com/sync/u/0/i/s?hl=en&c=20220909_01&rt=r&pt=ji',
+    },
+    {
+      status: 200,
+      response: JSON.stringify(
+        require('../../../test/data/2022-09-09-cvOnDraftSave_response.json')
+      ),
+    }
+  );
+
+  test('cv:2022-09-09 draft saved', async () => {
+    const response = await ajax(mainFrame, {
+      method: 'POST',
+      url: 'https://mail.google.com/sync/u/0/i/s?hl=en&c=20220909_01&rt=r&pt=ji',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: JSON.stringify(
+        require('../../../test/data/2022-09-09-cvOnDraftSave_request.json')
+      ),
+    });
+    expect(JSON.parse(response.text)).toEqual(
+      require('../../../test/data/2022-09-09-cvOnDraftSave_response.json')
+    );
+    expect(ajaxInterceptEvents).toEqual([
+      {
+        draftID: 'r8190137112111191537',
+        threadID: 'thread-a:r263523620390330024',
+        messageID: 'msg-a:r8190137112111191537',
+        oldMessageID: '183234ce86ffa010',
+        oldThreadID: '183234ce86ffa010',
+        rfcID:
+          '\u003cCAFsK+UTN\u003dz14aGfUY8\u003duw7O3yEmn2_ciGoq0o22SeK8dC4kkRw@mail.gmail.com\u003e',
+        type: 'emailDraftReceived',
+      },
+    ]);
+  });
+
+  mainServer.respondWith(
+    {
+      method: 'POST',
+      path: 'https://mail.google.com/sync/u/0/i/s?hl=en&c=20220909_02&rt=r&pt=ji',
+    },
+    {
+      status: 200,
+      response: JSON.stringify(
+        require('../../../test/data/2022-09-09-cvOnDraftUpdate_response.json')
+      ),
+    }
+  );
+
+  test('cv:2022-09-09 draft updated', async () => {
+    const response = await ajax(mainFrame, {
+      method: 'POST',
+      url: 'https://mail.google.com/sync/u/0/i/s?hl=en&c=20220909_02&rt=r&pt=ji',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: JSON.stringify(
+        require('../../../test/data/2022-09-09-cvOnDraftUpdate_request.json')
+      ),
+    });
+    expect(JSON.parse(response.text)).toEqual(
+      require('../../../test/data/2022-09-09-cvOnDraftUpdate_response.json')
+    );
+    console.log('!!!!!!!');
+    console.log(ajaxInterceptEvents);
+    expect(ajaxInterceptEvents).toEqual([
+      {
+        draftID: 'r8190137112111191537',
+        threadID: 'thread-a:r263523620390330024',
+        messageID: 'msg-a:r8190137112111191537',
+        oldMessageID: '183234e210caa042',
+        oldThreadID: '183234ce86ffa010',
+        rfcID:
+          '\u003cCAFsK+USFooaLjvYfUz4QLdCqAQS_PunKeWVvQgpso31w2PkPMA@mail.gmail.com\u003e',
+        type: 'emailDraftReceived',
+      },
+    ]);
+  });
+
+  mainServer.respondWith(
+    {
+      method: 'POST',
+      path: 'https://mail.google.com/sync/u/0/i/s?hl=en&c=20220909_03&rt=r&pt=ji',
+    },
+    {
+      status: 200,
+      response: JSON.stringify(
+        require('../../../test/data/2022-09-09-cvOnSend_response.json')
+      ),
+    }
+  );
+
+  test('cv:2022-09-09 draft sent', async () => {
+    const response = await ajax(mainFrame, {
+      method: 'POST',
+      url: 'https://mail.google.com/sync/u/0/i/s?hl=en&c=20220909_03&rt=r&pt=ji',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: JSON.stringify(
+        require('../../../test/data/2022-09-09-cvOnSend_request.json')
+      ),
+    });
+    expect(JSON.parse(response.text)).toEqual(
+      require('../../../test/data/2022-09-09-cvOnSend_response.json')
+    );
+    expect(ajaxInterceptEvents).toEqual([
+      { type: 'emailSending', draftID: 'r8190137112111191537' },
+      {
+        draftID: 'r8190137112111191537',
+        threadID: 'thread-a:r263523620390330024',
+        messageID: 'msg-a:r8190137112111191537',
+        oldMessageID: '183234eaadcf41e5',
+        oldThreadID: '183234ce86ffa010',
+        rfcID:
+          '\u003cCAFsK+UQf12W_Efo3+hwj+BWb+sk8DaGQkrOoBOU38nHafAHJ4Q@mail.gmail.com\u003e',
+        type: 'emailSent',
+      },
+    ]);
+  });
 });

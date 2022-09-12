@@ -20,9 +20,10 @@ import defer from '../../common/defer';
 import modifySuggestions from './modify-suggestions';
 
 import {
-  getDetailsOfComposeRequest,
-  replaceEmailBodyForSendRequest,
-} from './sync-compose-request-processor';
+  parseComposeRequestBody,
+  parseComposeResponseBody,
+  replaceBodyContentInComposeSendRequestBody,
+} from './sync-compose-processor';
 
 import type { XHRProxyConnectionDetails } from '../xhr-proxy-factory';
 
@@ -227,7 +228,7 @@ export function setupGmailInterceptorOnFrames(
         },
         originalSendBodyLogger(connection) {
           if (connection.originalSendBody) {
-            const composeRequestDetails = getDetailsOfComposeRequest(
+            const composeRequestDetails = parseComposeRequestBody(
               connection.originalSendBody
             );
 
@@ -252,9 +253,7 @@ export function setupGmailInterceptorOnFrames(
           }
         },
         requestChanger: async function (connection, request) {
-          const composeRequestDetails = getDetailsOfComposeRequest(
-            request.body
-          );
+          const composeRequestDetails = parseComposeRequestBody(request.body);
           if (!composeRequestDetails || composeRequestDetails.type !== 'SEND')
             return request;
 
@@ -295,7 +294,10 @@ export function setupGmailInterceptorOnFrames(
           }
 
           return Object.assign({}, request, {
-            body: replaceEmailBodyForSendRequest(request.body, newEmailBody),
+            body: replaceBodyContentInComposeSendRequestBody(
+              request.body,
+              newEmailBody
+            ),
           });
         },
         afterListeners(connection) {
@@ -345,6 +347,66 @@ export function setupGmailInterceptorOnFrames(
             if (connection.status !== 200 || !connection.originalResponseText) {
               sendFailed();
               return;
+            }
+
+            try {
+              const responseParsed = parseComposeResponseBody(
+                connection.originalResponseText
+              );
+
+              if (responseParsed) {
+                logger.eventSdkPassive(
+                  'connection.requestResponseParsed',
+                  {
+                    responseParsed,
+                  },
+                  true
+                );
+
+                if (
+                  responseParsed.type === 'FIRST_DRAFT_SAVE' ||
+                  responseParsed.type === 'DRAFT_SAVE'
+                ) {
+                  triggerEvent({
+                    draftID: draftID,
+                    type: 'emailDraftReceived',
+                    rfcID: responseParsed.rfcID,
+                    threadID: responseParsed.threadId,
+                    messageID: responseParsed.messageId,
+                    oldMessageID: responseParsed.oldMessageId,
+                    oldThreadID: responseParsed.oldThreadId,
+                  });
+
+                  currentSendConnectionIDs.delete(connection);
+                  currentDraftSaveConnectionIDs.delete(connection);
+                  currentFirstDraftSaveConnectionIDs.delete(connection);
+
+                  return;
+                } else if (responseParsed.type === 'SEND') {
+                  triggerEvent({
+                    draftID: draftID,
+                    type: 'emailSent',
+                    rfcID: responseParsed.rfcID,
+                    threadID: responseParsed.threadId,
+                    messageID: responseParsed.messageId,
+                    oldMessageID: responseParsed.oldMessageId,
+                    oldThreadID: responseParsed.oldThreadId,
+                  });
+
+                  currentSendConnectionIDs.delete(connection);
+                  currentDraftSaveConnectionIDs.delete(connection);
+                  currentFirstDraftSaveConnectionIDs.delete(connection);
+
+                  return;
+                }
+              }
+            } catch (err) {
+              logger.eventSdkPassive(
+                'connection.requestResponseParsingFailed',
+                {
+                  responseParseError: err,
+                }
+              );
             }
 
             const originalResponse = JSON.parse(
