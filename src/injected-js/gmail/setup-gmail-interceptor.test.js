@@ -411,8 +411,6 @@ describe('sync api', () => {
     expect(JSON.parse(response.text)).toEqual(
       require('../../../test/data/2022-09-09-cvOnDraftUpdate_response.json')
     );
-    console.log('!!!!!!!');
-    console.log(ajaxInterceptEvents);
     expect(ajaxInterceptEvents).toEqual([
       {
         draftID: 'r8190137112111191537',
@@ -464,6 +462,48 @@ describe('sync api', () => {
         oldThreadID: '183234ce86ffa010',
         rfcID:
           '\u003cCAFsK+UQf12W_Efo3+hwj+BWb+sk8DaGQkrOoBOU38nHafAHJ4Q@mail.gmail.com\u003e',
+        type: 'emailSent',
+      },
+    ]);
+  });
+
+  mainServer.respondWith(
+    {
+      method: 'POST',
+      path: 'https://mail.google.com/sync/u/1/i/s?hl=en&c=39&rt=r&pt=ji',
+    },
+    {
+      status: 200,
+      response: JSON.stringify(
+        require('../../../test/data/2022-09-09-cvOnReplySend_response.json')
+      ),
+    }
+  );
+
+  test('cv:2022-09-09 reply draft sent', async () => {
+    const response = await ajax(mainFrame, {
+      method: 'POST',
+      url: 'https://mail.google.com/sync/u/1/i/s?hl=en&c=39&rt=r&pt=ji',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: JSON.stringify(
+        require('../../../test/data/2022-09-09-cvOnReplySend_request.json')
+      ),
+    });
+    expect(JSON.parse(response.text)).toEqual(
+      require('../../../test/data/2022-09-09-cvOnReplySend_response.json')
+    );
+    expect(ajaxInterceptEvents).toEqual([
+      { type: 'emailSending', draftID: 'r-414184523264894368' },
+      {
+        draftID: 'r-414184523264894368',
+        threadID: 'thread-a:r-474834441621213468',
+        messageID: 'msg-a:r-414184523264894368',
+        oldMessageID: '1833309f6f6ac78f',
+        oldThreadID: '18332e4292f304f1',
+        rfcID:
+          '<CAFxDt-NBAWENo5CdNqGdhzQcsu9rvLERnKDGh_4h5ikqnpf8wA@mail.gmail.com>',
         type: 'emailSent',
       },
     ]);
