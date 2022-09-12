@@ -52,14 +52,14 @@ export async function getThreadFromSyncThreadIdUsingHeaders(
     // try sending request with new format 2022_09_09
     let { text } = await gmailAjax({
       method: 'POST',
-      url: `https://mail.google.com/sync${getAccountUrlPart()}/i/fd`,
+      url: `https://mail.google.com/sync${getAccountUrlPart()}/i/fd?rt=r&pt=ji`,
       headers: {
         'Content-Type': 'application/json',
         'X-Framework-Xsrf-Token': xsrfToken,
         'X-Gmail-BTAI': btaiHeader,
         'X-Google-BTD': '1',
       },
-      data: JSON.stringify([[[syncThreadId, 1]]]),
+      data: JSON.stringify([[[syncThreadId, 1]], 2]),
     });
     responseText = text;
   }
