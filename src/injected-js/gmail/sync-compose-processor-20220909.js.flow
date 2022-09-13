@@ -1,3 +1,8 @@
 /* @flow */
 
 declare export function parseComposeRequestBody_2022_09_09(request: any): any;
+
+declare export function replaceBodyContentInComposeSendRequestBody_2022_09_09(
+  request: any,
+  newBodyHtmlContent: string
+): any;
