@@ -315,8 +315,7 @@ function replaceBodyContentInSendRequestBody(
   request: Array<any>,
   newBodyHtmlContent: string
 ) {
-  const thread =
-    request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
+  const thread = request[1]?.[0]?.[0]?.[1];
 
   if (thread) {
     const threadId: string = thread[0];
@@ -325,7 +324,7 @@ function replaceBodyContentInSendRequestBody(
       return null;
     }
 
-    const msg = thread[1] && thread[1][13] && thread[1][13][0];
+    const msg = thread[1]?.[13]?.[0] || /* reply */ thread[1]?.[1]?.[0];
 
     if (!Array.isArray(msg)) {
       // exit cuz cannot parse
