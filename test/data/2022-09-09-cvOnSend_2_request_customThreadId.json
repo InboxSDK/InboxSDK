@@ -1,0 +1,108 @@
+[
+  [null, null, 2],
+  [
+    [
+      [
+        10,
+        [
+          "thread-a:r263523620390330024|msg-a:r8190137112111191537",
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [
+              [
+                "msg-a:r8190137112111191537",
+                [
+                  1,
+                  "test@gmail.com",
+                  "Test Test",
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  "test@gmail.com"
+                ],
+                [[1, "test+1@gmail.com", "Test Test"]],
+                null,
+                null,
+                null,
+                1662744701149,
+                "subject_111",
+                [
+                  null,
+                  [[0, "<div dir=\"ltr\">ab</div>"]],
+                  null,
+                  null,
+                  null,
+                  null,
+                  1
+                ],
+                null,
+                ["^all", "^pfg", "^f_bt", "^f_btns", "^f_cl", "^i", "^u"],
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                1662744701149,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                [null, null, null, null, null, 0],
+                [null, null, null, 0],
+                null,
+                null,
+                null,
+                null,
+                0,
+                [0, 0, 2, 0],
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "s:6253542622a63a8c|#msg-a:r8190137112111191537|0"
+              ],
+              null,
+              1
+            ]
+          ]
+        ]
+      ]
+    ]
+  ],
+  null,
+  [1662744694647, 1, 1662744701178, 1, 205],
+  2
+]

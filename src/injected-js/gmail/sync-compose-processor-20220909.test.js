@@ -40,9 +40,29 @@ it('handles onDraftSave request', () => {
   });
 });
 
-it('handles onDraftSave request', () => {
+it('handles onDraftSend request', () => {
   const request = JSON.stringify(
     require('../../../test/data/2022-09-09-cvOnSend_request.json')
+  );
+
+  const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
+    JSON.parse(request)
+  );
+  expect(composeRequest).toMatchObject({
+    threadId: 'thread-a:r263523620390330024',
+    messageId: 'msg-a:r8190137112111191537',
+    subject: 'subject_111',
+    body: '<div dir="ltr">ab</div>',
+    actions: ['^all', '^pfg', '^f_bt', '^f_btns', '^f_cl', '^i', '^u'],
+    type: 'SEND',
+  });
+});
+
+it('handles onDraftSend_2 request', () => {
+  // cvOnSend_2_request_customThreadId was created
+  // based on 2019-01-18-cvOffSend.json that has weird thread id field
+  const request = JSON.stringify(
+    require('../../../test/data/2022-09-09-cvOnSend_2_request_customThreadId.json')
   );
 
   const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
