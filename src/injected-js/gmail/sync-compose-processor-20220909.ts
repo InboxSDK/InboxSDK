@@ -36,8 +36,8 @@ function parseCreateDraftRequestBody(request: Array<any>) {
     request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
 
   if (thread) {
-    const threadId: string = thread[0];
-    if (!threadId.startsWith('thread-')) {
+    const threadId = parseThreadId(thread[0]);
+    if (!threadId) {
       // exit cuz cannot parse
       return null;
     }
@@ -93,8 +93,8 @@ function parseUpdateDraftRequestBody(request: Array<any>) {
     request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
 
   if (thread) {
-    const threadId: string = thread[0];
-    if (!threadId.startsWith('thread-')) {
+    const threadId = parseThreadId(thread[0]);
+    if (!threadId) {
       // exit cuz cannot parse
       return null;
     }
@@ -145,8 +145,8 @@ function parseSendDraftRequestBody(request: Array<any>) {
     request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
 
   if (thread) {
-    const threadId: string = thread[0];
-    if (!threadId.startsWith('thread-')) {
+    const threadId = parseThreadId(thread[0]);
+    if (!threadId) {
       // exit cuz cannot parse
       return null;
     }
@@ -201,8 +201,8 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
     return null;
   }
 
-  const threadId: string = thread[0];
-  if (!threadId.startsWith('thread-')) {
+  const threadId = parseThreadId(thread[0]);
+  if (!threadId) {
     // exit cuz cannot parse
     return null;
   }
@@ -213,7 +213,7 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
     return null;
   }
 
-  const oldThreadId = threadInner[threadInner.length - 1];
+  const oldThreadId = threadInner[19];
 
   const msg = threadInner[4] && threadInner[4][0];
   if (!Array.isArray(msg)) {
@@ -229,7 +229,7 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
 
   const actions = msg[10];
   const rfcID = msg[13];
-  const oldMessageId = msg[msg.length - 1];
+  const oldMessageId = msg[55];
 
   const hasRequiredActions =
     intersection(actions, DRAFT_SAVING_ACTIONS).length ===
@@ -262,8 +262,8 @@ function parseSendDraftResponseBody(response: Array<any>) {
     return null;
   }
 
-  const threadId: string = thread[0];
-  if (!threadId.startsWith('thread-')) {
+  const threadId = parseThreadId(thread[0]);
+  if (!threadId) {
     // exit cuz cannot parse
     return null;
   }
@@ -274,7 +274,7 @@ function parseSendDraftResponseBody(response: Array<any>) {
     return null;
   }
 
-  const oldThreadId = threadInner[threadInner.length - 1];
+  const oldThreadId = threadInner[19];
 
   const msg = threadInner[4] && last(threadInner[4]);
   if (!Array.isArray(msg)) {
@@ -290,7 +290,7 @@ function parseSendDraftResponseBody(response: Array<any>) {
 
   const actions = msg[10];
   const rfcID = msg[13];
-  const oldMessageId = msg[msg.length - 1];
+  const oldMessageId = msg[55];
 
   const hasRequiredActions =
     intersection(actions, SEND_ACTIONS).length === SEND_ACTIONS.length;
@@ -318,8 +318,8 @@ function replaceBodyContentInSendRequestBody(
   const thread = request[1]?.[0]?.[0]?.[1];
 
   if (thread) {
-    const threadId: string = thread[0];
-    if (!threadId.startsWith('thread-')) {
+    const threadId = parseThreadId(thread[0]);
+    if (!threadId) {
       // exit cuz cannot parse
       return null;
     }
@@ -344,4 +344,16 @@ function replaceBodyContentInSendRequestBody(
   }
 
   return null;
+}
+
+function parseThreadId(threadId: string): string | null {
+  if (!threadId.startsWith('thread-')) {
+    return null;
+  }
+
+  if (threadId.indexOf('|') > -1) {
+    return threadId.split('|')[0];
+  }
+
+  return threadId;
 }

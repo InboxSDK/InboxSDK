@@ -470,6 +470,48 @@ describe('sync api', () => {
   mainServer.respondWith(
     {
       method: 'POST',
+      path: 'https://mail.google.com/sync/u/0/i/s?hl=en&c=20220909_03_01&rt=r&pt=ji',
+    },
+    {
+      status: 200,
+      response: JSON.stringify(
+        require('../../../test/data/2022-09-09-cvOnSend_2_response_customThreadId.json')
+      ),
+    }
+  );
+
+  test('cv:2022-09-09 draft sent', async () => {
+    const response = await ajax(mainFrame, {
+      method: 'POST',
+      url: 'https://mail.google.com/sync/u/0/i/s?hl=en&c=20220909_03_01&rt=r&pt=ji',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: JSON.stringify(
+        require('../../../test/data/2022-09-09-cvOnSend_2_request_customThreadId.json')
+      ),
+    });
+    expect(JSON.parse(response.text)).toEqual(
+      require('../../../test/data/2022-09-09-cvOnSend_2_response_customThreadId.json')
+    );
+    expect(ajaxInterceptEvents).toEqual([
+      { type: 'emailSending', draftID: 'r8190137112111191537' },
+      {
+        draftID: 'r8190137112111191537',
+        threadID: 'thread-a:r263523620390330024',
+        messageID: 'msg-a:r8190137112111191537',
+        oldMessageID: '183234eaadcf41e5',
+        oldThreadID: '183234ce86ffa010',
+        rfcID:
+          '\u003cCAFsK+UQf12W_Efo3+hwj+BWb+sk8DaGQkrOoBOU38nHafAHJ4Q@mail.gmail.com\u003e',
+        type: 'emailSent',
+      },
+    ]);
+  });
+
+  mainServer.respondWith(
+    {
+      method: 'POST',
       path: 'https://mail.google.com/sync/u/1/i/s?hl=en&c=39&rt=r&pt=ji',
     },
     {
