@@ -301,34 +301,6 @@ export function setupGmailInterceptorOnFrames(
           });
         },
         afterListeners(connection) {
-          try {
-            // log if request/response format changed
-            const willBeProcessed =
-              currentSendConnectionIDs.has(connection) ||
-              currentDraftSaveConnectionIDs.has(connection) ||
-              currentFirstDraftSaveConnectionIDs.has(connection);
-
-            if (
-              !willBeProcessed &&
-              connection.originalSendBody &&
-              connection.originalSendBody[0] === '['
-            ) {
-              logger.eventSdkPassive(
-                'connection.requestResponseFormatChanged',
-                {
-                  url: connection.url,
-                  request: connection.originalSendBody,
-                  response: connection.originalResponseText,
-                },
-                true
-              );
-            }
-          } catch (err) {
-            logger.eventSdkPassive('connection.requestResponseFormatChanged', {
-              error: err,
-            });
-          }
-
           if (
             currentSendConnectionIDs.has(connection) ||
             currentDraftSaveConnectionIDs.has(connection) ||
@@ -355,14 +327,6 @@ export function setupGmailInterceptorOnFrames(
               );
 
               if (responseParsed) {
-                logger.eventSdkPassive(
-                  'connection.requestResponseParsed',
-                  {
-                    responseParsed,
-                  },
-                  true
-                );
-
                 if (
                   responseParsed.type === 'FIRST_DRAFT_SAVE' ||
                   responseParsed.type === 'DRAFT_SAVE'
