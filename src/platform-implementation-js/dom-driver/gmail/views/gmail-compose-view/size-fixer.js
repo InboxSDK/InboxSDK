@@ -33,7 +33,13 @@ function byId(id: string): string {
   return '#' + cssSelectorEscape(id);
 }
 
-function getAdjustedHeightRules(scrollBody, unexpectedHeight, minimumHeight) {
+function getAdjustedHeightRules(
+  scrollBody,
+  composeParentHeight,
+  unexpectedHeight,
+  minimumHeight
+) {
+  const maybeNewMin = composeParentHeight != null ? 0 : minimumHeight;
   return ['height', 'min-height', 'max-height']
     .map((property) => {
       const currentValue = parseInt(
@@ -49,10 +55,10 @@ function getAdjustedHeightRules(scrollBody, unexpectedHeight, minimumHeight) {
       // adjusted minimum height of the scroll body doesn't fall below it.
       const adjustedValue = Math.max(
         currentValue - unexpectedHeight,
-        minimumHeight
+        maybeNewMin
       );
 
-      if (adjustedValue === currentValue) {
+      if (Math.abs(adjustedValue - currentValue) <= 5) {
         return null;
       }
 
@@ -128,6 +134,8 @@ export default function sizeFixer(
       );
     });
 
+  let fullScreenComposeEl;
+
   resizeEvents
     .bufferBy(resizeEvents.flatMap((x) => delayAsap(null)))
     .filter((x) => x.length > 0)
@@ -144,11 +152,33 @@ export default function sizeFixer(
         0
       );
 
-      const unexpectedHeight = statusUnexpectedHeight + topFormUnexpectedHeight;
+      const isFullscreen = gmailComposeView.isFullscreen();
+
+      if (isFullscreen) {
+        fullScreenComposeEl ??= document.querySelector('.aSs .aSt');
+      }
+
+      const fullScreenComposeElHeight = isFullscreen
+        ? fullScreenComposeEl?.clientHeight
+        : null;
+
+      const composeViewUnexpectedHeight = isFullscreen
+        ? Math.max(
+            gmailComposeView.getElement().clientHeight -
+              fullScreenComposeElHeight,
+            0
+          )
+        : 0;
+
+      const unexpectedHeight =
+        statusUnexpectedHeight +
+        topFormUnexpectedHeight +
+        composeViewUnexpectedHeight;
       const minimumHeight = getMinimumBodyHeight(gmailComposeView);
 
       const adjustedHeightRules = getAdjustedHeightRules(
         scrollBody,
+        fullScreenComposeElHeight,
         unexpectedHeight,
         minimumHeight
       );
