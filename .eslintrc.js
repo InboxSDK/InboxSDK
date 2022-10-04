@@ -128,6 +128,10 @@ module.exports = {
         'flowtype/require-valid-file-annotation': ['off'],
       },
     },
+    {
+      files: ['src/platform-implementation-js/**'],
+      globals: { Observable: 'readonly' },
+    },
   ],
   settings: {
     react: {
