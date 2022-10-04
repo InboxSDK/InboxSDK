@@ -157,5 +157,6 @@
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
   },
-  "version": "0.7.25"
+  "version": "0.7.25",
+  "packageManager": "yarn@3.2.3"
 }
