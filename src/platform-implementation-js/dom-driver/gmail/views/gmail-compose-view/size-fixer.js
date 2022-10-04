@@ -137,7 +137,6 @@ export default function sizeFixer(
   let fullScreenComposeEl;
 
   resizeEvents
-    .bufferBy(resizeEvents.flatMap((x) => delayAsap(null)))
     .filter((x) => x.length > 0)
     .merge(makeMutationObserverChunkedStream(scrollBody, { attributes: true }))
     .takeUntilBy(stopper)
