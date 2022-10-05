@@ -33,45 +33,6 @@ function byId(id: string): string {
   return '#' + cssSelectorEscape(id);
 }
 
-function getAdjustedHeightRules(scrollBody, unexpectedHeight, minimumHeight) {
-  return ['height', 'min-height', 'max-height']
-    .map((property) => {
-      const currentValue = parseInt(
-        scrollBody.style.getPropertyValue(property),
-        10
-      );
-
-      if (Number.isNaN(currentValue)) {
-        return null;
-      }
-
-      // The child message body textbox enforces a minimum height, so ensure the
-      // adjusted minimum height of the scroll body doesn't fall below it.
-      const adjustedValue = Math.max(
-        currentValue - unexpectedHeight,
-        minimumHeight
-      );
-
-      if (adjustedValue === currentValue) {
-        return null;
-      }
-
-      return `${property}: ${adjustedValue}px !important;`;
-    })
-    .filter(Boolean)
-    .join('\n');
-}
-
-function getMinimumBodyHeight(gmailComposeView) {
-  const bodyElement = gmailComposeView.getMaybeBodyElement();
-
-  if (!bodyElement) {
-    return 0;
-  }
-
-  return parseInt(bodyElement.style.minHeight, 10) || 0;
-}
-
 export default function sizeFixer(
   driver: Object,
   gmailComposeView: GmailComposeView
@@ -145,15 +106,64 @@ export default function sizeFixer(
       );
 
       const unexpectedHeight = statusUnexpectedHeight + topFormUnexpectedHeight;
-      const minimumHeight = getMinimumBodyHeight(gmailComposeView);
 
-      const adjustedHeightRules = getAdjustedHeightRules(
-        scrollBody,
-        unexpectedHeight,
-        minimumHeight
+      const maybeBody = gmailComposeView.getMaybeBodyElement();
+
+      // in order to support dynamic height in non-fullscreen mode,
+      // get height of the inner element of scrollBody
+      // this way we still can override height values of scrollBody,
+      // but recalculate them based on actual height of an inner child
+      const scrollBodyInner = scrollBody.querySelector('.qz');
+      const height = scrollBodyInner?.offsetHeight || scrollBody.offsetHeight;
+
+      const maxHeight = parseInt(
+        scrollBody.style.getPropertyValue('max-height'),
+        10
       );
 
-      setRuleForSelector(byId(scrollBody.id), adjustedHeightRules);
+      const isFullScreen = gmailComposeView.isFullscreen();
+
+      const newMaxHeight = maxHeight - unexpectedHeight;
+      const newHeight = height > newMaxHeight ? newMaxHeight : null;
+
+      const scrollBodyCssRules = [`max-height: ${newMaxHeight}px !important;`];
+      const maybeBodyCssRules = [];
+
+      if (newHeight) {
+        scrollBodyCssRules.push(`height: ${newHeight}px !important;`);
+      }
+
+      if (isFullScreen) {
+        // in non fullscreen mode compose window can get taller on user input,
+        // but in fullscreen mode, compose window size is static so not only max-height
+        // should be updated, but also min-height of scrollBody and maybeBody
+
+        // NOTE: max-height and min-height in full screen are same
+
+        scrollBodyCssRules.push(`min-height: ${newMaxHeight}px !important;`);
+
+        const maybeBodyMinHeight =
+          (maybeBody && parseInt(maybeBody.style.minHeight, 10)) || maxHeight;
+        const maybeBodyNewMinHeight = maybeBodyMinHeight - unexpectedHeight;
+
+        maybeBodyCssRules.push(
+          `min-height: ${maybeBodyNewMinHeight}px !important;`
+        );
+      }
+
+      if (scrollBodyCssRules.length > 0) {
+        setRuleForSelector(
+          byId(scrollBody.id),
+          scrollBodyCssRules.filter(Boolean).join('\n')
+        );
+      }
+
+      if (maybeBodyCssRules.length > 0 && maybeBody) {
+        setRuleForSelector(
+          byId(maybeBody.id),
+          maybeBodyCssRules.filter(Boolean).join('\n')
+        );
+      }
     });
 
   stopper.onValue(() => {
