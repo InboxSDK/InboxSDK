@@ -109,10 +109,12 @@ export default function sizeFixer(
 
       const maybeBody = gmailComposeView.getMaybeBodyElement();
 
-      // in order to support dynamic height in non-fullscreen mode,
-      // get height of the inner element of scrollBody
-      // this way we still can override height values of scrollBody,
-      // but recalculate them based on actual height of an inner child
+      /**
+       * In order to support dynamic height in non-fullscreen mode,
+       * get height of the inner element of scrollBody
+       * this way we still can override height values of scrollBody,
+       * but recalculate them based on actual height of an inner child
+       */
       const scrollBodyInner = scrollBody.querySelector('.qz');
       const height = scrollBodyInner?.offsetHeight || scrollBody.offsetHeight;
 
@@ -127,7 +129,7 @@ export default function sizeFixer(
       const newHeight = height > newMaxHeight ? newMaxHeight : null;
 
       const scrollBodyCssRules = [`max-height: ${newMaxHeight}px !important;`];
-      const maybeBodyCssRules = [];
+      let maybeBodyCssRules;
 
       if (newHeight) {
         scrollBodyCssRules.push(`height: ${newHeight}px !important;`);
@@ -139,30 +141,21 @@ export default function sizeFixer(
         // should be updated, but also min-height of scrollBody and maybeBody
 
         // NOTE: max-height and min-height in full screen are same
-
         scrollBodyCssRules.push(`min-height: ${newMaxHeight}px !important;`);
 
         const maybeBodyMinHeight =
-          (maybeBody && parseInt(maybeBody.style.minHeight, 10)) || maxHeight;
+          parseInt(maybeBody?.style.minHeight, 10) || maxHeight;
         const maybeBodyNewMinHeight = maybeBodyMinHeight - unexpectedHeight;
 
-        maybeBodyCssRules.push(
-          `min-height: ${maybeBodyNewMinHeight}px !important;`
-        );
+        maybeBodyCssRules = `min-height: ${maybeBodyNewMinHeight}px !important;`;
       }
 
       if (scrollBodyCssRules.length > 0) {
-        setRuleForSelector(
-          byId(scrollBody.id),
-          scrollBodyCssRules.filter(Boolean).join('\n')
-        );
+        setRuleForSelector(byId(scrollBody.id), scrollBodyCssRules.join('\n'));
       }
 
-      if (maybeBodyCssRules.length > 0 && maybeBody) {
-        setRuleForSelector(
-          byId(maybeBody.id),
-          maybeBodyCssRules.filter(Boolean).join('\n')
-        );
+      if (maybeBodyCssRules && maybeBody) {
+        setRuleForSelector(byId(maybeBody.id), maybeBodyCssRules);
       }
     });
 
