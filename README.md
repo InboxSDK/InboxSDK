@@ -15,7 +15,7 @@ Check out the [Quickstart](https://inboxsdk.github.io/inboxsdk-docs/#quick-start
 
 The most basic example of adding a button to a Gmail compose window:
 
-```
+```javascript
 InboxSDK.load(2, 'YOUR_APP_ID_HERE').then(function(sdk){
   // the SDK has been loaded, now do something with it!
   sdk.Compose.registerComposeViewHandler(function(composeView){
