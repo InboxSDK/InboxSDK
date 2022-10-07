@@ -32,8 +32,7 @@ export function replaceBodyContentInComposeSendRequestBody_2022_09_09(
  * Parses request when compose window saves draft for the first time (creates draft)
  */
 function parseCreateDraftRequestBody(request: Array<any>) {
-  const thread =
-    request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
+  const thread = request[1]?.[0]?.[0]?.[1];
 
   if (thread) {
     const threadId = parseThreadId(thread[0]);
@@ -42,12 +41,7 @@ function parseCreateDraftRequestBody(request: Array<any>) {
       return null;
     }
 
-    const msg =
-      thread[1] &&
-      thread[1][2] &&
-      thread[1][2][0] &&
-      thread[1][2][0][4] &&
-      thread[1][2][0][4][0];
+    const msg = thread[1]?.[2]?.[0]?.[4]?.[0] || thread[1]?.[1]?.[0];
 
     if (!Array.isArray(msg)) {
       // exit cuz cannot parse
