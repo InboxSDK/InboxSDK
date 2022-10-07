@@ -1,8 +1,64 @@
-/* @flow */
-
-import fs from 'fs';
-
+/* eslint-disable @typescript-eslint/no-var-requires */
 import * as SCRP from './sync-compose-processor-20220909';
+
+const expectedOutputByFile = {
+  '2022-09-09-cvOnReplyDraftSave_request.json': {
+    expected: {
+      threadId: 'thread-a:r263523620390330024',
+      messageId: 'msg-a:r8190137112111191537',
+      subject: 'subject_111',
+      body: '<div dir="ltr">a</div>',
+      actions: ['^all', '^r', '^r_bt'],
+      type: 'FIRST_DRAFT_SAVE',
+    },
+    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+  },
+  '2022-09-09-cvOnReplyDraftSave_response.json': {
+    expected: {
+      threadId: 'thread-a:r263523620390330024',
+      messageId: 'msg-a:r8190137112111191537',
+      subject: 'subject_111',
+      body: '<div dir="ltr">a</div>',
+      actions: ['^all', '^r', '^r_bt'],
+      type: 'FIRST_DRAFT_SAVE',
+    },
+    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+  },
+  '2022-09-09-cvOnReplyDraftUpdate_request.json': {
+    expected: {
+      threadId: 'thread-a:r263523620390330024',
+      messageId: 'msg-a:r8190137112111191537',
+      subject: 'subject_111',
+      body: '<div dir="ltr">a</div>',
+      actions: ['^all', '^r', '^r_bt'],
+      type: 'FIRST_DRAFT_SAVE',
+    },
+    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+  },
+  '2022-09-09-cvOnReplyDraftUpdate_response.json': {
+    expected: {
+      threadId: 'thread-a:r263523620390330024',
+      messageId: 'msg-a:r8190137112111191537',
+      subject: 'subject_111',
+      body: '<div dir="ltr">a</div>',
+      actions: ['^all', '^r', '^r_bt'],
+      type: 'FIRST_DRAFT_SAVE',
+    },
+    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+  },
+};
+
+for (const [file, { parseWith, expected }] of Object.entries(
+  expectedOutputByFile
+)) {
+  it(`handles on ${file}`, () => {
+    const testData = JSON.stringify(require(`../../../test/data/${file}`));
+
+    const maybeResult = parseWith(JSON.parse(testData));
+
+    expect(maybeResult).toMatchObject(expected);
+  });
+}
 
 it('handles onDraftSave request', () => {
   const request = JSON.stringify(
@@ -117,8 +173,9 @@ it('replaces onReplySend request body', () => {
       'replaced_content'
     );
 
-  const parsedRequest =
-    SCRP.parseComposeRequestBody_2022_09_09(replacedRequest);
+  const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
+    replacedRequest!
+  );
 
   expect(parsedRequest).toMatchObject({
     threadId: 'thread-a:r-474834441621213468',
@@ -169,8 +226,9 @@ it('replaces onReplySend_2 request body', () => {
       'replaced_content'
     );
 
-  const parsedRequest =
-    SCRP.parseComposeRequestBody_2022_09_09(replacedRequest);
+  const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
+    replacedRequest!
+  );
 
   expect(parsedRequest).toMatchObject({
     threadId: 'thread-f:1743802434391390786',

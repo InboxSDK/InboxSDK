@@ -1,0 +1,115 @@
+[
+  null,
+  [
+    [
+      [
+        4,
+        [
+          "thread-f:1746035685735370050",
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [
+              [
+                "msg-a:r-8480821811518170896",
+                [
+                  1,
+                  "test@gmail.com",
+                  "za w",
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  "test@gmail.com"
+                ],
+                [[1, "notifications@streak.com", "Streak"]],
+                null,
+                null,
+                null,
+                1665171605260,
+                "Re: Your scheduled email did NOT send!",
+                [
+                  null,
+                  [
+                    [
+                      0,
+                      "<div dir=\"ltr\"><div dir=\"ltr\" gmail_original=\"1\">fish sticks</div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Fri, Oct 7, 2022 at 9:29 AM Streak &lt;notifications@streak.com&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin: 0px 0px 0px 0.8ex; border-left: 1px solid rgb(204, 204, 204); padding-left: 1ex;\"><div class=\"msg5849642694170245587\">"
+                    ]
+                  ],
+                  null,
+                  null,
+                  null,
+                  null,
+                  1
+                ],
+                null,
+                ["^all", "^r", "^r_bt"],
+                null,
+                null,
+                null,
+                null,
+                "<20221007132948.3ca489969d9cc1c5@cio14991.streak.com>",
+                null,
+                1665171605260,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                [null, null, null, null, null, 0],
+                [null, null, null, 0],
+                null,
+                null,
+                null,
+                null,
+                0,
+                [0, 0, 21, 0],
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "s:5d56ac0563735070|#msg-a:r-8480821811518170896|0"
+              ],
+              "msg-f:1746035685735370050",
+              1,
+              null,
+              [1665171605269]
+            ]
+          ]
+        ]
+      ]
+    ]
+  ],
+  [1, 11106, null, null, [null, 0], null, 1],
+  [1665171598955, 1, 1665171605270, 0, 65],
+  2
+]
