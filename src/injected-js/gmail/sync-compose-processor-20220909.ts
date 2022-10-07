@@ -41,7 +41,9 @@ function parseCreateDraftRequestBody(request: Array<any>) {
       return null;
     }
 
-    const msg = thread[1]?.[2]?.[0]?.[4]?.[0] || thread[1]?.[1]?.[0];
+    const msg =
+      thread[1]?.[2]?.[0]?.[4]?.[0] ||
+      /* Reply draft creation */ thread[1]?.[1]?.[0];
 
     if (!Array.isArray(msg)) {
       // exit cuz cannot parse
@@ -188,8 +190,7 @@ function parseSendDraftRequestBody(request: Array<any>) {
  * Parses response when compose window saves draft for the first time or updates it
  */
 function parseUpdateDraftResponseBody(response: Array<any>) {
-  const thread =
-    response[1] && response[1][5] && response[1][5][0] && response[1][5][0][0];
+  const thread = response[1]?.[5]?.[0]?.[0];
   if (!Array.isArray(thread)) {
     // exit cuz cannot parse
     return null;
@@ -201,7 +202,7 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
     return null;
   }
 
-  const threadInner = thread[2] && thread[2][6] && thread[2][6][0];
+  const threadInner = thread[2]?.[6]?.[0];
   if (!Array.isArray(threadInner)) {
     // exit cuz cannot parse
     return null;
@@ -209,7 +210,7 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
 
   const oldThreadId = threadInner[19];
 
-  const msg = threadInner[4] && threadInner[4][0];
+  const msg = last(threadInner[4]);
   if (!Array.isArray(msg)) {
     // exit cuz cannot parse
     return null;
@@ -249,8 +250,7 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
  * Parses response when compose window saves draft for the first time or updates it
  */
 function parseSendDraftResponseBody(response: Array<any>) {
-  const thread =
-    response[1] && response[1][5] && response[1][5][0] && response[1][5][0][0];
+  const thread = response[1]?.[5]?.[0]?.[0];
   if (!Array.isArray(thread)) {
     // exit cuz cannot parse
     return null;
@@ -262,7 +262,7 @@ function parseSendDraftResponseBody(response: Array<any>) {
     return null;
   }
 
-  const threadInner = thread[2] && thread[2][6] && thread[2][6][0];
+  const threadInner = thread[2]?.[6]?.[0];
   if (!Array.isArray(threadInner)) {
     // exit cuz cannot parse
     return null;
