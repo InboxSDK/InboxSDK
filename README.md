@@ -4,13 +4,18 @@ InboxSDK is a JavaScript library for building apps inside of Gmail with browser 
 
 - **No DOM Hacking**: exposes a high level, declarative API and handles all the DOM manipulation in a performant way
 - **Handles edge cases**: multiple inboxes, conversation mode on/off, personal vs workspace, preview pane, fullscreen compose, popouts & themes are all handled
-- **Constant updates**: new versions released as Gmail updates (but before their changes are fully rolled out)
+- **Constant updates**: new versions released as Gmail updates (often before their changes are fully rolled out)
+
+# Documentation
+
+The [full docs site](https://inboxsdk.github.io/inboxsdk-docs/) and [relevant repo](https://github.com/InboxSDK/inboxsdk-docs).
 
 # Installation
 
 Check out the [Quickstart](https://inboxsdk.github.io/inboxsdk-docs/#quick-start) in the docs, but basic summary:
 
 - Use the `@inboxsdk/core` package on [npm](https://www.npmjs.com/package/@inboxsdk/core)
+- Set up the project like the [example extension](https://github.com/InboxSDK/hello-world).
 - [Generate](https://www.inboxsdk.com/register) an app id
 
 # Usage
@@ -18,6 +23,8 @@ Check out the [Quickstart](https://inboxsdk.github.io/inboxsdk-docs/#quick-start
 The most basic example of adding a button to a Gmail compose window:
 
 ```javascript
+import * as InboxSDK from '@inboxsdk/core';
+
 InboxSDK.load(2, 'YOUR_APP_ID_HERE').then((sdk) => {
   // the SDK has been loaded, now do something with it!
   sdk.Compose.registerComposeViewHandler((composeView) => {
@@ -33,11 +40,7 @@ InboxSDK.load(2, 'YOUR_APP_ID_HERE').then((sdk) => {
 });
 ```
 
-See https://github.com/InboxSDK/hello-world/tree/mv3 for an example extension using the InboxSDK.
-
-# Documentation
-
-The [full docs site](https://inboxsdk.github.io/inboxsdk-docs/) and [relevant repo](https://github.com/InboxSDK/inboxsdk-docs).
+See https://github.com/InboxSDK/hello-world for an example extension using the InboxSDK.
 
 # Licensing
 
