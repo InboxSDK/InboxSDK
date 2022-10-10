@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* @flow */
 
 import Kefir from 'kefir';
@@ -11,6 +13,7 @@ jest.mock('../injected-logger', () => {
       console.error(err, details);
       throw err;
     },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     eventSdkPassive(name: string, details?: any) {},
   };
 });
@@ -41,11 +44,17 @@ const jsServer = new MockServer();
 const jsFrame = { XMLHttpRequest: jsServer.XMLHttpRequest };
 
 beforeAll(() => {
-  setupGmailInterceptorOnFrames(mainFrame, jsFrame);
+  setupGmailInterceptorOnFrames(
+    mainFrame as Partial<Window> as Window,
+    jsFrame as Partial<Window> as Window
+  );
 });
 
 const ajaxInterceptEvents: Array<Object> = [];
-Kefir.fromEvents(document, 'inboxSDKajaxIntercept').onValue((event) => {
+Kefir.fromEvents<{ detail: any }, unknown>(
+  document,
+  'inboxSDKajaxIntercept'
+).onValue((event) => {
   ajaxInterceptEvents.push(event.detail);
 });
 
