@@ -9,10 +9,12 @@
   "sideEffects": true,
   "files": [
     "inboxsdk.js",
+    "inboxsdk.js.map",
     "inboxsdk.d.ts",
     "background.js",
     "background.d.ts",
     "pageWorld.js",
+    "pageWorld.js.map",
     "pageWorld.d.ts"
   ],
   "dependencies": {
