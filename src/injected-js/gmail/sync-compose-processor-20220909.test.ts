@@ -1,8 +1,59 @@
-/* @flow */
-
-import fs from 'fs';
-
+/* eslint-disable @typescript-eslint/no-var-requires */
 import * as SCRP from './sync-compose-processor-20220909';
+
+const expectedOutputByFile = {
+  '2022-09-09-cvOnReplyDraftSave_request.json': {
+    expected: {
+      threadId: 'thread-f:1746035685735370050',
+      messageId: 'msg-a:r-8480821811518170896',
+      subject: 'Re: Your scheduled email did NOT send!',
+      body: '<div dir="ltr">aostnuhaeu</div>',
+      actions: ['^all', '^r', '^r_bt'],
+      type: 'FIRST_DRAFT_SAVE',
+    },
+    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+  },
+  '2022-09-09-cvOnReplyDraftSave_response.json': {
+    expected: {
+      messageId: 'msg-a:r-8480821811518170896',
+      threadId: 'thread-f:1746035685735370050',
+      type: 'DRAFT_SAVE',
+      actions: ['^all', '^r', '^r_bt'],
+    },
+    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+  },
+  '2022-09-09-cvOnReplyDraftUpdate_request.json': {
+    expected: {
+      body: '<div dir="ltr"><div dir="ltr" gmail_original="1">fish sticks</div><br><div class="gmail_quote"><div dir="ltr" class="gmail_attr">On Fri, Oct 7, 2022 at 9:29 AM Streak &lt;notifications@streak.com&gt; wrote:<br></div><blockquote class="gmail_quote" style="margin: 0px 0px 0px 0.8ex; border-left: 1px solid rgb(204, 204, 204); padding-left: 1ex;"><div class="msg5849642694170245587">',
+      messageId: 'msg-a:r-8480821811518170896',
+      subject: 'Re: Your scheduled email did NOT send!',
+      threadId: 'thread-f:1746035685735370050',
+      type: 'DRAFT_SAVE',
+    },
+    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+  },
+  '2022-09-09-cvOnReplyDraftUpdate_response.json': {
+    expected: {
+      messageId: 'msg-a:r-8480821811518170896',
+      threadId: 'thread-f:1746035685735370050',
+      type: 'DRAFT_SAVE',
+      actions: ['^all', '^r', '^r_bt'],
+    },
+    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+  },
+};
+
+for (const [file, { parseWith, expected }] of Object.entries(
+  expectedOutputByFile
+)) {
+  it(`handles on ${file}`, () => {
+    const testData = JSON.stringify(require(`../../../test/data/${file}`));
+
+    const maybeResult = parseWith(JSON.parse(testData));
+
+    expect(maybeResult).toMatchObject(expected);
+  });
+}
 
 it('handles onDraftSave request', () => {
   const request = JSON.stringify(
@@ -117,8 +168,9 @@ it('replaces onReplySend request body', () => {
       'replaced_content'
     );
 
-  const parsedRequest =
-    SCRP.parseComposeRequestBody_2022_09_09(replacedRequest);
+  const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
+    replacedRequest!
+  );
 
   expect(parsedRequest).toMatchObject({
     threadId: 'thread-a:r-474834441621213468',
@@ -169,8 +221,9 @@ it('replaces onReplySend_2 request body', () => {
       'replaced_content'
     );
 
-  const parsedRequest =
-    SCRP.parseComposeRequestBody_2022_09_09(replacedRequest);
+  const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
+    replacedRequest!
+  );
 
   expect(parsedRequest).toMatchObject({
     threadId: 'thread-f:1743802434391390786',

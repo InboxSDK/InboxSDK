@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* @flow */
 
 import Kefir from 'kefir';
@@ -11,6 +13,7 @@ jest.mock('../injected-logger', () => {
       console.error(err, details);
       throw err;
     },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     eventSdkPassive(name: string, details?: any) {},
   };
 });
@@ -41,11 +44,17 @@ const jsServer = new MockServer();
 const jsFrame = { XMLHttpRequest: jsServer.XMLHttpRequest };
 
 beforeAll(() => {
-  setupGmailInterceptorOnFrames(mainFrame, jsFrame);
+  setupGmailInterceptorOnFrames(
+    mainFrame as Partial<Window> as Window,
+    jsFrame as Partial<Window> as Window
+  );
 });
 
 const ajaxInterceptEvents: Array<Object> = [];
-Kefir.fromEvents(document, 'inboxSDKajaxIntercept').onValue((event) => {
+Kefir.fromEvents<{ detail: any }, unknown>(
+  document,
+  'inboxSDKajaxIntercept'
+).onValue((event) => {
   ajaxInterceptEvents.push(event.detail);
 });
 
@@ -593,3 +602,72 @@ test('cv:2022-09-09 reply draft 2 sent', async () => {
     },
   ]);
 });
+
+{
+  const pathPrefix = '../../../test/data/';
+
+  const replyDraftTests = [
+    {
+      filePrefix: '2022-09-09-cvOnReplyDraftSave_',
+      expectedEvents: [
+        {
+          draftID: 'r-8480821811518170896',
+          messageID: 'msg-a:r-8480821811518170896',
+          oldMessageID: '183b3f46fdd71d6d',
+          oldThreadID: '183b2a348d698d42',
+          rfcID:
+            '<CAF9MChDSw8XuwCujg22rOq_GWvVnox18mduqhVU8n=Nt+fF+tA@mail.gmail.com>',
+          threadID: 'thread-f:1746035685735370050',
+          type: 'emailDraftReceived',
+        },
+      ],
+      path: 'https://mail.google.com/sync/u/0/i/s?hl=en&c=45&rt=r&pt=ji',
+    },
+    {
+      filePrefix: '2022-09-09-cvOnReplyDraftUpdate_',
+      expectedEvents: [
+        {
+          draftID: 'r-8480821811518170896',
+          messageID: 'msg-a:r-8480821811518170896',
+          oldMessageID: '183b3f64980e72a8',
+          oldThreadID: '183b2a348d698d42',
+          rfcID:
+            '<CAF9MChCxDJ-7o=k2qnsD_JAMz9hBwU6uSO7TpeyeznRSQVywqg@mail.gmail.com>',
+          threadID: 'thread-f:1746035685735370050',
+          type: 'emailDraftReceived',
+        },
+      ],
+      path: 'https://mail.google.com/sync/u/0/i/s?hl=en&c=48&rt=r&pt=ji',
+    },
+  ];
+  for (const { filePrefix, expectedEvents, path } of replyDraftTests) {
+    const responseData = require(pathPrefix + filePrefix + 'response.json');
+    const requestData = JSON.stringify(
+      require(pathPrefix + filePrefix + 'request.json')
+    );
+
+    mainServer.respondWith(
+      {
+        method: 'POST',
+        path,
+      },
+      {
+        status: 200,
+        response: JSON.stringify(responseData),
+      }
+    );
+
+    test(`${filePrefix} sent`, async () => {
+      const response = await ajax(mainFrame, {
+        method: 'POST',
+        url: path,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: requestData,
+      });
+      expect(JSON.parse(response.text)).toEqual(responseData);
+      expect(ajaxInterceptEvents).toEqual(expectedEvents);
+    });
+  }
+}
