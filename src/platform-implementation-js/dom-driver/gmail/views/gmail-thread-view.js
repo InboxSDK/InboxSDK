@@ -190,7 +190,9 @@ class GmailThreadView {
   addNoticeBar(): SimpleElementView {
     const el = document.createElement('div');
     el.className = idMap('thread_noticeBar');
-    const subjectContainer = this._element.querySelector('.if > .nH');
+    const subjectContainer = this._element.querySelector(
+      '.if > .nH, .PeIF1d > .nH'
+    );
     if (!subjectContainer) throw new Error('Failed to find subject container');
     subjectContainer.insertAdjacentElement('afterend', el);
     const view = new SimpleElementView(el);
