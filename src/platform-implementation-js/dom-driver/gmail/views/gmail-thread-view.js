@@ -634,10 +634,24 @@ class GmailThreadView {
     if (
       (toolbarContainerElement: any).parentElement.getAttribute('role') ===
         'main' &&
-      (toolbarContainerElement: any).parentElement.querySelector('.if') &&
-      (toolbarContainerElement: any).parentElement.querySelector('.if')
+      (toolbarContainerElement: any).parentElement.querySelector(
+        '.if, .PeIF1d'
+      ) &&
+      (toolbarContainerElement: any).parentElement.querySelector('.if, .PeIF1d')
         .parentElement === this._element
     ) {
+      var version = toolbarContainerElement.parentElement.querySelector(
+        '.PeIF1d'
+      )
+        ? '2022-10-12'
+        : '2018';
+
+      this._driver
+        .getLogger()
+        .eventSdkPassive('gmailThreadView_isToolbarContainerRelevant', {
+          version,
+        });
+
       return true;
     }
 

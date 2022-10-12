@@ -362,7 +362,10 @@ class GmailRouteView {
 
     const elementStream = makeElementChildStream(
       threadContainerTableElement
-    ).filter((event) => !!event.el.querySelector('.if'));
+    ).filter(
+      (event) =>
+        !!event.el.querySelector('.if') || !!event.el.querySelector('.PeIF1d')
+    );
 
     this._eventStream.plug(
       elementStream
