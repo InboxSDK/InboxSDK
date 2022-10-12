@@ -640,7 +640,7 @@ class GmailThreadView {
       (toolbarContainerElement: any).parentElement.querySelector('.if, .PeIF1d')
         .parentElement === this._element
     ) {
-      var version = toolbarContainerElement.parentElement.querySelector(
+      var version = (toolbarContainerElement: any).parentElement.querySelector(
         '.PeIF1d'
       )
         ? '2022-10-12'
