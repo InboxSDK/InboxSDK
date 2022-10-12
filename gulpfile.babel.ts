@@ -167,7 +167,6 @@ interface BrowserifyTaskOptions {
   // hotPort?: number;
   disableMinification?: boolean;
   afterBuild?: () => Promise<void>;
-  noSourceMapComment?: boolean;
   sourceMappingURLPrefix?: string;
   writeToPackagesCore?: boolean;
 }
@@ -234,9 +233,6 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
         )
       )
       .pipe(sourcemaps.write, args.production ? '.' : null, {
-        // don't include sourcemap comment in the inboxsdk.js file that we
-        // distribute to developers since it'd always be broken.
-        addComment: !options.noSourceMapComment,
         sourceMappingURLPrefix: options.sourceMappingURLPrefix,
       });
 
@@ -327,7 +323,6 @@ if (args.remote) {
       standalone: 'InboxSDK',
       disableMinification: true,
       afterBuild: setupExamples,
-      noSourceMapComment: true,
     });
   });
   gulp.task(
@@ -352,7 +347,6 @@ if (args.remote) {
         standalone: 'InboxSDK',
         // hotPort: 3140,
         afterBuild: setupExamples,
-        noSourceMapComment: Boolean(args.production),
       });
     })
   );
@@ -369,7 +363,6 @@ if (args.remote) {
       standalone: 'InboxSDK',
       // hotPort: 3140,
       afterBuild: setupExamples,
-      noSourceMapComment: Boolean(args.production),
       writeToPackagesCore: true,
     });
   });
