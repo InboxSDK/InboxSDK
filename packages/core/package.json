@@ -4,15 +4,25 @@
   "description": "Library for building browser extensions for Gmail",
   "main": "inboxsdk.js",
   "author": "Streak",
-  "license": "All Rights Reserved",
+  "license": "(MIT OR Apache-2.0)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/InboxSDK/InboxSDK.git"
+  },
+  "bugs": {
+    "url": "https://github.com/InboxSDK/InboxSDK/issues"
+  },
+  "homepage": "https://www.inboxsdk.com/",
   "private": false,
   "sideEffects": true,
   "files": [
     "inboxsdk.js",
+    "inboxsdk.js.map",
     "inboxsdk.d.ts",
     "background.js",
     "background.d.ts",
     "pageWorld.js",
+    "pageWorld.js.map",
     "pageWorld.d.ts"
   ],
   "dependencies": {
