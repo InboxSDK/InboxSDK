@@ -107,7 +107,8 @@ async function setupExamples() {
 }
 
 gulp.task('noop', () => {
-  // noop
+  // This task exists so we can run `yarn gulp noop` to check that this
+  // script loads (and yarn-deps-check passes) without any side effects.
 });
 
 async function getVersion(): Promise<string> {
