@@ -167,7 +167,6 @@ interface BrowserifyTaskOptions {
   // hotPort?: number;
   disableMinification?: boolean;
   afterBuild?: () => Promise<void>;
-  sourceMappingURLPrefix?: string;
   writeToPackagesCore?: boolean;
 }
 
@@ -232,9 +231,7 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
           })
         )
       )
-      .pipe(sourcemaps.write, args.production ? '.' : null, {
-        sourceMappingURLPrefix: options.sourceMappingURLPrefix,
-      });
+      .pipe(sourcemaps.write, args.production ? '.' : null);
 
     const bundle = bundler.bundle();
     let result = bundle
@@ -299,7 +296,6 @@ gulp.task('pageWorld', () => {
     entry: './src/injected-js/main',
     destName: 'pageWorld.js',
     // hotPort: 3142,
-    sourceMappingURLPrefix: 'https://www.inboxsdk.com/build/',
     writeToPackagesCore: true,
   });
 });
