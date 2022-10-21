@@ -187,16 +187,36 @@ class GmailThreadView {
     return sidebar.addThreadSidebarContentPanel(descriptor, this);
   }
 
+  _subjectContainerSelectors = {
+    '2022_10_21': '.a98.iY > .nH',
+    '2022_10_12': '.PeIF1d > .nH',
+    '2018': '.if > .nH',
+  };
+
   addNoticeBar(): SimpleElementView {
     const el = document.createElement('div');
     el.className = idMap('thread_noticeBar');
-    const selector_2018 = this._element.querySelector('.if > .nH');
-    const selector_2022_10_12 = this._element.querySelector('.PeIF1d > .nH');
-    const subjectContainer = selector_2018 || selector_2022_10_12;
+    let version;
+    let subjectContainer;
+
+    for (const [currentVersion, selector] of Object.entries(
+      this._subjectContainerSelectors
+    )) {
+      // Flow should be able to infer selector to be a string,
+      // Typescript can. Remove this when ported.
+      const el = this._element.querySelector((selector: any));
+      if (!el) {
+        continue;
+      }
+
+      version = currentVersion;
+      subjectContainer = el;
+      break;
+    }
 
     if (!subjectContainer) throw new Error('Failed to find subject container');
     this._driver.getLogger().eventSdkPassive('addNoticeBar subjectContainer', {
-      version: selector_2018 ? '2018' : '2022-10-12',
+      version,
     });
     subjectContainer.insertAdjacentElement('afterend', el);
     const view = new SimpleElementView(el);
