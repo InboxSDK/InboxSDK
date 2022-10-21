@@ -641,10 +641,11 @@ class GmailThreadView {
       (toolbarContainerElement: any).parentElement.getAttribute('role') ===
         'main' &&
       (toolbarContainerElement: any).parentElement.querySelector(
-        '.if, .PeIF1d'
+        '.if, .PeIF1d, .a98.iY'
       ) &&
-      (toolbarContainerElement: any).parentElement.querySelector('.if, .PeIF1d')
-        .parentElement === this._element
+      (toolbarContainerElement: any).parentElement.querySelector(
+        '.if, .PeIF1d, .a98.iY'
+      ).parentElement === this._element
     ) {
       var version = (toolbarContainerElement: any).parentElement.querySelector(
         '.PeIF1d'

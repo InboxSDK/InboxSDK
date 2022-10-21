@@ -364,7 +364,9 @@ class GmailRouteView {
       threadContainerTableElement
     ).filter(
       (event) =>
-        !!event.el.querySelector('.if') || !!event.el.querySelector('.PeIF1d')
+        !!event.el.querySelector('.if') ||
+        !!event.el.querySelector('.PeIF1d') ||
+        !!event.el.querySelector('.a98.iY')
     );
 
     this._eventStream.plug(
