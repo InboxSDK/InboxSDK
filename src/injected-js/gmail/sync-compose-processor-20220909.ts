@@ -33,52 +33,51 @@ export function replaceBodyContentInComposeSendRequestBody_2022_09_09(
  */
 function parseCreateDraftRequestBody(request: Array<any>) {
   const thread = request[1]?.[0]?.[0]?.[1];
-
-  if (thread) {
-    const threadId = parseThreadId(thread[0]);
-    if (!threadId) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const msg =
-      thread[1]?.[2]?.[0]?.[4]?.[0] ||
-      /* Reply draft creation */ thread[1]?.[1]?.[0];
-
-    if (!Array.isArray(msg)) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const messageId: string = msg[0];
-
-    if (!messageId.startsWith('msg-')) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const subject = msg[7];
-    const body = msg[8][1][0][1];
-    const actions = msg[10];
-
-    const hasRequiredActions =
-      intersection(actions, DRAFT_SAVING_ACTIONS).length ===
-      DRAFT_SAVING_ACTIONS.length;
-
-    if (!hasRequiredActions) {
-      // exit if doesn't have required actions
-      return null;
-    }
-
-    return {
-      threadId,
-      messageId,
-      subject,
-      body,
-      actions,
-      type: 'FIRST_DRAFT_SAVE' as ComposeRequestType,
-    };
+  if (!Array.isArray(thread)) {
+    // exit cuz cannot parse
+    return null;
   }
+
+  const threadId = parseThreadId(thread[0]);
+  if (!threadId) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const msg =
+    /* new msg */ thread[1]?.[2]?.[0]?.[4]?.[0] ||
+    /* reply */ thread[1]?.[1]?.[0];
+
+  if (!Array.isArray(msg)) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const message = parseMsgInRequest(msg);
+  if (!message) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const { messageId, subject, body, actions } = message;
+
+  const hasRequiredActions =
+    intersection(actions, DRAFT_SAVING_ACTIONS).length ===
+    DRAFT_SAVING_ACTIONS.length;
+
+  if (!hasRequiredActions) {
+    // exit if doesn't have required actions
+    return null;
+  }
+
+  return {
+    threadId,
+    messageId,
+    subject,
+    body,
+    actions,
+    type: 'FIRST_DRAFT_SAVE' as ComposeRequestType,
+  };
 }
 
 /**
@@ -88,49 +87,49 @@ function parseUpdateDraftRequestBody(request: Array<any>) {
   const thread =
     request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
 
-  if (thread) {
-    const threadId = parseThreadId(thread[0]);
-    if (!threadId) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const msg = thread[1] && thread[1][13] && thread[1][13][0];
-
-    if (!Array.isArray(msg)) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const messageId: string = msg[0];
-
-    if (!messageId.startsWith('msg-')) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const subject = msg[7];
-    const body = msg[8][1][0][1];
-    const actions = msg[10];
-
-    const hasRequiredActions =
-      intersection(actions, DRAFT_SAVING_ACTIONS).length ===
-      DRAFT_SAVING_ACTIONS.length;
-
-    if (!hasRequiredActions) {
-      // exit if doesn't have required actions
-      return null;
-    }
-
-    return {
-      threadId,
-      messageId,
-      subject,
-      body,
-      actions,
-      type: 'DRAFT_SAVE' as ComposeRequestType,
-    };
+  if (!Array.isArray(thread)) {
+    // exit cuz cannot parse
+    return null;
   }
+
+  const threadId = parseThreadId(thread[0]);
+  if (!threadId) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const msg = thread[1] && thread[1][13] && thread[1][13][0];
+
+  if (!Array.isArray(msg)) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const message = parseMsgInRequest(msg);
+  if (!message) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const { messageId, subject, body, actions } = message;
+
+  const hasRequiredActions =
+    intersection(actions, DRAFT_SAVING_ACTIONS).length ===
+    DRAFT_SAVING_ACTIONS.length;
+
+  if (!hasRequiredActions) {
+    // exit if doesn't have required actions
+    return null;
+  }
+
+  return {
+    threadId,
+    messageId,
+    subject,
+    body,
+    actions,
+    type: 'DRAFT_SAVE' as ComposeRequestType,
+  };
 }
 
 /**
@@ -140,50 +139,50 @@ function parseSendDraftRequestBody(request: Array<any>) {
   const thread =
     request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
 
-  if (thread) {
-    const threadId = parseThreadId(thread[0]);
-    if (!threadId) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const msg =
-      (thread[1] && thread[1][13] && thread[1][13][0]) ||
-      /* reply */ (thread[1] && thread[1][1] && thread[1][1][0]);
-
-    if (!Array.isArray(msg)) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const messageId: string = msg[0];
-
-    if (!messageId.startsWith('msg-')) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const subject = msg[7];
-    const body = msg[8][1][0][1];
-    const actions = msg[10];
-
-    const hasRequiredActions =
-      intersection(actions, SEND_ACTIONS).length === SEND_ACTIONS.length;
-
-    if (!hasRequiredActions) {
-      // exit if doesn't have required actions
-      return null;
-    }
-
-    return {
-      threadId,
-      messageId,
-      subject,
-      body,
-      actions,
-      type: 'SEND' as ComposeRequestType,
-    };
+  if (!Array.isArray(thread)) {
+    // exit cuz cannot parse
+    return null;
   }
+
+  const threadId = parseThreadId(thread[0]);
+  if (!threadId) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const msg =
+    /* new msg */ (thread[1] && thread[1][13] && thread[1][13][0]) ||
+    /* reply */ (thread[1] && thread[1][1] && thread[1][1][0]);
+
+  if (!Array.isArray(msg)) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const message = parseMsgInRequest(msg);
+  if (!message) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const { messageId, subject, body, actions } = message;
+
+  const hasRequiredActions =
+    intersection(actions, SEND_ACTIONS).length === SEND_ACTIONS.length;
+
+  if (!hasRequiredActions) {
+    // exit if doesn't have required actions
+    return null;
+  }
+
+  return {
+    threadId,
+    messageId,
+    subject,
+    body,
+    actions,
+    type: 'SEND' as ComposeRequestType,
+  };
 }
 
 /**
@@ -216,15 +215,13 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
     return null;
   }
 
-  const messageId: string = msg[0];
-  if (!messageId.startsWith('msg-')) {
+  const message = parseMsgInResponse(msg);
+  if (!message) {
     // exit cuz cannot parse
     return null;
   }
 
-  const actions = msg[10];
-  const rfcID = msg[13];
-  const oldMessageId = msg[55];
+  const { messageId, actions, rfcID, oldMessageId } = message;
 
   const hasRequiredActions =
     intersection(actions, DRAFT_SAVING_ACTIONS).length ===
@@ -276,15 +273,13 @@ function parseSendDraftResponseBody(response: Array<any>) {
     return null;
   }
 
-  const messageId: string = msg[0];
-  if (!messageId.startsWith('msg-')) {
+  const message = parseMsgInResponse(msg);
+  if (!message) {
     // exit cuz cannot parse
     return null;
   }
 
-  const actions = msg[10];
-  const rfcID = msg[13];
-  const oldMessageId = msg[55];
+  const { messageId, actions, rfcID, oldMessageId } = message;
 
   const hasRequiredActions =
     intersection(actions, SEND_ACTIONS).length === SEND_ACTIONS.length;
@@ -310,34 +305,33 @@ function replaceBodyContentInSendRequestBody(
   newBodyHtmlContent: string
 ) {
   const thread = request[1]?.[0]?.[0]?.[1];
-
-  if (thread) {
-    const threadId = parseThreadId(thread[0]);
-    if (!threadId) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const msg = thread[1]?.[13]?.[0] || /* reply */ thread[1]?.[1]?.[0];
-
-    if (!Array.isArray(msg)) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const messageId: string = msg[0];
-
-    if (!messageId.startsWith('msg-')) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    msg[8][1][0][1] = newBodyHtmlContent;
-
-    return request;
+  if (!thread) {
+    return null;
   }
 
-  return null;
+  const threadId = parseThreadId(thread[0]);
+  if (!threadId) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const msg =
+    /* new msg */ thread[1]?.[13]?.[0] || /* reply */ thread[1]?.[1]?.[0];
+
+  if (!Array.isArray(msg)) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const messageId = parseMsgId(msg[0]);
+  if (!messageId) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  msg[8][1][0][1] = newBodyHtmlContent;
+
+  return request;
 }
 
 function parseThreadId(threadId: string): string | null {
@@ -350,4 +344,65 @@ function parseThreadId(threadId: string): string | null {
   }
 
   return threadId;
+}
+
+function parseMsgId(messageId: string): string | null {
+  if (!messageId.startsWith('msg-')) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  return messageId;
+}
+
+function parseMsgInRequest(msg: any[]) {
+  if (!Array.isArray(msg)) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const messageId = parseMsgId(msg[0]);
+  if (!messageId) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const subject = msg[7];
+  const body = msg[8][1][0][1];
+  const actions = msg[10];
+  const rfcID = msg[13];
+  const oldMessageId = msg[55];
+
+  return {
+    messageId,
+    subject,
+    body,
+    actions,
+    rfcID,
+    oldMessageId,
+  };
+}
+
+function parseMsgInResponse(msg: any[]) {
+  if (!Array.isArray(msg)) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const messageId = parseMsgId(msg[0]);
+  if (!messageId) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const actions = msg[10];
+  const rfcID = msg[13];
+  const oldMessageId = msg[55];
+
+  return {
+    messageId,
+    actions,
+    rfcID,
+    oldMessageId,
+  };
 }

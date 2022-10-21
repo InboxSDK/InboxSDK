@@ -1,0 +1,137 @@
+[
+  [null, null, 2],
+  [
+    [
+      [
+        78,
+        [
+          "thread-a:r-1030145228305804508",
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [
+              [
+                "msg-a:r7241715802500133864",
+                [
+                  1,
+                  "test@test.com",
+                  "test test",
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  "test@test.com"
+                ],
+                [[1, "test+to@test.com", "test to"]],
+                [
+                  [1, "test+cc@test.com", "test cc"],
+                  [1, "test+cc2@test.com", "test cc2"]
+                ],
+                [[1, "test+bcc2@test.com", "test bcc2"]],
+                null,
+                1666393031985,
+                "Re: test subject",
+                [
+                  null,
+                  [
+                    [
+                      0,
+                      "<div dir=\"ltr\">test reply body</div><div hspace=\"test-pt-mark\" style=\"max-height:1px;\"><img alt=\"\" style=\"width:0px;max-height:0px;overflow:hidden\" src=\"https://dev.mailfoogae.appspot.com:8888/t?sender=aYm9yeXNAc3RyZWFrLmNvbQ%3D%3D&amp;type=zerocontent&amp;guid=19b740a4-1742-41cb-93f7-c0b77319260c\"><font color=\"#ffffff\" size=\"1\">ᐧ</font></div>"
+                    ],
+                    [
+                      2,
+                      "<br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Fri, Oct 21, 2022 at 3:53 PM test test &lt;test@test.com&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin: 0px 0px 0px 0.8ex; border-left: 1px solid rgb(204, 204, 204); padding-left: 1ex;\"><div dir=\"ltr\">test body</div><div hspace=\"test-pt-mark\" style=\"max-height: 1px;\"><img alt=\"\" style=\"width: 0px; max-height: 0px; overflow: hidden;\" src=\"https://ci3.googleusercontent.com/proxy/lus_J-4zGGEynOqq4qBEO4U3Ch0vtlG747uVfKya5galyciju3XOVW2lp6RTqhzZyTbxEFo5Ua6aWSEnO5NIneBAKgIznqNzJlPVDXh-gdAmZrm49TI63MGWmFeV5x1fQU7ONoFeO71SAjoSVlUaIiW-QZjoCJVHwReCbC6Fe6kcsQ180-KCHXyx1dWHn9r9mMhpQCppn-aprQ9Rvw=s0-d-e1-ft#https://dev.mailfoogae.appspot.com:8888/t?sender=aYm9yeXNAc3RyZWFrLmNvbQ%3D%3D&amp;type=zerocontent&amp;guid=84a7c36b-0595-4065-a96f-5f84e68ccc0f\"><font color=\"#ffffff\" size=\"1\">ᐧ</font></div>\n</blockquote></div>"
+                    ]
+                  ],
+                  null,
+                  null,
+                  null,
+                  null,
+                  1
+                ],
+                null,
+                ["^all", "^pfg", "^f_bt", "^f_btns", "^f_cl", "^i", "^u"],
+                null,
+                null,
+                null,
+                null,
+                "<CAGx7AOSrDQiJw4TT-B9=eDSK3rRva9CvB9NFe364bxR5H9NuEQ@mail.gmail.com>",
+                null,
+                1666393031985,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0,
+                [0, 0, 15, 0],
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "s:18820b14ea357fe5|#msg-a:r7241715802500133864|0"
+              ],
+              "msg-a:r-9122305152175603305",
+              1,
+              null,
+              [1666393032005]
+            ]
+          ]
+        ]
+      ],
+      [
+        79,
+        [
+          "thread-a:r-1030145228305804508",
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [["^io_re"], ["^io_fwd"], ["msg-a:r-9122305152175603305"]]
+          ]
+        ]
+      ]
+    ]
+  ],
+  null,
+  [1666392915920, 2, 1666393032006, 1, 101],
+  2
+]

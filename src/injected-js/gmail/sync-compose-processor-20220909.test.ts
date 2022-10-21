@@ -41,6 +41,100 @@ const expectedOutputByFile = {
     },
     parseWith: SCRP.parseComposeResponseBody_2022_09_09,
   },
+  '2022-09-09-cvOnDraftUpdate_2_request.json': {
+    expected: {
+      threadId: 'thread-a:r-1030145228305804508',
+      messageId: 'msg-a:r-9122305152175603305',
+      subject: 'test subject',
+      body: '<div dir="ltr">test body</div>',
+      type: 'DRAFT_SAVE',
+    },
+    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+  },
+  '2022-09-09-cvOnDraftUpdate_2_response.json': {
+    expected: {
+      messageId: 'msg-a:r-9122305152175603305',
+      threadId: 'thread-a:r-1030145228305804508',
+      type: 'DRAFT_SAVE',
+      actions: ['^all', '^r', '^r_bt'],
+    },
+    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+  },
+  '2022-09-09-cvOnSend_3_request.json': {
+    expected: {
+      threadId: 'thread-a:r-8891700334768116294',
+      messageId: 'msg-a:r-329565169840451245',
+      subject: 'test subject',
+      body: '<div dir="ltr">test body</div><div hspace="test-pt-mark" style="max-height:1px;"><img alt="" style="width:0px;max-height:0px;overflow:hidden" src="https://dev.mailfoogae.appspot.com:8888/t?sender=aYm9yeXNAc3RyZWFrLmNvbQ%3D%3D&amp;type=zerocontent&amp;guid=b3b2b759-451a-4c4c-b620-27259f4a4907"><font color="#ffffff" size="1">ᐧ</font></div>',
+      type: 'SEND',
+    },
+    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+  },
+  '2022-09-09-cvOnSend_3_response.json': {
+    expected: {
+      messageId: 'msg-a:r-329565169840451245',
+      threadId: 'thread-a:r-8891700334768116294',
+      actions: [
+        '^all',
+        '^f',
+        '^f_bt',
+        '^f_cl',
+        '^i',
+        '^pfg',
+        '^sq_ig_i_personal',
+        '^u',
+      ],
+      type: 'SEND',
+    },
+    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+  },
+  '2022-09-09-cvOnReplyDraftUpdate_2_request.json': {
+    expected: {
+      threadId: 'thread-a:r-1030145228305804508',
+      messageId: 'msg-a:r7241715802500133864',
+      subject: 'Re: test subject',
+      body: '<div dir="ltr">test reply body</div>',
+      type: 'DRAFT_SAVE',
+    },
+    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+  },
+  '2022-09-09-cvOnReplyDraftUpdate_2_response.json': {
+    expected: {
+      messageId: 'msg-a:r7241715802500133864',
+      threadId: 'thread-a:r-1030145228305804508',
+      type: 'DRAFT_SAVE',
+      actions: ['^all', '^r', '^r_bt'],
+    },
+    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+  },
+  '2022-09-09-cvOnReplySend_3_request.json': {
+    expected: {
+      threadId: 'thread-a:r-1030145228305804508',
+      messageId: 'msg-a:r7241715802500133864',
+      subject: 'Re: test subject',
+      body: '<div dir="ltr">test reply body</div><div hspace="test-pt-mark" style="max-height:1px;"><img alt="" style="width:0px;max-height:0px;overflow:hidden" src="https://dev.mailfoogae.appspot.com:8888/t?sender=aYm9yeXNAc3RyZWFrLmNvbQ%3D%3D&amp;type=zerocontent&amp;guid=19b740a4-1742-41cb-93f7-c0b77319260c"><font color="#ffffff" size="1">ᐧ</font></div>',
+      type: 'SEND',
+    },
+    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+  },
+  '2022-09-09-cvOnReplySend_3_response.json': {
+    expected: {
+      messageId: 'msg-a:r7241715802500133864',
+      threadId: 'thread-a:r-1030145228305804508',
+      actions: [
+        '^all',
+        '^f',
+        '^f_bt',
+        '^f_cl',
+        '^i',
+        '^pfg',
+        '^sq_ig_i_personal',
+        '^u',
+      ],
+      type: 'SEND',
+    },
+    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+  },
 };
 
 for (const [file, { parseWith, expected }] of Object.entries(
