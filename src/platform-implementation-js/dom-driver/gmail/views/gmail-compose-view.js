@@ -115,9 +115,12 @@ class GmailComposeView {
   _stopper: Stopper;
   _lastSelectionRange: ?Range;
   _requestModifiers: {
-    [key: string]: (composeParams: { body: string }) =>
-      | { body: string }
-      | Promise<{ body: string }>,
+    [key: string]: (composeParams: {
+      to: ?Array<any>,
+      cc: ?Array<any>,
+      bcc: ?Array<any>,
+      body: string,
+    }) => { body: string } | Promise<{ body: string }>,
   };
   _isListeningToAjaxInterceptStream: boolean;
   _formattingArea: ?HTMLElement;
