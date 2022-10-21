@@ -647,11 +647,17 @@ class GmailThreadView {
         '.if, .PeIF1d, .a98.iY'
       ).parentElement === this._element
     ) {
-      var version = (toolbarContainerElement: any).parentElement.querySelector(
-        '.PeIF1d'
-      )
-        ? '2022-10-12'
-        : '2018';
+      let version = '2018';
+
+      if (
+        (toolbarContainerElement: any).parentElement.querySelector('.a98.iY')
+      ) {
+        version = '2022-10-20';
+      } else if (
+        (toolbarContainerElement: any).parentElement.querySelector('.PeIF1d')
+      ) {
+        version = '2022-10-12';
+      }
 
       this._driver
         .getLogger()
