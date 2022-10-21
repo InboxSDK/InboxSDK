@@ -87,6 +87,9 @@ function getComposeRequestFromUpdate(
   return {
     body,
     type,
+    to: null,
+    cc: null,
+    bcc: null,
     draftID: update[1].replace('msg-a:', ''),
     subject: update[8],
   };

@@ -1,5 +1,7 @@
 import intersection from 'lodash/intersection';
 import last from 'lodash/last';
+
+import type { Contact } from '../../platform-implementation-js/driver-interfaces/compose-view-driver';
 import {
   ComposeRequestType,
   DRAFT_SAVING_ACTIONS,
@@ -59,7 +61,7 @@ function parseCreateDraftRequestBody(request: Array<any>) {
     return null;
   }
 
-  const { messageId, subject, body, actions } = message;
+  const { messageId, to, cc, bcc, subject, body, actions } = message;
 
   const hasRequiredActions =
     intersection(actions, DRAFT_SAVING_ACTIONS).length ===
@@ -73,6 +75,9 @@ function parseCreateDraftRequestBody(request: Array<any>) {
   return {
     threadId,
     messageId,
+    to,
+    cc,
+    bcc,
     subject,
     body,
     actions,
@@ -111,7 +116,7 @@ function parseUpdateDraftRequestBody(request: Array<any>) {
     return null;
   }
 
-  const { messageId, subject, body, actions } = message;
+  const { messageId, to, cc, bcc, subject, body, actions } = message;
 
   const hasRequiredActions =
     intersection(actions, DRAFT_SAVING_ACTIONS).length ===
@@ -125,6 +130,9 @@ function parseUpdateDraftRequestBody(request: Array<any>) {
   return {
     threadId,
     messageId,
+    to,
+    cc,
+    bcc,
     subject,
     body,
     actions,
@@ -165,7 +173,7 @@ function parseSendDraftRequestBody(request: Array<any>) {
     return null;
   }
 
-  const { messageId, subject, body, actions } = message;
+  const { messageId, to, cc, bcc, subject, body, actions } = message;
 
   const hasRequiredActions =
     intersection(actions, SEND_ACTIONS).length === SEND_ACTIONS.length;
@@ -178,6 +186,9 @@ function parseSendDraftRequestBody(request: Array<any>) {
   return {
     threadId,
     messageId,
+    to,
+    cc,
+    bcc,
     subject,
     body,
     actions,
@@ -221,7 +232,7 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
     return null;
   }
 
-  const { messageId, actions, rfcID, oldMessageId } = message;
+  const { messageId, to, cc, bcc, actions, rfcID, oldMessageId } = message;
 
   const hasRequiredActions =
     intersection(actions, DRAFT_SAVING_ACTIONS).length ===
@@ -235,6 +246,9 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
   return {
     threadId,
     messageId,
+    to,
+    cc,
+    bcc,
     actions,
     rfcID,
     oldMessageId,
@@ -279,7 +293,7 @@ function parseSendDraftResponseBody(response: Array<any>) {
     return null;
   }
 
-  const { messageId, actions, rfcID, oldMessageId } = message;
+  const { messageId, to, cc, bcc, actions, rfcID, oldMessageId } = message;
 
   const hasRequiredActions =
     intersection(actions, SEND_ACTIONS).length === SEND_ACTIONS.length;
@@ -292,6 +306,9 @@ function parseSendDraftResponseBody(response: Array<any>) {
   return {
     threadId,
     messageId,
+    to,
+    cc,
+    bcc,
     actions,
     rfcID,
     oldMessageId,
@@ -355,6 +372,15 @@ function parseMsgId(messageId: string): string | null {
   return messageId;
 }
 
+function parseContacts(contacts: any[]): Contact[] | null {
+  if (!Array.isArray(contacts)) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  return contacts.map((c): Contact => ({ emailAddress: c[1], name: c[2] }));
+}
+
 function parseMsgInRequest(msg: any[]) {
   if (!Array.isArray(msg)) {
     // exit cuz cannot parse
@@ -368,6 +394,9 @@ function parseMsgInRequest(msg: any[]) {
   }
 
   const subject = msg[7];
+  const to = parseContacts(msg[2]);
+  const cc = parseContacts(msg[3]);
+  const bcc = parseContacts(msg[4]);
   const body = msg[8][1][0][1];
   const actions = msg[10];
   const rfcID = msg[13];
@@ -375,6 +404,9 @@ function parseMsgInRequest(msg: any[]) {
 
   return {
     messageId,
+    to,
+    cc,
+    bcc,
     subject,
     body,
     actions,
@@ -396,11 +428,17 @@ function parseMsgInResponse(msg: any[]) {
   }
 
   const actions = msg[10];
+  const to = parseContacts(msg[2]);
+  const cc = parseContacts(msg[3]);
+  const bcc = parseContacts(msg[4]);
   const rfcID = msg[13];
   const oldMessageId = msg[55];
 
   return {
     messageId,
+    to,
+    cc,
+    bcc,
     actions,
     rfcID,
     oldMessageId,

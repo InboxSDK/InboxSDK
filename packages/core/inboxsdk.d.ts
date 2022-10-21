@@ -673,7 +673,13 @@ export interface ComposeView extends EventEmitter {
   isReply(): boolean;
   overrideEditSubject(): void;
   registerRequestModifier(
-    cb: (composeParams: { isPlainText?: boolean; body: string }) => void
+    cb: (composeParams: {
+      to: Contact[] | null;
+      cc: Contact[] | null;
+      bcc: Contact[] | null;
+      isPlainText?: boolean;
+      body: string;
+    }) => void
   ): void;
   replaceSendButton({ el }: { el: HTMLElement }): () => void;
   setBccRecipients(emails: string[]): void;

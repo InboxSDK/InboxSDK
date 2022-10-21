@@ -257,7 +257,7 @@ export function setupGmailInterceptorOnFrames(
           if (!composeRequestDetails || composeRequestDetails.type !== 'SEND')
             return request;
 
-          const { draftID, body, type } = composeRequestDetails;
+          const { draftID, to, cc, bcc, body, type } = composeRequestDetails;
 
           const composeModifierIds = modifiers[draftID];
           if (!composeModifierIds || composeModifierIds.length === 0)
@@ -284,6 +284,9 @@ export function setupGmailInterceptorOnFrames(
               draftID,
               modifierId,
               composeParams: {
+                to,
+                cc,
+                bcc,
                 body: newEmailBody,
                 isPlainText: false,
               },

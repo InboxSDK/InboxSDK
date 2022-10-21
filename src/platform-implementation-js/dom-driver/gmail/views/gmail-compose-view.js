@@ -1849,9 +1849,12 @@ class GmailComposeView {
   }
 
   registerRequestModifier(
-    modifier: (composeParams: { body: string }) =>
-      | { body: string }
-      | Promise<{ body: string }>
+    modifier: (composeParams: {
+      to: ?Array<any>,
+      cc: ?Array<any>,
+      bcc: ?Array<any>,
+      body: string,
+    }) => { body: string } | Promise<{ body: string }>
   ) {
     const keyId = this._driver.isUsingSyncAPI()
       ? this._getDraftIDfromForm()
