@@ -1853,9 +1853,9 @@ class GmailComposeView {
 
   registerRequestModifier(
     modifier: (composeParams: {
-      to: ?Array<any>,
-      cc: ?Array<any>,
-      bcc: ?Array<any>,
+      to: ?Array<Contact>,
+      cc: ?Array<Contact>,
+      bcc: ?Array<Contact>,
       body: string,
     }) => { body: string } | Promise<{ body: string }>
   ) {

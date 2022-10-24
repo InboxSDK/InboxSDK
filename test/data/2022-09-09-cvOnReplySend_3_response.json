@@ -113,7 +113,7 @@
                     [[1, "test+to@test.com", "test to"]],
                     [
                       [1, "test+cc@test.com", "test cc"],
-                      [1, "test+cc2@test.com", "test cc2"]
+                      [1, "test+cc2@test.com"]
                     ],
                     [[1, "test+bcc2@test.com", "test bcc2"]],
                     null,
@@ -195,7 +195,7 @@
                     ["test cc", "test+cc@test.com"],
                     ["test to", "test+to@test.com"],
                     ["test cc", "test+cc@test.com"],
-                    ["test cc2", "test+cc2@test.com"]
+                    ["", "test+cc2@test.com"]
                   ],
                   [
                     ["test bcc", "test+bcc@test.com"],

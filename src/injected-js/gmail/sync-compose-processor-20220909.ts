@@ -378,7 +378,9 @@ function parseContacts(contacts: any[]): Contact[] | null {
     return null;
   }
 
-  return contacts.map((c): Contact => ({ emailAddress: c[1], name: c[2] }));
+  return contacts.map(
+    (c): Contact => ({ emailAddress: c[1], name: c[2] || null })
+  );
 }
 
 function parseMsgInRequest(msg: any[]) {

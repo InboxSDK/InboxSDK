@@ -107,7 +107,7 @@ const expectedOutputByFile = {
       to: [{ emailAddress: 'test+to@test.com', name: 'test to' }],
       cc: [
         { emailAddress: 'test+cc@test.com', name: 'test cc' },
-        { emailAddress: 'test+cc2@test.com', name: 'test cc2' },
+        { emailAddress: 'test+cc2@test.com', name: null },
       ],
       bcc: [{ emailAddress: 'test+bcc2@test.com', name: 'test bcc2' }],
       subject: 'Re: test subject',
@@ -123,7 +123,7 @@ const expectedOutputByFile = {
       to: [{ emailAddress: 'test+to@test.com', name: 'test to' }],
       cc: [
         { emailAddress: 'test+cc@test.com', name: 'test cc' },
-        { emailAddress: 'test+cc2@test.com', name: 'test cc2' },
+        { emailAddress: 'test+cc2@test.com', name: null },
       ],
       bcc: [{ emailAddress: 'test+bcc2@test.com', name: 'test bcc2' }],
       type: 'DRAFT_SAVE',
@@ -138,7 +138,7 @@ const expectedOutputByFile = {
       to: [{ emailAddress: 'test+to@test.com', name: 'test to' }],
       cc: [
         { emailAddress: 'test+cc@test.com', name: 'test cc' },
-        { emailAddress: 'test+cc2@test.com', name: 'test cc2' },
+        { emailAddress: 'test+cc2@test.com', name: null },
       ],
       bcc: [{ emailAddress: 'test+bcc2@test.com', name: 'test bcc2' }],
       subject: 'Re: test subject',
@@ -154,7 +154,7 @@ const expectedOutputByFile = {
       to: [{ emailAddress: 'test+to@test.com', name: 'test to' }],
       cc: [
         { emailAddress: 'test+cc@test.com', name: 'test cc' },
-        { emailAddress: 'test+cc2@test.com', name: 'test cc2' },
+        { emailAddress: 'test+cc2@test.com', name: null },
       ],
       bcc: [{ emailAddress: 'test+bcc2@test.com', name: 'test bcc2' }],
       actions: [
