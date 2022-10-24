@@ -116,9 +116,9 @@ class GmailComposeView {
   _lastSelectionRange: ?Range;
   _requestModifiers: {
     [key: string]: (composeParams: {
-      to: ?Array<any>,
-      cc: ?Array<any>,
-      bcc: ?Array<any>,
+      to: Array<Contact> | null,
+      cc: Array<Contact> | null,
+      bcc: Array<Contact> | null,
       body: string,
     }) => { body: string } | Promise<{ body: string }>,
   };
@@ -1853,9 +1853,9 @@ class GmailComposeView {
 
   registerRequestModifier(
     modifier: (composeParams: {
-      to: ?Array<Contact>,
-      cc: ?Array<Contact>,
-      bcc: ?Array<Contact>,
+      to: Array<Contact> | null,
+      cc: Array<Contact> | null,
+      bcc: Array<Contact> | null,
       body: string,
     }) => { body: string } | Promise<{ body: string }>
   ) {

@@ -4,9 +4,9 @@ type ComposeRequestType = 'FIRST_DRAFT_SAVE' | 'DRAFT_SAVE' | 'SEND';
 
 type ComposeRequest = {
   draftID: string,
-  to: ?Array<any>,
-  cc: ?Array<any>,
-  bcc: ?Array<any>,
+  to: Array<Contact> | null,
+  cc: Array<Contact> | null,
+  bcc: Array<Contact> | null,
   body: string,
   subject: string,
   type: ComposeRequestType,
@@ -19,9 +19,9 @@ declare export function parseComposeRequestBody(
 type ParsedComposeResponse = {
   threadId: string,
   messageId: string,
-  to: ?Array<any>,
-  cc: ?Array<any>,
-  bcc: ?Array<any>,
+  to: Array<Contact> | null,
+  cc: Array<Contact> | null,
+  bcc: Array<Contact> | null,
   actions: string[],
   rfcID: string,
   oldMessageId: string,
