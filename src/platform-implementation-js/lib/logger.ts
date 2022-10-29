@@ -495,7 +495,7 @@ async function retrieveNewEventsAccessToken(): Promise<{
   expirationDate: number;
 }> {
   const { text } = await ajax({
-    url: 'https://www.inboxsdk.com/api/v2/events/oauth',
+    url: 'https://api.inboxsdk.com/api/v2/events/oauth',
     // Work around CORB for extensions that have permissions to inboxsdk.com
     XMLHttpRequest: getXMLHttpRequest(),
   });
