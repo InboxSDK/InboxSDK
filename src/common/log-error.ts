@@ -205,7 +205,7 @@ const sendError = rateLimit(
   function (report: object) {
     try {
       ajax({
-        url: 'https://www.inboxsdk.com/api/v2/errors',
+        url: 'https://api.inboxsdk.com/api/v2/errors',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
