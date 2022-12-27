@@ -142,6 +142,7 @@ class GmailLabelView {
       outerEl.appendChild(contentEl);
     }
     contentEl.textContent = title;
+    this._element.children[0].setAttribute('data-tooltip', title);
   }
 }
 
