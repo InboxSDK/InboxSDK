@@ -73,7 +73,7 @@ class GmailLabelView {
     this._updateBackgroundColor(labelDescriptor.backgroundColor);
     this._updateForegroundColor(labelDescriptor.foregroundColor);
     this._updateIconBackgroundColor(labelDescriptor.iconBackgroundColor);
-    this._updateTitle(labelDescriptor.title);
+    this._updateTitle(labelDescriptor.title, labelDescriptor.titleHtml);
     this._updateTextMaxWidth(labelDescriptor.maxWidth);
 
     this._labelDescriptor = labelDescriptor;
@@ -84,7 +84,11 @@ class GmailLabelView {
       return;
     }
 
-    querySelector(this._element, '.av').style.maxWidth = maxWidth;
+    try {
+      querySelector(this._element, '.av').style.maxWidth = maxWidth;
+    } catch (e) {
+      // noop
+    }
   }
 
   _updateBackgroundColor(backgroundColor: string) {
@@ -114,13 +118,30 @@ class GmailLabelView {
     }
   }
 
-  _updateTitle(title: string) {
-    if (this._labelDescriptor.title === title) {
+  _updateTitle(title: string, titleHtml?: string) {
+    if (
+      this._labelDescriptor.title === title &&
+      this._labelDescriptor.titleHtml === titleHtml
+    ) {
       return;
     }
 
-    querySelector(this._element, '.av').textContent = title;
-    this._element.children[0].setAttribute('data-tooltip', title);
+    if (titleHtml) {
+      querySelector(this._element, '.au').innerHTML = titleHtml || '';
+      return;
+    }
+
+    let contentEl;
+    try {
+      contentEl = querySelector(this._element, '.av');
+    } catch (e) {
+      const outerEl = querySelector(this._element, '.au');
+      outerEl.innerHTML = '';
+      contentEl = document.createElement('div');
+      contentEl.setAttribute('class', 'av');
+      outerEl.appendChild(contentEl);
+    }
+    contentEl.textContent = title;
   }
 }
 
