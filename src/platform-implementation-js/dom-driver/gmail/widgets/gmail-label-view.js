@@ -84,10 +84,9 @@ class GmailLabelView {
       return;
     }
 
-    try {
-      querySelector(this._element, '.av').style.maxWidth = maxWidth;
-    } catch (e) {
-      // noop
+    const childEl = this._element.querySelector('.av');
+    if (childEl) {
+      childEl.style.maxWidth = maxWidth;
     }
   }
 
