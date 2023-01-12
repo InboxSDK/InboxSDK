@@ -1140,6 +1140,10 @@ export function setupGmailInterceptorOnFrames(
 }
 
 function triggerEvent(detail) {
+  console.group('triggerEvent');
+  console.count('triggerEvent');
+  console.log(detail);
+  console.groupEnd();
   document.dispatchEvent(
     new CustomEvent('inboxSDKajaxIntercept', {
       bubbles: true,

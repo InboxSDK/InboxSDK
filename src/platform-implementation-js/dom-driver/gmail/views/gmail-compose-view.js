@@ -180,6 +180,9 @@ class GmailComposeView {
               return { eventName: 'sending' };
             }
             case 'emailSent': {
+              console.group('ComposeView sent event');
+              console.log('event', event);
+              console.groupEnd('ComposeView sent event');
               let syncThreadID = event.threadID;
               let syncMessageID = event.messageID;
 
@@ -193,12 +196,23 @@ class GmailComposeView {
                 eventName: 'sent',
                 data: {
                   getThreadID: once(async (): Promise<string> => {
-                    if (event.oldThreadID) {
-                      return event.oldThreadID;
-                    }
-                    return await driver.getOldGmailThreadIdFromSyncThreadId(
-                      syncThreadID
-                    );
+                    console.group('getThreadId');
+                    const id = await (async () => {
+                      if (event.oldThreadID) {
+                        console.log('event.oldThreadId', event.oldThreadID);
+                        return event.oldThreadID;
+                      }
+                      const oldThreadId =
+                        await driver.getOldGmailThreadIdFromSyncThreadId(
+                          syncThreadID
+                        );
+
+                      console.log('oldThreadId', oldThreadId);
+                      return oldThreadId;
+                    })();
+
+                    console.groupEnd('getThreadId');
+                    return id;
                   }),
                   getMessageID: once(async (): Promise<string> => {
                     if (event.oldMessageID) {
