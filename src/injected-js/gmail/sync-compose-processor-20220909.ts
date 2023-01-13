@@ -14,11 +14,29 @@ export function parseComposeRequestBody_2022_09_09(request: Array<any>) {
   );
 }
 
-export function parseComposeResponseBody_2022_09_09(response: Array<any>) {
-  return (
-    parseUpdateDraftResponseBody(response) ||
-    parseSendDraftResponseBody(response)
-  );
+export function parseComposeResponseBody_2022_09_09(
+  response: Array<any>
+): any[] {
+  const threads = response[1]?.[5];
+
+  return (threads ?? []).flatMap((threadWrapper: unknown) => {
+    if (!Array.isArray(threadWrapper) || !threadWrapper?.[0]) {
+      // exit cuz cannot parse
+      return [];
+    }
+
+    const thread = threadWrapper[0];
+
+    const maybeBody =
+      parseUpdateDraftResponseBody(thread) ||
+      parseSendDraftResponseBody(thread);
+
+    if (maybeBody) {
+      return [maybeBody];
+    }
+
+    return [];
+  });
 }
 
 export function replaceBodyContentInComposeSendRequestBody_2022_09_09(
@@ -189,13 +207,7 @@ function parseSendDraftRequestBody(request: Array<any>) {
 /**
  * Parses response when compose window saves draft for the first time or updates it
  */
-function parseUpdateDraftResponseBody(response: Array<any>) {
-  const thread = response[1]?.[5]?.[0]?.[0];
-  if (!Array.isArray(thread)) {
-    // exit cuz cannot parse
-    return null;
-  }
-
+function parseUpdateDraftResponseBody(thread: Array<any>) {
   const threadId = parseThreadId(thread[0]);
   if (!threadId) {
     // exit cuz cannot parse
@@ -249,13 +261,7 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
 /**
  * Parses response when compose window saves draft for the first time or updates it
  */
-function parseSendDraftResponseBody(response: Array<any>) {
-  const thread = response[1]?.[5]?.[0]?.[0];
-  if (!Array.isArray(thread)) {
-    // exit cuz cannot parse
-    return null;
-  }
-
+function parseSendDraftResponseBody(thread: Array<any>) {
   const threadId = parseThreadId(thread[0]);
   if (!threadId) {
     // exit cuz cannot parse

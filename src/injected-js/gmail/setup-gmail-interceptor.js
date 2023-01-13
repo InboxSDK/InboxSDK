@@ -322,11 +322,13 @@ export function setupGmailInterceptorOnFrames(
             }
 
             try {
-              const responseParsed = parseComposeResponseBody(
+              const responsesParsed = parseComposeResponseBody(
                 connection.originalResponseText
               );
 
-              if (responseParsed) {
+              console.log('responsesParsed', responsesParsed);
+
+              for (const responseParsed of responsesParsed) {
                 if (
                   responseParsed.type === 'FIRST_DRAFT_SAVE' ||
                   responseParsed.type === 'DRAFT_SAVE'
