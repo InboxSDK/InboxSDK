@@ -115,12 +115,9 @@ class GmailComposeView {
   _stopper: Stopper;
   _lastSelectionRange: ?Range;
   _requestModifiers: {
-    [key: string]: (composeParams: {
-      to: Array<Contact> | null,
-      cc: Array<Contact> | null,
-      bcc: Array<Contact> | null,
-      body: string,
-    }) => { body: string } | Promise<{ body: string }>,
+    [key: string]: (composeParams: { body: string }) =>
+      | { body: string }
+      | Promise<{ body: string }>,
   };
   _isListeningToAjaxInterceptStream: boolean;
   _formattingArea: ?HTMLElement;
@@ -1852,12 +1849,9 @@ class GmailComposeView {
   }
 
   registerRequestModifier(
-    modifier: (composeParams: {
-      to: Array<Contact> | null,
-      cc: Array<Contact> | null,
-      bcc: Array<Contact> | null,
-      body: string,
-    }) => { body: string } | Promise<{ body: string }>
+    modifier: (composeParams: { body: string }) =>
+      | { body: string }
+      | Promise<{ body: string }>
   ) {
     const keyId = this._driver.isUsingSyncAPI()
       ? this._getDraftIDfromForm()

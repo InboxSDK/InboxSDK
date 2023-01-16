@@ -99,12 +99,9 @@ declare export default class ComposeView extends EventEmitter {
   //NOT DOCUMENTED BECAUSE STREAK-ONLY FOR NOW
   getElement(): HTMLElement;
   registerRequestModifier(
-    modifier: (composeParams: {
-      to: Array<Contact> | null,
-      cc: Array<Contact> | null,
-      bcc: Array<Contact> | null,
-      body: string,
-    }) => { body: string } | Promise<{ body: string }>
+    modifier: (composeParams: { body: string }) =>
+      | { body: string }
+      | Promise<{ body: string }>
   ): void;
   replaceSendButton({ el: HTMLElement }): () => void;
   hideDiscardButton(): () => void;

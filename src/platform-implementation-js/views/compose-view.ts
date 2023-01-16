@@ -443,9 +443,6 @@ export default class ComposeView extends EventEmitter {
 
   public registerRequestModifier(
     modifier: (composeParams: {
-      to: Contact[] | null;
-      cc: Contact[] | null;
-      bcc: Contact[] | null;
       body: string;
     }) => { body: string } | Promise<{ body: string }>
   ) {
