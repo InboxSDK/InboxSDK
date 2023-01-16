@@ -1,7 +1,9 @@
 import intersection from 'lodash/intersection';
 import last from 'lodash/last';
+import first from 'lodash/first';
 
 import type { Contact } from '../../platform-implementation-js/driver-interfaces/compose-view-driver';
+import isNotNil from '../../platform-implementation-js/lib/isNotNil';
 import {
   ComposeRequestType,
   DRAFT_SAVING_ACTIONS,
@@ -55,7 +57,7 @@ function parseCreateDraftRequestBody(request: Array<any>) {
     return null;
   }
 
-  const message = parseMsgInRequest(msg);
+  const message = parseRequestMsg(msg);
   if (!message) {
     // exit cuz cannot parse
     return null;
@@ -110,7 +112,7 @@ function parseUpdateDraftRequestBody(request: Array<any>) {
     return null;
   }
 
-  const message = parseMsgInRequest(msg);
+  const message = parseRequestMsg(msg);
   if (!message) {
     // exit cuz cannot parse
     return null;
@@ -167,7 +169,7 @@ function parseSendDraftRequestBody(request: Array<any>) {
     return null;
   }
 
-  const message = parseMsgInRequest(msg);
+  const message = parseRequestMsg(msg);
   if (!message) {
     // exit cuz cannot parse
     return null;
@@ -200,39 +202,18 @@ function parseSendDraftRequestBody(request: Array<any>) {
  * Parses response when compose window saves draft for the first time or updates it
  */
 function parseUpdateDraftResponseBody(response: Array<any>) {
-  const thread = response[1]?.[5]?.[0]?.[0];
-  if (!Array.isArray(thread)) {
+  const parsedThreadWithMessage = parseResponseAndFindThreadWithMessage(
+    response[1]?.[5]?.[0]
+  );
+
+  if (!parsedThreadWithMessage) {
     // exit cuz cannot parse
     return null;
   }
 
-  const threadId = parseThreadId(thread[0]);
-  if (!threadId) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const threadInner = thread[2]?.[6]?.[0];
-  if (!Array.isArray(threadInner)) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const oldThreadId = threadInner[19];
-
-  const msg = last(threadInner[4]);
-  if (!Array.isArray(msg)) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const message = parseMsgInResponse(msg);
-  if (!message) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const { messageId, to, cc, bcc, actions, rfcID, oldMessageId } = message;
+  const { threadId, oldThreadId, parsedMessage } = parsedThreadWithMessage;
+  const { messageId, to, cc, bcc, actions, rfcID, oldMessageId } =
+    parsedMessage;
 
   const hasRequiredActions =
     intersection(actions, DRAFT_SAVING_ACTIONS).length ===
@@ -261,39 +242,18 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
  * Parses response when compose window saves draft for the first time or updates it
  */
 function parseSendDraftResponseBody(response: Array<any>) {
-  const thread = response[1]?.[5]?.[0]?.[0];
-  if (!Array.isArray(thread)) {
+  const parsedThreadWithMessage = parseResponseAndFindThreadWithMessage(
+    response[1]?.[5]?.[0]
+  );
+
+  if (!parsedThreadWithMessage) {
     // exit cuz cannot parse
     return null;
   }
 
-  const threadId = parseThreadId(thread[0]);
-  if (!threadId) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const threadInner = thread[2]?.[6]?.[0];
-  if (!Array.isArray(threadInner)) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const oldThreadId = threadInner[19];
-
-  const msg = threadInner[4] && last(threadInner[4]);
-  if (!Array.isArray(msg)) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const message = parseMsgInResponse(msg);
-  if (!message) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const { messageId, to, cc, bcc, actions, rfcID, oldMessageId } = message;
+  const { threadId, oldThreadId, parsedMessage } = parsedThreadWithMessage;
+  const { messageId, to, cc, bcc, actions, rfcID, oldMessageId } =
+    parsedMessage;
 
   const hasRequiredActions =
     intersection(actions, SEND_ACTIONS).length === SEND_ACTIONS.length;
@@ -383,7 +343,7 @@ function parseContacts(contacts: any[]): Contact[] | null {
   );
 }
 
-function parseMsgInRequest(msg: any[]) {
+function parseRequestMsg(msg: any[]) {
   if (!Array.isArray(msg)) {
     // exit cuz cannot parse
     return null;
@@ -417,7 +377,76 @@ function parseMsgInRequest(msg: any[]) {
   };
 }
 
-function parseMsgInResponse(msg: any[]) {
+function parseResponseAndFindThreadWithMessage(threads: any) {
+  if (!Array.isArray(threads)) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const parsedThreads = threads.map(parseResponseThread).filter(isNotNil);
+  const parsedThread = first(parsedThreads);
+
+  if (!parsedThread) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const { threadId, oldThreadId, parsedMessages } = parsedThread;
+  const parsedMessage = last(parsedMessages);
+
+  if (!parsedMessage) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  return {
+    threadId,
+    oldThreadId,
+    parsedMessage,
+  };
+}
+
+function parseResponseThread(thread: any) {
+  if (!Array.isArray(thread)) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const threadId = parseThreadId(thread[0]);
+  if (!threadId) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const threadInner = thread[2]?.[6]?.[0];
+  if (!Array.isArray(threadInner)) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const oldThreadId = threadInner[19];
+
+  const parsedMessages = Array.isArray(threadInner[4])
+    ? threadInner[4]
+        .map((msg) => {
+          if (!Array.isArray(msg)) {
+            // exit cuz cannot parse
+            return null;
+          }
+
+          return parseResponseMsg(msg);
+        })
+        .filter(isNotNil)
+    : [];
+
+  return {
+    threadId,
+    oldThreadId,
+    parsedMessages,
+  };
+}
+
+function parseResponseMsg(msg: any[]) {
   if (!Array.isArray(msg)) {
     // exit cuz cannot parse
     return null;
