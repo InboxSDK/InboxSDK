@@ -1,4 +1,6 @@
-/* @flow */
+declare global {
+  var gmonkey: any | undefined;
+}
 
 export default function setupGmonkeyHandler() {
   const gmonkeyPromise = setupGmonkey();
@@ -6,15 +8,10 @@ export default function setupGmonkeyHandler() {
   document.addEventListener(
     'inboxSDKtellMeIsConversationViewDisabled',
     function () {
-      gmonkeyPromise.then((gmonkey) => {
+      gmonkeyPromise.then((gmonkey: any) => {
         const answer = gmonkey.isConversationViewDisabled();
         const event = document.createEvent('CustomEvent');
-        (event: any).initCustomEvent(
-          'inboxSDKgmonkeyResponse',
-          false,
-          false,
-          answer
-        );
+        event.initCustomEvent('inboxSDKgmonkeyResponse', false, false, answer);
         document.dispatchEvent(event);
       });
     }
@@ -22,10 +19,10 @@ export default function setupGmonkeyHandler() {
 
   document.addEventListener(
     'inboxSDKtellMeCurrentThreadId',
-    function (event: Object) {
+    function (event: any) {
       let threadId;
 
-      if ((event: any).detail.isPreviewedThread) {
+      if (event.detail.isPreviewedThread) {
         const rows = Array.from(document.querySelectorAll('[gh=tl] tr.aps'));
         if (rows.length > 0) {
           const elementWithId = rows
@@ -38,26 +35,20 @@ export default function setupGmonkeyHandler() {
           }
         }
       } else {
-        threadId =
-          window.gmonkey &&
-          window.gmonkey.v2 &&
-          window.gmonkey.v2.getCurrentThread().getThreadId();
+        threadId = window.gmonkey?.v2?.getCurrentThread?.()?.getThreadId();
       }
 
       if (threadId) {
         // hash is included in the sync id route url, so we also need to take it out
         threadId = threadId.replace('#', '');
-        (event: any).target.setAttribute(
-          'data-inboxsdk-currentthreadid',
-          threadId
-        );
+        event.target.setAttribute('data-inboxsdk-currentthreadid', threadId);
       }
     }
   );
 }
 
 function setupGmonkey() {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     function check() {
       if (!window.gmonkey) {
         setTimeout(check, 500);

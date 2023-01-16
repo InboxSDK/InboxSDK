@@ -338,10 +338,13 @@ export interface DraftLabelDescriptor {
 
 export interface LabelDescriptor {
   title: string;
+  titleHtml?: string;
   iconUrl: string;
   iconClass?: string;
+  iconHtml?: string;
   foregroundColor?: string;
   backgroundColor?: string;
+  maxWidth?: string;
 }
 
 export interface ThreadRowAttachmentIconDescriptor {
