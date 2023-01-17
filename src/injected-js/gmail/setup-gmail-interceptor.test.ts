@@ -638,6 +638,21 @@ test('cv:2022-09-09 reply draft 2 sent', async () => {
       ],
     },
     {
+      filePrefix: '2022-09-09-cvOnDraftSaveBatched_',
+      expectedEvents: [
+        {
+          draftID: 'r171568093711739042',
+          messageID: 'msg-a:r171568093711739042',
+          oldMessageID: '185ac55f9930b088',
+          oldThreadID: '185ac55f9930b088',
+          rfcID:
+            '<CAGx7AOSwKKeFbDNBTd+xXtNK4QTXAcVC7Avr2z5Vr8sK=FM7Ww@mail.gmail.com>',
+          threadID: 'thread-a:r3299110183418933622',
+          type: 'emailDraftReceived',
+        },
+      ],
+    },
+    {
       filePrefix: '2022-09-09-cvOnDraftUpdate_2_',
       expectedEvents: [
         {
@@ -679,6 +694,21 @@ test('cv:2022-09-09 reply draft 2 sent', async () => {
           oldThreadID: '183fcbe5afa22467',
           rfcID:
             '\u003cCAGx7AOT3v9AK8-PdxP+zGJwCXOYsDxLm8BF2QvufxFK_BtO5WA@mail.gmail.com\u003e',
+          type: 'emailDraftReceived',
+        },
+      ],
+    },
+    {
+      filePrefix: '2022-09-09-cvOnReplyDraftUpdate_3_',
+      expectedEvents: [
+        {
+          threadID: 'thread-a:r-2602384757092328293',
+          messageID: 'msg-a:r9206449609684993976',
+          draftID: 'r9206449609684993976',
+          oldMessageID: '185c12c05154feaa',
+          oldThreadID: '185c12a5072cb2fa',
+          rfcID:
+            '\u003cCAGx7AORVTxnFB3C_dyNbFNCCJMs_HQ0Chd6mq+24NERJrYSrYw@mail.gmail.com\u003e',
           type: 'emailDraftReceived',
         },
       ],
