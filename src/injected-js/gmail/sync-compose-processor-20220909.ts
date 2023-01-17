@@ -1,6 +1,4 @@
 import intersection from 'lodash/intersection';
-import last from 'lodash/last';
-import first from 'lodash/first';
 
 import type { Contact } from '../../platform-implementation-js/driver-interfaces/compose-view-driver';
 import isNotNil from '../../platform-implementation-js/lib/isNotNil';
@@ -195,38 +193,45 @@ function parseSendDraftRequestBody(request: Array<any>) {
  * updated the draft, or sent the draft.
  */
 function parseCreateUpdateSendDraftResponseBody(response: any[]) {
-  const parsedThreadWithMessage = parseResponseAndFindThreadWithMessage(
-    response[1]?.[5]?.[0]
-  );
+  const threadsWrappers = response[1]?.[5];
 
-  if (!parsedThreadWithMessage) {
+  if (!Array.isArray(threadsWrappers)) {
     // exit cuz cannot parse
-    return null;
+    return [];
   }
 
-  const { threadId, oldThreadId, parsedMessage } = parsedThreadWithMessage;
-  const { messageId, to, cc, bcc, actions, rfcID, oldMessageId } =
-    parsedMessage;
+  return threadsWrappers
+    .map(parseResponseThread)
+    .filter(isNotNil)
+    .flatMap((parsedThread) => {
+      const { threadId, oldThreadId, parsedMessages } = parsedThread;
 
-  const actionType = actionsToComposeRequestType(actions);
+      return parsedMessages.map((parsedMessage) => {
+        const { messageId, to, cc, bcc, actions, rfcID, oldMessageId } =
+          parsedMessage;
 
-  if (!actionType) {
-    // unsupported actions within a message
-    return null;
-  }
+        const actionType = actionsToComposeRequestType(actions);
 
-  return {
-    threadId,
-    messageId,
-    to,
-    cc,
-    bcc,
-    actions,
-    rfcID,
-    oldMessageId,
-    oldThreadId,
-    type: actionType,
-  };
+        if (!actionType) {
+          // unsupported actions within a message
+          return null;
+        }
+
+        return {
+          threadId,
+          messageId,
+          to,
+          cc,
+          bcc,
+          actions,
+          rfcID,
+          oldMessageId,
+          oldThreadId,
+          type: actionType,
+        };
+      });
+    })
+    .filter(isNotNil);
 }
 
 function replaceBodyContentInSendRequestBody(
@@ -329,41 +334,13 @@ function parseRequestMsg(msg: any[]) {
   };
 }
 
-function parseResponseAndFindThreadWithMessage(threads: any) {
-  if (!Array.isArray(threads)) {
+function parseResponseThread(threadWrapper: any) {
+  if (!Array.isArray(threadWrapper) || !Array.isArray(threadWrapper[0])) {
     // exit cuz cannot parse
     return null;
   }
 
-  const parsedThreads = threads.map(parseResponseThread).filter(isNotNil);
-  const parsedThread = first(parsedThreads);
-
-  if (!parsedThread) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const { threadId, oldThreadId, parsedMessages } = parsedThread;
-  const parsedMessage = last(parsedMessages);
-
-  if (!parsedMessage) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  return {
-    threadId,
-    oldThreadId,
-    parsedMessage,
-  };
-}
-
-function parseResponseThread(thread: any) {
-  if (!Array.isArray(thread)) {
-    // exit cuz cannot parse
-    return null;
-  }
-
+  const thread = threadWrapper[0];
   const threadId = parseThreadId(thread[0]);
   if (!threadId) {
     // exit cuz cannot parse

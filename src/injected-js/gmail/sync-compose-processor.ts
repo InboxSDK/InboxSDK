@@ -48,7 +48,7 @@ export function parseComposeResponseBody(response: string) {
     return parseComposeResponseBody_2022_09_09(responseParsed);
   }
 
-  return null;
+  return [];
 }
 
 export function replaceBodyContentInComposeSendRequestBody(

@@ -14,12 +14,14 @@ const expectedOutputByFile = {
     parseWith: SCRP.parseComposeRequestBody_2022_09_09,
   },
   '2022-09-09-cvOnReplyDraftSave_response.json': {
-    expected: {
-      messageId: 'msg-a:r-8480821811518170896',
-      threadId: 'thread-f:1746035685735370050',
-      type: 'DRAFT_SAVE',
-      actions: ['^all', '^r', '^r_bt'],
-    },
+    expected: [
+      {
+        messageId: 'msg-a:r-8480821811518170896',
+        threadId: 'thread-f:1746035685735370050',
+        type: 'DRAFT_SAVE',
+        actions: ['^all', '^r', '^r_bt'],
+      },
+    ],
     parseWith: SCRP.parseComposeResponseBody_2022_09_09,
   },
   '2022-09-09-cvOnReplyDraftUpdate_request.json': {
@@ -33,12 +35,50 @@ const expectedOutputByFile = {
     parseWith: SCRP.parseComposeRequestBody_2022_09_09,
   },
   '2022-09-09-cvOnReplyDraftUpdate_response.json': {
+    expected: [
+      {
+        messageId: 'msg-a:r-8480821811518170896',
+        threadId: 'thread-f:1746035685735370050',
+        type: 'DRAFT_SAVE',
+        actions: ['^all', '^r', '^r_bt'],
+      },
+    ],
+    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+  },
+  '2022-09-09-cvOnDraftSaveBatched_request.json': {
     expected: {
-      messageId: 'msg-a:r-8480821811518170896',
-      threadId: 'thread-f:1746035685735370050',
-      type: 'DRAFT_SAVE',
       actions: ['^all', '^r', '^r_bt'],
+      body: '<div dir="ltr"><br clear="all"><div><div dir="ltr" class="gmail_signature" data-smartmail="gmail_signature"><div dir="ltr"><div><div><img src="https://ci6.googleusercontent.com/proxy/yyVKpfVZRWmljx1FfXa1jU7hg-YtDXUQin1Af7ML33AEnjvRq_sM6WcmJ8tHPhtsLEaO8P5iLvCTqzfmlsMn-K3x0xotmsjFPkkaNZx9UlXOtKN7pl2XTrJffpciKMDJeHnWq02y--TtyZwbYPEarzDHohZNYk1GKI04dQnOkTs=s0-d-e1-ft#https://assets-global.website-files.com/5b7f24cc9009731774d7be8e/5c06a15b95c700eebb7b9823_headerLockup_2x.png"></div></div><div>sdff</div><div>fsd</div><div>fsdf</div></div></div></div></div>',
+      messageId: 'msg-a:r171568093711739042',
+      subject: '',
+      threadId: 'thread-a:r3299110183418933622',
+      type: 'FIRST_DRAFT_SAVE',
     },
+    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+  },
+  '2022-09-09-cvOnDraftSaveBatched_response.json': {
+    expected: [
+      {
+        actions: ['^a', '^all', '^f', '^f_bt', '^f_cl', '^pfg'],
+        messageId: 'msg-a:r-173578382580458011',
+        oldMessageId: '185ac55d43cf8449',
+        oldThreadId: '185ac55b4cde8c29',
+        rfcID:
+          '<CAGx7AOSdr0csk8U=4qK=zS_8XekBNpkKa=xAKZXYt2ft9i7gcg@mail.gmail.com>',
+        threadId: 'thread-a:r-175230870092109435',
+        type: 'SEND',
+      },
+      {
+        actions: ['^all', '^r', '^r_bt'],
+        messageId: 'msg-a:r171568093711739042',
+        oldMessageId: '185ac55f9930b088',
+        oldThreadId: '185ac55f9930b088',
+        rfcID:
+          '<CAGx7AOSwKKeFbDNBTd+xXtNK4QTXAcVC7Avr2z5Vr8sK=FM7Ww@mail.gmail.com>',
+        threadId: 'thread-a:r3299110183418933622',
+        type: 'DRAFT_SAVE',
+      },
+    ],
     parseWith: SCRP.parseComposeResponseBody_2022_09_09,
   },
   '2022-09-09-cvOnDraftUpdate_2_request.json': {
@@ -55,15 +95,17 @@ const expectedOutputByFile = {
     parseWith: SCRP.parseComposeRequestBody_2022_09_09,
   },
   '2022-09-09-cvOnDraftUpdate_2_response.json': {
-    expected: {
-      threadId: 'thread-a:r-1030145228305804508',
-      messageId: 'msg-a:r-9122305152175603305',
-      to: [{ emailAddress: 'test+to@test.com', name: 'test to' }],
-      cc: [{ emailAddress: 'test+cc@test.com', name: 'test cc' }],
-      bcc: [{ emailAddress: 'test+bcc@test.com', name: 'test bcc' }],
-      type: 'DRAFT_SAVE',
-      actions: ['^all', '^r', '^r_bt'],
-    },
+    expected: [
+      {
+        threadId: 'thread-a:r-1030145228305804508',
+        messageId: 'msg-a:r-9122305152175603305',
+        to: [{ emailAddress: 'test+to@test.com', name: 'test to' }],
+        cc: [{ emailAddress: 'test+cc@test.com', name: 'test cc' }],
+        bcc: [{ emailAddress: 'test+bcc@test.com', name: 'test bcc' }],
+        type: 'DRAFT_SAVE',
+        actions: ['^all', '^r', '^r_bt'],
+      },
+    ],
     parseWith: SCRP.parseComposeResponseBody_2022_09_09,
   },
   '2022-09-09-cvOnSend_3_request.json': {
@@ -80,24 +122,26 @@ const expectedOutputByFile = {
     parseWith: SCRP.parseComposeRequestBody_2022_09_09,
   },
   '2022-09-09-cvOnSend_3_response.json': {
-    expected: {
-      threadId: 'thread-a:r-8891700334768116294',
-      messageId: 'msg-a:r-329565169840451245',
-      to: [{ emailAddress: 'test+to@test.com', name: 'test to' }],
-      cc: [{ emailAddress: 'test+cc@test.com', name: 'test cc' }],
-      bcc: [{ emailAddress: 'test+bcc@test.com', name: 'test bcc' }],
-      actions: [
-        '^all',
-        '^f',
-        '^f_bt',
-        '^f_cl',
-        '^i',
-        '^pfg',
-        '^sq_ig_i_personal',
-        '^u',
-      ],
-      type: 'SEND',
-    },
+    expected: [
+      {
+        threadId: 'thread-a:r-8891700334768116294',
+        messageId: 'msg-a:r-329565169840451245',
+        to: [{ emailAddress: 'test+to@test.com', name: 'test to' }],
+        cc: [{ emailAddress: 'test+cc@test.com', name: 'test cc' }],
+        bcc: [{ emailAddress: 'test+bcc@test.com', name: 'test bcc' }],
+        actions: [
+          '^all',
+          '^f',
+          '^f_bt',
+          '^f_cl',
+          '^i',
+          '^pfg',
+          '^sq_ig_i_personal',
+          '^u',
+        ],
+        type: 'SEND',
+      },
+    ],
     parseWith: SCRP.parseComposeResponseBody_2022_09_09,
   },
   '2022-09-09-cvOnReplyDraftUpdate_2_request.json': {
@@ -117,18 +161,20 @@ const expectedOutputByFile = {
     parseWith: SCRP.parseComposeRequestBody_2022_09_09,
   },
   '2022-09-09-cvOnReplyDraftUpdate_2_response.json': {
-    expected: {
-      threadId: 'thread-a:r-1030145228305804508',
-      messageId: 'msg-a:r7241715802500133864',
-      to: [{ emailAddress: 'test+to@test.com', name: 'test to' }],
-      cc: [
-        { emailAddress: 'test+cc@test.com', name: 'test cc' },
-        { emailAddress: 'test+cc2@test.com', name: null },
-      ],
-      bcc: [{ emailAddress: 'test+bcc2@test.com', name: 'test bcc2' }],
-      type: 'DRAFT_SAVE',
-      actions: ['^all', '^r', '^r_bt'],
-    },
+    expected: [
+      {
+        threadId: 'thread-a:r-1030145228305804508',
+        messageId: 'msg-a:r7241715802500133864',
+        to: [{ emailAddress: 'test+to@test.com', name: 'test to' }],
+        cc: [
+          { emailAddress: 'test+cc@test.com', name: 'test cc' },
+          { emailAddress: 'test+cc2@test.com', name: null },
+        ],
+        bcc: [{ emailAddress: 'test+bcc2@test.com', name: 'test bcc2' }],
+        type: 'DRAFT_SAVE',
+        actions: ['^all', '^r', '^r_bt'],
+      },
+    ],
     parseWith: SCRP.parseComposeResponseBody_2022_09_09,
   },
   '2022-09-09-cvOnReplySend_3_request.json': {
@@ -148,27 +194,29 @@ const expectedOutputByFile = {
     parseWith: SCRP.parseComposeRequestBody_2022_09_09,
   },
   '2022-09-09-cvOnReplySend_3_response.json': {
-    expected: {
-      threadId: 'thread-a:r-1030145228305804508',
-      messageId: 'msg-a:r7241715802500133864',
-      to: [{ emailAddress: 'test+to@test.com', name: 'test to' }],
-      cc: [
-        { emailAddress: 'test+cc@test.com', name: 'test cc' },
-        { emailAddress: 'test+cc2@test.com', name: null },
-      ],
-      bcc: [{ emailAddress: 'test+bcc2@test.com', name: 'test bcc2' }],
-      actions: [
-        '^all',
-        '^f',
-        '^f_bt',
-        '^f_cl',
-        '^i',
-        '^pfg',
-        '^sq_ig_i_personal',
-        '^u',
-      ],
-      type: 'SEND',
-    },
+    expected: [
+      {
+        threadId: 'thread-a:r-1030145228305804508',
+        messageId: 'msg-a:r7241715802500133864',
+        to: [{ emailAddress: 'test+to@test.com', name: 'test to' }],
+        cc: [
+          { emailAddress: 'test+cc@test.com', name: 'test cc' },
+          { emailAddress: 'test+cc2@test.com', name: null },
+        ],
+        bcc: [{ emailAddress: 'test+bcc2@test.com', name: 'test bcc2' }],
+        actions: [
+          '^all',
+          '^f',
+          '^f_bt',
+          '^f_cl',
+          '^i',
+          '^pfg',
+          '^sq_ig_i_personal',
+          '^u',
+        ],
+        type: 'SEND',
+      },
+    ],
     parseWith: SCRP.parseComposeResponseBody_2022_09_09,
   },
 };
