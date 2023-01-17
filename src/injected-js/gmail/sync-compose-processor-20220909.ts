@@ -19,10 +19,7 @@ export function parseComposeRequestBody_2022_09_09(request: Array<any>) {
 }
 
 export function parseComposeResponseBody_2022_09_09(response: Array<any>) {
-  return (
-    parseUpdateDraftResponseBody(response) ||
-    parseSendDraftResponseBody(response)
-  );
+  return parseCreateUpdateSendDraftResponseBody(response);
 }
 
 export function replaceBodyContentInComposeSendRequestBody_2022_09_09(
@@ -91,8 +88,7 @@ function parseCreateDraftRequestBody(request: Array<any>) {
  * Parses request when compose window updates draft (consecutive updates after creation)
  */
 function parseUpdateDraftRequestBody(request: Array<any>) {
-  const thread =
-    request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
+  const thread = request[1]?.[0]?.[0]?.[1];
 
   if (!Array.isArray(thread)) {
     // exit cuz cannot parse
@@ -105,8 +101,7 @@ function parseUpdateDraftRequestBody(request: Array<any>) {
     return null;
   }
 
-  const msg = thread[1] && thread[1][13] && thread[1][13][0];
-
+  const msg = thread[1]?.[13]?.[0];
   if (!Array.isArray(msg)) {
     // exit cuz cannot parse
     return null;
@@ -146,9 +141,7 @@ function parseUpdateDraftRequestBody(request: Array<any>) {
  * Parses request when compose window sends draft
  */
 function parseSendDraftRequestBody(request: Array<any>) {
-  const thread =
-    request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
-
+  const thread = request[1]?.[0]?.[0]?.[1];
   if (!Array.isArray(thread)) {
     // exit cuz cannot parse
     return null;
@@ -161,8 +154,7 @@ function parseSendDraftRequestBody(request: Array<any>) {
   }
 
   const msg =
-    /* new msg */ (thread[1] && thread[1][13] && thread[1][13][0]) ||
-    /* reply */ (thread[1] && thread[1][1] && thread[1][1][0]);
+    /* new msg */ thread[1]?.[13]?.[0] || /* reply */ thread[1]?.[1]?.[0];
 
   if (!Array.isArray(msg)) {
     // exit cuz cannot parse
@@ -199,9 +191,10 @@ function parseSendDraftRequestBody(request: Array<any>) {
 }
 
 /**
- * Parses response when compose window saves draft for the first time or updates it
+ * Parses response body when compose window either saved a draft for the first time,
+ * updated the draft, or sent the draft.
  */
-function parseUpdateDraftResponseBody(response: Array<any>) {
+function parseCreateUpdateSendDraftResponseBody(response: any[]) {
   const parsedThreadWithMessage = parseResponseAndFindThreadWithMessage(
     response[1]?.[5]?.[0]
   );
@@ -215,12 +208,10 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
   const { messageId, to, cc, bcc, actions, rfcID, oldMessageId } =
     parsedMessage;
 
-  const hasRequiredActions =
-    intersection(actions, DRAFT_SAVING_ACTIONS).length ===
-    DRAFT_SAVING_ACTIONS.length;
+  const actionType = actionsToComposeRequestType(actions);
 
-  if (!hasRequiredActions) {
-    // exit if doesn't have required actions
+  if (!actionType) {
+    // unsupported actions within a message
     return null;
   }
 
@@ -234,46 +225,7 @@ function parseUpdateDraftResponseBody(response: Array<any>) {
     rfcID,
     oldMessageId,
     oldThreadId,
-    type: 'DRAFT_SAVE' as ComposeRequestType,
-  };
-}
-
-/**
- * Parses response when compose window saves draft for the first time or updates it
- */
-function parseSendDraftResponseBody(response: Array<any>) {
-  const parsedThreadWithMessage = parseResponseAndFindThreadWithMessage(
-    response[1]?.[5]?.[0]
-  );
-
-  if (!parsedThreadWithMessage) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const { threadId, oldThreadId, parsedMessage } = parsedThreadWithMessage;
-  const { messageId, to, cc, bcc, actions, rfcID, oldMessageId } =
-    parsedMessage;
-
-  const hasRequiredActions =
-    intersection(actions, SEND_ACTIONS).length === SEND_ACTIONS.length;
-
-  if (!hasRequiredActions) {
-    // exit if doesn't have required actions
-    return null;
-  }
-
-  return {
-    threadId,
-    messageId,
-    to,
-    cc,
-    bcc,
-    actions,
-    rfcID,
-    oldMessageId,
-    oldThreadId,
-    type: 'SEND' as ComposeRequestType,
+    type: actionType,
   };
 }
 
@@ -458,7 +410,7 @@ function parseResponseMsg(msg: any[]) {
     return null;
   }
 
-  const actions = msg[10];
+  const actions: string[] = msg[10];
   const to = parseContacts(msg[2]);
   const cc = parseContacts(msg[3]);
   const bcc = parseContacts(msg[4]);
@@ -474,4 +426,21 @@ function parseResponseMsg(msg: any[]) {
     rfcID,
     oldMessageId,
   };
+}
+
+export function actionsToComposeRequestType(
+  actions: string[]
+): ComposeRequestType | null {
+  if (
+    intersection(actions, DRAFT_SAVING_ACTIONS).length ===
+    DRAFT_SAVING_ACTIONS.length
+  ) {
+    return 'DRAFT_SAVE';
+  }
+
+  if (intersection(actions, SEND_ACTIONS).length === SEND_ACTIONS.length) {
+    return 'SEND';
+  }
+
+  return null;
 }
