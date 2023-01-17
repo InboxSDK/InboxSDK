@@ -470,9 +470,25 @@ class GmailThreadView {
     var subjectElement = this._element.querySelector('.ha h2');
     if (!subjectElement) {
       return '';
-    } else {
-      return subjectElement.textContent;
     }
+
+    if (subjectElement.querySelector('img[data-emoji]')) {
+      return Array.from(subjectElement.childNodes)
+        .map((c) => {
+          if (c instanceof HTMLElement && c.nodeName === 'IMG') {
+            const maybeEmoji = c.getAttribute('data-emoji');
+            return maybeEmoji;
+          }
+
+          if (c.nodeName === '#text') {
+            return (c: any).wholeText;
+          }
+        })
+        .filter((x) => x != null)
+        .join('');
+    }
+
+    return subjectElement.textContent;
   }
 
   getInternalID(): string {
