@@ -177,6 +177,33 @@ const expectedOutputByFile = {
     ],
     parseWith: SCRP.parseComposeResponseBody_2022_09_09,
   },
+  '2022-09-09-cvOnReplyDraftUpdate_3_request.json': {
+    expected: {
+      threadId: 'thread-a:r-2602384757092328293',
+      messageId: 'msg-a:r9206449609684993976',
+      to: [{ emailAddress: 'test+to@gmail.com', name: 'Test Test' }],
+      cc: null,
+      bcc: null,
+      subject: 'Re: test_subject',
+      body: '<div dir="ltr">b2</div>',
+      type: 'DRAFT_SAVE',
+    },
+    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+  },
+  '2022-09-09-cvOnReplyDraftUpdate_3_response.json': {
+    expected: [
+      {
+        threadId: 'thread-a:r-2602384757092328293',
+        messageId: 'msg-a:r9206449609684993976',
+        to: [{ emailAddress: 'test+to@gmail.com', name: 'Test Test' }],
+        cc: null,
+        bcc: null,
+        type: 'DRAFT_SAVE',
+        actions: ['^all', '^r', '^r_bt'],
+      },
+    ],
+    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+  },
   '2022-09-09-cvOnReplySend_3_request.json': {
     expected: {
       threadId: 'thread-a:r-1030145228305804508',
@@ -214,6 +241,33 @@ const expectedOutputByFile = {
           '^sq_ig_i_personal',
           '^u',
         ],
+        type: 'SEND',
+      },
+    ],
+    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+  },
+  '2022-09-09-cvOnReplySend_4_request.json': {
+    expected: {
+      threadId: 'thread-a:r-2602384757092328293',
+      messageId: 'msg-a:r9206449609684993976',
+      to: [{ emailAddress: 'test+to@gmail.com', name: 'Test Test' }],
+      cc: null,
+      bcc: null,
+      subject: 'Re: test_subject',
+      body: '<div dir="ltr">b2</div><div hspace="streak-pt-mark" style="max-height:1px;"><img alt="" style="width:0px;max-height:0px;overflow:hidden" src="https://mailfoogae.appspot.com/t?sender=aYm9yeXNAc3RyZWFrLmNvbQ%3D%3D&amp;type=zerocontent&amp;guid=0bffb01a-61aa-4e14-b1b5-82b115ecbad3"><font color="#ffffff" size="1">ᐧ</font></div>',
+      type: 'SEND',
+    },
+    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+  },
+  '2022-09-09-cvOnReplySend_4_response.json': {
+    expected: [
+      {
+        threadId: 'thread-a:r-2602384757092328293',
+        messageId: 'msg-a:r9206449609684993976',
+        to: [{ emailAddress: 'test+to@gmail.com', name: 'Test Test' }],
+        cc: null,
+        bcc: null,
+        actions: ['^all', '^f', '^f_bt', '^f_cl', '^pfg'],
         type: 'SEND',
       },
     ],
