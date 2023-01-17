@@ -745,6 +745,22 @@ test('cv:2022-09-09 reply draft 2 sent', async () => {
         },
       ],
     },
+    {
+      filePrefix: '2022-09-09-cvOnReplySend_5_',
+      expectedEvents: [
+        { type: 'emailSending', draftID: 'r5645180764593433440' },
+        {
+          threadID: 'thread-a:r-7504980498209780070',
+          messageID: 'msg-a:r5645180764593433440',
+          draftID: 'r5645180764593433440',
+          oldMessageID: '185c153a4f028cb5',
+          oldThreadID: '185c1536996a61dc',
+          rfcID:
+            '\u003cCAGx7AOTGUP2_JUYoZioTKJLFOx1L0-Rhuzd2h9KwOgDr2ZXrWw@mail.gmail.com\u003e',
+          type: 'emailSent',
+        },
+      ],
+    },
   ];
 
   let cIndex = 100;

@@ -273,6 +273,52 @@ const expectedOutputByFile = {
     ],
     parseWith: SCRP.parseComposeResponseBody_2022_09_09,
   },
+  '2022-09-09-cvOnReplySend_5_request.json': {
+    expected: {
+      threadId: 'thread-a:r-7504980498209780070',
+      messageId: 'msg-a:r5645180764593433440',
+      to: [{ emailAddress: 'test+to@gmail.com', name: 'Test to' }],
+      cc: null,
+      bcc: null,
+      subject: 'Re: test subject 4',
+      body: '<div dir="ltr">b</div>',
+      type: 'SEND',
+    },
+    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+  },
+  '2022-09-09-cvOnReplySend_5_response.json': {
+    expected: [
+      {
+        threadId: 'thread-a:r-7504980498209780070',
+        messageId: 'msg-a:r2752434536700201264',
+        to: [{ emailAddress: 'test+to@gmail.com', name: 'test to' }],
+        cc: null,
+        bcc: null,
+        actions: [
+          '^a',
+          '^all',
+          '^f',
+          '^f_bt',
+          '^f_cl',
+          '^io_lr',
+          '^io_re',
+          '^o',
+          '^pfg',
+        ],
+        type: 'SEND',
+      },
+      {
+        threadId: 'thread-a:r-7504980498209780070',
+        messageId: 'msg-a:r5645180764593433440',
+        to: [{ emailAddress: 'test+to@gmail.com', name: 'test to' }],
+        cc: null,
+        bcc: null,
+        actions: ['^all', '^f', '^f_bt', '^f_cl', '^pfg'],
+        type: 'SEND',
+      },
+    ],
+    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+  },
 };
 
 for (const [file, { parseWith, expected }] of Object.entries(
@@ -461,6 +507,81 @@ it('replaces onReplySend_2 request body', () => {
     threadId: 'thread-f:1743802434391390786',
     messageId: 'msg-a:r2026878197680476540',
     subject: 'Re: hey2',
+    body: 'replaced_content',
+    actions: ['^all', '^pfg', '^f_bt', '^f_btns', '^f_cl'],
+    type: 'SEND',
+  });
+});
+
+it('replaces onReplySend_3 request body', () => {
+  const request = JSON.stringify(
+    require('../../../test/data/2022-09-09-cvOnReplySend_3_request.json')
+  );
+
+  const replacedRequest =
+    SCRP.replaceBodyContentInComposeSendRequestBody_2022_09_09(
+      JSON.parse(request),
+      'replaced_content'
+    );
+
+  const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
+    replacedRequest!
+  );
+
+  expect(parsedRequest).toMatchObject({
+    threadId: 'thread-a:r-1030145228305804508',
+    messageId: 'msg-a:r7241715802500133864',
+    subject: 'Re: test subject',
+    body: 'replaced_content',
+    actions: ['^all', '^pfg', '^f_bt', '^f_btns', '^f_cl', '^i', '^u'],
+    type: 'SEND',
+  });
+});
+
+it('replaces onReplySend_4 request body', () => {
+  const request = JSON.stringify(
+    require('../../../test/data/2022-09-09-cvOnReplySend_4_request.json')
+  );
+
+  const replacedRequest =
+    SCRP.replaceBodyContentInComposeSendRequestBody_2022_09_09(
+      JSON.parse(request),
+      'replaced_content'
+    );
+
+  const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
+    replacedRequest!
+  );
+
+  expect(parsedRequest).toMatchObject({
+    threadId: 'thread-a:r-2602384757092328293',
+    messageId: 'msg-a:r9206449609684993976',
+    subject: 'Re: test_subject',
+    body: 'replaced_content',
+    actions: ['^all', '^pfg', '^f_bt', '^f_btns', '^f_cl'],
+    type: 'SEND',
+  });
+});
+
+it('replaces onReplySend_5 request body', () => {
+  const request = JSON.stringify(
+    require('../../../test/data/2022-09-09-cvOnReplySend_5_request.json')
+  );
+
+  const replacedRequest =
+    SCRP.replaceBodyContentInComposeSendRequestBody_2022_09_09(
+      JSON.parse(request),
+      'replaced_content'
+    );
+
+  const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
+    replacedRequest!
+  );
+
+  expect(parsedRequest).toMatchObject({
+    threadId: 'thread-a:r-7504980498209780070',
+    messageId: 'msg-a:r5645180764593433440',
+    subject: 'Re: test subject 4',
     body: 'replaced_content',
     actions: ['^all', '^pfg', '^f_bt', '^f_btns', '^f_cl'],
     type: 'SEND',
