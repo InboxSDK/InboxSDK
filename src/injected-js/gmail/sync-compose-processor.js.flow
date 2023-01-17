@@ -25,7 +25,7 @@ type ParsedComposeResponse = {
 
 declare export function parseComposeResponseBody(
   respone: string
-): ?ParsedComposeResponse;
+): ParsedComposeResponse[];
 
 declare export function replaceBodyContentInComposeSendRequestBody(
   request: string,
