@@ -474,18 +474,17 @@ class GmailThreadView {
 
     if (subjectElement.querySelector('img[data-emoji]')) {
       return Array.from(subjectElement.childNodes)
-        .flatMap((c) => {
+        .map((c) => {
           if (c instanceof HTMLElement && c.nodeName === 'IMG') {
             const maybeEmoji = c.getAttribute('data-emoji');
-            return maybeEmoji ? [maybeEmoji] : [];
+            return maybeEmoji;
           }
 
           if (c.nodeName === '#text') {
-            return [c.wholeText];
+            return (c: any).wholeText;
           }
-
-          return [];
         })
+        .filter((x) => x != null)
         .join('');
     }
 
