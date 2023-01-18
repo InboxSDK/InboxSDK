@@ -90,7 +90,12 @@ export default class Logger {
     })();
 
     if (this._isMaster && typeof document !== 'undefined') {
-      document.addEventListener('inboxSDKinjectedError', (event: any) => {
+      document.addEventListener('inboxSDKinjectedError', (event: unknown) => {
+        if (!(event instanceof CustomEvent && event?.detail)) {
+          this.error(new Error('Invalid inboxSDKinjectedError event'), event);
+          return;
+        }
+
         const detail = event.detail;
         this.error(
           Object.assign(new Error(detail.message), { stack: detail.stack }),
