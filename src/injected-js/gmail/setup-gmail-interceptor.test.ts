@@ -684,6 +684,23 @@ test('cv:2022-09-09 reply draft 2 sent', async () => {
       ],
     },
     {
+      // parsing should prioritize SEND to DRAFT_SAVE action
+      filePrefix: '2022-09-09-cvOnSend_4_',
+      expectedEvents: [
+        { type: 'emailSending', draftID: 'r-329565169840451245' },
+        {
+          draftID: 'r-329565169840451245',
+          messageID: 'msg-a:r-329565169840451245',
+          oldMessageID: '183fcc5cc03fea78',
+          oldThreadID: '183fcc554fa6f2dd',
+          rfcID:
+            '\u003cCAGx7AOQiYaKpc6Zb5\u003d+mRqU3K-WF+G3KxmmaYKdzCisHqSaRAQ@mail.gmail.com\u003e',
+          threadID: 'thread-a:r-8891700334768116294',
+          type: 'emailSent',
+        },
+      ],
+    },
+    {
       filePrefix: '2022-09-09-cvOnReplyDraftUpdate_2_',
       expectedEvents: [
         {
