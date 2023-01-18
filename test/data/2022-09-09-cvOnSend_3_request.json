@@ -1,0 +1,113 @@
+[
+  [null, null, 2],
+  [
+    [
+      [
+        84,
+        [
+          "thread-a:r-8891700334768116294",
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [
+              [
+                "msg-a:r-329565169840451245",
+                [
+                  1,
+                  "test@test.com",
+                  "test test",
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  "test@test.com"
+                ],
+                [[1, "test+to@test.com", "test to"]],
+                [[1, "test+cc@test.com", "test cc"]],
+                [[1, "test+bcc@test.com", "test bcc"]],
+                null,
+                1666393164210,
+                "test subject",
+                [
+                  null,
+                  [
+                    [
+                      0,
+                      "<div dir=\"ltr\">test body</div><div hspace=\"test-pt-mark\" style=\"max-height:1px;\"><img alt=\"\" style=\"width:0px;max-height:0px;overflow:hidden\" src=\"https://dev.mailfoogae.appspot.com:8888/t?sender=aYm9yeXNAc3RyZWFrLmNvbQ%3D%3D&amp;type=zerocontent&amp;guid=b3b2b759-451a-4c4c-b620-27259f4a4907\"><font color=\"#ffffff\" size=\"1\">ᐧ</font></div>"
+                    ]
+                  ],
+                  null,
+                  null,
+                  null,
+                  null,
+                  1
+                ],
+                null,
+                ["^all", "^pfg", "^f_bt", "^f_btns", "^f_cl", "^i", "^u"],
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                1666393164210,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0,
+                [0, 0, 10, 0],
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "s:18820b14ea357fe5|#msg-a:r-329565169840451245|0"
+              ],
+              null,
+              1
+            ]
+          ]
+        ]
+      ]
+    ]
+  ],
+  null,
+  [1666393156508, 1, 1666393164228, 1, 102],
+  2
+]

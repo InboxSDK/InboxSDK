@@ -1,0 +1,134 @@
+[
+  [null, null, 2],
+  [
+    [
+      [
+        140,
+        [
+          "thread-a:r-7504980498209780070",
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [["^io_lr"], null, ["msg-a:r2752434536700201264"]]
+          ]
+        ]
+      ],
+      [
+        141,
+        [
+          "thread-a:r-7504980498209780070",
+          [
+            null,
+            [
+              [
+                "msg-a:r5645180764593433440",
+                [
+                  1,
+                  "test@test.com",
+                  "Test Test",
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  "test@test.com"
+                ],
+                [[1, "test+to@gmail.com", "Test to"]],
+                null,
+                null,
+                null,
+                1673985762041,
+                "Re: test subject 4",
+                [
+                  null,
+                  [
+                    [0, "<div dir=\"ltr\">b</div>"],
+                    [
+                      2,
+                      "<br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Jan 17, 2023 at 12:02 PM Test Test &lt;test@test.com&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin: 0px 0px 0px 0.8ex; border-left: 1px solid rgb(204, 204, 204); padding-left: 1ex;\"><div dir=\"ltr\">a</div><div hspace=\"streak-pt-mark\" style=\"max-height: 1px;\"><img alt=\"\" style=\"width: 0px; max-height: 0px; overflow: hidden;\" src=\"https://ci3.googleusercontent.com/proxy/HXA5FyC3jn0PvKKIZkUvYVexwJeWv9YzUrZtg8-juznjbIAfG1czKsUZu9_rR2mp4dsGnZzaDI-veDruknmVAHpWU1w7OZBOJuk46t_C7I_LP4WEm2yqIm1b78b9PzcBiwTqn5P4nqlGMhMvjktS0MDMweY67TTcB2jvNqgRr54ILLhzk_W9r5kE1pUowE1SRpsSKw=s0-d-e1-ft#https://mailfoogae.appspot.com/t?sender=aYm9yeXNAc3RyZWFrLmNvbQ%3D%3D&amp;type=zerocontent&amp;guid=f9e0f293-fe51-4ab2-8d7c-3b695fae0cd8\"><font color=\"#ffffff\" size=\"1\">ᐧ</font></div>\n</blockquote></div>"
+                    ]
+                  ],
+                  null,
+                  null,
+                  null,
+                  null,
+                  1
+                ],
+                null,
+                ["^all", "^pfg", "^f_bt", "^f_btns", "^f_cl"],
+                null,
+                null,
+                null,
+                null,
+                "<CAGx7AORLRSdVaH=9=sA7Kob=_xmiR91JTQJraTUvrXM=dyTthA@mail.gmail.com>",
+                null,
+                1673985762041,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0,
+                [0, 0, 1, 0],
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "s:137b607841be323e|#msg-a:r5645180764593433440|0"
+              ],
+              "msg-a:r2752434536700201264",
+              1,
+              null,
+              [1673985762053]
+            ]
+          ]
+        ]
+      ],
+      [
+        142,
+        [
+          "thread-a:r-7504980498209780070",
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [["^io_re"], ["^io_fwd"], ["msg-a:r2752434536700201264"]]
+          ]
+        ]
+      ]
+    ]
+  ],
+  null,
+  [1673985757942, 3, 1673985758058, 1, 145],
+  2
+]

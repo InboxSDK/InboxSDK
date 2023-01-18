@@ -1,42 +1,25 @@
+import sortBy from 'lodash/sortBy';
 import intersection from 'lodash/intersection';
-import last from 'lodash/last';
+
+import type { Contact } from '../../platform-implementation-js/driver-interfaces/compose-view-driver';
+import isNotNil from '../../platform-implementation-js/lib/isNotNil';
 import {
   ComposeRequestType,
   DRAFT_SAVING_ACTIONS,
   SEND_ACTIONS,
 } from './constants';
 
+const ACTION_TYPE_PRIORITY_RANK: [ComposeRequestType, ComposeRequestType] = [
+  'SEND',
+  'DRAFT_SAVE',
+];
+
 export function parseComposeRequestBody_2022_09_09(request: Array<any>) {
-  return (
-    parseCreateDraftRequestBody(request) ||
-    parseUpdateDraftRequestBody(request) ||
-    parseSendDraftRequestBody(request)
-  );
+  return parseCreateUpdateSendDraftRequestBody(request);
 }
 
-export function parseComposeResponseBody_2022_09_09(
-  response: Array<any>
-): any[] {
-  const threads = response[1]?.[5];
-
-  return (threads ?? []).flatMap((threadWrapper: unknown) => {
-    if (!Array.isArray(threadWrapper) || !threadWrapper?.[0]) {
-      // exit cuz cannot parse
-      return [];
-    }
-
-    const thread = threadWrapper[0];
-
-    const maybeBody =
-      parseUpdateDraftResponseBody(thread) ||
-      parseSendDraftResponseBody(thread);
-
-    if (maybeBody) {
-      return [maybeBody];
-    }
-
-    return [];
-  });
+export function parseComposeResponseBody_2022_09_09(response: Array<any>) {
+  return parseCreateUpdateSendDraftResponseBody(response);
 }
 
 export function replaceBodyContentInComposeSendRequestBody_2022_09_09(
@@ -47,300 +30,124 @@ export function replaceBodyContentInComposeSendRequestBody_2022_09_09(
 }
 
 /**
- * Parses request when compose window saves draft for the first time (creates draft)
+ * Parses request body when compose window either saves a draft for the first time,
+ * updates the draft or sends the draft.
+ * NOTE: request could contain multiple threads and messages within it,
+ * prioritize SEND to DRAFT_SAVE message.
  */
-function parseCreateDraftRequestBody(request: Array<any>) {
-  const thread = request[1]?.[0]?.[0]?.[1];
+function parseCreateUpdateSendDraftRequestBody(request: any[]) {
+  const updateList = request[1]?.[0];
 
-  if (thread) {
-    const threadId = parseThreadId(thread[0]);
-    if (!threadId) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const msg =
-      thread[1]?.[2]?.[0]?.[4]?.[0] ||
-      /* Reply draft creation */ thread[1]?.[1]?.[0];
-
-    if (!Array.isArray(msg)) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const messageId: string = msg[0];
-
-    if (!messageId.startsWith('msg-')) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const subject = msg[7];
-    const body = msg[8][1][0][1];
-    const actions = msg[10];
-
-    const hasRequiredActions =
-      intersection(actions, DRAFT_SAVING_ACTIONS).length ===
-      DRAFT_SAVING_ACTIONS.length;
-
-    if (!hasRequiredActions) {
-      // exit if doesn't have required actions
-      return null;
-    }
-
-    return {
-      threadId,
-      messageId,
-      subject,
-      body,
-      actions,
-      type: 'FIRST_DRAFT_SAVE' as ComposeRequestType,
-    };
+  if (!Array.isArray(updateList)) {
+    // cannot parse
+    return null;
   }
+
+  const parsedMessages = updateList.map(parseRequestThread).filter(isNotNil);
+
+  const sorted = sortBy(parsedMessages, (m) =>
+    ACTION_TYPE_PRIORITY_RANK.indexOf(m.type)
+  );
+
+  return sorted[0] || null;
 }
 
 /**
- * Parses request when compose window updates draft (consecutive updates after creation)
+ * Parses response body when compose window either saved a draft for the first time,
+ * updated the draft, or sent the draft.
+ * NOTE: response could contain multiple threads and messages within it
+ * even not related to a message/thread in the request body.
+ * So the calling code should find needed message manually.
  */
-function parseUpdateDraftRequestBody(request: Array<any>) {
-  const thread =
-    request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
+function parseCreateUpdateSendDraftResponseBody(response: any[]) {
+  const updateList = response[1]?.[5];
 
-  if (thread) {
-    const threadId = parseThreadId(thread[0]);
-    if (!threadId) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const msg = thread[1] && thread[1][13] && thread[1][13][0];
-
-    if (!Array.isArray(msg)) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const messageId: string = msg[0];
-
-    if (!messageId.startsWith('msg-')) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const subject = msg[7];
-    const body = msg[8][1][0][1];
-    const actions = msg[10];
-
-    const hasRequiredActions =
-      intersection(actions, DRAFT_SAVING_ACTIONS).length ===
-      DRAFT_SAVING_ACTIONS.length;
-
-    if (!hasRequiredActions) {
-      // exit if doesn't have required actions
-      return null;
-    }
-
-    return {
-      threadId,
-      messageId,
-      subject,
-      body,
-      actions,
-      type: 'DRAFT_SAVE' as ComposeRequestType,
-    };
-  }
-}
-
-/**
- * Parses request when compose window sends draft
- */
-function parseSendDraftRequestBody(request: Array<any>) {
-  const thread =
-    request[1] && request[1][0] && request[1][0][0] && request[1][0][0][1];
-
-  if (thread) {
-    const threadId = parseThreadId(thread[0]);
-    if (!threadId) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const msg =
-      (thread[1] && thread[1][13] && thread[1][13][0]) ||
-      /* reply */ (thread[1] && thread[1][1] && thread[1][1][0]);
-
-    if (!Array.isArray(msg)) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const messageId: string = msg[0];
-
-    if (!messageId.startsWith('msg-')) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    const subject = msg[7];
-    const body = msg[8][1][0][1];
-    const actions = msg[10];
-
-    const hasRequiredActions =
-      intersection(actions, SEND_ACTIONS).length === SEND_ACTIONS.length;
-
-    if (!hasRequiredActions) {
-      // exit if doesn't have required actions
-      return null;
-    }
-
-    return {
-      threadId,
-      messageId,
-      subject,
-      body,
-      actions,
-      type: 'SEND' as ComposeRequestType,
-    };
-  }
-}
-
-/**
- * Parses response when compose window saves draft for the first time or updates it
- */
-function parseUpdateDraftResponseBody(thread: Array<any>) {
-  const threadId = parseThreadId(thread[0]);
-  if (!threadId) {
-    // exit cuz cannot parse
-    return null;
+  if (!Array.isArray(updateList)) {
+    // cannot parse
+    return [];
   }
 
-  const threadInner = thread[2]?.[6]?.[0];
-  if (!Array.isArray(threadInner)) {
-    // exit cuz cannot parse
-    return null;
-  }
+  return updateList
+    .map(parseResponseThread)
+    .filter(isNotNil)
+    .flatMap((parsedThread) => {
+      const { threadId, oldThreadId, parsedMessages } = parsedThread;
 
-  const oldThreadId = threadInner[19];
+      return parsedMessages.map((parsedMessage) => {
+        const { messageId, to, cc, bcc, actions, rfcID, oldMessageId } =
+          parsedMessage;
 
-  const msg = last(threadInner[4]);
-  if (!Array.isArray(msg)) {
-    // exit cuz cannot parse
-    return null;
-  }
+        const actionType = actionsToComposeRequestType(actions);
 
-  const messageId: string = msg[0];
-  if (!messageId.startsWith('msg-')) {
-    // exit cuz cannot parse
-    return null;
-  }
+        if (!actionType) {
+          // unsupported actions within a message
+          return null;
+        }
 
-  const actions = msg[10];
-  const rfcID = msg[13];
-  const oldMessageId = msg[55];
-
-  const hasRequiredActions =
-    intersection(actions, DRAFT_SAVING_ACTIONS).length ===
-    DRAFT_SAVING_ACTIONS.length;
-
-  if (!hasRequiredActions) {
-    // exit if doesn't have required actions
-    return null;
-  }
-
-  return {
-    threadId,
-    messageId,
-    actions,
-    rfcID,
-    oldMessageId,
-    oldThreadId,
-    type: 'DRAFT_SAVE' as ComposeRequestType,
-  };
-}
-
-/**
- * Parses response when compose window saves draft for the first time or updates it
- */
-function parseSendDraftResponseBody(thread: Array<any>) {
-  const threadId = parseThreadId(thread[0]);
-  if (!threadId) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const threadInner = thread[2]?.[6]?.[0];
-  if (!Array.isArray(threadInner)) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const oldThreadId = threadInner[19];
-
-  const msg = threadInner[4] && last(threadInner[4]);
-  if (!Array.isArray(msg)) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const messageId: string = msg[0];
-  if (!messageId.startsWith('msg-')) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const actions = msg[10];
-  const rfcID = msg[13];
-  const oldMessageId = msg[55];
-
-  const hasRequiredActions =
-    intersection(actions, SEND_ACTIONS).length === SEND_ACTIONS.length;
-
-  if (!hasRequiredActions) {
-    // exit if doesn't have required actions
-    return null;
-  }
-
-  return {
-    threadId,
-    messageId,
-    actions,
-    rfcID,
-    oldMessageId,
-    oldThreadId,
-    type: 'SEND' as ComposeRequestType,
-  };
+        return {
+          threadId,
+          messageId,
+          to,
+          cc,
+          bcc,
+          actions,
+          rfcID,
+          oldMessageId,
+          oldThreadId,
+          type: actionType,
+        };
+      });
+    })
+    .filter(isNotNil);
 }
 
 function replaceBodyContentInSendRequestBody(
   request: Array<any>,
   newBodyHtmlContent: string
 ) {
-  const thread = request[1]?.[0]?.[0]?.[1];
+  // since draftID is not passed from outside,
+  // use parse function to find a message which body needs to be replaced
+  const parsed = parseCreateUpdateSendDraftRequestBody(request);
+  if (!parsed) {
+    return null;
+  }
 
-  if (thread) {
+  const replaceBodyInThisMessageId = parsed.messageId;
+
+  const updateList = request[1]?.[0];
+
+  if (!Array.isArray(updateList)) {
+    // cannot parse
+    return null;
+  }
+
+  for (const threadWrapper of updateList) {
+    if (!Array.isArray(threadWrapper) || !Array.isArray(threadWrapper[1])) {
+      // cannot parse
+      return null;
+    }
+
+    const thread = threadWrapper[1];
+
     const threadId = parseThreadId(thread[0]);
     if (!threadId) {
-      // exit cuz cannot parse
+      // cannot parse
       return null;
     }
 
-    const msg = thread[1]?.[13]?.[0] || /* reply */ thread[1]?.[1]?.[0];
+    const parseResult = findAndParseRequestMessage(thread);
 
-    if (!Array.isArray(msg)) {
-      // exit cuz cannot parse
-      return null;
+    if (parseResult?.parsedMsg.messageId === replaceBodyInThisMessageId) {
+      const actionType = actionsToComposeRequestType(
+        parseResult.parsedMsg.actions
+      );
+
+      if (actionType === 'SEND') {
+        // find first message with needed messageId and 'SEND' action and replace the body content
+        replaceBodyInRequestMsg(parseResult.originalMsg, newBodyHtmlContent);
+        return request;
+      }
     }
-
-    const messageId: string = msg[0];
-
-    if (!messageId.startsWith('msg-')) {
-      // exit cuz cannot parse
-      return null;
-    }
-
-    msg[8][1][0][1] = newBodyHtmlContent;
-
-    return request;
   }
 
   return null;
@@ -351,9 +158,234 @@ function parseThreadId(threadId: string): string | null {
     return null;
   }
 
-  if (threadId.indexOf('|') > -1) {
+  if (threadId.includes('|')) {
     return threadId.split('|')[0];
   }
 
   return threadId;
+}
+
+function parseMsgId(messageId: string): string | null {
+  if (!messageId.startsWith('msg-')) {
+    // cannot parse
+    return null;
+  }
+
+  return messageId;
+}
+
+function parseContacts(contacts: any[]): Contact[] | null {
+  if (!Array.isArray(contacts)) {
+    // cannot parse
+    return null;
+  }
+
+  return contacts
+    .filter((c) => !!c[1])
+    .map((c): Contact => ({ emailAddress: c[1], name: c[2] ?? null }));
+}
+
+function findAndParseRequestMessage(thread: any[]): {
+  parsedMsg: NonNullable<ReturnType<typeof parseRequestMsg>>;
+  originalMsg: any;
+} | null {
+  const originalMsgs = [
+    thread[1]?.[2]?.[0]?.[4]?.[0],
+    thread[1]?.[1]?.[0],
+    thread[1]?.[13]?.[0],
+  ];
+
+  for (const originalMsg of originalMsgs) {
+    const parsedMsg = parseRequestMsg(originalMsg);
+    if (parsedMsg) {
+      return { parsedMsg, originalMsg };
+    }
+  }
+
+  return null;
+}
+
+function parseRequestThread(threadWrapper: any) {
+  if (!Array.isArray(threadWrapper) || !Array.isArray(threadWrapper[1])) {
+    // cannot parse
+    return null;
+  }
+
+  const thread = threadWrapper[1];
+
+  const threadId = parseThreadId(thread[0]);
+  if (!threadId) {
+    // cannot parse
+    return null;
+  }
+
+  const parseResult = findAndParseRequestMessage(thread);
+
+  if (!parseResult) {
+    // cannot parse
+    return null;
+  }
+
+  const { parsedMsg: message, originalMsg } = parseResult;
+
+  const { messageId, to, cc, bcc, subject, body, actions } = message;
+
+  let actionType = actionsToComposeRequestType(actions);
+  if (!actionType) {
+    // exit if doesn't have required actions
+    return null;
+  }
+
+  // usually for draft_save action when draft or reply got saved for first time, response could be different
+  // from usual update response, so replace draft_save action with first_draft_save in this case.
+  if (
+    actionType === 'DRAFT_SAVE' &&
+    (originalMsg === thread[1]?.[2]?.[0]?.[4]?.[0] ||
+      originalMsg === thread[1]?.[1]?.[0])
+  ) {
+    actionType = 'FIRST_DRAFT_SAVE';
+  }
+
+  return {
+    threadId,
+    messageId,
+    to,
+    cc,
+    bcc,
+    subject,
+    body,
+    actions,
+    type: actionType,
+  };
+}
+
+function parseRequestMsg(msg: any) {
+  if (!Array.isArray(msg)) {
+    // cannot parse
+    return null;
+  }
+
+  const messageId = parseMsgId(msg[0]);
+  if (!messageId) {
+    // cannot parse
+    return null;
+  }
+
+  const subject = msg[7];
+  const to = parseContacts(msg[2]);
+  const cc = parseContacts(msg[3]);
+  const bcc = parseContacts(msg[4]);
+  const body = msg[8][1][0][1];
+  const actions = msg[10];
+  const rfcID = msg[13];
+  const oldMessageId = msg[55];
+
+  return {
+    messageId,
+    to,
+    cc,
+    bcc,
+    subject,
+    body,
+    actions,
+    rfcID,
+    oldMessageId,
+  };
+}
+
+function replaceBodyInRequestMsg(msg: any, newBodyHtmlContent: string) {
+  if (!Array.isArray(msg)) {
+    // cannot parse
+    return null;
+  }
+
+  msg[8][1][0][1] = newBodyHtmlContent;
+}
+
+function parseResponseThread(threadWrapper: any) {
+  if (!Array.isArray(threadWrapper) || !Array.isArray(threadWrapper[0])) {
+    // cannot parse
+    return null;
+  }
+
+  const thread = threadWrapper[0];
+  const threadId = parseThreadId(thread[0]);
+  if (!threadId) {
+    // cannot parse
+    return null;
+  }
+
+  const threadInner = thread[2]?.[6]?.[0];
+  if (!Array.isArray(threadInner)) {
+    // cannot parse
+    return null;
+  }
+
+  const oldThreadId = threadInner[19];
+
+  const parsedMessages = Array.isArray(threadInner[4])
+    ? threadInner[4]
+        .map((msg) => {
+          if (!Array.isArray(msg)) {
+            // cannot parse
+            return null;
+          }
+
+          return parseResponseMsg(msg);
+        })
+        .filter(isNotNil)
+    : [];
+
+  return {
+    threadId,
+    oldThreadId,
+    parsedMessages,
+  };
+}
+
+function parseResponseMsg(msg: any[]) {
+  if (!Array.isArray(msg)) {
+    // cannot parse
+    return null;
+  }
+
+  const messageId = parseMsgId(msg[0]);
+  if (!messageId) {
+    // cannot parse
+    return null;
+  }
+
+  const actions: string[] = msg[10];
+  const to = parseContacts(msg[2]);
+  const cc = parseContacts(msg[3]);
+  const bcc = parseContacts(msg[4]);
+  const rfcID = msg[13];
+  const oldMessageId = msg[55];
+
+  return {
+    messageId,
+    to,
+    cc,
+    bcc,
+    actions,
+    rfcID,
+    oldMessageId,
+  };
+}
+
+export function actionsToComposeRequestType(
+  actions: string[]
+): ComposeRequestType | null {
+  if (
+    intersection(actions, DRAFT_SAVING_ACTIONS).length ===
+    DRAFT_SAVING_ACTIONS.length
+  ) {
+    return 'DRAFT_SAVE';
+  }
+
+  if (intersection(actions, SEND_ACTIONS).length === SEND_ACTIONS.length) {
+    return 'SEND';
+  }
+
+  return null;
 }

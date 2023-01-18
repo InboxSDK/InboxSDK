@@ -21,6 +21,9 @@ export function parseComposeRequestBody(
       if (parsed) {
         return {
           type: parsed.type,
+          to: parsed.to,
+          cc: parsed.cc,
+          bcc: parsed.bcc,
           draftID: parsed.messageId.replace('msg-a:', ''),
           subject: parsed.subject,
           body: parsed.body,
