@@ -9,6 +9,11 @@ import {
   SEND_ACTIONS,
 } from './constants';
 
+const ACTION_TYPE_PRIORITY_RANK: [ComposeRequestType, ComposeRequestType] = [
+  'SEND',
+  'DRAFT_SAVE',
+];
+
 export function parseComposeRequestBody_2022_09_09(request: Array<any>) {
   return parseCreateUpdateSendDraftRequestBody(request);
 }
@@ -24,12 +29,12 @@ export function replaceBodyContentInComposeSendRequestBody_2022_09_09(
   return replaceBodyContentInSendRequestBody(request, newBodyHtmlContent);
 }
 
-// prioritize SEND -> DRAFT_SAVE
-const ACTION_TYPE_PRIORITY_RANK: [ComposeRequestType, ComposeRequestType] = [
-  'SEND',
-  'DRAFT_SAVE',
-];
-
+/**
+ * Parses request body when compose window either saves a draft for the first time,
+ * updates the draft or sends the draft.
+ * NOTE: request could contain multiple threads and messages within it,
+ * prioritize SEND to DRAFT_SAVE message.
+ */
 function parseCreateUpdateSendDraftRequestBody(request: any[]) {
   const updateList = request[1]?.[0];
 
@@ -45,60 +50,6 @@ function parseCreateUpdateSendDraftRequestBody(request: any[]) {
   );
 
   return sorted[0] || null;
-}
-
-function parseRequestThread(threadWrapper: any) {
-  if (!Array.isArray(threadWrapper) || !Array.isArray(threadWrapper[1])) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const thread = threadWrapper[1];
-
-  const threadId = parseThreadId(thread[0]);
-  if (!threadId) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const parseResult = findAndParseRequestMessage(thread);
-
-  if (!parseResult) {
-    // exit cuz cannot parse
-    return null;
-  }
-
-  const { parsedMsg: message, originalMsg } = parseResult;
-
-  const { messageId, to, cc, bcc, subject, body, actions } = message;
-
-  let actionType = actionsToComposeRequestType(actions);
-  if (!actionType) {
-    // exit if doesn't have required actions
-    return null;
-  }
-
-  // usually for draft_save action when draft or reply got saved for first time, response could be different
-  // from usual update response, so replace draft_save action with first_draft_save in this case.
-  if (
-    actionType === 'DRAFT_SAVE' &&
-    (originalMsg === thread[1]?.[2]?.[0]?.[4]?.[0] ||
-      originalMsg === thread[1]?.[1]?.[0])
-  ) {
-    actionType = 'FIRST_DRAFT_SAVE';
-  }
-
-  return {
-    threadId,
-    messageId,
-    to,
-    cc,
-    bcc,
-    subject,
-    body,
-    actions,
-    type: actionType,
-  };
 }
 
 /**
@@ -255,6 +206,60 @@ function findAndParseRequestMessage(thread: any[]): {
   }
 
   return null;
+}
+
+function parseRequestThread(threadWrapper: any) {
+  if (!Array.isArray(threadWrapper) || !Array.isArray(threadWrapper[1])) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const thread = threadWrapper[1];
+
+  const threadId = parseThreadId(thread[0]);
+  if (!threadId) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const parseResult = findAndParseRequestMessage(thread);
+
+  if (!parseResult) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  const { parsedMsg: message, originalMsg } = parseResult;
+
+  const { messageId, to, cc, bcc, subject, body, actions } = message;
+
+  let actionType = actionsToComposeRequestType(actions);
+  if (!actionType) {
+    // exit if doesn't have required actions
+    return null;
+  }
+
+  // usually for draft_save action when draft or reply got saved for first time, response could be different
+  // from usual update response, so replace draft_save action with first_draft_save in this case.
+  if (
+    actionType === 'DRAFT_SAVE' &&
+    (originalMsg === thread[1]?.[2]?.[0]?.[4]?.[0] ||
+      originalMsg === thread[1]?.[1]?.[0])
+  ) {
+    actionType = 'FIRST_DRAFT_SAVE';
+  }
+
+  return {
+    threadId,
+    messageId,
+    to,
+    cc,
+    bcc,
+    subject,
+    body,
+    actions,
+    type: actionType,
+  };
 }
 
 function parseRequestMsg(msg: any) {
