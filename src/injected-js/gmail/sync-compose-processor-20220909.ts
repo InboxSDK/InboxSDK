@@ -39,7 +39,7 @@ function parseCreateUpdateSendDraftRequestBody(request: any[]) {
   const updateList = request[1]?.[0];
 
   if (!Array.isArray(updateList)) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
@@ -63,7 +63,7 @@ function parseCreateUpdateSendDraftResponseBody(response: any[]) {
   const updateList = response[1]?.[5];
 
   if (!Array.isArray(updateList)) {
-    // exit cuz cannot parse
+    // cannot parse
     return [];
   }
 
@@ -106,7 +106,7 @@ function replaceBodyContentInSendRequestBody(
   newBodyHtmlContent: string
 ) {
   // since draftID is not passed from outside,
-  // use parse method to find a message which body needs to be replaced
+  // use parse function to find a message which body needs to be replaced
   const parsed = parseCreateUpdateSendDraftRequestBody(request);
   if (!parsed) {
     return null;
@@ -117,13 +117,13 @@ function replaceBodyContentInSendRequestBody(
   const updateList = request[1]?.[0];
 
   if (!Array.isArray(updateList)) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
   for (const threadWrapper of updateList) {
     if (!Array.isArray(threadWrapper) || !Array.isArray(threadWrapper[1])) {
-      // exit cuz cannot parse
+      // cannot parse
       return null;
     }
 
@@ -131,16 +131,13 @@ function replaceBodyContentInSendRequestBody(
 
     const threadId = parseThreadId(thread[0]);
     if (!threadId) {
-      // exit cuz cannot parse
+      // cannot parse
       return null;
     }
 
     const parseResult = findAndParseRequestMessage(thread);
 
-    if (
-      parseResult &&
-      parseResult.parsedMsg.messageId === replaceBodyInThisMessageId
-    ) {
+    if (parseResult?.parsedMsg.messageId === replaceBodyInThisMessageId) {
       const actionType = actionsToComposeRequestType(
         parseResult.parsedMsg.actions
       );
@@ -161,7 +158,7 @@ function parseThreadId(threadId: string): string | null {
     return null;
   }
 
-  if (threadId.indexOf('|') > -1) {
+  if (threadId.includes('|')) {
     return threadId.split('|')[0];
   }
 
@@ -170,7 +167,7 @@ function parseThreadId(threadId: string): string | null {
 
 function parseMsgId(messageId: string): string | null {
   if (!messageId.startsWith('msg-')) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
@@ -179,13 +176,13 @@ function parseMsgId(messageId: string): string | null {
 
 function parseContacts(contacts: any[]): Contact[] | null {
   if (!Array.isArray(contacts)) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
-  return contacts.map(
-    (c): Contact => ({ emailAddress: c[1], name: c[2] || null })
-  );
+  return contacts
+    .filter((c) => !!c[1])
+    .map((c): Contact => ({ emailAddress: c[1], name: c[2] ?? null }));
 }
 
 function findAndParseRequestMessage(thread: any[]): {
@@ -210,7 +207,7 @@ function findAndParseRequestMessage(thread: any[]): {
 
 function parseRequestThread(threadWrapper: any) {
   if (!Array.isArray(threadWrapper) || !Array.isArray(threadWrapper[1])) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
@@ -218,14 +215,14 @@ function parseRequestThread(threadWrapper: any) {
 
   const threadId = parseThreadId(thread[0]);
   if (!threadId) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
   const parseResult = findAndParseRequestMessage(thread);
 
   if (!parseResult) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
@@ -264,13 +261,13 @@ function parseRequestThread(threadWrapper: any) {
 
 function parseRequestMsg(msg: any) {
   if (!Array.isArray(msg)) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
   const messageId = parseMsgId(msg[0]);
   if (!messageId) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
@@ -298,7 +295,7 @@ function parseRequestMsg(msg: any) {
 
 function replaceBodyInRequestMsg(msg: any, newBodyHtmlContent: string) {
   if (!Array.isArray(msg)) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
@@ -307,20 +304,20 @@ function replaceBodyInRequestMsg(msg: any, newBodyHtmlContent: string) {
 
 function parseResponseThread(threadWrapper: any) {
   if (!Array.isArray(threadWrapper) || !Array.isArray(threadWrapper[0])) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
   const thread = threadWrapper[0];
   const threadId = parseThreadId(thread[0]);
   if (!threadId) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
   const threadInner = thread[2]?.[6]?.[0];
   if (!Array.isArray(threadInner)) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
@@ -330,7 +327,7 @@ function parseResponseThread(threadWrapper: any) {
     ? threadInner[4]
         .map((msg) => {
           if (!Array.isArray(msg)) {
-            // exit cuz cannot parse
+            // cannot parse
             return null;
           }
 
@@ -348,13 +345,13 @@ function parseResponseThread(threadWrapper: any) {
 
 function parseResponseMsg(msg: any[]) {
   if (!Array.isArray(msg)) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
   const messageId = parseMsgId(msg[0]);
   if (!messageId) {
-    // exit cuz cannot parse
+    // cannot parse
     return null;
   }
 
