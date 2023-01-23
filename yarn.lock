@@ -2681,13 +2681,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@yarnpkg/lockfile@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "@yarnpkg/lockfile@npm:1.1.0"
-  checksum: 05b881b4866a3546861fee756e6d3812776ea47fa6eb7098f983d6d0eefa02e12b66c3fff931574120f196286a7ad4879ce02743c8bb2be36c6a576c7852083a
-  languageName: node
-  linkType: hard
-
 "JSONStream@npm:^1.0.3":
   version: 1.3.5
   resolution: "JSONStream@npm:1.3.5"
@@ -7356,7 +7349,6 @@ __metadata:
     ud-kefir: ^2.0.1
     vinyl-source-stream: ^2.0.0
     watchify: ^4.0.0
-    yarn-deps-check: ^2.0.0
   languageName: unknown
   linkType: soft
 
@@ -9198,7 +9190,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.0.0, lodash@npm:^4.13.1, lodash@npm:^4.14.0, lodash@npm:^4.16.6, lodash@npm:^4.17.11, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.21, lodash@npm:^4.17.4, lodash@npm:^4.6.1, lodash@npm:^4.7.0":
+"lodash@npm:^4.0.0, lodash@npm:^4.13.1, lodash@npm:^4.14.0, lodash@npm:^4.16.6, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.21, lodash@npm:^4.17.4, lodash@npm:^4.6.1, lodash@npm:^4.7.0":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -13944,19 +13936,6 @@ __metadata:
     decamelize: ^1.0.0
     window-size: 0.1.0
   checksum: 73fd1978a311c853ae4c2c2da12642878912a33e4a8e9e8fec00900dc3b5db31a334c337cff04a542ebba7a32f64a9330419ba45249002f45f349a5d41010cab
-  languageName: node
-  linkType: hard
-
-"yarn-deps-check@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "yarn-deps-check@npm:2.0.0"
-  dependencies:
-    "@yarnpkg/lockfile": ^1.1.0
-    lodash: ^4.17.11
-    pkg-dir: ^4.2.0
-  bin:
-    yarn-deps-check: dist/src/bin/depsCheck.js
-  checksum: c5ddad914b05128993b97d097b311a97691286ae3c332ba22931b58b59f90471956a25176461f244be1e3ed492bf91382b5c48d9dcd02c5245b12a5bc086d605
   languageName: node
   linkType: hard
 
