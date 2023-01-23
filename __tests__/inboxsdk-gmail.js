@@ -1,8 +1,7 @@
 /* @flow */
-Object.defineProperty(globalThis, 'regeneratorRuntime', {
-  set(x) {
-    console.error(new Error('something set the global'));
-  },
+
+jest.mock('@babel/runtime-corejs2/regenerator/index.js', () => {
+  return require('../overrides/node_modules/regenerator-runtime/runtime.js');
 });
 
 import MockMutationObserver from '../test/lib/mock-mutation-observer';
