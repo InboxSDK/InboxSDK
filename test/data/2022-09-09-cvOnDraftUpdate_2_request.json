@@ -1,0 +1,108 @@
+[
+  null,
+  [
+    [
+      [
+        72,
+        [
+          "thread-a:r-1030145228305804508",
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [
+              [
+                "msg-a:r-9122305152175603305",
+                [
+                  1,
+                  "test@test.com",
+                  "test test",
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  "test@test.com"
+                ],
+                [[1, "test+to@test.com", "test to"]],
+                [[1, "test+cc@test.com", "test cc"]],
+                [[1, "test+bcc@test.com", "test bcc"]],
+                null,
+                1666392717746,
+                "test subject",
+                [
+                  null,
+                  [[0, "<div dir=\"ltr\">test body</div>"]],
+                  null,
+                  null,
+                  null,
+                  null,
+                  1
+                ],
+                null,
+                ["^all", "^r", "^r_bt"],
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                1666392717746,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0,
+                [0, 0, 15, 0],
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "s:18820b14ea357fe5|#msg-a:r-9122305152175603305|0"
+              ],
+              null,
+              1
+            ]
+          ]
+        ]
+      ]
+    ]
+  ],
+  [1, 5999318, null, null, [null, 0], null, 1, null, ["^b"]],
+  [1666392692847, 1, 1666392717760, 0, 101],
+  2
+]

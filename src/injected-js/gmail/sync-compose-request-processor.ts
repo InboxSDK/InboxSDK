@@ -1,6 +1,7 @@
 /* @flow */
 
 import intersection from 'lodash/intersection';
+import { Contact } from '../../platform-implementation-js/driver-interfaces/compose-view-driver';
 import { ComposeRequest, ComposeRequestType, SEND_ACTIONS } from './constants';
 
 export function getDetailsOfComposeRequest(
@@ -87,9 +88,23 @@ function getComposeRequestFromUpdate(
   return {
     body,
     type,
+    to: parseContacts(update[3]),
+    cc: parseContacts(update[4]),
+    bcc: parseContacts(update[5]),
     draftID: update[1].replace('msg-a:', ''),
     subject: update[8],
   };
+}
+
+function parseContacts(contacts: any[]): Contact[] | null {
+  if (!Array.isArray(contacts)) {
+    // exit cuz cannot parse
+    return null;
+  }
+
+  return contacts.map(
+    (c): Contact => ({ emailAddress: c[2], name: c[3] || null })
+  );
 }
 
 export function replaceEmailBodyForSendRequest(

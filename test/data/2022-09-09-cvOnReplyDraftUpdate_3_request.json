@@ -1,0 +1,116 @@
+[
+  null,
+  [
+    [
+      [
+        117,
+        [
+          "thread-a:r-2602384757092328293",
+          [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            [
+              [
+                "msg-a:r9206449609684993976",
+                [
+                  1,
+                  "test@test.com",
+                  "Test Test",
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  null,
+                  "test@test.com"
+                ],
+                [[1, "test+to@gmail.com", "Test Test"]],
+                null,
+                null,
+                null,
+                1673983165221,
+                "Re: test_subject",
+                [
+                  null,
+                  [
+                    [0, "<div dir=\"ltr\">b2</div>"],
+                    [
+                      2,
+                      "<br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Jan 17, 2023 at 11:18 AM Test Test &lt;test@test.com&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin: 0px 0px 0px 0.8ex; border-left: 1px solid rgb(204, 204, 204); padding-left: 1ex;\"><div dir=\"ltr\">b</div><br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Tue, Jan 17, 2023 at 11:17 AM Test Test &lt;<a href=\"mailto:test@test.com\" target=\"_blank\">test@test.com</a>&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin: 0px 0px 0px 0.8ex; border-left: 1px solid rgb(204, 204, 204); padding-left: 1ex;\"><div dir=\"ltr\">a</div><div hspace=\"streak-pt-mark\" style=\"max-height: 1px;\"><img alt=\"\" style=\"width: 0px; max-height: 0px; overflow: hidden;\" src=\"https://ci3.googleusercontent.com/proxy/poW_IWT227BMRlZq_TIM5a_uPE2llOR7u9kkZQDuE_gc-FcFcYo-t8a-dtHrxECK5GyKZZm_0td0_kJwtuoUriNfn38jo6ZrgsbxiobPWrBnVQihqzFCHc994Brlg6boDz-ZrnE1_6gUHsspLwScjrplkzWYd8unexXMZUiQEjiDbQCtjMzJE0avNjpXJUe8NHZTCg=s0-d-e1-ft#https://mailfoogae.appspot.com/t?sender=aYm9yeXNAc3RyZWFrLmNvbQ%3D%3D&amp;type=zerocontent&amp;guid=fb80bfb5-6f2b-4d0a-8be9-3a3fd71abcd1\"><font color=\"#ffffff\" size=\"1\">ᐧ</font></div>\n</blockquote></div>\n</blockquote></div>"
+                    ]
+                  ],
+                  null,
+                  null,
+                  null,
+                  null,
+                  1
+                ],
+                null,
+                ["^all", "^r", "^r_bt"],
+                null,
+                null,
+                null,
+                null,
+                "<CAGx7AOR+VZB-T2Yc-_Q41Kyt5KE_WTBhABk49zqnqKmgJ99NEg@mail.gmail.com>",
+                null,
+                1673983165221,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0,
+                [0, 0, 6, 0],
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                "s:137b607841be323e|#msg-a:r9206449609684993976|0"
+              ],
+              "msg-a:r-5927579399657060923",
+              1,
+              null,
+              [1673983165226]
+            ]
+          ]
+        ]
+      ]
+    ]
+  ],
+  [1, 6277082, null, null, [null, 0], null, 1, null, ["^b"]],
+  [1673983126247, 1, 1673983165228, 0, 143],
+  2
+]

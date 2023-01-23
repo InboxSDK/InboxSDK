@@ -90,7 +90,12 @@ export default class Logger {
     })();
 
     if (this._isMaster && typeof document !== 'undefined') {
-      document.addEventListener('inboxSDKinjectedError', (event: any) => {
+      document.addEventListener('inboxSDKinjectedError', (event: unknown) => {
+        if (!(event instanceof CustomEvent && event?.detail)) {
+          this.error(new Error('Invalid inboxSDKinjectedError event'), event);
+          return;
+        }
+
         const detail = event.detail;
         this.error(
           Object.assign(new Error(detail.message), { stack: detail.stack }),
@@ -495,7 +500,7 @@ async function retrieveNewEventsAccessToken(): Promise<{
   expirationDate: number;
 }> {
   const { text } = await ajax({
-    url: 'https://www.inboxsdk.com/api/v2/events/oauth',
+    url: 'https://api.inboxsdk.com/api/v2/events/oauth',
     // Work around CORB for extensions that have permissions to inboxsdk.com
     XMLHttpRequest: getXMLHttpRequest(),
   });

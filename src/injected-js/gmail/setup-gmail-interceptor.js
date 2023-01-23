@@ -301,34 +301,6 @@ export function setupGmailInterceptorOnFrames(
           });
         },
         afterListeners(connection) {
-          try {
-            // log if request/response format changed
-            const willBeProcessed =
-              currentSendConnectionIDs.has(connection) ||
-              currentDraftSaveConnectionIDs.has(connection) ||
-              currentFirstDraftSaveConnectionIDs.has(connection);
-
-            if (
-              !willBeProcessed &&
-              connection.originalSendBody &&
-              connection.originalSendBody[0] === '['
-            ) {
-              logger.eventSdkPassive(
-                'connection.requestResponseFormatChanged',
-                {
-                  url: connection.url,
-                  request: connection.originalSendBody,
-                  response: connection.originalResponseText,
-                },
-                true
-              );
-            }
-          } catch (err) {
-            logger.eventSdkPassive('connection.requestResponseFormatChanged', {
-              error: err,
-            });
-          }
-
           if (
             currentSendConnectionIDs.has(connection) ||
             currentDraftSaveConnectionIDs.has(connection) ||
@@ -350,19 +322,15 @@ export function setupGmailInterceptorOnFrames(
             }
 
             try {
-              const responseParsed = parseComposeResponseBody(
+              const responsesParsed = parseComposeResponseBody(
                 connection.originalResponseText
               );
 
-              if (responseParsed) {
-                logger.eventSdkPassive(
-                  'connection.requestResponseParsed',
-                  {
-                    responseParsed,
-                  },
-                  true
-                );
-
+              for (const responseParsed of responsesParsed) {
+                // If we're sending a draft, we only care about the response related to the draft we're sending.
+                if (draftID && !responseParsed.messageId.endsWith(draftID)) {
+                  continue;
+                }
                 if (
                   responseParsed.type === 'FIRST_DRAFT_SAVE' ||
                   responseParsed.type === 'DRAFT_SAVE'

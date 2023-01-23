@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* @flow */
 
 import Kefir from 'kefir';
@@ -11,6 +13,7 @@ jest.mock('../injected-logger', () => {
       console.error(err, details);
       throw err;
     },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     eventSdkPassive(name: string, details?: any) {},
   };
 });
@@ -41,11 +44,17 @@ const jsServer = new MockServer();
 const jsFrame = { XMLHttpRequest: jsServer.XMLHttpRequest };
 
 beforeAll(() => {
-  setupGmailInterceptorOnFrames(mainFrame, jsFrame);
+  setupGmailInterceptorOnFrames(
+    mainFrame as Partial<Window> as Window,
+    jsFrame as Partial<Window> as Window
+  );
 });
 
 const ajaxInterceptEvents: Array<Object> = [];
-Kefir.fromEvents(document, 'inboxSDKajaxIntercept').onValue((event) => {
+Kefir.fromEvents<{ detail: any }, unknown>(
+  document,
+  'inboxSDKajaxIntercept'
+).onValue((event) => {
   ajaxInterceptEvents.push(event.detail);
 });
 
@@ -593,3 +602,215 @@ test('cv:2022-09-09 reply draft 2 sent', async () => {
     },
   ]);
 });
+
+{
+  const pathPrefix = '../../../test/data/';
+
+  const replyDraftTests = [
+    {
+      filePrefix: '2022-09-09-cvOnReplyDraftSave_',
+      expectedEvents: [
+        {
+          draftID: 'r-8480821811518170896',
+          messageID: 'msg-a:r-8480821811518170896',
+          oldMessageID: '183b3f46fdd71d6d',
+          oldThreadID: '183b2a348d698d42',
+          rfcID:
+            '<CAF9MChDSw8XuwCujg22rOq_GWvVnox18mduqhVU8n=Nt+fF+tA@mail.gmail.com>',
+          threadID: 'thread-f:1746035685735370050',
+          type: 'emailDraftReceived',
+        },
+      ],
+    },
+    {
+      filePrefix: '2022-09-09-cvOnReplyDraftUpdate_',
+      expectedEvents: [
+        {
+          draftID: 'r-8480821811518170896',
+          messageID: 'msg-a:r-8480821811518170896',
+          oldMessageID: '183b3f64980e72a8',
+          oldThreadID: '183b2a348d698d42',
+          rfcID:
+            '<CAF9MChCxDJ-7o=k2qnsD_JAMz9hBwU6uSO7TpeyeznRSQVywqg@mail.gmail.com>',
+          threadID: 'thread-f:1746035685735370050',
+          type: 'emailDraftReceived',
+        },
+      ],
+    },
+    {
+      filePrefix: '2022-09-09-cvOnDraftSaveBatched_',
+      expectedEvents: [
+        {
+          draftID: 'r171568093711739042',
+          messageID: 'msg-a:r171568093711739042',
+          oldMessageID: '185ac55f9930b088',
+          oldThreadID: '185ac55f9930b088',
+          rfcID:
+            '<CAGx7AOSwKKeFbDNBTd+xXtNK4QTXAcVC7Avr2z5Vr8sK=FM7Ww@mail.gmail.com>',
+          threadID: 'thread-a:r3299110183418933622',
+          type: 'emailDraftReceived',
+        },
+      ],
+    },
+    {
+      filePrefix: '2022-09-09-cvOnDraftUpdate_2_',
+      expectedEvents: [
+        {
+          draftID: 'r-9122305152175603305',
+          messageID: 'msg-a:r-9122305152175603305',
+          oldMessageID: '183fcbefc9f0d769',
+          oldThreadID: '183fcbe5afa22467',
+          rfcID:
+            '\u003cCAGx7AORFVLcZ_3sE54WvX3+bb6CkVrds8Nu27Je+atJRLy8DsQ@mail.gmail.com\u003e',
+          threadID: 'thread-a:r-1030145228305804508',
+          type: 'emailDraftReceived',
+        },
+      ],
+    },
+    {
+      filePrefix: '2022-09-09-cvOnSend_3_',
+      expectedEvents: [
+        { type: 'emailSending', draftID: 'r-329565169840451245' },
+        {
+          draftID: 'r-329565169840451245',
+          messageID: 'msg-a:r-329565169840451245',
+          oldMessageID: '183fcc5cc03fea78',
+          oldThreadID: '183fcc554fa6f2dd',
+          rfcID:
+            '\u003cCAGx7AOQiYaKpc6Zb5\u003d+mRqU3K-WF+G3KxmmaYKdzCisHqSaRAQ@mail.gmail.com\u003e',
+          threadID: 'thread-a:r-8891700334768116294',
+          type: 'emailSent',
+        },
+      ],
+    },
+    {
+      // parsing should prioritize SEND to DRAFT_SAVE action
+      filePrefix: '2022-09-09-cvOnSend_4_',
+      expectedEvents: [
+        { type: 'emailSending', draftID: 'r-329565169840451245' },
+        {
+          draftID: 'r-329565169840451245',
+          messageID: 'msg-a:r-329565169840451245',
+          oldMessageID: '183fcc5cc03fea78',
+          oldThreadID: '183fcc554fa6f2dd',
+          rfcID:
+            '\u003cCAGx7AOQiYaKpc6Zb5\u003d+mRqU3K-WF+G3KxmmaYKdzCisHqSaRAQ@mail.gmail.com\u003e',
+          threadID: 'thread-a:r-8891700334768116294',
+          type: 'emailSent',
+        },
+      ],
+    },
+    {
+      filePrefix: '2022-09-09-cvOnReplyDraftUpdate_2_',
+      expectedEvents: [
+        {
+          threadID: 'thread-a:r-1030145228305804508',
+          messageID: 'msg-a:r7241715802500133864',
+          draftID: 'r7241715802500133864',
+          oldMessageID: '183fcc0bcf2875d8',
+          oldThreadID: '183fcbe5afa22467',
+          rfcID:
+            '\u003cCAGx7AOT3v9AK8-PdxP+zGJwCXOYsDxLm8BF2QvufxFK_BtO5WA@mail.gmail.com\u003e',
+          type: 'emailDraftReceived',
+        },
+      ],
+    },
+    {
+      filePrefix: '2022-09-09-cvOnReplyDraftUpdate_3_',
+      expectedEvents: [
+        {
+          threadID: 'thread-a:r-2602384757092328293',
+          messageID: 'msg-a:r9206449609684993976',
+          draftID: 'r9206449609684993976',
+          oldMessageID: '185c12c05154feaa',
+          oldThreadID: '185c12a5072cb2fa',
+          rfcID:
+            '\u003cCAGx7AORVTxnFB3C_dyNbFNCCJMs_HQ0Chd6mq+24NERJrYSrYw@mail.gmail.com\u003e',
+          type: 'emailDraftReceived',
+        },
+      ],
+    },
+    {
+      filePrefix: '2022-09-09-cvOnReplySend_3_',
+      expectedEvents: [
+        { type: 'emailSending', draftID: 'r7241715802500133864' },
+        {
+          threadID: 'thread-a:r-1030145228305804508',
+          messageID: 'msg-a:r7241715802500133864',
+          draftID: 'r7241715802500133864',
+          oldMessageID: '183fcc3c75f0255e',
+          oldThreadID: '183fcbe5afa22467',
+          rfcID:
+            '\u003cCAGx7AOR_\u003dmWqD-p+Di3YbkA+zKP5Hk57LOhMUY5J1-\u003drCF+Vmg@mail.gmail.com\u003e',
+          type: 'emailSent',
+        },
+      ],
+    },
+    {
+      filePrefix: '2022-09-09-cvOnReplySend_4_',
+      expectedEvents: [
+        { type: 'emailSending', draftID: 'r9206449609684993976' },
+        {
+          threadID: 'thread-a:r-2602384757092328293',
+          messageID: 'msg-a:r9206449609684993976',
+          draftID: 'r9206449609684993976',
+          oldMessageID: '185c13432b3eb04b',
+          oldThreadID: '185c12a5072cb2fa',
+          rfcID:
+            '\u003cCAGx7AOREcWgHg9fjp0oT3hV4kt_6Wu6O0W9-hzuFuv2jbQdbVw@mail.gmail.com\u003e',
+          type: 'emailSent',
+        },
+      ],
+    },
+    {
+      filePrefix: '2022-09-09-cvOnReplySend_5_',
+      expectedEvents: [
+        { type: 'emailSending', draftID: 'r5645180764593433440' },
+        {
+          threadID: 'thread-a:r-7504980498209780070',
+          messageID: 'msg-a:r5645180764593433440',
+          draftID: 'r5645180764593433440',
+          oldMessageID: '185c153a4f028cb5',
+          oldThreadID: '185c1536996a61dc',
+          rfcID:
+            '\u003cCAGx7AOTGUP2_JUYoZioTKJLFOx1L0-Rhuzd2h9KwOgDr2ZXrWw@mail.gmail.com\u003e',
+          type: 'emailSent',
+        },
+      ],
+    },
+  ];
+
+  let cIndex = 100;
+  for (const { filePrefix, expectedEvents } of replyDraftTests) {
+    const path = `https://mail.google.com/sync/u/0/i/s?hl=en&c=${cIndex++}&rt=r&pt=ji`;
+
+    const responseData = require(pathPrefix + filePrefix + 'response.json');
+    const requestData = JSON.stringify(
+      require(pathPrefix + filePrefix + 'request.json')
+    );
+
+    mainServer.respondWith(
+      {
+        method: 'POST',
+        path,
+      },
+      {
+        status: 200,
+        response: JSON.stringify(responseData),
+      }
+    );
+
+    test(`${filePrefix} sent`, async () => {
+      const response = await ajax(mainFrame, {
+        method: 'POST',
+        url: path,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: requestData,
+      });
+      expect(JSON.parse(response.text)).toEqual(responseData);
+      expect(ajaxInterceptEvents).toEqual(expectedEvents);
+    });
+  }
+}

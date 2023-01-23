@@ -12,23 +12,8 @@ export function injectScriptEmbedded() {
     'utf8'
   );
 
-  let disableSourceMappingURL = true;
-  try {
-    disableSourceMappingURL =
-      localStorage.getItem('inboxsdk__enable_sourcemap') !== 'true';
-  } catch (err) {
-    console.error(err); //eslint-disable-line no-console
-  }
-
   const codeParts: string[] = [];
-  if (disableSourceMappingURL) {
-    // Don't remove a data: URI sourcemap (used in dev)
-    codeParts.push(
-      originalCode.replace(/\/\/# sourceMappingURL=(?!data:)[^\n]*\n?$/, '')
-    );
-  } else {
-    codeParts.push(originalCode);
-  }
+  codeParts.push(originalCode);
   codeParts.push('\n//# sourceURL=' + url + '\n');
 
   const codeToRun = codeParts.join('');

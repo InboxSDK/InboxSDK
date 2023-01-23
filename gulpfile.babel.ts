@@ -107,7 +107,8 @@ async function setupExamples() {
 }
 
 gulp.task('noop', () => {
-  // noop
+  // This task exists so we can run `yarn gulp noop` to check that this
+  // script loads (and yarn-deps-check passes) without any side effects.
 });
 
 async function getVersion(): Promise<string> {
@@ -166,8 +167,6 @@ interface BrowserifyTaskOptions {
   // hotPort?: number;
   disableMinification?: boolean;
   afterBuild?: () => Promise<void>;
-  noSourceMapComment?: boolean;
-  sourceMappingURLPrefix?: string;
   writeToPackagesCore?: boolean;
 }
 
@@ -232,12 +231,7 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
           })
         )
       )
-      .pipe(sourcemaps.write, args.production ? '.' : null, {
-        // don't include sourcemap comment in the inboxsdk.js file that we
-        // distribute to developers since it'd always be broken.
-        addComment: !options.noSourceMapComment,
-        sourceMappingURLPrefix: options.sourceMappingURLPrefix,
-      });
+      .pipe(sourcemaps.write, args.production ? '.' : null);
 
     const bundle = bundler.bundle();
     let result = bundle
@@ -302,7 +296,6 @@ gulp.task('pageWorld', () => {
     entry: './src/injected-js/main',
     destName: 'pageWorld.js',
     // hotPort: 3142,
-    sourceMappingURLPrefix: 'https://www.inboxsdk.com/build/',
     writeToPackagesCore: true,
   });
 });
@@ -326,7 +319,6 @@ if (args.remote) {
       standalone: 'InboxSDK',
       disableMinification: true,
       afterBuild: setupExamples,
-      noSourceMapComment: true,
     });
   });
   gulp.task(
@@ -351,7 +343,6 @@ if (args.remote) {
         standalone: 'InboxSDK',
         // hotPort: 3140,
         afterBuild: setupExamples,
-        noSourceMapComment: Boolean(args.production),
       });
     })
   );
@@ -368,7 +359,6 @@ if (args.remote) {
       standalone: 'InboxSDK',
       // hotPort: 3140,
       afterBuild: setupExamples,
-      noSourceMapComment: Boolean(args.production),
       writeToPackagesCore: true,
     });
   });

@@ -1,12 +1,44 @@
-[**InboxSDK** - Main Site](https://www.inboxsdk.com/)
+# [InboxSDK](https://www.inboxsdk.com) &middot; [![GitHub license](https://shields.io/badge/license-Apache--2.0-blue.svg)](https://github.com/InboxSDK/InboxSDK/blob/main/LICENSE-APACHE.txt) [![GitHub license](https://shields.io/badge/license-MIT-green.svg)](https://github.com/InboxSDK/InboxSDK/blob/main/LICENSE-MIT.txt) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/inboxSDK/inboxsdk#contribution-guidelines)
+
+InboxSDK is a JavaScript library for building apps inside of Gmail with browser extensions.
+
+- **No DOM Hacking**: exposes a high level, declarative API and handles all the DOM manipulation in a performant way
+- **Handles edge cases**: multiple inboxes, conversation mode on/off, personal vs workspace, preview pane, fullscreen compose, popouts & themes are all handled
+- **Constant updates**: new versions released as Gmail updates (often before their changes are fully rolled out)
 
 # Documentation
 
-https://inboxsdk.github.io/inboxsdk-docs/
+The [full docs site](https://inboxsdk.github.io/inboxsdk-docs/) and [relevant repo](https://github.com/InboxSDK/inboxsdk-docs).
 
-[Original mailing list](https://groups.google.com/g/inboxsdk/) (inactive, superseded by the Issues tracker here)
+# Installation
+
+Check out the [Quickstart](https://inboxsdk.github.io/inboxsdk-docs/#quick-start) in the docs, but basic summary:
+
+- Use the `@inboxsdk/core` package on [npm](https://www.npmjs.com/package/@inboxsdk/core)
+- Set up the project like the [example extension](https://github.com/InboxSDK/hello-world).
+- [Generate](https://www.inboxsdk.com/register) an app id
 
 # Usage
+
+The most basic example of adding a button to a Gmail compose window:
+
+```javascript
+import * as InboxSDK from '@inboxsdk/core';
+
+InboxSDK.load(2, 'YOUR_APP_ID_HERE').then((sdk) => {
+  // the SDK has been loaded, now do something with it!
+  sdk.Compose.registerComposeViewHandler((composeView) => {
+    // a compose view has come into existence, do something with it!
+    composeView.addButton({
+      title: 'My Nifty Button!',
+      iconUrl: 'https://example.com/foo.png',
+      onClick(event) {
+        event.composeView.insertTextIntoBodyAtCursor('Hello World!');
+      },
+    });
+  });
+});
+```
 
 See https://github.com/InboxSDK/hello-world for an example extension using the InboxSDK.
 
@@ -93,8 +125,6 @@ which runs the code on all known versions of the HTML. (Ideally, the unit test
 should even work on the censored HTML directly from an error report! Maybe in
 the future for specific errors, we could automate the process of taking the censored HTML from an error report and creating a new failing test case using
 it.)
-
----
 
 # Build Options
 

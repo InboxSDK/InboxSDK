@@ -187,11 +187,37 @@ class GmailThreadView {
     return sidebar.addThreadSidebarContentPanel(descriptor, this);
   }
 
+  _subjectContainerSelectors = {
+    '2022_10_21': '.a98.iY > .nH',
+    '2022_10_12': '.PeIF1d > .nH',
+    '2018': '.if > .nH',
+  };
+
   addNoticeBar(): SimpleElementView {
     const el = document.createElement('div');
     el.className = idMap('thread_noticeBar');
-    const subjectContainer = this._element.querySelector('.if > .nH');
+    let version;
+    let subjectContainer;
+
+    for (const [currentVersion, selector] of Object.entries(
+      this._subjectContainerSelectors
+    )) {
+      // Flow should be able to infer selector to be a string,
+      // Typescript can. Remove this when ported.
+      const el = this._element.querySelector((selector: any));
+      if (!el) {
+        continue;
+      }
+
+      version = currentVersion;
+      subjectContainer = el;
+      break;
+    }
+
     if (!subjectContainer) throw new Error('Failed to find subject container');
+    this._driver.getLogger().eventSdkPassive('addNoticeBar subjectContainer', {
+      version,
+    });
     subjectContainer.insertAdjacentElement('afterend', el);
     const view = new SimpleElementView(el);
 
@@ -444,9 +470,25 @@ class GmailThreadView {
     var subjectElement = this._element.querySelector('.ha h2');
     if (!subjectElement) {
       return '';
-    } else {
-      return subjectElement.textContent;
     }
+
+    if (subjectElement.querySelector('img[data-emoji]')) {
+      return Array.from(subjectElement.childNodes)
+        .map((c) => {
+          if (c instanceof HTMLElement && c.nodeName === 'IMG') {
+            const maybeEmoji = c.getAttribute('data-emoji');
+            return maybeEmoji;
+          }
+
+          if (c.nodeName === '#text') {
+            return (c: any).wholeText;
+          }
+        })
+        .filter((x) => x != null)
+        .join('');
+    }
+
+    return subjectElement.textContent;
   }
 
   getInternalID(): string {
@@ -634,10 +676,31 @@ class GmailThreadView {
     if (
       (toolbarContainerElement: any).parentElement.getAttribute('role') ===
         'main' &&
-      (toolbarContainerElement: any).parentElement.querySelector('.if') &&
-      (toolbarContainerElement: any).parentElement.querySelector('.if')
-        .parentElement === this._element
+      (toolbarContainerElement: any).parentElement.querySelector(
+        '.if, .PeIF1d, .a98.iY'
+      ) &&
+      (toolbarContainerElement: any).parentElement.querySelector(
+        '.if, .PeIF1d, .a98.iY'
+      ).parentElement === this._element
     ) {
+      let version = '2018';
+
+      if (
+        (toolbarContainerElement: any).parentElement.querySelector('.a98.iY')
+      ) {
+        version = '2022-10-20';
+      } else if (
+        (toolbarContainerElement: any).parentElement.querySelector('.PeIF1d')
+      ) {
+        version = '2022-10-12';
+      }
+
+      this._driver
+        .getLogger()
+        .eventSdkPassive('gmailThreadView_isToolbarContainerRelevant', {
+          version,
+        });
+
       return true;
     }
 
