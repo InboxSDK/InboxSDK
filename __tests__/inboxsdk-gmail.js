@@ -1,8 +1,9 @@
 /* @flow */
-
-jest.mock('regenerator-runtime/runtime.js', () =>
-  require('../overrides/node_modules/regenerator-runtime/runtime.js')
-);
+Object.defineProperty(globalThis, 'regeneratorRuntime', {
+  set(x) {
+    console.error(new Error('something set the global'));
+  },
+});
 
 import MockMutationObserver from '../test/lib/mock-mutation-observer';
 import _ from 'lodash';

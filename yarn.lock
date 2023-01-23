@@ -478,18 +478,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-export-default-from@npm:^7.18.10":
-  version: 7.18.10
-  resolution: "@babel/plugin-proposal-export-default-from@npm:7.18.10"
-  dependencies:
-    "@babel/helper-plugin-utils": ^7.18.9
-    "@babel/plugin-syntax-export-default-from": ^7.18.6
-  peerDependencies:
-    "@babel/core": ^7.0.0-0
-  checksum: 2a12387e095ccd02a1560e5dd40812a83befe581d319685ae2a95f0650a4500381c1d9c710e6e29b34a1b053f9632ee2d3827b937e1cc5c9d2555280da22df53
-  languageName: node
-  linkType: hard
-
 "@babel/plugin-proposal-export-namespace-from@npm:^7.18.9":
   version: 7.18.9
   resolution: "@babel/plugin-proposal-export-namespace-from@npm:7.18.9"
@@ -550,7 +538,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/plugin-proposal-object-rest-spread@npm:^7.18.9, @babel/plugin-proposal-object-rest-spread@npm:^7.20.2":
+"@babel/plugin-proposal-object-rest-spread@npm:^7.20.2":
   version: 7.20.7
   resolution: "@babel/plugin-proposal-object-rest-spread@npm:7.20.7"
   dependencies:
@@ -680,17 +668,6 @@ __metadata:
   peerDependencies:
     "@babel/core": ^7.0.0-0
   checksum: ce307af83cf433d4ec42932329fad25fa73138ab39c7436882ea28742e1c0066626d224e0ad2988724c82644e41601cef607b36194f695cb78a1fcdc959637bd
-  languageName: node
-  linkType: hard
-
-"@babel/plugin-syntax-export-default-from@npm:^7.18.6":
-  version: 7.18.6
-  resolution: "@babel/plugin-syntax-export-default-from@npm:7.18.6"
-  dependencies:
-    "@babel/helper-plugin-utils": ^7.18.6
-  peerDependencies:
-    "@babel/core": ^7.0.0-0
-  checksum: 4258156553d825abb2ebac920eae6837087b485eb8e0011e05ad1e57004a03441335325feb18185ffbfa0c33a340673e7ab79549080ff2beb4607f88936fedf2
   languageName: node
   linkType: hard
 
@@ -7264,12 +7241,6 @@ __metadata:
     "@babel/cli": ^7.19.3
     "@babel/core": ^7.19.3
     "@babel/node": ^7.19.1
-    "@babel/plugin-proposal-class-properties": ^7.18.6
-    "@babel/plugin-proposal-export-default-from": ^7.18.10
-    "@babel/plugin-proposal-export-namespace-from": ^7.18.9
-    "@babel/plugin-proposal-nullish-coalescing-operator": ^7.18.6
-    "@babel/plugin-proposal-object-rest-spread": ^7.18.9
-    "@babel/plugin-proposal-optional-chaining": ^7.18.9
     "@babel/plugin-transform-runtime": ^7.19.1
     "@babel/preset-env": ^7.19.3
     "@babel/preset-flow": ^7.18.6
