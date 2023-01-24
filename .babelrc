@@ -14,7 +14,7 @@
       "presets": ["@babel/preset-typescript"]
     },
     {
-      "test": ["**/*.js"],
+      "test": ["**/*.js", "**/*.js.flow"],
       "presets": ["@babel/preset-flow"],
       "plugins": []
     }

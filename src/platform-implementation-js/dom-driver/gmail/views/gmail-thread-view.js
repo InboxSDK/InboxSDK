@@ -1,5 +1,4 @@
 /* @flow */
-
 import constant from 'lodash/constant';
 import asap from 'asap';
 import delay from 'pdelay';
@@ -190,7 +189,7 @@ class GmailThreadView {
   _subjectContainerSelectors = {
     '2022_10_21': '.a98.iY > .nH',
     '2022_10_12': '.PeIF1d > .nH',
-    '2018': '.if > .nH',
+    2018: '.if > .nH',
   };
 
   addNoticeBar(): SimpleElementView {

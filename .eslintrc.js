@@ -1,20 +1,19 @@
 module.exports = {
   root: true,
-  parser: 'babel-eslint',
+  parser: '@babel/eslint-parser',
   env: {
     browser: true,
     node: true,
-    es6: true,
+    es2022: true,
   },
   extends: [
     'eslint:recommended',
     'plugin:react/recommended',
-    'plugin:no-dupe-class-fields/recommended',
     'plugin:@typescript-eslint/eslint-recommended',
   ],
   parserOptions: {
+    babelOptions: { configFile: './.babelrc' },
     ecmaFeatures: {
-      experimentalObjectRestSpread: true,
       jsx: true,
     },
     sourceType: 'module',
