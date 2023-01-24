@@ -14,3 +14,12 @@ yarn-debug.log
 yarn-error.log
 /packages/core/inboxsdk.js*
 /packages/core/pageWorld.js*
+
+# Yarn without zero installs
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions

@@ -7,3 +7,5 @@
 *.snap
 /packages/core/inboxsdk.js*
 /packages/core/pageWorld.js*
+.pnp.*
+.yarn/*

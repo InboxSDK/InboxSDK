@@ -6,11 +6,7 @@
       {
         "corejs": 2
       }
-    ],
-    "@babel/plugin-proposal-class-properties",
-    "@babel/plugin-proposal-object-rest-spread",
-    "@babel/plugin-proposal-export-namespace-from",
-    "@babel/plugin-proposal-export-default-from"
+    ]
   ],
   "overrides": [
     {
@@ -20,10 +16,7 @@
     {
       "test": ["**/*.js"],
       "presets": ["@babel/preset-flow"],
-      "plugins": [
-        "@babel/plugin-proposal-optional-chaining",
-        "@babel/plugin-proposal-nullish-coalescing-operator"
-      ]
+      "plugins": []
     }
   ]
 }

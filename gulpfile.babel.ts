@@ -1,7 +1,5 @@
 /* eslint-disable no-console */
 
-import 'yarn-deps-check';
-
 import fs from 'fs';
 const packageJson = JSON.parse(
   fs.readFileSync(__dirname + '/package.json', 'utf8')

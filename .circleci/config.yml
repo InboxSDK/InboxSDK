@@ -22,8 +22,12 @@ jobs:
             - ~/.config/yarn/global/
             - ~/.cache
       - run:
-          name: Unit Tests
+          name: Lint and Typecheck
           command: yarn test
+      - run:
+          name: Unit Tests
+          command: yarn jest --detectOpenHandles
+
   integration:
     working_directory: ~/StreakYC/GmailSDK
     parallelism: 1
