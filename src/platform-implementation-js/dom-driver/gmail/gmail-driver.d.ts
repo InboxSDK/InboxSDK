@@ -61,6 +61,7 @@ export default class GmailDriver implements Driver {
   >;
   public registerThreadButton(options: any): () => void;
   public addNavItem(appId: string, navItemDescriptor: any): any;
+  public addAppMenuItem(/* TODO */): any;
   public addSupportItem(
     supportItemDescriptor: SupportItemDescriptor
   ): GmailSupportItemView;
