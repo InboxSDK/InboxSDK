@@ -17,7 +17,7 @@ type MessageEvents = {
 export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<MessageEvents>) {
   #driver;
   #destroyed = false;
-  #gmailView?: GmailAppMenuItemView;
+  #gmailViewPromise: Promise<GmailAppMenuItemView>;
 
   constructor(
     appId: string,
@@ -32,27 +32,31 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       menuItemDescriptor
     );
 
+    this.#gmailViewPromise = gmailAppMenuItemView;
+
     gmailAppMenuItemView.then((gmailView) => {
       if (this.#destroyed || !gmailView) {
         return; //we have been removed already
       }
-      // TODO the nav item stores promise instead, should we do the same?
-      this.#gmailView = gmailView;
+      // add callbacks and listeners here
     });
   }
 
   addCollapsiblePanel(
     panelDescriptor: AppMenuItemPanelDescriptor
-  ): CollapsiblePanelView {}
+  ): CollapsiblePanelView {
+    return {} as any;
+  }
 
-  update(menuItemDescriptor: AppMenuItemDescriptor) {
-    this.#gmailView!.menuItemDescriptor = menuItemDescriptor;
+  async update(menuItemDescriptor: AppMenuItemDescriptor) {
+    const gmailView = await this.#gmailViewPromise;
+    gmailView.menuItemDescriptor = menuItemDescriptor;
   }
 
   destroy() {
     if (this.#destroyed) return;
     this.#destroyed = true;
     this.emit('destroy');
-    this.#gmailView?.destroy();
+    this.#gmailViewPromise.then((gmailView) => gmailView.destroy());
   }
 }

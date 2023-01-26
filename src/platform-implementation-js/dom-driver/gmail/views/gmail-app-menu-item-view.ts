@@ -1,5 +1,6 @@
 import { AppMenuItemDescriptor } from '../../../namespaces/app-menu';
 import GmailDriver from '../gmail-driver';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 export class GmailAppMenuItemView {
   #menuItemDescriptor: AppMenuItemDescriptor | undefined;
@@ -20,16 +21,29 @@ export class GmailAppMenuItemView {
 
   destroy() {
     this.element?.remove();
-    // TODO handle other shit
+    // TODO handle other stuff
   }
 
   #setupElement() {
     const element = document.createElement('div');
-    // TODO implement
+    element.classList.add('Xa');
+    element.innerHTML = `
+      <div class="V6 CL" aria-label="" role="link" tabindex="-1">
+        <span class="XS">
+        </span>
+      </div>
+      <div class="apW" role="heading" aria-level="2">Chat</div>
+    `.trim();
     return element;
   }
 
   #update() {
-    // TODO
+    const element = this.element;
+    if (!element || !this.#menuItemDescriptor) {
+      return;
+    }
+    const { name } = this.#menuItemDescriptor;
+    const headingElement = querySelector(element, '.apW');
+    headingElement.textContent = name;
   }
 }

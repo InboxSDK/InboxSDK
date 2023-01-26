@@ -1,6 +1,7 @@
 import { EventEmitter } from 'events';
 import * as Kefir from 'kefir';
 import TypedEmitter from 'typed-emitter';
+import AppMenu from '../../src/platform-implementation-js/namespaces/app-menu';
 
 export const LOADER_VERSION: string;
 export interface LoadScriptOptions {
@@ -36,6 +37,7 @@ export interface InboxSDK {
     ) => void;
   };
   NavMenu: NavMenu;
+  AppMenu: AppMenu;
   Router: Router;
   Widgets: Widgets;
   Toolbars: Toolbars;

@@ -5,7 +5,7 @@ export type AppMenuItemDescriptor = {
   name: string;
   iconElement: string;
   className?: string;
-  orderHint?: 2;
+  orderHint?: number;
   routeID?: string;
   routeParams?: {};
   // TBD
