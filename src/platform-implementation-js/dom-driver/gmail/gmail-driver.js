@@ -44,7 +44,7 @@ import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
 import type { GetDraftIdResult } from './gmail-driver/get-draft-id-for-message-id';
 import addNavItem from './gmail-driver/add-nav-item';
-import addAppMenuItem from './gmail-driver/add-app-menu-item';
+import { addAppMenuItem } from './gmail-driver/add-app-menu-item';
 import addSupportItem from './gmail-driver/add-support-item';
 import gotoView from './gmail-driver/goto-view';
 import showCustomThreadList from './gmail-driver/show-custom-thread-list';
@@ -640,8 +640,8 @@ class GmailDriver {
     return addNavItem(this, appId, navItemDescriptorPropertyStream);
   }
 
-  addAppMenuItem() {
-    return addAppMenuItem();
+  addAppMenuItem(appId: string, menuItemDescriptor: AppMenuItemDescriptor) {
+    return addAppMenuItem(this, appId, menuItemDescriptor);
   }
 
   addSupportItem(

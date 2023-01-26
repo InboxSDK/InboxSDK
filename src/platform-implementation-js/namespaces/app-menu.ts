@@ -1,3 +1,6 @@
+import type { Driver } from '../driver-interfaces/driver';
+import { AppMenuItemView } from '../views/app-menu-item-view';
+
 export type AppMenuItemDescriptor = {
   name: string;
   iconElement: string;
@@ -8,15 +11,15 @@ export type AppMenuItemDescriptor = {
   // TBD
 };
 
-type AppMenuItemView = {
-  addCollapsiblePanel: (
-    panelDescriptor: AppMenuItemPanelDescriptor
-  ) => CollapsiblePanelView;
-  update: (menuItemDescriptor: AppMenuItemDescriptor) => void;
-  destroy: () => void;
-  // typed-emitter
-  on: (event: 'click' | 'hover?') => void;
-};
+// type AppMenuItemView = {
+//   addCollapsiblePanel: (
+//     panelDescriptor: AppMenuItemPanelDescriptor
+//   ) => CollapsiblePanelView;
+//   update: (menuItemDescriptor: AppMenuItemDescriptor) => void;
+//   destroy: () => void;
+//   // typed-emitter
+//   on: (event: 'click' | 'hover?') => void;
+// };
 
 export type AppMenuItemPanelDescriptor = {
   contentElement: string;
@@ -38,12 +41,29 @@ export type CollapsiblePanelView = {
 };
 
 export default class AppMenu {
+  #appId;
+  #driver;
+  // #menuItemViews: AppMenuItemView[] = [];
+
+  constructor(appId: string, driver: Driver) {
+    this.#appId = appId;
+    this.#driver = driver;
+  }
+
   addMenuItem(menuItemDescriptor: AppMenuItemDescriptor): AppMenuItemView {
     // TODO: should we support the Observable being passed in
-    // AppMenuItemView
+
+    const navItemView = new AppMenuItemView(
+      this.#appId,
+      this.#driver,
+      menuItemDescriptor
+    );
+
+    // this.#menuItemViews.push(navItemView);
+    return navItemView;
   }
-  isShown(panelIndex: number) {
-    // TODO: use orderHint or panelIndex ?
-  }
+
+  isAppMenuBarShown() {}
+
   isCollapsiblePanelShown(panelIndex: number) {}
 }

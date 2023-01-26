@@ -183,6 +183,10 @@ const GmailElementGetter = {
     }
   },
 
+  getAppMenu() {
+    return document.querySelector('.aeN');
+  },
+
   getSeparateSectionNavItemMenuInjectionContainer(): HTMLElement | null {
     return document.querySelector('.aeN');
   },
