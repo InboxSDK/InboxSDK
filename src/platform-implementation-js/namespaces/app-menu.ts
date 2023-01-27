@@ -3,8 +3,9 @@ import { AppMenuItemView } from '../views/app-menu-item-view';
 
 export type AppMenuItemDescriptor = {
   name: string;
-  iconElement: string;
+  iconUrl: string;
   className?: string;
+  iconClassName?: string;
   orderHint?: number;
   routeID?: string;
   routeParams?: {};

@@ -24,53 +24,66 @@ export class GmailAppMenuItemView {
     // TODO handle other stuff
   }
 
+  #ELEMENT_CLASS = 'Xa inboxsdk__appMenuItem';
+  #ICON_ELEMENT_CLASS = 'V6 CL';
+  #HEADING_ELEMENT_CLASS = 'apW';
+
   #ICON_ELEMENT_SELECTOR = '.V6.CL';
+  #HEADING_ELEMENT_SELECTOR = '.apW';
 
   #setupElement() {
     const element = document.createElement('div');
-    element.classList.add('Xa', 'inboxsdk__appMenuItem');
+    element.className = this.#ELEMENT_CLASS;
     element.innerHTML = `
-      <div class="V6 CL" aria-label="" role="link" tabindex="-1">
-        <span class="XS">
-        </span>
-      </div>
-      <div class="apW" role="heading" aria-level="2">Chat</div>
+      <div class="${
+        this.#ICON_ELEMENT_CLASS
+      }" aria-label="//TODO" role="link" tabindex="-1"></div>
+      <div class="${
+        this.#HEADING_ELEMENT_CLASS
+      }" role="heading" aria-level="2"></div>
     `.trim();
     return element;
   }
 
   #update() {
     const element = this.element;
-    if (!element || !this.#menuItemDescriptor) {
-      return;
-    }
-    const { iconElement: icon, name } = this.#menuItemDescriptor;
-    const headingElement = querySelector(element, '.apW');
-    headingElement.textContent = name;
+    if (!element) return;
 
-    const existingIconContainerEl = querySelector(
+    element.className = `${this.#ELEMENT_CLASS} ${
+      this.#menuItemDescriptor?.className ?? ''
+    }`.trim();
+
+    this.#updateName(element);
+    this.#updateIcon(element);
+    this.#updateARIA(element);
+  }
+
+  #updateName(element: HTMLElement) {
+    const headingElement = querySelector(
       element,
-      this.#ICON_ELEMENT_SELECTOR
+      this.#HEADING_ELEMENT_SELECTOR
     );
-    // check for existing element
-    const existingIconEl = existingIconContainerEl.querySelector<HTMLElement>(
-      '[data-inboxsdk__icon="true"]'
-    );
+    headingElement.textContent = this.#menuItemDescriptor?.name ?? '';
+  }
 
-    if (existingIconEl) {
-      existingIconEl.innerHTML = icon;
-      return;
-    }
+  #updateIcon(element: HTMLElement) {
+    const iconContainerEl = querySelector(element, this.#ICON_ELEMENT_SELECTOR);
 
-    // create new element
-    const newElement = document.createElement('div');
-    newElement.innerHTML = icon;
-    newElement.dataset.inboxsdk__icon = 'true';
+    const backgroundImage = this.#menuItemDescriptor?.iconUrl
+      ? `url(${this.#menuItemDescriptor.iconUrl}`
+      : 'initial';
+    iconContainerEl.style.setProperty('--background-image', backgroundImage);
 
-    // https://stackoverflow.com/a/2007473/1924257
-    existingIconContainerEl.insertBefore(
-      newElement,
-      existingIconContainerEl.firstChild
+    iconContainerEl.className = `${this.#ICON_ELEMENT_CLASS} ${
+      this.#menuItemDescriptor?.iconClassName ?? ''
+    }`.trim();
+  }
+
+  #updateARIA(element: HTMLElement) {
+    const iconContainerEl = querySelector(element, this.#ICON_ELEMENT_SELECTOR);
+    iconContainerEl.setAttribute(
+      'aria-label',
+      this.#menuItemDescriptor?.name ?? ''
     );
   }
 }

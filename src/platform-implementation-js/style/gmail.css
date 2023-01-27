@@ -1666,11 +1666,8 @@ shows up on our elements preventing them from collapsing.
   visibility: visible;
 }
 
-.inboxsdk__appMenuItem .CL.V6 {
-  justify-content: center;
-}
-
 .inboxsdk__appMenuItem .CL.V6:before {
+  background-image: var(--background-image);
 }
 
 .inboxsdk__navItem_link {
