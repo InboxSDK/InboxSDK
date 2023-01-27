@@ -10,17 +10,17 @@ type MessageEvents = {
   destroy: () => void;
 };
 
+const ELEMENT_CLASS = 'Xa inboxsdk__appMenuItem' as const;
+const ICON_ELEMENT_CLASS = 'V6 CL' as const;
+const HEADING_ELEMENT_CLASS = 'apW' as const;
+
+const ICON_ELEMENT_SELECTOR = '.V6.CL' as const;
+const HEADING_ELEMENT_SELECTOR = '.apW' as const;
+
 export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventEmitter<MessageEvents>) {
   #menuItemDescriptor: AppMenuItemDescriptor | undefined;
   #element?: HTMLElement;
   #destroyed = false;
-
-  #ELEMENT_CLASS = 'Xa inboxsdk__appMenuItem';
-  #ICON_ELEMENT_CLASS = 'V6 CL';
-  #HEADING_ELEMENT_CLASS = 'apW';
-
-  #ICON_ELEMENT_SELECTOR = '.V6.CL';
-  #HEADING_ELEMENT_SELECTOR = '.apW';
 
   get element() {
     return this.#element;
@@ -31,7 +31,7 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     this.#update();
   }
 
-  constructor(driver: GmailDriver, appId: string) {
+  constructor(driver: GmailDriver, _appId: string) {
     super();
     this.#element = this.#setupElement();
 
@@ -49,14 +49,10 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
 
   #setupElement() {
     const element = document.createElement('div');
-    element.className = this.#ELEMENT_CLASS;
+    element.className = ELEMENT_CLASS;
     element.innerHTML = `
-      <div class="${
-        this.#ICON_ELEMENT_CLASS
-      }" aria-label="//TODO" role="link" tabindex="-1"></div>
-      <div class="${
-        this.#HEADING_ELEMENT_CLASS
-      }" role="heading" aria-level="2"></div>
+      <div class="${ICON_ELEMENT_CLASS}" aria-label="//TODO" role="link" tabindex="-1"></div>
+      <div class="${HEADING_ELEMENT_CLASS}" role="heading" aria-level="2"></div>
     `.trim();
     return element;
   }
@@ -65,7 +61,7 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     const element = this.element;
     if (!element) return;
 
-    element.className = `${this.#ELEMENT_CLASS} ${
+    element.className = `${ELEMENT_CLASS} ${
       this.#menuItemDescriptor?.className ?? ''
     }`.trim();
 
@@ -75,28 +71,25 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
   }
 
   #updateName(element: HTMLElement) {
-    const headingElement = querySelector(
-      element,
-      this.#HEADING_ELEMENT_SELECTOR
-    );
+    const headingElement = querySelector(element, HEADING_ELEMENT_SELECTOR);
     headingElement.textContent = this.#menuItemDescriptor?.name ?? '';
   }
 
   #updateIcon(element: HTMLElement) {
-    const iconContainerEl = querySelector(element, this.#ICON_ELEMENT_SELECTOR);
+    const iconContainerEl = querySelector(element, ICON_ELEMENT_SELECTOR);
 
     const backgroundImage = this.#menuItemDescriptor?.iconUrl
       ? `url(${this.#menuItemDescriptor.iconUrl}`
       : 'initial';
     iconContainerEl.style.setProperty('--background-image', backgroundImage);
 
-    iconContainerEl.className = `${this.#ICON_ELEMENT_CLASS} ${
+    iconContainerEl.className = `${ICON_ELEMENT_CLASS} ${
       this.#menuItemDescriptor?.iconClassName ?? ''
     }`.trim();
   }
 
   #updateARIA(element: HTMLElement) {
-    const iconContainerEl = querySelector(element, this.#ICON_ELEMENT_SELECTOR);
+    const iconContainerEl = querySelector(element, ICON_ELEMENT_SELECTOR);
     iconContainerEl.setAttribute(
       'aria-label',
       this.#menuItemDescriptor?.name ?? ''
