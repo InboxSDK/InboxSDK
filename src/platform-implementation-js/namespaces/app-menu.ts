@@ -7,6 +7,8 @@ export type AppMenuItemDescriptor = {
   className?: string;
   iconClassName?: string;
   insertIndex?: number;
+  onClick?: (e?: MouseEvent) => void | null;
+  onHover?: (e?: MouseEvent) => void | null;
   routeID?: string;
   routeParams?: {};
   // TBD

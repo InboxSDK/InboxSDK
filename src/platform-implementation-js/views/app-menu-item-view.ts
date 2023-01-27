@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import EventEmitter from '../lib/safe-event-emitter';
 import TypedEmitter from 'typed-emitter';
 import { GmailAppMenuItemView } from '../dom-driver/gmail/views/gmail-app-menu-item-view';
 import { Driver } from '../driver-interfaces/driver';
@@ -39,6 +39,9 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         return; //we have been removed already
       }
       // add callbacks and listeners here
+      gmailView.on('click', () => this.emit('click'));
+      gmailView.on('destroy', () => this.remove());
+      gmailView.on('hover', () => this.emit('hover'));
     });
   }
 
@@ -53,10 +56,10 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     gmailView.menuItemDescriptor = menuItemDescriptor;
   }
 
-  destroy() {
+  remove() {
     if (this.#destroyed) return;
     this.#destroyed = true;
     this.emit('destroy');
-    this.#gmailViewPromise.then((gmailView) => gmailView.destroy());
+    this.#gmailViewPromise.then((gmailView) => gmailView.remove());
   }
 }

@@ -1,10 +1,26 @@
 import { AppMenuItemDescriptor } from '../../../namespaces/app-menu';
 import GmailDriver from '../gmail-driver';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
+import TypedEventEmitter from 'typed-emitter';
+import { EventEmitter } from 'events';
 
-export class GmailAppMenuItemView {
+type MessageEvents = {
+  click: () => void;
+  hover: () => void;
+  destroy: () => void;
+};
+
+export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventEmitter<MessageEvents>) {
   #menuItemDescriptor: AppMenuItemDescriptor | undefined;
   #element?: HTMLElement;
+  #destroyed = false;
+
+  #ELEMENT_CLASS = 'Xa inboxsdk__appMenuItem';
+  #ICON_ELEMENT_CLASS = 'V6 CL';
+  #HEADING_ELEMENT_CLASS = 'apW';
+
+  #ICON_ELEMENT_SELECTOR = '.V6.CL';
+  #HEADING_ELEMENT_SELECTOR = '.apW';
 
   get element() {
     return this.#element;
@@ -16,20 +32,20 @@ export class GmailAppMenuItemView {
   }
 
   constructor(driver: GmailDriver, appId: string) {
+    super();
     this.#element = this.#setupElement();
+
+    driver.getStopper().onValue(() => this.remove());
+    this.#element.addEventListener('click', this.#onClick);
+    this.#element.addEventListener('mouseover', this.#onHover);
   }
 
-  destroy() {
+  remove() {
+    if (this.#destroyed) return;
+    this.#destroyed = true;
     this.element?.remove();
-    // TODO handle other stuff
+    this.emit('destroy');
   }
-
-  #ELEMENT_CLASS = 'Xa inboxsdk__appMenuItem';
-  #ICON_ELEMENT_CLASS = 'V6 CL';
-  #HEADING_ELEMENT_CLASS = 'apW';
-
-  #ICON_ELEMENT_SELECTOR = '.V6.CL';
-  #HEADING_ELEMENT_SELECTOR = '.apW';
 
   #setupElement() {
     const element = document.createElement('div');
@@ -85,5 +101,15 @@ export class GmailAppMenuItemView {
       'aria-label',
       this.#menuItemDescriptor?.name ?? ''
     );
+  }
+
+  #onClick(e: MouseEvent) {
+    this.emit('click');
+    this.#menuItemDescriptor?.onClick?.(e);
+  }
+
+  #onHover(e: MouseEvent) {
+    this.emit('hover');
+    this.#menuItemDescriptor?.onHover?.(e);
   }
 }
