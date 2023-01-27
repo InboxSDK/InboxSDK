@@ -11,6 +11,8 @@
 .*/node_modules/builtin-modules/.*
 .*/node_modules/spdx-.*/.*
 .*/node_modules/.*/\(test\|lib\|example\|samplejson\|tables\)/.*\.json
+# This was for the old inbox by gmail product that no longer exists
+srsrc/platform-implementation-js/dom-driver/inbox
 
 [libs]
 flow-libs/

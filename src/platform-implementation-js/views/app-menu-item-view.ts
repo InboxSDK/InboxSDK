@@ -39,6 +39,9 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         return; //we have been removed already
       }
       // add callbacks and listeners here
+      gmailView.on('click', () => this.emit('click'));
+      gmailView.on('destroy', () => this.destroy());
+      gmailView.on('hover', () => this.emit('hover'));
     });
   }
 
