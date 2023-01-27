@@ -57,6 +57,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     if (this.#destroyed) return;
     this.#destroyed = true;
     this.emit('destroy');
-    this.#gmailViewPromise.then((gmailView) => gmailView.destroy());
+    this.#gmailViewPromise.then((gmailView) => gmailView.remove());
   }
 }

@@ -1,10 +1,20 @@
 import { AppMenuItemDescriptor } from '../../../namespaces/app-menu';
 import GmailDriver from '../gmail-driver';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
+import TypedEventEmitter from 'typed-emitter';
+import { EventEmitter } from 'events';
 
-export class GmailAppMenuItemView {
+type MessageEvents = {
+  click: () => void;
+  destroy: () => void;
+};
+
+export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventEmitter<MessageEvents>) {
   #menuItemDescriptor: AppMenuItemDescriptor | undefined;
   #element?: HTMLElement;
+  #onClick: AppMenuItemDescriptor['onClick'];
+  readonly #MENU_ITEM_SELECTOR = '.inboxsdk__appMenuItem';
+  readonly #ICON_ELEMENT_SELECTOR = '.V6.CL';
 
   get element() {
     return this.#element;
@@ -16,19 +26,20 @@ export class GmailAppMenuItemView {
   }
 
   constructor(driver: GmailDriver, appId: string) {
+    super();
     this.#element = this.#setupElement();
+    driver.getStopper().onValue(this.remove.bind(this));
   }
 
-  destroy() {
+  remove() {
     this.element?.remove();
+    this.emit('destroy');
     // TODO handle other stuff
   }
 
-  #ICON_ELEMENT_SELECTOR = '.V6.CL';
-
   #setupElement() {
     const element = document.createElement('div');
-    element.classList.add('Xa', 'inboxsdk__appMenuItem');
+    element.classList.add('Xa', this.#MENU_ITEM_SELECTOR);
     element.innerHTML = `
       <div class="V6 CL" aria-label="" role="link" tabindex="-1">
         <span class="XS">
@@ -44,7 +55,7 @@ export class GmailAppMenuItemView {
     if (!element || !this.#menuItemDescriptor) {
       return;
     }
-    const { iconElement: icon, name } = this.#menuItemDescriptor;
+    const { iconElement: icon, name, onClick } = this.#menuItemDescriptor;
     const headingElement = querySelector(element, '.apW');
     headingElement.textContent = name;
 
@@ -52,9 +63,21 @@ export class GmailAppMenuItemView {
       element,
       this.#ICON_ELEMENT_SELECTOR
     );
+
+    if (this.#onClick) {
+      element.removeEventListener('click', this.#onClick);
+    }
+
+    this.#onClick = (e) => {
+      this.emit('click');
+      onClick?.(e);
+    };
+
+    existingIconContainerEl.addEventListener('click', this.#onClick);
+
     // check for existing element
     const existingIconEl = existingIconContainerEl.querySelector<HTMLElement>(
-      '[data-inboxsdk__icon="true"]'
+      '[data-inboxsdk__icon]'
     );
 
     if (existingIconEl) {
