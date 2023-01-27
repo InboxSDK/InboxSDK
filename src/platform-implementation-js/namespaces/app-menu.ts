@@ -6,7 +6,7 @@ export type AppMenuItemDescriptor = {
   iconUrl: string;
   className?: string;
   iconClassName?: string;
-  orderHint?: number;
+  insertIndex?: number;
   routeID?: string;
   routeParams?: {};
   // TBD

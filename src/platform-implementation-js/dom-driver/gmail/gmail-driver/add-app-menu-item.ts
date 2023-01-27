@@ -6,7 +6,6 @@ import GmailDriver from '../gmail-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import waitFor from '../../../lib/wait-for';
 import Logger from '../../../lib/logger';
-import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 
 export async function addAppMenuItem(
   driver: GmailDriver,
@@ -21,12 +20,16 @@ export async function addAppMenuItem(
   try {
     if (!appMenuInjectionContainer || !gmailAppMenuItemView.element) return;
 
-    insertElementInOrder(
-      appMenuInjectionContainer,
-      gmailAppMenuItemView.element
+    const siblingElement = menuItemDescriptor.insertIndex
+      ? appMenuInjectionContainer.childNodes[menuItemDescriptor.insertIndex] ??
+        null
+      : null;
+    appMenuInjectionContainer.insertBefore(
+      gmailAppMenuItemView.element,
+      siblingElement
     );
 
-    // Need this crap?
+    // Need this?
     // gmailNavItemView
     //   .getEventStream()
     //   .filter((event) => event.eventName === 'orderChanged')
