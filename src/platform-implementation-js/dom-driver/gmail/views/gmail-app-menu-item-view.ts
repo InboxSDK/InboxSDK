@@ -6,6 +6,7 @@ import { EventEmitter } from 'events';
 
 type MessageEvents = {
   click: () => void;
+  hover: () => void;
   destroy: () => void;
 };
 
@@ -13,6 +14,7 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
   #menuItemDescriptor: AppMenuItemDescriptor | undefined;
   #element?: HTMLElement;
   #onClick: AppMenuItemDescriptor['onClick'];
+  #onHover: AppMenuItemDescriptor['onHover'];
   readonly #MENU_ITEM_SELECTOR = '.inboxsdk__appMenuItem';
   readonly #ICON_ELEMENT_SELECTOR = '.V6.CL';
 
@@ -67,13 +69,22 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     if (this.#onClick) {
       element.removeEventListener('click', this.#onClick);
     }
+    if (this.#onHover) {
+      element.removeEventListener('mouseover', this.#onHover);
+    }
 
     this.#onClick = (e) => {
       this.emit('click');
       onClick?.(e);
     };
 
+    this.#onHover = (e) => {
+      this.emit('hover');
+      this.#onHover?.(e);
+    };
+
     existingIconContainerEl.addEventListener('click', this.#onClick);
+    existingIconContainerEl.addEventListener('mouseover', this.#onHover);
 
     // check for existing element
     const existingIconEl = existingIconContainerEl.querySelector<HTMLElement>(

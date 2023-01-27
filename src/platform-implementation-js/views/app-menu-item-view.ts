@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import EventEmitter from '../lib/safe-event-emitter';
 import TypedEmitter from 'typed-emitter';
 import { GmailAppMenuItemView } from '../dom-driver/gmail/views/gmail-app-menu-item-view';
 import { Driver } from '../driver-interfaces/driver';
