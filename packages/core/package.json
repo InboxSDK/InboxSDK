@@ -13,17 +13,17 @@
     "url": "https://github.com/InboxSDK/InboxSDK/issues"
   },
   "homepage": "https://www.inboxsdk.com/",
-  "private": false,
   "sideEffects": true,
+  "types": "src/inboxsdk.d.ts",
   "files": [
     "inboxsdk.js",
     "inboxsdk.js.map",
-    "inboxsdk.d.ts",
     "background.js",
     "background.d.ts",
     "pageWorld.js",
     "pageWorld.js.map",
-    "pageWorld.d.ts"
+    "pageWorld.d.ts",
+    "src"
   ],
   "dependencies": {
     "@types/kefir": "^3.8.6",

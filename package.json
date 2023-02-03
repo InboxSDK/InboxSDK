@@ -133,8 +133,9 @@
     "dir": "overrides"
   },
   "scripts": {
+    "typedefs": "tsc -p tsconfig.declarations.json",
     "prepare": "husky install",
-    "publish-npm": "gulp clean && gulp --production --minify && cd packages/core/ && yarn publish && git push --follow-tags",
+    "publish-npm": "gulp clean && gulp --production --minify && yarn workspace @inboxsdk/core npm publish && git push --follow-tags",
     "flow_check": "flow check",
     "lint": "eslint .",
     "lint-fix": "eslint . --ext js,jsx,ts,tsx,flow --fix",
@@ -148,5 +149,8 @@
     "**/*": "prettier --write --ignore-unknown"
   },
   "version": "0.7.25",
+  "workspaces": [
+    "packages/*"
+  ],
   "packageManager": "yarn@3.3.1"
 }

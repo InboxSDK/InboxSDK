@@ -14,6 +14,7 @@ yarn-debug.log
 yarn-error.log
 /packages/core/inboxsdk.js*
 /packages/core/pageWorld.js*
+/packages/core/src/
 
 # Yarn without zero installs
 .pnp.*

@@ -300,6 +300,14 @@ gulp.task('pageWorld', () => {
 
 gulp.task('clean', async () => {
   await fs.promises.rm('./dist', { force: true, recursive: true });
+  await fs.promises.rm('./packages/core/src', {
+    force: true,
+    recursive: true,
+  });
+  await fs.promises.rm('./packages/core/test', {
+    force: true,
+    recursive: true,
+  });
   for (const filename of [
     './packages/core/inboxsdk.js',
     './packages/core/pageWorld.js',
@@ -350,7 +358,14 @@ if (args.remote) {
   gulp.task('default', gulp.parallel('sdk'));
 } else {
   // standard npm non-remote bundle
-  gulp.task('sdk', () => {
+  gulp.task('sdk', async () => {
+    await exec('yarn typedefs');
+    const filename = 'inboxsdk';
+    await fs.promises.copyFile(
+      `./src/${filename}.d.ts`,
+      `./packages/core/src/${filename}.d.ts`
+    );
+
     return browserifyTask({
       entry: './src/inboxsdk-js/inboxsdk-NONREMOTE',
       destName: sdkFilename,
