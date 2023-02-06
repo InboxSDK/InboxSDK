@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "outDir": "packages/core/src",
+    "sourceMap": false,
+    "listEmittedFiles": true
+  },
+  "include": ["src"],
+  "exclude": ["**/*.test.ts", "**/*.test.js", "**/*.test.jsx"]
+}

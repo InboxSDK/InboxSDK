@@ -1621,6 +1621,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@inboxsdk/core@workspace:packages/core":
+  version: 0.0.0-use.local
+  resolution: "@inboxsdk/core@workspace:packages/core"
+  dependencies:
+    "@types/kefir": ^3.8.6
+    "@types/node": "*"
+    typed-emitter: ^2.1.0
+  languageName: unknown
+  linkType: soft
+
 "@istanbuljs/load-nyc-config@npm:^1.0.0":
   version: 1.1.0
   resolution: "@istanbuljs/load-nyc-config@npm:1.1.0"
@@ -2362,7 +2372,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/kefir@npm:^3.8.7":
+"@types/kefir@npm:^3.8.6, @types/kefir@npm:^3.8.7":
   version: 3.8.7
   resolution: "@types/kefir@npm:3.8.7"
   dependencies:
