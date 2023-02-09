@@ -189,6 +189,7 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
   })
     .transform(
       babelify.configure({
+        presets: ['@babel/preset-env'],
         plugins: [
           [
             'transform-inline-environment-variables',

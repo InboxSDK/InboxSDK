@@ -1,9 +1,5 @@
 /* @flow */
 
-jest.mock('@babel/runtime-corejs2/regenerator/index.js', () => {
-  return require('../overrides/node_modules/regenerator-runtime/runtime.js');
-});
-
 import MockMutationObserver from '../test/lib/mock-mutation-observer';
 import _ from 'lodash';
 
@@ -48,6 +44,8 @@ test('loads in gmail mock', () => {
           'inboxsdk__shared_style',
           '__inboxsdk_extensionSeenErrors',
           '__coverage__',
+          // https://github.com/zloirock/core-js/issues/726
+          '__core-js_shared__',
         ]
       ).map((x) => `window.${x}`);
       expect(newGlobals).toEqual([]);
