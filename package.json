@@ -73,7 +73,7 @@
     "gulp-if": "^2.0.0",
     "gulp-sourcemaps": "^2.1.1",
     "gulp-streamify": "^1.0.0",
-    "gulp-uglify": "^2.0.0",
+    "gulp-terser": "^2.1.0",
     "gulp-util": "^3.0.3",
     "http-server": "^0.10.0",
     "husky": "^7.0.4",

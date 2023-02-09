@@ -13,7 +13,7 @@ import watchify from 'watchify';
 import source from 'vinyl-source-stream';
 import streamify from 'gulp-streamify';
 import gulpif from 'gulp-if';
-import uglify from 'gulp-uglify';
+import terser from 'gulp-terser';
 import sourcemaps from 'gulp-sourcemaps';
 import stdio from 'stdio';
 import gutil from 'gulp-util';
@@ -189,7 +189,6 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
   })
     .transform(
       babelify.configure({
-        presets: ['@babel/preset-env'],
         plugins: [
           [
             'transform-inline-environment-variables',
@@ -218,18 +217,7 @@ async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
       )
       .pipe(sourcemaps.init, { loadMaps: true })
       .pipe(concat, destName)
-      .pipe(() =>
-        gulpif(
-          willMinify,
-          uglify({
-            // TODO check
-            // preserveComments: 'some',
-            mangle: {
-              reserved: ['Generator', 'GeneratorFunction'],
-            },
-          })
-        )
-      )
+      .pipe(() => gulpif(willMinify, terser()))
       .pipe(sourcemaps.write, args.production ? '.' : null);
 
     const bundle = bundler.bundle();
