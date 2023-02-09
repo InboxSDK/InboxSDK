@@ -48,6 +48,8 @@ test('loads in gmail mock', () => {
           'inboxsdk__shared_style',
           '__inboxsdk_extensionSeenErrors',
           '__coverage__',
+          // https://github.com/zloirock/core-js/issues/726
+          '__core-js_shared__',
         ]
       ).map((x) => `window.${x}`);
       expect(newGlobals).toEqual([]);

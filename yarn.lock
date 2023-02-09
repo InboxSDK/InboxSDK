@@ -1467,16 +1467,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime-corejs2@npm:^7.0.0, @babel/runtime-corejs2@npm:^7.19.2":
-  version: 7.20.13
-  resolution: "@babel/runtime-corejs2@npm:7.20.13"
-  dependencies:
-    core-js: ^2.6.12
-    regenerator-runtime: ^0.13.11
-  checksum: 86590da70a0dcafd8d7b1d92cb218675afe22dec3d68d0ee5d9757ba2160f49cd4c8b4c29f3aa92801cd419dfbc92adb5df5c83d63c6d95f70ad118428382a23
-  languageName: node
-  linkType: hard
-
 "@babel/runtime@npm:^7.0.0, @babel/runtime@npm:^7.1.2, @babel/runtime@npm:^7.4.5, @babel/runtime@npm:^7.8.4":
   version: 7.20.13
   resolution: "@babel/runtime@npm:7.20.13"
@@ -2411,7 +2401,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^10.11.0, @types/node@npm:^10.9.4":
+"@types/node@npm:^10.11.0":
   version: 10.17.60
   resolution: "@types/node@npm:10.17.60"
   checksum: 2cdb3a77d071ba8513e5e8306fa64bf50e3c3302390feeaeff1fd325dd25c8441369715dfc8e3701011a72fed5958c7dfa94eb9239a81b3c286caa4d97db6eef
@@ -4653,7 +4643,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:^2.4.0, core-js@npm:^2.6.12":
+"core-js@npm:^2.4.0":
   version: 2.6.12
   resolution: "core-js@npm:2.6.12"
   checksum: 44fa9934a85f8c78d61e0c8b7b22436330471ffe59ec5076fe7f324d6e8cf7f824b14b1c81ca73608b13bdb0fef035bd820989bf059767ad6fa13123bb8bd016
@@ -7483,7 +7473,6 @@ __metadata:
     "@babel/preset-react": ^7.18.6
     "@babel/preset-typescript": ^7.18.6
     "@babel/register": ^7.18.9
-    "@babel/runtime-corejs2": ^7.19.2
     "@macil/simple-base-converter": ^1.0.0
     "@types/asap": ^2.0.0
     "@types/babelify": ^7.3.6
@@ -7585,7 +7574,7 @@ __metadata:
     transducers.js: ^0.3.2
     typed-emitter: ^2.1.0
     typescript: ^4.9.4
-    ud: ^3.1.1
+    ud: ^3.3.1
     ud-kefir: ^2.0.1
     vinyl-source-stream: ^2.0.0
     watchify: ^4.0.0
@@ -13528,15 +13517,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ud@npm:^1.0.1 || ^2.0.0 || ^3.0.0, ud@npm:^3.1.1":
-  version: 3.3.0
-  resolution: "ud@npm:3.3.0"
+"ud@npm:^1.0.1 || ^2.0.0 || ^3.0.0, ud@npm:^3.3.1":
+  version: 3.3.1
+  resolution: "ud@npm:3.3.1"
   dependencies:
-    "@babel/runtime-corejs2": ^7.0.0
-    "@types/node": ^10.9.4
+    "@babel/runtime": ^7.0.0
+    "@types/node": ^18.11.18
     array-range: ^1.0.1
     zip-object: ^0.1.0
-  checksum: a2e748220c18668d5c90640e305c15f2058bbffe111e1cb258350a531b13f7f20c6cbabe4aa14cf144c6fe9f95440eb7dfd50566539c1c56713efe4ef9bdb7f9
+  checksum: c3bc4c563da693a7887068a133632b106aa3cbc31352b7fecad7f69b1a67a6f453da9d7a677cf3bee4b0e37557a44babc9f9612ef7612c2124f991f37e4b555f
   languageName: node
   linkType: hard
 

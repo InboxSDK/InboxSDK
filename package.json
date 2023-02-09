@@ -16,7 +16,6 @@
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.18.6",
     "@babel/register": "^7.18.9",
-    "@babel/runtime-corejs2": "^7.19.2",
     "@macil/simple-base-converter": "^1.0.0",
     "@types/asap": "^2.0.0",
     "@types/babelify": "^7.3.6",
@@ -118,7 +117,7 @@
     "transducers.js": "^0.3.2",
     "typed-emitter": "^2.1.0",
     "typescript": "^4.9.4",
-    "ud": "^3.1.1",
+    "ud": "^3.3.1",
     "ud-kefir": "^2.0.1",
     "vinyl-source-stream": "^2.0.0",
     "watchify": "^4.0.0"

@@ -12,7 +12,6 @@ module.exports = {
     'plugin:@typescript-eslint/eslint-recommended',
   ],
   parserOptions: {
-    babelOptions: { configFile: './.babelrc' },
     ecmaFeatures: {
       jsx: true,
     },
