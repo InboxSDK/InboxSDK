@@ -1,4 +1,7 @@
-declare module 'gulp-terser' {
-  const terser: any;
-  export default terser;
+declare module 'gulp-add-src' {
+  const addsrc: {
+    (filename: string): any;
+    prepend(filename: string): any;
+  };
+  export = addsrc;
 }
