@@ -1617,6 +1617,7 @@ __metadata:
   dependencies:
     "@types/kefir": ^3.8.6
     "@types/node": "*"
+    tag-tree: ^1.0.0
     typed-emitter: ^2.1.0
   languageName: unknown
   linkType: soft
