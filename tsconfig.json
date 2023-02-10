@@ -9,5 +9,6 @@
     "target": "ES2018",
     "moduleResolution": "node",
     "isolatedModules": true
-  }
+  },
+  "exclude": ["packages/core"]
 }

@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 
 import fs from 'fs';
+import path from 'path';
 const packageJson = JSON.parse(
   fs.readFileSync(__dirname + '/package.json', 'utf8')
 );
@@ -306,6 +307,22 @@ gulp.task('clean', async () => {
   }
 });
 
+/**
+ * Copy handwritten type definitions and plain js to a appease tsc in our mixed TS/flow setup.
+ */
+gulp.task('types', async () => {
+  const files = await fg(['./src/**/*.d.ts', './src/**/*.js'], {
+    onlyFiles: true,
+    ignore: ['packages/core'],
+  });
+  for (const f of files) {
+    const newPath = path.join('./packages/core', f);
+    await fs.promises.mkdir(path.dirname(newPath), { recursive: true });
+    await fs.promises.copyFile(f, newPath);
+  }
+  await exec('yarn typedefs');
+});
+
 if (args.remote) {
   gulp.task('sdk', () => {
     return browserifyTask({
@@ -344,17 +361,10 @@ if (args.remote) {
   gulp.task('remote', () => {
     throw new Error('No separate remote bundle in non-remote bundle mode');
   });
-  gulp.task('default', gulp.parallel('sdk'));
+  gulp.task('default', gulp.parallel('sdk', 'types'));
 } else {
   // standard npm non-remote bundle
   gulp.task('sdk', async () => {
-    await exec('yarn typedefs');
-    const filename = 'inboxsdk';
-    await fs.promises.copyFile(
-      `./src/${filename}.d.ts`,
-      `./packages/core/src/${filename}.d.ts`
-    );
-
     return browserifyTask({
       entry: './src/inboxsdk-js/inboxsdk-NONREMOTE',
       destName: sdkFilename,
@@ -367,7 +377,7 @@ if (args.remote) {
   gulp.task('remote', () => {
     throw new Error('No separate remote bundle in non-remote bundle mode');
   });
-  gulp.task('default', gulp.parallel('sdk', 'pageWorld'));
+  gulp.task('default', gulp.parallel('sdk', 'pageWorld', 'types'));
 }
 
 gulp.task(
