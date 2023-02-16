@@ -1142,17 +1142,17 @@ class GmailComposeView {
     const endDrag = once(() => simulateDragEnd(this._element, files));
     try {
       let firstLoop = true;
-      for (let files of t.partition(files, 3)) {
+      for (let partitionedFiles of t.partition(files, 3)) {
         if (firstLoop) {
           firstLoop = false;
         } else {
           await delay(500);
         }
 
-        simulateDragOver(this._element, files);
+        simulateDragOver(this._element, partitionedFiles);
         await waitFor(() => this._dropzonesVisible(), 20 * 1000);
         const dropzone = this._findDropzoneForThisCompose(inline);
-        simulateDrop(dropzone, files);
+        simulateDrop(dropzone, partitionedFiles);
         endDrag();
         await waitFor(() => !this._dropzonesVisible(), 20 * 1000);
       }
