@@ -13,16 +13,20 @@ import once from 'lodash/once';
 export default async function addNavItem(
   driver: GmailDriver,
   orderGroup: string,
-  navItemDescriptor: Kefir.Observable<any, any>
+  navItemDescriptor: Kefir.Observable<any, any>,
+  navMenuInjectionContainer?: HTMLElement
 ): Promise<GmailNavItemView> {
-  await waitForNavMenuReady();
+  await waitForMenuReady();
 
   const gmailNavItemView = new GmailNavItemView(driver, orderGroup, 1);
   gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
   if (!GmailElementGetter.isStandalone()) {
     try {
-      const attacher = _attachNavItemView(gmailNavItemView);
+      const attacher = _attachNavItemView(
+        gmailNavItemView,
+        navMenuInjectionContainer
+      );
 
       attacher();
 
@@ -38,7 +42,14 @@ export default async function addNavItem(
   return gmailNavItemView;
 }
 
-export const waitForNavMenuReady = once(async (): Promise<void> => {
+export const waitForMenuReady = once(async (): Promise<void> => {
+  const appMenu = await GmailElementGetter.getAppMenuAsync();
+  if (!appMenu) {
+    await waitForNavMenuReady();
+  }
+});
+
+const waitForNavMenuReady = once(async (): Promise<void> => {
   if (!GmailElementGetter.isStandalone()) {
     await GmailElementGetter.waitForGmailModeToSettle();
     await waitFor(() =>
@@ -49,7 +60,19 @@ export const waitForNavMenuReady = once(async (): Promise<void> => {
   }
 });
 
-function _attachNavItemView(gmailNavItemView: GmailNavItemView) {
+function _attachNavItemView(
+  gmailNavItemView: GmailNavItemView,
+  navMenuInjectionContainer?: HTMLElement
+) {
+  if (navMenuInjectionContainer) {
+    return () => {
+      insertElementInOrder(
+        navMenuInjectionContainer,
+        gmailNavItemView.getElement()
+      );
+    };
+  }
+
   if (!GmailElementGetter.shouldAddNavItemsInline()) {
     // If we're in the modern (non-classic-hangouts) leftnav, then put
     // the added nav items in a floating section at the bottom separate

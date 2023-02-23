@@ -11,3 +11,4 @@
 /chromeTestOutput
 /packages/core/inboxsdk.js*
 /packages/core/pageWorld.js*
+/packages/core/src/

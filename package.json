@@ -132,7 +132,8 @@
     "dir": "overrides"
   },
   "scripts": {
-    "typedefs": "tsc -p tsconfig.declarations.json",
+    "transpile-flow": "babel -d packages/core/src --source-type module --ignore '*.test.js' --no-copy-ignored src",
+    "typedefs": "yarn transpile-flow && tsc -p tsconfig.declarations.json",
     "prepare": "husky install",
     "publish-npm": "gulp clean && gulp --production --minify && yarn workspace @inboxsdk/core npm publish && git push --follow-tags",
     "flow_check": "flow check",

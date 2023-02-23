@@ -3,14 +3,14 @@
 import gmailElementGetter from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
 import isIntegratedViewGmail from './isIntegratedViewGmail';
-import { waitForNavMenuReady } from './add-nav-item';
+import { waitForMenuReady } from './add-nav-item';
 
 export default async function gmailLoadEvent(driver: GmailDriver) {
   const pageCommunicator = driver.getPageCommunicator();
 
   const isConversationViewDisabled =
     await pageCommunicator.isConversationViewDisabled();
-  await waitForNavMenuReady();
+  await waitForMenuReady();
 
   driver.getLogger().eventSite('gmailSettings', {
     isGmailIntegratedView: isIntegratedViewGmail(),

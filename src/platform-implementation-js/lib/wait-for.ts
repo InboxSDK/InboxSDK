@@ -2,7 +2,7 @@ export default function waitFor<T>(
   condition: () => T | null | undefined,
   timeout: number = 120 * 1000,
   steptime: number = 250
-): Promise<T> {
+): Promise<NonNullable<T>> {
   // make this error here so we have a sensible stack.
   const timeoutError = new Error('waitFor timeout');
 
