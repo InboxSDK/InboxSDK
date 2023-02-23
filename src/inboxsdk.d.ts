@@ -1,6 +1,13 @@
 import { EventEmitter } from 'events';
 import * as Kefir from 'kefir';
 import TypedEmitter from 'typed-emitter';
+import AppMenu from './platform-implementation-js/namespaces/app-menu';
+import {
+  NavItemTypes,
+  NavItemDescriptor,
+} from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
+import NavItemView from './platform-implementation-js/views/nav-item-view';
+export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 
 export const LOADER_VERSION: string;
 export interface LoadScriptOptions {
@@ -36,6 +43,7 @@ export interface InboxSDK {
     ) => void;
   };
   NavMenu: NavMenu;
+  AppMenu: AppMenu;
   Router: Router;
   Widgets: Widgets;
   Toolbars: Toolbars;
@@ -97,27 +105,7 @@ export interface ButterBar {
 // export interface IconButtonAccessoryDescriptor {}
 // export interface DropdownButtonAccessoryDescriptor {}
 
-type NavItemTypes = {
-  GROUPER: 'GROUPER';
-  LINK: 'LINK';
-  NAVIGATION: 'NAVIGATION';
-};
-
-export interface NavItemDescriptor {
-  name: string;
-  routeID?: string | null;
-  routeParams?: object | null;
-  onClick?: () => void | null;
-  orderHint?: number;
-  // todo: accessory: CreateAccessoryDescriptor | IconButtonAccessoryDescriptor | DropdownButtonAccessoryDescriptor
-  accessory?: any;
-  iconUrl?: string | null;
-  iconClass?: string | null;
-  iconElement?: HTMLElement | null;
-  backgroundColor?: string | null;
-  expanderForegroundColor?: string | null;
-  type?: keyof NavItemTypes;
-}
+export { AppMenu };
 
 export interface NativeNavItemView extends EventEmitter {
   addNavItem(descriptor: NavItemDescriptor): NavItemView;
@@ -353,12 +341,7 @@ export interface ThreadRowAttachmentIconDescriptor {
   tooltip?: string;
 }
 
-export interface NavItemView extends EventEmitter {
-  addNavItem(descriptor: any): NavItemView;
-  remove(): void;
-  setCollapsed(collapseState: boolean): void;
-  isCollapsed(): boolean;
-}
+export { NavItemView };
 
 export interface SectionView extends EventEmitter {
   remove(): void;
@@ -523,7 +506,9 @@ export interface ContentPanelView extends EventEmitter {
 }
 
 export interface ContentPanelDescriptor {
+  appName?: string;
   el: HTMLElement;
+  id: string;
   title: string;
   iconUrl?: string;
   iconClass?: string;

@@ -1615,8 +1615,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@inboxsdk/core@workspace:packages/core"
   dependencies:
+    "@babel/runtime": ^7.0.0
     "@types/kefir": ^3.8.6
     "@types/node": "*"
+    asap: ^2.0.3
+    kefir-cast: ^3.3.0
+    sha.js: ^2.4.0
     tag-tree: ^1.0.0
     typed-emitter: ^2.1.0
   languageName: unknown

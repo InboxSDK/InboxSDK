@@ -10,6 +10,8 @@ import CommonPageCommunicator from '../lib/common-page-communicator';
 import GmailSupportItemView, {
   SupportItemDescriptor,
 } from '../dom-driver/gmail/views/gmail-support-item-view';
+import { AppMenuItemDescriptor } from '../namespaces/app-menu';
+import { GmailAppMenuItemView } from '../dom-driver/gmail/views/gmail-app-menu-item-view';
 
 // import GmailBackdrop from '../dom-driver/gmail/views/gmail-backdrop';
 // import InboxBackdrop from '../dom-driver/inbox/views/inbox-backdrop';
@@ -90,6 +92,9 @@ export interface Driver {
   addSupportItem(
     supportItemDescriptor: SupportItemDescriptor
   ): GmailSupportItemView;
+  addAppMenuItem(
+    menuItemDescriptor: AppMenuItemDescriptor
+  ): Promise<GmailAppMenuItemView>;
   getSentMailNativeNavItem(): Promise<any>;
   createLink(a: any, b: any): any;
   goto(routeID: string, params: any): Promise<void>;
