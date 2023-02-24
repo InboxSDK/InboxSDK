@@ -157,7 +157,7 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     if (this.#menuItemDescriptor?.routeID) {
       this.#driver.goto(
         this.#menuItemDescriptor.routeID,
-        this.#menuItemDescriptor?.routeParams
+        this.#menuItemDescriptor.routeParams
       );
     }
   }

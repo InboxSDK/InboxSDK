@@ -94,6 +94,6 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
 
     panel1.addNavItem({
       name: 'Nav Item 1',
-      onClick: () => alert('clicked nav item 1'),
+      onClick: () => sdk.Router.goto('custom-route-3'),
     })
 });
