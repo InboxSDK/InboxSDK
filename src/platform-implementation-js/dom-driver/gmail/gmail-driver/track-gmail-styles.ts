@@ -1,5 +1,3 @@
-/* @flow */
-
 import Logger from '../../../lib/logger';
 import waitFor from '../../../lib/wait-for';
 import GmailElementGetter from '../gmail-element-getter';
@@ -45,7 +43,7 @@ function isDarkTheme(): boolean {
     g = +colorMatch[2],
     b = +colorMatch[3];
   // rgb(32, 33, 36) is the default color of nav items in Material Gmail
-  if ((r === 32 && g === 33, b === 36)) {
+  if (r === 32 && g === 33 && b === 36) {
     return false;
   }
   if (r !== g || r !== b) {
@@ -56,44 +54,35 @@ function isDarkTheme(): boolean {
 
 export default function trackGmailStyles() {
   if (
-    (document.head: any).hasAttribute('data-inboxsdk-gmail-style-tracker') ||
+    document.head.hasAttribute('data-inboxsdk-gmail-style-tracker') ||
     GmailElementGetter.isStandalone()
   ) {
     return;
   }
-  (document.head: any).setAttribute(
-    'data-inboxsdk-gmail-style-tracker',
-    'true'
-  );
+  document.head.setAttribute('data-inboxsdk-gmail-style-tracker', 'true');
 
-  let currentDensity = null;
-  let currentDarkTheme = null;
+  let currentDensity: string | null = null;
+  let currentDarkTheme: boolean | null = null;
 
   function checkStyles() {
     const newDensity = getDensity();
     if (currentDensity !== newDensity) {
       if (currentDensity) {
-        ((document.body: any): HTMLElement).classList.remove(
+        document.body.classList.remove(
           'inboxsdk__gmail_density_' + currentDensity
         );
       }
       currentDensity = newDensity;
-      ((document.body: any): HTMLElement).classList.add(
-        'inboxsdk__gmail_density_' + currentDensity
-      );
+      document.body.classList.add('inboxsdk__gmail_density_' + currentDensity);
     }
 
     const newDarkTheme = isDarkTheme();
     if (currentDarkTheme !== newDarkTheme) {
       currentDarkTheme = newDarkTheme;
       if (currentDarkTheme) {
-        ((document.body: any): HTMLElement).classList.add(
-          'inboxsdk__gmail_dark_theme'
-        );
+        document.body.classList.add('inboxsdk__gmail_dark_theme');
       } else {
-        ((document.body: any): HTMLElement).classList.remove(
-          'inboxsdk__gmail_dark_theme'
-        );
+        document.body.classList.remove('inboxsdk__gmail_dark_theme');
       }
     }
   }
@@ -110,8 +99,8 @@ export default function trackGmailStyles() {
         childList: true,
       };
       Array.from(document.styleSheets).forEach((sheet) => {
-        if ((sheet.ownerNode: any).tagName == 'STYLE') {
-          observer.observe(sheet.ownerNode, options);
+        if ((sheet.ownerNode as Element)!.tagName == 'STYLE') {
+          observer.observe(sheet.ownerNode!, options);
         }
       });
       checkStyles();

@@ -1,0 +1,5 @@
+/* @flow */
+
+export type AppMenuItemDescriptor = Object;
+
+declare export default Object;
