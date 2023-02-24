@@ -19,6 +19,7 @@ import {
 import GmailDriver from '../dom-driver/gmail/gmail-driver';
 import { addCollapsiblePanel } from '../dom-driver/gmail/gmail-driver/add-collapsible-panel';
 import GmailElementGetter from '../dom-driver/gmail/gmail-element-getter';
+import defer from '../../common/defer';
 
 type MessageEvents = {
   blur: () => void;
@@ -60,7 +61,6 @@ const routeIDtoMenuItemClass = Object.fromEntries([
 ]);
 
 type StreamType =
-  | ['burger', 'open' | 'close']
   | ['click', HTMLElement]
   | ['mouseenter' | 'mouseleave', HTMLElement, MouseEvent];
 
@@ -68,9 +68,9 @@ type StreamType =
  * Contains both a native Gmail app menu item and a collapsible panel.
  */
 export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<MessageEvents>) {
-  static #burgerMenuOpen = false;
   static #menuItemChangeStream = Kefir.pool<StreamType, unknown>();
   static #menuItemChangeBus = kefirBus<StreamType, unknown>();
+  static #menuItemAddedDeferred = defer<undefined>();
   static #routeViewDriverStream: ReturnType<
     GmailDriver['getRouteViewDriverStream']
   >;
@@ -96,34 +96,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
     return button;
   }
-  static #setUpBurgerObserver() {
-    const burgerElement = GmailElementGetter.getAppBurgerMenu();
-    if (!burgerElement) return;
-
-    AppMenuItemView.#burgerMenuOpen =
-      burgerElement.getAttribute('aria-expanded') === 'true';
-
-    const observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        if (
-          !(
-            mutation.attributeName === 'aria-expanded' &&
-            mutation.target instanceof HTMLElement
-          )
-        )
-          continue;
-
-        const isOpen = mutation.target.getAttribute('aria-expanded') === 'true';
-        AppMenuItemView.#menuItemChangeBus.emit([
-          'burger',
-          isOpen ? 'open' : 'close',
-        ]);
-      }
-    });
-
-    observer.observe(burgerElement, { attributes: true });
-  }
-
   static #setUpRouteViewDriverStream(driver: GmailDriver) {
     if (AppMenuItemView.#routeViewDriverStream) return;
 
@@ -202,7 +174,10 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           );
         }
       }
-
+    })();
+  }
+  static {
+    AppMenuItemView.#menuItemAddedDeferred.promise.then(() => {
       // Set up event listeners we use to control menu UI
       // We intercept some events emitted on Gmail (native) menu items to gain full control of the menu (menu items and panels).
       // Thus, some native event handlers won't be invoked so we replicate the Gmail's behavior by ourselves.
@@ -253,7 +228,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           ]);
         });
       }
-    })();
+    });
   }
   static {
     AppMenuItemView.#menuItemChangeStream.onValue(async (v) => {
@@ -261,10 +236,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       const { ACTIVE, HOVER } = GmailAppMenuItemView.elementCss;
 
       switch (type) {
-        case 'burger': {
-          //
-          break;
-        }
         case 'mouseenter': {
           const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
 
@@ -277,8 +248,15 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
           const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
           const activePanel = AppMenuItemView.#getActivePanel();
+          const burgerMenuOpen = GmailElementGetter.isAppBurgerMenuOpen();
 
-          if (activeMenuItem === menuItem && activePanel === panel) return;
+          // hover-styled panel is displayed for collapsed burger menu
+          if (
+            activeMenuItem === menuItem &&
+            activePanel === panel &&
+            burgerMenuOpen
+          )
+            return;
 
           // deactivate active panel
           if (activePanel) {
@@ -286,7 +264,10 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
             activePanel.classList.remove(
               CollapsiblePanelView.elementCss.ACTIVE
             );
-            activePanel.classList.remove(AppMenuItemView.#getPanelHoverClass());
+            activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
+            activePanel.classList.remove(
+              CollapsiblePanelView.elementCss.COLLAPSED_HOVER
+            );
           }
 
           // activate new panel
@@ -295,7 +276,12 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
               window.innerHeight - panel.getBoundingClientRect().top;
             panel.style.cssText = `height: ${height}px;`;
             panel.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
-            panel.classList.add(AppMenuItemView.#getPanelHoverClass());
+            panel.classList.add(CollapsiblePanelView.elementCss.HOVER);
+            if (!burgerMenuOpen) {
+              panel.classList.add(
+                CollapsiblePanelView.elementCss.COLLAPSED_HOVER
+              );
+            }
             // hover menu item
             menuItem.classList.add(HOVER);
           } else {
@@ -333,7 +319,10 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
             activePanel.classList.remove(
               CollapsiblePanelView.elementCss.ACTIVE
             );
-            activePanel.classList.remove(AppMenuItemView.#getPanelHoverClass());
+            activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
+            activePanel.classList.remove(
+              CollapsiblePanelView.elementCss.COLLAPSED_HOVER
+            );
           }
 
           // activate active menu item panel
@@ -355,7 +344,10 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
             activePanel.classList.remove(
               CollapsiblePanelView.elementCss.ACTIVE
             );
-            activePanel.classList.remove(AppMenuItemView.#getPanelHoverClass());
+            activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
+            activePanel.classList.remove(
+              CollapsiblePanelView.elementCss.COLLAPSED_HOVER
+            );
           }
 
           // deactivate menu items
@@ -376,13 +368,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         }
       }
     });
-  }
-
-  static #getPanelHoverClass() {
-    if (this.#burgerMenuOpen) {
-      return CollapsiblePanelView.elementCss.HOVER;
-    }
-    return CollapsiblePanelView.elementCss.COLLAPSED_HOVER;
   }
 
   get menuItemDescriptor() {
@@ -445,7 +430,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     });
 
     AppMenuItemView.#setUpRouteViewDriverStream(driver);
-    AppMenuItemView.#setUpBurgerObserver();
+    AppMenuItemView.#menuItemAddedDeferred.resolve(undefined);
 
     AppMenuItemView.#appMenuItemViews.add(this);
   }
