@@ -22,21 +22,20 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
     document.head.appendChild(sheet);
   };
 
-  sdk.Router.handleCustomRoute('custom-route-1', (customRouteView) => {
-    const el = document.createElement('span');
-    el.innerHTML = 'This is custom route 1';
-    customRouteView.getElement().appendChild(el);
-  });
-
-  sdk.Router.handleCustomRoute('custom-route-2', (customRouteView) => {
-    const el = document.createElement('span');
-    el.innerHTML = 'This is custom route 2';
-    customRouteView.getElement().appendChild(el);
-  });
+  for (const n of [1, 2, 3]) {
+    sdk.Router.handleCustomRoute(`custom-route-${n}`, (customRouteView) => {
+      const el = document.createElement('span');
+      el.innerHTML = `This is custom route ${n}`;
+      customRouteView.getElement().appendChild(el);
+    });
+  }
 
   const customItem1 = sdk.AppMenu.addMenuItem({
       name: 'Custom Panel 1',
       insertIndex: 1,
+      iconUrl: {
+        lightTheme: 'https://assets.streak.com/clientjs-commit-builds/assets/pipelineIndicator.ebfc97a74f09365a433e8537ff414815.png',
+      },
       onClick: () => {
         log('clicked custom menu item 1');
         sdk.Router.goto('custom-route-1');
@@ -54,6 +53,18 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
       },
       iconUrl: {
         lightTheme: chrome.runtime.getURL('monkey-face.jpg'),
+      }
+    }),
+    /** No panel with this menu item */
+    customItem3 = sdk.AppMenu.addMenuItem({
+      name: 'III',
+      onClick: () => {
+        log('clicked custom menu item 3');
+        sdk.Router.goto('custom-route-3');
+      },
+      routeID: 'custom-route-3',
+      isRouteActive: (route) => {
+        return route === 'custom-route-3';
       }
     }),
     panel1 = await customItem1.addCollapsiblePanel({
