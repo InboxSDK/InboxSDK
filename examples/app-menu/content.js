@@ -31,52 +31,65 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
   }
 
   const customItem1 = sdk.AppMenu.addMenuItem({
-      name: 'Custom Panel 1',
+      name: 'Lion menu item',
       insertIndex: 1,
       iconUrl: {
-        lightTheme: 'https://assets.streak.com/clientjs-commit-builds/assets/pipelineIndicator.ebfc97a74f09365a433e8537ff414815.png',
+        lightTheme: chrome.runtime.getURL('lion.png'),
       },
       onClick: () => {
         log('clicked custom menu item 1');
-        sdk.Router.goto('custom-route-1');
       },
       routeID: 'custom-route-1',
+      isRouteActive: (route) => {
+        const routeID = route.getRouteID()
+        return routeID === 'custom-route-1';
+      },
     }),
     customItem2 = sdk.AppMenu.addMenuItem({
-      name: 'II',
+      name: 'monkey',
       onClick: () => {
         log('clicked custom menu item 2');
         sdk.Router.goto('custom-route-2');
       },
+      routeID: 'custom-route-2',
       isRouteActive: (route) => {
-        return route === 'custom-route-2';
+        const routeID = route.getRouteID()
+        return routeID === 'custom-route-2';
+      },
+      iconUrl: {
+        lightTheme: chrome.runtime.getURL('monkey.png'),
+      }
+    }),
+    /** No panel with this menu item */
+    customItem3 = sdk.AppMenu.addMenuItem({
+      name: 'No panel',
+      onClick: () => {
+        log('clicked custom menu item 3');
+        // sdk.Router.goto('custom-route-3');
+      },
+      routeID: 'custom-route-3',
+      isRouteActive: (route) => {
+        const routeID = route.getRouteID()
+        return routeID === 'custom-route-3';
       },
       iconUrl: {
         lightTheme: chrome.runtime.getURL('monkey-face.jpg'),
       }
     }),
-    /** No panel with this menu item */
-    customItem3 = sdk.AppMenu.addMenuItem({
-      name: 'III',
-      onClick: () => {
-        log('clicked custom menu item 3');
-        sdk.Router.goto('custom-route-3');
-      },
-      routeID: 'custom-route-3',
-      isRouteActive: (route) => {
-        return route === 'custom-route-3';
-      }
-    }),
     panel1 = await customItem1.addCollapsiblePanel({
-      title: 'Panel 1',
+      // title: 'Lion panel',
       primaryButton: {
-        name: 'Custom panel 1',
+        name: 'Lion panel',
         onClick: () => alert('clicked custom panel 1'),
-        iconUrl: {lightTheme: chrome.runtime.getURL('monkey-face.jpg')},
+        iconUrl: {lightTheme: chrome.runtime.getURL('lion.png')},
       }
     }),
     panel2 = await customItem2.addCollapsiblePanel({
-      title: 'Panel 2',
+      primaryButton: {
+        name: 'Monkey panel',
+        onClick: () => alert('clicked custom panel 2'),
+        iconUrl: {lightTheme: chrome.runtime.getURL('monkey.png')},
+      }
     });
 
     panel1.addNavItem({

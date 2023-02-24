@@ -14,7 +14,9 @@
     "inboxsdk.js.map",
     "pageWorld.js",
     "pageWorld.js.map",
-    "monkey-face.jpg"
+    "monkey-face.jpg",
+    "monkey.png",
+    "lion.png"
   ],
   "background": {
     "scripts": ["background.js"],
