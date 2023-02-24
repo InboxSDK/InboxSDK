@@ -67,4 +67,9 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
     panel2 = await customItem2.addCollapsiblePanel({
       title: 'Panel 2',
     });
+
+    panel1.addNavItem({
+      name: 'Nav Item 1',
+      onClick: () => alert('clicked nav item 1'),
+    })
 });
