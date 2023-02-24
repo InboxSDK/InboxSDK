@@ -44,7 +44,6 @@ import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
 import type { GetDraftIdResult } from './gmail-driver/get-draft-id-for-message-id';
 import addNavItem from './gmail-driver/add-nav-item';
-import { addAppMenuItem } from './gmail-driver/add-app-menu-item';
 import addSupportItem from './gmail-driver/add-support-item';
 import gotoView from './gmail-driver/goto-view';
 import showCustomThreadList from './gmail-driver/show-custom-thread-list';
@@ -91,7 +90,6 @@ import type GmailSupportItemView from './views/gmail-support-item-view';
 import type SupportItemDescriptor from './views/gmail-support-item-view';
 import type { PiOpts, EnvData } from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
-import type { AppMenuItemDescriptor } from '../../namespaces/app-menu';
 
 import type ContentPanelViewDriver from '../../driver-common/sidebar/ContentPanelViewDriver';
 import GmailNavItemView from './views/gmail-nav-item-view';
@@ -636,19 +634,9 @@ class GmailDriver {
 
   addNavItem(
     appId: string,
-    navItemDescriptorPropertyStream: Kefir.Observable<Object>,
-    navMenuInjectionContainer?: HTMLElement
+    navItemDescriptorPropertyStream: Kefir.Observable<Object>
   ): Promise<GmailNavItemView> {
-    return addNavItem(
-      this,
-      appId,
-      navItemDescriptorPropertyStream,
-      navMenuInjectionContainer
-    );
-  }
-
-  addAppMenuItem(menuItemDescriptor: AppMenuItemDescriptor) {
-    return addAppMenuItem(this, menuItemDescriptor);
+    return addNavItem(this, appId, navItemDescriptorPropertyStream);
   }
 
   addSupportItem(

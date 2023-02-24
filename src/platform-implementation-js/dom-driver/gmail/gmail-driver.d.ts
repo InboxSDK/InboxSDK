@@ -15,10 +15,7 @@ import { Contact } from '../../driver-interfaces/compose-view-driver';
 import GmailSupportItemView, {
   SupportItemDescriptor,
 } from './views/gmail-support-item-view';
-import { AppMenuItemDescriptor } from '../../namespaces/app-menu';
-import { GmailAppMenuItemView } from './views/gmail-app-menu-item-view';
-import { RouteView } from '../../../inboxsdk';
-
+type GmailRouteView = any;
 type GmailThreadView = any;
 type GmailMessageView = any;
 type GmailAttachmentCardView = any;
@@ -33,7 +30,7 @@ export default class GmailDriver implements Driver {
   public getLogger(): Logger;
   public getAppId(): string;
   public getOpts(): PiOpts;
-  public getRouteViewDriverStream(): Kefir.Observable<RouteView, any>; // should be a property
+  public getRouteViewDriverStream(): Kefir.Observable<GmailRouteView, any>; // should be a property
   public getRowListViewDriverStream(): Kefir.Observable<any, any>;
   public openNewComposeViewDriver(): Promise<GmailComposeView>;
   public getNextComposeViewDriver(): Promise<GmailComposeView>;
@@ -63,14 +60,7 @@ export default class GmailDriver implements Driver {
     any
   >;
   public registerThreadButton(options: any): () => void;
-  public addNavItem(
-    appId: string,
-    navItemDescriptor: any,
-    navMenuInjectionContainer?: HTMLElement
-  ): any;
-  addAppMenuItem(
-    menuItemDescriptor: AppMenuItemDescriptor
-  ): Promise<GmailAppMenuItemView>;
+  public addNavItem(appId: string, navItemDescriptor: any): any;
   public addSupportItem(
     supportItemDescriptor: SupportItemDescriptor
   ): GmailSupportItemView;

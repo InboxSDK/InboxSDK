@@ -44,7 +44,6 @@ import type { PiOpts } from '../platform-implementation';
 import type SupportItemDescriptor from '../dom-driver/gmail/views/gmail-support-item-view';
 import type GmailSupportItemView from '../dom-driver/gmail/views/gmail-support-item-view';
 import type GmailNavItemView from '../dom-driver/gmail/views/gmail-nav-item-view';
-import type GmailAppMenuItemView from '../dom-driver/gmail/views/gmail-app-menu-item-view';
 
 // TODO fill in some of these any types
 export type Driver = {
@@ -79,10 +78,6 @@ export type Driver = {
     appId: string,
     navItemDescriptor: Object
   ): Promise<GmailNavItemView>,
-  addAppMenuItem(
-    appId: string,
-    menuItemDescriptor: Object
-  ): Promise<GmailAppMenuItemView>,
   addSupportItem(
     supportItemDescriptor: SupportItemDescriptor
   ): GmailSupportItemView,

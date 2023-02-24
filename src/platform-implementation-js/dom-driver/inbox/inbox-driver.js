@@ -1,4 +1,4 @@
-/* eslint-disable flowtype/require-valid-file-annotation -- flow support is deprecated and this file existed for a Google product that no longer exists */
+/* @flow */
 
 import once from 'lodash/once';
 import constant from 'lodash/constant';

@@ -6,7 +6,7 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "target": "ES2022",
+    "target": "ES2018",
     "moduleResolution": "node",
     "isolatedModules": true
   },

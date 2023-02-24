@@ -42,7 +42,6 @@ import Widgets from './namespaces/widgets';
 import Modal from './namespaces/modal';
 import Lists from './namespaces/lists';
 import NavMenu from './namespaces/nav-menu';
-import AppMenu from './namespaces/app-menu';
 import Router from './namespaces/router';
 import Search from './namespaces/search';
 import Toolbars from './namespaces/toolbars';
@@ -86,7 +85,6 @@ export class PlatformImplementation extends SafeEventEmitter {
   User: User;
   Lists: Lists;
   NavMenu: NavMenu;
-  AppMenu: AppMenu;
   Router: Router;
   Search: Search;
   Toolbars: Toolbars;
@@ -175,7 +173,6 @@ export class PlatformImplementation extends SafeEventEmitter {
     this.User = new User(driver, piOpts);
     this.Lists = new Lists(appId, driver, membrane);
     this.NavMenu = new NavMenu(appId, driver);
-    this.AppMenu = new AppMenu(driver);
     this.Router = new Router(appId, driver, membrane);
     this.Search = new Search(appId, driver);
     this.Toolbars = new Toolbars(appId, driver, membrane, piOpts);

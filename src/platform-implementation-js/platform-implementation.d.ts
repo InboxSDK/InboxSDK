@@ -62,7 +62,6 @@ type Modal = any;
 type Lists = any;
 // import NavMenu from './namespaces/nav-menu';
 type NavMenu = any;
-import AppMenu from './namespaces/app-menu';
 // import Router from './namespaces/router';
 type Router = any;
 // import Search from './namespaces/search';
@@ -105,7 +104,6 @@ export class PlatformImplementation extends SafeEventEmitter {
   User: User;
   Lists: Lists;
   NavMenu: NavMenu;
-  AppMenu: AppMenu;
   Router: Router;
   Search: Search;
   Toolbars: Toolbars;

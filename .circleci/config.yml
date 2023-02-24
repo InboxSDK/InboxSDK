@@ -4,7 +4,7 @@ jobs:
     working_directory: ~/StreakYC/GmailSDK
     parallelism: 1
     docker:
-      - image: cimg/node:18.14-browsers
+      - image: circleci/node:12-browsers
     steps:
       - checkout
       - restore_cache:

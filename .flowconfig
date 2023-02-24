@@ -2,7 +2,6 @@
 
 [ignore]
 .*/examples/.*/inboxsdk\.js.*
-.*/packages/core.*
 .*/dist/inboxsdk\.js.*
 .*/dist/platform-implementation\.js.*
 .*/dist/injected\.js.*

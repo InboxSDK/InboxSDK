@@ -29,45 +29,6 @@ let NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED = 0;
 
 const GMAIL_V2_LEFT_INDENTATION_PADDING = 12;
 
-type CreateAccessoryDescriptor = {
-  type: 'CREATE';
-  onClick: () => void;
-};
-
-type IconButtonAccessoryDescriptor = {
-  type: 'ICON_BUTTON';
-  onClick: () => void;
-  iconUrl: string;
-  iconClass?: string;
-};
-
-type DropdownButtonAccessoryDescriptor = {
-  type: 'DROPDOWN_BUTTON';
-  onClick: (e: MouseEvent) => void;
-};
-
-export type NavItemTypes = typeof NAV_ITEM_TYPES;
-
-export type NavItemDescriptor = {
-  name: string;
-} & Partial<{
-  key: string;
-  orderHint: number;
-  routeID: string;
-  iconClass: string;
-  iconElement: HTMLElement;
-  routeParams: Record<string, string | number>;
-  expanderForegroundColor: string;
-  backgroundColor: string;
-  onClick: () => void;
-  accessory:
-    | CreateAccessoryDescriptor
-    | IconButtonAccessoryDescriptor
-    | DropdownButtonAccessoryDescriptor
-    | null;
-  type: keyof NavItemTypes;
-}>;
-
 // TODO could we recreate this with React? There's so much statefulness that it's
 
 export default class GmailNavItemView {
@@ -83,7 +44,7 @@ export default class GmailNavItemView {
   private _itemContainerElement: HTMLElement | null = null;
   private _level: number;
   private _name: string = '';
-  private _navItemDescriptor?: NavItemDescriptor;
+  private _navItemDescriptor: any;
   private _navItemNumber: number;
   private _orderGroup: number | string;
   private _orderHint: any;
@@ -972,9 +933,7 @@ export default class GmailNavItemView {
     }`;
   }
 
-  private _updateType(
-    type: keyof typeof NAV_ITEM_TYPES | undefined = NAV_ITEM_TYPES.NAVIGATION
-  ) {
+  private _updateType(type: string) {
     if (!this._element) {
       return;
     }
@@ -1010,7 +969,7 @@ export default class GmailNavItemView {
     this._type = type;
   }
 
-  private _updateValues(navItemDescriptor: NavItemDescriptor) {
+  private _updateValues(navItemDescriptor: any) {
     this._navItemDescriptor = navItemDescriptor;
 
     if (this._collapseKey == null) {

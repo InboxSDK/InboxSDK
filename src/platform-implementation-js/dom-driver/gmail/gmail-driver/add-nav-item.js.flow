@@ -5,13 +5,10 @@ import GmailNavItemView from '../views/gmail-nav-item-view';
 
 import type GmailDriver from '../gmail-driver';
 
-declare export function waitForMenuReady(): Promise<void>;
-
 declare export default function addNavItem(
   driver: GmailDriver,
   orderGroup: string,
-  navItemDescriptor: Kefir.Observable<Object>,
-  navMenuInjectionContainer?: HTMLElement
+  navItemDescriptor: Kefir.Observable<Object>
 ): Promise<GmailNavItemView>;
 
 declare export function waitForNavMenuReady(): Promise<void>;

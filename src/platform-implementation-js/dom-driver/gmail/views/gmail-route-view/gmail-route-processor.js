@@ -89,12 +89,6 @@ Object.assign(GmailRouteProcessor.prototype, {
       circle: this.NativeRouteIDs.LABEL,
       settings: this.NativeRouteIDs.SETTINGS,
       chats: this.NativeRouteIDs.CHATS,
-      // new Gmail stuff
-      scheduled: this.NativeRouteIDs.SCHEDULED,
-      // these are added as part of new gmail redesign -- FEB 2023
-      chat: this.NativeRouteIDs.CHAT_WELCOME,
-      rooms: this.NativeRouteIDs.SPACES_WELCOME,
-      calls: this.NativeRouteIDs.MEET,
     };
   },
 

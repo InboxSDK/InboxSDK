@@ -2,12 +2,12 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "declaration": true,
-    "declarationMap": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": true,
     "noEmit": false,
-    "module": "ES2022",
-    "target": "ES2022",
     "outDir": "packages/core/src",
-    "sourceMap": false
+    "sourceMap": false,
+    "listEmittedFiles": true
   },
   "include": ["src"],
   "exclude": ["**/*.test.ts", "**/*.test.js", "**/*.test.jsx"]

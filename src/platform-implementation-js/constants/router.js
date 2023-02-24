@@ -20,12 +20,6 @@ export const NATIVE_ROUTE_IDS: { [k: string]: string } = Object.freeze({
   CONTACTS: 'contacts/:page',
   CONTACT: 'contacts/:contactID',
   SETTINGS: 'settings/:section',
-  SCHEDULED: 'scheduled' /** DEC 2022 */,
-  CHAT_WELCOME: 'chat/welcome' /** FEB 2023 */,
-  CHAT_DM: 'chat/dm/:chatID' /** FEB 2023 */,
-  SPACES_WELCOME: 'rooms/welcome' /** FEB 2023 */,
-  SPACE: 'chat/space/:spaceID' /** FEB 2023 */,
-  MEET: 'calls' /** FEB 2023 */,
   ANY_LIST: '*',
 });
 
@@ -51,8 +45,6 @@ export const ROUTE_TYPES: { [k: string]: string } = Object.freeze({
   THREAD: 'THREAD',
   SETTINGS: 'SETTINGS',
   CHAT: 'CHAT',
-  SPACE: 'SPACE',
-  MEET: 'MEET',
   CUSTOM: 'CUSTOM',
   UNKNOWN: 'UNKNOWN',
 });

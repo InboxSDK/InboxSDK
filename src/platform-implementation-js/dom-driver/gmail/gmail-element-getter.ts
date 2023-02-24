@@ -9,7 +9,6 @@ import waitForGmailModeToSettle from './gmail-element-getter/wait-for-gmail-mode
 import getMainContentElementChangedStream from './gmail-element-getter/get-main-content-element-changed-stream';
 import isIntegratedViewGmail from './gmail-driver/isIntegratedViewGmail';
 import Logger from '../../lib/logger';
-import waitFor from '../../lib/wait-for';
 
 // TODO Figure out if these functions can and should be able to return null
 const GmailElementGetter = {
@@ -43,7 +42,7 @@ const GmailElementGetter = {
 
   getComposeButton(): HTMLElement | null {
     if (isIntegratedViewGmail()) {
-      return document.querySelector('.aIH .aic div[role=button].L3');
+      return document.querySelector('.aqn .aic div[role=button].L3');
     }
     return document.querySelector('[gh=cm]');
   },
@@ -184,43 +183,6 @@ const GmailElementGetter = {
     }
   },
 
-  getAppMenuAsync: once(async () => {
-    if (!GmailElementGetter.isStandalone()) {
-      await GmailElementGetter.waitForGmailModeToSettle();
-      /**
-       * The selector for the new app menu https://support.google.com/mail/answer/11555490 -- FEB 2023
-       */
-      const APP_MENU = '.aeN.WR.a6o.anZ.nH.oy8Mbf[role=navigation]';
-      /**
-       * If the APP_MENU selector is not found, NAV_MENU _might_ be present.
-       */
-      const NAV_MENU = '.aeN.WR.nH.oy8Mbf[role=navigation]';
-
-      try {
-        const element = await waitFor(() =>
-          document.querySelector<HTMLElement>(`${APP_MENU}, ${NAV_MENU}`)
-        );
-
-        if (!document.querySelector(APP_MENU)) {
-          return;
-        }
-
-        return element;
-      } catch (e) {
-        Logger.error(e);
-      }
-    }
-  }),
-
-  getAppMenuContainer() {
-    return document.querySelector<HTMLElement>('.aqk.aql.bkL');
-  },
-
-  // TODO figure out if we use it
-  // getNavMenu() {
-  //   return document.querySelector('.aeN.WR.nH.oy8Mbf[role=navigation]');
-  // },
-
   getSeparateSectionNavItemMenuInjectionContainer(): HTMLElement | null {
     return document.querySelector('.aeN');
   },
@@ -291,10 +253,6 @@ const GmailElementGetter = {
         'a[href*="https://plus"][href*="upgrade"]'
       ).length === 0
     );
-  },
-
-  isDarkTheme(): boolean {
-    return document.body.classList.contains('inboxsdk__gmail_dark_theme');
   },
 
   isPreviewPane(): boolean {
