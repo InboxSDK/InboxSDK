@@ -178,7 +178,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
   }
   static {
     AppMenuItemView.#menuItemAddedDeferred.promise.then(() => {
-      console.log('init listeners');
       // Set up event listeners we use to control menu UI
       // We intercept some events emitted on Gmail (native) menu items to gain full control of the menu (menu items and panels).
       // Thus, some native event handlers won't be invoked so we replicate the Gmail's behavior by ourselves.
@@ -241,21 +240,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       switch (type) {
         case 'mouseenter': {
           const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
-
-          console.log(
-            'mouseenter',
-            menuItem,
-            'mouseEvent.relatedTarget',
-            mouseEvent.relatedTarget
-          );
-
-          // if (
-          //   mouseEvent.relatedTarget instanceof Node &&
-          //   (menuItem.contains(mouseEvent.relatedTarget) ||
-          //     panel?.contains(mouseEvent.relatedTarget))
-          // )
-          //   return;
-
           const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
           const activePanel = AppMenuItemView.#getActivePanel();
           const burgerMenuOpen = GmailElementGetter.isAppBurgerMenuOpen();
@@ -308,7 +292,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         }
 
         case 'mouseleave': {
-          console.log('mouseleave', menuItem);
           const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
           const activePanel = AppMenuItemView.#getActivePanel();
           const activeMenuItemPanel =
@@ -321,7 +304,10 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
               activePanel?.contains(mouseEvent.relatedTarget))
           )
             return;
-          if (activePanel === activeMenuItemPanel) return;
+
+          const burgerMenuOpen = GmailElementGetter.isAppBurgerMenuOpen();
+
+          if (activePanel === activeMenuItemPanel && burgerMenuOpen) return;
 
           // unhover menu item
           menuItem.classList.remove(HOVER);
@@ -354,8 +340,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         }
 
         case 'click': {
-          console.log('click', menuItem);
-
           const appMenuElement = GmailElementGetter.getAppMenuContainer();
 
           // deactivate active panel
