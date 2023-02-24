@@ -178,6 +178,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
   }
   static {
     AppMenuItemView.#menuItemAddedDeferred.promise.then(() => {
+      console.log('init listeners');
       // Set up event listeners we use to control menu UI
       // We intercept some events emitted on Gmail (native) menu items to gain full control of the menu (menu items and panels).
       // Thus, some native event handlers won't be invoked so we replicate the Gmail's behavior by ourselves.
@@ -186,7 +187,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         `.${NATIVE_CLASS}:not(.${INBOXSDK_CLASS})`
       ) ?? []) {
         // Gmail uses this listener for panel hover state activation. It's prevented from propagation and we handle UI updates
-        nativeMenuItem.addEventListener(
+        nativeMenuItem.querySelector<HTMLElement>('.V6.CL')?.addEventListener(
           'mouseenter',
           (e) => {
             e.stopImmediatePropagation();
@@ -239,12 +240,19 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         case 'mouseenter': {
           const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
 
-          if (
-            mouseEvent.relatedTarget instanceof Node &&
-            (menuItem.contains(mouseEvent.relatedTarget) ||
-              panel?.contains(mouseEvent.relatedTarget))
-          )
-            return;
+          console.log(
+            'mouseenter',
+            menuItem,
+            'mouseEvent.relatedTarget',
+            mouseEvent.relatedTarget
+          );
+
+          // if (
+          //   mouseEvent.relatedTarget instanceof Node &&
+          //   (menuItem.contains(mouseEvent.relatedTarget) ||
+          //     panel?.contains(mouseEvent.relatedTarget))
+          // )
+          //   return;
 
           const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
           const activePanel = AppMenuItemView.#getActivePanel();
@@ -265,9 +273,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
               CollapsiblePanelView.elementCss.ACTIVE
             );
             activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
-            activePanel.classList.remove(
-              CollapsiblePanelView.elementCss.COLLAPSED_HOVER
-            );
           }
 
           // activate new panel
@@ -277,13 +282,18 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
             panel.style.cssText = `height: ${height}px;`;
             panel.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
             panel.classList.add(CollapsiblePanelView.elementCss.HOVER);
-            if (!burgerMenuOpen) {
-              panel.classList.add(
-                CollapsiblePanelView.elementCss.COLLAPSED_HOVER
-              );
-            }
             // hover menu item
             menuItem.classList.add(HOVER);
+            // handle burger menu collapsed
+            if (!burgerMenuOpen) {
+              for (const panel of document.querySelectorAll(
+                CollapsiblePanelView.elementSelectors.NATIVE
+              ) ?? []) {
+                panel.classList.add(
+                  CollapsiblePanelView.elementCss.COLLAPSED_HOVER
+                );
+              }
+            }
           } else {
             // panel doesn't exist (i.e. Meet) so activate active menu item's panel instead (as Gmail currently does -- FEB 2023)
             const panel =
@@ -296,6 +306,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         }
 
         case 'mouseleave': {
+          console.log('mouseleave', menuItem);
           const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
           const activePanel = AppMenuItemView.#getActivePanel();
           const activeMenuItemPanel =
@@ -313,6 +324,15 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           // unhover menu item
           menuItem.classList.remove(HOVER);
 
+          // handle burger menu collapsed
+          for (const panel of document.querySelectorAll(
+            CollapsiblePanelView.elementSelectors.NATIVE
+          ) ?? []) {
+            panel.classList.remove(
+              CollapsiblePanelView.elementCss.COLLAPSED_HOVER
+            );
+          }
+
           // deactivate active panel
           if (activePanel) {
             activePanel.style.removeProperty('height');
@@ -320,9 +340,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
               CollapsiblePanelView.elementCss.ACTIVE
             );
             activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
-            activePanel.classList.remove(
-              CollapsiblePanelView.elementCss.COLLAPSED_HOVER
-            );
           }
 
           // activate active menu item panel
@@ -335,6 +352,8 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         }
 
         case 'click': {
+          console.log('click', menuItem);
+
           const appMenuElement = GmailElementGetter.getAppMenuContainer();
 
           // deactivate active panel
@@ -345,9 +364,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
               CollapsiblePanelView.elementCss.ACTIVE
             );
             activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
-            activePanel.classList.remove(
-              CollapsiblePanelView.elementCss.COLLAPSED_HOVER
-            );
           }
 
           // deactivate menu items
