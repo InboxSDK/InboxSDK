@@ -60,13 +60,15 @@ const routeIDtoMenuItemClass = Object.fromEntries([
 ]);
 
 type StreamType =
-  | ['mouseenter' | 'mouseleave', HTMLElement, MouseEvent]
-  | ['click', HTMLElement];
+  | ['burger', 'open' | 'close']
+  | ['click', HTMLElement]
+  | ['mouseenter' | 'mouseleave', HTMLElement, MouseEvent];
 
 /**
  * Contains both a native Gmail app menu item and a collapsible panel.
  */
 export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<MessageEvents>) {
+  static #burgerMenuOpen = false;
   static #menuItemChangeStream = Kefir.pool<StreamType, unknown>();
   static #menuItemChangeBus = kefirBus<StreamType, unknown>();
   static #routeViewDriverStream: ReturnType<
@@ -94,6 +96,34 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
     return button;
   }
+  static #setUpBurgerObserver() {
+    const burgerElement = GmailElementGetter.getAppBurgerMenu();
+    if (!burgerElement) return;
+
+    AppMenuItemView.#burgerMenuOpen =
+      burgerElement.getAttribute('aria-expanded') === 'true';
+
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (
+          !(
+            mutation.attributeName === 'aria-expanded' &&
+            mutation.target instanceof HTMLElement
+          )
+        )
+          continue;
+
+        const isOpen = mutation.target.getAttribute('aria-expanded') === 'true';
+        AppMenuItemView.#menuItemChangeBus.emit([
+          'burger',
+          isOpen ? 'open' : 'close',
+        ]);
+      }
+    });
+
+    observer.observe(burgerElement, { attributes: true });
+  }
+
   static #setUpRouteViewDriverStream(driver: GmailDriver) {
     if (AppMenuItemView.#routeViewDriverStream) return;
 
@@ -230,106 +260,129 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       const [type, menuItem, mouseEvent] = v;
       const { ACTIVE, HOVER } = GmailAppMenuItemView.elementCss;
 
-      if (type === 'mouseenter') {
-        const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
+      switch (type) {
+        case 'burger': {
+          //
+          break;
+        }
+        case 'mouseenter': {
+          const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
 
-        if (
-          mouseEvent.relatedTarget instanceof Node &&
-          (menuItem.contains(mouseEvent.relatedTarget) ||
-            panel?.contains(mouseEvent.relatedTarget))
-        )
-          return;
+          if (
+            mouseEvent.relatedTarget instanceof Node &&
+            (menuItem.contains(mouseEvent.relatedTarget) ||
+              panel?.contains(mouseEvent.relatedTarget))
+          )
+            return;
 
-        const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
-        const activePanel = AppMenuItemView.#getActivePanel();
+          const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
+          const activePanel = AppMenuItemView.#getActivePanel();
 
-        if (activeMenuItem === menuItem && activePanel === panel) return;
+          if (activeMenuItem === menuItem && activePanel === panel) return;
 
-        // deactivate active panel
-        if (activePanel) {
-          activePanel.style.removeProperty('height');
-          activePanel.classList.remove(CollapsiblePanelView.elementCss.ACTIVE);
-          activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
+          // deactivate active panel
+          if (activePanel) {
+            activePanel.style.removeProperty('height');
+            activePanel.classList.remove(
+              CollapsiblePanelView.elementCss.ACTIVE
+            );
+            activePanel.classList.remove(AppMenuItemView.#getPanelHoverClass());
+          }
+
+          // activate new panel
+          if (panel) {
+            const height =
+              window.innerHeight - panel.getBoundingClientRect().top;
+            panel.style.cssText = `height: ${height}px;`;
+            panel.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
+            panel.classList.add(AppMenuItemView.#getPanelHoverClass());
+            // hover menu item
+            menuItem.classList.add(HOVER);
+          } else {
+            // panel doesn't exist (i.e. Meet) so activate active menu item's panel instead (as Gmail currently does -- FEB 2023)
+            const panel =
+              activeMenuItem &&
+              AppMenuItemView.#menuItemToPanelMap.get(activeMenuItem);
+            panel?.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
+          }
+
+          break;
         }
 
-        // activate new panel
-        if (panel) {
-          const height = window.innerHeight - panel.getBoundingClientRect().top;
-          panel.style.cssText = `height: ${height}px;`;
-          panel.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
-          panel.classList.add(CollapsiblePanelView.elementCss.HOVER);
-          // hover menu item
-          menuItem.classList.add(HOVER);
-        } else {
-          // panel doesn't exist (i.e. Meet) so activate active menu item's panel instead (as Gmail currently does -- FEB 2023)
-          const panel =
+        case 'mouseleave': {
+          const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
+          const activePanel = AppMenuItemView.#getActivePanel();
+          const activeMenuItemPanel =
             activeMenuItem &&
             AppMenuItemView.#menuItemToPanelMap.get(activeMenuItem);
-          panel?.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
-        }
-      }
 
-      if (type === 'mouseleave') {
-        const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
-        const activePanel = AppMenuItemView.#getActivePanel();
-        const activeMenuItemPanel =
-          activeMenuItem &&
-          AppMenuItemView.#menuItemToPanelMap.get(activeMenuItem);
+          if (
+            mouseEvent.relatedTarget instanceof Node &&
+            (menuItem.contains(mouseEvent.relatedTarget) ||
+              activePanel?.contains(mouseEvent.relatedTarget))
+          )
+            return;
+          if (activePanel === activeMenuItemPanel) return;
 
-        if (
-          mouseEvent.relatedTarget instanceof Node &&
-          (menuItem.contains(mouseEvent.relatedTarget) ||
-            activePanel?.contains(mouseEvent.relatedTarget))
-        )
-          return;
-        if (activePanel === activeMenuItemPanel) return;
+          // unhover menu item
+          menuItem.classList.remove(HOVER);
 
-        // unhover menu item
-        menuItem.classList.remove(HOVER);
+          // deactivate active panel
+          if (activePanel) {
+            activePanel.style.removeProperty('height');
+            activePanel.classList.remove(
+              CollapsiblePanelView.elementCss.ACTIVE
+            );
+            activePanel.classList.remove(AppMenuItemView.#getPanelHoverClass());
+          }
 
-        // deactivate active panel
-        if (activePanel) {
-          activePanel.style.removeProperty('height');
-          activePanel.classList.remove(CollapsiblePanelView.elementCss.ACTIVE);
-          activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
-        }
-
-        // activate active menu item panel
-        if (activeMenuItemPanel) {
-          activeMenuItemPanel.classList.add(
-            CollapsiblePanelView.elementCss.ACTIVE
-          );
-        }
-      }
-
-      if (type === 'click') {
-        const appMenuElement = GmailElementGetter.getAppMenuContainer();
-
-        // deactivate active panel
-        const activePanel = AppMenuItemView.#getActivePanel();
-        if (activePanel) {
-          activePanel.style.removeProperty('height');
-          activePanel.classList.remove(CollapsiblePanelView.elementCss.ACTIVE);
-          activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
+          // activate active menu item panel
+          if (activeMenuItemPanel) {
+            activeMenuItemPanel.classList.add(
+              CollapsiblePanelView.elementCss.ACTIVE
+            );
+          }
+          break;
         }
 
-        // deactivate menu items
-        for (const menuItem_ of appMenuElement?.querySelectorAll(
-          `.${NATIVE_CLASS}`
-        ) ?? []) {
-          menuItem_.classList.remove(ACTIVE);
-          menuItem_.classList.remove(HOVER);
-        }
+        case 'click': {
+          const appMenuElement = GmailElementGetter.getAppMenuContainer();
 
-        // activate menu item
-        menuItem.classList.add(ACTIVE);
-        // activate panel
-        const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
-        if (panel) {
-          panel.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
+          // deactivate active panel
+          const activePanel = AppMenuItemView.#getActivePanel();
+          if (activePanel) {
+            activePanel.style.removeProperty('height');
+            activePanel.classList.remove(
+              CollapsiblePanelView.elementCss.ACTIVE
+            );
+            activePanel.classList.remove(AppMenuItemView.#getPanelHoverClass());
+          }
+
+          // deactivate menu items
+          for (const menuItem_ of appMenuElement?.querySelectorAll(
+            `.${NATIVE_CLASS}`
+          ) ?? []) {
+            menuItem_.classList.remove(ACTIVE);
+            menuItem_.classList.remove(HOVER);
+          }
+
+          // activate menu item
+          menuItem.classList.add(ACTIVE);
+          // activate panel
+          const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
+          if (panel) {
+            panel.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
+          }
         }
       }
     });
+  }
+
+  static #getPanelHoverClass() {
+    if (this.#burgerMenuOpen) {
+      return CollapsiblePanelView.elementCss.HOVER;
+    }
+    return CollapsiblePanelView.elementCss.COLLAPSED_HOVER;
   }
 
   get menuItemDescriptor() {
@@ -392,6 +445,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     });
 
     AppMenuItemView.#setUpRouteViewDriverStream(driver);
+    AppMenuItemView.#setUpBurgerObserver();
 
     AppMenuItemView.#appMenuItemViews.add(this);
   }

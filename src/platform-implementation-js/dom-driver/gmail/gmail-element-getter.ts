@@ -212,6 +212,10 @@ const GmailElementGetter = {
     }
   }),
 
+  getAppBurgerMenu() {
+    return document.querySelector<HTMLElement>('.gb_Hc[aria-expanded]');
+  },
+
   getAppMenuContainer() {
     return document.querySelector<HTMLElement>('.aqk.aql.bkL');
   },

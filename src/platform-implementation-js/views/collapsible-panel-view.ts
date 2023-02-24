@@ -36,6 +36,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     COLLAPSED: 'aBa',
     /** A hover popover has both ACTIVE _and_ HOVER */
     HOVER: 'aJu',
+    COLLAPSED_HOVER: 'bym',
   } as const;
   #panelDescriptor: AppMenuItemPanelDescriptor | undefined;
   #element?: HTMLElement;
