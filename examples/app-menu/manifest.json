@@ -1,0 +1,24 @@
+{
+  "name": "AppMenu - Example Gmail Extension",
+  "description": "Example extension testing NavMenu and NavItemView.",
+  "version": "0.1",
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*", "https://inbox.google.com/*"],
+      "js": ["inboxsdk.js", "content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": ["https://mail.google.com/", "https://inbox.google.com/"],
+  "web_accessible_resources": [
+    "inboxsdk.js.map",
+    "pageWorld.js",
+    "pageWorld.js.map",
+    "monkey-face.jpg"
+  ],
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "manifest_version": 2
+}
