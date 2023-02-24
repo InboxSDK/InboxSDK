@@ -14,8 +14,16 @@ export type AppMenuItemDescriptor = {
   insertIndex?: number;
   onClick?: (e?: MouseEvent) => void | null;
   onHover?: (e?: MouseEvent) => void | null;
+  /**
+   * If routeID is provided, isRouteActive should be as well.
+   */
   routeID?: string;
   routeParams?: {};
+  /**
+   * @example (routeView) => routeView.getRouteID() === 'inbox'
+   *
+   * @see RouteView
+   */
   isRouteActive: (routeView: RouteView) => boolean;
 };
 
