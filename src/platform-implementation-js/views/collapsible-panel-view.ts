@@ -33,7 +33,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   } as const;
   static elementCss = {
     ACTIVE: 'apV',
-    COLLAPSED: 'aBa',
+    COLLAPSED: 'aBA',
     /** A hover popover has both ACTIVE _and_ HOVER */
     HOVER: 'aJu',
     COLLAPSED_HOVER: 'bym',
@@ -124,7 +124,10 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       name = '',
     } = this.#panelDescriptor?.primaryButton ?? {};
     const element = document.createElement('div');
-    element.className = ELEMENT_CLASS;
+    const burgerMenuOpen = GmailElementGetter.isAppBurgerMenuOpen();
+    element.className = cx(ELEMENT_CLASS, {
+      [CollapsiblePanelView.elementCss.COLLAPSED]: !burgerMenuOpen,
+    });
     const primaryButtonClass = cx(PRIMARY_BUTTON_ELEMENT_CLASS, className);
 
     let iconUrl;
