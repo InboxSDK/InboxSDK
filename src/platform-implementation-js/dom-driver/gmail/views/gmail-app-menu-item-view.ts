@@ -53,8 +53,11 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
 
     driver.getStopper().onValue(() => this.remove());
     this.#element.addEventListener('click', (e) => this.#onClick(e));
-    this.#element.addEventListener('mouseenter', this.#onHover);
     this.#element.addEventListener('mouseleave', this.#onBlur);
+    querySelector(this.#element, ICON_ELEMENT_SELECTOR).addEventListener(
+      'mouseenter',
+      this.#onHover
+    );
   }
 
   remove() {

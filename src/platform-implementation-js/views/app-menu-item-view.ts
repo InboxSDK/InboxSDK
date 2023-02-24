@@ -187,7 +187,9 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         `.${NATIVE_CLASS}:not(.${INBOXSDK_CLASS})`
       ) ?? []) {
         // Gmail uses this listener for panel hover state activation. It's prevented from propagation and we handle UI updates
-        nativeMenuItem.querySelector<HTMLElement>('.V6.CL')?.addEventListener(
+        const buttonElement =
+          nativeMenuItem.querySelector<HTMLElement>('.V6.CL');
+        buttonElement?.addEventListener(
           'mouseenter',
           (e) => {
             e.stopImmediatePropagation();
