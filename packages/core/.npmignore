@@ -1,0 +1,2 @@
+# declaration map files only make sense when TS source is avaliable. We don't publish TS source yet, so we don't publish declaration maps either.
+*.d.ts.map

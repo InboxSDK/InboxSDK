@@ -121,6 +121,7 @@ module.exports = {
         'jest.config.js',
         'jest-puppeteer.config.js',
         'tools/**',
+        'packages/core/**',
       ],
       rules: {
         'flowtype/require-valid-file-annotation': ['off'],
