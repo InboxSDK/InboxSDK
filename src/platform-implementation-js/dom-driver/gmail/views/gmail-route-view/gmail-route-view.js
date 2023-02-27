@@ -450,6 +450,38 @@ class GmailRouteView {
     );
   }
 
+  /* FEB 2023 */
+  _isChatWelcomeRoute(): boolean {
+    return this._hash === this._gmailRouteProcessor.NativeRouteIDs.CHAT_WELCOME;
+  }
+
+  _isChatDmRoute(): boolean {
+    return (
+      this._name === 'chat' &&
+      this._paramsArray?.[0] === 'dm' &&
+      !!this._paramsArray?.[1]
+    );
+  }
+
+  _isSpacesWelcomeRoute(): boolean {
+    return (
+      this._hash === this._gmailRouteProcessor.NativeRouteIDs.SPACES_WELCOME
+    );
+  }
+
+  _isSpaceRoute(): boolean {
+    return (
+      this._name === 'chat' &&
+      this._paramsArray?.[0] === 'space' &&
+      !!this._paramsArray?.[1]
+    );
+  }
+
+  _isMeetRoute(): boolean {
+    return this._hash === this._gmailRouteProcessor.NativeRouteIDs.MEET;
+  }
+  /* end FEB 2023 */
+
   getRouteType(): string {
     if (includes(['CUSTOM', 'OTHER_APP_CUSTOM'], this._type)) {
       return this._gmailRouteProcessor.RouteTypes.CUSTOM;
@@ -459,6 +491,12 @@ class GmailRouteView {
       return this._gmailRouteProcessor.RouteTypes.THREAD;
     } else if (this._isSettingsRoute()) {
       return this._gmailRouteProcessor.RouteTypes.SETTINGS;
+    } else if (this._isChatWelcomeRoute() || this._isChatDmRoute()) {
+      return this._gmailRouteProcessor.RouteTypes.CHAT;
+    } else if (this._isSpacesWelcomeRoute() || this._isSpaceRoute()) {
+      return this._gmailRouteProcessor.RouteTypes.SPACE;
+    } else if (this._isMeetRoute()) {
+      return this._gmailRouteProcessor.RouteTypes.MEET;
     }
 
     return this._gmailRouteProcessor.RouteTypes.UNKNOWN;
@@ -561,6 +599,14 @@ class GmailRouteView {
       return this._customRouteID;
     } else if (this._isThreadRoute()) {
       return this._gmailRouteProcessor.NativeRouteIDs.THREAD;
+    } else if (this._isChatWelcomeRoute()) {
+      return this._gmailRouteProcessor.NativeRouteIDs.CHAT_WELCOME;
+    } else if (this._isChatDmRoute()) {
+      return this._gmailRouteProcessor.NativeRouteIDs.CHAT_DM;
+    } else if (this._isSpacesWelcomeRoute()) {
+      return this._gmailRouteProcessor.NativeRouteIDs.SPACES_WELCOME;
+    } else if (this._isSpaceRoute()) {
+      return this._gmailRouteProcessor.NativeRouteIDs.SPACE;
     } else {
       return this._gmailRouteProcessor.getRouteID(this._name);
     }
