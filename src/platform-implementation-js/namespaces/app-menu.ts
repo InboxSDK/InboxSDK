@@ -3,11 +3,18 @@ import GmailDriver from '../dom-driver/gmail/gmail-driver';
 import GmailElementGetter from '../dom-driver/gmail/gmail-element-getter';
 import { AppMenuItemView } from '../views/app-menu-item-view';
 
+type ThemedIcon =
+  | string
+  | {
+      active: string;
+      default: string;
+    };
+
 export type AppMenuItemDescriptor = {
   name: string;
   iconUrl?: {
-    darkTheme: string;
-    lightTheme: string;
+    darkTheme: ThemedIcon;
+    lightTheme: ThemedIcon;
   };
   className?: string;
   iconClassName?: string;
