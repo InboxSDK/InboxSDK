@@ -37,6 +37,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     /** A hover popover has both ACTIVE _and_ HOVER */
     HOVER: 'aJu',
     COLLAPSED_HOVER: 'bym',
+    PANEL_LESS: 'a3W',
   } as const;
   #panelDescriptor: AppMenuItemPanelDescriptor | undefined;
   #element?: HTMLElement;
@@ -125,7 +126,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     } = this.#panelDescriptor?.primaryButton ?? {};
     const element = document.createElement('div');
     const burgerMenuOpen = GmailElementGetter.isAppBurgerMenuOpen();
-    element.className = cx(ELEMENT_CLASS, {
+    element.className = cx(ELEMENT_CLASS, this.#panelDescriptor?.className, {
       [CollapsiblePanelView.elementCss.COLLAPSED]: !burgerMenuOpen,
     });
     const primaryButtonClass = cx(PRIMARY_BUTTON_ELEMENT_CLASS, className);
@@ -201,15 +202,14 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     const element = this.element;
     if (!element) return;
 
-    const { ACTIVE, COLLAPSED } = CollapsiblePanelView.elementCss;
-
-    const isActive = element.classList.contains(ACTIVE);
-    const isCollapsed = element.classList.contains(COLLAPSED);
-
-    element.className = cx(ELEMENT_CLASS, this.#panelDescriptor?.className, {
-      [ACTIVE]: isActive,
-      [COLLAPSED]: isCollapsed,
-    });
+    const activeClassNames = Object.values(
+      CollapsiblePanelView.elementCss
+    ).filter((className) => element.classList.contains(className));
+    element.className = cx(
+      ELEMENT_CLASS,
+      this.#panelDescriptor?.className,
+      ...activeClassNames
+    );
 
     this.#updateName(element);
     this.#updateIcon(element);

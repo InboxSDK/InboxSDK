@@ -101,6 +101,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
     AppMenuItemView.#routeViewDriverStream = driver.getRouteViewDriverStream();
 
+    // Activate menu items on route changes. Used for deep-links, browser history navigation etc.
     AppMenuItemView.#routeViewDriverStream.onValue(async (routeView) => {
       const routeViewID = routeView.getRouteID();
       const routeType = routeView.getRouteType();
@@ -145,8 +146,23 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       }
     });
   }
+  static #handlePanelLessMode() {
+    const activePanel = AppMenuItemView.#getActivePanel();
+    const noActivePanel = !activePanel;
+
+    for (const panel of document.querySelectorAll(
+      CollapsiblePanelView.elementSelectors.NATIVE
+    ) ?? []) {
+      panel.classList.toggle(
+        CollapsiblePanelView.elementCss.PANEL_LESS,
+        noActivePanel
+      );
+    }
+    GmailElementGetter.getAppMenu()?.classList.toggle('aTO', noActivePanel);
+    GmailElementGetter.getAppHeader()?.classList.toggle('aTO', noActivePanel);
+  }
   static {
-    (async () => {
+    (async function init() {
       const gmailAppMenu = await GmailElementGetter.getAppMenuAsync();
       if (!gmailAppMenu) {
         return;
@@ -367,6 +383,10 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           if (panel) {
             panel.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
           }
+
+          // handle no panel
+          AppMenuItemView.#handlePanelLessMode();
+          break;
         }
       }
     });
