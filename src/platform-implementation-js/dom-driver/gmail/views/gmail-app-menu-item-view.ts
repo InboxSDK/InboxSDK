@@ -118,10 +118,17 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     const { iconUrl, iconClassName } = this.#menuItemDescriptor ?? {};
 
     if (iconUrl) {
-      const theme = GmailElementGetter.isDarkTheme()
+      const rawTheme = GmailElementGetter.isDarkTheme()
         ? iconUrl.darkTheme
         : iconUrl.lightTheme;
+      const theme = typeof rawTheme === 'string' ? rawTheme : rawTheme.default;
+      const activeImg =
+        typeof rawTheme === 'string' ? rawTheme : rawTheme.active;
       iconContainerEl.style.setProperty('--background-image', `url(${theme})`);
+      iconContainerEl.style.setProperty(
+        '--background-image--active',
+        `url(${activeImg})`
+      );
     }
 
     iconContainerEl.className = cx(ICON_ELEMENT_CLASS, iconClassName);
