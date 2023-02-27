@@ -86,21 +86,6 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     this.element?.classList.add(GmailAppMenuItemView.elementCss.HOVER);
   }
 
-  /**
-   * @internal
-   */
-  activate() {
-    this.element?.classList.remove(GmailAppMenuItemView.elementCss.HOVER);
-    this.element?.classList.add(GmailAppMenuItemView.elementCss.ACTIVE);
-  }
-
-  // /**
-  //  * @internal
-  //  */
-  // deactivate() {
-  //   this.element?.classList.remove(GmailAppMenuItemView.elementCss.ACTIVE);
-  // }
-
   #setupElement() {
     const element = document.createElement('div');
     element.className = ELEMENT_CLASS;
