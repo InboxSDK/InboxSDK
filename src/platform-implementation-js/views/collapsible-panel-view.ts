@@ -202,13 +202,13 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     const element = this.element;
     if (!element) return;
 
-    const activeClassNames = Object.values(
+    const existingClassNames = Object.values(
       CollapsiblePanelView.elementCss
     ).filter((className) => element.classList.contains(className));
     element.className = cx(
       ELEMENT_CLASS,
       this.#panelDescriptor?.className,
-      ...activeClassNames
+      ...existingClassNames
     );
 
     this.#updateName(element);

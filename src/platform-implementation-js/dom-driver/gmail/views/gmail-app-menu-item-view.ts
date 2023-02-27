@@ -115,7 +115,14 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     const element = this.element;
     if (!element) return;
 
-    element.className = cx(ELEMENT_CLASS, this.#menuItemDescriptor?.className);
+    const existingClassNames = Object.values(
+      GmailAppMenuItemView.elementCss
+    ).filter((className) => element.classList.contains(className));
+    element.className = cx(
+      ELEMENT_CLASS,
+      this.#menuItemDescriptor?.className,
+      ...existingClassNames
+    );
 
     this.#updateName(element);
     this.#updateIcon(element);
