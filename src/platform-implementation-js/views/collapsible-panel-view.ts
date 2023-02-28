@@ -125,10 +125,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       name = '',
     } = this.#panelDescriptor?.primaryButton ?? {};
     const element = document.createElement('div');
-    const burgerMenuOpen = GmailElementGetter.isAppBurgerMenuOpen();
-    element.className = cx(ELEMENT_CLASS, this.#panelDescriptor?.className, {
-      [CollapsiblePanelView.elementCss.COLLAPSED]: !burgerMenuOpen,
-    });
+    element.className = cx(ELEMENT_CLASS, this.#panelDescriptor?.className);
     const primaryButtonClass = cx(PRIMARY_BUTTON_ELEMENT_CLASS, className);
 
     let iconUrl;

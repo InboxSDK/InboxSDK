@@ -1,6 +1,7 @@
 import TypedEmitter from 'typed-emitter';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
+import cx from 'classnames';
 
 import EventEmitter from '../lib/safe-event-emitter';
 import {
@@ -61,6 +62,7 @@ const routeIDtoMenuItemClass = Object.fromEntries([
 ]);
 
 type StreamType =
+  | ['route-activated', HTMLElement]
   | ['click', HTMLElement]
   | ['mouseenter' | 'mouseleave', HTMLElement, MouseEvent];
 
@@ -96,6 +98,10 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
     return button;
   }
+  static #isPanelLess() {
+    const activePanel = AppMenuItemView.#getActivePanel();
+    return !activePanel;
+  }
   static #setUpRouteViewDriverStream(driver: GmailDriver) {
     if (AppMenuItemView.#routeViewDriverStream) return;
 
@@ -123,7 +129,10 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         }) ?? [];
 
       if (gmailView?.element) {
-        AppMenuItemView.#menuItemChangeBus.emit(['click', gmailView.element]);
+        AppMenuItemView.#menuItemChangeBus.emit([
+          'route-activated',
+          gmailView.element,
+        ]);
         return;
       }
 
@@ -142,24 +151,12 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         document.querySelector<HTMLElement>(`.${menuItemClass}`);
 
       if (menuItemElement) {
-        AppMenuItemView.#menuItemChangeBus.emit(['click', menuItemElement]);
+        AppMenuItemView.#menuItemChangeBus.emit([
+          'route-activated',
+          menuItemElement,
+        ]);
       }
     });
-  }
-  static #handlePanelLessMode() {
-    const activePanel = AppMenuItemView.#getActivePanel();
-    const noActivePanel = !activePanel;
-
-    for (const panel of document.querySelectorAll(
-      CollapsiblePanelView.elementSelectors.NATIVE
-    ) ?? []) {
-      panel.classList.toggle(
-        CollapsiblePanelView.elementCss.PANEL_LESS,
-        noActivePanel
-      );
-    }
-    GmailElementGetter.getAppMenu()?.classList.toggle('aTO', noActivePanel);
-    GmailElementGetter.getAppHeader()?.classList.toggle('aTO', noActivePanel);
   }
   static {
     (async function init() {
@@ -252,6 +249,34 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     AppMenuItemView.#menuItemChangeStream.onValue(async (v) => {
       const [type, menuItem, mouseEvent] = v;
       const { ACTIVE, HOVER } = GmailAppMenuItemView.elementCss;
+
+      function handleActivate() {
+        const appMenuElement = GmailElementGetter.getAppMenuContainer();
+
+        // deactivate active panel
+        const activePanel = AppMenuItemView.#getActivePanel();
+        if (activePanel) {
+          activePanel.style.removeProperty('height');
+          activePanel.classList.remove(CollapsiblePanelView.elementCss.ACTIVE);
+          activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
+        }
+
+        // deactivate menu items
+        for (const menuItem_ of appMenuElement?.querySelectorAll(
+          `.${NATIVE_CLASS}`
+        ) ?? []) {
+          menuItem_.classList.remove(ACTIVE);
+          menuItem_.classList.remove(HOVER);
+        }
+
+        // activate menu item
+        menuItem.classList.add(ACTIVE);
+        // activate panel
+        const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
+        if (panel) {
+          panel.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
+        }
+      }
 
       switch (type) {
         case 'mouseenter': {
@@ -356,36 +381,29 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         }
 
         case 'click': {
-          const appMenuElement = GmailElementGetter.getAppMenuContainer();
+          handleActivate();
 
-          // deactivate active panel
-          const activePanel = AppMenuItemView.#getActivePanel();
-          if (activePanel) {
-            activePanel.style.removeProperty('height');
-            activePanel.classList.remove(
-              CollapsiblePanelView.elementCss.ACTIVE
-            );
-            activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
-          }
+          // handle panel-less mode
+          const isPanelLess = AppMenuItemView.#isPanelLess();
 
-          // deactivate menu items
-          for (const menuItem_ of appMenuElement?.querySelectorAll(
-            `.${NATIVE_CLASS}`
+          for (const panel of document.querySelectorAll(
+            CollapsiblePanelView.elementSelectors.NATIVE
           ) ?? []) {
-            menuItem_.classList.remove(ACTIVE);
-            menuItem_.classList.remove(HOVER);
+            panel.classList.toggle(
+              CollapsiblePanelView.elementCss.PANEL_LESS,
+              isPanelLess
+            );
           }
+          GmailElementGetter.getAppMenu()?.classList.toggle('aTO', isPanelLess);
+          GmailElementGetter.getAppHeader()?.classList.toggle(
+            'aTO',
+            isPanelLess
+          );
+          break;
+        }
 
-          // activate menu item
-          menuItem.classList.add(ACTIVE);
-          // activate panel
-          const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
-          if (panel) {
-            panel.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
-          }
-
-          // handle no panel
-          AppMenuItemView.#handlePanelLessMode();
+        case 'route-activated': {
+          handleActivate();
           break;
         }
       }
@@ -457,9 +475,19 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
   }
 
   async addCollapsiblePanel(panelDescriptor: AppMenuItemPanelDescriptor) {
+    const descriptor = {
+      ...panelDescriptor,
+      className: cx(panelDescriptor.className, {
+        [CollapsiblePanelView.elementCss.COLLAPSED]:
+          !GmailElementGetter.isAppBurgerMenuOpen(),
+        [CollapsiblePanelView.elementCss.PANEL_LESS]:
+          AppMenuItemView.#isPanelLess(),
+      }),
+    };
+
     const collapsiblePanel = await addCollapsiblePanel(
       this.#driver,
-      panelDescriptor
+      descriptor
     );
 
     if (collapsiblePanel) {
