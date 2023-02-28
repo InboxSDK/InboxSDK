@@ -108,7 +108,8 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       | NavItemDescriptor
       | Kefir.Observable<NavItemDescriptor, any>
   ) {
-    const element = this.element;
+    this.setLoading(false);
+    const { element } = this;
 
     const navMenuContainerElement = querySelector(
       element,
