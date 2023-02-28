@@ -36,6 +36,8 @@ export type AppMenuItemDescriptor = {
 
 export type AppMenuItemPanelDescriptor = {
   className?: string;
+  /** In the form of HTML as a string. */
+  loadingIcon?: string;
   primaryButton?: {
     name: string;
     onClick: (e: MouseEvent) => void;

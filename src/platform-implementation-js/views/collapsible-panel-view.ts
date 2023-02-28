@@ -18,6 +18,11 @@ const ELEMENT_CLASS = `${NATIVE_CLASS} ${INBOXSDK_CLASS} oy8Mbf` as const;
 
 const PRIMARY_BUTTON_ELEMENT_CLASS = 'T-I T-I-KE L3' as const;
 const PRIMARY_BUTTON_ELEMENT_SELECTOR = '.T-I.T-I-KE.L3' as const;
+const scrollablePanelClass = 'at9' as const;
+const scrollablePanelSelector = `.${scrollablePanelClass}` as const;
+const loadingElementClass =
+  'inboxsdk__collapsiblePanel_loading_container' as const;
+const loadingElementSelector = `.${loadingElementClass}` as const;
 
 const NAV_MENU_CONTAINER_ELEMENT_SELECTOR = '.at9 .n3 .TK' as const;
 
@@ -38,25 +43,42 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     HOVER: 'aJu',
     COLLAPSED_HOVER: 'bym',
   } as const;
-  #panelDescriptor: AppMenuItemPanelDescriptor | undefined;
-  #element?: HTMLElement;
+  panelDescriptor: AppMenuItemPanelDescriptor;
+  #element: HTMLElement;
   #destroyed = false;
   #id = Math.random().toFixed(3);
   #ARIA_LABELLED_BY_ID = Math.random().toFixed(3);
   #driver;
+  #loading = false;
+
+  get loading() {
+    return this.#loading;
+  }
+
+  setLoading(loading: boolean) {
+    const changed = this.#loading !== loading;
+    this.#loading = loading;
+
+    if (changed) {
+      this.#update();
+    }
+  }
 
   get element() {
     return this.#element;
   }
 
-  set panelDescriptor(panelDescriptor: AppMenuItemPanelDescriptor) {
-    this.#panelDescriptor = panelDescriptor;
-    this.#update();
+  get scrollablePaneElement() {
+    return this.element.querySelector(scrollablePanelSelector);
   }
 
-  constructor(driver: GmailDriver) {
+  constructor(
+    driver: GmailDriver,
+    panelDescriptor: AppMenuItemPanelDescriptor
+  ) {
     super();
     this.#driver = driver;
+    this.panelDescriptor = panelDescriptor;
     this.#element = this.#setupElement();
     this.#element.addEventListener('mouseleave', (e: MouseEvent) => {
       this.emit('blur', e);
@@ -77,7 +99,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   remove() {
     if (this.#destroyed) return;
     this.#destroyed = true;
-    this.element?.remove();
+    this.element.remove();
     this.emit('destroy');
   }
 
@@ -87,7 +109,6 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       | Kefir.Observable<NavItemDescriptor, any>
   ) {
     const element = this.element;
-    if (!element) return;
 
     const navMenuContainerElement = querySelector(
       element,
@@ -118,11 +139,13 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   }
 
   #setupElement() {
+    const { panelDescriptor } = this;
+    const { loadingIcon } = panelDescriptor ?? {};
     const {
       iconUrl: themedIcons,
       className,
       name = '',
-    } = this.#panelDescriptor?.primaryButton ?? {};
+    } = panelDescriptor?.primaryButton ?? {};
     const element = document.createElement('div');
     const burgerMenuOpen = GmailElementGetter.isAppBurgerMenuOpen();
     element.className = cx(ELEMENT_CLASS, {
@@ -149,7 +172,10 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
             </div>
           </div>
         </div>
-        <div class="at9">
+        <div class="${scrollablePanelClass}">
+          <div class="${loadingElementClass}">${
+      loadingIcon ? { __html: loadingIcon } : ''
+    }</div>
           <div class="Ls77Lb aZ6">
             <div class="pp" style="user-select: none;">
               <div>
@@ -194,7 +220,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   }
 
   #onPrimaryButtonClick = (e: MouseEvent) => {
-    this.#panelDescriptor?.primaryButton?.onClick?.(e);
+    this.panelDescriptor?.primaryButton?.onClick?.(e);
   };
 
   #update() {
@@ -206,13 +232,14 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     const isActive = element.classList.contains(ACTIVE);
     const isCollapsed = element.classList.contains(COLLAPSED);
 
-    element.className = cx(ELEMENT_CLASS, this.#panelDescriptor?.className, {
+    element.className = cx(ELEMENT_CLASS, this.panelDescriptor?.className, {
       [ACTIVE]: isActive,
       [COLLAPSED]: isCollapsed,
     });
 
     this.#updateName(element);
     this.#updateIcon(element);
+    this.#updateScrollablePanelLoading(element);
   }
 
   #updateIcon(element: HTMLElement) {
@@ -221,7 +248,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       PRIMARY_BUTTON_ELEMENT_SELECTOR
     );
 
-    const { iconUrl, className } = this.#panelDescriptor?.primaryButton ?? {};
+    const { iconUrl, className } = this.panelDescriptor?.primaryButton ?? {};
 
     if (iconUrl) {
       const backgroundImage = `url(${
@@ -244,6 +271,24 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       return;
     }
 
-    buttonTextEl.textContent = this.#panelDescriptor?.primaryButton?.name ?? '';
+    buttonTextEl.textContent = this.panelDescriptor?.primaryButton?.name ?? '';
+  }
+
+  #updateScrollablePanelLoading(element: Element) {
+    const scrollablePanelLoadingEl = element.querySelector(
+      loadingElementSelector
+    );
+
+    if (!scrollablePanelLoadingEl) {
+      return;
+    }
+
+    const panelLoadingClass = `${loadingElementClass}--active` as const;
+
+    if (this.loading) {
+      scrollablePanelLoadingEl.classList.add(panelLoadingClass);
+    } else {
+      scrollablePanelLoadingEl.classList.remove(panelLoadingClass);
+    }
   }
 }

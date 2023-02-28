@@ -13,8 +13,10 @@ export async function addCollapsiblePanel(
 ) {
   const injectionContainer = await waitForAppMenuParentReady();
 
-  const collapsiblePanelView = new CollapsiblePanelView(driver);
-  collapsiblePanelView.panelDescriptor = panelDescriptor;
+  const collapsiblePanelView = new CollapsiblePanelView(
+    driver,
+    panelDescriptor
+  );
 
   if (!injectionContainer || !collapsiblePanelView.element) return;
 
