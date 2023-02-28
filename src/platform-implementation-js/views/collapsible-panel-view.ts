@@ -64,17 +64,6 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     });
   }
 
-  /**
-   * @internal
-   */
-  activate() {
-    const element = this.element;
-    if (!element) return;
-
-    element?.classList.remove(CollapsiblePanelView.elementCss.HOVER);
-    element.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
-  }
-
   remove() {
     if (this.#destroyed) return;
     this.#destroyed = true;
