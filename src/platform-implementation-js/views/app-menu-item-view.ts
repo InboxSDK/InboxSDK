@@ -423,7 +423,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       }
 
       gmailView.on('destroy', () => {
-        AppMenuItemView.#menuItemChangeBus.end();
         this.remove();
       });
 
