@@ -36,7 +36,9 @@ export type AppMenuItemDescriptor = {
 
 export type AppMenuItemPanelDescriptor = {
   className?: string;
-  /** In the form of HTML as a string. */
+  /** In the form of HTML as a string.
+   *
+   * If this option is provided, the panel defaults to loading=true.  */
   loadingIcon?: string;
   primaryButton?: {
     name: string;

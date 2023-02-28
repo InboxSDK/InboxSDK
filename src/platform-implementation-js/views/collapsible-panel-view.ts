@@ -50,7 +50,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   #id = Math.random().toFixed(3);
   #ARIA_LABELLED_BY_ID = Math.random().toFixed(3);
   #driver;
-  #loading = false;
+  #loading;
 
   get loading() {
     return this.#loading;
@@ -89,6 +89,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     super();
     this.#driver = driver;
     this.#panelDescriptor = panelDescriptor;
+    this.#loading = panelDescriptor.loadingIcon != null;
     this.#element = this.#setupElement();
     this.#element.addEventListener('mouseleave', (e: MouseEvent) => {
       this.emit('blur', e);
