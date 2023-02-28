@@ -37,6 +37,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     /** A hover popover has both ACTIVE _and_ HOVER */
     HOVER: 'aJu',
     COLLAPSED_HOVER: 'bym',
+    PANEL_LESS: 'a3W',
   } as const;
   #panelDescriptor: AppMenuItemPanelDescriptor | undefined;
   #element?: HTMLElement;
@@ -61,17 +62,6 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     this.#element.addEventListener('mouseleave', (e: MouseEvent) => {
       this.emit('blur', e);
     });
-  }
-
-  /**
-   * @internal
-   */
-  activate() {
-    const element = this.element;
-    if (!element) return;
-
-    element?.classList.remove(CollapsiblePanelView.elementCss.HOVER);
-    element.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
   }
 
   remove() {
@@ -124,10 +114,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       name = '',
     } = this.#panelDescriptor?.primaryButton ?? {};
     const element = document.createElement('div');
-    const burgerMenuOpen = GmailElementGetter.isAppBurgerMenuOpen();
-    element.className = cx(ELEMENT_CLASS, {
-      [CollapsiblePanelView.elementCss.COLLAPSED]: !burgerMenuOpen,
-    });
+    element.className = cx(ELEMENT_CLASS, this.#panelDescriptor?.className);
     const primaryButtonClass = cx(PRIMARY_BUTTON_ELEMENT_CLASS, className);
 
     let iconUrl;
@@ -201,15 +188,14 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     const element = this.element;
     if (!element) return;
 
-    const { ACTIVE, COLLAPSED } = CollapsiblePanelView.elementCss;
-
-    const isActive = element.classList.contains(ACTIVE);
-    const isCollapsed = element.classList.contains(COLLAPSED);
-
-    element.className = cx(ELEMENT_CLASS, this.#panelDescriptor?.className, {
-      [ACTIVE]: isActive,
-      [COLLAPSED]: isCollapsed,
-    });
+    const existingClassNames = Object.values(
+      CollapsiblePanelView.elementCss
+    ).filter((className) => element.classList.contains(className));
+    element.className = cx(
+      ELEMENT_CLASS,
+      this.#panelDescriptor?.className,
+      ...existingClassNames
+    );
 
     this.#updateName(element);
     this.#updateIcon(element);
