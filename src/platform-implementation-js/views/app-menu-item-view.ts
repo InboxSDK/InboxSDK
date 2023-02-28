@@ -61,6 +61,7 @@ const routeIDtoMenuItemClass = Object.fromEntries([
 ]);
 
 type StreamType =
+  | ['added', HTMLElement]
   | ['click', HTMLElement]
   | ['mouseenter' | 'mouseleave', HTMLElement, MouseEvent];
 
@@ -238,6 +239,20 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       const { ACTIVE, HOVER } = GmailAppMenuItemView.elementCss;
 
       switch (type) {
+        case 'added': {
+          const element = menuItem;
+
+          const panel = AppMenuItemView.#menuItemToPanelMap.get(element);
+
+          if (!panel) {
+            console.log('😭');
+            return;
+          }
+
+          console.log({ element, panel });
+
+          break;
+        }
         case 'mouseenter': {
           const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
           const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
@@ -399,6 +414,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       const gmailElement = gmailView.element;
 
       if (gmailElement) {
+        AppMenuItemView.#menuItemChangeBus.emit(['added', gmailElement]);
         AppMenuItemView.#menuItemToPanelMap.set(gmailElement, undefined);
       }
 

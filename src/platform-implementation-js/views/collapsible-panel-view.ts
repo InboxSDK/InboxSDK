@@ -30,6 +30,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   static elementSelectors = {
     NATIVE: '.aqn.oy8Mbf',
     CUSTOM: '.inboxsdk__collapsiblePanel',
+    PANEL_POINTER: '.aTV',
   } as const;
   static elementCss = {
     ACTIVE: 'apV',
@@ -38,8 +39,10 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     HOVER: 'aJu',
     COLLAPSED_HOVER: 'bym',
   } as const;
-  #panelDescriptor: AppMenuItemPanelDescriptor | undefined;
-  #element?: HTMLElement;
+
+  panelDescriptor;
+
+  #element: HTMLElement;
   #destroyed = false;
   #id = Math.random().toFixed(3);
   #ARIA_LABELLED_BY_ID = Math.random().toFixed(3);
@@ -49,14 +52,13 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     return this.#element;
   }
 
-  set panelDescriptor(panelDescriptor: AppMenuItemPanelDescriptor) {
-    this.#panelDescriptor = panelDescriptor;
-    this.#update();
-  }
-
-  constructor(driver: GmailDriver) {
+  constructor(
+    driver: GmailDriver,
+    panelDescriptor: AppMenuItemPanelDescriptor
+  ) {
     super();
     this.#driver = driver;
+    this.panelDescriptor = panelDescriptor;
     this.#element = this.#setupElement();
     this.#element.addEventListener('mouseleave', (e: MouseEvent) => {
       this.emit('blur', e);
@@ -68,9 +70,8 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
    */
   activate() {
     const element = this.element;
-    if (!element) return;
 
-    element?.classList.remove(CollapsiblePanelView.elementCss.HOVER);
+    element.classList.remove(CollapsiblePanelView.elementCss.HOVER);
     element.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
   }
 
@@ -87,7 +88,6 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       | Kefir.Observable<NavItemDescriptor, any>
   ) {
     const element = this.element;
-    if (!element) return;
 
     const navMenuContainerElement = querySelector(
       element,
@@ -117,12 +117,18 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     return navItemView;
   }
 
+  #getPopoverPointerElement() {
+    this.element.querySelector(
+      CollapsiblePanelView.elementSelectors.PANEL_POINTER
+    );
+  }
+
   #setupElement() {
     const {
       iconUrl: themedIcons,
       className,
       name = '',
-    } = this.#panelDescriptor?.primaryButton ?? {};
+    } = this.panelDescriptor.primaryButton ?? {};
     const element = document.createElement('div');
     const burgerMenuOpen = GmailElementGetter.isAppBurgerMenuOpen();
     element.className = cx(ELEMENT_CLASS, {
@@ -194,7 +200,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   }
 
   #onPrimaryButtonClick = (e: MouseEvent) => {
-    this.#panelDescriptor?.primaryButton?.onClick?.(e);
+    this.panelDescriptor.primaryButton?.onClick?.(e);
   };
 
   #update() {
@@ -206,7 +212,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     const isActive = element.classList.contains(ACTIVE);
     const isCollapsed = element.classList.contains(COLLAPSED);
 
-    element.className = cx(ELEMENT_CLASS, this.#panelDescriptor?.className, {
+    element.className = cx(ELEMENT_CLASS, this.panelDescriptor?.className, {
       [ACTIVE]: isActive,
       [COLLAPSED]: isCollapsed,
     });
@@ -221,7 +227,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       PRIMARY_BUTTON_ELEMENT_SELECTOR
     );
 
-    const { iconUrl, className } = this.#panelDescriptor?.primaryButton ?? {};
+    const { iconUrl, className } = this.panelDescriptor?.primaryButton ?? {};
 
     if (iconUrl) {
       const backgroundImage = `url(${
@@ -244,6 +250,6 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       return;
     }
 
-    buttonTextEl.textContent = this.#panelDescriptor?.primaryButton?.name ?? '';
+    buttonTextEl.textContent = this.panelDescriptor?.primaryButton?.name ?? '';
   }
 }

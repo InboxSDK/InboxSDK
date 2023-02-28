@@ -36,6 +36,12 @@ export type AppMenuItemDescriptor = {
 
 export type AppMenuItemPanelDescriptor = {
   className?: string;
+  /**
+   * Controls pointer pointing towards app menu item on overlay placement.
+   *
+   * @interal
+   */
+  popoverPointerTop?: number;
   primaryButton?: {
     name: string;
     onClick: (e: MouseEvent) => void;
