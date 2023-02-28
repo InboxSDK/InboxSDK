@@ -11,6 +11,15 @@ import isIntegratedViewGmail from './gmail-driver/isIntegratedViewGmail';
 import Logger from '../../lib/logger';
 import waitFor from '../../lib/wait-for';
 
+/**
+ * The selector for the new app menu https://support.google.com/mail/answer/11555490 -- FEB 2023
+ */
+const APP_MENU = '.aeN.WR.a6o.anZ.nH.oy8Mbf[role=navigation]';
+/**
+ * If the APP_MENU selector is not found, NAV_MENU _might_ be present.
+ */
+const NAV_MENU = '.aeN.WR.nH.oy8Mbf[role=navigation]';
+
 // TODO Figure out if these functions can and should be able to return null
 const GmailElementGetter = {
   getActiveMoreMenu(): HTMLElement | null {
@@ -187,14 +196,6 @@ const GmailElementGetter = {
   getAppMenuAsync: once(async () => {
     if (!GmailElementGetter.isStandalone()) {
       await GmailElementGetter.waitForGmailModeToSettle();
-      /**
-       * The selector for the new app menu https://support.google.com/mail/answer/11555490 -- FEB 2023
-       */
-      const APP_MENU = '.aeN.WR.a6o.anZ.nH.oy8Mbf[role=navigation]';
-      /**
-       * If the APP_MENU selector is not found, NAV_MENU _might_ be present.
-       */
-      const NAV_MENU = '.aeN.WR.nH.oy8Mbf[role=navigation]';
 
       try {
         const element = await waitFor(() =>
@@ -224,10 +225,13 @@ const GmailElementGetter = {
     return document.querySelector<HTMLElement>('.aqk.aql.bkL');
   },
 
-  // TODO figure out if we use it
-  // getNavMenu() {
-  //   return document.querySelector('.aeN.WR.nH.oy8Mbf[role=navigation]');
-  // },
+  getAppMenu() {
+    return document.querySelector<HTMLElement>(APP_MENU);
+  },
+
+  getAppHeader() {
+    return document.querySelector<HTMLElement>('.oy8Mbf.qp');
+  },
 
   getSeparateSectionNavItemMenuInjectionContainer(): HTMLElement | null {
     return document.querySelector('.aeN');

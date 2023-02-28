@@ -42,8 +42,9 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     /** A hover popover has both ACTIVE _and_ HOVER */
     HOVER: 'aJu',
     COLLAPSED_HOVER: 'bym',
+    PANEL_LESS: 'a3W',
   } as const;
-  panelDescriptor: AppMenuItemPanelDescriptor;
+  #panelDescriptor: AppMenuItemPanelDescriptor;
   #element: HTMLElement;
   #destroyed = false;
   #id = Math.random().toFixed(3);
@@ -64,6 +65,15 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     }
   }
 
+  get panelDescriptor() {
+    return this.#panelDescriptor;
+  }
+
+  set panelDescriptor(panelDescriptor: AppMenuItemPanelDescriptor) {
+    this.#panelDescriptor = panelDescriptor;
+    this.#update();
+  }
+
   get element() {
     return this.#element;
   }
@@ -78,22 +88,11 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   ) {
     super();
     this.#driver = driver;
-    this.panelDescriptor = panelDescriptor;
+    this.#panelDescriptor = panelDescriptor;
     this.#element = this.#setupElement();
     this.#element.addEventListener('mouseleave', (e: MouseEvent) => {
       this.emit('blur', e);
     });
-  }
-
-  /**
-   * @internal
-   */
-  activate() {
-    const element = this.element;
-    if (!element) return;
-
-    element?.classList.remove(CollapsiblePanelView.elementCss.HOVER);
-    element.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
   }
 
   remove() {
@@ -141,17 +140,14 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
 
   #setupElement() {
     const { panelDescriptor } = this;
-    const { loadingIcon } = panelDescriptor ?? {};
+    const { loadingIcon } = panelDescriptor;
     const {
       iconUrl: themedIcons,
       className,
       name = '',
     } = panelDescriptor?.primaryButton ?? {};
     const element = document.createElement('div');
-    const burgerMenuOpen = GmailElementGetter.isAppBurgerMenuOpen();
-    element.className = cx(ELEMENT_CLASS, {
-      [CollapsiblePanelView.elementCss.COLLAPSED]: !burgerMenuOpen,
-    });
+    element.className = cx(ELEMENT_CLASS, this.panelDescriptor.className);
     const primaryButtonClass = cx(PRIMARY_BUTTON_ELEMENT_CLASS, className);
 
     let iconUrl;
@@ -221,22 +217,21 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   }
 
   #onPrimaryButtonClick = (e: MouseEvent) => {
-    this.panelDescriptor?.primaryButton?.onClick?.(e);
+    this.panelDescriptor.primaryButton?.onClick?.(e);
   };
 
   #update() {
     const element = this.element;
     if (!element) return;
 
-    const { ACTIVE, COLLAPSED } = CollapsiblePanelView.elementCss;
-
-    const isActive = element.classList.contains(ACTIVE);
-    const isCollapsed = element.classList.contains(COLLAPSED);
-
-    element.className = cx(ELEMENT_CLASS, this.panelDescriptor?.className, {
-      [ACTIVE]: isActive,
-      [COLLAPSED]: isCollapsed,
-    });
+    const existingClassNames = Object.values(
+      CollapsiblePanelView.elementCss
+    ).filter((className) => element.classList.contains(className));
+    element.className = cx(
+      ELEMENT_CLASS,
+      this.panelDescriptor.className,
+      ...existingClassNames
+    );
 
     this.#updateName(element);
     this.#updateIcon(element);
@@ -249,7 +244,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       PRIMARY_BUTTON_ELEMENT_SELECTOR
     );
 
-    const { iconUrl, className } = this.panelDescriptor?.primaryButton ?? {};
+    const { iconUrl, className } = this.panelDescriptor.primaryButton ?? {};
 
     if (iconUrl) {
       const backgroundImage = `url(${
@@ -272,7 +267,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       return;
     }
 
-    buttonTextEl.textContent = this.panelDescriptor?.primaryButton?.name ?? '';
+    buttonTextEl.textContent = this.panelDescriptor.primaryButton?.name ?? '';
   }
 
   #updateScrollablePanelLoading(element: Element) {
