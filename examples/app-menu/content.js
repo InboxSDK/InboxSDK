@@ -85,11 +85,26 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
       }
     }),
     panel2 = await customItem2.addCollapsiblePanel({
+      loadingIcon: `<div>
+        Slow loading...20s&nbsp;
+        <img src="${chrome.runtime.getURL('monkey.png')}" width="20" height="20" />
+      </div>`,
       primaryButton: {
         name: 'Monkey panel',
         onClick: () => alert('clicked custom panel 2'),
         iconUrl: {lightTheme: chrome.runtime.getURL('monkey.png')},
       }
+    });
+
+    panel2.setLoading(true);
+
+    // Simulate very slow loading.
+    new Promise((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 20_000);
+    }).then(() => {
+      panel2.setLoading(false);
     });
 
     panel1.addNavItem({
