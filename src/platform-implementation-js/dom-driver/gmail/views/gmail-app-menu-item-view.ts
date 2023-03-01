@@ -138,6 +138,7 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
       // https://stackoverflow.com/a/68521953/1924257
       for (const url of [theme, activeImg]) {
         if (GmailAppMenuItemView.#preloadedIcons.has(url)) continue;
+        GmailAppMenuItemView.#preloadedIcons.add(url);
 
         var link = document.createElement('link');
         link.rel = 'preload';
