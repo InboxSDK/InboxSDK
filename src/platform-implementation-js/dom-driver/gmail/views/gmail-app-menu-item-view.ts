@@ -119,6 +119,8 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     headingElement.textContent = this.#menuItemDescriptor?.name ?? '';
   }
 
+  static #preloadedIcons = new Set<string>();
+
   #updateIcon(element: HTMLElement) {
     const iconContainerEl = querySelector(element, ICON_ELEMENT_SELECTOR);
 
@@ -131,6 +133,20 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
       const theme = typeof rawTheme === 'string' ? rawTheme : rawTheme.default;
       const activeImg =
         typeof rawTheme === 'string' ? rawTheme : rawTheme.active;
+
+      // alleviate FOUC when switching between active and default icons
+      // https://stackoverflow.com/a/68521953/1924257
+      for (const url of [theme, activeImg]) {
+        if (GmailAppMenuItemView.#preloadedIcons.has(url)) continue;
+        GmailAppMenuItemView.#preloadedIcons.add(url);
+
+        var link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'image';
+        link.href = url;
+        document.head.appendChild(link);
+      }
+
       iconContainerEl.style.setProperty('--background-image', `url(${theme})`);
       iconContainerEl.style.setProperty(
         '--background-image--active',
