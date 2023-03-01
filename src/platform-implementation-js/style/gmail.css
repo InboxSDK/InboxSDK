@@ -1605,6 +1605,18 @@ shows up on our elements preventing them from collapsing.
   padding-left: 0;
 }
 
+/* app menu panel nav item reshaping */
+.inboxsdk__collapsiblePanel .inboxsdk__navItem > .TO .TN.aik {
+  padding-left: 18px;
+}
+
+/* Tweak alignment of  */
+.inboxsdk__collapsiblePanel .inboxsdk__navItem > .TO .qj {
+  margin-right: 14px;
+}
+
+/* end app menu panel nav item reshaping */
+
 .inboxsdk__navItem > .TO.n4 .qj > .G-asx {
   margin-right: 0;
 }
