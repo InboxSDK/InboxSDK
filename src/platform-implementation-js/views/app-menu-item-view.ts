@@ -102,6 +102,31 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     const activePanel = AppMenuItemView.#getActivePanel();
     return !activePanel;
   }
+  static #adjustTooltipNub() {
+    // adjust all menu items' collapsible panel's tooltip nub position
+    const appMenuElement = GmailElementGetter.getAppMenu();
+    for (const menuItem of appMenuElement?.querySelectorAll<HTMLElement>(
+      `.${NATIVE_CLASS}`
+    ) ?? []) {
+      const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
+      if (!panel) continue;
+
+      const nubElement = panel?.querySelector<HTMLElement>('* > .aTV');
+      const iconElement = menuItem?.querySelector<HTMLElement>('.V6');
+
+      const iconElementBox = iconElement?.getBoundingClientRect();
+      const offsetTop =
+        (iconElement?.offsetTop ?? 0) + (iconElementBox?.height ?? 0) * 0.5;
+      const nubSide = 17;
+      const nubDiagonal = nubSide * Math.sqrt(2);
+      const offsetNub = nubDiagonal / 4;
+      const offset = offsetTop - offsetNub;
+
+      if (nubElement && offset) {
+        nubElement.style.top = `${offset}px`;
+      }
+    }
+  }
   static #setUpRouteViewDriverStream(driver: GmailDriver) {
     if (AppMenuItemView.#routeViewDriverStream) return;
 
@@ -438,6 +463,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
       if (gmailElement) {
         AppMenuItemView.#menuItemToPanelMap.set(gmailElement, undefined);
+        AppMenuItemView.#adjustTooltipNub();
       }
 
       gmailView.on('destroy', () => {
@@ -470,7 +496,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
     AppMenuItemView.#setUpRouteViewDriverStream(driver);
     AppMenuItemView.#menuItemAddedDeferred.resolve(undefined);
-
     AppMenuItemView.#appMenuItemViews.add(this);
   }
 
@@ -487,7 +512,8 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
     const collapsiblePanel = await addCollapsiblePanel(
       this.#driver,
-      descriptor
+      descriptor,
+      this.menuItemDescriptor.insertIndex
     );
 
     if (collapsiblePanel) {
@@ -502,13 +528,12 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
               e,
             ]);
           });
-        }
 
-        if (gmailElement && collapsiblePanel) {
           AppMenuItemView.#menuItemToPanelMap.set(
             gmailElement,
             collapsiblePanel.element
           );
+          AppMenuItemView.#adjustTooltipNub();
         }
       });
     }
@@ -532,6 +557,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       gmailView.element &&
         AppMenuItemView.#menuItemToPanelMap.delete(gmailView.element);
       gmailView.remove();
+      AppMenuItemView.#adjustTooltipNub();
     });
     AppMenuItemView.#appMenuItemViews.delete(this);
   }

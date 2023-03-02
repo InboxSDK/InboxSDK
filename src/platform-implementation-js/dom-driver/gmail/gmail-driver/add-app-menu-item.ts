@@ -16,8 +16,8 @@ export async function addAppMenuItem(
   try {
     if (!appMenuInjectionContainer || !gmailAppMenuItemView.element) return;
 
-    const siblingElement = menuItemDescriptor.insertIndex
-      ? appMenuInjectionContainer.childNodes[menuItemDescriptor.insertIndex] ??
+    const siblingElement = Number.isInteger(menuItemDescriptor.insertIndex)
+      ? appMenuInjectionContainer.childNodes[menuItemDescriptor.insertIndex!] ??
         null
       : null;
     appMenuInjectionContainer.insertBefore(
