@@ -201,7 +201,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
           </div>
         </div>
       </div>
-      <div class="aTV" style="top: 27px;"></div>
+      <div class="aTV"></div>
     `.trim();
     const primaryBtnEl = querySelector(
       element,
