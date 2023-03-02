@@ -22,6 +22,7 @@ const scrollablePanelClass = 'at9' as const;
 const scrollablePanelSelector = `.${scrollablePanelClass}` as const;
 const loadingElementClass =
   'inboxsdk__collapsiblePanel_loading_container' as const;
+const panelLoadingClass = `${loadingElementClass}--active` as const;
 const loadingElementSelector = `.${loadingElementClass}` as const;
 
 const NAV_MENU_CONTAINER_ELEMENT_SELECTOR = '.at9 .n3 .TK' as const;
@@ -150,6 +151,9 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     const element = document.createElement('div');
     element.className = cx(ELEMENT_CLASS, this.panelDescriptor.className);
     const primaryButtonClass = cx(PRIMARY_BUTTON_ELEMENT_CLASS, className);
+    const loadingElClass = cx(loadingElementClass, {
+      [panelLoadingClass]: this.#loading,
+    });
 
     let iconUrl;
 
@@ -171,7 +175,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
           </div>
         </div>
         <div class="${scrollablePanelClass}">
-          <div class="${loadingElementClass}">${
+          <div class="${loadingElClass}">${
       loadingIcon ? { __html: loadingIcon } : ''
     }</div>
           <div class="Ls77Lb aZ6">
@@ -279,8 +283,6 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     if (!scrollablePanelLoadingEl) {
       return;
     }
-
-    const panelLoadingClass = `${loadingElementClass}--active` as const;
 
     if (this.loading) {
       scrollablePanelLoadingEl.classList.add(panelLoadingClass);

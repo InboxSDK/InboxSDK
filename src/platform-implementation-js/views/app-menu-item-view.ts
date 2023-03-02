@@ -557,6 +557,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       gmailView.element &&
         AppMenuItemView.#menuItemToPanelMap.delete(gmailView.element);
       gmailView.remove();
+      AppMenuItemView.#adjustTooltipNub();
     });
     AppMenuItemView.#appMenuItemViews.delete(this);
   }
