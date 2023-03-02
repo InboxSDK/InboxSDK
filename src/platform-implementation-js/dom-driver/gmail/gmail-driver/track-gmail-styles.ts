@@ -101,10 +101,11 @@ export default async function trackGmailStyles() {
   }
 
   try {
-    await Promise.all([
-      waitFor(() => document.querySelector('.TO .TN')),
-      waitFor(() => document.querySelector(navItemSelector)),
-    ]);
+    await waitFor(
+      () =>
+        document.querySelector('.TO .TN') &&
+        document.querySelector(navItemSelector)
+    );
   } catch (err) {
     Logger.error(err);
     return;
