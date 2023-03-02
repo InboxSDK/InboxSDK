@@ -103,13 +103,13 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     return !activePanel;
   }
   static #adjustTooltipNub() {
-    // adjust custom menu items' collapsible panel's tooltip nub position
-    const appMenuElement = GmailElementGetter.getAppMenuContainer();
+    // adjust all menu items' collapsible panel's tooltip nub position
+    const appMenuElement = GmailElementGetter.getAppMenu();
     for (const menuItem of appMenuElement?.querySelectorAll<HTMLElement>(
-      `.${INBOXSDK_CLASS}`
+      `.${NATIVE_CLASS}`
     ) ?? []) {
       const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
-      if (!panel) return;
+      if (!panel) continue;
 
       const nubElement = panel?.querySelector<HTMLElement>('* > .aTV');
       const iconElement = menuItem?.querySelector<HTMLElement>('.V6');
@@ -463,6 +463,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
       if (gmailElement) {
         AppMenuItemView.#menuItemToPanelMap.set(gmailElement, undefined);
+        AppMenuItemView.#adjustTooltipNub();
       }
 
       gmailView.on('destroy', () => {
