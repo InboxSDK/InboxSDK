@@ -123,6 +123,9 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
       const rawTheme = GmailElementGetter.isDarkTheme()
         ? iconUrl.darkTheme
         : iconUrl.lightTheme;
+
+      if (!rawTheme) return;
+
       const theme = typeof rawTheme === 'string' ? rawTheme : rawTheme.default;
       const activeImg =
         typeof rawTheme === 'string' ? rawTheme : rawTheme.active;

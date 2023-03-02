@@ -13,8 +13,8 @@ type ThemedIcon =
 export type AppMenuItemDescriptor = {
   name: string;
   iconUrl?: {
-    darkTheme: ThemedIcon;
-    lightTheme: ThemedIcon;
+    darkTheme?: ThemedIcon;
+    lightTheme?: ThemedIcon;
   };
   className?: string;
   iconClassName?: string;
