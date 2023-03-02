@@ -5,6 +5,8 @@ import TypedEventEmitter from 'typed-emitter';
 import { EventEmitter } from 'events';
 import cx from 'classnames';
 import GmailElementGetter from '../gmail-element-getter';
+import { stylesStream } from '../gmail-driver/track-gmail-styles';
+import isEqual from 'fast-deep-equal';
 
 export type MessageEvents = {
   click: (e: MouseEvent) => void;
@@ -28,8 +30,8 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     ACTIVE: 'apV',
   } as const;
 
-  #menuItemDescriptor?: AppMenuItemDescriptor;
-  #element?: HTMLElement;
+  #menuItemDescriptor: AppMenuItemDescriptor;
+  #element: HTMLElement;
   #destroyed = false;
   #driver;
 
@@ -37,7 +39,7 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     return this.#element;
   }
 
-  setMenuItemDescriptor(newMenuItemDescriptor: AppMenuItemDescriptor) {
+  set menuItemDescriptor(newMenuItemDescriptor) {
     this.#menuItemDescriptor = newMenuItemDescriptor;
     this.#update();
   }
@@ -46,10 +48,20 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     return this.#menuItemDescriptor;
   }
 
-  constructor(driver: GmailDriver) {
+  constructor(driver: GmailDriver, menuItemDescriptor: AppMenuItemDescriptor) {
     super();
     this.#element = this.#setupElement();
     this.#driver = driver;
+    this.#menuItemDescriptor = menuItemDescriptor;
+    this.#update();
+
+    stylesStream
+      .skipDuplicates((a, b) => isEqual(a, b))
+      .onValue(({ type }) => {
+        if (type === 'theme') {
+          this.#update();
+        }
+      });
 
     driver.getStopper().onValue(() => this.remove());
     this.#element.addEventListener('click', (e) => this.#onClick(e));
@@ -65,25 +77,6 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     this.#destroyed = true;
     this.element?.remove();
     this.emit('destroy');
-  }
-
-  /**
-   * @internal
-   */
-  blur() {
-    this.element?.classList.remove(GmailAppMenuItemView.elementCss.HOVER);
-  }
-
-  /**
-   * @internal
-   */
-  hover() {
-    if (
-      this.element?.classList.contains(GmailAppMenuItemView.elementCss.ACTIVE)
-    ) {
-      return;
-    }
-    this.element?.classList.add(GmailAppMenuItemView.elementCss.HOVER);
   }
 
   #setupElement() {
