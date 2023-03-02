@@ -519,7 +519,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
   async update(menuItemDescriptor: AppMenuItemDescriptor) {
     const gmailView = await this.#gmailViewPromise;
-    gmailView.setMenuItemDescriptor(menuItemDescriptor);
+    gmailView.menuItemDescriptor = menuItemDescriptor;
     this.#menuItemDescriptor = menuItemDescriptor;
   }
 

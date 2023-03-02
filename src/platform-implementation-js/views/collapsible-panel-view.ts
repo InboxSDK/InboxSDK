@@ -11,6 +11,8 @@ import GmailElementGetter from '../dom-driver/gmail/gmail-element-getter';
 import GmailDriver from '../dom-driver/gmail/gmail-driver';
 import { NavItemDescriptor } from '../dom-driver/gmail/views/gmail-nav-item-view';
 import NavItemView from './nav-item-view';
+import { stylesStream } from '../dom-driver/gmail/gmail-driver/track-gmail-styles';
+import { isEqual } from 'lodash';
 
 export const NATIVE_CLASS = 'aqn' as const;
 export const INBOXSDK_CLASS = 'inboxsdk__collapsiblePanel' as const;
@@ -69,7 +71,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     return this.#panelDescriptor;
   }
 
-  set panelDescriptor(panelDescriptor: AppMenuItemPanelDescriptor) {
+  set panelDescriptor(panelDescriptor) {
     this.#panelDescriptor = panelDescriptor;
     this.#update();
   }
@@ -94,6 +96,13 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     this.#element.addEventListener('mouseleave', (e: MouseEvent) => {
       this.emit('blur', e);
     });
+    stylesStream
+      .skipDuplicates((a, b) => isEqual(a, b))
+      .onValue(({ type }) => {
+        if (type === 'theme') {
+          this.#update();
+        }
+      });
   }
 
   remove() {

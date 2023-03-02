@@ -1,3 +1,4 @@
+import kefirBus from 'kefir-bus';
 import Logger from '../../../lib/logger';
 import waitFor from '../../../lib/wait-for';
 import GmailElementGetter from '../gmail-element-getter';
@@ -25,10 +26,12 @@ function getDensity(): string {
   }
 }
 
+const navItemSelector = '.aio' as const;
+
 function isDarkTheme(): boolean {
   // get the color of the left-nav-menu entries to determine whether Gmail is
   // in dark theme mode.
-  const navItem = document.querySelector('.aio');
+  const navItem = document.querySelector(navItemSelector);
   if (!navItem) {
     Logger.error(new Error('Failed to find nav item'));
     return false;
@@ -52,7 +55,12 @@ function isDarkTheme(): boolean {
   return r > 128;
 }
 
-export default function trackGmailStyles() {
+export const stylesStream = kefirBus<
+  { type: 'theme'; isDarkMode: boolean },
+  unknown
+>();
+
+export default async function trackGmailStyles() {
   if (
     document.head.hasAttribute('data-inboxsdk-gmail-style-tracker') ||
     GmailElementGetter.isStandalone()
@@ -84,28 +92,38 @@ export default function trackGmailStyles() {
       } else {
         document.body.classList.remove('inboxsdk__gmail_dark_theme');
       }
+
+      stylesStream.emit({
+        type: 'theme',
+        isDarkMode: newDarkTheme,
+      });
     }
   }
 
-  waitFor(
-    () => document.querySelector('.TO .TN') && document.querySelector('.aio')
-  )
-    .then(() => {
-      // Gmail changes an inline <style> sheet when the display density changes.
-      // Watch for changes to all <style> elements.
-      const observer = new MutationObserver(checkStyles);
-      const options = {
-        characterData: true,
-        childList: true,
-      };
-      Array.from(document.styleSheets).forEach((sheet) => {
-        if ((sheet.ownerNode as Element)!.tagName == 'STYLE') {
-          observer.observe(sheet.ownerNode!, options);
-        }
-      });
-      checkStyles();
-    })
-    .catch((err) => {
-      Logger.error(err);
-    });
+  try {
+    await Promise.all([
+      waitFor(() => document.querySelector('.TO .TN')),
+      waitFor(() => document.querySelector(navItemSelector)),
+    ]);
+  } catch (err) {
+    Logger.error(err);
+    return;
+  }
+
+  // Gmail changes an inline <style> sheet when the display density changes.
+  // Watch for changes to all <style> elements.
+  const observer = new MutationObserver(checkStyles);
+  const options = {
+    characterData: true,
+    childList: true,
+  };
+  for (const sheet of document.styleSheets) {
+    if (!(sheet.ownerNode instanceof Element)) {
+      continue;
+    }
+    if (sheet.ownerNode.tagName == 'STYLE') {
+      observer.observe(sheet.ownerNode!, options);
+    }
+  }
+  checkStyles();
 }
