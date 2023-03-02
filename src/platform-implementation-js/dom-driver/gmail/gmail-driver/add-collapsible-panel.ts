@@ -27,7 +27,9 @@ export async function addCollapsiblePanel(
 
   const panelNodes =
     injectionContainer.querySelectorAll<HTMLElement>('.aqn') ?? [];
-  const siblingElement = insertIndex ? panelNodes[insertIndex] ?? null : null;
+  const siblingElement = Number.isInteger(insertIndex)
+    ? panelNodes[insertIndex!] ?? null
+    : null;
 
   if (siblingElement) {
     siblingElement.insertAdjacentElement(
