@@ -26,7 +26,9 @@ export async function addCollapsiblePanel(
   if (!appMenu) return;
 
   const panelNodes =
-    injectionContainer.querySelectorAll<HTMLElement>('.aqn') ?? [];
+    injectionContainer.querySelectorAll<HTMLElement>(
+      CollapsiblePanelView.elementSelectors.NATIVE
+    ) ?? [];
   const siblingElement = Number.isInteger(insertIndex)
     ? panelNodes[insertIndex!] ?? null
     : null;
