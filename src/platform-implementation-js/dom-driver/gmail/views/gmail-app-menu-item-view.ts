@@ -6,7 +6,7 @@ import { EventEmitter } from 'events';
 import cx from 'classnames';
 import GmailElementGetter from '../gmail-element-getter';
 import { stylesStream } from '../gmail-driver/track-gmail-styles';
-import { isEqual } from 'lodash';
+import isEqual from 'fast-deep-equal';
 
 export type MessageEvents = {
   click: (e: MouseEvent) => void;

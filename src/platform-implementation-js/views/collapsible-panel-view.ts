@@ -12,7 +12,7 @@ import GmailDriver from '../dom-driver/gmail/gmail-driver';
 import { NavItemDescriptor } from '../dom-driver/gmail/views/gmail-nav-item-view';
 import NavItemView from './nav-item-view';
 import { stylesStream } from '../dom-driver/gmail/gmail-driver/track-gmail-styles';
-import { isEqual } from 'lodash';
+import isEqual from 'fast-deep-equal';
 
 export const NATIVE_CLASS = 'aqn' as const;
 export const INBOXSDK_CLASS = 'inboxsdk__collapsiblePanel' as const;
