@@ -34,6 +34,16 @@ export type AppMenuItemDescriptor = {
   isRouteActive: (routeView: RouteView) => boolean;
 };
 
+/**
+ * In dark themes, Gmail has different colored primary buttons depending on hover or active state
+ */
+type PanelPrimaryButtonThemedIcon =
+  | string
+  | {
+      panelHovered: string;
+      panelDefault: string;
+    };
+
 export type AppMenuItemPanelDescriptor = {
   className?: string;
   /** In the form of HTML as a string.
@@ -44,8 +54,8 @@ export type AppMenuItemPanelDescriptor = {
     name: string;
     onClick: (e: MouseEvent) => void;
     iconUrl?: {
-      darkTheme: string;
-      lightTheme: string;
+      darkTheme?: PanelPrimaryButtonThemedIcon;
+      lightTheme?: PanelPrimaryButtonThemedIcon;
     };
     className?: string;
   };
