@@ -156,7 +156,9 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       return;
     }
 
-    const theme = GmailElementGetter.isDarkTheme() ? iconUrl.darkTheme : iconUrl.lightTheme;
+    const theme = GmailElementGetter.isDarkTheme()
+      ? iconUrl.darkTheme
+      : iconUrl.lightTheme;
 
     if (!theme) {
       return;
