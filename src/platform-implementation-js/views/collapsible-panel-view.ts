@@ -149,14 +149,37 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     return navItemView;
   }
 
+  #extractPrimaryButtonTheme() {
+    const { iconUrl } = this.panelDescriptor.primaryButton ?? {};
+
+    if (!iconUrl) {
+      return;
+    }
+
+    const themeSelect = GmailElementGetter.isDarkTheme() ? 'dark' : 'light';
+    const theme = iconUrl[`${themeSelect}Theme`];
+
+    if (!theme) {
+      return;
+    }
+
+    if (typeof theme === 'string') {
+      return {
+        panelHovered: theme,
+        panelDefault: theme,
+      };
+    } else {
+      return {
+        panelDefault: theme.panelDefault,
+        panelHovered: theme.panelHovered,
+      };
+    }
+  }
+
   #setupElement() {
     const { panelDescriptor } = this;
     const { loadingIcon } = panelDescriptor;
-    const {
-      iconUrl: themedIcons,
-      className,
-      name = '',
-    } = panelDescriptor?.primaryButton ?? {};
+    const { className, name = '' } = panelDescriptor?.primaryButton ?? {};
     const element = document.createElement('div');
     element.className = cx(ELEMENT_CLASS, this.panelDescriptor.className);
     const primaryButtonClass = cx(PRIMARY_BUTTON_ELEMENT_CLASS, className);
@@ -164,15 +187,8 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       [panelLoadingClass]: this.#loading,
     });
 
-    let iconUrl;
-
-    if (themedIcons) {
-      if (GmailElementGetter.isDarkTheme()) {
-        iconUrl = themedIcons.darkTheme;
-      } else {
-        iconUrl = themedIcons.lightTheme;
-      }
-    }
+    const { panelDefault: defaultIconUrl, panelHovered: hoverPanelIconUrl } =
+      this.#extractPrimaryButtonTheme() ?? {};
 
     element.innerHTML = autoHtml`
       <div class="aBO">
@@ -222,7 +238,11 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     );
     primaryBtnEl.style.setProperty(
       '--background-image',
-      iconUrl ? `url(${iconUrl})` : 'unset'
+      defaultIconUrl ? `url(${defaultIconUrl})` : 'unset'
+    );
+    primaryBtnEl.style.setProperty(
+      '--background-image--hover',
+      hoverPanelIconUrl ? `url(${hoverPanelIconUrl})` : 'unset'
     );
 
     primaryBtnEl.addEventListener('click', this.#onPrimaryButtonClick);
@@ -258,19 +278,21 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       PRIMARY_BUTTON_ELEMENT_SELECTOR
     );
 
-    const { iconUrl, className } = this.panelDescriptor.primaryButton ?? {};
+    const { panelDefault, panelHovered } =
+      this.#extractPrimaryButtonTheme() ?? {};
 
-    if (iconUrl) {
-      const backgroundImage = `url(${
-        GmailElementGetter.isDarkTheme()
-          ? iconUrl.darkTheme
-          : iconUrl.lightTheme
-      })`;
-      iconContainerEl.style.setProperty('--background-image', backgroundImage);
-    } else {
-      iconContainerEl.style.setProperty('--background-image', 'unset');
+    for (const [key, value] of Object.entries({
+      '--background-image--hover': panelHovered,
+      '--background-image': panelDefault,
+    })) {
+      if (value) {
+        iconContainerEl.style.setProperty(key, `url(${value})`);
+      } else {
+        iconContainerEl.style.removeProperty(key);
+      }
     }
 
+    const { className } = this.panelDescriptor.primaryButton ?? {};
     iconContainerEl.className = cx(PRIMARY_BUTTON_ELEMENT_CLASS, className);
   }
 
