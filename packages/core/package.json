@@ -31,6 +31,7 @@
     "@types/kefir": "^3.8.6",
     "@types/node": "*",
     "asap": "^2.0.3",
+    "fast-deep-equal": "^3.1.3",
     "kefir-cast": "^3.3.0",
     "sha.js": "^2.4.0",
     "tag-tree": "^1.0.0",

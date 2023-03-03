@@ -10,11 +10,13 @@ export async function addAppMenuItem(
 ) {
   const appMenuInjectionContainer = await GmailElementGetter.getAppMenuAsync();
 
-  const gmailAppMenuItemView = new GmailAppMenuItemView(driver);
-  gmailAppMenuItemView.setMenuItemDescriptor(menuItemDescriptor);
+  const gmailAppMenuItemView = new GmailAppMenuItemView(
+    driver,
+    menuItemDescriptor
+  );
 
   try {
-    if (!appMenuInjectionContainer || !gmailAppMenuItemView.element) return;
+    if (!appMenuInjectionContainer) return;
 
     const siblingElement = Number.isInteger(menuItemDescriptor.insertIndex)
       ? appMenuInjectionContainer.childNodes[menuItemDescriptor.insertIndex!] ??
