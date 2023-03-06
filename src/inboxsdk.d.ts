@@ -106,6 +106,9 @@ export interface ButterBar {
 // export interface DropdownButtonAccessoryDescriptor {}
 
 export { AppMenu };
+export type { AppMenuItemView } from './platform-implementation-js/views/app-menu-item-view';
+export type { AppMenuItemPanelDescriptor } from './platform-implementation-js/namespaces/app-menu';
+export type { CollapsiblePanelView } from './platform-implementation-js/views/collapsible-panel-view';
 
 export interface NativeNavItemView extends EventEmitter {
   addNavItem(descriptor: NavItemDescriptor): NavItemView;
