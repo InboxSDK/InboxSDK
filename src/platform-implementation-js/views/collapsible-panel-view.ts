@@ -273,6 +273,8 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     this.#updateScrollablePanelLoading(element);
   }
 
+  static #preloadedIcons = new Set<string>();
+
   #updateIcon(element: HTMLElement) {
     const iconContainerEl = querySelector(
       element,
@@ -281,6 +283,21 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
 
     const { panelDefault, panelHovered } =
       this.#extractPrimaryButtonTheme() ?? {};
+
+    // alleviate FOUC when switching between active and default icons
+    // https://stackoverflow.com/a/68521953/1924257
+    for (const url of [panelHovered, panelDefault]) {
+      if (!url || CollapsiblePanelView.#preloadedIcons.has(url)) {
+        continue;
+      }
+      CollapsiblePanelView.#preloadedIcons.add(url);
+
+      var link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = url;
+      document.head.appendChild(link);
+    }
 
     for (const [key, value] of Object.entries({
       '--background-image--hover': panelHovered,
