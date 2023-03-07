@@ -21,7 +21,7 @@ export const ELEMENT_CLASS = `${NATIVE_CLASS} ${INBOXSDK_CLASS}` as const;
 const ICON_ELEMENT_CLASS = 'V6 CL' as const;
 const HEADING_ELEMENT_CLASS = 'apW' as const;
 
-const ICON_ELEMENT_SELECTOR = '.V6.CL' as const;
+export const ICON_ELEMENT_SELECTOR = '.V6.CL' as const;
 const HEADING_ELEMENT_SELECTOR = '.apW' as const;
 
 export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventEmitter<MessageEvents>) {

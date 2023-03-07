@@ -8,6 +8,7 @@ import {
   GmailAppMenuItemView,
   NATIVE_CLASS,
   INBOXSDK_CLASS,
+  ICON_ELEMENT_SELECTOR,
 } from '../dom-driver/gmail/views/gmail-app-menu-item-view';
 import {
   AppMenuItemDescriptor,
@@ -286,12 +287,19 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
         }
 
-        // deactivate menu items
+        // deactivate menu items and handle keyboard accessibility
         for (const menuItem_ of appMenuElement?.querySelectorAll(
           `.${NATIVE_CLASS}`
         ) ?? []) {
           menuItem_.classList.remove(ACTIVE);
           menuItem_.classList.remove(HOVER);
+          // update tabindex
+          const iconElement = menuItem_.querySelector<HTMLElement>(
+            ICON_ELEMENT_SELECTOR
+          );
+          if (iconElement) {
+            iconElement.tabIndex = menuItem_ === menuItem ? 0 : -1;
+          }
         }
 
         // activate menu item
