@@ -28,7 +28,7 @@ function getDensity(): string {
 
 const navItemSelector = '.aio' as const;
 
-function isDarkTheme(): boolean {
+export function isDarkTheme(): boolean {
   // get the color of the left-nav-menu entries to determine whether Gmail is
   // in dark theme mode.
   const navItem = document.querySelector(navItemSelector);

@@ -18,6 +18,7 @@ import GmailSupportItemView, {
 import { AppMenuItemDescriptor } from '../../namespaces/app-menu';
 import { GmailAppMenuItemView } from './views/gmail-app-menu-item-view';
 import { RouteView } from '../../../inboxsdk';
+import { EnvData } from '../../platform-implementation';
 
 type GmailThreadView = any;
 type GmailMessageView = any;
@@ -28,6 +29,8 @@ type GmailMoleViewDriver = any;
 type GmailBackdrop = any;
 
 export default class GmailDriver implements Driver {
+  getEnvData(): EnvData;
+  getTimings(): { [ix: string]: number | undefined | null };
   public onready: Promise<void>;
   public isUsingSyncAPI(): boolean;
   public getLogger(): Logger;

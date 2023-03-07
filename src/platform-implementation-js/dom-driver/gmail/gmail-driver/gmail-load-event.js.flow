@@ -1,0 +1,5 @@
+/* @flow */
+
+import type GmailDriver from '../gmail-driver';
+
+declare export default function gmailLoadEvent(driver: GmailDriver): void;
