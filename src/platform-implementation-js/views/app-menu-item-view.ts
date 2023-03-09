@@ -131,12 +131,10 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
   static #isPanelDropdownShown() {
     const sdkDropdown = document.querySelector<HTMLElement>('.inboxsdk__menu');
     if (sdkDropdown) {
-      console.log('sdkDropdown');
       return true;
     }
     const mailDropdown = document.querySelector<HTMLElement>('.JM');
     if (mailDropdown && mailDropdown.style.display !== 'none') {
-      console.log('mailDropdown');
       return true;
     }
     const chatAndSpacesDropdown = document.querySelector<HTMLElement>('.tP');
@@ -144,7 +142,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       chatAndSpacesDropdown &&
       chatAndSpacesDropdown.style.display !== 'none'
     ) {
-      console.log('chatAndSpacesDropdown');
       return true;
     }
     return false;
@@ -291,16 +288,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           ]);
         });
       }
-
-      document.addEventListener(
-        'click',
-        function (event: MouseEvent) {
-          const target = event.target;
-          if (!(target instanceof HTMLElement)) return;
-          console.log('document click');
-        },
-        true
-      );
     });
   }
   static {
@@ -345,7 +332,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
       switch (type) {
         case 'mouseenter': {
-          console.log('mouseenter');
           const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
           const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
           const activePanel = AppMenuItemView.#getActivePanel();
@@ -401,7 +387,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         case 'mouseleave': {
           // Do not handle blur event when we're in one of the panel's dropdowns
           const isPanelDropdownShown = AppMenuItemView.#isPanelDropdownShown();
-          console.log('mouseleave isPanelDropdownShown', isPanelDropdownShown);
           if (isPanelDropdownShown) return;
 
           const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
@@ -452,8 +437,6 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         }
 
         case 'click': {
-          console.log('app menu click');
-
           handleActivate();
 
           // handle panel-less mode
