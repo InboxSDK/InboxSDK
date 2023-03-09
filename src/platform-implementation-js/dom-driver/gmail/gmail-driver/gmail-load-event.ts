@@ -1,7 +1,9 @@
 /* @flow */
 
 import type GmailDriver from '../gmail-driver';
-import isIntegratedViewGmail from './isIntegratedViewGmail';
+import isIntegratedViewGmail, {
+  isCollapsiblePanelHidden,
+} from './isIntegratedViewGmail';
 import { waitForMenuReady } from './add-nav-item';
 import { isDarkTheme } from './track-gmail-styles';
 
@@ -14,6 +16,7 @@ export default async function gmailLoadEvent(driver: GmailDriver) {
 
   driver.getLogger().eventSite('gmailSettings', {
     isGmailIntegratedView: isIntegratedViewGmail(),
+    isCollapsiblePanelHidden: isCollapsiblePanelHidden(),
     isDarkTheme: isDarkTheme(),
     screenWidth: window.screen?.width,
     screenHeight: window.screen?.height,
