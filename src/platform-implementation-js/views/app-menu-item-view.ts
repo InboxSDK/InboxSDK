@@ -128,6 +128,24 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       }
     }
   }
+  static #isPanelDropdownShown() {
+    const sdkDropdown = document.querySelector<HTMLElement>('.inboxsdk__menu');
+    if (sdkDropdown) {
+      return true;
+    }
+    const mailDropdown = document.querySelector<HTMLElement>('.JM');
+    if (mailDropdown && mailDropdown.style.display !== 'none') {
+      return true;
+    }
+    const chatAndSpacesDropdown = document.querySelector<HTMLElement>('.tP');
+    if (
+      chatAndSpacesDropdown &&
+      chatAndSpacesDropdown.style.display !== 'none'
+    ) {
+      return true;
+    }
+    return false;
+  }
   static #setUpRouteViewDriverStream(driver: GmailDriver) {
     if (AppMenuItemView.#routeViewDriverStream) return;
 
@@ -262,6 +280,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         // Handle moving cursor out of panel. We use it to enhance the styling since it won't be handled by Gmail
         const panel = AppMenuItemView.#menuItemToPanelMap.get(nativeMenuItem);
         panel?.addEventListener('mouseleave', (e) => {
+          e.stopImmediatePropagation();
           AppMenuItemView.#menuItemChangeBus.emit([
             'mouseleave',
             nativeMenuItem,
@@ -366,6 +385,10 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         }
 
         case 'mouseleave': {
+          // Do not handle blur event when we're in one of the panel's dropdowns
+          const isPanelDropdownShown = AppMenuItemView.#isPanelDropdownShown();
+          if (isPanelDropdownShown) return;
+
           const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
           const activePanel = AppMenuItemView.#getActivePanel();
           const activeMenuItemPanel =
