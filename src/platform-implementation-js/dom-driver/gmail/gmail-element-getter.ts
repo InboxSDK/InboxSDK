@@ -219,8 +219,13 @@ const GmailElementGetter = {
   isAppBurgerMenuOpen() {
     return (
       document
-        .querySelector<HTMLElement>('.gb_Hc[aria-expanded]')
-        ?.getAttribute('aria-expanded') === 'true' ?? false
+        .querySelector<HTMLElement>(
+          '.gb_Hc[aria-expanded], .gb_Ic[aria-expanded]'
+        )
+        ?.getAttribute('aria-expanded') === 'true' ??
+      // Default to true if we can't find the element because
+      // the majority of users seem to favor that version.
+      true
     );
   },
 
