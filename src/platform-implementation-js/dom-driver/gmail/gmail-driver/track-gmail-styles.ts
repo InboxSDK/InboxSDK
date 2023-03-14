@@ -6,14 +6,14 @@ import GmailElementGetter from '../gmail-element-getter';
 const RGB_REGEX = /^rgb\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/;
 
 function getDensity(): 'compact' | 'default' {
-  const navItemElement = document.querySelector('.aim')
+  const navItemElement = document.querySelector('.aim');
   if (!navItemElement) {
     Logger.error(new Error('Failed to find a nav item element'));
-    return 'default'
+    return 'default';
   }
 
-  const rect = navItemElement.getBoundingClientRect()
-  return rect?.height === 24 ? 'compact' : 'default'
+  const rect = navItemElement.getBoundingClientRect();
+  return rect?.height === 24 ? 'compact' : 'default';
 }
 
 const navItemSelector = '.aio' as const;
