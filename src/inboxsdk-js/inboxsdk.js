@@ -3,7 +3,6 @@
 import logError from '../common/log-error';
 
 import PlatformImplementationLoader from './loading/platform-implementation-loader';
-import checkRequirements from './check-requirements';
 import { BUILD_VERSION } from '../common/version';
 import _loadScript from '../common/load-script';
 
@@ -23,8 +22,6 @@ export function load(version: any, appId: string, opts: ?Object) {
       REQUESTED_API_VERSION: version,
     }
   );
-
-  checkRequirements(opts);
 
   return PlatformImplementationLoader.load(appId, opts);
 }
