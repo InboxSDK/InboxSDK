@@ -9,7 +9,7 @@ export default class HandlerRegistry<T> {
   private _pendingHandlers: Array<Handler<T>> = [];
   private _handlers: Array<Handler<T>> = [];
 
-  public registerHandler(handler: Handler<T>): () => void {
+  registerHandler(handler: Handler<T>): () => void {
     if (this._pendingHandlers.indexOf(handler) === -1) {
       this._pendingHandlers.push(handler);
 
@@ -33,7 +33,7 @@ export default class HandlerRegistry<T> {
     };
   }
 
-  public addTarget(target: T) {
+  addTarget(target: T) {
     this._targets.push(target);
 
     // TODO should we error if an object without an .on method is added?
@@ -50,11 +50,11 @@ export default class HandlerRegistry<T> {
     this._informHandlersOfTarget(target);
   }
 
-  public removeTarget(target: T) {
+  removeTarget(target: T) {
     remove(this._targets, (t) => t === target);
   }
 
-  public dumpHandlers() {
+  dumpHandlers() {
     this._pendingHandlers = [];
     this._handlers = [];
   }

@@ -11,7 +11,7 @@ import {
 } from '../../../driver-interfaces/compose-view-driver';
 
 export default class GmailComposeView implements ComposeViewDriver {
-  public constructor(
+  constructor(
     element: HTMLElement,
     xhrInterceptorStream: Kefir.Observable<any, any>,
     driver: GmailDriver,
@@ -20,50 +20,50 @@ export default class GmailComposeView implements ComposeViewDriver {
       isStandalone: boolean;
     }
   );
-  public getGmailDriver(): GmailDriver;
-  public getStatusArea(): HTMLElement;
+  getGmailDriver(): GmailDriver;
+  getStatusArea(): HTMLElement;
 
   // interface methods
-  public getEventStream(): Kefir.Observable<any, any>;
-  public getStopper(): Kefir.Observable<any, never>;
-  public getElement(): HTMLElement;
-  public insertBodyTextAtCursor(text: string): null | undefined | HTMLElement;
-  public insertBodyHTMLAtCursor(html: string): null | undefined | HTMLElement;
-  public insertLinkIntoBody(
+  getEventStream(): Kefir.Observable<any, any>;
+  getStopper(): Kefir.Observable<any, never>;
+  getElement(): HTMLElement;
+  insertBodyTextAtCursor(text: string): null | undefined | HTMLElement;
+  insertBodyHTMLAtCursor(html: string): null | undefined | HTMLElement;
+  insertLinkIntoBody(
     text: string,
     href: string
   ): null | undefined | HTMLElement;
-  public insertLinkChipIntoBody(options: {
+  insertLinkChipIntoBody(options: {
     iconUrl?: string;
     url: string;
     text: string;
   }): HTMLElement;
-  public setSubject(text: string): void;
-  public setBodyHTML(html: string): void;
-  public setBodyText(text: string): void;
-  public setToRecipients(emails: ReadonlyArray<string>): void;
-  public setCcRecipients(emails: ReadonlyArray<string>): void;
-  public setBccRecipients(emails: ReadonlyArray<string>): void;
-  public getFromContact(): Contact;
-  public getFromContactChoices(): ReadonlyArray<Contact>;
-  public setFromEmail(email: string): void;
-  public focus(): void;
-  public close(): void;
-  public send(options: { sendAndArchive: boolean }): void;
-  public discard(): void;
-  public popOut(): void;
-  public replaceSendButton(el: HTMLElement): () => void;
-  public hideDiscardButton(): () => void;
-  public registerRequestModifier(modifier: object): void;
-  public attachFiles(files: Blob[]): Promise<void>;
-  public attachInlineFiles(files: Blob[]): Promise<void>;
-  public isFullscreen(): boolean;
-  public setFullscreen(fullscreen: boolean): void;
-  public isMinimized(): boolean;
-  public setMinimized(minimized: boolean): void;
-  public setTitleBarColor(color: string): () => void;
-  public setTitleBarText(text: string): () => void;
-  public addButton(
+  setSubject(text: string): void;
+  setBodyHTML(html: string): void;
+  setBodyText(text: string): void;
+  setToRecipients(emails: ReadonlyArray<string>): void;
+  setCcRecipients(emails: ReadonlyArray<string>): void;
+  setBccRecipients(emails: ReadonlyArray<string>): void;
+  getFromContact(): Contact;
+  getFromContactChoices(): ReadonlyArray<Contact>;
+  setFromEmail(email: string): void;
+  focus(): void;
+  close(): void;
+  send(options: { sendAndArchive: boolean }): void;
+  discard(): void;
+  popOut(): void;
+  replaceSendButton(el: HTMLElement): () => void;
+  hideDiscardButton(): () => void;
+  registerRequestModifier(modifier: object): void;
+  attachFiles(files: Blob[]): Promise<void>;
+  attachInlineFiles(files: Blob[]): Promise<void>;
+  isFullscreen(): boolean;
+  setFullscreen(fullscreen: boolean): void;
+  isMinimized(): boolean;
+  setMinimized(minimized: boolean): void;
+  setTitleBarColor(color: string): () => void;
+  setTitleBarText(text: string): () => void;
+  addButton(
     buttonDescriptor: Kefir.Observable<
       null | undefined | ComposeButtonDescriptor,
       any
@@ -71,49 +71,49 @@ export default class GmailComposeView implements ComposeViewDriver {
     groupOrderHint: string,
     extraOnClickOptions: object
   ): Promise<null | undefined | object>;
-  public addRecipientRow(
+  addRecipientRow(
     options: Kefir.Observable<null | undefined | object, any>
   ): () => void;
-  public forceRecipientRowsOpen(): () => void;
-  public hideNativeRecipientRows(): () => void;
-  public hideRecipientArea(): () => void;
-  public ensureFormattingToolbarIsHidden(): void;
-  public ensureAppButtonToolbarsAreClosed(): void;
+  forceRecipientRowsOpen(): () => void;
+  hideNativeRecipientRows(): () => void;
+  hideRecipientArea(): () => void;
+  ensureFormattingToolbarIsHidden(): void;
+  ensureAppButtonToolbarsAreClosed(): void;
   // addOuterSidebar(options: {title: string, el: HTMLElement}): void;
   // addInnerSidebar(options: {el: HTMLElement}): void;
-  public addComposeNotice(options?: { orderHint?: number }): ComposeNotice;
-  public addStatusBar(options?: {
+  addComposeNotice(options?: { orderHint?: number }): ComposeNotice;
+  addStatusBar(options?: {
     height?: number;
     orderHint?: number;
     addAboveNativeStatusBar?: boolean;
   }): StatusBar;
-  public hideNativeStatusBar(): () => void;
-  public isForward(): boolean;
-  public isReply(): boolean;
-  public isInlineReplyForm(): boolean;
-  public getBodyElement(): HTMLElement;
-  public getMetadataFormElement(): HTMLElement;
-  public getSubjectInput(): null | undefined | HTMLInputElement;
-  public getHTMLContent(): string;
-  public getTextContent(): string;
-  public getSelectedBodyHTML(): null | undefined | string;
-  public getSelectedBodyText(): null | undefined | string;
-  public getLastSelectionRange(): Range | undefined;
-  public getSubject(): string;
-  public getToRecipients(): ReadonlyArray<Contact>;
-  public getCcRecipients(): ReadonlyArray<Contact>;
-  public getBccRecipients(): ReadonlyArray<Contact>;
-  public getComposeID(): string;
-  public getInitialMessageID(): null | undefined | string;
-  public getMessageID(): null | undefined | string;
-  public getThreadID(): null | undefined | string;
-  public getCurrentDraftID(): Promise<null | string>;
-  public getDraftID(): Promise<null | string>;
-  public addTooltipToButton(
+  hideNativeStatusBar(): () => void;
+  isForward(): boolean;
+  isReply(): boolean;
+  isInlineReplyForm(): boolean;
+  getBodyElement(): HTMLElement;
+  getMetadataFormElement(): HTMLElement;
+  getSubjectInput(): null | undefined | HTMLInputElement;
+  getHTMLContent(): string;
+  getTextContent(): string;
+  getSelectedBodyHTML(): null | undefined | string;
+  getSelectedBodyText(): null | undefined | string;
+  getLastSelectionRange(): Range | undefined;
+  getSubject(): string;
+  getToRecipients(): ReadonlyArray<Contact>;
+  getCcRecipients(): ReadonlyArray<Contact>;
+  getBccRecipients(): ReadonlyArray<Contact>;
+  getComposeID(): string;
+  getInitialMessageID(): null | undefined | string;
+  getMessageID(): null | undefined | string;
+  getThreadID(): null | undefined | string;
+  getCurrentDraftID(): Promise<null | string>;
+  getDraftID(): Promise<null | string>;
+  addTooltipToButton(
     buttonViewController: object,
     buttonDescriptor: object,
     tooltipDescriptor: TooltipDescriptor
   ): void;
-  public closeButtonTooltip(buttonViewController: object): void;
-  public setupLinkPopOvers(): void;
+  closeButtonTooltip(buttonViewController: object): void;
+  setupLinkPopOvers(): void;
 }

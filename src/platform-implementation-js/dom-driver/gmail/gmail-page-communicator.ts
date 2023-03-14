@@ -9,7 +9,7 @@ import Kefir from 'kefir';
 // if you have an instance of this, then the injected script is present and this
 // will work.
 export default class GmailPageCommunicator extends CommonPageCommunicator {
-  public async getMessageDate(
+  async getMessageDate(
     threadId: string,
     message: HTMLElement
   ): Promise<number | null> {
@@ -21,7 +21,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  public async getMessageRecipients(
+  async getMessageRecipients(
     threadId: string,
     message: HTMLElement
   ): Promise<Array<{
@@ -76,9 +76,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     else return null;
   }
 
-  public getThreadIdForThreadRowByDatabase(
-    threadRow: HTMLElement
-  ): string | null {
+  getThreadIdForThreadRowByDatabase(threadRow: HTMLElement): string | null {
     let threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     if (!threadid) {
       threadRow.dispatchEvent(
@@ -93,7 +91,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return threadid;
   }
 
-  public getThreadIdForThreadRowByClick(threadRow: HTMLElement): string | null {
+  getThreadIdForThreadRowByClick(threadRow: HTMLElement): string | null {
     let threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     if (!threadid) {
       threadRow.dispatchEvent(
@@ -108,7 +106,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return threadid;
   }
 
-  public getCurrentThreadID(
+  getCurrentThreadID(
     threadContainerElement: HTMLElement,
     isPreviewedThread: boolean = false
   ): string {
@@ -127,23 +125,23 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return s;
   }
 
-  public getUserOriginalPreviewPaneMode(): string | null {
+  getUserOriginalPreviewPaneMode(): string | null {
     return document.head.getAttribute('data-inboxsdk-user-preview-pane-mode');
   }
 
-  public getActionTokenValue(): string {
+  getActionTokenValue(): string {
     const s = document.head.getAttribute('data-inboxsdk-action-token-value');
     if (s == null) throw new Error('Failed to read value');
     return s;
   }
 
-  public isUsingSyncAPI(): boolean {
+  isUsingSyncAPI(): boolean {
     const s = document.head.getAttribute('data-inboxsdk-using-sync-api');
     if (s == null) throw new Error('Failed to read value');
     return s === 'true';
   }
 
-  public isConversationViewDisabled(): Promise<boolean> {
+  isConversationViewDisabled(): Promise<boolean> {
     return new Promise((resolve) => {
       Kefir.fromEvents<any, never>(document, 'inboxSDKgmonkeyResponse')
         .take(1)
@@ -161,7 +159,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     });
   }
 
-  public registerSuggestionsModifier(providerID: string) {
+  registerSuggestionsModifier(providerID: string) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKregisterSuggestionsModifier', {
         bubbles: false,
@@ -171,7 +169,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  public provideAutocompleteSuggestions(
+  provideAutocompleteSuggestions(
     providerID: string,
     query: string,
     suggestions: AutocompleteSearchResultWithId[]
@@ -190,7 +188,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  public setupCustomListResultsQuery(query: string) {
+  setupCustomListResultsQuery(query: string) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKcustomListRegisterQuery', {
         bubbles: false,
@@ -200,7 +198,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  public setCustomListNewQuery(detail: {
+  setCustomListNewQuery(detail: {
     query: string;
     start: number;
     newQuery: string;
@@ -215,7 +213,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  public setCustomListResults(query: string, newResults: string | null) {
+  setCustomListResults(query: string, newResults: string | null) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKcustomListResults', {
         bubbles: false,
@@ -225,7 +223,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  public createCustomSearchTerm(term: string) {
+  createCustomSearchTerm(term: string) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKcreateCustomSearchTerm', {
         bubbles: false,
@@ -235,7 +233,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  public setSearchQueryReplacement(query: string, newQuery: string) {
+  setSearchQueryReplacement(query: string, newQuery: string) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKsearchReplacementReady', {
         bubbles: false,
@@ -245,7 +243,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  public registerComposeRequestModifier(keyId: string, appId: string): string {
+  registerComposeRequestModifier(keyId: string, appId: string): string {
     const modifierId = new Date().getTime() + '_' + appId + '_' + Math.random();
 
     const detail: any = { modifierId };
@@ -266,7 +264,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return modifierId;
   }
 
-  public unregisterComposeRequestModifier(keyId: string, modifierId: string) {
+  unregisterComposeRequestModifier(keyId: string, modifierId: string) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKunregisterComposeRequestModifier', {
         detail: { keyId, modifierId },
@@ -276,11 +274,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     );
   }
 
-  public modifyComposeRequest(
-    keyId: string,
-    modifierId: string,
-    composeParams: any
-  ) {
+  modifyComposeRequest(keyId: string, modifierId: string, composeParams: any) {
     const detail: any = { modifierId, composeParams };
     if (this.isUsingSyncAPI()) detail.draftID = keyId;
     else detail.composeid = keyId;

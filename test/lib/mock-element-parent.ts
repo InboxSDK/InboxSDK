@@ -3,17 +3,17 @@ import EventEmitter from 'events';
 
 // Mock element suitable for use with MockMutationObserver
 export default class MockElementParent extends EventEmitter {
-  public children: any[];
-  public _emitsMutations = true;
-  public nodeType = 1;
+  children: any[];
+  _emitsMutations = true;
+  nodeType = 1;
 
-  public constructor(children: any[] = []) {
+  constructor(children: any[] = []) {
     super();
     assert(Array.isArray(children), 'children must be array');
     this.children = children;
   }
 
-  public appendAndRemoveChildren(toAdd: any[] = [], toRemove: any[] = []) {
+  appendAndRemoveChildren(toAdd: any[] = [], toRemove: any[] = []) {
     const presentTargets = [];
     for (const target of toRemove) {
       const ix = this.children.indexOf(target);
@@ -35,19 +35,19 @@ export default class MockElementParent extends EventEmitter {
     });
   }
 
-  public appendChildren(targets: any[]) {
+  appendChildren(targets: any[]) {
     return this.appendAndRemoveChildren(targets, undefined);
   }
 
-  public removeChildren(targets: any[]) {
+  removeChildren(targets: any[]) {
     return this.appendAndRemoveChildren(undefined, targets);
   }
 
-  public appendChild(target: any) {
+  appendChild(target: any) {
     return this.appendChildren([target]);
   }
 
-  public removeChild(target: any) {
+  removeChild(target: any) {
     return this.removeChildren([target]);
   }
 }

@@ -31,42 +31,39 @@ type GmailBackdrop = any;
 export default class GmailDriver implements Driver {
   getEnvData(): EnvData;
   getTimings(): { [ix: string]: number | undefined | null };
-  public onready: Promise<void>;
-  public isUsingSyncAPI(): boolean;
-  public getLogger(): Logger;
-  public getAppId(): string;
-  public getOpts(): PiOpts;
-  public getRouteViewDriverStream(): Kefir.Observable<RouteView, any>; // should be a property
-  public getRowListViewDriverStream(): Kefir.Observable<any, any>;
-  public openNewComposeViewDriver(): Promise<GmailComposeView>;
-  public getNextComposeViewDriver(): Promise<GmailComposeView>;
-  public getComposeViewDriverStream(): Kefir.Observable<GmailComposeView, any>;
-  public openDraftByMessageID(messageID: string): Promise<void>;
-  public getThreadViewDriverStream(): Kefir.Observable<GmailThreadView, any>;
-  public getMessageViewDriverStream(): Kefir.Observable<GmailMessageView, any>;
-  public getAttachmentCardViewDriverStream(): Kefir.Observable<
+  onready: Promise<void>;
+  isUsingSyncAPI(): boolean;
+  getLogger(): Logger;
+  getAppId(): string;
+  getOpts(): PiOpts;
+  getRouteViewDriverStream(): Kefir.Observable<RouteView, any>; // should be a property
+  getRowListViewDriverStream(): Kefir.Observable<any, any>;
+  openNewComposeViewDriver(): Promise<GmailComposeView>;
+  getNextComposeViewDriver(): Promise<GmailComposeView>;
+  getComposeViewDriverStream(): Kefir.Observable<GmailComposeView, any>;
+  openDraftByMessageID(messageID: string): Promise<void>;
+  getThreadViewDriverStream(): Kefir.Observable<GmailThreadView, any>;
+  getMessageViewDriverStream(): Kefir.Observable<GmailMessageView, any>;
+  getAttachmentCardViewDriverStream(): Kefir.Observable<
     GmailAttachmentCardView,
     any
   >;
-  public activateShortcut(
+  activateShortcut(
     keyboardShortcutHandle: KeyboardShortcutHandle,
     appName?: string,
     appIconUrl?: string
   ): void;
-  public getTagTree(): TagTree<HTMLElement>;
-  public getPageCommunicator(): GmailPageCommunicator;
-  public getGmailActionToken(): Promise<string>;
-  public getUserEmailAddress(): string;
-  public isConversationViewDisabled(): Promise<boolean>;
-  public getUserLanguage(): string;
-  public getUserContact(): Contact;
-  public getAccountSwitcherContactList(): Contact[];
-  public getThreadRowViewDriverStream(): Kefir.Observable<
-    GmailThreadRowView,
-    any
-  >;
-  public registerThreadButton(options: any): () => void;
-  public addNavItem(
+  getTagTree(): TagTree<HTMLElement>;
+  getPageCommunicator(): GmailPageCommunicator;
+  getGmailActionToken(): Promise<string>;
+  getUserEmailAddress(): string;
+  isConversationViewDisabled(): Promise<boolean>;
+  getUserLanguage(): string;
+  getUserContact(): Contact;
+  getAccountSwitcherContactList(): Contact[];
+  getThreadRowViewDriverStream(): Kefir.Observable<GmailThreadRowView, any>;
+  registerThreadButton(options: any): () => void;
+  addNavItem(
     appId: string,
     navItemDescriptor: any,
     navMenuInjectionContainer?: HTMLElement
@@ -74,38 +71,38 @@ export default class GmailDriver implements Driver {
   addAppMenuItem(
     menuItemDescriptor: AppMenuItemDescriptor
   ): Promise<GmailAppMenuItemView>;
-  public addSupportItem(
+  addSupportItem(
     supportItemDescriptor: SupportItemDescriptor
   ): GmailSupportItemView;
-  public getSentMailNativeNavItem(): Promise<any>;
-  public createLink(a: any, b: any): any;
-  public goto(routeID: string, params: any): Promise<void>;
-  public addCustomRouteID(routeID: string): () => void;
-  public addCustomListRouteID(routeID: string, handler: Function): () => void;
-  public showCustomRouteView(el: HTMLElement): void;
-  public setShowNativeNavMarker(isNative: boolean): any;
-  public setShowNativeAddonSidebar(isNative: boolean): any;
-  public registerSearchSuggestionsProvider(handler: Function): void;
-  public registerSearchQueryRewriter(obj: any): void;
-  public addToolbarButtonForApp(
+  getSentMailNativeNavItem(): Promise<any>;
+  createLink(a: any, b: any): any;
+  goto(routeID: string, params: any): Promise<void>;
+  addCustomRouteID(routeID: string): () => void;
+  addCustomListRouteID(routeID: string, handler: Function): () => void;
+  showCustomRouteView(el: HTMLElement): void;
+  setShowNativeNavMarker(isNative: boolean): any;
+  setShowNativeAddonSidebar(isNative: boolean): any;
+  registerSearchSuggestionsProvider(handler: Function): void;
+  registerSearchQueryRewriter(obj: any): void;
+  addToolbarButtonForApp(
     buttonDescriptor: Kefir.Observable<any, any>
   ): Promise<any>;
-  public addGlobalSidebarContentPanel(
+  addGlobalSidebarContentPanel(
     buttonDescriptor: Kefir.Observable<any, any>
   ): Promise<ContentPanelViewDriver | null | undefined>;
-  public getButterBarDriver(): GmailButterBarDriver;
-  public setButterBar(butterBar: any): void;
-  public isRunningInPageContext(): boolean;
-  public showAppIdWarning(): void;
-  public createModalViewDriver(options: any): any;
-  public createMoleViewDriver(options: any): GmailMoleViewDriver;
-  public createTopMessageBarDriver(options: any): any;
-  public createDrawerViewDriver(options: DrawerViewOptions): DrawerViewDriver;
-  public createBackdrop(zIndex?: number, target?: HTMLElement): GmailBackdrop;
-  public getStopper(): Kefir.Observable<null, never>;
-  public destroy(): void;
+  getButterBarDriver(): GmailButterBarDriver;
+  setButterBar(butterBar: any): void;
+  isRunningInPageContext(): boolean;
+  showAppIdWarning(): void;
+  createModalViewDriver(options: any): any;
+  createMoleViewDriver(options: any): GmailMoleViewDriver;
+  createTopMessageBarDriver(options: any): any;
+  createDrawerViewDriver(options: DrawerViewOptions): DrawerViewDriver;
+  createBackdrop(zIndex?: number, target?: HTMLElement): GmailBackdrop;
+  getStopper(): Kefir.Observable<null, never>;
+  destroy(): void;
 
-  public getSelectedThreadRowViewDrivers(): ReadonlyArray<GmailThreadRowView>;
-  public registerThreadRowViewSelectionHandler(handler: () => any): () => void;
-  public getLoadEventDetails(): any;
+  getSelectedThreadRowViewDrivers(): ReadonlyArray<GmailThreadRowView>;
+  registerThreadRowViewSelectionHandler(handler: () => any): () => void;
+  getLoadEventDetails(): any;
 }

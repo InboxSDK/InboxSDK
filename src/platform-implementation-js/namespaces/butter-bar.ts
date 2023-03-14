@@ -25,7 +25,7 @@ const memberMap = new WeakMap<
 
 // documented in src/docs/
 export default class ButterBar {
-  public constructor(appId: string, driver: Driver) {
+  constructor(appId: string, driver: Driver) {
     const members = {
       driver,
       messagesByKey: new Map(),
@@ -34,7 +34,7 @@ export default class ButterBar {
     memberMap.set(this, members);
   }
 
-  public showMessage(options: any): ButterBarMessage {
+  showMessage(options: any): ButterBarMessage {
     defaults(options, {
       priority: 0,
       time: 15 * 1000,
@@ -128,7 +128,7 @@ export default class ButterBar {
     return message;
   }
 
-  public showLoading(options: any = {}): ButterBarMessage {
+  showLoading(options: any = {}): ButterBarMessage {
     defaults(options, {
       text: 'Loading...',
       priority: -3,
@@ -142,7 +142,7 @@ export default class ButterBar {
     return this.showMessage(options);
   }
 
-  public showError(options: any): ButterBarMessage {
+  showError(options: any): ButterBarMessage {
     defaults(options, {
       priority: 100,
       className: 'inboxsdk__butterbar_error',
@@ -150,7 +150,7 @@ export default class ButterBar {
     return this.showMessage(options);
   }
 
-  public showSaving(options: any = {}): any {
+  showSaving(options: any = {}): any {
     defaults(options, {
       text: 'Saving...',
       confirmationText: 'Saved',
@@ -185,7 +185,7 @@ export default class ButterBar {
     return deferred;
   }
 
-  public hideMessage(messageKey: any | string) {
+  hideMessage(messageKey: any | string) {
     if (messageKey) {
       const members = get(memberMap, this);
       const message = members.messagesByKey.get(messageKey);
@@ -195,7 +195,7 @@ export default class ButterBar {
     }
   }
 
-  public hideGmailMessage() {
+  hideGmailMessage() {
     const members = get(memberMap, this);
     const butterBarDriver = members.driver.getButterBarDriver();
 

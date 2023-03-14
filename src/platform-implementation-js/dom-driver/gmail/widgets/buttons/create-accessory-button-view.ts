@@ -8,39 +8,39 @@ export default class CreateAccessoryButtonView implements ButtonViewI {
   private _eventStream = kefirBus<any, any>();
   private _stopper = kefirStopper();
 
-  public constructor() {
+  constructor() {
     this._setupElement();
     this._setupEventStream();
   }
 
-  public update() {
+  update() {
     // noop
   }
 
-  public setEnabled() {
+  setEnabled() {
     throw new Error('not implemented');
   }
 
-  public destroy() {
+  destroy() {
     this._eventStream.end();
     this._stopper.destroy();
     this._element.remove();
   }
 
-  public getElement(): HTMLElement {
+  getElement(): HTMLElement {
     return this._element;
   }
 
-  public getEventStream(): Kefir.Observable<any, any> {
+  getEventStream(): Kefir.Observable<any, any> {
     return this._eventStream;
   }
 
-  public activate() {
+  activate() {
     const innerButtonElement = this._element.firstElementChild;
     if (innerButtonElement) innerButtonElement.classList.add('aj1');
   }
 
-  public deactivate() {
+  deactivate() {
     const innerButtonElement = this._element.firstElementChild;
     if (innerButtonElement) innerButtonElement.classList.remove('aj1');
   }

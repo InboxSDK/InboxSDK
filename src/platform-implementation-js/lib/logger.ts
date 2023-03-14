@@ -63,7 +63,7 @@ export default class Logger {
   private _appId: string;
   private _isMaster: boolean;
 
-  public constructor(
+  constructor(
     appId: string,
     opts: any,
     loaderVersion: string,
@@ -113,22 +113,22 @@ export default class Logger {
     }
   }
 
-  public setUserEmailAddress(email: string) {
+  setUserEmailAddress(email: string) {
     _extensionUserEmailHash = hashEmail(email);
   }
 
-  public shouldTrackEverything(): boolean {
+  shouldTrackEverything(): boolean {
     return (
       _extensionUserEmailHash ===
       'ca05afe92819df590a4196c31814fdb24050e8f49d8a41613f3d6cfb5729c785'
     );
   }
 
-  public setIsUsingSyncAPI(isUsing: boolean) {
+  setIsUsingSyncAPI(isUsing: boolean) {
     _isUsingSyncAPI = isUsing;
   }
 
-  public static run<T>(cb: () => T, details?: any): T {
+  static run<T>(cb: () => T, details?: any): T {
     try {
       return cb();
     } catch (err) {
@@ -137,7 +137,7 @@ export default class Logger {
     }
   }
 
-  public run<T>(cb: () => T, details?: any): T {
+  run<T>(cb: () => T, details?: any): T {
     try {
       return cb();
     } catch (err) {
@@ -146,19 +146,19 @@ export default class Logger {
     }
   }
 
-  public static error(err: Error | unknown, details?: any) {
+  static error(err: Error | unknown, details?: any) {
     _logError(err, details, undefined, false);
   }
 
-  public error(err: Error | unknown, details?: any) {
+  error(err: Error | unknown, details?: any) {
     _logError(err, details, this._appId, false);
   }
 
-  public errorApp(err: Error | unknown, details?: any) {
+  errorApp(err: Error | unknown, details?: any) {
     _logError(err, details, this._appId, true);
   }
 
-  public errorSite(err: Error | unknown, details?: any) {
+  errorSite(err: Error | unknown, details?: any) {
     // Only the first logger instance reports Site errors.
     if (!this._isMaster) {
       return;
@@ -167,13 +167,13 @@ export default class Logger {
   }
 
   // Should only be used by the InboxSDK users for their own app events.
-  public eventApp(name: string, details?: any) {
+  eventApp(name: string, details?: any) {
     _trackEvent(this._appId, 'app', name, details);
   }
 
   // For tracking app events that are possibly triggered by the user. Extensions
   // can opt out of this with a flag passed to InboxSDK.load().
-  public eventSdkActive(name: string, details?: any) {
+  eventSdkActive(name: string, details?: any) {
     if (!_extensionUseEventTracking) {
       return;
     }
@@ -183,7 +183,7 @@ export default class Logger {
   // Track events unrelated to user activity about how the app uses the SDK.
   // Examples include the app being initialized, and calls to any of the
   // register___ViewHandler functions.
-  public eventSdkPassive(name: string, details?: any, sensitive?: boolean) {
+  eventSdkPassive(name: string, details?: any, sensitive?: boolean) {
     if (sensitive && !isStreakAppId(this._appId)) {
       // do not log events if they were marked as sensitive
       return;
@@ -193,7 +193,7 @@ export default class Logger {
   }
 
   // Track Site events.
-  public eventSite(name: string, details?: any) {
+  eventSite(name: string, details?: any) {
     // Only the first logger instance reports Site events.
     if (!this._isMaster) {
       return;
@@ -201,7 +201,7 @@ export default class Logger {
     _trackEvent(this._appId, 'gmail', name, details);
   }
 
-  public deprecationWarning(name: string, suggestion?: string) {
+  deprecationWarning(name: string, suggestion?: string) {
     console.warn(
       `InboxSDK: ${name} is deprecated.` +
         (suggestion ? ` Please use ${suggestion} instead.` : '')
@@ -214,14 +214,14 @@ export default class Logger {
     }
   }
 
-  public getAppLogger(): AppLogger {
+  getAppLogger(): AppLogger {
     return {
       error: (err, details) => this.errorApp(err, details),
       event: (name, details) => this.eventApp(name, details),
     };
   }
 
-  public trackFunctionPerformance(
+  trackFunctionPerformance(
     fn: Function,
     sampleRate: number,
     details: { type: string }

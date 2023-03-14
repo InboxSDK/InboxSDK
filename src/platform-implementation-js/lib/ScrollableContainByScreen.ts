@@ -9,7 +9,7 @@ export default class ScrollableContainByScreen {
   private _manualRepositions = kefirBus<null, any>();
   private _stopper = kefirStopper();
 
-  public constructor(
+  constructor(
     element: HTMLElement,
     anchorPoint: HTMLElement,
     options: Options
@@ -29,11 +29,11 @@ export default class ScrollableContainByScreen {
       });
   }
 
-  public reposition() {
+  reposition() {
     this._manualRepositions.emit(null);
   }
 
-  public destroy() {
+  destroy() {
     this._stopper.destroy();
   }
 }

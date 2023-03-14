@@ -11,10 +11,10 @@ class MockButterBarDriver {
   private _currentMessage: any = null;
   private _hideGmailMessageCount: number = 0;
 
-  public getNoticeAvailableStream() {
+  getNoticeAvailableStream() {
     return this._openBus;
   }
-  public showMessage(options: any) {
+  showMessage(options: any) {
     const num = ++this._showMessageCount;
     this._currentMessage = options;
     return {
@@ -26,13 +26,13 @@ class MockButterBarDriver {
       },
     };
   }
-  public getSharedMessageQueue() {
+  getSharedMessageQueue() {
     return _.cloneDeep(this._queue);
   }
-  public setSharedMessageQueue(queue: any[]) {
+  setSharedMessageQueue(queue: any[]) {
     this._queue = _.cloneDeep(queue);
   }
-  public hideGmailMessage() {
+  hideGmailMessage() {
     this._hideGmailMessageCount++;
   }
 }

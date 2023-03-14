@@ -7,7 +7,7 @@ export default class PersistentQueue<T> {
   private _fallbackQueue: T[] = [];
   private _sid: string;
 
-  public constructor(id: string) {
+  constructor(id: string) {
     this._sid = 'inboxsdk__persistentqueue_' + id;
   }
 
@@ -27,7 +27,7 @@ export default class PersistentQueue<T> {
     localStorage.removeItem(this._sid);
   }
 
-  public add(val: T) {
+  add(val: T) {
     let success = false;
     if (typeof localStorage !== 'undefined') {
       try {
@@ -44,7 +44,7 @@ export default class PersistentQueue<T> {
     }
   }
 
-  public remove(): T | undefined {
+  remove(): T | undefined {
     let ret;
     if (typeof localStorage !== 'undefined') {
       try {
@@ -64,7 +64,7 @@ export default class PersistentQueue<T> {
     return ret;
   }
 
-  public removeAll(): T[] {
+  removeAll(): T[] {
     let ret: any[] | void = undefined;
     if (typeof localStorage !== 'undefined') {
       try {
@@ -83,7 +83,7 @@ export default class PersistentQueue<T> {
     return ret;
   }
 
-  public peekAll(): T[] {
+  peekAll(): T[] {
     let ret: any[] | void = undefined;
     if (typeof localStorage !== 'undefined') {
       try {
@@ -99,7 +99,7 @@ export default class PersistentQueue<T> {
     return ret;
   }
 
-  public clear() {
+  clear() {
     if (typeof localStorage !== 'undefined') {
       try {
         this._clearSavedQueue();

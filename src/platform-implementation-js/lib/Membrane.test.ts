@@ -4,8 +4,8 @@ import Membrane, { Mapper } from './Membrane';
 
 class FooDriver {}
 class Foo {
-  public fooDriver: FooDriver;
-  public constructor(fooDriver: FooDriver) {
+  fooDriver: FooDriver;
+  constructor(fooDriver: FooDriver) {
     this.fooDriver = fooDriver;
   }
 }
