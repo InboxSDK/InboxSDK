@@ -7,7 +7,7 @@ import Logger from './logger';
 // Version of EventEmitter where any exceptions thrown by event handlers are
 // caught. This is used to catch exceptions from application code.
 export default class SafeEventEmitter extends EventEmitter {
-  public emit(event: string, ...args: Array<any>): boolean {
+  emit(event: string, ...args: Array<any>): boolean {
     try {
       return super.emit.apply(this, arguments as any);
     } catch (e) {

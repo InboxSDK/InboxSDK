@@ -31,7 +31,7 @@ export default class GmailComposeButtonView implements ButtonViewI {
   private _keyboardShortcutHandle: null | undefined | KeyboardShortcutHandle;
   private _eventStream: Bus<any, any>;
 
-  public constructor(options: ButtonViewOptions) {
+  constructor(options: ButtonViewOptions) {
     this._isEnabled = options.enabled !== false;
 
     this._iconClass = options.iconClass;
@@ -54,47 +54,47 @@ export default class GmailComposeButtonView implements ButtonViewI {
     }
   }
 
-  public destroy() {
+  destroy() {
     this._element.remove();
     this._eventStream.end();
   }
 
-  public getElement(): HTMLElement {
+  getElement(): HTMLElement {
     return this._element;
   }
-  public getEventStream(): Kefir.Observable<any, any> {
+  getEventStream(): Kefir.Observable<any, any> {
     return this._eventStream;
   }
 
-  public activate() {
+  activate() {
     this.addClass('inboxsdk__composeButton_active');
   }
 
-  public deactivate() {
+  deactivate() {
     this.removeClass('inboxsdk__composeButton_active');
   }
 
-  public addClass(className: string) {
+  addClass(className: string) {
     this._element.classList.add(className);
   }
 
-  public removeClass(className: string) {
+  removeClass(className: string) {
     this._element.classList.remove(className);
   }
 
-  public simulateHover() {
+  simulateHover() {
     simulateHover(this._element);
   }
 
-  public setEnabled(value: boolean) {
+  setEnabled(value: boolean) {
     this._setEnabled(value);
   }
 
-  public isEnabled(): boolean {
+  isEnabled(): boolean {
     return this._isEnabled;
   }
 
-  public update(options: any) {
+  update(options: any) {
     if (!options) {
       this._element.style.display = 'none';
       return;

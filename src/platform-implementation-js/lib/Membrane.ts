@@ -12,11 +12,11 @@ export default class Membrane {
   private _mappers: Map<any, MapperFn<any>>;
   private _map: WeakMap<any, any> = new WeakMap();
 
-  public constructor(mappers: Array<Mapper<any>>) {
+  constructor(mappers: Array<Mapper<any>>) {
     this._mappers = new Map(mappers);
   }
 
-  public get(wet: any): any {
+  get(wet: any): any {
     let dry = this._map.get(wet);
     if (!dry) {
       const mapperFn = this._mappers.get(wet.constructor);

@@ -1,7 +1,7 @@
 import CreateParentAccessoryButtonView from './create-parent-accessory-button-view';
 
 export default class MoreParentAccessoryButtonView extends CreateParentAccessoryButtonView {
-  public constructor() {
+  constructor() {
     super();
 
     // New Gmail left nav does not have a "more" parent level accessory icon (only "create").

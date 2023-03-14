@@ -25,9 +25,9 @@ const memberMap = new WeakMap<
 >();
 
 export default class ComposeButtonView extends EventEmitter {
-  public destroyed: boolean = false;
+  destroyed: boolean = false;
 
-  public constructor(
+  constructor(
     optionsPromise: Promise<Options | null | undefined>,
     composeViewDriver: ComposeViewDriver,
     driver: Driver
@@ -48,7 +48,7 @@ export default class ComposeButtonView extends EventEmitter {
     });
   }
 
-  public showTooltip(tooltipDescriptor: TooltipDescriptor) {
+  showTooltip(tooltipDescriptor: TooltipDescriptor) {
     const members = get(memberMap, this);
     members.driver
       .getLogger()
@@ -65,7 +65,7 @@ export default class ComposeButtonView extends EventEmitter {
     });
   }
 
-  public closeTooltip() {
+  closeTooltip() {
     const members = get(memberMap, this);
     members.optionsPromise.then((options) => {
       if (!options) return;

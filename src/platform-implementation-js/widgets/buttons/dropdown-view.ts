@@ -15,8 +15,8 @@ interface Options {
 // documented in src/docs/
 export default class DropdownView extends EventEmitter {
   private _dropdownViewDriver: any;
-  public destroyed: boolean = false;
-  /*deprecated*/ public closed: boolean = false;
+  destroyed: boolean = false;
+  /*deprecated*/ closed: boolean = false;
   private _options: Options;
   private _userPlacementOptions: ContainByScreenOptions = { hAlign: 'left' };
   private _scrollableContainByScreen:
@@ -24,9 +24,9 @@ export default class DropdownView extends EventEmitter {
     | null
     | undefined = null;
   private _didInsertContainerEl: boolean;
-  public el: HTMLElement;
+  el: HTMLElement;
 
-  public constructor(
+  constructor(
     dropdownViewDriver: any,
     anchorElement: HTMLElement,
     options: Options | null | undefined
@@ -124,7 +124,7 @@ export default class DropdownView extends EventEmitter {
     });
   }
 
-  public setPlacementOptions(options: ContainByScreenOptions) {
+  setPlacementOptions(options: ContainByScreenOptions) {
     if (this._options.manualPosition) {
       // eslint-disable-next-line no-console
       console.error(
@@ -136,7 +136,7 @@ export default class DropdownView extends EventEmitter {
     this.emit('_placementOptionsUpdated');
   }
 
-  public close() {
+  close() {
     if (!this.destroyed) {
       this.destroyed = this.closed = true;
       if (this._scrollableContainByScreen) {
@@ -150,7 +150,7 @@ export default class DropdownView extends EventEmitter {
     }
   }
 
-  public reposition() {
+  reposition() {
     if (this._scrollableContainByScreen) {
       this._scrollableContainByScreen.reposition();
     }

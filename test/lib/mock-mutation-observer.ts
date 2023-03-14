@@ -8,11 +8,11 @@ export default class MockMutationObserver {
   private _updateQueued: boolean = false;
   private _stopper = kefirBus();
 
-  public constructor(callback: (mutations: MutationRecord[]) => void) {
+  constructor(callback: (mutations: MutationRecord[]) => void) {
     this._callback = callback;
   }
 
-  public observe(element: Node, options: MutationObserverInit) {
+  observe(element: Node, options: MutationObserverInit) {
     assert(element);
     assert(options);
 
@@ -41,18 +41,18 @@ export default class MockMutationObserver {
     }
   }
 
-  public disconnect() {
+  disconnect() {
     this._stopper.emit('stop');
     this.takeRecords();
   }
 
-  public takeRecords() {
+  takeRecords() {
     const records = this._records;
     this._records = [];
     return records;
   }
 
-  public _queueMutation(mutation: MutationRecord) {
+  _queueMutation(mutation: MutationRecord) {
     this._records.push(mutation);
     if (!this._updateQueued) {
       this._updateQueued = true;

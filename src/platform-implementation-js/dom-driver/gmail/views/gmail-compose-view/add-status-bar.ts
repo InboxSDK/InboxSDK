@@ -62,7 +62,7 @@ class StatusBar extends SimpleElementView implements IStatusBar {
   private _prependContainer: null | undefined | HTMLElement = null;
   private _stopper = kefirStopper();
 
-  public constructor(
+  constructor(
     gmailComposeView: GmailComposeView,
     height: number,
     orderHint: number,
@@ -80,7 +80,7 @@ class StatusBar extends SimpleElementView implements IStatusBar {
     this.setHeight(height);
   }
 
-  public destroy() {
+  destroy() {
     if (this.destroyed) {
       return;
     }
@@ -97,7 +97,7 @@ class StatusBar extends SimpleElementView implements IStatusBar {
     this._updateTotalHeight();
   }
 
-  public setHeight(newHeight: number) {
+  setHeight(newHeight: number) {
     this.el.style.height = newHeight + 'px';
     this._updateTotalHeight();
   }

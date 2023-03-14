@@ -21,7 +21,7 @@ export default class BasicButtonViewController {
   private _view: ButtonViewI;
   private _stopper = kefirStopper();
 
-  public constructor(options: Options) {
+  constructor(options: Options) {
     this._activateFunction = options.activateFunction || options.onClick;
     this._view = options.buttonView;
 
@@ -33,32 +33,32 @@ export default class BasicButtonViewController {
       });
   }
 
-  public getStopper(): Kefir.Observable<null, never> {
+  getStopper(): Kefir.Observable<null, never> {
     return this._stopper;
   }
 
-  public destroy() {
+  destroy() {
     this._activateFunction = null;
     this._view.destroy();
     this._stopper.destroy();
   }
 
-  public update(options: Options) {
+  update(options: Options) {
     this.getView().update(options);
     this.setActivateFunction(
       options && (options.activateFunction || options.onClick)
     );
   }
 
-  public getView(): ButtonViewI {
+  getView(): ButtonViewI {
     return this._view;
   }
 
-  public setActivateFunction(f: null | undefined | ((event: any) => void)) {
+  setActivateFunction(f: null | undefined | ((event: any) => void)) {
     this._activateFunction = f;
   }
 
-  public activate() {
+  activate() {
     if (this._activateFunction) {
       this._activateFunction({});
     }

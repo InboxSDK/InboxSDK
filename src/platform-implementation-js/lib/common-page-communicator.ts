@@ -5,28 +5,28 @@ import Logger from './logger';
 import { CommonAjaxOpts } from '../../common/ajax';
 
 export default class CommonPageCommunicator {
-  public ajaxInterceptStream: Kefir.Observable<any, never>;
+  ajaxInterceptStream: Kefir.Observable<any, never>;
 
-  public constructor() {
+  constructor() {
     this.ajaxInterceptStream = Kefir.fromEvents<any, never>(
       document,
       'inboxSDKajaxIntercept'
     ).map((x) => x.detail);
   }
 
-  public getUserEmailAddress(): string {
+  getUserEmailAddress(): string {
     const s = document.head.getAttribute('data-inboxsdk-user-email-address');
     if (typeof s !== 'string') throw new Error('should not happen');
     return s;
   }
 
-  public getUserLanguage(): string {
+  getUserLanguage(): string {
     const s = document.head.getAttribute('data-inboxsdk-user-language');
     if (typeof s !== 'string') throw new Error('should not happen');
     return s;
   }
 
-  public getIkValue(): string {
+  getIkValue(): string {
     const ownIk = document.head.getAttribute('data-inboxsdk-ik-value');
     if (ownIk) {
       return ownIk;
@@ -45,11 +45,11 @@ export default class CommonPageCommunicator {
     throw new Error("Failed to look up 'ik' value");
   }
 
-  public isUsingSyncAPI(): boolean {
+  isUsingSyncAPI(): boolean {
     return false;
   }
 
-  public async getXsrfToken(): Promise<string> {
+  async getXsrfToken(): Promise<string> {
     const existingHeader = document.head.getAttribute(
       'data-inboxsdk-xsrf-token'
     );
@@ -67,7 +67,7 @@ export default class CommonPageCommunicator {
     }
   }
 
-  public async getBtaiHeader(): Promise<string> {
+  async getBtaiHeader(): Promise<string> {
     const existingHeader = document.head.getAttribute(
       'data-inboxsdk-btai-header'
     );
@@ -85,13 +85,13 @@ export default class CommonPageCommunicator {
     }
   }
 
-  public resolveUrlRedirects(url: string): Promise<string> {
+  resolveUrlRedirects(url: string): Promise<string> {
     return this.pageAjax({ url, method: 'HEAD' }).then(
       (result) => result.responseURL
     );
   }
 
-  public pageAjax(
+  pageAjax(
     opts: CommonAjaxOpts
   ): Promise<{ text: string; responseURL: string }> {
     const id = `${Date.now()}-${Math.random()}`;
@@ -128,7 +128,7 @@ export default class CommonPageCommunicator {
     return promise;
   }
 
-  public silenceGmailErrorsForAMoment(): () => void {
+  silenceGmailErrorsForAMoment(): () => void {
     document.dispatchEvent(
       new CustomEvent('inboxSDKsilencePageErrors', {
         bubbles: false,
@@ -158,7 +158,7 @@ export default class CommonPageCommunicator {
     return unsilence;
   }
 
-  public registerAllowedHashLinkStartTerm(term: string) {
+  registerAllowedHashLinkStartTerm(term: string) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKregisterAllowedHashLinkStartTerm', {
         bubbles: false,

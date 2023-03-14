@@ -20,7 +20,7 @@ export default class ModalButtonView implements ButtonViewI {
   private _eventStream = kefirBus<any, any>();
   private _isEnabled: boolean;
 
-  public constructor(options: ButtonViewOptions) {
+  constructor(options: ButtonViewOptions) {
     this._isEnabled = options.enabled !== false;
 
     this._title = options.text || options.title;
@@ -34,27 +34,27 @@ export default class ModalButtonView implements ButtonViewI {
     this._setupEventStream();
   }
 
-  public destroy() {
+  destroy() {
     this._element.remove();
     this._eventStream.end();
   }
 
-  public getElement(): HTMLElement {
+  getElement(): HTMLElement {
     return this._element;
   }
-  public getEventStream(): Kefir.Observable<any, any> {
+  getEventStream(): Kefir.Observable<any, any> {
     return this._eventStream;
   }
 
-  public setEnabled(value: boolean) {
+  setEnabled(value: boolean) {
     this._setEnabled(value);
   }
 
-  public update() {
+  update() {
     throw new Error('not implemented');
   }
 
-  public isEnabled(): boolean {
+  isEnabled(): boolean {
     return this._isEnabled;
   }
 

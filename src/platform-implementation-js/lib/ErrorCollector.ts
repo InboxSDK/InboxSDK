@@ -11,11 +11,11 @@ export default class ErrorCollector {
   private _errorLogs: Array<ErrorLog> = [];
   private _hasReported: boolean = false;
 
-  public constructor(name: string) {
+  constructor(name: string) {
     this._name = name;
   }
 
-  public run<T>(name: string, cb: () => T): T | null {
+  run<T>(name: string, cb: () => T): T | null {
     if (this._hasReported) {
       throw new Error('Has already reported');
     }
@@ -31,7 +31,7 @@ export default class ErrorCollector {
     }
   }
 
-  public report(errorDataCb: () => any) {
+  report(errorDataCb: () => any) {
     if (this._hasReported) {
       throw new Error('Has already reported');
     }
@@ -44,15 +44,15 @@ export default class ErrorCollector {
     }
   }
 
-  public getErrorLogs(): ReadonlyArray<ErrorLog> {
+  getErrorLogs(): ReadonlyArray<ErrorLog> {
     return this._errorLogs;
   }
 
-  public runCount(): number {
+  runCount(): number {
     return this._runCount;
   }
 
-  public errorCount(): number {
+  errorCount(): number {
     return this._errorLogs.length;
   }
 }

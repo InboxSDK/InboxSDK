@@ -58,6 +58,10 @@ module.exports = {
       files: ['*.ts', '*.tsx'],
       rules: {
         '@typescript-eslint/ban-types': ['off'],
+        '@typescript-eslint/explicit-member-accessibility': [
+          'error',
+          { accessibility: 'no-public' },
+        ],
         '@typescript-eslint/explicit-module-boundary-types': ['off'],
         '@typescript-eslint/indent': ['off'],
         '@typescript-eslint/explicit-function-return-type': ['off'],

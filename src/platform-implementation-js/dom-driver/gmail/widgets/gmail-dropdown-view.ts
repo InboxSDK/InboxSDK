@@ -4,7 +4,7 @@ export default class GmailDropdownView {
   private _containerElement: HTMLElement;
   private _contentElement: HTMLElement;
 
-  public constructor() {
+  constructor() {
     this._containerElement = document.createElement('div');
     this._containerElement.setAttribute('class', 'inboxsdk__menu');
 
@@ -16,15 +16,15 @@ export default class GmailDropdownView {
     blockAndReemiteKeyboardEvents(this._containerElement);
   }
 
-  public destroy() {
+  destroy() {
     this._containerElement.remove();
   }
 
-  public getContainerElement() {
+  getContainerElement() {
     return this._containerElement;
   }
 
-  public getContentElement() {
+  getContentElement() {
     return this._contentElement;
   }
 }
