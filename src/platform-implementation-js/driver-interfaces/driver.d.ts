@@ -13,10 +13,9 @@ import GmailSupportItemView, {
 import { AppMenuItemDescriptor } from '../namespaces/app-menu';
 import { GmailAppMenuItemView } from '../dom-driver/gmail/views/gmail-app-menu-item-view';
 
-// import GmailBackdrop from '../dom-driver/gmail/views/gmail-backdrop';
+import GmailBackdrop from '../dom-driver/gmail/views/gmail-backdrop';
 // import InboxBackdrop from '../dom-driver/inbox/views/inbox-backdrop';
-// export type Backdrop = GmailBackdrop | InboxBackdrop;
-export type Backdrop = any;
+export type Backdrop = GmailBackdrop | any;
 
 // import GmailThreadView from '../dom-driver/gmail/views/gmail-thread-view';
 // import InboxThreadView from '../dom-driver/inbox/views/inbox-thread-view';
@@ -94,7 +93,7 @@ export interface Driver {
   ): GmailSupportItemView;
   addAppMenuItem(
     menuItemDescriptor: AppMenuItemDescriptor
-  ): Promise<GmailAppMenuItemView>;
+  ): Promise<GmailAppMenuItemView | undefined>;
   getSentMailNativeNavItem(): Promise<any>;
   createLink(a: any, b: any): any;
   goto(routeID: string, params: any): Promise<void>;
@@ -125,8 +124,6 @@ export interface Driver {
 
   getSelectedThreadRowViewDrivers(): ReadonlyArray<ThreadRowViewDriver>;
   registerThreadRowViewSelectionHandler(handler: () => any): () => void;
-
-  getLoadEventDetails(): any;
 }
 
 export interface ButterBarDriver {

@@ -20,6 +20,7 @@ export default class GmailComposeView implements ComposeViewDriver {
       isStandalone: boolean;
     }
   );
+  destroy(): void;
   getGmailDriver(): GmailDriver;
   getStatusArea(): HTMLElement;
 
