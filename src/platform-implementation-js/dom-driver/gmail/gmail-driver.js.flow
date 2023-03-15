@@ -2,24 +2,24 @@
 import * as Kefir from 'kefir';
 import { TagTree } from 'tag-tree';
 import {
-  Driver,
-  PiOpts,
-  ContentPanelViewDriver,
-  DrawerViewOptions,
-  DrawerViewDriver,
+  type Driver,
+  type DrawerViewOptions,
+  type DrawerViewDriver,
 } from '../../driver-interfaces/driver';
+import type { PiOpts } from '../../platform-implementation';
+import type ContentPanelViewDriver from '../../driver-common/sidebar/ContentPanelViewDriver';
+import type GmailAppSidebarView from './views/gmail-app-sidebar-view';
 import Logger from '../../lib/logger';
 import GmailComposeView from './views/gmail-compose-view';
 import KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import GmailPageCommunicator from './gmail-page-communicator';
-import { Contact } from '../../driver-interfaces/compose-view-driver';
 import GmailSupportItemView, {
-  SupportItemDescriptor,
+  type SupportItemDescriptor,
 } from './views/gmail-support-item-view';
-import { AppMenuItemDescriptor } from '../../namespaces/app-menu';
+import { type AppMenuItemDescriptor } from '../../namespaces/app-menu';
 import { GmailAppMenuItemView } from './views/gmail-app-menu-item-view';
-import { RouteView } from '../../../inboxsdk';
-import { EnvData } from '../../platform-implementation';
+import RouteView from './views/gmail-route-view/gmail-route-view';
+import { type EnvData } from '../../platform-implementation';
 
 type GmailThreadView = any;
 type GmailMessageView = any;
@@ -28,10 +28,19 @@ type GmailButterBarDriver = any;
 type GmailThreadRowView = any;
 type GmailMoleViewDriver = any;
 type GmailBackdrop = any;
+type ThreadRowIdentifier = any;
 
 declare export default class GmailDriver {
+  constructor(
+    appId: string,
+    LOADER_VERSION: string,
+    IMPL_VERSION: string,
+    logger: Logger,
+    opts: PiOpts,
+    envData: EnvData
+  ): this;
   getEnvData(): EnvData;
-  getTimings(): { [ix: string]: number | undefined | null };
+  getTimings(): { [ix: string]: ?number };
   onready: Promise<void>;
   isUsingSyncAPI(): boolean;
   getLogger(): Logger;
@@ -51,8 +60,8 @@ declare export default class GmailDriver {
   >;
   activateShortcut(
     keyboardShortcutHandle: KeyboardShortcutHandle,
-    appName?: string,
-    appIconUrl?: string
+    appName: ?string,
+    appIconUrl: ?string
   ): void;
   getTagTree(): TagTree<HTMLElement>;
   getPageCommunicator(): GmailPageCommunicator;
@@ -90,7 +99,7 @@ declare export default class GmailDriver {
   ): Promise<any>;
   addGlobalSidebarContentPanel(
     buttonDescriptor: Kefir.Observable<any, any>
-  ): Promise<ContentPanelViewDriver | null | undefined>;
+  ): Promise<?ContentPanelViewDriver>;
   getButterBarDriver(): GmailButterBarDriver;
   setButterBar(butterBar: any): void;
   isRunningInPageContext(): boolean;
@@ -100,9 +109,35 @@ declare export default class GmailDriver {
   createTopMessageBarDriver(options: any): any;
   createDrawerViewDriver(options: DrawerViewOptions): DrawerViewDriver;
   createBackdrop(zIndex?: number, target?: HTMLElement): GmailBackdrop;
-  getStopper(): Kefir.Observable<null, never>;
+  getStopper(): Kefir.Observable<null>;
   destroy(): void;
 
-  getSelectedThreadRowViewDrivers(): ReadonlyArray<GmailThreadRowView>;
+  getGmailMessageIdForSyncDraftId(syncDraftId: string): Promise<string>;
+  getSelectedThreadRowViewDrivers(): $ReadOnlyArray<GmailThreadRowView>;
+  getGmailMessageIdForSyncDraftId(syncDraftId: string): Promise<string>;
   registerThreadRowViewSelectionHandler(handler: () => any): () => void;
+  delayToTimeAfterReady(delay: number): Kefir.Observable<void>;
+  getDraftIDForMessageID(
+    messageID: string,
+    skipCache: ?boolean
+  ): Promise<string>;
+  getGlobalSidebar(): GmailAppSidebarView;
+  getGmailMessageIdForSyncMessageId(syncMessageId: string): Promise<string>;
+  getOldGmailThreadIdFromSyncThreadId(syncThreadId: string): Promise<string>;
+  getThreadIDForMessageID(messageID: string): string;
+  isRecentSyncDraftId(syncMessageId: string): boolean;
+  removeCachedGmailMessageIdForSyncMessageId(syncMessageId: string): void;
+  reportDraftClosed(draftID: string): void;
+  reportRecentSyncDraftId(syncMessageId: string): void;
+  waitForGlobalSidebarReady(): Kefir.Observable<void>;
+  signalThreadRowViewSelectionChange(): void;
+  showNativeRouteView(): void;
+  associateThreadAndMessageIDs(threadID: string, messageID: string): void;
+  resolveUrlRedirects(url: string): Promise<string>;
+  removeCachedOldGmailThreadIdFromSyncThreadId(syncThreadId: string): void;
+  getThreadRowIdentifier(): ThreadRowIdentifier;
+  getLastCustomThreadListActivity(): ?{
+    customRouteID: string,
+    timestamp: Date,
+  };
 }
