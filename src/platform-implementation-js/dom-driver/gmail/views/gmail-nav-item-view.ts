@@ -912,6 +912,10 @@ export default class GmailNavItemView {
     if (this._expandoElement) {
       this._expandoElement.title = `Expand ${name}`;
     }
+
+    this._element.firstElementChild?.setAttribute('data-tooltip', name);
+    this._element.firstElementChild?.setAttribute('data-tooltip-align', 'r');
+
     this._name = name;
   }
 
