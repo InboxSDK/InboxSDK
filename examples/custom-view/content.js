@@ -72,7 +72,9 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
       onClick: function(event) {
         event.dropdown.el.innerHTML = 'Hello world!';
       }
-    }
+    },
+    showTooltip: true,
+    tooltipAlignment: 'top'
   });
 
   sdk.NavMenu.addNavItem({
@@ -86,7 +88,8 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
       onClick: function(event) {
         event.dropdown.el.innerHTML = 'Hello world!';
       }
-    }
+    },
+    tooltipAlignment: 'right'
   });
 
   sdk.Router.handleCustomRoute('beep', function(customRouteView) {
@@ -110,7 +113,8 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
       onClick: function() {
         log('create monkeys');
       }
-    }
+    },
+    tooltipAlignment: 'bottom'
   });
 
   var lion = navItem.addNavItem({
@@ -126,7 +130,8 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
       onClick: function() {
         log('lions rocks!');
       }
-    }
+    },
+    tooltipAlignment: 'left'
   });
 
   var monkey = lion.addNavItem({
