@@ -917,7 +917,10 @@ export default class GmailNavItemView {
     if (this._navItemDescriptor?.tooltipAlignment) {
       const align = this._navItemDescriptor?.tooltipAlignment[0];
       this._element.firstElementChild?.setAttribute('data-tooltip', name);
-      this._element.firstElementChild?.setAttribute('data-tooltip-align', align);
+      this._element.firstElementChild?.setAttribute(
+        'data-tooltip-align',
+        align
+      );
     }
 
     this._name = name;
