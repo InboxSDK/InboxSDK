@@ -222,10 +222,7 @@ const GmailElementGetter = {
         .querySelector<HTMLElement>(
           'header[role="banner"] > div > div > div[aria-expanded]'
         )
-        ?.getAttribute('aria-expanded') === 'true' ??
-      // Default to true if we can't find the element because
-      // the majority of users seem to favor that version.
-      false
+        ?.getAttribute('aria-expanded') === 'true' ?? false
     );
   },
 
