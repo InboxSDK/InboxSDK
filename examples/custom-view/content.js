@@ -72,8 +72,7 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
       onClick: function(event) {
         event.dropdown.el.innerHTML = 'Hello world!';
       }
-    },
-    showTooltip: true,
+    }
     tooltipAlignment: 'top'
   });
 
