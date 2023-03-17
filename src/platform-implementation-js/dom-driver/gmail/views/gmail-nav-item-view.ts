@@ -66,6 +66,7 @@ export type NavItemDescriptor = {
     | DropdownButtonAccessoryDescriptor
     | null;
   type: keyof NavItemTypes;
+  tooltipAlignment: 'left' | 'top' | 'right' | 'bottom' | null;
 }>;
 
 // TODO could we recreate this with React? There's so much statefulness that it's
@@ -912,6 +913,16 @@ export default class GmailNavItemView {
     if (this._expandoElement) {
       this._expandoElement.title = `Expand ${name}`;
     }
+
+    if (this._navItemDescriptor?.tooltipAlignment) {
+      const align = this._navItemDescriptor?.tooltipAlignment[0];
+      this._element.firstElementChild?.setAttribute('data-tooltip', name);
+      this._element.firstElementChild?.setAttribute(
+        'data-tooltip-align',
+        align
+      );
+    }
+
     this._name = name;
   }
 
