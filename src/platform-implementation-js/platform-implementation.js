@@ -50,13 +50,11 @@ import User from './namespaces/user';
 import Global from './namespaces/global';
 
 import GmailDriver from './dom-driver/gmail/gmail-driver';
-import InboxDriver from './dom-driver/inbox/inbox-driver';
 import Logger from './lib/logger';
 
 import isValidAppId from './lib/is-valid-app-id';
 
 // Some types
-import type { Driver } from './driver-interfaces/driver';
 import type { AppLogger } from './lib/logger';
 
 const loadedAppIds: Set<string> = new Set();
@@ -96,7 +94,7 @@ export class PlatformImplementation extends SafeEventEmitter {
   Modal: ?Modal;
   Logger: AppLogger;
 
-  constructor(driver: Driver, appId: string, piOpts: PiOpts) {
+  constructor(driver: GmailDriver, appId: string, piOpts: PiOpts) {
     super();
     const { appName, appIconUrl, VERSION: LOADER_VERSION } = piOpts;
 
@@ -240,11 +238,6 @@ export function makePlatformImplementation(
       );
   }
 
-  const DRIVERS_BY_ORIGIN: { [name: string]: * } = {
-    'https://mail.google.com': GmailDriver,
-    'https://inbox.google.com': InboxDriver,
-  };
-
   const LOADER_VERSION: string = opts.VERSION;
   const IMPL_VERSION: string = BUILD_VERSION;
   const logger = new Logger(appId, opts, LOADER_VERSION, IMPL_VERSION);
@@ -252,16 +245,14 @@ export function makePlatformImplementation(
   const origin: string =
     (process.env.NODE_ENV === 'test' && global.__test_origin) ||
     document.location.origin;
-  const DriverClass = DRIVERS_BY_ORIGIN[origin];
-  if (!DriverClass) {
-    console.log('InboxSDK: Unsupported origin', origin);
+  if (origin !== 'https://mail.google.com') {
     // never resolve
     return new Promise((resolve, reject) => {});
   }
 
   sharedStyle();
 
-  const driver: Driver = new DriverClass(
+  const driver = new GmailDriver(
     appId,
     LOADER_VERSION,
     IMPL_VERSION,
