@@ -8,9 +8,9 @@ import type ComposeView from '../views/compose-view';
 import type { RouteViewDriver } from './route-view-driver';
 import type CommonPageCommunicator from '../lib/common-page-communicator';
 
-import type GmailBackdrop from '../dom-driver/gmail/views/gmail-backdrop';
+// import type GmailBackdrop from '../dom-driver/gmail/views/gmail-backdrop';
 import type InboxBackdrop from '../dom-driver/inbox/views/inbox-backdrop';
-export type Backdrop = GmailBackdrop | InboxBackdrop;
+export type Backdrop = Object | InboxBackdrop;
 
 import type GmailThreadView from '../dom-driver/gmail/views/gmail-thread-view';
 import type InboxThreadView from '../dom-driver/inbox/views/inbox-thread-view';
@@ -41,8 +41,9 @@ import type InboxDrawerView from '../dom-driver/inbox/views/inbox-drawer-view';
 export type DrawerViewDriver = InboxDrawerView;
 
 import type { PiOpts } from '../platform-implementation';
-import type SupportItemDescriptor from '../dom-driver/gmail/views/gmail-support-item-view';
-import type GmailSupportItemView from '../dom-driver/gmail/views/gmail-support-item-view';
+import type GmailSupportItemView, {
+  SupportItemDescriptor,
+} from '../dom-driver/gmail/views/gmail-support-item-view';
 import type GmailNavItemView from '../dom-driver/gmail/views/gmail-nav-item-view';
 import type GmailAppMenuItemView from '../dom-driver/gmail/views/gmail-app-menu-item-view';
 

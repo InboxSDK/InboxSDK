@@ -14,6 +14,8 @@ export interface AutocompleteSearchResult {
   routeParams?: null | { [ix: string]: string | number };
   externalURL?: null | string;
   searchTerm?: null | string;
+  /** @deprecated use iconUrl instead */
+  iconURL?: null | string;
   iconUrl?: null | string;
   iconClass?: null | string;
   iconHTML?: null | string;

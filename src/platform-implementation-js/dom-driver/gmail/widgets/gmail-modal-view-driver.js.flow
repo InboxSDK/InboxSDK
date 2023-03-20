@@ -1,0 +1,10 @@
+/* @flow */
+
+import Kefir from 'kefir';
+
+declare export default class GmailModalViewDriver {
+  destroy(): void;
+  getEventStream(): Kefir.Observable<Object>;
+  getModalContainerElement(): HTMLElement;
+  setTitle(title: string): void;
+}

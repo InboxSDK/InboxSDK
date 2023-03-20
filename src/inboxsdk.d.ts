@@ -7,6 +7,10 @@ import {
   NavItemDescriptor,
 } from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 import NavItemView from './platform-implementation-js/views/nav-item-view';
+import type { Stopper } from 'kefir-stopper';
+import GmailRouteProcessor from './platform-implementation-js/dom-driver/gmail/views/gmail-route-view/gmail-route-processor';
+import GmailDriver from './platform-implementation-js/dom-driver/gmail/gmail-driver';
+import GmailRowListView from './platform-implementation-js/dom-driver/gmail/views/gmail-row-list-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 
 export const LOADER_VERSION: string;
@@ -299,6 +303,7 @@ export interface ThreadRowView extends Destroyable {
   getThreadID(): string;
   getThreadIDAsync(): Promise<string>;
   getDraftID(): Promise<string>;
+  isSelected(): boolean;
   replaceDate(
     threadDateDescriptor:
       | ThreadDateDescriptor
@@ -354,10 +359,20 @@ export interface CollapsibleSectionView extends SectionView {
   setCollapsed(value: boolean): void;
 }
 
-export interface RouteView extends EventEmitter {
+export class RouteView extends EventEmitter {
+  constructor(
+    options: any,
+    gmailRouteProcessor: GmailRouteProcessor,
+    driver: GmailDriver
+  );
+  destroy(): void;
+  getEventStream(): Kefir.Observable<any, any>;
   getRouteID(): string | null;
   getRouteType(): string;
+  getRowListViews(): GmailRowListView[];
   getParams(): { [key: string]: string };
+  getStopper(): Stopper;
+  isCustomRouteBelongingToApp(): boolean;
 }
 
 export interface ListRouteView extends RouteView {

@@ -16,7 +16,7 @@ export async function addAppMenuItem(
   );
 
   try {
-    if (!appMenuInjectionContainer) return;
+    if (!appMenuInjectionContainer) return undefined!;
 
     const siblingElement = Number.isInteger(menuItemDescriptor.insertIndex)
       ? appMenuInjectionContainer.childNodes[menuItemDescriptor.insertIndex!] ??

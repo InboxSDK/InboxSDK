@@ -14,7 +14,7 @@ import type {
 } from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
-import isComposeTitleBarLightColor from '../../gmail/is-compose-titlebar-light-color';
+import isComposeTitleBarLightColor from '../is-compose-titlebar-light-color';
 
 class GmailMoleViewDriver {
   _driver: GmailDriver;
