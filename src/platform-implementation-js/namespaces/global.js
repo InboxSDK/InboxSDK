@@ -10,7 +10,7 @@ import type { PiOpts } from '../platform-implementation';
 import type Membrane from '../lib/Membrane';
 import type { Driver } from '../driver-interfaces/driver';
 import GmailSupportItemView from '../dom-driver/gmail/views/gmail-support-item-view';
-import type SupportItemDescriptor from '../dom-driver/gmail/views/gmail-support-item-view';
+import type { SupportItemDescriptor } from '../dom-driver/gmail/views/gmail-support-item-view';
 
 const memberMap = new WeakMap();
 

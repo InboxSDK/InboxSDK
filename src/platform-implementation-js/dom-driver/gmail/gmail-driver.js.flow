@@ -120,7 +120,10 @@ declare export default class GmailDriver {
   getDraftIDForMessageID(
     messageID: string,
     skipCache: ?boolean
-  ): Promise<string>;
+  ): Promise<{
+    draftID: ?string,
+    debugData: any,
+  }>;
   getGlobalSidebar(): GmailAppSidebarView;
   getGmailMessageIdForSyncMessageId(syncMessageId: string): Promise<string>;
   getOldGmailThreadIdFromSyncThreadId(syncThreadId: string): Promise<string>;

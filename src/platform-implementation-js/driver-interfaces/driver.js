@@ -41,8 +41,9 @@ import type InboxDrawerView from '../dom-driver/inbox/views/inbox-drawer-view';
 export type DrawerViewDriver = InboxDrawerView;
 
 import type { PiOpts } from '../platform-implementation';
-import type SupportItemDescriptor from '../dom-driver/gmail/views/gmail-support-item-view';
-import type GmailSupportItemView from '../dom-driver/gmail/views/gmail-support-item-view';
+import type GmailSupportItemView, {
+  SupportItemDescriptor,
+} from '../dom-driver/gmail/views/gmail-support-item-view';
 import type GmailNavItemView from '../dom-driver/gmail/views/gmail-nav-item-view';
 import type GmailAppMenuItemView from '../dom-driver/gmail/views/gmail-app-menu-item-view';
 
