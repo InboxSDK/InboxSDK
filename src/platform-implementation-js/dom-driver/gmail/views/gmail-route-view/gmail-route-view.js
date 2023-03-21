@@ -267,9 +267,16 @@ class GmailRouteView {
     const gtalkButtons = GmailElementGetter.getGtalkButtons();
     const customViewEl = this._customViewElement;
     if (!leftNav || !customViewEl) throw new Error('Should not happen');
+
+    const contentSectionElement = GmailElementGetter.getContentSectionElement();
+    const contentSectionElementBottomMargin = contentSectionElement
+      ? parseInt(getComputedStyle(contentSectionElement).marginBottom, 10)
+      : 0;
+
     customViewEl.style.height = `${
       parseInt(leftNav.style.height, 10) +
-      (gtalkButtons ? gtalkButtons.offsetHeight : 0)
+      (gtalkButtons ? gtalkButtons.offsetHeight : 0) -
+      contentSectionElementBottomMargin
     }px`;
   }
 
