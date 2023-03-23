@@ -39,6 +39,8 @@ export default class NativeNavItemView extends EventEmitter {
       navItemViewDriver
         .getEventStream()
         .onValue((event) => _handleStreamEvent(this, event));
+
+      this.emit('inserted');
     });
   }
 
