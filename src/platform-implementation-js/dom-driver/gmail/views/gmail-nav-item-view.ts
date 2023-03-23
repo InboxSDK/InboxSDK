@@ -54,6 +54,7 @@ export type NavItemDescriptor = {
   key: string;
   orderHint: number;
   routeID: string;
+  iconUrl: string;
   iconClass: string;
   iconElement: HTMLElement;
   routeParams: Record<string, string | number>;
@@ -67,6 +68,7 @@ export type NavItemDescriptor = {
     | null;
   type: keyof NavItemTypes;
   tooltipAlignment: 'left' | 'top' | 'right' | 'bottom' | null;
+  subtitle: string;
 }>;
 
 // TODO could we recreate this with React? There's so much statefulness that it's
