@@ -61,20 +61,40 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
   customIconElement.style.background = 'blue';
   customIconElement.innerHTML = '<div>X</div>';
 
-  sdk.NavMenu.addNavItem({
-    name: 'Custom icon element',
-    iconElement: customIconElement,
-    routeID: 'Custom icon element',
-    subtitle: '123',
-    accessory: {
-      type: 'DROPDOWN_BUTTON',
-      buttonBackgroundColor: 'red',
-      onClick: function(event) {
-        event.dropdown.el.innerHTML = 'Hello world!';
-      }
-    },
-    tooltipAlignment: 'top'
-  });
+  const stream = Kefir.stream(emitter => {
+    emitter.value({
+      name: 'Custom icon elemnet',
+      iconElement: customIconElement,
+      routeID: 'Custom icon elemnet',
+      subtitle: '123',
+      accessory: {
+        type: 'DROPDOWN_BUTTON',
+        onClick: function(event) {
+          event.dropdown.el.innerHTML = 'Hello world!';
+        }
+      },
+      tooltipAlignment: 'top'
+    })
+
+    setTimeout(() => {
+      emitter.value({
+        name: 'Custom icon element',
+        iconElement: customIconElement,
+        routeID: 'Custom icon element',
+        subtitle: '42',
+        accessory: {
+          type: 'DROPDOWN_BUTTON',
+          onClick: function(event) {
+            event.dropdown.el.innerHTML = 'Hello, world!';
+          }
+        },
+        tooltipAlignment: 'right'
+      })
+      emitter.end()
+    }, 5000)
+  })
+
+  sdk.NavMenu.addNavItem(stream);
 
   sdk.NavMenu.addNavItem({
     name: 'beep',
