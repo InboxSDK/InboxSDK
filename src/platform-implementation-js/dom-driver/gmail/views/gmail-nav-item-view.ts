@@ -965,7 +965,7 @@ export default class GmailNavItemView {
     }
   }
 
-  private _updateSubtitle(navItemDescriptor: any) {
+  private _updateSubtitle(navItemDescriptor: NavItemDescriptor) {
     if (this._isNewLeftNavParent) {
       return;
     }
@@ -980,7 +980,7 @@ export default class GmailNavItemView {
       return;
     }
 
-    querySelector(this._element, '.bsU').innerHTML += autoHtml`${
+    querySelector(this._element, '.bsU').innerHTML = autoHtml`${
       navItemDescriptor.subtitle || ''
     }`;
   }
