@@ -20,6 +20,6 @@ export default async function waitForAsync<T>(
       throw timeoutError;
     }
   }
-  // eslint-disable-next-line no-unreachable
+
   throw new Error();
 }

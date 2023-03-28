@@ -19,7 +19,7 @@ export default async function getSyncThreadForOldGmailThreadId(
   );
   const firstThread = threadDescriptors[0];
   if (firstThread == null) {
-    console.error(`Thread with ID ${oldGmailThreadId} not found by Gmail`); //eslint-disable-line
+    console.error(`Thread with ID ${oldGmailThreadId} not found by Gmail`);
     const isStreak = isStreakAppId(driver.getAppId());
     const err = new Error(
       'Thread not found by getSyncThreadForOldGmailThreadId'

@@ -79,7 +79,7 @@ class GmailAppSidebarPrimary {
           global.localStorage.getItem('inboxsdk__sidebar_ordering') || 'null'
         );
       } catch (err) {
-        console.error('failed to read sidebar order data', err); //eslint-disable-line no-console
+        console.error('failed to read sidebar order data', err);
       }
     },
     set(data) {
@@ -89,7 +89,7 @@ class GmailAppSidebarPrimary {
           JSON.stringify(data)
         );
       } catch (err) {
-        console.error('failed to set sidebar order data', err); //eslint-disable-line no-console
+        console.error('failed to set sidebar order data', err);
       }
     },
   });
@@ -136,7 +136,7 @@ class GmailAppSidebarPrimary {
         String(open)
       );
     } catch (err) {
-      console.error('error saving', err); //eslint-disable-line no-console
+      console.error('error saving', err);
     }
   }
 
@@ -155,7 +155,7 @@ class GmailAppSidebarPrimary {
         String(open)
       );
     } catch (err) {
-      console.error('error saving', err); //eslint-disable-line no-console
+      console.error('error saving', err);
     }
   }
 

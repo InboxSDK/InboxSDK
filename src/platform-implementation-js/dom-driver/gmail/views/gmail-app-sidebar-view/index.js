@@ -76,7 +76,7 @@ class GmailAppSidebarView {
         String(open)
       );
     } catch (err) {
-      console.error('error saving', err); //eslint-disable-line no-console
+      console.error('error saving', err);
     }
   }
 
@@ -98,7 +98,7 @@ class GmailAppSidebarView {
         String(open)
       );
     } catch (err) {
-      console.error('error saving', err); //eslint-disable-line no-console
+      console.error('error saving', err);
     }
   }
 

@@ -1,5 +1,4 @@
 /* @flow */
-/* eslint-disable no-console */
 
 import SafeEventEmitter from './lib/safe-event-emitter';
 import { BUILD_VERSION } from '../common/version';

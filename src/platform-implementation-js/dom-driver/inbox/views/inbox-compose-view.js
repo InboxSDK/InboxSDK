@@ -794,7 +794,7 @@ class InboxComposeView {
     return addRecipientRow(this, options);
   }
   forceRecipientRowsOpen(): () => void {
-    console.warn('ComposeView.forceRecipientRowsOpen() is a no-op in Inbox'); // eslint-disable-line no-console
+    console.warn('ComposeView.forceRecipientRowsOpen() is a no-op in Inbox');
     return () => {};
   }
   hideNativeRecipientRows(): () => void {

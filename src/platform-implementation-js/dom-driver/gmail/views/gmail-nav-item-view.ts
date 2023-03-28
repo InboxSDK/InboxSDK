@@ -225,7 +225,6 @@ export default class GmailNavItemView {
         localStorage.removeItem(storageKey);
       }
     } catch (e) {
-      // eslint-disable-next-line no-console
       console.error('Caught error', e);
     }
   }

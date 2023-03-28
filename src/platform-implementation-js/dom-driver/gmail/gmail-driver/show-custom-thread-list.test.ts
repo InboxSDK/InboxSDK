@@ -27,7 +27,6 @@ class ShowCustomThreadListTester {
     isUsingSyncAPI: () => true,
     getLogger: once(() => ({
       error(e: any) {
-        // eslint-disable-next-line no-console
         console.error(e);
         throw e;
       },

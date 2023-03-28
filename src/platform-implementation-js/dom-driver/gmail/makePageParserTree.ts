@@ -33,7 +33,7 @@ export default function makePageParserTree(
 
   const page = new PageParserTree(root, transformOptions(pageParserOptions));
   pageParserOptionsStream.changes().onValue((pageParserOptions) => {
-    console.log('replacing PageParserTree options'); //eslint-disable-line no-console
+    console.log('replacing PageParserTree options');
     page.replaceOptions(transformOptions(pageParserOptions));
   });
   return page;

@@ -12,7 +12,6 @@ export default function makeElementStreamMerger<T>(): (
     let stopperPool = knownElementStopperPools.get(event.el);
     if (stopperPool) {
       if (stopperPool.getSize() > 1) {
-        // eslint-disable-next-line no-console
         console.warn(
           'element is part of multiple element streams',
           stopperPool.getSize(),

@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 import fs from 'fs';
 import path from 'path';
 const packageJson = JSON.parse(

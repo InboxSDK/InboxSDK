@@ -494,7 +494,6 @@ it all back together.
           if (item[6]) {
             item[6][0] = [query, 1];
           } else {
-            // eslint-disable-next-line no-console
             console.error('replaceThreadsInResponse(): Missing item[6]');
           }
         }

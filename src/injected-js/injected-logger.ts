@@ -2,7 +2,7 @@ export function error(err: Error | unknown, details?: any) {
   if (!err) {
     err = new Error('No error given');
   }
-  console.error('Error in injected script', err, details); //eslint-disable-line no-console
+  console.error('Error in injected script', err, details);
   try {
     JSON.stringify(details);
   } catch (e) {

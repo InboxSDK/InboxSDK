@@ -41,7 +41,6 @@ export default function logError(
     }
 
     if (!(err instanceof Error)) {
-      // eslint-disable-next-line no-console
       console.warn(
         'First parameter to Logger.error was not an error object:',
         err
@@ -89,7 +88,6 @@ export default function logError(
     stuffToLog.push('\nInboxSDK Implementation Version:', implVersion);
     stuffToLog.push('\nIs Using Sync API:', isUsingSyncAPI);
 
-    // eslint-disable-next-line no-console
     console.error(...stuffToLog);
 
     const report = {
@@ -153,7 +151,6 @@ const _extensionSeenErrors: {
         try {
           return !!(e as any).__inboxsdk_extensionHasSeenError;
         } catch (err) {
-          // eslint-disable-next-line no-console
           console.error(err);
           return false;
         }
@@ -179,7 +176,6 @@ const _extensionSeenErrors: {
             value: true,
           });
         } catch (err) {
-          // eslint-disable-next-line no-console
           console.error(err);
         }
       }
@@ -223,8 +219,7 @@ const sendError = rateLimit(
 );
 
 function tooManyErrors(err2: unknown, originalArgs: any) {
-  // eslint-disable-next-line no-console
   console.error('ERROR REPORTING ERROR', err2);
-  // eslint-disable-next-line no-console
+
   console.error('ORIGINAL ERROR', originalArgs);
 }

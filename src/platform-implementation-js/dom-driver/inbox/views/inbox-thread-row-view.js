@@ -101,7 +101,7 @@ class InboxThreadRowView {
 
   addImage(icon: Object) {
     if (this._isDestroyed) {
-      console.warn('addImage called on destroyed thread row'); //eslint-disable-line no-console
+      console.warn('addImage called on destroyed thread row');
       return;
     }
 
@@ -168,7 +168,7 @@ class InboxThreadRowView {
 
   addLabel(label: Object) {
     if (this._isDestroyed) {
-      console.warn('addLabel called on destroyed thread row'); //eslint-disable-line no-console
+      console.warn('addLabel called on destroyed thread row');
       return;
     }
 
@@ -303,7 +303,7 @@ class InboxThreadRowView {
 
   replaceDraftLabel(label: Object) {
     if (this._isDestroyed) {
-      console.warn('addLabel called on destroyed thread row'); //eslint-disable-line no-console
+      console.warn('addLabel called on destroyed thread row');
       return;
     }
 

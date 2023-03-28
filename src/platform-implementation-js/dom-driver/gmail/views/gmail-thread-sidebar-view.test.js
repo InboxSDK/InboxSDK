@@ -310,7 +310,7 @@ function makeDriver(appId, opts): any {
       return {
         eventSdkPassive() {},
         error(err, details) {
-          console.error('logger.error called:', err, details); //eslint-disable-line no-console
+          console.error('logger.error called:', err, details);
           throw err;
         },
       };
