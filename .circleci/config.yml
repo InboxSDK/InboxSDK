@@ -28,53 +28,8 @@ jobs:
           name: Unit Tests
           command: yarn jest --detectOpenHandles
 
-  integration:
-    working_directory: ~/StreakYC/GmailSDK
-    parallelism: 1
-    docker:
-      - image: circleci/node:12-browsers
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - v3-integration-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - v3-integration-{{ .Branch }}-
-            - v3-integration-master-
-            - v3-integration-
-      - run: yarn
-      - run:
-          name: Build
-          command: |
-            if ! [ -n "$INBOXSDK_TEST_SECRET" ]; then exit; fi
-            yarn gulp -s
-      - run:
-          name: Integration Test
-          command: |
-            if ! [ -n "$INBOXSDK_TEST_SECRET" ]; then exit; fi
-            yarn puppeteer
-      - save_cache:
-          key: v3-integration-{{ .Branch }}-{{ checksum "yarn.lock" }}
-          paths:
-            - node_modules/
-            - ~/.yarn/bin/
-            - ~/.config/yarn/global/
-            - ~/.cache
-            - /tmp/jest_puppeteer_userDataDir
-
 workflows:
   version: 2
   all_workflow:
     jobs:
       - unit_tests
-  #     - integration
-  # nightly_workflow:
-  #   triggers:
-  #     - schedule:
-  #         cron: '0 0 * * *'
-  #         filters:
-  #           branches:
-  #             only:
-  #               - master
-  #   jobs:
-  #     - unit_tests
-  #     - integration
