@@ -70,6 +70,8 @@ export default class NavItemView extends EventEmitter {
         .onValue((x) => {
           _handleRouteViewChange(navItemViewDriver, x);
         });
+
+      this.emit('inserted');
     });
   }
 
