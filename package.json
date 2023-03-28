@@ -28,12 +28,11 @@
     "@types/gulp-uglify": "^3.0.6",
     "@types/gulp-util": "^3.0.34",
     "@types/http-server": "^0.10.1",
-    "@types/jest": "^26.0.13",
+    "@types/jest": "^29",
     "@types/kefir": "^3.8.7",
     "@types/lazypipe": "^0.0.31",
     "@types/lodash": "^4.14.161",
     "@types/node": "^18.11.18",
-    "@types/puppeteer": "^3.0.2",
     "@types/react": "^17.0.11",
     "@types/react-dom": "^17.0.7",
     "@types/sinon": "^10.0.2",
@@ -45,7 +44,7 @@
     "@typescript-eslint/parser": "^5.39.0",
     "asap": "^2.0.3",
     "auto-html": "^1.0.4",
-    "babel-jest": "^27.0.2",
+    "babel-jest": "^29",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "babelify": "^10.0.0",
     "bignumber.js": "^9.0.1",
@@ -57,7 +56,6 @@
     "combokeys-capture": "^2.4.2",
     "concat-stream": "^2.0.0",
     "contain-by-screen": "^1.0.3",
-    "envify": "^4.0.0",
     "eslint": "^8.32.0",
     "eslint-plugin-deprecate": "^0.7.0",
     "eslint-plugin-flowtype": "^8.0.3",
@@ -79,9 +77,7 @@
     "http-server": "^0.10.0",
     "husky": "^7.0.4",
     "immutability-helper": "^3.0.0",
-    "jest": "^27.0.4",
-    "jest-circus": "^27.0.4",
-    "jest-puppeteer": "^5.0.4",
+    "jest": "^29.5.0",
     "kefir": "^3.8.3",
     "kefir-bus": "^2.2.0",
     "kefir-cast": "^3.3.0",
@@ -99,7 +95,6 @@
     "pdelay": "^2.0.0",
     "postcss-selector-parser": "^2.2.0",
     "prettier": "2.5.1",
-    "puppeteer": "^10.0.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-draggable-list": "^4.0.2",
@@ -153,5 +148,8 @@
   "workspaces": [
     "packages/*"
   ],
-  "packageManager": "yarn@3.3.1"
+  "packageManager": "yarn@3.3.1",
+  "devDependencies": {
+    "jest-environment-jsdom": "^29.5.0"
+  }
 }

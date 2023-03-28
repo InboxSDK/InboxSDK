@@ -106,7 +106,6 @@ module.exports = {
         page: 'readonly',
         browser: 'readonly',
         context: 'readonly',
-        jestPuppeteer: 'readonly',
       },
     },
     {

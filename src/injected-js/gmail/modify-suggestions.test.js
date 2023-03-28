@@ -8,7 +8,7 @@ test('works on old suggestion response', () => {
     modifications,
   } = require('../../../test/data/modify-suggestions-old.json');
   const modified = modifySuggestions(responseText, modifications);
-  expect(JSON.stringify(modified)).toMatchSnapshot();
+  expect(modified).toMatchSnapshot();
 });
 
 test('works on new suggestion response', () => {
@@ -17,5 +17,5 @@ test('works on new suggestion response', () => {
     modifications,
   } = require('../../../test/data/modify-suggestions-2016-10-04.json');
   const modified = modifySuggestions(responseText, modifications);
-  expect(JSON.stringify(modified)).toMatchSnapshot();
+  expect(modified).toMatchSnapshot();
 });
