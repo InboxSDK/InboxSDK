@@ -119,7 +119,6 @@ class InboxThreadView {
       throw new Error('Failed to find thread id');
     }
     if (/^msg-a:/.test(inboxThreadId)) {
-      // eslint-disable-next-line no-console
       console.warn(
         'ThreadView.getThreadID() returned an incorrect thread ID. This method will be deprecated soon. Use getThreadIDAsync() instead which does not have this problem.'
       );

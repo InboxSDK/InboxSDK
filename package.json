@@ -133,7 +133,7 @@
     "prepare": "husky install",
     "publish-npm": "gulp clean && gulp --production --minify && yarn workspace @inboxsdk/core npm publish && git push --follow-tags",
     "flow_check": "flow check",
-    "lint": "eslint .",
+    "lint": "eslint . --report-unused-disable-directives",
     "lint-fix": "eslint . --ext js,jsx,ts,tsx,flow --fix",
     "prettier-check": "prettier --check .",
     "prettier-fix": "prettier --write .",

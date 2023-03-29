@@ -159,7 +159,7 @@ class GmailAttachmentCardView {
             finalUrl
           )
         ) {
-          console.error('getDownloadURL returned unexpected url', finalUrl); //eslint-disable-line
+          console.error('getDownloadURL returned unexpected url', finalUrl);
           const err = new Error('getDownloadURL returned unexpected url');
           this._driver.getLogger().error(err, {
             finalUrlCensored: finalUrl.replace(/\?[^/]+$/, '?[...]'),

@@ -9,7 +9,7 @@ export default function setupErrorSilencer() {
       oldErrorHandlers.push(window.onerror);
       window.onerror = function (...args) {
         if (process.env.NODE_ENV !== 'production') {
-          console.error('(Silenced in production) Page error:', ...args); //eslint-disable-line no-console
+          console.error('(Silenced in production) Page error:', ...args);
         }
         return true;
       };

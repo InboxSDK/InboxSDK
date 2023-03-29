@@ -118,7 +118,7 @@ class GmailToolbarView {
 
   getThreadRowViewDrivers() {
     if (!this._rowListViewDriver) {
-      console.error('missing this._rowListViewDriver'); //eslint-disable-line no-console
+      console.error('missing this._rowListViewDriver');
       return new Set();
     }
     return this._rowListViewDriver.getThreadRowViewDrivers();

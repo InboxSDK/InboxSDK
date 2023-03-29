@@ -14,7 +14,7 @@ function logError(error, label) {
   if (error === testError) {
     logErrorTestCalls++;
   } else {
-    console.error('logError:', label, error); // eslint-disable-line no-console
+    console.error('logError:', label, error);
     throw error || new Error(label);
   }
 }

@@ -1031,7 +1031,6 @@ class GmailComposeView {
 
   close() {
     if (this.isInlineReplyForm()) {
-      // eslint-disable-next-line no-console
       console.warn("Trying to close an inline reply which doesn't work.");
       return;
     }

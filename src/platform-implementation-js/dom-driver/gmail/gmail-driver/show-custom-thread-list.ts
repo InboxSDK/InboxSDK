@@ -95,7 +95,7 @@ function copyAndOmitExcessThreads(
 }
 
 function _findIdFailure(id: string, err: Error) {
-  console.log('Failed to find id for thread', id, err); //eslint-disable-line no-console
+  console.log('Failed to find id for thread', id, err);
   return null;
 }
 

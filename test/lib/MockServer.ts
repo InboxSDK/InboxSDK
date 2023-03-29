@@ -129,7 +129,6 @@ export default class MockServer {
   XMLHttpRequest: typeof XMLHttpRequest;
 
   constructor() {
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const server = this;
 
     this.XMLHttpRequest = class XMLHttpRequest {
@@ -202,7 +201,7 @@ export default class MockServer {
         async: boolean | undefined = undefined
       ) {
         if (this._server._verbose) {
-          console.log('Connection opened', method, path); //eslint-disable-line no-console
+          console.log('Connection opened', method, path);
         }
         this._terminate();
         this._sendFlag = false;

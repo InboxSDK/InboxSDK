@@ -54,7 +54,7 @@ export default class InboxNavItemView {
     };
 
     if (this._level > 2) {
-      console.warn('Adding NavItems more than 3 levels deep is not supported'); //eslint-disable-line no-console
+      console.warn('Adding NavItems more than 3 levels deep is not supported');
     }
 
     this._stopper = this._eventStream

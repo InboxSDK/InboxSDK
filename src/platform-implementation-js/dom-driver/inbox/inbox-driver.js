@@ -769,7 +769,6 @@ class InboxDriver {
     appName: ?string,
     appIconUrl: ?string
   ): void {
-    // eslint-disable-next-line no-console
     console.warn('activateShortcut not implemented');
   }
 
@@ -812,7 +811,6 @@ class InboxDriver {
   }
 
   getAccountSwitcherContactList(): Contact[] {
-    // eslint-disable-next-line no-console
     console.log('getAccountSwitcherContactList not implemented');
     return [this.getUserContact()];
   }
@@ -832,7 +830,6 @@ class InboxDriver {
       if (inboxToolbarView.isForThread()) {
         if (!options.positions || includes(options.positions, 'THREAD')) {
           if (options.threadSection === 'OTHER') {
-            // eslint-disable-next-line no-console
             console.warn(
               'registerThreadButton does not support OTHER section items in Inbox yet.'
             );
@@ -857,7 +854,6 @@ class InboxDriver {
       } else if (inboxToolbarView.isForRowList()) {
         if (!options.positions || includes(options.positions, 'LIST')) {
           if (options.listSection === 'OTHER') {
-            // eslint-disable-next-line no-console
             console.warn(
               'registerThreadButton does not support OTHER section items in Inbox yet.'
             );
@@ -963,7 +959,6 @@ class InboxDriver {
   }
 
   addCustomListRouteID(routeID: string, handler: Function): () => void {
-    // eslint-disable-next-line no-console
     console.log('addCustomListRouteID not implemented');
     return () => {};
   }
@@ -1061,7 +1056,6 @@ class InboxDriver {
   }
 
   registerSearchQueryRewriter(obj: Object) {
-    // eslint-disable-next-line no-console
     console.log('registerSearchQueryRewriter not implemented');
   }
 

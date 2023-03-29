@@ -1,5 +1,4 @@
 /* @flow */
-/* eslint-disable no-console */
 
 import once from 'lodash/once';
 import flatten from 'lodash/flatten';

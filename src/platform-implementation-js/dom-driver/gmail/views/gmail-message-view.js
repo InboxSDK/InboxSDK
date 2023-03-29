@@ -499,7 +499,7 @@ class GmailMessageView {
     const attachmentIcon = new AttachmentIcon();
 
     if (!this._element) {
-      console.warn('addDateIcon called on destroyed message'); //eslint-disable-line no-console
+      console.warn('addDateIcon called on destroyed message');
       return attachmentIcon;
     }
 

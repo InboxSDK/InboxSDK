@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 import EventEmitter from '../lib/safe-event-emitter';
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';

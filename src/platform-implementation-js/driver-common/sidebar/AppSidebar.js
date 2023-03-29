@@ -130,7 +130,7 @@ export default class AppSidebar extends React.Component<Props, State> {
           'null'
       );
     } catch (err) {
-      console.error('Failed to read sidebar settings', err); //eslint-disable-line no-console
+      console.error('Failed to read sidebar settings', err);
     }
     if (data) return data;
     return { apps: {} };
@@ -158,7 +158,7 @@ export default class AppSidebar extends React.Component<Props, State> {
         JSON.stringify(data)
       );
     } catch (err) {
-      console.error('Failed to save sidebar settings', err); //eslint-disable-line no-console
+      console.error('Failed to save sidebar settings', err);
     }
   }
   render() {

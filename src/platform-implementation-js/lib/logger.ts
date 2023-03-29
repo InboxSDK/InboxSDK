@@ -1,5 +1,3 @@
-/* eslint-disable no-console */
-
 import Sha256 from 'sha.js/sha256';
 import ajax from '../../common/ajax';
 import getExtensionId from '../../common/get-extension-id';
@@ -325,7 +323,7 @@ function _extensionLoggerSetup(
             let loggedFn = args[1].__inboxsdk_logged;
             if (!loggedFn) {
               loggedFn = makeLoggedFunction(args[1], 'event listener');
-              // eslint-disable-next-line
+
               (args[1] as any).__inboxsdk_logged = loggedFn;
             }
             args[1] = loggedFn;

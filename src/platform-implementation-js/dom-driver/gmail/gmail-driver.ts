@@ -216,7 +216,6 @@ class GmailDriver implements Driver {
           'inboxsdk__cached_gmail_and_inbox_message_ids_2'
         );
       } catch (err) {
-        // eslint-disable-next-line no-console
         console.error(err);
       }
       const gmailMessageIdForSyncMessageIdCache = new BiMapCache({
