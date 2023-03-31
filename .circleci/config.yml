@@ -1,27 +1,45 @@
 version: 2.1
 orbs:
-  node: 'cimg/node:18.14.1'
+  node: circleci/node@5.1.0
+executors:
+  sdk:
+    docker:
+      - image: cimg/node:18.15.0
 
 jobs:
   # build: TODO
   lint:
-    docker:
-      - image: cimg/node:18.15
+    executor: sdk
     steps:
       - checkout
       - node/install
+      - node/install-packages:
+          pkg-manager: yarn-berry
+          check-cache: always
       - run:
           name: ESLint
           command: yarn lint:eslint
       - run:
           name: Prettier
           command: yarn prettier:check
+  test:
+    executor: sdk
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn-berry
+          check-cache: always
+      - run:
+          command: yarn test
+          name: Tests
   typecheck:
-    docker:
-      - image: cimg/node:18.15
+    executor: sdk
     steps:
       - checkout
       - node/install
+      - node/install-packages:
+          pkg-manager: yarn-berry
+          check-cache: always
       - run:
           name: Typecheck (tsc)
           command: yarn tsc
@@ -34,5 +52,5 @@ workflows:
   all_workflow:
     jobs:
       - lint
+      - test
       - typecheck
-      - node/test
