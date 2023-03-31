@@ -7,18 +7,51 @@ executors:
       - image: cimg/node:18.15.0
 
 jobs:
-  build:
+  # MV3 Version Build
+  'build inboxsdk core':
     executor: sdk
     steps:
       - checkout
       - node/install-packages:
           pkg-manager: yarn-berry
       - run:
-          name: Build '@inboxsdk/core' version
+          name: Build
           command: yarn gulp
       - run:
           name: Check output files exist
           command: ls packages/core/inboxsdk.js
+      - run:
+          name: Clean
+          command: yarn gulp clean
+  # MV2 Remote Build
+  'build REMOTE':
+    executor: sdk
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn-berry
+      - run:
+          name: Build
+          command: yarn gulp --remote
+      - run:
+          name: Check output files exist
+          command: ls dist/inboxsdk.js dist/platform-implementation.js
+      - run:
+          name: Clean
+          command: yarn gulp clean
+  # MV2 Local Build
+  'build NONREMOTE-INTEGRATED-PAGEWORLD':
+    executor: sdk
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn-berry
+      - run:
+          name: Build
+          command: yarn gulp --integratedPageWorld
+      - run:
+          name: Check output files exist
+          command: ls dist/inboxsdk.js dist/pageWorld.js packages/core/pageWorld.js
       - run:
           name: Clean
           command: yarn gulp clean
@@ -61,7 +94,9 @@ workflows:
   version: 2
   all_workflow:
     jobs:
-      - build
+      - 'build inboxsdk core'
+      - 'build REMOTE'
+      - 'build NONREMOTE-INTEGRATED-PAGEWORLD'
       - lint
       - test
       - typecheck
