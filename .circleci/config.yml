@@ -7,7 +7,22 @@ executors:
       - image: cimg/node:18.15.0
 
 jobs:
-  # build: TODO
+  build:
+    executor: sdk
+    steps:
+      - checkout
+      - node/install
+      - node/install-packages:
+          pkg-manager: yarn-berry
+      - run:
+          name: Build '@inboxsdk/core' version
+          command: yarn gulp
+      - run:
+          name: Check output files exist
+          command: ls packages/core/inboxsdk.js
+      - run:
+          name: Clean
+          command: yarn gulp clean
   lint:
     executor: sdk
     steps:
@@ -49,6 +64,7 @@ workflows:
   version: 2
   all_workflow:
     jobs:
+      - build
       - lint
       - test
       - typecheck
