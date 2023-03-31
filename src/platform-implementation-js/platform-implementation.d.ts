@@ -74,9 +74,6 @@ type User = any;
 // import Global from './namespaces/global';
 type Global = any;
 
-// import InboxDriver from './dom-driver/inbox/inbox-driver';
-type InboxDriver = any;
-
 // Some types
 import { Driver } from './driver-interfaces/driver';
 import { AppLogger } from './lib/logger';

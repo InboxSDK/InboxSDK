@@ -7,10 +7,7 @@ import { defn } from 'ud';
 import EventEmitter from '../lib/safe-event-emitter';
 
 import type { Backdrop, Driver } from '../driver-interfaces/driver';
-import type GmailModalViewDriver from '../dom-driver/gmail/widgets/gmail-modal-view-driver';
-import type InboxModalView from '../dom-driver/inbox/views/inbox-modal-view';
-
-type ModalViewDriver = GmailModalViewDriver | InboxModalView;
+import type ModalViewDriver from '../dom-driver/gmail/widgets/gmail-modal-view-driver';
 
 // documented in src/docs/
 class ModalView extends EventEmitter {
