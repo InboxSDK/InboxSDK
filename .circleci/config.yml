@@ -30,7 +30,7 @@ jobs:
           pkg-manager: yarn-berry
           check-cache: always
       - run:
-          command: yarn test
+          command: yarn test --ci
           name: Tests
   typecheck:
     executor: sdk
