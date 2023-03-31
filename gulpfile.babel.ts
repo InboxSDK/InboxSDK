@@ -11,6 +11,7 @@ import stdio from 'stdio';
 import extReloader from './live/extReloader';
 import fg from 'fast-glob';
 import exec from './src/build/exec';
+import { styleTagTransform } from './src/common/insert-css';
 
 const sdkFilename = 'inboxsdk.js';
 
@@ -149,7 +150,7 @@ async function browserifyTask({
 }: BrowserifyTaskOptions): Promise<void> {
   const willMinify = args.minify && !disableMinification;
 
-  process.env.VERSION = await getVersion();
+  const VERSION = await getVersion();
 
   const bundler = webpack({
     devtool: options.devtool ?? 'source-map',
@@ -170,7 +171,7 @@ async function browserifyTask({
                 [
                   'transform-inline-environment-variables',
                   {
-                    include: ['NODE_ENV', 'IMPLEMENTATION_URL', 'VERSION'],
+                    include: ['NODE_ENV', 'IMPLEMENTATION_URL'],
                   },
                 ],
               ],
@@ -183,16 +184,7 @@ async function browserifyTask({
             {
               loader: 'style-loader',
               options: {
-                insert: (
-                  htmlElement: HTMLElement,
-                  _options: Record<string, any>
-                ) => {
-                  if (!document.getElementById('inboxsdk__style')) {
-                    htmlElement.id = 'inboxsdk__style';
-                    if (!document.head) throw new Error('missing head');
-                    document.head.appendChild(htmlElement);
-                  }
-                },
+                styleTagTransform,
               },
             },
             {
@@ -232,9 +224,12 @@ async function browserifyTask({
             },
           }
         : {}),
-      uniqueName: 'inboxsdk_' + (await process.env.VERSION),
+      uniqueName: 'inboxsdk_' + VERSION,
     },
     plugins: [
+      new webpack.DefinePlugin({
+        SDK_VERSION: JSON.stringify(VERSION),
+      }),
       // Work around for Buffer is undefined:
       // https://github.com/webpack/changelog-v5/issues/10
       new webpack.ProvidePlugin({

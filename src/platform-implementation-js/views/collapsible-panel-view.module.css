@@ -1,0 +1,29 @@
+/* app menu panel nav item reshaping */
+.collapsiblePanel :global(.inboxsdk__navItem > .TO .TN.aik) {
+  padding-left: 18px;
+}
+
+/* Tweak alignment of  */
+.collapsiblePanel :global(.inboxsdk__navItem > .TO .qj) {
+  margin-right: 14px;
+}
+
+.collapsiblePanel :global(.T-I.T-I-KE.L3):before {
+  background-image: var(--background-image);
+}
+
+.collapsiblePanel:global(.apV.aJu .T-I.T-I-KE.L3):before {
+  background-image: var(--background-image--hover);
+}
+
+.collapsiblePanel :global(.T-I.T-I-KE.L3):before {
+  background-size: 24px;
+}
+
+.loading_container {
+  display: none;
+}
+
+.loading_container.loading_containerActive {
+  display: block;
+}

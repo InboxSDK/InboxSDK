@@ -13,18 +13,18 @@ import { NavItemDescriptor } from '../dom-driver/gmail/views/gmail-nav-item-view
 import NavItemView from './nav-item-view';
 import { stylesStream } from '../dom-driver/gmail/gmail-driver/track-gmail-styles';
 import isEqual from 'fast-deep-equal';
+import * as s from './collapsible-panel-view.module.css';
 
 export const NATIVE_CLASS = 'aqn' as const;
-export const INBOXSDK_CLASS = 'inboxsdk__collapsiblePanel' as const;
+const INBOXSDK_CLASS = s.collapsiblePanel;
 const ELEMENT_CLASS = `${NATIVE_CLASS} ${INBOXSDK_CLASS} oy8Mbf` as const;
 
 const PRIMARY_BUTTON_ELEMENT_CLASS = 'T-I T-I-KE L3' as const;
 const PRIMARY_BUTTON_ELEMENT_SELECTOR = '.T-I.T-I-KE.L3' as const;
 const scrollablePanelClass = 'at9' as const;
 const scrollablePanelSelector = `.${scrollablePanelClass}` as const;
-const loadingElementClass =
-  'inboxsdk__collapsiblePanel_loading_container' as const;
-const panelLoadingClass = `${loadingElementClass}--active` as const;
+const loadingElementClass = s.loading_container;
+const panelLoadingClass = s.loading_containerActive;
 const loadingElementSelector = `.${loadingElementClass}` as const;
 
 const NAV_MENU_CONTAINER_ELEMENT_SELECTOR = '.at9 .n3 .TK' as const;
@@ -37,7 +37,7 @@ type MessageEvents = {
 export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitter<MessageEvents>) {
   static elementSelectors = {
     NATIVE: '.aqn.oy8Mbf',
-    CUSTOM: '.inboxsdk__collapsiblePanel',
+    CUSTOM: INBOXSDK_CLASS,
   } as const;
   static elementCss = {
     ACTIVE: 'apV',
