@@ -1,35 +1,38 @@
-version: 2
+version: 2.1
+orbs:
+  node: 'cimg/node:18.14.1'
+
 jobs:
-  unit_tests:
-    working_directory: ~/StreakYC/GmailSDK
-    parallelism: 1
+  # build: TODO
+  lint:
     docker:
-      - image: cimg/node:18.14-browsers
+      - image: cimg/node:18.15
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v3-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - v3-dep-{{ .Branch }}-
-            - v3-dep-master-
-            - v3-dep-
-      - run: yarn
-      - save_cache:
-          key: v3-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
-          paths:
-            - node_modules/
-            - ~/.yarn/bin/
-            - ~/.config/yarn/global/
-            - ~/.cache
+      - node/install
       - run:
-          name: Lint and Typecheck
-          command: yarn test
+          name: ESLint
+          command: yarn lint:eslint
       - run:
-          name: Unit Tests
-          command: yarn jest --detectOpenHandles
+          name: Prettier
+          command: yarn prettier:check
+  typecheck:
+    docker:
+      - image: cimg/node:18.15
+    steps:
+      - checkout
+      - node/install
+      - run:
+          name: Typecheck (tsc)
+          command: yarn tsc
+      - run:
+          name: Typecheck (flow)
+          command: yarn flow check
 
 workflows:
   version: 2
   all_workflow:
     jobs:
-      - unit_tests
+      - lint
+      - typecheck
+      - node/test
