@@ -15,7 +15,6 @@ jobs:
       - node/install
       - node/install-packages:
           pkg-manager: yarn-berry
-          check-cache: always
       - run:
           name: ESLint
           command: yarn lint:eslint
@@ -28,7 +27,6 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: yarn-berry
-          check-cache: always
       - run:
           # https://stackoverflow.com/questions/71985308/jest-a-worker-process-has-failed-to-exit-gracefully-and-has-been-force-exited#comment130902392_74087365
           command: yarn test --detectOpenHandles
@@ -40,7 +38,6 @@ jobs:
       - node/install
       - node/install-packages:
           pkg-manager: yarn-berry
-          check-cache: always
       - run:
           name: Typecheck (tsc)
           command: yarn tsc
