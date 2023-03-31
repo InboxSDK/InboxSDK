@@ -1,35 +1,102 @@
-version: 2
-jobs:
-  unit_tests:
-    working_directory: ~/StreakYC/GmailSDK
-    parallelism: 1
+version: 2.1
+orbs:
+  node: circleci/node@5.1.0
+executors:
+  sdk:
     docker:
-      - image: cimg/node:18.14-browsers
+      - image: cimg/node:18.15.0
+
+jobs:
+  # MV3 Version Build
+  'build inboxsdk core':
+    executor: sdk
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - v3-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
-            - v3-dep-{{ .Branch }}-
-            - v3-dep-master-
-            - v3-dep-
-      - run: yarn
-      - save_cache:
-          key: v3-dep-{{ .Branch }}-{{ checksum "yarn.lock" }}
-          paths:
-            - node_modules/
-            - ~/.yarn/bin/
-            - ~/.config/yarn/global/
-            - ~/.cache
+      - node/install-packages:
+          pkg-manager: yarn-berry
       - run:
-          name: Lint and Typecheck
-          command: yarn test
+          name: Build
+          command: yarn gulp
       - run:
-          name: Unit Tests
-          command: yarn jest --detectOpenHandles
+          name: Check output files exist
+          command: ls packages/core/inboxsdk.js
+      - run:
+          name: Clean
+          command: yarn gulp clean
+  # MV2 Remote Build
+  'build REMOTE':
+    executor: sdk
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn-berry
+      - run:
+          name: Build
+          command: yarn gulp --remote
+      - run:
+          name: Check output files exist
+          command: ls dist/inboxsdk.js dist/platform-implementation.js
+      - run:
+          name: Clean
+          command: yarn gulp clean
+  # MV2 Local Build
+  'build NONREMOTE-INTEGRATED-PAGEWORLD':
+    executor: sdk
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn-berry
+      - run:
+          name: Build
+          command: yarn gulp --integratedPageWorld
+      - run:
+          name: Check output files exist
+          command: ls dist/inboxsdk.js dist/pageWorld.js packages/core/pageWorld.js
+      - run:
+          name: Clean
+          command: yarn gulp clean
+  lint:
+    executor: sdk
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn-berry
+      - run:
+          name: ESLint
+          command: yarn lint:eslint
+      - run:
+          name: Prettier
+          command: yarn prettier:check
+  test:
+    executor: sdk
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn-berry
+      - run:
+          # https://stackoverflow.com/questions/71985308/jest-a-worker-process-has-failed-to-exit-gracefully-and-has-been-force-exited#comment130902392_74087365
+          command: yarn test --detectOpenHandles
+          name: Tests
+  typecheck:
+    executor: sdk
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn-berry
+      - run:
+          name: Typecheck (tsc)
+          command: yarn tsc
+      - run:
+          name: Typecheck (flow)
+          command: yarn flow check
 
 workflows:
   version: 2
   all_workflow:
     jobs:
-      - unit_tests
+      - 'build inboxsdk core'
+      - 'build REMOTE'
+      - 'build NONREMOTE-INTEGRATED-PAGEWORLD'
+      - lint
+      - test
+      - typecheck

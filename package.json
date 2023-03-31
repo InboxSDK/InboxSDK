@@ -129,17 +129,19 @@
   },
   "scripts": {
     "transpile-flow": "babel -d packages/core/src --source-type module --ignore '*.test.js' --no-copy-ignored src",
+    "typecheck": "yarn run flow_check && tsc",
     "typedefs": "yarn transpile-flow && tsc -p tsconfig.declarations.json",
     "prepare": "husky install",
     "publish-npm": "gulp clean && gulp --production --minify && yarn workspace @inboxsdk/core npm publish && git push --follow-tags",
     "flow_check": "flow check",
-    "lint": "eslint . --report-unused-disable-directives",
-    "lint-fix": "eslint . --ext js,jsx,ts,tsx,flow --fix",
-    "prettier-check": "prettier --check .",
-    "prettier-fix": "prettier --write .",
+    "lint": "yarn run lint:eslint && yarn run prettier:check",
+    "lint:fix": "yarn run lint:eslint --fix && yarn run prettier:fix",
+    "lint:eslint": "eslint . --report-unused-disable-directives",
+    "prettier:check": "prettier --check .",
+    "prettier:fix": "prettier --write .",
     "puppeteer": "jest -c test/chrome/jest.config.js --runInBand",
     "start": "gulp default --watch --reloader",
-    "test": "yarn run lint && yarn run prettier-check && yarn run flow_check && tsc"
+    "test": "jest"
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown"
