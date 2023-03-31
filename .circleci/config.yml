@@ -30,7 +30,8 @@ jobs:
           pkg-manager: yarn-berry
           check-cache: always
       - run:
-          command: yarn test --ci
+          # https://stackoverflow.com/questions/71985308/jest-a-worker-process-has-failed-to-exit-gracefully-and-has-been-force-exited#comment130902392_74087365
+          command: yarn test --detectOpenHandles
           name: Tests
   typecheck:
     executor: sdk
