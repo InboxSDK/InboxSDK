@@ -51,7 +51,6 @@ import setupComposeViewDriverStream from './gmail-driver/setup-compose-view-driv
 import trackEvents from './gmail-driver/track-events';
 import gmailLoadEvent from './gmail-driver/gmail-load-event';
 import ThreadRowIdentifier from './gmail-driver/thread-row-identifier';
-import customStyle from './custom-style';
 import overrideGmailBackButton from './gmail-driver/override-gmail-back-button';
 import addToolbarButtonForApp from './gmail-driver/add-toolbar-button-for-app';
 import setupRouteViewDriverStream from './gmail-driver/setup-route-view-driver-stream';
@@ -154,8 +153,6 @@ class GmailDriver implements Driver {
     opts: PiOpts,
     envData: EnvData
   ) {
-    customStyle();
-
     this._appId = appId;
     this._logger = logger;
     this._opts = opts;

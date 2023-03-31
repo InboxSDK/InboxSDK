@@ -8,6 +8,6 @@
     "outDir": "packages/core/src",
     "sourceMap": false
   },
-  "include": ["src"],
+  "include": ["src", "./types/webpack.d.ts"],
   "exclude": ["**/*.test.ts", "**/*.test.js", "**/*.test.jsx"]
 }

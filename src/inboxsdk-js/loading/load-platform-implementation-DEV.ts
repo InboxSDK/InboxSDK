@@ -1,8 +1,6 @@
-/* @flow */
-
 import once from 'lodash/once';
 
-module.exports = function (delay: number): () => Promise<void> {
+export default function (delay: number): () => Promise<void> {
   return once(
     () =>
       new Promise((resolve, reject) => {
@@ -16,4 +14,4 @@ module.exports = function (delay: number): () => Promise<void> {
         }, delay);
       })
   );
-};
+}

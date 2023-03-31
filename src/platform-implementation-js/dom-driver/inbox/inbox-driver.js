@@ -35,7 +35,6 @@ import getAccountUrlPart from '../../driver-common/getAccountUrlPart';
 import simulateKey from '../../lib/dom/simulate-key';
 import setCss from '../../lib/dom/set-css';
 import querySelector from '../../lib/dom/querySelectorOrFail';
-import customStyle from './custom-style';
 import censorHTMLstring from '../../../common/censorHTMLstring';
 import censorHTMLtree from '../../../common/censorHTMLtree';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
@@ -150,7 +149,6 @@ class InboxDriver {
     envData: EnvData
   ) {
     (this: Driver); // interface check
-    customStyle();
     this._appId = appId;
     this._logger = logger;
     this._opts = opts;

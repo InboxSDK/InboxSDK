@@ -4,30 +4,19 @@ const packageJson = JSON.parse(
   fs.readFileSync(__dirname + '/package.json', 'utf8')
 );
 
-import _ from 'lodash';
 import gulp from 'gulp';
 import destAtomic from 'gulp-dest-atomic';
-import browserify from 'browserify';
-import watchify from 'watchify';
-import source from 'vinyl-source-stream';
-import streamify from 'gulp-streamify';
-import gulpif from 'gulp-if';
-import terser from 'gulp-terser';
-import sourcemaps from 'gulp-sourcemaps';
+import webpack from 'webpack';
 import stdio from 'stdio';
-import gutil from 'gulp-util';
 import extReloader from './live/extReloader';
-import Kefir from 'kefir';
 import fg from 'fast-glob';
 import exec from './src/build/exec';
-import babelify from 'babelify';
-import lazyPipe from 'lazypipe';
-import concat from 'gulp-concat';
-import addsrc from 'gulp-add-src';
 
 const sdkFilename = 'inboxsdk.js';
 
 const args = stdio.getopt({
+  // --watch is a node flag that doesn't seem to work after Node 18.12 with gulp.
+  // using -w seems to work though.
   watch: { key: 'w', description: 'Automatic rebuild' },
   reloader: { key: 'r', description: 'Automatic extension reloader' },
   hot: { key: 'h', description: 'hot module replacement' },
@@ -44,11 +33,6 @@ const args = stdio.getopt({
     key: 'c',
     description: 'Copy dev build to Streak dev build folder',
   },
-  fullPaths: {
-    key: 'f',
-    description:
-      'Use fullPaths browserify setting (for bundle size checking; recommended to use --minify with this)',
-  },
 });
 
 // Don't let production be built without minification.
@@ -60,12 +44,9 @@ if (args.production && !args.minify) {
 
 // --watch causes Browserify to use full paths in module references. We don't
 // want those visible in production.
-if (
-  args.production &&
-  (args.watch || args.fullPaths || args.integratedPageWorld)
-) {
+if (args.production && (args.watch || args.integratedPageWorld)) {
   throw new Error(
-    '--production can not be used with --watch, --fullPaths, or --integratedPageWorld'
+    '--production can not be used with --watch, or --integratedPageWorld'
   );
 }
 
@@ -76,14 +57,29 @@ process.env.IMPLEMENTATION_URL = args.production
 
 async function setupExamples() {
   // Copy inboxsdk.js (and .map) to all subdirs under examples/
-  const dirs: string[] = await fg(['examples/*'], { onlyDirectories: true });
+  let dirs: string[] = [];
   if (args.copyToStreak) {
     dirs.push('../MailFoo/extensions/devBuilds/chrome/');
   }
 
-  const srcs = ['./dist/inboxsdk.js'];
+  let srcs: string[] = [];
   if (!args.remote && !args.integratedPageWorld) {
-    srcs.push('./dist/pageWorld.js', './packages/core/background.js');
+    srcs = [
+      './packages/core/inboxsdk.js',
+      './packages/core/pageWorld.js',
+      './packages/core/background.js',
+    ];
+
+    dirs = dirs.concat(await fg(['examples/*'], { onlyDirectories: true }));
+  } else if (args.remote) {
+    dirs.push('./dist');
+    srcs = [
+      './packages/core/inboxsdk.js*',
+      './packages/core/platform-implementation.js*',
+    ];
+  } else if (args.integratedPageWorld) {
+    dirs.push('./dist');
+    srcs = ['./packages/core/inboxsdk.js', './packages/core/pageWorld.js'];
   }
 
   let stream = gulp.src(srcs);
@@ -105,7 +101,7 @@ async function setupExamples() {
 
 gulp.task('noop', () => {
   // This task exists so we can run `yarn gulp noop` to check that this
-  // script loads (and yarn-deps-check passes) without any side effects.
+  // script loads without any side effects.
 });
 
 async function getVersion(): Promise<string> {
@@ -126,163 +122,168 @@ async function getVersion(): Promise<string> {
   return version;
 }
 
-// async function getBrowserifyHmrOptions(port: number) {
-//   const HOME = process.env.HOME;
-//   if (!HOME) throw new Error('HOME env variable not set');
-//   const keyFile = `${HOME}/stunnel/key.pem`;
-//   const certFile = `${HOME}/stunnel/cert.pem`;
-
-//   let url, tlskey, tlscert;
-
-//   async function checkFilesAllExistAndReadable(
-//     filenames: string[]
-//   ): Promise<boolean> {
-//     try {
-//       await Promise.all(
-//         filenames.map(filename =>
-//           fs.promises.access(filename, fs.constants.R_OK)
-//         )
-//       );
-//       return true;
-//     } catch (err) {
-//       return false;
-//     }
-//   }
-
-//   if (await checkFilesAllExistAndReadable([keyFile, certFile])) {
-//     url = `https://dev.mailfoogae.appspot.com:${port}`;
-//     tlskey = keyFile;
-//     tlscert = certFile;
-//   }
-//   return { url, tlskey, tlscert, port, disableHostCheck: true };
-// }
+const enum OutputLibraryType {
+  /** Used for the integrated page world build */
+  Var = 'var',
+  /** Remote and npm output format for compatibility's sake */
+  UMD = 'umd',
+  /** Future output format */
+  ESM = 'module',
+}
 
 interface BrowserifyTaskOptions {
   entry: string;
   destName: string;
+  devtool?: 'source-map' | 'inline-source-map';
   standalone?: string;
-  // hotPort?: number;
   disableMinification?: boolean;
   afterBuild?: () => Promise<void>;
-  writeToPackagesCore?: boolean;
+  outputLibraryType?: OutputLibraryType;
 }
 
-async function browserifyTask(options: BrowserifyTaskOptions): Promise<void> {
-  const { entry, destName, disableMinification } = options;
-
+async function browserifyTask({
+  entry,
+  destName,
+  disableMinification,
+  ...options
+}: BrowserifyTaskOptions): Promise<void> {
   const willMinify = args.minify && !disableMinification;
 
   process.env.VERSION = await getVersion();
-  // const browserifyHmrOptions = hotPort
-  //   ? await getBrowserifyHmrOptions(hotPort)
-  //   : null;
 
-  let bundler = browserify({
-    entries: entry,
-    debug: true,
-    extensions: ['.ts', '.tsx'],
-    fullPaths: args.fullPaths,
-    cache: {},
-    packageCache: {},
-    standalone: options.standalone,
-  })
-    .transform(
-      babelify.configure({
-        plugins: [
-          [
-            'transform-inline-environment-variables',
+  const bundler = webpack({
+    devtool: options.devtool ?? 'source-map',
+    entry: [
+      willMinify || args.production ? './src/inboxsdk-js/header.js' : null,
+      entry,
+    ].flatMap((x) => (x != null ? [x] : [])),
+    mode: args.production ? 'production' : 'development',
+    module: {
+      rules: [
+        {
+          exclude: /(node_modules|dist|packages\/core)/,
+          test: /\.m?[jt]sx?$/,
+          use: {
+            loader: 'babel-loader',
+            options: {
+              plugins: [
+                [
+                  'transform-inline-environment-variables',
+                  {
+                    include: ['NODE_ENV', 'IMPLEMENTATION_URL', 'VERSION'],
+                  },
+                ],
+              ],
+            },
+          },
+        },
+        {
+          test: /\.css$/,
+          use: [
             {
-              include: ['NODE_ENV', 'IMPLEMENTATION_URL', 'VERSION'],
+              loader: 'style-loader',
+              options: {
+                insert: (
+                  htmlElement: HTMLElement,
+                  _options: Record<string, any>
+                ) => {
+                  if (!document.getElementById('inboxsdk__style')) {
+                    htmlElement.id = 'inboxsdk__style';
+                    if (!document.head) throw new Error('missing head');
+                    document.head.appendChild(htmlElement);
+                  }
+                },
+              },
+            },
+            {
+              loader: 'css-loader',
+              options: {
+                // importLoaders: 1,
+                modules: {
+                  exportLocalsConvention: 'dashesOnly',
+                  localIdentName: args.production
+                    ? 'inboxsdk__[hash:base64]'
+                    : 'inboxsdk__[name]__[local][hash:base64]',
+                  // This keeps the spirit of local hash names changing every hour that used to be in idMap.js
+                  localIdentHashSalt:
+                    '' + Math.floor(Date.now() / (1_000 * 60 * 60)),
+                  mode: (resourcePath: string) =>
+                    resourcePath.endsWith('.module.css') ? 'local' : 'global',
+                  namedExport: true,
+                },
+              },
             },
           ],
-        ],
+        },
+      ],
+    },
+    optimization: {
+      minimize: willMinify,
+    },
+    output: {
+      path: path.join(__dirname, 'packages/core'),
+      filename: destName,
+      ...(options.standalone
+        ? {
+            library: {
+              export: 'default',
+              name: options.standalone,
+              type: options.outputLibraryType ?? OutputLibraryType.UMD,
+            },
+          }
+        : {}),
+      uniqueName: 'inboxsdk_' + (await process.env.VERSION),
+    },
+    plugins: [
+      // Work around for Buffer is undefined:
+      // https://github.com/webpack/changelog-v5/issues/10
+      new webpack.ProvidePlugin({
+        Buffer: ['buffer', 'Buffer'],
+        // https://github.com/algolia/places/issues/847#issuecomment-748202652 For Algolia
+        process: 'process/browser',
       }),
-      { extensions: ['.js', '.tsx', '.ts'] }
-    )
-    .transform('redirectify', { global: true });
-
-  // if (args.hot && hotPort) {
-  //   // eslint-disable-next-line @typescript-eslint/no-var-requires
-  //   bundler.plugin(require('browserify-hmr'), browserifyHmrOptions!);
-  // }
-
-  async function buildBundle(): Promise<void> {
-    const sourcemapPipeline = lazyPipe()
-      .pipe(() =>
-        gulpif(
-          Boolean(willMinify || args.production),
-          addsrc.prepend('./src/inboxsdk-js/header.js')
-        )
-      )
-      .pipe(sourcemaps.init, { loadMaps: true })
-      .pipe(concat, destName)
-      .pipe(() => gulpif(willMinify, terser()))
-      .pipe(sourcemaps.write, args.production ? '.' : null);
-
-    const bundle = bundler.bundle();
-    let result = bundle
-      .pipe(source(destName))
-      .pipe(
-        gulpif(
-          Boolean(willMinify || args.production),
-          streamify(sourcemapPipeline())
-        )
-      )
-      .pipe(destAtomic('./dist/'));
-
-    if (options.writeToPackagesCore) {
-      result = result.pipe(destAtomic('./packages/core/'));
-    }
-
-    await new Promise((resolve, reject) => {
-      const errCb = _.once((err) => {
-        reject(err);
-        result.end();
-      });
-      bundle.on('error', errCb);
-      result.on('error', errCb);
-      result.on('finish', resolve);
-    });
-
-    if (options.afterBuild) {
-      await options.afterBuild();
-    }
-  }
+    ],
+    resolve: {
+      extensions: ['.js', '.jsx', '.ts', '.tsx'],
+      fallback: {
+        buffer: require.resolve('buffer'),
+      },
+    },
+    stats: {
+      errorDetails: true,
+    },
+  } satisfies webpack.Configuration);
 
   if (args.watch) {
-    bundler = watchify(bundler);
-    Kefir.fromEvents(bundler, 'update')
-      .throttle(10)
-      .onValue(() => {
-        (async () => {
-          try {
-            gutil.log("Rebuilding '" + gutil.colors.cyan(destName) + "'");
-            await buildBundle();
-            gutil.log(
-              "Finished rebuild of '" + gutil.colors.cyan(destName) + "'"
-            );
-          } catch (err: any) {
-            gutil.log(
-              gutil.colors.red('Error') +
-                " rebuilding '" +
-                gutil.colors.cyan(destName) +
-                "':",
-              err.message
-            );
-          }
-        })();
-      });
-  }
+    bundler.watch({}, (err, stats) => {
+      if (err) {
+        console.error(err);
+        return;
+      }
+      console.log(stats?.toString({ colors: true }));
 
-  return buildBundle();
+      options.afterBuild?.();
+    });
+  } else {
+    await new Promise<void>((resolve, reject) => {
+      bundler.run((err, stats) => {
+        if (err) {
+          console.error(err);
+          reject(err);
+          return;
+        }
+        console.log(stats?.toString({ colors: true }));
+        resolve();
+      });
+    });
+    return options.afterBuild?.();
+  }
 }
 
 gulp.task('pageWorld', () => {
   return browserifyTask({
     entry: './src/injected-js/main',
     destName: 'pageWorld.js',
-    // hotPort: 3142,
-    writeToPackagesCore: true,
   });
 });
 
@@ -328,7 +329,6 @@ if (args.remote) {
       destName: sdkFilename,
       standalone: 'InboxSDK',
       disableMinification: true,
-      afterBuild: setupExamples,
     });
   });
   gulp.task(
@@ -337,22 +337,23 @@ if (args.remote) {
       return browserifyTask({
         entry: './src/platform-implementation-js/main-INTEGRATED-PAGEWORLD',
         destName: 'platform-implementation.js',
-        // hotPort: 3141
+        afterBuild: setupExamples,
       });
     })
   );
-  gulp.task('default', gulp.parallel('sdk', 'remote'));
+  gulp.task('default', gulp.series('sdk', 'remote'));
 } else if (args.integratedPageWorld) {
   // non-remote bundle built for compatibility with remote bundle
   gulp.task(
     'sdk',
     gulp.series('pageWorld', function sdkBundle() {
       return browserifyTask({
+        devtool: 'inline-source-map',
         entry: './src/inboxsdk-js/inboxsdk-NONREMOTE-INTEGRATED-PAGEWORLD',
         destName: sdkFilename,
         standalone: 'InboxSDK',
-        // hotPort: 3140,
         afterBuild: setupExamples,
+        outputLibraryType: OutputLibraryType.Var,
       });
     })
   );
@@ -367,9 +368,7 @@ if (args.remote) {
       entry: './src/inboxsdk-js/inboxsdk-NONREMOTE',
       destName: sdkFilename,
       standalone: 'InboxSDK',
-      // hotPort: 3140,
       afterBuild: setupExamples,
-      writeToPackagesCore: true,
     });
   });
   gulp.task('remote', () => {
