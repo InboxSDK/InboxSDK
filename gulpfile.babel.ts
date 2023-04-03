@@ -299,6 +299,11 @@ gulp.task('clean', async () => {
     await fs.promises.rm(filename, { force: true });
     await fs.promises.rm(filename + '.map', { force: true });
   }
+  await Promise.all(
+    (
+      await fg('examples/*/{pageWorld,background,inboxsdk}.js')
+    ).map((fileName) => fs.promises.rm(fileName))
+  );
 });
 
 /**
