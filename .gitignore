@@ -5,6 +5,7 @@
 /examples/*/inboxsdk.js*
 /examples/*/pageWorld.js*
 /examples/*/background.js*
+/examples/*/platform-implementation.js*
 *~
 npm-debug.log
 yarn-debug.log
@@ -14,6 +15,7 @@ yarn-debug.log
 yarn-error.log
 /packages/core/inboxsdk.js*
 /packages/core/pageWorld.js*
+/packages/core/platform-implementation.js*
 /packages/core/src/
 
 # Yarn without zero installs

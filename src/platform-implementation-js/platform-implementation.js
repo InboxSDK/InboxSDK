@@ -3,7 +3,6 @@
 import SafeEventEmitter from './lib/safe-event-emitter';
 import { BUILD_VERSION } from '../common/version';
 import get from '../common/get-or-fail';
-import sharedStyle from './lib/shared-style';
 import Membrane from './lib/Membrane';
 
 import AttachmentCardView from './views/conversations/attachment-card-view';
@@ -213,8 +212,6 @@ export function makePlatformImplementation(
     // never resolve
     return new Promise((resolve, reject) => {});
   }
-
-  sharedStyle();
 
   const driver = new GmailDriver(
     appId,

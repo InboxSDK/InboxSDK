@@ -1,14 +1,14 @@
-/* @flow */
-
-import logError from '../common/log-error';
-
 import PlatformImplementationLoader from './loading/platform-implementation-loader';
 import { BUILD_VERSION } from '../common/version';
 import _loadScript from '../common/load-script';
 
+declare global {
+  var __test_origin: string | undefined;
+}
+
 export const LOADER_VERSION = BUILD_VERSION;
 export const loadScript = _loadScript;
-export function load(version: any, appId: string, opts: ?Object) {
+export function load(version: any, appId: string, opts: any) {
   opts = Object.assign(
     {
       // defaults

@@ -5,16 +5,14 @@
   "content_scripts": [
     {
       "matches": [
-        "https://mail.google.com/*",
-        "https://inbox.google.com/*"
+        "https://mail.google.com/*"
       ],
       "js": ["inboxsdk.js", "content.js"],
       "run_at": "document_end"
     }
   ],
   "permissions": [
-    "https://mail.google.com/",
-    "https://inbox.google.com/"
+    "https://mail.google.com/"
   ],
 
   "web_accessible_resources": [ "pageWorld.js" ],
