@@ -76,6 +76,7 @@ async function setupExamples() {
     srcs = [
       './packages/core/inboxsdk.js*',
       './packages/core/platform-implementation.js*',
+      './packages/core/pageWorld.js*',
     ];
   } else if (args.integratedPageWorld) {
     dirs.push('./dist');
