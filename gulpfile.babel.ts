@@ -135,14 +135,14 @@ const enum OutputLibraryType {
 interface BrowserifyTaskOptions {
   entry: string;
   destName: string;
-  devtool?: 'source-map' | 'inline-source-map';
+  devtool?: 'source-map' | 'inline-source-map' | 'remote';
   standalone?: string;
   disableMinification?: boolean;
   afterBuild?: () => Promise<void>;
   outputLibraryType?: OutputLibraryType;
 }
 
-async function browserifyTask({
+async function webpackTask({
   entry,
   destName,
   disableMinification,
@@ -153,7 +153,8 @@ async function browserifyTask({
   process.env.VERSION = await getVersion();
 
   const bundler = webpack({
-    devtool: options.devtool ?? 'source-map',
+    devtool:
+      options.devtool === 'remote' ? false : options.devtool ?? 'source-map',
     entry: [
       willMinify || args.production ? './src/inboxsdk-js/header.js' : null,
       entry,
@@ -243,6 +244,15 @@ async function browserifyTask({
         // https://github.com/algolia/places/issues/847#issuecomment-748202652 For Algolia
         process: 'process/browser',
       }),
+      ...(options.devtool === 'remote'
+        ? [
+            new webpack.SourceMapDevToolPlugin({
+              fileContext: '../',
+              filename: '[file].map',
+              publicPath: 'https://www.inboxsdk.com/build/',
+            }),
+          ]
+        : []),
     ],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
@@ -282,7 +292,8 @@ async function browserifyTask({
 }
 
 gulp.task('pageWorld', () => {
-  return browserifyTask({
+  return webpackTask({
+    devtool: args.remote ? 'remote' : undefined,
     entry: './src/injected-js/main',
     destName: 'pageWorld.js',
   });
@@ -325,17 +336,19 @@ gulp.task('types', async () => {
 
 if (args.remote) {
   gulp.task('sdk', () => {
-    return browserifyTask({
+    return webpackTask({
+      devtool: 'remote',
+      disableMinification: true,
       entry: './src/inboxsdk-js/inboxsdk-REMOTE',
       destName: sdkFilename,
       standalone: 'InboxSDK',
-      disableMinification: true,
     });
   });
   gulp.task(
     'remote',
     gulp.series('pageWorld', function impBundle() {
-      return browserifyTask({
+      return webpackTask({
+        devtool: 'remote',
         entry: './src/platform-implementation-js/main-INTEGRATED-PAGEWORLD',
         destName: 'platform-implementation.js',
         afterBuild: setupExamples,
@@ -348,7 +361,7 @@ if (args.remote) {
   gulp.task(
     'sdk',
     gulp.series('pageWorld', function sdkBundle() {
-      return browserifyTask({
+      return webpackTask({
         devtool: 'inline-source-map',
         entry: './src/inboxsdk-js/inboxsdk-NONREMOTE-INTEGRATED-PAGEWORLD',
         destName: sdkFilename,
@@ -365,7 +378,7 @@ if (args.remote) {
 } else {
   // standard npm non-remote bundle
   gulp.task('sdk', async () => {
-    return browserifyTask({
+    return webpackTask({
       entry: './src/inboxsdk-js/inboxsdk-NONREMOTE',
       destName: sdkFilename,
       standalone: 'InboxSDK',
