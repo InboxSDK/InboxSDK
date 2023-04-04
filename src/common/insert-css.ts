@@ -23,6 +23,10 @@ export function styleTagTransform(css: string, htmlElement: HTMLStyleElement) {
   /** Used as ID until @inboxsdk/core@1.0.4 */
   const CLASS_NAME = 'inboxsdk__style' as const;
 
+  function formatContentHash(hash: number) {
+    return `${DATA_ATTR.CONTENT_HASH}="${hash}"`;
+  }
+
   function extractPublishTime(version: string | undefined) {
     const epochTimestamp = version?.split('-')[1];
 
@@ -57,20 +61,32 @@ export function styleTagTransform(css: string, htmlElement: HTMLStyleElement) {
 
   /**
    * There may be more than one CSS file inserted by style loader.
-   * This hashing allows us to check quickly if the current SDK version has already added the corresponding stylesheet.
-   * If there are two versions of the SDK with the same CSS file, both are inserted with the latest version occurring latest.
+   * This hashing allows us to check quickly if the current SDK version has already added to the corresponding stylesheet.
+   * If there are two versions of the SDK with the same CSS file, both are inserted with the latest version occurring last.
    */
   const contentHash = hashCode(css);
+  const formattedContentHash = formatContentHash(contentHash);
 
   const maybeExistingStyle = document.querySelector(
-    `style.${CLASS_NAME}[${DATA_ATTR.SDK_VERSION}="` +
-      SDK_VERSION +
-      `"][${DATA_ATTR.CONTENT_HASH}="${contentHash}"]`
+    `style.${CLASS_NAME}[${DATA_ATTR.SDK_VERSION}="` + SDK_VERSION + `"]`
   );
 
   if (maybeExistingStyle) {
+    // Insert a respective SDK's css modules all in one style tag.
+    if (maybeExistingStyle.innerHTML.includes(formattedContentHash)) {
+      return;
+    }
+
+    maybeExistingStyle.innerHTML += `
+/* ${formattedContentHash} */
+${css}`;
+
     return;
   }
+
+  htmlElement.innerHTML = `
+/* ${formattedContentHash} */
+${css}`;
 
   const currentSdkStyleVersions = Array.from(
     document.querySelectorAll<HTMLStyleElement>(
@@ -87,7 +103,6 @@ export function styleTagTransform(css: string, htmlElement: HTMLStyleElement) {
   const versionDate = extractPublishTime(SDK_VERSION);
 
   htmlElement.className = CLASS_NAME;
-  htmlElement.setAttribute(DATA_ATTR.CONTENT_HASH, contentHash.toString());
 
   htmlElement.setAttribute(DATA_ATTR.SDK_VERSION, SDK_VERSION);
 
