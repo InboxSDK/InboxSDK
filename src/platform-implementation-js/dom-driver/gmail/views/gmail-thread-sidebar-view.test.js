@@ -1,5 +1,17 @@
 /* @flow */
 
+jest.mock('../../../lib/idMap', () => {
+  function idMap(key) {
+    const legacyMapping = {
+      app_sidebar_content_panel: 'bccbBAHIcfEeHCHf',
+      sidebar_button_container: 'CdCEaDfbJJbHDEaD',
+    };
+    return legacyMapping[key];
+  }
+
+  return idMap;
+});
+
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';

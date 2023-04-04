@@ -5,8 +5,6 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import autoHtml from 'auto-html';
 
-import sharedStyle from '../../../lib/shared-style';
-import customStyle from '../../../dom-driver/inbox/custom-style';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 import ajax from '../../../../common/ajax';
 
@@ -31,10 +29,6 @@ class InboxAttachmentOverlayView {
     this._el = el;
     this._p = parsed;
     this._cardView = cardView;
-
-    // The element is within a same-origin iframe
-    sharedStyle(el.ownerDocument);
-    customStyle(el.ownerDocument);
 
     this._cardView.setOverlay(this);
 

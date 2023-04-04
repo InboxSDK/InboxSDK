@@ -4,7 +4,7 @@ import loadScript from '../../common/load-script';
 import { PlatformImplementation } from '../../platform-implementation-js/platform-implementation';
 
 const PlatformImplementationLoader = {
-  load(appId: string, opts: object): Promise<PlatformImplementation> {
+  load(appId: string, opts: any): Promise<PlatformImplementation> {
     return Promise.resolve()
       .then(() => {
         if (!(global as any).__InboxSDKImpLoader) {

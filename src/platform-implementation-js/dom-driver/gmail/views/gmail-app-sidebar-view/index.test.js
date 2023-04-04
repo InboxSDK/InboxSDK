@@ -1,12 +1,25 @@
 /* @flow */
 
+jest.mock('../../../../lib/idMap', () => {
+  function idMap(key) {
+    const legacyMapping = {
+      app_sidebar_content_panel: 'bccbBAHIcfEeHCHf',
+    };
+
+    return legacyMapping[key];
+  }
+
+  return idMap;
+});
+
+import idMap from '../../../../lib/idMap';
+
 import _ from 'lodash';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import delay from 'pdelay';
 import fs from 'fs';
-import idMap from '../../../../lib/idMap';
 import GmailAppSidebarView from './index';
 import ContentPanelViewDriver from '../../../../driver-common/sidebar/ContentPanelViewDriver';
 import MockWebStorage from 'mock-webstorage';
