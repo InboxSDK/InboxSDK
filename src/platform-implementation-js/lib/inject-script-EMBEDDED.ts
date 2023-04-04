@@ -1,5 +1,3 @@
-// const fs = require('fs');
-
 export function injectScriptEmbedded() {
   const url = 'https://www.inboxsdk.com/build/pageWorld.js';
 

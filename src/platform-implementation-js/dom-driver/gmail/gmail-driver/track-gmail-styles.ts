@@ -5,25 +5,15 @@ import GmailElementGetter from '../gmail-element-getter';
 
 const RGB_REGEX = /^rgb\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/;
 
-function getDensity(): string {
-  // get the padding amount on the left-nav-menu entries to find the active
-  // density setting value.
-  const navItemOuter = document.querySelector('.TO .TN');
-  if (!navItemOuter) {
-    Logger.error(new Error('Failed to find nav item outer element'));
-    return 'compact';
+function getDensity(): 'compact' | 'default' {
+  const navItemElement = document.querySelector('.aim');
+  if (!navItemElement) {
+    Logger.error(new Error('Failed to find a nav item element'));
+    return 'default';
   }
-  const padding = parseInt(
-    getComputedStyle(navItemOuter).getPropertyValue('padding-top'),
-    10
-  );
-  if (padding >= 6) {
-    return 'comfortable';
-  } else if (padding >= 3) {
-    return 'cozy';
-  } else {
-    return 'compact';
-  }
+
+  const rect = navItemElement.getBoundingClientRect();
+  return rect?.height === 24 ? 'compact' : 'default';
 }
 
 const navItemSelector = '.aio' as const;

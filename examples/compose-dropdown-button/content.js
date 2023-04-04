@@ -22,7 +22,7 @@ InboxSDK.load(1, 'simple-example', {
       iconUrl: chrome.runtime.getURL('monkey.png'),
       hasDropdown: true,
       onClick: function(event){
-        if (!composeView.isInlineReplyForm() || document.location.origin !== 'https://inbox.google.com') {
+        if (!composeView.isInlineReplyForm()) {
           composeView.setSubject('foo<b>ar');
         }
         event.dropdown.el.textContent = 'hello world!';
