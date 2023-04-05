@@ -24,7 +24,9 @@ import { removeAllThreadRowUnclaimedModifications } from './views/gmail-thread-r
 import GmailTopMessageBarDriver from './widgets/gmail-top-message-bar-driver';
 import GmailModalViewDriver from './widgets/gmail-modal-view-driver';
 import GmailMoleViewDriver from './widgets/gmail-mole-view-driver';
-import InboxDrawerView from '../inbox/views/inbox-drawer-view';
+import InboxDrawerView, {
+  DrawerViewOptions,
+} from '../inbox/views/inbox-drawer-view';
 import GmailRouteProcessor from './views/gmail-route-view/gmail-route-processor';
 import KeyboardShortcutHelpModifier from './gmail-driver/keyboard-shortcut-help-modifier';
 import openDraftByMessageID from './gmail-driver/open-draft-by-message-id';
@@ -73,7 +75,6 @@ import type Logger from '../../lib/logger';
 import type PageCommunicator from './gmail-page-communicator';
 import type { RouteParams } from '../../namespaces/router';
 import type ButterBar from '../../namespaces/butter-bar';
-import type { Driver, DrawerViewOptions } from '../../driver-interfaces/driver';
 import type { Contact } from '../../driver-interfaces/compose-view-driver';
 import type GmailComposeView from './views/gmail-compose-view';
 import type GmailMessageView from './views/gmail-message-view';
@@ -95,7 +96,7 @@ import type ContentPanelViewDriver from '../../driver-common/sidebar/ContentPane
 import GmailNavItemView from './views/gmail-nav-item-view';
 import { MoleOptions } from '../../driver-interfaces/mole-view-driver';
 
-class GmailDriver implements Driver {
+class GmailDriver {
   _appId: string;
   _logger: Logger;
   _opts: PiOpts;
