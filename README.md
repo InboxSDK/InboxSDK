@@ -186,8 +186,8 @@ instantiates a PlatformImplementation object. Calls to `InboxSDK.load` return a
 promise that resolves to this object. This object is the object given to the
 extension.
 
-The PlatformImplementation object instantiates either a GmailDriver or
-InboxDriver object and uses it to do its DOM manipulations. The Driver object
+The PlatformImplementation object instantiates a GmailDriver object and uses it 
+to do its DOM manipulations. The GmailDriver object
 is not directly exposed to the application. This pattern is used often. For
 example, each Driver object has a getComposeViewDriverStream() method which
 returns a Kefir stream of objects following the ComposeViewDriver interface.
