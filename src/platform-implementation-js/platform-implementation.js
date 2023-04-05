@@ -7,30 +7,22 @@ import Membrane from './lib/Membrane';
 
 import AttachmentCardView from './views/conversations/attachment-card-view';
 import GmailAttachmentCardView from './dom-driver/gmail/views/gmail-attachment-card-view';
-import InboxAttachmentCardView from './dom-driver/inbox/views/inbox-attachment-card-view';
 
 import MessageView from './views/conversations/message-view';
 import GmailMessageView from './dom-driver/gmail/views/gmail-message-view';
-import InboxMessageView from './dom-driver/inbox/views/inbox-message-view';
 
 import ThreadView from './views/conversations/thread-view';
 import GmailThreadView from './dom-driver/gmail/views/gmail-thread-view';
-import InboxThreadView from './dom-driver/inbox/views/inbox-thread-view';
 
 import ThreadRowView from './views/thread-row-view';
 import GmailThreadRowView from './dom-driver/gmail/views/gmail-thread-row-view';
-import InboxThreadRowView from './dom-driver/inbox/views/inbox-thread-row-view';
 
 import ComposeView from './views/compose-view';
 import GmailComposeView from './dom-driver/gmail/views/gmail-compose-view';
-import InboxComposeView from './dom-driver/inbox/views/inbox-compose-view';
 
 import DummyRouteViewDriver from './views/route-view/dummy-route-view-driver';
 import RouteView from './views/route-view/route-view';
 import GmailRouteView from './dom-driver/gmail/views/gmail-route-view/gmail-route-view';
-import InboxRouteView from './dom-driver/inbox/views/inbox-route-view';
-import InboxDummyRouteView from './dom-driver/inbox/views/inbox-dummy-route-view';
-import InboxCustomRouteView from './dom-driver/inbox/views/inbox-custom-route-view';
 
 import ButterBar from './namespaces/butter-bar';
 import Compose from './namespaces/compose';
@@ -109,15 +101,7 @@ export class PlatformImplementation extends SafeEventEmitter {
         (viewDriver) => new ComposeView(driver, viewDriver, membrane),
       ],
       [
-        InboxComposeView,
-        (viewDriver) => new ComposeView(driver, viewDriver, membrane),
-      ],
-      [
         GmailAttachmentCardView,
-        (viewDriver) => new AttachmentCardView(viewDriver, driver, membrane),
-      ],
-      [
-        InboxAttachmentCardView,
         (viewDriver) => new AttachmentCardView(viewDriver, driver, membrane),
       ],
       [
@@ -132,30 +116,11 @@ export class PlatformImplementation extends SafeEventEmitter {
           ),
       ],
       [
-        InboxMessageView,
-        (viewDriver) =>
-          new MessageView(
-            viewDriver,
-            appId,
-            membrane,
-            this.Conversations,
-            driver
-          ),
-      ],
-      [
         GmailThreadView,
         (viewDriver) => new ThreadView(viewDriver, appId, driver, membrane),
       ],
-      [
-        InboxThreadView,
-        (viewDriver) => new ThreadView(viewDriver, appId, driver, membrane),
-      ],
       [GmailThreadRowView, (viewDriver) => new ThreadRowView(viewDriver)],
-      [InboxThreadRowView, (viewDriver) => new ThreadRowView(viewDriver)],
       [GmailRouteView, (viewDriver) => new RouteView(viewDriver)],
-      [InboxRouteView, (viewDriver) => new RouteView(viewDriver)],
-      [InboxDummyRouteView, (viewDriver) => new RouteView(viewDriver)],
-      [InboxCustomRouteView, (viewDriver) => new RouteView(viewDriver)],
       [DummyRouteViewDriver, (viewDriver) => new RouteView(viewDriver)],
     ]);
     this.destroyed = false;

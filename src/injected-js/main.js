@@ -27,15 +27,6 @@ if (!global.__InboxSDKInjected) {
     const setupGmonkeyHandler =
       require('./gmail/setup-gmonkey-handler').default;
 
-    const setupClickAndGetNewIframeSrc =
-      require('./inbox/setupClickAndGetNewIframeSrc').default;
-    const setupInboxFakeWindowResizeListener =
-      require('./inbox/setupInboxFakeWindowResizeListener').default;
-    const setupComposeViewDraftIDFinder =
-      require('./inbox/setupComposeViewDraftIDFinder').default;
-    const setupInboxAjaxInterceptor =
-      require('./inbox/setupAjaxInterceptor').default;
-
     const pageOrigin: string =
       (process.env.NODE_ENV === 'test' && global.__test_origin) ||
       document.location.origin;
@@ -43,11 +34,6 @@ if (!global.__InboxSDKInjected) {
     if (pageOrigin === 'https://mail.google.com') {
       gmailInterceptor();
       setupGmonkeyHandler();
-    } else if (pageOrigin === 'https://inbox.google.com') {
-      setupClickAndGetNewIframeSrc();
-      setupInboxFakeWindowResizeListener();
-      setupComposeViewDraftIDFinder();
-      setupInboxAjaxInterceptor();
     } else {
       throw new Error('Should not happen');
     }

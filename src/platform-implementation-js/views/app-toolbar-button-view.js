@@ -4,12 +4,7 @@ import EventEmitter from '../lib/safe-event-emitter';
 import get from '../../common/get-or-fail';
 import type { Driver } from '../driver-interfaces/driver';
 
-import type GmailAppToolbarButtonView from '../dom-driver/gmail/views/gmail-app-toolbar-button-view';
-import type InboxAppToolbarButtonView from '../dom-driver/inbox/views/inbox-app-toolbar-button-view';
-
-type AppToolbarButtonViewDriver =
-  | GmailAppToolbarButtonView
-  | InboxAppToolbarButtonView;
+import type AppToolbarButtonViewDriver from '../dom-driver/gmail/views/gmail-app-toolbar-button-view';
 
 const memberMap = new WeakMap();
 

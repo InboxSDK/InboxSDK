@@ -13,8 +13,7 @@ import type InboxBackdrop from '../dom-driver/inbox/views/inbox-backdrop';
 export type Backdrop = Object | InboxBackdrop;
 
 import type GmailThreadView from '../dom-driver/gmail/views/gmail-thread-view';
-import type InboxThreadView from '../dom-driver/inbox/views/inbox-thread-view';
-export type ThreadViewDriver = GmailThreadView | InboxThreadView;
+export type ThreadViewDriver = GmailThreadView;
 
 import type { ThreadRowViewDriver } from './thread-row-view-driver';
 
@@ -24,10 +23,7 @@ import type { MessageViewDriver } from './message-view-driver';
 import type ContentPanelViewDriver from '../driver-common/sidebar/ContentPanelViewDriver';
 
 import type GmailAttachmentCardView from '../dom-driver/gmail/views/gmail-attachment-card-view';
-import type InboxAttachmentCardView from '../dom-driver/inbox/views/inbox-attachment-card-view';
-export type AttachmentCardViewDriver =
-  | GmailAttachmentCardView
-  | InboxAttachmentCardView;
+export type AttachmentCardViewDriver = GmailAttachmentCardView;
 
 export type DrawerViewOptions = {
   el: HTMLElement,
