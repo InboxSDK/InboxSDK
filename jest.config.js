@@ -1,6 +1,9 @@
 'use strict';
 
 module.exports = {
+  globals: {
+    SDK_VERSION: 'beep',
+  },
   moduleNameMapper: {
     '\\.css$': require.resolve('jest-css-modules'),
   },

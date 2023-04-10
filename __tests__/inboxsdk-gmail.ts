@@ -4,8 +4,6 @@ import MockMutationObserver from '../test/lib/mock-mutation-observer';
 import _ from 'lodash';
 import type { InboxSDK as InboxSDKT } from '../src/inboxsdk';
 
-process.env.VERSION = 'beep';
-
 globalThis.MutationObserver = MockMutationObserver as any;
 document.documentElement.innerHTML = `
 <body>

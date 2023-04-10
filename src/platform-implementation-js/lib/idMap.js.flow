@@ -4,5 +4,4 @@
 // The returned identifier will only contain alphabetic characters.
 declare export default function idMap(name: string): string;
 
-// Only exposed for tests!
-declare export function _reset(): void;
+declare export function legacyIdMap(name: string): string;

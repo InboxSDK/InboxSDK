@@ -35,11 +35,16 @@ import GmailElementGetter from '../gmail-element-getter';
 
 import addIconArea from './gmail-thread-sidebar-view/add-icon-area';
 import addToIconArea from './gmail-app-sidebar-view/primary/add-to-icon-area';
+import cx from 'classnames';
 
 const ADD_ON_SIDEBAR_CONTENT_SELECTOR = '.J-KU-Jz';
 const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
 
 import type WidthManager from './gmail-thread-view/width-manager';
+import {
+  sidebarWaitingPlatformSelector,
+  sidebarWaitingPlatformClassName,
+} from '../../../driver-common/sidebar/constants';
 
 class GmailAppSidebarView {
   _stopper = kefirStopper();
@@ -221,11 +226,14 @@ class GmailAppSidebarView {
 
     if (
       !((document.body: any): HTMLElement).querySelector(
-        '.' + idMap('app_sidebar_waiting_platform')
+        sidebarWaitingPlatformSelector
       )
     ) {
       const waitingPlatform = document.createElement('div');
-      waitingPlatform.className = idMap('app_sidebar_waiting_platform');
+      waitingPlatform.className = cx(
+        sidebarWaitingPlatformClassName,
+        idMap('app_sidebar_waiting_platform')
+      );
       ((document.body: any): HTMLElement).appendChild(waitingPlatform);
     }
 

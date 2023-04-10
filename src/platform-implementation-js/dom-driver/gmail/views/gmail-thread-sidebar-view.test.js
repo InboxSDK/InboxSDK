@@ -6,10 +6,14 @@ jest.mock('../../../lib/idMap', () => {
       app_sidebar_content_panel: 'bccbBAHIcfEeHCHf',
       sidebar_button_container: 'CdCEaDfbJJbHDEaD',
     };
-    return legacyMapping[key];
+    return legacyMapping[key] ?? key;
   }
 
-  return idMap;
+  return {
+    __esModule: true,
+    default: idMap,
+    legacyIdMap: idMap,
+  };
 });
 
 import _ from 'lodash';

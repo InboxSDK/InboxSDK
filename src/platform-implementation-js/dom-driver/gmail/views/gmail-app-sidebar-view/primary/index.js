@@ -30,6 +30,11 @@ import fakeWindowResize from '../../../../../lib/fake-window-resize';
 import addCompanionThreadIconArea from './add-companion-thread-icon-area';
 import addCompanionGlobalIconArea from './add-companion-global-icon-area';
 import addToIconArea from './add-to-icon-area';
+import cx from 'classnames';
+import {
+  sidebarWaitingPlatformClassName,
+  sidebarWaitingPlatformSelector,
+} from '../../../../../driver-common/sidebar/constants';
 
 const ACTIVE_ADD_ON_ICON_SELECTOR = '.aT5-aOt-I-KO';
 const COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS = 'brC-brG-btc';
@@ -671,11 +676,14 @@ class GmailAppSidebarPrimary {
 
     if (
       !((document.body: any): HTMLElement).querySelector(
-        '.' + idMap('app_sidebar_waiting_platform')
+        sidebarWaitingPlatformSelector
       )
     ) {
       const waitingPlatform = document.createElement('div');
-      waitingPlatform.className = idMap('app_sidebar_waiting_platform');
+      waitingPlatform.className = cx(
+        sidebarWaitingPlatformClassName,
+        idMap('app_sidebar_waiting_platform')
+      );
       ((document.body: any): HTMLElement).appendChild(waitingPlatform);
     }
 
