@@ -150,7 +150,7 @@ async function webpackTask({
 }: BrowserifyTaskOptions): Promise<void> {
   const willMinify = args.minify && !disableMinification;
 
-  process.env.VERSION = await getVersion();
+  const VERSION = await getVersion();
 
   const bundler = webpack({
     devtool:
@@ -185,15 +185,14 @@ async function webpackTask({
             {
               loader: 'style-loader',
               options: {
-                insert: (
-                  htmlElement: HTMLElement,
-                  _options: Record<string, any>
-                ) => {
-                  if (!document.getElementById('inboxsdk__style')) {
-                    htmlElement.id = 'inboxsdk__style';
-                    if (!document.head) throw new Error('missing head');
-                    document.head.appendChild(htmlElement);
-                  }
+                insert: (htmlElement: HTMLStyleElement) => {
+                  htmlElement.setAttribute(
+                    'data-inboxsdk-version',
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- this is injected by webpack
+                    ///@ts-ignore
+                    SDK_VERSION
+                  );
+                  document.head.append(htmlElement);
                 },
               },
             },
@@ -206,9 +205,6 @@ async function webpackTask({
                   localIdentName: args.production
                     ? 'inboxsdk__[hash:base64]'
                     : 'inboxsdk__[name]__[local][hash:base64]',
-                  // This keeps the spirit of local hash names changing every hour that used to be in idMap.js
-                  localIdentHashSalt:
-                    '' + Math.floor(Date.now() / (1_000 * 60 * 60)),
                   mode: (resourcePath: string) =>
                     resourcePath.endsWith('.module.css') ? 'local' : 'global',
                   namedExport: true,
@@ -234,9 +230,12 @@ async function webpackTask({
             },
           }
         : {}),
-      uniqueName: 'inboxsdk_' + (await process.env.VERSION),
+      uniqueName: 'inboxsdk_' + VERSION,
     },
     plugins: [
+      new webpack.DefinePlugin({
+        SDK_VERSION: JSON.stringify(VERSION),
+      }),
       // Work around for Buffer is undefined:
       // https://github.com/webpack/changelog-v5/issues/10
       new webpack.ProvidePlugin({

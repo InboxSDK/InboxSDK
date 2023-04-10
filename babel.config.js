@@ -21,7 +21,7 @@ module.exports = (api) => ({
   overrides: [
     {
       test: ['**/*.ts', '**/*.tsx'],
-      presets: ['@babel/preset-typescript'],
+      presets: [['@babel/preset-typescript', { optimizeConstEnums: true }]],
     },
     {
       test: ['**/*.js', '**/*.js.flow'],

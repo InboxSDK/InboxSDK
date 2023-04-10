@@ -7,8 +7,8 @@ import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import delayAsap from '../../lib/delay-asap';
 import type { Driver } from '../../driver-interfaces/driver';
-import idMap from '../../lib/idMap';
 import querySelector from '../../lib/dom/querySelectorOrFail';
+import { sidebarWaitingPlatformSelector } from './constants';
 
 class ContentPanelViewDriver {
   _driver: Driver;
@@ -65,7 +65,7 @@ class ContentPanelViewDriver {
     let appName;
     const waitingPlatform = querySelector(
       (document.body: any),
-      '.' + idMap('app_sidebar_waiting_platform')
+      sidebarWaitingPlatformSelector
     );
 
     descriptor
