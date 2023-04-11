@@ -211,6 +211,7 @@ async function webpackTask({
                 },
               },
             },
+            { loader: 'postcss-loader' },
           ],
         },
       ],
