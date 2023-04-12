@@ -55,7 +55,7 @@ jobs:
       - run:
           name: Clean
           command: yarn gulp clean
-  lint JS/TS:
+  lint JS and TS:
     executor: sdk
     steps:
       - checkout
@@ -74,7 +74,7 @@ jobs:
       - node/install-packages:
           pkg-manager: yarn-berry
       - run:
-          name: ESLint
+          name: Stylelint
           command: yarn lint:stylelint
   test:
     executor: sdk
@@ -106,7 +106,7 @@ workflows:
       - 'build inboxsdk core'
       - 'build REMOTE'
       - 'build NONREMOTE-INTEGRATED-PAGEWORLD'
-      - lint JS/TS
+      - lint JS and TS
       - lint CSS
       - test
       - typecheck

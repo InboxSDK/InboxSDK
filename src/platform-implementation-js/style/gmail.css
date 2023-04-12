@@ -146,6 +146,7 @@
 
 :local(.app_sidebar_content_area) {
   width: 216px;
+  margin-left: 0px;
 }
 
 :local(.app_sidebar_content_panel) {
@@ -153,6 +154,7 @@
   font: 12px Arial, sans-serif;
   max-height: 100%;
   box-sizing: border-box;
+  background: #fff;
 }
 
 :local(.app_sidebar_content_panel_top_line) {
@@ -213,11 +215,11 @@
   width: 20px;
   height: 20px;
   vertical-align: middle;
-  margin-left: 6px;
   display: inline-flex;
   justify-content: center;
   align-items: center;
   margin-top: -1px;
+  margin-left: 0px;
 }
 
 :local(.app_sidebar_content_panel_title_icon),
@@ -316,10 +318,20 @@ a.inboxsdk__appid_register {
 
 .inboxsdk__thread_row_icon_wrapper {
   display: inline-block;
+  width: 20px;
+  margin-right: 3px;
+  align-self: center;
+  height: 20px;
+  flex: 0 0 auto;
 }
 
 .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
   margin-top: 0px;
+  width: 20px;
+  margin-right: 3px;
+  align-self: center;
+  height: 20px;
+  flex: 0 0 auto;
 }
 
 :local(.thread_noticeBar) {
@@ -367,7 +379,6 @@ div.T-I.inboxsdk__button {
   width: 20px;
   vertical-align: middle;
   margin-top: -2px;
-  user-drag: none;
   user-select: none;
   -webkit-user-drag: none;
 }
@@ -375,7 +386,7 @@ div.T-I.inboxsdk__button {
 .inboxsdk__button_green_inactive {
   box-shadow: 0 1px 0 rgb(0 0 0 / 5%);
   background-color: #53a93f;
-  background-image: linear-gradient(top, transparent, transparent);
+  background-image: linear-gradient(to top, transparent, transparent);
   border: 1px solid transparent;
   color: #fff;
   text-shadow: none;
@@ -384,7 +395,7 @@ div.T-I.inboxsdk__button {
 .inboxsdk__button_green_hover {
   box-shadow: inset 0 -1px 0 #4c8534;
   background-color: #65b045;
-  background-image: linear-gradient(top, transparent, transparent);
+  background-image: linear-gradient(to top, transparent, transparent);
   border: 1px solid transparent;
   border-bottom: 1px solid #4c8534;
   text-shadow: none;
@@ -554,18 +565,9 @@ steps to repro:
   color: white;
   height: 24px;
   width: auto;
-  padding-left: 3px;
-  padding-right: 3px;
   border-radius: 4px;
-}
-
-.inboxsdk__compose_sendButton {
   padding: 6px 4px;
   margin-left: 2px;
-}
-
-.inboxsdk__compose_inlineReply .inboxsdk__compose_sendButton {
-  height: 20px;
 }
 
 .inboxsdk__compose_inlineReply .inboxsdk__compose_sendButton {
@@ -586,9 +588,6 @@ steps to repro:
 
 .inboxsdk__compose_actionToolbar {
   white-space: nowrap;
-}
-
-.inboxsdk__compose_actionToolbar {
   padding-left: 6px;
 }
 
@@ -620,14 +619,9 @@ steps to repro:
   bottom: 44px;
   margin: 3px;
   z-index: 10;
-  left: 0px;
   border-radius: 2px;
   box-shadow: 0 4px 5px 0 rgb(0 0 0 / 14%), 0 1px 10px 0 rgb(0 0 0 / 12%),
     0 2px 4px -1px rgb(0 0 0 / 20%);
-  padding: 5px 15px;
-}
-
-.inboxsdk__compose_groupedActionToolbar {
   margin-bottom: 7px;
   padding: 4px 5px;
   background: white;
@@ -662,9 +656,6 @@ the actionToolbar is visible
 
 .inboxsdk__compose_groupedActionToolbar div.inboxsdk__button {
   z-index: 1;
-}
-
-.inboxsdk__compose_groupedActionToolbar div.inboxsdk__button {
   margin-right: 0px;
 }
 
@@ -678,14 +669,9 @@ the actionToolbar is visible
   display: inline-block;
   position: relative;
   outline: 0;
-  height: 29px;
   margin: 6px 0;
   padding: 0;
-  line-height: 29px;
   vertical-align: middle;
-}
-
-.inboxsdk__compose_customSendContainer {
   height: 36px;
   line-height: 36px;
 }
@@ -798,7 +784,7 @@ input.inboxsdk__x_close_button {
   margin-left: 1em;
   cursor: default;
   padding: 0 6px;
-  background-image: linear-gradient(top, #e9e9e9, #e6e6e6);
+  background-image: linear-gradient(to top, #e9e9e9, #e6e6e6);
   border: 1px solid rgb(0 0 0 / 10%);
   border-color: #ccc;
   color: #444;
@@ -825,7 +811,7 @@ input.inboxsdk__x_close_button {
 .inboxsdk__gmail_action:hover {
   box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
   background-color: #ededed;
-  background-image: linear-gradient(top, #ededed, #eaeaea);
+  background-image: linear-gradient(to top, #ededed, #eaeaea);
   border-color: #b8b8b8;
 }
 
@@ -928,18 +914,6 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
   width: 18px;
 }
 
-.inboxsdk__thread_row_icon_wrapper {
-  width: 20px;
-  margin-right: 3px;
-  align-self: center;
-  height: 20px;
-  flex: 0 0 auto;
-}
-
-.inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
-  vertical-align: top;
-}
-
 .inboxsdk__thread_row_image_added
   .y6
   .inboxsdk__thread_row_icon_wrapper
@@ -1014,9 +988,6 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
 .aQw .inboxsdk__button_iconImg {
   height: 18px;
   width: 18px;
-}
-
-.aQw .inboxsdk__button_iconImg {
   margin-top: 2px;
 }
 
@@ -1342,15 +1313,11 @@ isn't visible behind it. */
 
 /* mole */
 
-/* Fix issue where Compose toolbar can become disconnected when moles or
+.inboxsdk__drawers_in_use .aDi,
+.inboxsdk__moles_in_use .aDi {
+  /* Fix issue where Compose toolbar can become disconnected when moles or
  * drawers are in use */
-.inboxsdk__drawers_in_use .aDi,
-.inboxsdk__moles_in_use .aDi {
   left: auto !important;
-}
-
-.inboxsdk__drawers_in_use .aDi,
-.inboxsdk__moles_in_use .aDi {
   position: static;
 }
 
@@ -1384,10 +1351,6 @@ isn't visible behind it. */
   margin-right: 5px;
   box-shadow: rgb(0 0 0 / 20%) 0 2px 6px;
   min-width: 260px;
-  min-height: 36px;
-}
-
-.inboxsdk__mole_view_inner {
   min-height: 40px;
 }
 
@@ -1588,14 +1551,6 @@ body.inboxsdk__hasTopMessageBar .bq9 {
   /* Necessary to prevent z-indexes on sidebar items from causing them to show
   above stuff outside of the sidebar. */
   will-change: position;
-}
-
-:local(.app_sidebar_content_panel) {
-  background: #fff;
-}
-
-:local(.app_sidebar_content_area) {
-  padding: 4px 0 12px;
 }
 
 :local(.app_sidebar):local(.hideTitleBar) :local(.app_sidebar_content_area) {
@@ -1816,10 +1771,6 @@ body :local(.sidebar_iconArea) .inboxsdk__button_icon {
 
 :local(.app_sidebar_in_use):not(.companion_app_sidebar_visible) .addon_sidebar {
   display: none;
-}
-
-:local(.app_sidebar_content_panel_title_icon_container) {
-  margin-left: 0px;
 }
 
 :local(.app_sidebar_content_panel) :local(.app_sidebar_content_panel_top_line) {
@@ -2116,10 +2067,6 @@ shows up on our elements preventing them from collapsing.
 
 /* search results section */
 
-.inboxsdk__custom_sections {
-  margin-bottom: 15px;
-}
-
 .inboxsdk__custom_sections.Wc {
   padding: 0px;
   margin-bottom: 0px;
@@ -2192,11 +2139,7 @@ shows up on our elements preventing them from collapsing.
 /* end lone collapsed SectionView in Gmailv2 */
 
 .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
-  display: inline-block;
   margin-right: 20px;
-}
-
-.inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
   display: inline-flex;
 }
 
@@ -2211,10 +2154,6 @@ shows up on our elements preventing them from collapsing.
 .inboxsdk__resultsSection_title {
   white-space: nowrap;
   cursor: pointer;
-  display: inline-block;
-}
-
-.inboxsdk__resultsSection_title {
   display: flex;
   align-items: center;
   height: 48px;
@@ -2304,10 +2243,6 @@ shows up on our elements preventing them from collapsing.
 
 .inboxsdk__thread_row_label {
   flex-shrink: 0;
-  align-self: center;
-}
-
-.inboxsdk__thread_row_label {
   align-self: flex-end;
 }
 
@@ -2322,9 +2257,6 @@ shows up on our elements preventing them from collapsing.
   position: absolute;
   top: 2px;
   margin-left: 4px;
-}
-
-.inboxsdk__resultsSection_label_icon {
   margin-top: 1px;
 }
 
@@ -2356,8 +2288,10 @@ shows up on our elements preventing them from collapsing.
   border: 1px solid;
   border-color: #bbb #bbb #a8a8a8;
   padding: 16px;
-  position: absolute;
   z-index: 1201 !important;
+  position: relative;
+  width: auto;
+  max-width: 500px;
 }
 
 .inboxsdk__tooltip.inboxdk__tooltip_content .T-P {
@@ -2393,12 +2327,6 @@ shows up on our elements preventing them from collapsing.
   position: fixed;
   z-index: 1300;
   transition: left 200ms ease, top 200ms ease;
-}
-
-.inboxsdk__tooltip .T-P {
-  position: relative;
-  width: auto;
-  max-width: 500px;
 }
 
 .inboxsdk__tooltip .inboxsdk__tooltip_arrow {
@@ -2659,18 +2587,7 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 .inboxsdk__custom_message_view_app_notice_content {
   position: relative;
-  display: flex;
-  justify-content: center;
   z-index: 1;
-}
-
-.adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container {
-  position: relative;
-  width: auto !important;
-  min-width: 32px;
-}
-
-.inboxsdk__custom_message_view_app_notice_content {
   align-items: center;
   display: flex;
   font-size: 0.75rem !important;
@@ -2678,6 +2595,12 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   margin-left: 0;
   padding: 0px;
   top: 0;
+}
+
+.adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container {
+  position: relative;
+  width: auto !important;
+  min-width: 32px;
 }
 
 .adx.inboxsdk__custom_message_view_app_notice_container.inboxsdk__custom_message_view_app_notice_container:hover::before {
