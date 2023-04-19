@@ -362,23 +362,25 @@ const setupSearchReplacing = (
                         ? {
                             '0': {
                               '4': (oldVal: any[]) =>
-                                oldVal.map((md) => ({
-                                  ...md,
-                                  '6': newTime,
-                                  '17': newTime,
-                                  '30': newTime,
-                                })),
+                                oldVal.map((md) =>
+                                  update(md, {
+                                    '6': { $set: newTime },
+                                    '17': { $set: newTime },
+                                    '30': { $set: newTime },
+                                  })
+                                ),
                             },
                           }
                         : {
                             '1': {
                               '5': (oldVal: any[]) =>
-                                oldVal.map((md) => ({
-                                  ...md,
-                                  '7': newTime,
-                                  '18': newTime,
-                                  '31': newTime,
-                                })),
+                                oldVal.map((md) =>
+                                  update(md, {
+                                    '7': { $set: newTime },
+                                    '18': { $set: newTime },
+                                    '31': { $set: newTime },
+                                  })
+                                ),
                             },
                           },
                     });

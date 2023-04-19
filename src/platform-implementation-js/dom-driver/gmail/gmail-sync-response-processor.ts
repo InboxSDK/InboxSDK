@@ -347,6 +347,7 @@ export function replaceThreadsInSearchResponse(
         _unused
       );
     } catch (err) {
+      console.error('Caught err in replaceThreadsInSearchResponse', err);
       return response;
     }
   }
@@ -389,9 +390,21 @@ export function replaceThreadsInSearchResponse_20220909(
     parsedResponse[14][0] = replacementThreads.map(
       ({ extraMetaData }) => extraMetaData.snippet
     );
-    parsedResponse[14][1] = replacementThreads.map(({ extraMetaData }) =>
-      extraMetaData.syncMessageData.map(({ syncMessageID }) => syncMessageID)
-    );
+
+    if (
+      Array.isArray(parsedResponse[14][1]) &&
+      parsedResponse[14][1].length > 0 &&
+      Array.isArray(parsedResponse[14][1][0][0])
+    ) {
+      // 2023-04-19 gmail change
+      parsedResponse[14][1] = replacementThreads.map(({ extraMetaData }) => [
+        [extraMetaData.syncMessageData[0].syncMessageID],
+      ]);
+    } else {
+      parsedResponse[14][1] = replacementThreads.map(({ extraMetaData }) =>
+        extraMetaData.syncMessageData.map(({ syncMessageID }) => syncMessageID)
+      );
+    }
   }
 
   return JSON.stringify(parsedResponse);
