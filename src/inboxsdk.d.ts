@@ -312,6 +312,7 @@ export interface ThreadRowView extends Destroyable {
   ): void;
   getVisibleMessageCount(): number;
   getSubject(): string;
+  replaceSubject(newSubjectStr: string): void;
   getContacts(): Array<{ name: string | null; emailAddress: string }>;
   replaceDraftLabel(
     descriptor:
