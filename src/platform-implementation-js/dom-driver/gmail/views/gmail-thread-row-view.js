@@ -995,10 +995,10 @@ class GmailThreadRowView {
   }
 
   getSubject(): string {
-    return this.#getSubjectSelector().textContent;
+    return this._getSubjectSelector().textContent;
   }
 
-  #getSubjectSelector(): HTMLElement {
+  _getSubjectSelector(): HTMLElement {
     return this._elements.length > 1
       ? querySelector(this._elements[1], 'div.xS div.xT div.y6 > span[id]')
       : querySelector(
@@ -1008,7 +1008,7 @@ class GmailThreadRowView {
   }
 
   replaceSubject(newSubjectStr: string) {
-    const subjectEleSelector = this.#getSubjectSelector();
+    const subjectEleSelector = this._getSubjectSelector();
     if (subjectEleSelector) {
       subjectEleSelector.textContent = newSubjectStr;
     }
