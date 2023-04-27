@@ -995,14 +995,22 @@ class GmailThreadRowView {
   }
 
   getSubject(): string {
-    if (this._elements.length > 1) {
-      return querySelector(this._elements[1], 'div.xS div.xT div.y6 > span[id]')
-        .textContent;
-    } else {
-      return querySelector(
-        this._elements[0],
-        'td.a4W div.xS div.xT div.y6 > span[id]'
-      ).textContent;
+    return this._getSubjectSelector().textContent;
+  }
+
+  _getSubjectSelector(): HTMLElement {
+    return this._elements.length > 1
+      ? querySelector(this._elements[1], 'div.xS div.xT div.y6 > span[id]')
+      : querySelector(
+          this._elements[0],
+          'td.a4W div.xS div.xT div.y6 > span[id]'
+        );
+  }
+
+  replaceSubject(newSubjectStr: string) {
+    const subjectEleSelector = this._getSubjectSelector();
+    if (subjectEleSelector) {
+      subjectEleSelector.textContent = newSubjectStr;
     }
   }
 

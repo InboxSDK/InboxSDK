@@ -97,6 +97,8 @@ InboxSDK.load(2, 'thread-rows').then(function(inboxSDK) {
     } : null);
     threadRowView.replaceDate(null);
 
+    threadRowView.replaceSubject("This is a new subect!")
+
     // threadRowView.addButton(Kefir.repeatedly(5000, [
     // 	{
     // 		iconUrl: 'https://mailfoogae.appspot.com/build/images/listIndicatorDark.png',

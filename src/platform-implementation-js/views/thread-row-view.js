@@ -68,6 +68,10 @@ export default class ThreadRowView extends EventEmitter {
     return get(membersMap, this).threadRowViewDriver.getSubject();
   }
 
+  replaceSubject(newSubjectStr: string) {
+    get(membersMap, this).threadRowViewDriver.replaceSubject(newSubjectStr);
+  }
+
   getDateString(): string {
     return get(membersMap, this).threadRowViewDriver.getDateString();
   }

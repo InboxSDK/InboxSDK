@@ -6,6 +6,7 @@ export type ThreadRowViewDriver = {
   addAttachmentIcon(opts: Object): void,
   replaceDate(opts: Object): void,
   getSubject(): string,
+  replaceSubject(newSubjectStr: string): void,
   getDateString(): string,
   getThreadID(): string,
 };
