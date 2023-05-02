@@ -5,6 +5,7 @@ module.exports = (api) => ({
     [
       '@babel/preset-env',
       {
+        bugfixes: true,
         ...(api.env('test') ? { targets: { node: 'current' } } : {}),
       },
     ],
