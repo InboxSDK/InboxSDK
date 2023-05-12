@@ -11,6 +11,7 @@ import type { Stopper } from 'kefir-stopper';
 import GmailRouteProcessor from './platform-implementation-js/dom-driver/gmail/views/gmail-route-view/gmail-route-processor';
 import GmailDriver from './platform-implementation-js/dom-driver/gmail/gmail-driver';
 import GmailRowListView from './platform-implementation-js/dom-driver/gmail/views/gmail-row-list-view';
+import type { AppLogger } from './platform-implementation-js/lib/logger';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 
 export const LOADER_VERSION: string;
@@ -39,13 +40,7 @@ export interface InboxSDK {
   Compose: Compose;
   ButterBar: ButterBar;
   Lists: Lists;
-  Logger: {
-    event(name: string, extras: any): void;
-    error: (
-      err: Error & { details?: Record<string, any> },
-      options: Record<string, any>
-    ) => void;
-  };
+  Logger: AppLogger;
   NavMenu: NavMenu;
   AppMenu: AppMenu;
   Router: Router;
