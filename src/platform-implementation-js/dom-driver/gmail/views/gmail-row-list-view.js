@@ -1,6 +1,5 @@
 /* @flow */
 
-import { defn } from 'ud';
 import find from 'lodash/find';
 import zip from 'lodash/zip';
 import asap from 'asap';
@@ -306,4 +305,4 @@ class GmailRowListView {
   }
 }
 
-export default defn(module, GmailRowListView);
+export default GmailRowListView;

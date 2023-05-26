@@ -1,6 +1,6 @@
 /* @flow */
 
-import { defn, defonce } from 'ud';
+import { defonce } from 'ud';
 import asap from 'asap';
 import EventEmitter from '../../lib/safe-event-emitter';
 import type Membrane from '../../lib/Membrane';
@@ -285,4 +285,4 @@ function _bindToEventStream(messageView, members, stream) {
     });
 }
 
-export default defn(module, MessageView);
+export default MessageView;

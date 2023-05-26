@@ -85,4 +85,4 @@ class Compose {
   }
 }
 
-export default ud.defn(module, Compose);
+export default Compose;

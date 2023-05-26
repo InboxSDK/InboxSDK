@@ -1,6 +1,5 @@
 /* @flow */
 
-import { defn } from 'ud';
 import EventEmitter from '../lib/safe-event-emitter';
 import get from '../../common/get-or-fail';
 import type { Driver } from '../driver-interfaces/driver';
@@ -74,4 +73,4 @@ function _bindToEventStream(sectionView, sectionViewDriver, driver) {
   });
 }
 
-export default defn(module, SectionView);
+export default SectionView;

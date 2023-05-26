@@ -1,6 +1,6 @@
 /* @flow */
 
-import { defn, defonce } from 'ud';
+import { defonce } from 'ud';
 import ModalView from '../widgets/modal-view';
 import get from '../../common/get-or-fail';
 import type { Driver } from '../driver-interfaces/driver';
@@ -42,4 +42,4 @@ class Modal {
   }
 }
 
-export default defn(module, Modal);
+export default Modal;

@@ -3,7 +3,6 @@
 import uniq from 'lodash/uniq';
 import escape from 'lodash/escape';
 import asap from 'asap';
-import { defn } from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import type { Stopper } from 'kefir-stopper';
@@ -588,4 +587,4 @@ class GmailToolbarView {
   }
 }
 
-export default defn(module, GmailToolbarView);
+export default GmailToolbarView;

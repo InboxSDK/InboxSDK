@@ -44,4 +44,4 @@ class Keyboard {
   }
 }
 
-export default ud.defn(module, Keyboard);
+export default Keyboard;

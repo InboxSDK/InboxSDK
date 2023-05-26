@@ -1,7 +1,6 @@
 /* @flow */
 
 import last from 'lodash/last';
-import { defn } from 'ud';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
@@ -209,7 +208,7 @@ class GmailMoleViewDriver {
   }
 }
 
-export default defn(module, GmailMoleViewDriver);
+export default GmailMoleViewDriver;
 
 function getHTMLString(options: MoleOptions) {
   const originalView = !isComposeTitleBarLightColor();

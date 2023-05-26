@@ -1,6 +1,5 @@
 /* @flow */
 
-import { defn } from 'ud';
 import escape from 'lodash/escape';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -906,4 +905,4 @@ function _getLabelHTML(label) {
   return retArray.join('');
 }
 
-export default defn(module, GmailCollapsibleSectionView);
+export default GmailCollapsibleSectionView;

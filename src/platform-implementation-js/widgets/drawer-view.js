@@ -2,7 +2,6 @@
 
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
-import { defn } from 'ud';
 import EventEmitter from '../lib/safe-event-emitter';
 import ComposeView from '../views/compose-view';
 
@@ -58,4 +57,4 @@ class DrawerView extends EventEmitter {
   }
 }
 
-export default defn(module, DrawerView);
+export default DrawerView;

@@ -1,6 +1,5 @@
 /* @flow */
 
-import { defn } from 'ud';
 import isEqual from 'lodash/isEqual';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 
@@ -54,4 +53,4 @@ class GmailActionButtonView {
     querySelector(this._element, 'div').textContent = title;
   }
 }
-export default defn(module, GmailActionButtonView);
+export default GmailActionButtonView;
