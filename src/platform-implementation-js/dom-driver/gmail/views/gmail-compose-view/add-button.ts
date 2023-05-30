@@ -1,4 +1,5 @@
-import Kefir from 'kefir';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import * as Kefir from 'kefir';
 import type GmailDriver from '../../gmail-driver';
 import GmailComposeButtonView from './gmail-compose-button-view';
 import BasicButtonViewController from '../../../../widgets/buttons/basic-button-view-controller';
@@ -6,21 +7,26 @@ import DropdownButtonViewController from '../../../../widgets/buttons/dropdown-b
 import GmailDropdownView from '../../widgets/gmail-dropdown-view';
 import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 import type GmailComposeView from '../gmail-compose-view';
+import { ButtonDescriptor } from '../../../../../inboxsdk';
 export default function addButton(
   gmailComposeView: GmailComposeView,
   buttonDescriptorStream: Kefir.Observable<
-    Record<string, any> | null | undefined
+    ButtonDescriptor | null | undefined,
+    unknown
   >,
   groupOrderHint: string,
   extraOnClickOptions: Record<string, any>
 ): Promise<Record<string, any> | null | undefined> {
   return new Promise((resolve, reject) => {
-    let buttonViewController;
+    let buttonViewController:
+      | BasicButtonViewController
+      | DropdownButtonViewController
+      | undefined;
     buttonDescriptorStream
       .takeUntilBy(gmailComposeView.getStopper())
-      .onValue((buttonDescriptor: Record<string, any> | null | undefined) => {
+      .onValue((buttonDescriptor) => {
         const buttonOptions = _processButtonDescriptor(
-          buttonDescriptor,
+          buttonDescriptor!,
           extraOnClickOptions,
           gmailComposeView.getGmailDriver()
         );
@@ -29,7 +35,7 @@ export default function addButton(
           if (buttonOptions) {
             buttonViewController = _addButton(
               gmailComposeView,
-              buttonOptions,
+              buttonOptions as any,
               groupOrderHint
             );
             resolve({
@@ -38,7 +44,7 @@ export default function addButton(
             });
           }
         } else {
-          buttonViewController.update(buttonOptions);
+          buttonViewController.update(buttonOptions as any);
         }
       })
       .onEnd(() => {
@@ -50,7 +56,7 @@ export default function addButton(
 
 function _addButton(
   gmailComposeView: GmailComposeView,
-  buttonOptions: Record<string, any>,
+  buttonOptions: ButtonDescriptor,
   groupOrderHint: string
 ) {
   if (
@@ -114,7 +120,10 @@ function _addButtonToModifierArea(
   return buttonViewController;
 }
 
-function _addButtonToSendActionArea(gmailComposeView, buttonDescriptor) {
+function _addButtonToSendActionArea(
+  gmailComposeView: GmailComposeView,
+  buttonDescriptor: ButtonDescriptor
+) {
   const buttonViewController = _getButtonViewController(buttonDescriptor);
 
   buttonViewController.getView().removeClass('inboxsdk__composeButton');
@@ -154,7 +163,7 @@ function _getButtonViewController(buttonDescriptor: Record<string, any>) {
 }
 
 function _processButtonDescriptor(
-  buttonDescriptor: Record<string, any> | null | undefined,
+  buttonDescriptor: ButtonDescriptor | null | undefined,
   extraOnClickOptions: Record<string, any>,
   driver: GmailDriver
 ): Record<string, any> | null | undefined {
@@ -165,11 +174,11 @@ function _processButtonDescriptor(
 
   const buttonOptions = {
     type: 'MODIFIER',
-    ...buttonDescriptor,
+    ...(buttonDescriptor as any),
   };
   const oldOnClick = buttonOptions.onClick;
 
-  buttonOptions.onClick = function (event) {
+  buttonOptions.onClick = function (event: any) {
     driver.getLogger().eventSdkActive('composeView.addedButton.click');
     oldOnClick({ ...extraOnClickOptions, ...event });
   };

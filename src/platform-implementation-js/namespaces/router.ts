@@ -15,8 +15,21 @@ import {
 } from '../constants/router';
 import type { Driver } from '../driver-interfaces/driver';
 import type { Handler } from '../lib/handler-registry';
+import { RouteViewDriver } from '../driver-interfaces/route-view-driver';
 export type RouteParams = Record<string, string | number>;
-const memberMap = defonce(module, () => new WeakMap());
+interface Members {
+  appId: string;
+  driver: Driver;
+  currentRouteViewDriver: RouteViewDriver | DummyRouteViewDriver;
+  allRoutesHandlerRegistry: HandlerRegistry<RouteView>;
+  customRoutes: Array<{
+    routeID: string | string[];
+    onActivate: HandlerRegistry<CustomRouteView>;
+  }>;
+  membrane: Membrane;
+  listRouteHandlerRegistries: Record<string, HandlerRegistry<ListRouteView>>;
+}
+const memberMap = defonce(module, () => new WeakMap<Router, Members>());
 const SAMPLE_RATE = 0.01; // documented in src/docs/
 
 class Router {
@@ -25,7 +38,7 @@ class Router {
   RouteTypes = ROUTE_TYPES;
 
   constructor(appId: string, driver: Driver, membrane: Membrane) {
-    const members = {
+    const members: Members = {
       appId,
       driver,
       currentRouteViewDriver: new DummyRouteViewDriver(),
@@ -34,7 +47,7 @@ class Router {
       membrane,
       listRouteHandlerRegistries: {},
     };
-    Object.values(NATIVE_LIST_ROUTE_IDS).forEach((value: any) => {
+    Object.values(NATIVE_LIST_ROUTE_IDS).forEach((value) => {
       members.listRouteHandlerRegistries[value] = new HandlerRegistry();
     });
     memberMap.set(this, members);
@@ -144,7 +157,11 @@ class Router {
   }
 }
 
-function _handleRouteViewChange(router, members, routeViewDriver) {
+function _handleRouteViewChange(
+  router: Router,
+  members: Members,
+  routeViewDriver: RouteViewDriver
+) {
   if (members.currentRouteViewDriver instanceof DummyRouteViewDriver) {
     members.currentRouteViewDriver.destroy();
   }
@@ -179,7 +196,11 @@ function _handleRouteViewChange(router, members, routeViewDriver) {
   }
 }
 
-function _informRelevantCustomRoutes(members, routeViewDriver, routeView) {
+function _informRelevantCustomRoutes(
+  members: Members,
+  routeViewDriver: RouteViewDriver,
+  routeView: RouteView
+) {
   const routeID = routeView.getRouteID();
   const routeIDArray = Array.isArray(routeID) ? routeID : [routeID];
   const relevantCustomRoute = find(
@@ -200,14 +221,14 @@ function _informRelevantCustomRoutes(members, routeViewDriver, routeView) {
     members.driver.showCustomRouteView(customViewElement);
 
     try {
-      relevantCustomRoute.onActivate(customRouteView);
+      (relevantCustomRoute as any).onActivate(customRouteView);
     } catch (err) {
       members.driver.getLogger().error(err);
     }
   }
 }
 
-function _updateNavMenu(members, newRouteViewDriver) {
+function _updateNavMenu(members: Members, newRouteViewDriver: RouteViewDriver) {
   members.driver.setShowNativeNavMarker(
     newRouteViewDriver.getType() !== ROUTE_TYPES.CUSTOM
   );

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import find from 'lodash/find';
 import * as GmailResponseProcessor from '../../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import { parse } from 'querystring';
@@ -83,10 +84,10 @@ function threadMetadataKey(
 
 function processPreloadedThreads() {
   const preloadScript = find(
-    document.querySelectorAll('script:not([src])'),
+    document.querySelectorAll<HTMLScriptElement>('script:not([src])'),
     (script) =>
       script.text && script.text.slice(0, 500).indexOf('var VIEW_DATA=[[') > -1
-  );
+  ) as HTMLScriptElement | undefined;
 
   if (!preloadScript) {
     // preloadScript is not available in gmail v2, so let's stop logging an error
@@ -123,7 +124,7 @@ function getThreadIdFromUrl(url: string): string | null | undefined {
 
   // if we're in sync world and it's a
   // draft then a hash can come through in the beginning
-  return tid.replace('#', '');
+  return (tid as string)!.replace('#', '');
 }
 
 function getGmailThreadIdForThreadRowByDatabase(
@@ -157,7 +158,8 @@ function getGmailThreadIdForThreadRowByClick(
   }
 
   const currentRowSelection =
-    parent.querySelector('td.PE') || parent.querySelector('tr');
+    parent.querySelector<HTMLElement>('td.PE') ||
+    parent.querySelector<HTMLElement>('tr');
   const url = clickAndGetPopupUrl(threadRow);
   const threadId = url && getThreadIdFromUrl(url);
 

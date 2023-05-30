@@ -58,10 +58,13 @@ class ListRouteView extends RouteView {
 
 const membersMap = new WeakMap();
 
-function _bindToEventStream(routeViewDriver, routeView) {
+function _bindToEventStream(
+  routeViewDriver: RouteViewDriver,
+  routeView: ListRouteView
+) {
   routeViewDriver.getEventStream().onEnd(() => {
     const members = get(membersMap, routeView);
-    members.sectionViews.forEach((sectionView) => {
+    members.sectionViews.forEach((sectionView: { destroy(): void }) => {
       sectionView.destroy();
     });
   });

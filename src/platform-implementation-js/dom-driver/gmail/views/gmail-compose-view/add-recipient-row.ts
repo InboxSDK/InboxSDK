@@ -1,14 +1,15 @@
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import blockAndReemiteKeyboardEvents from '../../../../lib/dom/block-and-reemit-keyboard-events';
 import { getRecipientRowElements } from './page-parser';
 import type GmailComposeView from '../gmail-compose-view';
 export default function addRecipientRow(
   gmailComposeView: GmailComposeView,
   recipientRowOptionStream: Kefir.Observable<
-    Record<string, any> | null | undefined
+    Record<string, any> | null | undefined,
+    unknown
   >
 ): () => void {
-  let row;
+  let row: HTMLElement | null;
   recipientRowOptionStream
     .takeUntilBy(gmailComposeView.getStopper())
     .onValue((options) => {

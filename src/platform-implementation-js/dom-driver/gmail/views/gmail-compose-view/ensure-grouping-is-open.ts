@@ -7,7 +7,7 @@ export default function ensureGroupingIsOpen(
     return; //we don't currently group send_actions
   }
 
-  var groupedButton = gmailComposeViewElement.querySelector(
+  var groupedButton = gmailComposeViewElement.querySelector<HTMLElement>(
     '.inboxsdk__compose_groupedActionButton'
   );
 

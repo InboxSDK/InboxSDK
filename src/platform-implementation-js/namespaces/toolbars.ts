@@ -58,17 +58,17 @@ export default class Toolbars extends EventEmitter {
     const registerThreadButton = () => {
       return members.driver.registerThreadButton({
         ..._buttonDescriptor,
-        onClick: (event) => {
+        onClick: (event: any) => {
           if (!_buttonDescriptor.onClick) return;
 
           _buttonDescriptor.onClick({
             position: event.position,
             dropdown: event.dropdown,
-            selectedThreadViews: event.selectedThreadViewDrivers.map((x) =>
+            selectedThreadViews: event.selectedThreadViewDrivers.map((x: any) =>
               members.membrane.get(x)
             ),
             selectedThreadRowViews: event.selectedThreadRowViewDrivers.map(
-              (x) => members.membrane.get(x)
+              (x: any) => members.membrane.get(x)
             ),
           });
         },
@@ -79,7 +79,7 @@ export default class Toolbars extends EventEmitter {
       return registerThreadButton();
     } else {
       const stopper = kefirStopper();
-      let currentRemover = null;
+      let currentRemover: null | (() => void) = null;
       const sub = members.driver
         .getRouteViewDriverStream()
         .takeUntilBy(stopper)
@@ -116,7 +116,7 @@ export default class Toolbars extends EventEmitter {
       title: buttonDescriptor.title,
       iconUrl: buttonDescriptor.iconUrl,
       iconClass: buttonDescriptor.iconClass,
-      onClick: (event) => {
+      onClick: (event: any) => {
         if (!buttonDescriptor.onClick) return;
         buttonDescriptor.onClick({
           dropdown: event.dropdown,
@@ -146,7 +146,7 @@ export default class Toolbars extends EventEmitter {
       title: buttonDescriptor.title,
       iconUrl: buttonDescriptor.iconUrl,
       iconClass: buttonDescriptor.iconClass,
-      onClick: (event) => {
+      onClick: (event: any) => {
         if (event.selectedThreadViews.length !== 1)
           throw new Error('should not happen');
         if (!buttonDescriptor.onClick) return;

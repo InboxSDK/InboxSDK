@@ -1,5 +1,6 @@
+import { Driver } from '../../../driver-interfaces/driver';
 import GmailAttachmentCardView from './gmail-attachment-card-view';
-const driver: Record<string, any> = {};
+const driver: Driver = {} as Driver;
 describe('getAttachmentType', () => {
   describe('UNLOADED', () => {
     it('not loaded', () => {

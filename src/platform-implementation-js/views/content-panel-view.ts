@@ -1,8 +1,11 @@
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import EventEmitter from '../lib/safe-event-emitter';
 import get from '../../common/get-or-fail';
 import type ContentPanelViewDriver from '../driver-common/sidebar/ContentPanelViewDriver';
-const membersMap = new WeakMap(); // documented in src/docs/
+interface Members {
+  contentPanelViewImplementation: ContentPanelViewDriver;
+}
+const membersMap = new WeakMap<ContentPanelView, Members>(); // documented in src/docs/
 
 export default class ContentPanelView extends EventEmitter {
   destroyed: boolean = false;
@@ -34,7 +37,7 @@ export default class ContentPanelView extends EventEmitter {
   }
 
   _bindToStreamEvents() {
-    const stream: Kefir.Observable<any> = get(
+    const stream = get(
       membersMap,
       this
     ).contentPanelViewImplementation.getEventStream();

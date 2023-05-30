@@ -6,7 +6,15 @@ import get from '../../common/get-or-fail';
 import NavItemView from './nav-item-view';
 import type { Driver } from '../driver-interfaces/driver';
 import type GmailNavItemView from '../dom-driver/gmail/views/gmail-nav-item-view';
-const memberMap = new WeakMap();
+interface Members {
+  appId: string;
+  driver: Driver;
+  labelName: string;
+  navItemViews: NavItemView[];
+  navItemViewDriver: GmailNavItemView | null | undefined;
+  navItemViewDriverPromise: Promise<GmailNavItemView>;
+}
+const memberMap = new WeakMap<NativeNavItemView, Members>();
 export default class NativeNavItemView extends EventEmitter {
   constructor(
     appId: string,
@@ -81,7 +89,10 @@ export default class NativeNavItemView extends EventEmitter {
   }
 }
 
-function _handleStreamEvent(emitter, event) {
+function _handleStreamEvent(
+  emitter: NativeNavItemView,
+  event: { eventName: string }
+) {
   switch (event.eventName) {
     case 'expanded':
     case 'collapsed':

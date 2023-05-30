@@ -1,4 +1,4 @@
-import Kefir from 'kefir';
+import type * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import once from 'lodash/once';
 import SafeEventEmitter from '../../lib/safe-event-emitter';
@@ -10,18 +10,18 @@ export type CustomMessageDescriptor = {
   sortDate: Date;
 };
 export default class CustomMessageView extends SafeEventEmitter {
-  _el: HTMLElement;
-  _iconEl: HTMLElement;
-  _contentEl: HTMLElement;
-  _contentHeaderEl: HTMLElement;
-  _contentBodyEl: HTMLElement;
+  _el!: HTMLElement;
+  _iconEl!: HTMLElement;
+  _contentEl!: HTMLElement;
+  _contentHeaderEl!: HTMLElement;
+  _contentBodyEl!: HTMLElement;
   _destroyed: boolean = false;
   _stopper = kefirStopper();
   _isCollapsed: boolean = true;
   _lastDescriptor: CustomMessageDescriptor | null | undefined;
 
   constructor(
-    descriptorStream: Kefir.Observable<CustomMessageDescriptor>,
+    descriptorStream: Kefir.Observable<CustomMessageDescriptor, unknown>,
     onReady: () => any
   ) {
     super();

@@ -1,10 +1,10 @@
 import * as ud from 'ud';
-import type { ComposeViewDriver } from '../driver-interfaces/compose-view-driver';
 import autoHtml from 'auto-html';
+import GmailComposeView from '../dom-driver/gmail/views/gmail-compose-view';
 var insertLinkChipIntoBody = ud.defn(
   module,
   function (
-    composeViewDriver: ComposeViewDriver,
+    composeViewDriver: GmailComposeView,
     options: Record<string, any>
   ): HTMLElement {
     composeViewDriver.focus();

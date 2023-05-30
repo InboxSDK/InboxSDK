@@ -1,4 +1,3 @@
-/* eslint-disable flowtype/require-valid-file-annotation */
 import includes from 'lodash/includes';
 // only used for constants
 import {
@@ -6,19 +5,22 @@ import {
   NATIVE_LIST_ROUTE_IDS,
   ROUTE_TYPES,
 } from '../../../../constants/router';
-export default function GmailRouteProcessor() {
-  this._routeNameToRouteIDMap = null;
-  this._compatibleRouteIDMap = null;
 
-  this._setupRouteNameToRouteIDMap();
+export default class GmailRouteProcessor {
+  _routeNameToRouteIDMap: Record<string, string> = null!;
+  _routeNameToRouteIDMaps: Record<string, string> = null!;
+  _compatibleRouteIDMap: Record<string, string> = null!;
 
-  this._setupCompatibleRouteIDMap();
-}
-Object.assign(GmailRouteProcessor.prototype, {
-  NativeRouteIDs: NATIVE_ROUTE_IDS,
-  NativeListRouteIDs: NATIVE_LIST_ROUTE_IDS,
-  RouteTypes: ROUTE_TYPES,
-  isListRouteName: function (routeName) {
+  constructor() {
+    this._setupRouteNameToRouteIDMap();
+
+    this._setupCompatibleRouteIDMap();
+  }
+
+  NativeRouteIDs = NATIVE_ROUTE_IDS;
+  NativeListRouteIDs = NATIVE_LIST_ROUTE_IDS;
+  RouteTypes = ROUTE_TYPES;
+  isListRouteName(routeName: string) {
     var routeID = this.getRouteID(routeName);
 
     if (!routeID) {
@@ -26,23 +28,23 @@ Object.assign(GmailRouteProcessor.prototype, {
     }
 
     return includes(Object.values(NATIVE_LIST_ROUTE_IDS), routeID);
-  },
-  isSettingsRouteName: function (routeName) {
+  }
+  isSettingsRouteName(routeName: string) {
     return (
       this._routeNameToRouteIDMap[routeName] === this.NativeRouteIDs.SETTINGS
     );
-  },
-  isContactRouteName: function (routeName) {
+  }
+  isContactRouteName(routeName: string) {
     return (
       this._routeNameToRouteIDMap[routeName] === this.NativeRouteIDs.CONTACTS ||
       this._routeNameToRouteIDMap[routeName] === this.NativeRouteIDs.CONTACT
     );
-  },
-  getRouteID: function (routeName) {
+  }
+  getRouteID(routeName: string) {
     var routeID = this._routeNameToRouteIDMap[routeName];
     return routeID ? routeID : null;
-  },
-  getRouteName: function (routeID) {
+  }
+  getRouteName(routeID: string) {
     for (var key in this._routeNameToRouteIDMaps) {
       if (this._routeNameToRouteIDMap[key] === routeID) {
         return key;
@@ -50,14 +52,14 @@ Object.assign(GmailRouteProcessor.prototype, {
     }
 
     return null;
-  },
-  isNativeRoute: function (routeName) {
+  }
+  isNativeRoute(routeName: string) {
     return !!this._routeNameToRouteIDMap[routeName];
-  },
-  getCompatibleRouteID: function (routeID) {
+  }
+  getCompatibleRouteID(routeID: string) {
     return this._compatibleRouteIDMap[routeID] || routeID;
-  },
-  _setupRouteNameToRouteIDMap: function () {
+  }
+  _setupRouteNameToRouteIDMap() {
     this._routeNameToRouteIDMap = {
       inbox: this.NativeRouteIDs.INBOX,
       section_query: this.NativeRouteIDs.SEARCH,
@@ -86,8 +88,8 @@ Object.assign(GmailRouteProcessor.prototype, {
       rooms: this.NativeRouteIDs.SPACES_WELCOME,
       calls: this.NativeRouteIDs.MEET,
     };
-  },
-  _setupCompatibleRouteIDMap: function () {
+  }
+  _setupCompatibleRouteIDMap() {
     this._compatibleRouteIDMap = {};
     this._compatibleRouteIDMap[this.NativeRouteIDs.INBOX] = 'inbox/p:page';
     this._compatibleRouteIDMap[this.NativeRouteIDs.ALL_MAIL] = 'all/p:page';
@@ -112,5 +114,5 @@ Object.assign(GmailRouteProcessor.prototype, {
       this.NativeRouteIDs.CONTACT;
     this._compatibleRouteIDMap[this.NativeRouteIDs.SETTINGS] =
       this.NativeRouteIDs.SETTINGS;
-  },
-});
+  }
+}

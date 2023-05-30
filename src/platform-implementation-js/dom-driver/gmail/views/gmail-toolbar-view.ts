@@ -1,7 +1,7 @@
 import uniq from 'lodash/uniq';
 import escape from 'lodash/escape';
 import asap from 'asap';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import type { Stopper } from 'kefir-stopper';
 import streamWaitFor from '../../../lib/stream-wait-for';
@@ -19,11 +19,12 @@ import { SECTION_NAMES } from '../../../constants/toolbars';
 import type GmailDriver from '../gmail-driver';
 import type { RouteViewDriver } from '../../../driver-interfaces/route-view-driver';
 import Logger from '../../../lib/logger';
+import GmailThreadRowView from './gmail-thread-row-view';
 
 class GmailToolbarView {
   _element: HTMLElement;
   _driver: GmailDriver;
-  _ready: Kefir.Observable<GmailToolbarView>;
+  _ready: Kefir.Observable<GmailToolbarView, unknown>;
   _stopper: Stopper;
   _routeViewDriver: RouteViewDriver;
   _buttonViewControllers: Set<
@@ -92,7 +93,7 @@ class GmailToolbarView {
     }
   }
 
-  getStopper(): Kefir.Observable<null> {
+  getStopper() {
     return this._stopper;
   }
 
@@ -119,7 +120,7 @@ class GmailToolbarView {
   getThreadRowViewDrivers() {
     if (!this._rowListViewDriver) {
       console.error('missing this._rowListViewDriver');
-      return new Set();
+      return new Set<GmailThreadRowView>();
     }
 
     return this._rowListViewDriver.getThreadRowViewDrivers();
@@ -129,7 +130,7 @@ class GmailToolbarView {
     buttonDescriptor: Record<string, any>,
     id?: string
   ): {
-    getStopper(): Kefir.Observable<null>;
+    getStopper(): Kefir.Observable<null, unknown>;
     destroy(): void;
   } {
     const buttonStopper = kefirStopper();
@@ -272,7 +273,7 @@ class GmailToolbarView {
     };
   }
 
-  waitForReady(): Kefir.Observable<GmailToolbarView> {
+  waitForReady(): Kefir.Observable<GmailToolbarView, unknown> {
     return this._ready;
   }
 
@@ -295,7 +296,9 @@ class GmailToolbarView {
         },
       });
     } else {
-      buttonViewController = new BasicButtonViewController(buttonDescriptor);
+      buttonViewController = new BasicButtonViewController(
+        buttonDescriptor as any
+      );
     }
 
     return buttonViewController;
@@ -316,7 +319,8 @@ class GmailToolbarView {
   }
 
   _startMonitoringMoreMenu() {
-    const moreButtonElement = this._element.querySelector('.nf[role=button]');
+    const moreButtonElement =
+      this._element.querySelector<HTMLElement>('.nf[role=button]');
 
     if (!moreButtonElement) {
       return;
@@ -428,7 +432,8 @@ class GmailToolbarView {
   _getSectionElementForButtonSelector(
     buttonSelector: string
   ): HTMLElement | null | undefined {
-    const sectionElements = this._element.querySelectorAll('.G-Ni');
+    const sectionElements =
+      this._element.querySelectorAll<HTMLElement>('.G-Ni');
 
     for (let ii = 0; ii < sectionElements.length; ii++) {
       if (sectionElements[ii].querySelector(buttonSelector)) {

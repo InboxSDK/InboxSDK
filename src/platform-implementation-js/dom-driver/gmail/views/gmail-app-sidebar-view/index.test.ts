@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 jest.mock('../../../../lib/idMap', () => {
-  function idMap(key) {
-    const legacyMapping = {
+  function idMap(key: string) {
+    const legacyMapping: Record<string, string> = {
       app_sidebar_content_panel: 'bccbBAHIcfEeHCHf',
     };
     return legacyMapping[key] ?? key;
@@ -22,6 +25,7 @@ import fs from 'fs';
 import GmailAppSidebarView from './index';
 import ContentPanelViewDriver from '../../../../driver-common/sidebar/ContentPanelViewDriver';
 import MockWebStorage from 'mock-webstorage';
+import GmailThreadView from '../gmail-thread-view';
 jest.mock('../../../../lib/dom/make-element-child-stream', () => {
   return () => require('kefir-bus')();
 });
@@ -29,7 +33,7 @@ jest.mock('../../../../lib/dom/make-mutation-observer-chunked-stream', () => {
   return () => require('kefir-bus')();
 });
 global.localStorage = new MockWebStorage();
-global._APP_SIDEBAR_TEST = true;
+(global as any)._APP_SIDEBAR_TEST = true;
 describe('GmailAppSidebarView Primary', function () {
   beforeEach(() => {
     makeSidebarContainerElement();
@@ -54,9 +58,9 @@ describe('GmailAppSidebarView Primary', function () {
       iconUrl: '/bar.png',
       el: document.createElement('div'),
     });
-    const fakeThreadView: Record<string, any> = {
+    const fakeThreadView = {
       getStopper: _.constant(kefirStopper()),
-    };
+    } as GmailThreadView;
     const panel = gmailAppSidebarView.addThreadSidebarContentPanel(
       descriptor,
       fakeThreadView
@@ -88,9 +92,9 @@ describe('GmailAppSidebarView Primary', function () {
       iconUrl: '/bar.png',
       el: document.createElement('div'),
     });
-    const fakeThreadView: Record<string, any> = {
+    const fakeThreadView = {
       getStopper: _.constant(kefirStopper()),
-    };
+    } as GmailThreadView;
     gmailAppSidebarView.addThreadSidebarContentPanel(
       descriptor1,
       fakeThreadView
@@ -107,7 +111,7 @@ describe('GmailAppSidebarView Primary', function () {
   });
 });
 
-function makeDriver(appId, opts): any {
+function makeDriver(appId?: string, opts?: any): any {
   return {
     getAppId: () => appId || 'test',
     getOpts: () =>
@@ -120,7 +124,7 @@ function makeDriver(appId, opts): any {
       return {
         eventSdkPassive() {},
 
-        error(err, details) {
+        error(err: unknown, details: unknown) {
           console.error('logger.error called:', err, details);
           throw err;
         },

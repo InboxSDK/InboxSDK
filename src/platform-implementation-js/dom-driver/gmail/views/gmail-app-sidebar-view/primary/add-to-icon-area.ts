@@ -16,13 +16,14 @@ function addToIconArea(
       orderManager.getOrderedItems(),
       ({ value }) => value.appName === elAppName
     );
-    el.setAttribute('data-order-hint', index);
+    el.setAttribute('data-order-hint', index as unknown as string);
   });
   const index = findIndex(
     orderManager.getOrderedItems(),
     ({ value }) => value.appName === appName
   );
-  if (index > -1) container.setAttribute('data-order-hint', index);
+  if (index > -1)
+    container.setAttribute('data-order-hint', index as unknown as string);
   insertElementInOrder(iconArea, container, ['data-order-hint']);
 }
 

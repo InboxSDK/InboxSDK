@@ -1,4 +1,4 @@
-export const NATIVE_ROUTE_IDS: Record<string, string> = Object.freeze({
+export const NATIVE_ROUTE_IDS = Object.freeze({
   INBOX: 'inbox/:page',
   ALL_MAIL: 'all/:page',
   SENT: 'sent/:page',
@@ -37,7 +37,7 @@ export const NATIVE_ROUTE_IDS: Record<string, string> = Object.freeze({
 
   /** FEB 2023 */
   ANY_LIST: '*',
-});
+} as const);
 export const NATIVE_LIST_ROUTE_IDS: Record<string, string> = Object.freeze({
   INBOX: NATIVE_ROUTE_IDS.INBOX,
   ALL_MAIL: NATIVE_ROUTE_IDS.ALL_MAIL,

@@ -66,7 +66,7 @@ export function extractMetadataFromThreadRow(
 
   return {
     timeString: timeSpan ? timeSpan.getAttribute('title') || '' : '',
-    subject: subjectSpan ? subjectSpan.textContent : '',
+    subject: subjectSpan ? subjectSpan.textContent! : '',
     peopleHtml: peopleDiv ? cleanupPeopleLine(peopleDiv.innerHTML) : '',
   };
 }

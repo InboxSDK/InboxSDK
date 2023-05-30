@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import flatMap from 'lodash/flatMap';
 import sortBy from 'lodash/sortBy';
 import cx from 'classnames';
@@ -56,8 +58,8 @@ type State = {
   expansionSettings: ExpansionSettings;
 };
 export default class AppSidebar extends React.Component<Props, State> {
-  _list: DraggableList<any>;
-  _main: HTMLElement;
+  _list!: DraggableList<any, any, any>;
+  _main!: HTMLElement;
   _stopper = kefirStopper();
 
   constructor(props: Props) {
@@ -68,7 +70,7 @@ export default class AppSidebar extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-    Kefir.fromEvents(window, 'storage')
+    Kefir.fromEvents<StorageEvent, unknown>(window, 'storage')
       .filter((e) => e.key === 'inboxsdk__sidebar_expansion_settings')
       .takeUntilBy(this._stopper)
       .onValue(() => {
@@ -160,13 +162,12 @@ export default class AppSidebar extends React.Component<Props, State> {
   }
 
   _saveExpansionSettings(data: ExpansionSettings) {
-    const allSidebarIds: Array<[string, string]> = flatMap(
-      Object.keys(data.apps),
-      (appId) => Object.keys(data.apps[appId].ids).map((id) => [appId, id])
+    const allSidebarIds = flatMap(Object.keys(data.apps), (appId) =>
+      Object.keys(data.apps[appId].ids).map((id) => [appId, id] as const)
     );
 
     if (allSidebarIds.length > MAX_SIDEBAR_SETTINGS) {
-      const idsToRemove: Array<[string, string]> = sortBy(
+      const idsToRemove = sortBy(
         allSidebarIds,
         ([appId, id]) => data.apps[appId].ids[id].lastUse
       ).slice(0, allSidebarIds.length - MAX_SIDEBAR_SETTINGS);
@@ -212,7 +213,7 @@ export default class AppSidebar extends React.Component<Props, State> {
         panelDescriptor,
         showControls,
         expanded,
-        onExpandedToggle: (expanded) => {
+        onExpandedToggle: (expanded: boolean) => {
           this._expandedToggle(
             panelDescriptor.appId,
             panelDescriptor.id,
@@ -288,7 +289,7 @@ type PanelProps = {
 };
 
 class Panel extends React.Component<PanelProps> {
-  _el: HTMLElement;
+  _el!: HTMLElement;
 
   scrollIntoView(
     useContainer: boolean,

@@ -8,6 +8,7 @@ import ComposeView from '../views/compose-view';
 import type { Driver, DrawerViewOptions } from '../driver-interfaces/driver';
 import get from '../../common/get-or-fail';
 import isComposeTitleBarLightColor from '../dom-driver/gmail/is-compose-titlebar-light-color'; // documented in src/docs/
+import { MoleOptions } from '../driver-interfaces/mole-view-driver';
 
 class Widgets {
   constructor(appId: string, driver: Driver) {
@@ -19,7 +20,7 @@ class Widgets {
 
   showModalView(options: Record<string, any>): ModalView {
     if (options.buttons) {
-      options.buttons = options.buttons.map((button) => {
+      options.buttons = options.buttons.map((button: any) => {
         if (button.onClick) {
           const appOnClick = button.onClick;
           return {
@@ -47,7 +48,7 @@ class Widgets {
     return modalView;
   }
 
-  showMoleView(options: Record<string, any>): MoleView {
+  showMoleView(options: MoleOptions): MoleView {
     const moleViewDriver = get(memberMap, this).driver.createMoleViewDriver(
       options
     );

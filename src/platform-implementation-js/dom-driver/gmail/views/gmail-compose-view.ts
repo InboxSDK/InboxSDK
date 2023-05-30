@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable prefer-const */
 import autoHtml from 'auto-html';
 import t from 'transducers.js';
 import once from 'lodash/once';
@@ -81,11 +84,13 @@ import type {
 } from '../../../driver-interfaces/compose-view-driver';
 import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
+import { ButtonDescriptor, Contact } from '../../../../inboxsdk';
+import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 let hasReportedMissingBody = false;
 
 class GmailComposeView {
   _element: HTMLElement;
-  _seenBodyElement: HTMLElement;
+  _seenBodyElement!: HTMLElement;
   _isInlineReplyForm: boolean;
   _isFullscreen: boolean;
   _isStandalone: boolean;
@@ -94,14 +99,14 @@ class GmailComposeView {
   _managedViewControllers: Array<{
     destroy(): void;
   }>;
-  _eventStream: Bus<any>;
+  _eventStream: Bus<any, unknown>;
   _isTriggeringADraftSavePending: boolean;
   _buttonViewControllerTooltipMap: WeakMap<
     Record<string, any>,
     Record<string, any>
   >;
-  _composeID: string;
-  _messageIDElement: HTMLInputElement;
+  _composeID!: string;
+  _messageIDElement!: HTMLInputElement;
   _messageId: string | null | undefined;
   _finalMessageId: string | null | undefined; // Set only after the message is sent.
 
@@ -130,11 +135,11 @@ class GmailComposeView {
   _hasSetupLinkPopOvers: boolean = false;
   _page: PageParserTree;
   tagTree: TagTree<HTMLElement>;
-  ready: () => Kefir.Observable<GmailComposeView>;
+  ready: () => Kefir.Observable<GmailComposeView, unknown>;
 
   constructor(
     element: HTMLElement,
-    xhrInterceptorStream: Kefir.Observable<any>,
+    xhrInterceptorStream: Kefir.Observable<any, unknown>,
     driver: GmailDriver,
     options: {
       isInlineReplyForm: boolean;
@@ -375,7 +380,7 @@ class GmailComposeView {
                   this._messageId = response.messageID;
                   events.push({
                     eventName: 'messageIDChange',
-                    data: this._messageId,
+                    data: this._messageId as any,
                   });
                 } else {
                   this._driver
@@ -400,7 +405,7 @@ class GmailComposeView {
         .map((event) => {
           if (this._driver.getLogger().shouldTrackEverything()) {
             driver.getLogger().eventSite('compose.debug.xhr', {
-              eventName: event.eventName,
+              eventName: (event as any).eventName,
             });
           }
 
@@ -409,7 +414,7 @@ class GmailComposeView {
     }
 
     this._eventStream.plug(
-      Kefir.merge([
+      Kefir.merge<any, any>([
         saveAndSendStream,
         Kefir.fromEvents(this._element, 'buttonAdded').map(() => {
           return {
@@ -485,7 +490,7 @@ class GmailComposeView {
               .filter(({ eventName }) => eventName === 'presending')
               .takeUntilBy(this._stopper)
               .onValue(() => {
-                makeElementChildStream(document.body as any as HTMLElement)
+                makeElementChildStream(document.body)
                   .map((event) => event.el)
                   .filter(
                     (node) =>
@@ -499,7 +504,7 @@ class GmailComposeView {
                           eventName === 'sendCanceled' ||
                           eventName === 'sending'
                       ),
-                      Kefir.later(15),
+                      Kefir.later(15, undefined),
                     ])
                   )
                   .onValue(() => {
@@ -583,11 +588,11 @@ class GmailComposeView {
     this._destroyed = true;
   }
 
-  getStopper(): Kefir.Observable<null> {
+  getStopper() {
     return this._stopper;
   }
 
-  getEventStream(): Kefir.Observable<Record<string, any>> {
+  getEventStream() {
     return this._eventStream;
   }
 
@@ -651,7 +656,7 @@ class GmailComposeView {
     );
 
     this._eventStream.plug(
-      Kefir.later(10)
+      Kefir.later(10, undefined)
         .flatMap(() => getMinimizedStream(this))
         .changes()
         .map((minimized) => ({
@@ -670,7 +675,9 @@ class GmailComposeView {
         .map(() => this._getMessageIDfromForm())
         .filter(
           (messageID) =>
-            messageID && !this._emailWasSent && this._messageId !== messageID
+            (messageID as unknown as boolean) &&
+            !this._emailWasSent &&
+            this._messageId !== messageID
         )
         .onValue((messageID) => {
           this._messageId = messageID;
@@ -844,7 +851,7 @@ class GmailComposeView {
   }
 
   addRecipientRow(
-    options: Kefir.Observable<Record<string, any> | null | undefined>
+    options: Kefir.Observable<Record<string, any> | null | undefined, unknown>
   ): () => void {
     return addRecipientRow(this, options);
   }
@@ -890,7 +897,10 @@ class GmailComposeView {
   }
 
   addButton(
-    buttonDescriptor: Kefir.Observable<Record<string, any> | null | undefined>,
+    buttonDescriptor: Kefir.Observable<
+      ButtonDescriptor | null | undefined,
+      unknown
+    >,
     groupOrderHint: string,
     extraOnClickOptions: Record<string, any>
   ): Promise<Record<string, any> | null | undefined> {
@@ -903,7 +913,7 @@ class GmailComposeView {
   }
 
   addTooltipToButton(
-    buttonViewController: Record<string, any>,
+    buttonViewController: BasicButtonViewController,
     buttonDescriptor: Record<string, any>,
     tooltipDescriptor: TooltipDescriptor
   ) {
@@ -1033,7 +1043,7 @@ class GmailComposeView {
     this._element.setAttribute('data-inboxsdk-send-replaced', '');
 
     const removalStopper = kefirStopper();
-    Kefir.fromEvents(this.getBodyElement(), 'keydown')
+    Kefir.fromEvents<KeyboardEvent, unknown>(this.getBodyElement(), 'keydown')
       .takeUntilBy(this._stopper)
       .takeUntilBy(removalStopper)
       .filter(
@@ -1047,7 +1057,8 @@ class GmailComposeView {
         // so we have replicate this behavior when the native send button isn't
         // visible.
         const statusArea = this.getStatusArea();
-        const focusableEls = statusArea.querySelectorAll('[tabindex]');
+        const focusableEls =
+          statusArea.querySelectorAll<HTMLElement>('[tabindex]');
         if (focusableEls.length === 0) return;
         const firstVisibleEl = Array.from(focusableEls).find(
           (el) => el.offsetParent !== null
@@ -1177,11 +1188,16 @@ class GmailComposeView {
     const dropzoneSelector = inline
       ? 'body > .aC7:not(.aWP)'
       : 'body > .aC7.aWP';
-    const el: HTMLElement | null | undefined = t.toArray(
-      Array.prototype.slice.call(document.querySelectorAll(dropzoneSelector)),
+    const el: HTMLElement | null | undefined = t.toArray<
+      any,
+      HTMLElement | null | undefined
+    >(
+      Array.prototype.slice.call(
+        document.querySelectorAll<HTMLElement>(dropzoneSelector)
+      ),
       t.compose(
         t.filter(isElementVisible),
-        t.filter((dropzone) => {
+        t.filter((dropzone: HTMLElement) => {
           const top = parseInt(dropzone.style.top, 10);
           const bottom = top + parseInt(dropzone.style.height, 10);
           const left = parseInt(dropzone.style.left, 10);
@@ -1212,7 +1228,7 @@ class GmailComposeView {
     try {
       let firstLoop = true;
 
-      for (let partitionedFiles of t.partition(files, 3)) {
+      for (let partitionedFiles of (t.partition as any)(files, 3)) {
         if (firstLoop) {
           firstLoop = false;
         } else {
@@ -1264,7 +1280,7 @@ class GmailComposeView {
   }
 
   getMaybeBodyElement(): HTMLElement | null | undefined {
-    return this._element.querySelector('.Ap [g_editable=true]');
+    return this._element.querySelector<HTMLElement>('.Ap [g_editable=true]');
   }
 
   getTopFormElement(): HTMLElement {
@@ -1276,7 +1292,7 @@ class GmailComposeView {
   }
 
   getTextContent(): string {
-    return this.getBodyElement().textContent;
+    return this.getBodyElement().textContent!;
   }
 
   getSelectedBodyHTML(): string | null | undefined {
@@ -1342,14 +1358,14 @@ class GmailComposeView {
 
     if (!formattingArea) {
       formattingArea = this._formattingArea =
-        this._element.querySelector('.oc');
+        this._element.querySelector<HTMLElement>('.oc');
     }
 
     return formattingArea;
   }
 
   getFormattingToolbar(): HTMLElement | null | undefined {
-    return this._element.querySelector('.aX');
+    return this._element.querySelector<HTMLElement>('.aX');
   }
 
   getFormattingToolbarArrow(): HTMLElement {
@@ -1366,13 +1382,13 @@ class GmailComposeView {
   }
 
   getStatusBarPrependContainer(): HTMLElement | null | undefined {
-    return this._element.querySelector(
+    return this._element.querySelector<HTMLElement>(
       '.inboxsdk__compose_statusBarPrependContainer'
     );
   }
 
   getScrollBody(): HTMLElement {
-    var scrollBody = this._element.querySelector('table .GP');
+    var scrollBody = this._element.querySelector<HTMLElement>('table .GP');
 
     if (!scrollBody) {
       throw new Error('Failed to find scroll body');
@@ -1382,7 +1398,8 @@ class GmailComposeView {
   }
 
   getStatusArea(): HTMLElement {
-    let statusArea = this._element.querySelector('.aDg .aDj > .aDh');
+    let statusArea =
+      this._element.querySelector<HTMLElement>('.aDg .aDj > .aDh');
 
     if (!statusArea) throw new Error('Failed to find status area');
     return statusArea;
@@ -1421,7 +1438,7 @@ class GmailComposeView {
       return null;
     }
 
-    const sendAndArchiveButton = this._element.querySelector(
+    const sendAndArchiveButton = this._element.querySelector<HTMLElement>(
       '.IZ .Up div > div[role=button].Uo:not([aria-haspopup=true]):not([class^=inboxsdk_])'
     );
 
@@ -1464,15 +1481,15 @@ class GmailComposeView {
         );
     }
 
-    return result;
+    return result as HTMLElement | null;
   }
 
   getCloseButton(): HTMLElement {
-    return this._element.querySelectorAll('.Hm > img')[2];
+    return this._element.querySelectorAll<HTMLElement>('.Hm > img')[2];
   }
 
   getMoleSwitchButton(): HTMLElement {
-    return this._element.querySelectorAll('.Hm > img')[1];
+    return this._element.querySelectorAll<HTMLElement>('.Hm > img')[1];
   }
 
   getBottomBarTable(): HTMLElement {
@@ -1750,8 +1767,8 @@ class GmailComposeView {
     const element = this.getElement();
     const bodyElement = this.getMaybeBodyElement();
     const bodyContainer = find(element.children, (child) =>
-      child.contains(bodyElement)
-    );
+      child.contains(bodyElement!)
+    ) as HTMLElement | undefined;
 
     if (!bodyContainer) {
       if (!hasReportedMissingBody) {
@@ -1876,7 +1893,7 @@ class GmailComposeView {
       // Done asynchronously with setTimeout because if it's done synchronously
       // or after an asap step after an inline compose view's creation, Gmail
       // interprets the fake keypress and decides to add a '¾' character.
-      Kefir.later(0)
+      Kefir.later(0, undefined)
         .takeUntilBy(this._stopper)
         .onValue(() => {
           this._isTriggeringADraftSavePending = false;

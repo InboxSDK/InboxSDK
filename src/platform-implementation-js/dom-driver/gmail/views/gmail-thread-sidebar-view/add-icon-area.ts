@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { defn } from 'ud';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
@@ -42,14 +43,15 @@ const TAB_LIST_SELECTOR = '[role=tablist],.J-KU-Jg';
 function addIconArea(
   iconArea: HTMLElement,
   addonSidebarContainerEl: HTMLElement,
-  stopper: Kefir.Observable<any>
+  stopper: Kefir.Observable<any, any>
 ) {
   const nativeIconArea = addonSidebarContainerEl.firstElementChild;
   if (!nativeIconArea) return;
   const loadingHolderAsAny: any = nativeIconArea.firstElementChild;
   const loadingHolder = loadingHolderAsAny as HTMLElement | null | undefined;
   if (!loadingHolder) return;
-  const tabList = addonSidebarContainerEl.querySelector(TAB_LIST_SELECTOR);
+  const tabList =
+    addonSidebarContainerEl.querySelector<HTMLElement>(TAB_LIST_SELECTOR);
   if (!tabList) return;
   // emits when the loading div display style changes
   const loadingDivIsDisplayedStream = makeMutationObserverChunkedStream(
@@ -107,7 +109,11 @@ function addIconArea(
 
 // Gmail periodically clears the children of this element before it's
 // visible, so we fight back.
-function maintainIconArea(iconArea, tabList, stopper) {
+function maintainIconArea(
+  iconArea: Element,
+  tabList: HTMLElement,
+  stopper: any
+) {
   makeMutationObserverChunkedStream(tabList, {
     childList: true,
   })

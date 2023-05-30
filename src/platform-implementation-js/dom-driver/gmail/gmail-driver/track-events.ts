@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import Kefir from 'kefir';
 import { ComposeViewDriver } from '../../../driver-interfaces/compose-view-driver';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import type GmailDriver from '../gmail-driver';
+import GmailComposeView from '../views/gmail-compose-view';
 
 export default function trackEvents(gmailDriver: GmailDriver) {
   _setupComposeMonitoring(gmailDriver);
@@ -20,7 +22,7 @@ function _setupComposeMonitoring(gmailDriver: GmailDriver) {
 
 function _getLogFunction(
   gmailDriver: GmailDriver,
-  composeViewDriver: ComposeViewDriver
+  composeViewDriver: GmailComposeView
 ) {
   var logger = gmailDriver.getLogger();
   var composeStats = {
@@ -36,7 +38,7 @@ function _getLogFunction(
 type LogFunction = (eventName: string, extraOptions?: any) => void;
 
 function _monitorComposeSpecificEvents(
-  composeViewDriver: ComposeViewDriver,
+  composeViewDriver: GmailComposeView,
   logFunction: LogFunction
 ) {
   _monitorAttachmentButton(composeViewDriver, logFunction);
@@ -44,7 +46,7 @@ function _monitorComposeSpecificEvents(
 }
 
 function _monitorAttachmentButton(
-  composeViewDriver: ComposeViewDriver,
+  composeViewDriver: GmailComposeView,
   logFunction: LogFunction
 ) {
   var attachmentButton = composeViewDriver.getElement().querySelector('.a1');
@@ -59,7 +61,7 @@ function _monitorAttachmentButton(
 }
 
 function _monitorAttachmentAdded(
-  composeViewDriver: ComposeViewDriver,
+  composeViewDriver: GmailComposeView,
   logFunction: LogFunction
 ) {
   makeElementChildStream(document.body)
@@ -82,7 +84,7 @@ function _monitorAttachmentAdded(
 }
 
 function _monitorDriveButton(
-  composeViewDriver: ComposeViewDriver,
+  composeViewDriver: GmailComposeView,
   logFunction: LogFunction
 ) {
   var driveButton = composeViewDriver.getElement().querySelector('.aA7');
@@ -97,7 +99,7 @@ function _monitorDriveButton(
 }
 
 function _monitorDriveFileAdded(
-  composeViewDriver: ComposeViewDriver,
+  composeViewDriver: GmailComposeView,
   logFunction: LogFunction
 ) {
   var numberCurrentDriveChips = composeViewDriver

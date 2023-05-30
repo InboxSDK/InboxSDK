@@ -1,8 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import find from 'lodash/find';
 import zip from 'lodash/zip';
 import asap from 'asap';
 import assert from 'assert';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
 import get from '../../../../common/get-or-fail';
@@ -24,12 +25,12 @@ class GmailRowListView {
   _gmailDriver: GmailDriver;
   _routeViewDriver: GmailRouteView;
   _pendingExpansions: Map<string, number>;
-  _pendingExpansionsSignal: Bus<any>;
+  _pendingExpansionsSignal: Bus<any, unknown>;
   _toolbarView: GmailToolbarView | null | undefined;
   _threadRowViewDrivers: Set<GmailThreadRowView> = new Set();
-  _eventStreamBus: Bus<any>;
-  _rowViewDriverStream: Kefir.Observable<GmailThreadRowView>;
-  _stopper: Kefir.Observable<any>;
+  _eventStreamBus: Bus<any, unknown>;
+  _rowViewDriverStream!: Kefir.Observable<GmailThreadRowView, unknown>;
+  _stopper: Kefir.Observable<any, unknown>;
   _elementsToViews: Map<HTMLElement, GmailThreadRowView> = new Map();
   _selectionMutationObserver: MutationObserver;
   _selectedThreadRowViews: Set<GmailThreadRowView> = new Set();
@@ -129,11 +130,11 @@ class GmailRowListView {
     return this._threadRowViewDrivers;
   }
 
-  getRowViewDriverStream(): Kefir.Observable<GmailThreadRowView> {
+  getRowViewDriverStream() {
     return this._rowViewDriverStream;
   }
 
-  getEventStream(): Kefir.Observable<any> {
+  getEventStream() {
     return this._eventStreamBus;
   }
 
@@ -154,22 +155,22 @@ class GmailRowListView {
 
   _findToolbarElement() {
     /* multiple inbox extra section */
-    const firstTry = this._element.querySelector('[gh=mtb]');
+    const firstTry = this._element.querySelector<HTMLElement>('[gh=mtb]');
 
     if (firstTry) {
       return firstTry;
     }
 
     const el = find(
-      document.querySelectorAll('[gh=tm]'),
+      document.querySelectorAll<HTMLElement>('[gh=tm]'),
       (toolbarContainerElement) =>
-        toolbarContainerElement.parentElement.parentElement ===
+        toolbarContainerElement.parentElement!.parentElement ===
           (this._element as any).parentElement.parentElement.parentElement
             .parentElement.parentElement ||
-        toolbarContainerElement.parentElement.parentElement ===
+        toolbarContainerElement.parentElement!.parentElement ===
           this._element.parentElement
     );
-    return el ? el.querySelector('[gh=mtb]') : null;
+    return el ? el.querySelector<HTMLElement>('[gh=mtb]') : null;
   }
 
   // When a new table is added to a row list, if an existing table has had its
@@ -183,15 +184,15 @@ class GmailRowListView {
     const firstTableParent = newTableParent.parentElement.firstElementChild;
 
     if (firstTableParent !== newTableParent && firstTableParent) {
-      const firstCols = firstTableParent.querySelectorAll(
+      const firstCols = firstTableParent.querySelectorAll<HTMLElement>(
         'table.cf > colgroup > col'
       );
-      const newCols = newTableParent.querySelectorAll(
+      const newCols = newTableParent.querySelectorAll<HTMLElement>(
         'table.cf > colgroup > col'
       );
       assert.strictEqual(firstCols.length, newCols.length);
       zip(firstCols, newCols).forEach(([firstCol, newCol]) => {
-        newCol.style.width = firstCol.style.width;
+        newCol!.style.width = firstCol!.style.width;
       });
     }
   }
@@ -202,7 +203,7 @@ class GmailRowListView {
     if (!pendingWidth || width > pendingWidth) {
       this._pendingExpansions.set(colSelector, width);
 
-      this._pendingExpansionsSignal.emit();
+      this._pendingExpansionsSignal.emit(undefined);
     }
   }
 
@@ -242,9 +243,9 @@ class GmailRowListView {
 
   _startWatchingForRowViews() {
     const tableDivParents = Array.from(
-      this._element.querySelectorAll('div.Cp')
+      this._element.querySelectorAll<HTMLElement>('div.Cp')
     );
-    const elementStream: Kefir.Observable<ElementWithLifetime> = Kefir.merge(
+    const elementStream = Kefir.merge(
       tableDivParents.map(makeElementChildStream)
     ).flatMap((event) => {
       this._fixColumnWidths(event.el);
@@ -255,9 +256,9 @@ class GmailRowListView {
       // GmailThreadRowView().
       return makeElementChildStream(tbody)
         .takeUntilBy(event.removalStream)
-        .filter((rowEvent) => rowEvent.el.id);
+        .filter((rowEvent) => rowEvent.el.id as unknown as boolean);
     });
-    const laterStream = Kefir.later(2);
+    const laterStream = Kefir.later(2, undefined);
     this._rowViewDriverStream = elementStream
       .map((event) => {
         const element = event.el;

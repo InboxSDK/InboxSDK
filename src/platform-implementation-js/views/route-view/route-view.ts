@@ -51,7 +51,10 @@ class RouteView extends EventEmitter {
   }
 }
 
-function _bindToEventStream(routeViewDriver, routeView) {
+function _bindToEventStream(
+  routeViewDriver: MinRouteViewDriver,
+  routeView: RouteView
+) {
   routeViewDriver.getEventStream().onEnd(() => {
     routeView.destroyed = true;
     routeView.emit('destroy');

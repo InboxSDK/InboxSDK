@@ -6,9 +6,9 @@ export default function parseParamsFromRouteID(
   const params: Record<string, string> = Object.create(null) as any;
   zip(routeID.split('/'), hash.split('/')).forEach(
     ([routePart, hashPart], i) => {
-      if (routePart[0] === ':') {
-        params[routePart.slice(1)] = decodeURIComponent(
-          hashPart.replace(/\+/g, ' ')
+      if (routePart![0] === ':') {
+        params[routePart!.slice(1)] = decodeURIComponent(
+          hashPart!.replace(/\+/g, ' ')
         );
       }
     }

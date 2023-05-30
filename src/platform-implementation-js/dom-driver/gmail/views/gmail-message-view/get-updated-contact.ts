@@ -1,6 +1,8 @@
+/* eslint-disable prefer-const */
 import Logger from '../../../../lib/logger';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import extractContactFromEmailContactString from '../../../../lib/extract-contact-from-email-contact-string';
+import type { Contact } from '../../../../../inboxsdk';
 const cache: Record<
   string,
   | {
@@ -24,10 +26,12 @@ export default function getUpdatedContact(
     }
   }
 
-  const menuElement = element.querySelector('.ajA.SK');
+  const menuElement = element.querySelector<HTMLElement>('.ajA.SK');
   const isMenuElementHidden =
     menuElement && menuElement.style.visibility === 'hidden';
-  const menuButtonElement = element.querySelector('.ajy[aria-haspopup=true]');
+  const menuButtonElement = element.querySelector<HTMLElement>(
+    '.ajy[aria-haspopup=true]'
+  );
 
   if (menuButtonElement && isMenuElementHidden) {
     //the modal that contains this email address is not visible, so we need to bring the modal up
@@ -35,12 +39,12 @@ export default function getUpdatedContact(
       event.stopPropagation();
     };
 
-    const modifyFocusEvent = (event) => {
+    const modifyFocusEvent = (event: any) => {
       event.shouldIgnore = true;
     };
 
     element.addEventListener('click', block);
-    (document as any).addEventListener('focus', modifyFocusEvent, true);
+    document.addEventListener('focus', modifyFocusEvent, true);
     simulateClick(menuButtonElement);
 
     try {
@@ -50,7 +54,7 @@ export default function getUpdatedContact(
     } finally {
       simulateClick(menuButtonElement);
       element.removeEventListener('click', block);
-      (document as any).removeEventListener('focus', modifyFocusEvent, true);
+      document.removeEventListener('focus', modifyFocusEvent, true);
     }
 
     cacheEntry = cache[headerContact.emailAddress];
@@ -63,7 +67,7 @@ export default function getUpdatedContact(
   return headerContact;
 }
 
-function updateContactCacheFromModal(headerContact) {
+function updateContactCacheFromModal(headerContact: Contact) {
   const spans = document.querySelectorAll('.ajC [email]');
 
   for (let ii = 0; ii < spans.length; ii++) {
@@ -73,7 +77,7 @@ function updateContactCacheFromModal(headerContact) {
     if (cache[emailAddress]) continue;
     let modalContact: Contact = {
       emailAddress,
-      name: null,
+      name: null!,
     };
     let name = span.getAttribute('name');
 
@@ -81,7 +85,7 @@ function updateContactCacheFromModal(headerContact) {
       modalContact.name = name;
     } else {
       const stringContact = extractContactFromEmailContactString(
-        span.textContent
+        span.textContent!
       );
 
       if (emailAddress === stringContact.emailAddress) {

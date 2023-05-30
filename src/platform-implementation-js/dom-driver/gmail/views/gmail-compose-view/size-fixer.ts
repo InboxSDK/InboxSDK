@@ -64,7 +64,7 @@ export default function sizeFixer(
       SELECTOR_ESCAPE_HATCH_PREFIX + byId(composeId) + ' ' + selector;
     const ix = findIndex(
       sheet.cssRules,
-      (cssRule) => cssRule.selectorText === fullSelector
+      (cssRule) => (cssRule as any).selectorText === fullSelector
     );
 
     if (ix !== -1) {
@@ -115,7 +115,7 @@ export default function sizeFixer(
        * this way we still can override height values of scrollBody,
        * but recalculate them based on actual height of an inner child
        */
-      const scrollBodyInner = scrollBody.querySelector('.qz');
+      const scrollBodyInner = scrollBody.querySelector<HTMLElement>('.qz');
       const height = scrollBodyInner?.offsetHeight || scrollBody.offsetHeight;
       const maxHeight = parseInt(
         scrollBody.style.getPropertyValue('max-height'),
@@ -138,7 +138,7 @@ export default function sizeFixer(
         // NOTE: max-height and min-height in full screen are same
         scrollBodyCssRules.push(`min-height: ${newMaxHeight}px !important;`);
         const maybeBodyMinHeight =
-          parseInt(maybeBody?.style.minHeight, 10) || maxHeight;
+          parseInt(maybeBody?.style.minHeight ?? '', 10) || maxHeight;
         const maybeBodyNewMinHeight = maybeBodyMinHeight - unexpectedHeight;
         maybeBodyCssRules = `min-height: ${maybeBodyNewMinHeight}px !important;`;
       }

@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-empty-function */
 import SafeEventEmitter from './lib/safe-event-emitter';
 import { BUILD_VERSION } from '../common/version';
 import get from '../common/get-or-fail';
@@ -80,7 +82,7 @@ export class PlatformImplementation extends SafeEventEmitter {
       (this as any)._members = members;
     }
 
-    const membrane = new Membrane([
+    const membrane: Membrane = new Membrane([
       [
         GmailComposeView,
         (viewDriver) => new ComposeView(driver, viewDriver, membrane),
@@ -155,7 +157,7 @@ export type EnvData = {
 // returns a promise for the PlatformImplementation object
 export function makePlatformImplementation(
   appId: string,
-  _opts: Record<string, any>,
+  _opts: Partial<PiOpts>,
   envData: EnvData
 ): Promise<PlatformImplementation> {
   if (typeof appId !== 'string') {
@@ -168,7 +170,7 @@ export function makePlatformImplementation(
     eventTracking: true,
     inboxBeta: false,
     ..._opts,
-  };
+  } as PiOpts;
   opts.REQUESTED_API_VERSION = +opts.REQUESTED_API_VERSION;
 
   switch (opts.REQUESTED_API_VERSION) {
@@ -227,7 +229,8 @@ https://www.inboxsdk.com/docs/#RequiredSetup
     logger.eventSdkPassive('instantiate');
     const pi = new PlatformImplementation(driver, appId, opts);
 
-    if (origin === 'https://inbox.google.com' && !opts.inboxBeta) {
+    // TODO: drop. This condition isn't possible.
+    if (origin === ('https://inbox.google.com' as any) && !opts.inboxBeta) {
       console.log('InboxSDK: Unsupported origin', origin);
 
       if (!loadedAppIds.has(appId)) {

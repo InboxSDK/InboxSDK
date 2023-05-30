@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import escape from 'lodash/escape';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
 import defer from '../../../../common/defer';
@@ -26,7 +27,7 @@ class GmailCollapsibleSectionView {
   _collapsedContainer: HTMLElement | null | undefined = null;
   _messageElement: HTMLElement | null | undefined = null;
   _footerElement: HTMLElement | null | undefined = null;
-  _eventStream: Bus<any>;
+  _eventStream: Bus<any, unknown>;
   _isCollapsed: boolean = false;
   _inboxDropdownButtonView: Record<string, any> | null | undefined = null;
   _dropdownViewController: Record<string, any> | null | undefined = null;
@@ -42,7 +43,7 @@ class GmailCollapsibleSectionView {
     this._groupOrderHint = groupOrderHint;
     this._isCollapsible = isCollapsible;
     this._eventStream = kefirBus();
-    this._isReadyDeferred = new defer();
+    this._isReadyDeferred = new (defer as any)();
   }
 
   destroy() {
@@ -66,13 +67,14 @@ class GmailCollapsibleSectionView {
     return element;
   }
 
-  getEventStream(): Kefir.Observable<any> {
+  getEventStream() {
     return this._eventStream;
   }
 
   setCollapsibleSectionDescriptorProperty(
     collapsibleSectionDescriptorProperty: Kefir.Observable<
-      Record<string, any> | null | undefined
+      Record<string, any> | null | undefined,
+      unknown
     >
   ) {
     const stoppedProperty = collapsibleSectionDescriptorProperty.takeUntilBy(
@@ -793,7 +795,7 @@ function _getTableHTML() {
   ].join('');
 }
 
-function _getRowHTML(result) {
+function _getRowHTML(result: Record<string, any>) {
   let iconHtml = '';
 
   if (result.iconHtml != null) {
@@ -851,7 +853,7 @@ function _getRowHTML(result) {
   return rowArr.join('');
 }
 
-function _getLabelHTML(label) {
+function _getLabelHTML(label: Record<string, any>) {
   const backgroundColor = label.backgroundColor || 'rgb(194, 194, 194)'; //grey
 
   const foregroundColor = label.foregroundColor || 'rgb(255, 255, 255)'; //white

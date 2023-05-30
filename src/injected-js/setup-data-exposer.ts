@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import find from 'lodash/find';
 import * as logger from './injected-logger';
 import waitFor from '../platform-implementation-js/lib/wait-for';
@@ -24,7 +25,7 @@ function getSettingValue(settings: any[], name: string): boolean {
 }
 
 function getContext() {
-  let context = global;
+  let context = global as any;
 
   try {
     // our current tab has globals defined
@@ -45,7 +46,7 @@ function getContext() {
 }
 
 export default function setupDataExposer() {
-  let context;
+  let context: any;
   waitFor(() => {
     context = getContext();
     return context && (context.GLOBALS || context.gbar);
@@ -114,11 +115,11 @@ export default function setupDataExposer() {
         // Inbox
         const preloadDataSearchString = 'window.BT_EmbeddedAppData=[';
         const preloadScript = find(
-          document.querySelectorAll('script:not([src])'),
+          document.querySelectorAll<HTMLScriptElement>('script:not([src])'),
           (script) =>
             script.text &&
             script.text.slice(0, 500).indexOf(preloadDataSearchString) > -1
-        );
+        ) as HTMLScriptElement | undefined;
 
         if (!preloadScript) {
           logger.error(

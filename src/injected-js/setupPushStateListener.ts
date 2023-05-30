@@ -1,7 +1,7 @@
 export default function setupPushStateListener() {
   const origPushState = history.pushState;
 
-  (history as any).pushState = function (...args) {
+  history.pushState = function (...args) {
     const ret = origPushState.apply(this, args);
     document.dispatchEvent(
       new CustomEvent('inboxSDKpushState', {

@@ -1,5 +1,5 @@
 import last from 'lodash/last';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import streamWaitFor from '../../../lib/stream-wait-for';
@@ -102,8 +102,8 @@ class GmailMoleViewDriver {
   }
 
   show() {
-    const doShow = (moleParent) => {
-      moleParent.insertBefore(this._element, last(moleParent.children));
+    const doShow = (moleParent: HTMLElement) => {
+      moleParent.insertBefore(this._element, last(moleParent.children)!);
       const dw = findParent(
         moleParent,
         (el) => el.nodeName === 'DIV' && el.classList.contains('dw')
@@ -161,7 +161,7 @@ class GmailMoleViewDriver {
       const moleParent = this._element.parentElement;
 
       if (moleParent && this._element.getBoundingClientRect().left < 0) {
-        moleParent.insertBefore(this._element, last(moleParent.children));
+        moleParent.insertBefore(this._element, last(moleParent.children)!);
       }
 
       this._eventStream.emit({
@@ -208,7 +208,7 @@ class GmailMoleViewDriver {
     }
   }
 
-  getEventStream(): Kefir.Observable<Record<string, any>> {
+  getEventStream() {
     return this._eventStream;
   }
 

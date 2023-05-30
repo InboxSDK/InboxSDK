@@ -33,7 +33,7 @@ export default class WidthManager {
     }
 
     const noIconsVisible = ![...tabList.children].some(
-      (child) => child.style.display !== 'none'
+      (child) => (child as HTMLElement).style.display !== 'none'
     );
     if (noIconsVisible)
       this._contentContainerEl.classList.add(

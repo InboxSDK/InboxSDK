@@ -1,22 +1,23 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as ud from 'ud';
 import Kefir from 'kefir';
 var insertHTMLatCursor = ud.defn(
   module,
   function insertHTMLatCursor(
     element: HTMLElement,
-    html: string,
+    html: any,
     oldRange: Record<string, any> | null | undefined
   ): HTMLElement | null | undefined {
     element.focus();
 
     if (element instanceof HTMLTextAreaElement) {
-      var oldStart = (element as any).selectionStart;
+      var oldStart = element.selectionStart;
 
       // first delete selected range
-      if ((element as any).selectionStart < (element as any).selectionEnd) {
+      if (element.selectionStart < element.selectionEnd) {
         element.value =
-          element.value.substring(0, (element as any).selectionStart) +
-          element.value.substring((element as any).selectionEnd);
+          element.value.substring(0, element.selectionStart) +
+          element.value.substring(element.selectionEnd);
       }
 
       // insert into position
@@ -25,14 +26,17 @@ var insertHTMLatCursor = ud.defn(
         html +
         element.value.substring(oldStart);
       // set caret
-      (element as any).selectionStart = oldStart + html.length;
-      (element as any).selectionEnd = oldStart + html.length;
+      element.selectionStart = oldStart + html.length;
+      element.selectionEnd = oldStart + html.length;
     } else {
       var editable = null;
 
       if ((element as any).getSelection) {
         editable = element;
-      } else if (element.ownerDocument && element.ownerDocument.getSelection) {
+      } else if (
+        element.ownerDocument &&
+        (element.ownerDocument.getSelection as any)
+      ) {
         editable = element.ownerDocument;
       }
 

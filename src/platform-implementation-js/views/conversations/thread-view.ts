@@ -8,10 +8,15 @@ import ContentPanelView from '../content-panel-view';
 import get from '../../../common/get-or-fail';
 import type MessageView from './message-view';
 import type { Driver, ThreadViewDriver } from '../../driver-interfaces/driver';
-import type CustomMessageView, {
-  CustomMessageDescriptor,
-} from '../../views/conversations/custom-message-view';
-const memberMap = defonce(module, () => new WeakMap()); // documented in src/docs/
+import type CustomMessageView from '../../views/conversations/custom-message-view';
+interface Members {
+  threadViewImplementation: ThreadViewDriver;
+  appId: string;
+  driver: Driver;
+  membrane: Membrane;
+}
+
+const memberMap = defonce(module, () => new WeakMap<ThreadView, Members>()); // documented in src/docs/
 
 class ThreadView extends EventEmitter {
   destroyed: boolean = false;
@@ -127,7 +132,10 @@ class ThreadView extends EventEmitter {
 
 export default ThreadView;
 
-function _bindToStreamEvents(threadView, threadViewImplementation) {
+function _bindToStreamEvents(
+  threadView: ThreadView,
+  threadViewImplementation: ThreadViewDriver
+) {
   threadViewImplementation.getEventStream().onEnd(function () {
     threadView.destroyed = true;
     threadView.emit('destroy');

@@ -1,6 +1,7 @@
-import Kefir from 'kefir';
+import type * as Kefir from 'kefir';
 import type { AttachmentCardViewDriver } from './driver';
 import SafeEventEmitter from '../lib/safe-event-emitter';
+import { Contact } from '../../inboxsdk';
 export type VIEW_STATE = 'HIDDEN' | 'COLLAPSED' | 'EXPANDED';
 export type MessageViewLinkDescriptor = {
   text: string;
@@ -28,11 +29,11 @@ export type MessageViewDriver = {
   getAttachmentCardViewDrivers(): Array<AttachmentCardViewDriver>;
   addAttachmentCard(options: Record<string, any>): AttachmentCardViewDriver;
   addButtonToDownloadAllArea(options: Record<string, any>): void;
-  getEventStream(): Kefir.Observable<Record<string, any>>;
+  getEventStream(): Kefir.Observable<Record<string, any>, unknown>;
   getViewState(): VIEW_STATE;
   getDateString(): string;
   getSender(): Contact;
-  getReadyStream(): Kefir.Observable<any>;
+  getReadyStream(): Kefir.Observable<any, unknown>;
   getRecipients(): Array<Contact>;
   getRecipientEmailAddresses(): Array<string>;
   getRecipientsFull(): Promise<Array<Contact>>;

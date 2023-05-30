@@ -1,7 +1,7 @@
 import find from 'lodash/find';
 import uniqBy from 'lodash/uniqBy';
-import { Contact } from '../../../driver-interfaces/compose-view-driver';
 import { Driver } from '../../../driver-interfaces/driver';
+import { Contact } from '../../../../inboxsdk';
 
 export default class UserInfo {
   _failedWaitFor: boolean;
@@ -30,7 +30,7 @@ export default class UserInfo {
     return this._userEmail;
   }
 
-  // deprecated
+  /* @deprecated */
   getAccountSwitcherContactList(): Contact[] {
     const main: Contact[] = Array.from(
       document.querySelectorAll<HTMLElement>(
@@ -59,7 +59,7 @@ export default class UserInfo {
         throw new Error('Failed to match');
       }
       return {
-        name: el.children[0].textContent,
+        name: el.children[0].textContent!,
         emailAddress: match[0],
       };
     });

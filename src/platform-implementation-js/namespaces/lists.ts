@@ -3,7 +3,13 @@ import HandlerRegistry from '../lib/handler-registry';
 import ThreadRowView from '../views/thread-row-view';
 import type Membrane from '../lib/Membrane';
 import type { Driver } from '../driver-interfaces/driver';
-const memberMap = new WeakMap(); // documented in src/docs/
+interface Members {
+  driver: Driver;
+  membrane: Membrane;
+  threadRowViewRegistry: HandlerRegistry<ThreadRowView>;
+}
+
+const memberMap = new WeakMap<Lists, Members>(); // documented in src/docs/
 
 export default class Lists {
   ActionButtonTypes = ActionButtonTypes;
@@ -13,7 +19,7 @@ export default class Lists {
       appId,
       driver,
       membrane,
-      threadRowViewRegistry: new HandlerRegistry(),
+      threadRowViewRegistry: new HandlerRegistry<ThreadRowView>(),
     };
     memberMap.set(this, members);
     driver.getStopper().onValue(() => {

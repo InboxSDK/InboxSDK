@@ -96,7 +96,7 @@ class GmailLabelView {
       return;
     }
 
-    const childEl = this._element.querySelector('.av');
+    const childEl = this._element.querySelector<HTMLElement>('.av');
 
     if (childEl) {
       childEl.style.maxWidth = maxWidth;
@@ -123,7 +123,9 @@ class GmailLabelView {
   }
 
   _updateIconBackgroundColor(iconBackgroundColor: string | null | undefined) {
-    const icon = this.getElement().querySelector('.inboxsdk__button_icon');
+    const icon = this.getElement().querySelector<HTMLElement>(
+      '.inboxsdk__button_icon'
+    );
 
     if (icon) {
       icon.style.backgroundColor = iconBackgroundColor || '';

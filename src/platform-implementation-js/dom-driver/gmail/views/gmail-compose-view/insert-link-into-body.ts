@@ -9,7 +9,11 @@ export default function insertLinkIntoBody(
   return _insertLinkIntoBody(gmailComposeView, text, href);
 }
 
-function _insertLinkIntoBody(gmailComposeView, text, href) {
+function _insertLinkIntoBody(
+  gmailComposeView: GmailComposeView,
+  text: string,
+  href: string
+) {
   gmailComposeView.focus();
   gmailComposeView.getBodyElement().focus();
   const selection = document.getSelection();

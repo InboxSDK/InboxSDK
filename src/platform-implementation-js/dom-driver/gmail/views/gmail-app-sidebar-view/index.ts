@@ -1,11 +1,11 @@
 import udKefir from 'ud-kefir';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import GmailAppSidebarPrimary from './primary';
 import ContentPanelViewDriver from '../../../../driver-common/sidebar/ContentPanelViewDriver';
 import type GmailDriver from '../../gmail-driver';
 import type GmailThreadView from '../gmail-thread-view';
-const updates: Kefir.Observable<null> = udKefir(module, null);
+const updates = udKefir(module, null);
 
 class GmailAppSidebarView {
   _stopper = kefirStopper();
@@ -52,7 +52,7 @@ class GmailAppSidebarView {
     this._stopper.destroy();
   }
 
-  getStopper(): Kefir.Observable<any> {
+  getStopper() {
     return this._stopper;
   }
 
@@ -98,7 +98,7 @@ class GmailAppSidebarView {
   }
 
   addThreadSidebarContentPanel(
-    descriptor: Kefir.Observable<Record<string, any>>,
+    descriptor: Kefir.Observable<Record<string, any>, unknown>,
     threadView: GmailThreadView
   ) {
     const panel = new ContentPanelViewDriver(
@@ -114,7 +114,7 @@ class GmailAppSidebarView {
   }
 
   addGlobalSidebarContentPanel(
-    descriptor: Kefir.Observable<Record<string, any>>
+    descriptor: Kefir.Observable<Record<string, any>, unknown>
   ) {
     const panel = new ContentPanelViewDriver(
       this._driver,

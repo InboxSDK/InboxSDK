@@ -1,6 +1,7 @@
 import EventEmitter from '../lib/safe-event-emitter';
 import type GmailThreadRowView from '../dom-driver/gmail/views/gmail-thread-row-view';
 import get from '../../common/get-or-fail';
+import { Contact } from '../../inboxsdk';
 const membersMap = new WeakMap(); // documented in src/docs/
 
 export default class ThreadRowView extends EventEmitter {

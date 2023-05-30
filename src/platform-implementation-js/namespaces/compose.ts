@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as ud from 'ud';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import get from '../../common/get-or-fail';
 import ComposeView from '../views/compose-view';
 import HandlerRegistry from '../lib/handler-registry';
@@ -7,7 +8,13 @@ import type Membrane from '../lib/Membrane';
 import type { PiOpts } from '../platform-implementation';
 import type { Handler } from '../lib/handler-registry';
 import type { Driver } from '../driver-interfaces/driver';
-const memberMap = ud.defonce(module, () => new WeakMap());
+interface Members {
+  driver: Driver;
+  membrane: Membrane;
+  handlerRegistry: HandlerRegistry<ComposeView>;
+  composeViewStream: Kefir.Stream<ComposeView, unknown>;
+}
+const memberMap = ud.defonce(module, () => new WeakMap<Compose, Members>());
 const SAMPLE_RATE = 0.01; // documented in src/docs/
 
 class Compose {
@@ -15,7 +22,7 @@ class Compose {
     const members = {
       driver,
       membrane,
-      handlerRegistry: new HandlerRegistry(),
+      handlerRegistry: new HandlerRegistry<ComposeView>(),
       composeViewStream: driver
         .getComposeViewDriverStream()
         .map((viewDriver) => membrane.get(viewDriver) as ComposeView),

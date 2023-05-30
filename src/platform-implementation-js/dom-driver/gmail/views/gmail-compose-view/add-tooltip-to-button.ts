@@ -1,16 +1,17 @@
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import Logger from '../../../../lib/logger';
 import GmailTooltipView from '../../widgets/gmail-tooltip-view';
 import type GmailComposeView from '../gmail-compose-view';
 import type { TooltipDescriptor } from '../../../../views/compose-button-view';
+import BasicButtonViewController from '../../../../widgets/buttons/basic-button-view-controller';
 export default function addTooltipToButton(
   gmailComposeView: GmailComposeView,
-  buttonViewController: Record<string, any>,
+  buttonViewController: BasicButtonViewController,
   buttonDescriptor: Record<string, any>,
   tooltipDescriptor: TooltipDescriptor
 ): GmailTooltipView {
   var gmailTooltipView = new GmailTooltipView(tooltipDescriptor);
-  var tooltipStopperStream: Kefir.Observable<any> = gmailTooltipView
+  var tooltipStopperStream: Kefir.Observable<any, unknown> = gmailTooltipView
     .getStopper()
     .merge(gmailComposeView.getStopper());
   gmailComposeView
@@ -59,8 +60,9 @@ export default function addTooltipToButton(
       return event.eventName === 'click';
     })
     .onValue(gmailTooltipView.destroy.bind(gmailTooltipView));
-  var stoppedIntervalStream =
-    Kefir.interval(50).takeUntilBy(tooltipStopperStream);
+  var stoppedIntervalStream = Kefir.interval(50, undefined).takeUntilBy(
+    tooltipStopperStream
+  );
   var left = 0;
   var top = 0;
   stoppedIntervalStream
@@ -96,10 +98,10 @@ export default function addTooltipToButton(
 }
 
 function _anchorTooltip(
-  gmailTooltipView,
-  gmailComposeView,
-  buttonViewController,
-  buttonDescriptor
+  gmailTooltipView: GmailTooltipView,
+  gmailComposeView: GmailComposeView,
+  buttonViewController: BasicButtonViewController,
+  buttonDescriptor: any
 ) {
   try {
     gmailComposeView.ensureGroupingIsOpen(buttonDescriptor.type);

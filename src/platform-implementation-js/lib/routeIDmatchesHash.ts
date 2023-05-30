@@ -12,5 +12,8 @@ export default function routeIDmatchesHash(
   hash: string
 ): string | null | undefined {
   const routeIDs = Array.isArray(routeID) ? routeID : [routeID];
-  return find(routeIDs, (routeID) => hash.match(routeIDtoRegExp(routeID)));
+  return find(routeIDs, (routeID) => hash.match(routeIDtoRegExp(routeID))) as
+    | string
+    | null
+    | undefined;
 }

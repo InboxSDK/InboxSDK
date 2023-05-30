@@ -1,12 +1,12 @@
-import type Kefir from 'kefir';
+import type * as Kefir from 'kefir';
 import type GmailCollapsibleSectionView from '../dom-driver/gmail/views/gmail-collapsible-section-view';
 // The necessary interface that Router and RouteView expect.
 export type MinRouteViewDriver = {
   getRouteType(): string;
   getRouteID(): string;
   getParams(): Record<string, string>;
-  getEventStream(): Kefir.Observable<Record<string, any>>;
-  getStopper(): Kefir.Observable<any>;
+  getEventStream(): Kefir.Observable<Record<string, any>, unknown>;
+  getStopper(): Kefir.Observable<any, unknown>;
 };
 // The necessary interface that ListRouteView and CustomRouteView expect.
 export type RouteViewDriver = MinRouteViewDriver & {
@@ -15,13 +15,15 @@ export type RouteViewDriver = MinRouteViewDriver & {
   getHash(): string;
   addSection(
     sectionDescriptorProperty: Kefir.Observable<
-      Record<string, any> | null | undefined
+      Record<string, any> | null | undefined,
+      unknown
     >,
     groupOrderHint: any
   ): GmailCollapsibleSectionView;
   addCollapsibleSection(
     sectionDescriptorProperty: Kefir.Observable<
-      Record<string, any> | null | undefined
+      Record<string, any> | null | undefined,
+      unknown
     >,
     groupOrderHint: any
   ): GmailCollapsibleSectionView;

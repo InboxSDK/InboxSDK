@@ -1,10 +1,10 @@
-import { Contact } from '../driver-interfaces/compose-view-driver';
+import { Contact } from '../../inboxsdk';
 import isValidEmail from './is-valid-email';
 
 export default function extractContactFromEmailContactString(
   contactInfoString: string
 ): Contact {
-  let name = null;
+  let name: string = null!;
   let emailAddress = null;
 
   const contactInfoParts = contactInfoString.split('<');

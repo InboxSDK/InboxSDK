@@ -2,7 +2,7 @@ import constant from 'lodash/constant';
 import asap from 'asap';
 import delay from 'pdelay';
 import util from 'util';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import { parse } from 'querystring';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
@@ -29,14 +29,14 @@ class GmailThreadView {
   _routeViewDriver: any;
   _driver: GmailDriver;
   _isPreviewedThread: boolean;
-  _eventStream: Bus<any>;
+  _eventStream: Bus<any, unknown>;
   _stopper = kefirStopper();
   _threadSidebar: GmailThreadSidebarView | null | undefined = null;
   _widthManager: WidthManager | null | undefined = null;
   _toolbarView: any;
   _messageViewDrivers: any[];
   _newMessageMutationObserver: MutationObserver | null | undefined;
-  _readyStream: Kefir.Observable<any>;
+  _readyStream: Kefir.Observable<any, unknown>;
   _threadID: string | null | undefined;
   _syncThreadID: string | null | undefined;
   _customMessageViews: Set<CustomMessageView> = new Set();
@@ -124,7 +124,7 @@ class GmailThreadView {
   }
 
   // TODO use livesets eventually
-  getMessageViewDriverStream(): Kefir.Observable<GmailMessageView> {
+  getMessageViewDriverStream(): Kefir.Observable<GmailMessageView, unknown> {
     return Kefir.constant(this._messageViewDrivers)
       .flatten()
       .merge(
@@ -134,7 +134,7 @@ class GmailThreadView {
               event.type === 'internal' && event.eventName === 'messageCreated'
           )
           .map((event) => event.view)
-      );
+      ) as any;
   }
 
   isLoadingStub() {
@@ -145,7 +145,7 @@ class GmailThreadView {
     return this._stopper;
   }
 
-  getEventStream(): Kefir.Observable<Record<string, any>> {
+  getEventStream(): Kefir.Observable<Record<string, any>, unknown> {
     return this._eventStream;
   }
 
@@ -192,7 +192,9 @@ class GmailThreadView {
     }
   }
 
-  addSidebarContentPanel(descriptor: Kefir.Observable<Record<string, any>>) {
+  addSidebarContentPanel(
+    descriptor: Kefir.Observable<Record<string, any>, unknown>
+  ) {
     const sidebar = this._driver.getGlobalSidebar();
 
     return sidebar.addThreadSidebarContentPanel(descriptor, this);
@@ -253,12 +255,12 @@ class GmailThreadView {
   }
 
   addCustomMessage(
-    descriptorStream: Kefir.Observable<CustomMessageDescriptor>
+    descriptorStream: Kefir.Observable<CustomMessageDescriptor, unknown>
   ): CustomMessageView {
     const parentElement = this._element.parentElement;
     if (!parentElement) throw new Error('missing parent element');
     const customMessageView = new CustomMessageView(descriptorStream, () => {
-      this._readyStream.onValue(async (): any => {
+      this._readyStream.onValue(async () => {
         const messageContainer = this._element.querySelector('[role=list]');
 
         if (!messageContainer) return;
@@ -351,14 +353,15 @@ class GmailThreadView {
       .classList.add('inboxsdk__custom_message_view_hidden');
 
     // get the message element that contains the hidden messages notice
-    let hiddenNoticeMessageElement = this._element.querySelector('.adv');
+    let hiddenNoticeMessageElement =
+      this._element.querySelector<HTMLElement>('.adv');
 
     let nativeHiddenNoticePresent = true;
 
     if (!hiddenNoticeMessageElement) {
       nativeHiddenNoticePresent = false;
       const superCollapsedMessageElements = Array.from(
-        this._element.querySelectorAll('.kQ')
+        this._element.querySelectorAll<HTMLElement>('.kQ')
       );
       if (superCollapsedMessageElements.length < 2) return;
       hiddenNoticeMessageElement = superCollapsedMessageElements[1];
@@ -377,7 +380,7 @@ class GmailThreadView {
       )
       .filter(
         () =>
-          hiddenNoticeMessageElement &&
+          hiddenNoticeMessageElement != null &&
           !hiddenNoticeMessageElement.classList.contains('kQ')
       ) //when kQ is gone, message is visible
       .onValue(() => {
@@ -501,7 +504,7 @@ class GmailThreadView {
         .join('');
     }
 
-    return subjectElement.textContent;
+    return subjectElement.textContent!;
   }
 
   getInternalID(): string {
@@ -667,11 +670,14 @@ class GmailThreadView {
   }
 
   _findToolbarElement(): HTMLElement | null | undefined {
-    var toolbarContainerElements = document.querySelectorAll('[gh=tm]');
+    var toolbarContainerElements =
+      document.querySelectorAll<HTMLElement>('[gh=tm]');
 
     for (var ii = 0; ii < toolbarContainerElements.length; ii++) {
       if (this._isToolbarContainerRelevant(toolbarContainerElements[ii])) {
-        return toolbarContainerElements[ii].querySelector('[gh=mtb]');
+        return toolbarContainerElements[ii].querySelector<HTMLElement>(
+          '[gh=mtb]'
+        );
       }
     }
 
@@ -759,7 +765,7 @@ class GmailThreadView {
   _observeNewMessages(messageContainer: any) {
     this._newMessageMutationObserver = new MutationObserver(
       this._handleNewMessageMutations.bind(this)
-    ) as any;
+    );
 
     this._newMessageMutationObserver.observe(messageContainer, {
       childList: true,
@@ -832,7 +838,9 @@ class GmailThreadView {
           : null,
         self: container.style.display === 'none',
         children: Array.from(container.children).map((el) =>
-          el.style ? el.style.display === 'none' : null
+          (el as HTMLElement).style
+            ? (el as HTMLElement).style.display === 'none'
+            : null
         ),
       };
       const rect = container.getBoundingClientRect();
@@ -847,7 +855,7 @@ class GmailThreadView {
     }
 
     const eventData = {
-      time: {},
+      time: {} as any,
     };
     eventData.time[0] = readInfo();
     await Promise.all(
@@ -868,7 +876,8 @@ class GmailThreadView {
 
   _listenToExpandCollapseAll() {
     //expand all
-    const expandAllElementImg = this._element.querySelector('img.gx');
+    const expandAllElementImg =
+      this._element.querySelector<HTMLElement>('img.gx');
 
     if (expandAllElementImg) {
       const expandAllElement = findParent(
@@ -879,7 +888,10 @@ class GmailThreadView {
       if (expandAllElement) {
         Kefir.merge([
           Kefir.fromEvents(expandAllElement, 'click'),
-          Kefir.fromEvents(expandAllElement, 'keydown').filter(
+          Kefir.fromEvents<KeyboardEvent, unknown>(
+            expandAllElement,
+            'keydown'
+          ).filter(
             (e) => e.which === 13
             /* enter */
           ),
@@ -894,7 +906,8 @@ class GmailThreadView {
     }
 
     //collapse all
-    const collapseAllElementImg = this._element.querySelector('img.gq');
+    const collapseAllElementImg =
+      this._element.querySelector<HTMLElement>('img.gq');
 
     if (collapseAllElementImg) {
       const collapseAllElement = findParent(
@@ -905,7 +918,10 @@ class GmailThreadView {
       if (collapseAllElement) {
         Kefir.merge([
           Kefir.fromEvents(collapseAllElement, 'click'),
-          Kefir.fromEvents(collapseAllElement, 'keydown').filter(
+          Kefir.fromEvents<KeyboardEvent, unknown>(
+            collapseAllElement,
+            'keydown'
+          ).filter(
             (e) => e.which === 13
             /* enter */
           ),

@@ -2,7 +2,7 @@ import sortBy from 'lodash/sortBy';
 import once from 'lodash/once';
 import autoHtml from 'auto-html';
 import asap from 'asap';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
@@ -28,18 +28,19 @@ import type {
   MessageViewDriver,
   VIEW_STATE,
 } from '../../../driver-interfaces/message-view-driver';
+import { Contact } from '../../../../inboxsdk';
 let hasSeenOldElement = false;
 
 class GmailMessageView {
   _element: HTMLElement;
-  _driver: GmailDriver;
-  _eventStream: Bus<any> = kefirBus();
+  _driver!: GmailDriver;
+  _eventStream: Bus<any, unknown> = kefirBus();
   _stopper = kefirStopper();
   _threadViewDriver: GmailThreadView;
   _moreMenuItemDescriptors: Array<Record<string, any>>;
   _moreMenuAddedElements: Array<HTMLElement>;
-  _replyElementStream: Kefir.Observable<ElementWithLifetime>;
-  _readyStream: Kefir.Observable<null>;
+  _replyElementStream: Kefir.Observable<ElementWithLifetime, unknown>;
+  _readyStream: Kefir.Observable<null, unknown>;
   _replyElement: HTMLElement | null | undefined;
   _gmailAttachmentAreaView: GmailAttachmentAreaView | null | undefined;
   _messageLoaded: boolean = false;
@@ -145,11 +146,11 @@ class GmailMessageView {
     });
   }
 
-  getEventStream(): Kefir.Observable<Record<string, any>> {
+  getEventStream() {
     return this._eventStream;
   }
 
-  getReplyElementStream(): Kefir.Observable<ElementWithLifetime> {
+  getReplyElementStream() {
     return this._replyElementStream;
   }
 
@@ -191,7 +192,7 @@ class GmailMessageView {
     const emailAddress = senderSpan.getAttribute('email');
     if (!emailAddress) throw new Error('Could not find email address');
     sender = this._sender = {
-      name: senderSpan.getAttribute('name'),
+      name: senderSpan.getAttribute('name')!,
       emailAddress,
     };
     return sender;
@@ -205,7 +206,7 @@ class GmailMessageView {
     );
     recipients = this._recipients = receipientSpans.map((span) => {
       return this._getUpdatedContact({
-        name: span.getAttribute('name'),
+        name: span.getAttribute('name')!,
         emailAddress: span.getAttribute('email') || '',
       });
     });
@@ -231,9 +232,9 @@ class GmailMessageView {
     if (this._driver.isUsingSyncAPI()) {
       const threadID = this._threadViewDriver.getInternalID();
 
-      recipients = this._recipientsFull = await this._driver
+      recipients = this._recipientsFull = (await this._driver
         .getPageCommunicator()
-        .getMessageRecipients(threadID, this._element);
+        .getMessageRecipients(threadID, this._element)) as any;
 
       if (!recipients) {
         this._driver
@@ -250,7 +251,7 @@ class GmailMessageView {
       );
       recipients = this._recipientsFull = receipientSpans.map((span) => {
         return this._getUpdatedContact({
-          name: span.getAttribute('name'),
+          name: span.getAttribute('name')!,
           emailAddress: span.getAttribute('email') || '',
         });
       });
@@ -336,7 +337,7 @@ class GmailMessageView {
       return null;
     }
 
-    return this._element.querySelector(
+    return this._element.querySelector<HTMLElement>(
       'tr.acZ div.T-I.J-J5-Ji.aap.L3[role=button][aria-haspopup]'
     );
   }
@@ -344,14 +345,13 @@ class GmailMessageView {
   _getOpenMoreMenu(): HTMLElement | null | undefined {
     const selector_2022_11_23 =
       'td > div.nH.a98.iY > div.nH.aHU .b7.J-M[aria-haspopup=true]';
-    const maybeMoreMenu = (document.body as any as HTMLElement).querySelector(
-      selector_2022_11_23
-    );
+    const maybeMoreMenu =
+      document.body.querySelector<HTMLElement>(selector_2022_11_23);
     // This will find any message's open more menu! The caller needs to make
     // sure it belongs to this message!
     return (
       maybeMoreMenu ||
-      (document.body as any as HTMLElement).querySelector(
+      document.body.querySelector<HTMLElement>(
         'td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]'
       )
     );
@@ -455,7 +455,7 @@ class GmailMessageView {
       return messageId;
     }
 
-    const messageEl = this._element.querySelector('div.ii.gt');
+    const messageEl = this._element.querySelector<HTMLElement>('div.ii.gt');
 
     if (!messageEl) {
       const err = new Error('Could not find message id element');
@@ -539,7 +539,7 @@ class GmailMessageView {
       return div;
     });
     let added = false;
-    let currentIconUrl = null;
+    let currentIconUrl: string | null = null;
 
     this._stopper.onValue(() => {
       if (added) {
@@ -550,8 +550,8 @@ class GmailMessageView {
       }
     });
 
-    kefirCast(Kefir as any, iconDescriptor)
-      .combine(
+    kefirCast(Kefir, iconDescriptor)
+      .combine<any, any, any>(
         this._eventStream
           .filter((event) => event.eventName === 'viewStateChange')
           .toProperty(() => null),
@@ -820,14 +820,14 @@ class GmailMessageView {
   }
 
   _setupReplyStream() {
-    const replyContainer = this._element.querySelector('.ip');
+    const replyContainer = this._element.querySelector<HTMLElement>('.ip');
 
     if (!replyContainer) {
       return;
     }
 
     var self = this;
-    var currentReplyElementRemovalStream = null;
+    var currentReplyElementRemovalStream: any = null;
     // hold off on emitting the mutation for a millisecond so
     // that compose-view-driver-stream is listening to reply stream
     Kefir.combine([
@@ -837,7 +837,7 @@ class GmailMessageView {
       }),
       Kefir.later(1, null),
     ])
-      .merge(Kefir.later(1))
+      .merge(Kefir.later(1, undefined))
       .takeUntilBy(this._stopper)
       .beforeEnd(() => 'END')
       .onValue((mutation) => {
@@ -880,12 +880,12 @@ class GmailMessageView {
     var self = this;
 
     this._eventStream.plug(
-      Kefir.fromEvents(this._element, 'mouseover')
+      Kefir.fromEvents<MouseEvent, unknown>(this._element, 'mouseover')
         .map((e) => e.target)
         .filter(function (element) {
-          return element && element.getAttribute('email');
+          return element && (element as any).getAttribute('email');
         })
-        .map(function (element) {
+        .map(function (element: HTMLElement) {
           let contactType = null;
 
           if (!self._element.classList.contains('h7')) {
@@ -911,14 +911,14 @@ class GmailMessageView {
             eventName: 'contactHover',
             messageViewDriver: self,
           };
-        })
+        } as any)
     );
   }
 
   _getAttachmentArea(): GmailAttachmentAreaView | null | undefined {
     if (this._element.querySelector('.hq')) {
       return new GmailAttachmentAreaView(
-        this._element.querySelector('.hq'),
+        this._element.querySelector<HTMLElement>('.hq'),
         this._driver,
         this
       );
@@ -952,20 +952,11 @@ class GmailMessageView {
   }
 }
 
-function _extractContactInformation(span) {
+function _extractContactInformation(span: HTMLElement) {
   return {
-    name: span.getAttribute('name'),
-    emailAddress: span.getAttribute('email'),
+    name: span.getAttribute('name')!,
+    emailAddress: span.getAttribute('email')!,
   };
 }
 
-export default GmailMessageView; // This function does not get executed. It's only checked by Flow to make sure
-// this class successfully implements the type interface.
-
-function __interfaceCheck() {
-  const test: MessageViewDriver = new GmailMessageView(
-    {} as any,
-    {} as any,
-    {} as any
-  );
-}
+export default GmailMessageView;

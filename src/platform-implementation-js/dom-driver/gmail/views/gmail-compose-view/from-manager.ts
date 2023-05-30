@@ -2,6 +2,7 @@ import find from 'lodash/find';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import type GmailDriver from '../../gmail-driver';
 import type GmailComposeView from '../../views/gmail-compose-view';
+import { Contact } from '../../../../../inboxsdk';
 export function getFromContact(
   driver: GmailDriver,
   gmailComposeView: GmailComposeView
@@ -53,7 +54,7 @@ export function getFromContactChoices(
 
   return Array.from(choiceEls).map((item) => ({
     emailAddress: item.getAttribute('value') || '',
-    name: item.textContent.replace(/<.*/, '').trim(),
+    name: item.textContent!.replace(/<.*/, '').trim(),
   }));
 }
 export function setFromEmail(
@@ -82,7 +83,7 @@ export function setFromEmail(
   const chosenChoice = find(
     choiceParent.children,
     (item) => item.getAttribute('value') == email
-  );
+  ) as HTMLElement;
 
   if (!chosenChoice) {
     throw new Error('Chosen email from choice was not found');

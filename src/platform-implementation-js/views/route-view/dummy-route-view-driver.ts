@@ -1,10 +1,10 @@
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import type { MinRouteViewDriver } from '../../driver-interfaces/route-view-driver';
 
 class DummyRouteViewDriver {
-  _eventStream = kefirBus();
+  _eventStream = kefirBus<Record<string, any>, unknown>();
   _stopper = kefirStopper();
 
   constructor() {
@@ -23,11 +23,11 @@ class DummyRouteViewDriver {
     return {};
   }
 
-  getEventStream(): Kefir.Observable<Record<string, any>> {
+  getEventStream() {
     return this._eventStream;
   }
 
-  getStopper(): Kefir.Observable<any> {
+  getStopper(): Kefir.Observable<any, unknown> {
     return this._stopper;
   }
 

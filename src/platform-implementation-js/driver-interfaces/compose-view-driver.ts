@@ -1,6 +1,7 @@
-import type Kefir from 'kefir';
+import type * as Kefir from 'kefir';
 import type EventEmitter from 'events';
 import type { TooltipDescriptor } from '../views/compose-button-view';
+import type { Contact } from '../../inboxsdk';
 export type ComposeNotice = EventEmitter & {
   destroy(): void;
   destroyed: boolean;
@@ -23,8 +24,8 @@ export type ComposeButtonDescriptor = {
   enabled?: boolean | null | undefined;
 };
 export type ComposeViewDriver = {
-  getEventStream(): Kefir.Observable<Record<string, any>>;
-  getStopper(): Kefir.Observable<any>;
+  getEventStream(): Kefir.Observable<Record<string, any>, unknown>;
+  getStopper(): Kefir.Observable<any, unknown>;
   getElement(): HTMLElement;
   insertBodyTextAtCursor(text: string): HTMLElement | null | undefined;
   insertBodyHTMLAtCursor(html: string): HTMLElement | null | undefined;
@@ -64,13 +65,14 @@ export type ComposeViewDriver = {
   setTitleBarText(text: string): () => void;
   addButton(
     buttonDescriptor: Kefir.Observable<
-      ComposeButtonDescriptor | null | undefined
+      ComposeButtonDescriptor | null | undefined,
+      unknown
     >,
     groupOrderHint: string,
     extraOnClickOptions: Record<string, any>
   ): Promise<Record<string, any> | null | undefined>;
   addRecipientRow(
-    options: Kefir.Observable<Record<string, any> | null | undefined>
+    options: Kefir.Observable<Record<string, any> | null | undefined, unknown>
   ): () => void;
   forceRecipientRowsOpen(): () => void;
   hideNativeRecipientRows(): () => void;
@@ -112,4 +114,5 @@ export type ComposeViewDriver = {
     tooltipDescriptor: TooltipDescriptor
   ): void;
   closeButtonTooltip(buttonViewController: Record<string, any>): void;
+  setupLinkPopOvers(): void;
 };

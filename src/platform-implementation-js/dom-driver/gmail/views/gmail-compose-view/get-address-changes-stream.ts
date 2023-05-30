@@ -1,4 +1,5 @@
-import Kefir from 'kefir';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import * as Kefir from 'kefir';
 import t from 'transducers.js';
 import Logger from '../../../../lib/logger';
 import makeMutationObserverStream from '../../../../lib/dom/make-mutation-observer-stream';
@@ -7,9 +8,11 @@ import { getRecipientRowElements } from './page-parser';
 import type GmailComposeView from '../gmail-compose-view';
 import makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
 import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
+import { ReceiverType } from './set-recipients';
+import { Contact } from '../../../../../inboxsdk';
 export default function getAddressChangesStream(
   gmailComposeView: GmailComposeView
-): Kefir.Observable<Record<string, any>> {
+): Kefir.Observable<any, any> {
   const recipientRowElements = getRecipientRowElements(
     gmailComposeView.getElement()
   );
@@ -26,7 +29,7 @@ export default function getAddressChangesStream(
   const umbrellaStream = mergedStream.map(_groupChangeEvents);
   return Kefir.merge([
     mergedStream,
-    umbrellaStream,
+    umbrellaStream as any,
     getFromAddressChangeStream(gmailComposeView),
   ]);
 }
@@ -40,7 +43,7 @@ function readContactFromElement(
     // Handling updated compose recipients
     // https://workspaceupdates.googleblog.com/2021/10/visual-updates-for-composing-email-in-gmail.html
     return {
-      name: contactNode.getAttribute('data-name'),
+      name: contactNode.getAttribute('data-name')!,
       emailAddress: contactNode.getAttribute('data-hovercard-id') as any,
     };
   } else {
@@ -54,12 +57,15 @@ function readContactFromElement(
 function _makeSubAddressStream(
   addressType: ReceiverType,
   gmailComposeView: GmailComposeView
-): Kefir.Observable<{
-  eventName: string;
-  data: {
-    contact: Contact;
-  };
-}> {
+): Kefir.Observable<
+  {
+    eventName: string;
+    data: {
+      contact: Contact;
+    };
+  },
+  unknown
+> {
   const contactNodes = gmailComposeView.tagTree.getAllByTag(
     `${addressType}Recipient`
   );
@@ -92,7 +98,7 @@ function _makeSubAddressStream(
   );
 }
 
-function _groupChangeEvents(event) {
+function _groupChangeEvents(event: any) {
   const grouping = {
     to: {
       added: [],
@@ -109,18 +115,18 @@ function _groupChangeEvents(event) {
   };
   const parts = event.eventName.split('Contact'); //splits "toContactAdded" => ["to", "Added"]
 
-  grouping[parts[0]][parts[1].toLowerCase()].push(event.data.contact);
+  (grouping as any)[parts[0]][parts[1].toLowerCase()].push(event.data.contact);
   return {
     eventName: 'recipientsChanged',
     data: grouping,
   };
 }
 
-function getFromAddressChangeStream(gmailComposeView) {
+function getFromAddressChangeStream(gmailComposeView: GmailComposeView) {
   return Kefir.later(0, null).flatMap(() => {
     const fromInput = gmailComposeView
       .getElement()
-      .querySelector('input[name="from"]');
+      .querySelector<HTMLElement>('input[name="from"]');
     return Kefir.constant(
       _convertToEvent('fromContactChanged', gmailComposeView.getFromContact())
     ).merge(
@@ -139,7 +145,7 @@ function getFromAddressChangeStream(gmailComposeView) {
   });
 }
 
-function _convertToEvent(eventName, addressInfo) {
+function _convertToEvent(eventName: string, addressInfo: Contact) {
   return {
     eventName,
     data: {

@@ -1,6 +1,7 @@
+/* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-var-requires */
 jest.mock('../../../lib/idMap', () => {
-  function idMap(key) {
-    const legacyMapping = {
+  function idMap(key: string) {
+    const legacyMapping: Record<string, string> = {
       app_sidebar_content_panel: 'bccbBAHIcfEeHCHf',
       sidebar_button_container: 'CdCEaDfbJJbHDEaD',
     };
@@ -31,12 +32,12 @@ jest.mock('../../../lib/dom/make-mutation-observer-chunked-stream', () => {
   return () => require('kefir-bus')();
 });
 global.localStorage = new MockWebStorage();
-global._APP_SIDEBAR_TEST = true;
+(global as any)._APP_SIDEBAR_TEST = true;
 
-(Element as any).prototype.insertAdjacentElement = function (position, el) {
+Element.prototype.insertAdjacentElement = function (position, el) {
   switch (position) {
     case 'beforebegin':
-      this.parentElement.insertBefore(el, this);
+      this.parentElement!.insertBefore(el, this);
       break;
 
     case 'afterbegin':
@@ -48,10 +49,12 @@ global._APP_SIDEBAR_TEST = true;
       break;
 
     case 'afterend':
-      this.parentElement.insertBefore(el, this);
-      this.parentElement.insertBefore(this, el);
+      this.parentElement!.insertBefore(el, this);
+      this.parentElement!.insertBefore(this, el);
       break;
   }
+
+  return null;
 };
 
 describe('Without add-ons', function () {
@@ -287,7 +290,7 @@ describe('With old add-ons html', function () {
   });
 });
 
-function makeDriver(appId, opts): any {
+function makeDriver(appId?: string, opts?: any): any {
   return {
     getAppId: () => appId || 'test',
     getOpts: () =>
@@ -300,7 +303,7 @@ function makeDriver(appId, opts): any {
       return {
         eventSdkPassive() {},
 
-        error(err, details) {
+        error(err: any, details: any) {
           console.error('logger.error called:', err, details);
           throw err;
         },

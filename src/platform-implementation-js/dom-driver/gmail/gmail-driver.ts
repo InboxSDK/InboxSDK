@@ -74,7 +74,6 @@ import type PageCommunicator from './gmail-page-communicator';
 import type { RouteParams } from '../../namespaces/router';
 import type ButterBar from '../../namespaces/butter-bar';
 import type { Driver, DrawerViewOptions } from '../../driver-interfaces/driver';
-import type { Contact } from '../../driver-interfaces/compose-view-driver';
 import type GmailComposeView from './views/gmail-compose-view';
 import type GmailMessageView from './views/gmail-message-view';
 import type GmailThreadView from './views/gmail-thread-view';
@@ -83,17 +82,15 @@ import type GmailRowListView from './views/gmail-row-list-view';
 import type GmailRouteView from './views/gmail-route-view/gmail-route-view';
 import type GmailSupportItemView from './views/gmail-support-item-view';
 import type { SupportItemDescriptor } from './views/gmail-support-item-view';
-import type {
-  PiOpts,
-  EnvData,
-  MessageView,
-} from '../../platform-implementation';
+import type { PiOpts, EnvData } from '../../platform-implementation';
 import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
 import type { AppMenuItemDescriptor } from '../../namespaces/app-menu';
 
 import type ContentPanelViewDriver from '../../driver-common/sidebar/ContentPanelViewDriver';
 import GmailNavItemView from './views/gmail-nav-item-view';
 import { MoleOptions } from '../../driver-interfaces/mole-view-driver';
+import { Contact } from '../../../inboxsdk';
+import GmailAttachmentCardView from './views/gmail-attachment-card-view';
 
 class GmailDriver implements Driver {
   _appId: string;
@@ -340,10 +337,8 @@ class GmailDriver implements Driver {
               .map(() => messageViewDriver)
               .take(1)
       )
-      .map((messageView: MessageView) =>
-        messageView.getAttachmentCardViewDrivers()
-      )
-      .flatten();
+      .map((messageView) => messageView.getAttachmentCardViewDrivers())
+      .flatten<GmailAttachmentCardView>();
   }
   getComposeViewDriverStream() {
     return this._composeViewDriverStream;

@@ -13,7 +13,8 @@ export default function xhrHelper() {
     // It's important to use fetch when possible because it's needed for
     // getDownloadURL() in Gmail v2: Gmail v2's ServiceWorker in Chrome causes
     // xhr.responseURL to have the wrong value (possibly a Chrome bug).
-    if (global.fetch) {
+    // TODO: This condition will always return true since this function is always defined. Did you mean to call it instead? ts(2774)
+    if (global.fetch as any) {
       (async () => {
         const response = await fetch(opts.url, {
           method: opts.method || 'GET',

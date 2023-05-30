@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import clone from 'lodash/clone';
 import flatten from 'lodash/flatten';
 import find from 'lodash/find';
@@ -13,7 +15,7 @@ import * as messageMetadataHolder from '../message-metadata-holder';
 import * as GmailResponseProcessor from '../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import * as GmailSyncResponseProcessor from '../../platform-implementation-js/dom-driver/gmail/gmail-sync-response-processor';
 import quotedSplit from '../../common/quoted-split';
-import defer from '../../common/defer';
+import defer, { Defer } from '../../common/defer';
 import modifySuggestions from './modify-suggestions';
 import {
   parseComposeRequestBody,
@@ -22,7 +24,7 @@ import {
 } from './sync-compose-processor';
 import type { XHRProxyConnectionDetails } from '../xhr-proxy-factory';
 
-function logErrorExceptEventListeners(err, details) {
+function logErrorExceptEventListeners(err: unknown, details: string) {
   // Don't log Gmail's errors
   if (details !== 'XMLHttpRequest event listener error') {
     logger.error(err, details);
@@ -36,10 +38,10 @@ function logErrorExceptEventListeners(err, details) {
 
 export default function setupGmailInterceptor() {
   let jsFrame: WindowProxy | null | undefined = null;
-  const js_frame_element = top.document.getElementById('js_frame');
+  const js_frame_element = top!.document.getElementById('js_frame');
 
   if (js_frame_element) {
-    jsFrame = js_frame_element.contentDocument.defaultView;
+    jsFrame = (js_frame_element as any).contentDocument.defaultView;
   } else {
     logger.eventSdkPassive('noJSFrameElementFound');
   }
@@ -51,11 +53,12 @@ export function setupGmailInterceptorOnFrames(
   mainFrame: WindowProxy,
   jsFrame: WindowProxy | null | undefined
 ) {
-  const main_wrappers = [],
-    js_frame_wrappers = [];
+  type Wrappers = Parameters<typeof XHRProxyFactory>[1];
+  const main_wrappers: Wrappers = [],
+    js_frame_wrappers: Wrappers = [];
   {
-    const main_originalXHR = mainFrame.XMLHttpRequest;
-    mainFrame.XMLHttpRequest = XHRProxyFactory(
+    const main_originalXHR = (mainFrame as any).XMLHttpRequest;
+    (mainFrame as any).XMLHttpRequest = XHRProxyFactory(
       main_originalXHR,
       main_wrappers,
       {
@@ -65,8 +68,8 @@ export function setupGmailInterceptorOnFrames(
   }
 
   if (jsFrame) {
-    const js_frame_originalXHR = jsFrame.XMLHttpRequest;
-    jsFrame.XMLHttpRequest = XHRProxyFactory(
+    const js_frame_originalXHR = (jsFrame as any).XMLHttpRequest;
+    (jsFrame as any).XMLHttpRequest = XHRProxyFactory(
       js_frame_originalXHR,
       js_frame_wrappers,
       {
@@ -80,7 +83,7 @@ export function setupGmailInterceptorOnFrames(
   //email sending modifier/notifier
   {
     let modifiers: Record<string, Array<string>> = {};
-    Kefir.fromEvents(
+    Kefir.fromEvents<{ detail: any }, unknown>(
       document,
       'inboxSDKregisterComposeRequestModifier'
     ).onValue(({ detail }) => {
@@ -95,7 +98,7 @@ export function setupGmailInterceptorOnFrames(
     Kefir.fromEvents(
       document,
       'inboxSDKunregisterComposeRequestModifier'
-    ).onValue(({ detail }) => {
+    ).onValue(({ detail }: any) => {
       const { keyId, modifierId } = detail;
       modifiers[keyId] = modifiers[keyId].filter((item) => item !== modifierId);
 
@@ -116,7 +119,7 @@ export function setupGmailInterceptorOnFrames(
       requestChanger: async function (connection, request) {
         let composeParams = querystring.parse(request.body);
         const composeid = composeParams.composeid;
-        const composeModifierIds = modifiers[composeParams.composeid];
+        const composeModifierIds = modifiers[composeParams.composeid as any];
 
         if (!composeModifierIds || composeModifierIds.length === 0) {
           return request;
@@ -124,7 +127,7 @@ export function setupGmailInterceptorOnFrames(
 
         for (let ii = 0; ii < composeModifierIds.length; ii++) {
           const modifierId = composeModifierIds[ii];
-          const modificationPromise = Kefir.fromEvents(
+          const modificationPromise = Kefir.fromEvents<any, unknown>(
             document,
             'inboxSDKcomposeRequestModified'
           )
@@ -135,7 +138,7 @@ export function setupGmailInterceptorOnFrames(
             )
             .take(1)
             .map(({ detail }) => detail.composeParams)
-            .toPromise(Promise);
+            .toPromise(/* Promise */);
           triggerEvent({
             type: 'inboxSDKmodifyComposeRequest',
             composeid,
@@ -151,7 +154,7 @@ export function setupGmailInterceptorOnFrames(
 
         return Object.assign({}, request, {
           body: stringifyComposeParams(composeParams),
-        });
+        }) as any;
       },
       afterListeners: function (connection) {
         if (connection.status === 200) {
@@ -165,7 +168,7 @@ export function setupGmailInterceptorOnFrames(
             const composeParams = querystring.parse(
               connection.originalSendBody
             );
-            delete modifiers[composeParams.composeid];
+            delete modifiers[composeParams.composeid as string];
           }
         }
       },
@@ -259,7 +262,7 @@ export function setupGmailInterceptorOnFrames(
 
           for (let ii = 0; ii < composeModifierIds.length; ii++) {
             const modifierId = composeModifierIds[ii];
-            const modificationPromise = Kefir.fromEvents(
+            const modificationPromise = Kefir.fromEvents<any, unknown>(
               document,
               'inboxSDKcomposeRequestModified'
             )
@@ -269,7 +272,7 @@ export function setupGmailInterceptorOnFrames(
               )
               .take(1)
               .map(({ detail }) => detail.composeParams)
-              .toPromise(Promise);
+              .toPromise(/* Promise */);
             triggerEvent({
               type: 'inboxSDKmodifyComposeRequest',
               draftID,
@@ -288,7 +291,7 @@ export function setupGmailInterceptorOnFrames(
               request.body,
               newEmailBody
             ),
-          });
+          }) as any;
         },
 
         afterListeners(connection) {
@@ -435,9 +438,9 @@ export function setupGmailInterceptorOnFrames(
               }
 
               const sendUpdateMatch = updateList.find(
-                (update) =>
+                (update: any) =>
                   update[1]?.[3]?.[7]?.[1]?.[5]?.[0]?.[14] &&
-                  update[1][3][7][1][5].find((message) =>
+                  update[1][3][7][1][5].find((message: any) =>
                     includes(message[1], draftID)
                   )
               );
@@ -445,7 +448,7 @@ export function setupGmailInterceptorOnFrames(
               if (!sendUpdateMatch) {
                 if (currentSendConnectionIDs.has(connection)) {
                   const minimalSendUpdates = updateList.filter(
-                    (update) => update[1]?.[3]?.[5]?.[3]
+                    (update: any) => update[1]?.[3]?.[5]?.[3]
                   );
 
                   if (minimalSendUpdates.length > 0) {
@@ -472,7 +475,7 @@ export function setupGmailInterceptorOnFrames(
               }
 
               const sendUpdateWrapper = sendUpdateMatch[1]?.[3]?.[7]?.[1];
-              const sendUpdate = sendUpdateWrapper[5].find((message) =>
+              const sendUpdate = sendUpdateWrapper[5].find((message: any) =>
                 message[1].includes(draftID)
               );
 
@@ -601,7 +604,7 @@ export function setupGmailInterceptorOnFrames(
                     recipients: syncMessage.recipients,
                   })
                 ),
-              }))
+              })) as any
             );
           }
         },
@@ -627,7 +630,7 @@ export function setupGmailInterceptorOnFrames(
                     recipients: syncMessage.recipients,
                   })
                 ),
-              }))
+              })) as any
             );
           }
         },
@@ -642,9 +645,9 @@ export function setupGmailInterceptorOnFrames(
   // suggestion modifiers, and then meld them into the query response.
   {
     const providers = Object.create(null);
-    let currentQuery;
-    let suggestionModifications;
-    let currentQueryDefer;
+    let currentQuery: unknown;
+    let suggestionModifications: any;
+    let currentQueryDefer: any;
     document.addEventListener(
       'inboxSDKregisterSuggestionsModifier',
       function ({ detail }: any) {
@@ -700,7 +703,7 @@ export function setupGmailInterceptorOnFrames(
           return;
         }
 
-        const query = JSON.parse(parsedBody.request)[2];
+        const query = JSON.parse(parsedBody.request as string)[2];
 
         if (!query) {
           return;
@@ -738,8 +741,13 @@ export function setupGmailInterceptorOnFrames(
     // search query containing the term, we delay it being sent out, trigger an
     // event containing the full query, and wait for a response event from the
     // content script that contains a new query to substitute in.
-    const customSearchTerms = [];
-    let queryReplacement;
+    const customSearchTerms: unknown[] = [];
+    let queryReplacement: {
+      term: unknown;
+      query: unknown;
+      newQuery: Defer<unknown>;
+      start: unknown;
+    };
     document.addEventListener(
       'inboxSDKcreateCustomSearchTerm',
       function (event: any) {
@@ -757,7 +765,7 @@ export function setupGmailInterceptorOnFrames(
     // classic Gmail API intercept
     js_frame_wrappers.push({
       isRelevantTo: function (connection) {
-        let customSearchTerm;
+        let customSearchTerm: unknown;
         const params = connection.params;
 
         if (
@@ -812,7 +820,7 @@ export function setupGmailInterceptorOnFrames(
       },
       requestChanger: function (connection, request) {
         return (connection as any)._queryReplacement.newQuery.promise.then(
-          function (newQuery) {
+          function (newQuery: string) {
             let newParams = clone(connection.params);
             newParams.q = newQuery;
             return {
@@ -893,7 +901,7 @@ export function setupGmailInterceptorOnFrames(
         }
 
         return (connection as any)._queryReplacement.newQuery.promise.then(
-          function (newQuery) {
+          function (newQuery: string) {
             if (newFormat) {
               body[0][3] = newQuery;
             } else {
@@ -916,8 +924,13 @@ export function setupGmailInterceptorOnFrames(
     // the search query, trigger an event containing the query, trigger an
     // event containing the response, and then wait for a response event from
     // the content script that contains new results to substitute in.
-    const customSearchQueries = [];
-    let customListJob;
+    const customSearchQueries: unknown[] = [];
+    let customListJob: {
+      query: unknown;
+      start: unknown;
+      newRequestParams: Defer<unknown>;
+      newResults: Defer<unknown>;
+    };
     document.addEventListener(
       'inboxSDKcustomListRegisterQuery',
       (event: any) => {
@@ -983,7 +996,7 @@ export function setupGmailInterceptorOnFrames(
       },
       requestChanger: function (connection, request) {
         return (connection as any)._customListJob.newRequestParams.promise.then(
-          ({ query, start }) => {
+          ({ query, start }: any) => {
             const newParams = clone(connection.params);
             newParams.q = query;
             newParams.start = start;
@@ -1003,7 +1016,7 @@ export function setupGmailInterceptorOnFrames(
           response,
         });
         return (connection as any)._customListJob.newResults.promise.then(
-          (newResults) => (newResults === null ? response : newResults)
+          (newResults: any) => (newResults === null ? response : newResults)
         );
       },
     });
@@ -1051,7 +1064,7 @@ export function setupGmailInterceptorOnFrames(
             return (
               connection as any
             )._customListJob.newRequestParams.promise.then(
-              ({ query, start }) => {
+              ({ query, start }: any) => {
                 if (newFormat) {
                   parsedBody[0][3] = query;
                   parsedBody[0][9] = start;
@@ -1081,7 +1094,7 @@ export function setupGmailInterceptorOnFrames(
             response,
           });
           return (connection as any)._customListJob.newResults.promise.then(
-            (newResults) => (newResults === null ? response : newResults)
+            (newResults: any) => (newResults === null ? response : newResults)
           );
         } else {
           return response;
@@ -1091,8 +1104,8 @@ export function setupGmailInterceptorOnFrames(
   }
   // sync token savers
   {
-    const saveBTAIHeader = (header) => {
-      (document.head as any).setAttribute('data-inboxsdk-btai-header', header);
+    const saveBTAIHeader = (header: string) => {
+      document.head.setAttribute('data-inboxsdk-btai-header', header);
       triggerEvent({
         type: 'btaiHeaderReceived',
       });
@@ -1113,8 +1126,8 @@ export function setupGmailInterceptorOnFrames(
       },
     });
 
-    const saveXsrfTokenHeader = (header) => {
-      (document.head as any).setAttribute('data-inboxsdk-xsrf-token', header);
+    const saveXsrfTokenHeader = (header: string) => {
+      document.head.setAttribute('data-inboxsdk-xsrf-token', header);
       triggerEvent({
         type: 'xsrfTokenHeaderReceived',
       });
@@ -1137,7 +1150,7 @@ export function setupGmailInterceptorOnFrames(
   }
 }
 
-function triggerEvent(detail) {
+function triggerEvent(detail: Record<string, any>) {
   document.dispatchEvent(
     new CustomEvent('inboxSDKajaxIntercept', {
       bubbles: true,
@@ -1147,22 +1160,29 @@ function triggerEvent(detail) {
   );
 }
 
-function stringifyComposeParams(inComposeParams) {
+function stringifyComposeParams(inComposeParams: {
+  to?: string;
+  cc?: string;
+  bcc?: string;
+}) {
   const composeParams = clone(inComposeParams);
   const string = `=${stringifyComposeRecipientParam(
-    composeParams.to,
+    composeParams.to!,
     'to'
   )}&=${stringifyComposeRecipientParam(
-    composeParams.cc,
+    composeParams.cc!,
     'cc'
-  )}&=${stringifyComposeRecipientParam(composeParams.bcc, 'bcc')}`;
+  )}&=${stringifyComposeRecipientParam(composeParams.bcc!, 'bcc')}`;
   delete composeParams.to;
   delete composeParams.bcc;
   delete composeParams.cc;
   return string + '&' + querystring.stringify(composeParams);
 }
 
-function stringifyComposeRecipientParam(value, paramType) {
+function stringifyComposeRecipientParam(
+  value: string | string[],
+  paramType: string
+) {
   let string = '';
 
   if (Array.isArray(value)) {

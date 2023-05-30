@@ -55,7 +55,7 @@ export default function clickAndGetPopupUrl(
     window.HTMLElement.prototype.blur = noop;
     window.onerror = ignoreErrors;
 
-    const newOpen = function (_url, _title, _options) {
+    const newOpen = function (_url: string, _title: string, _options: any) {
       url = _url;
       // Gmail checks the returned object for these two values specifically.
       const newWin = {
@@ -68,7 +68,7 @@ export default function clickAndGetPopupUrl(
       return newWin;
     };
 
-    window.open = newOpen;
+    window.open = newOpen as any;
 
     // If another extension created a setter on window.open, then setting it
     // could have failed. Log to see if this is a thing that ever happens, and
@@ -83,13 +83,13 @@ export default function clickAndGetPopupUrl(
     if (oldFocus) {
       window.HTMLElement.prototype.focus = oldFocus;
     } else {
-      delete window.HTMLElement.prototype.focus;
+      delete (window.HTMLElement.prototype as any).focus;
     }
 
     if (oldBlur) {
       window.HTMLElement.prototype.blur = oldBlur;
     } else {
-      delete window.HTMLElement.prototype.blur;
+      delete (window.HTMLElement.prototype as any).blur;
     }
 
     window.onerror = oldWindowOnerror;

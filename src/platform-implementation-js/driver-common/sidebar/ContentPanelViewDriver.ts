@@ -1,5 +1,5 @@
 import autoHtml from 'auto-html';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import delayAsap from '../../lib/delay-asap';
@@ -9,8 +9,8 @@ import { sidebarWaitingPlatformSelector } from './constants';
 
 class ContentPanelViewDriver {
   _driver: Driver;
-  _stopper: Kefir.Observable<null>;
-  _eventStream = kefirBus();
+  _stopper: Kefir.Observable<null, unknown>;
+  _eventStream = kefirBus<{ eventName: string }, unknown>();
   _isActive: boolean = false;
   // This is not the `id` property passed by the application, but a random
   // unique identifier used to manage a specific instance.
@@ -20,7 +20,7 @@ class ContentPanelViewDriver {
 
   constructor(
     driver: Driver,
-    descriptor: Kefir.Observable<Record<string, any>>,
+    descriptor: Kefir.Observable<Record<string, any>, unknown>,
     sidebarId: string,
     isGlobal?: boolean
   ) {
@@ -35,7 +35,7 @@ class ContentPanelViewDriver {
 
     this._eventStream.plug(
       Kefir.fromEvents(document.body as any, 'inboxsdkSidebarPanelActivated')
-        .filter((e) => e.detail.instanceId === this._instanceId)
+        .filter((e: any) => e.detail.instanceId === this._instanceId)
         .map(() => {
           this._isActive = true;
           return {
@@ -45,8 +45,8 @@ class ContentPanelViewDriver {
     );
 
     this._eventStream.plug(
-      Kefir.fromEvents(document.body as any, 'inboxsdkSidebarPanelDeactivated')
-        .filter((e) => e.detail.instanceId === this._instanceId)
+      Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelDeactivated')
+        .filter((e: any) => e.detail.instanceId === this._instanceId)
         .map(() => {
           this._isActive = false;
           return {
@@ -59,11 +59,12 @@ class ContentPanelViewDriver {
     // property retains its value.
     const afterAsap = delayAsap()
       .toProperty()
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       .onValue(() => {});
     let hasPlacedAlready = false;
-    let appName;
+    let appName: any;
     const waitingPlatform = querySelector(
-      document.body as any,
+      document.body,
       sidebarWaitingPlatformSelector
     );
     descriptor
@@ -135,11 +136,11 @@ class ContentPanelViewDriver {
     });
   }
 
-  getStopper(): Kefir.Observable<null> {
+  getStopper() {
     return this._stopper;
   }
 
-  getEventStream(): Kefir.Observable<any> {
+  getEventStream() {
     return this._eventStream;
   }
 

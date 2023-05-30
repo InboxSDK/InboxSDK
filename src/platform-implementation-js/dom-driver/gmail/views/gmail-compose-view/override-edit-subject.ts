@@ -1,4 +1,5 @@
 import censorHTMLtree from '../../../../../common/censorHTMLtree';
+import { Driver } from '../../../../driver-interfaces/driver';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import type GmailDriver from '../../gmail-driver';
 import type GmailComposeView from '../gmail-compose-view';
@@ -10,7 +11,7 @@ export default function overrideEditSubject(
   if (!gmailComposeView.isReply()) return;
   const menuItem = gmailComposeView
     .getElement()
-    .querySelector(
+    .querySelector<HTMLElement>(
       'div.J-M.jQjAxd.HX[role=menu] > div.SK.AX > [role=menuitem]:nth-last-child(2)'
     );
 
@@ -45,7 +46,10 @@ export default function overrideEditSubject(
   );
 }
 
-function _cloneContentToNewCompose(gmailDriver, gmailComposeView) {
+function _cloneContentToNewCompose(
+  gmailDriver: Driver,
+  gmailComposeView: GmailComposeView
+) {
   const toRecipients = gmailComposeView.getToRecipients();
   const ccRecipients = gmailComposeView.getCcRecipients();
   const bccRecipients = gmailComposeView.getBccRecipients();
@@ -76,8 +80,10 @@ function _cloneContentToNewCompose(gmailDriver, gmailComposeView) {
     });
 }
 
-function _ensureExtraContentIsVisible(gmailComposeView) {
+function _ensureExtraContentIsVisible(gmailComposeView: GmailComposeView) {
   if (gmailComposeView.getBodyElement().querySelector('.gmail_extra')) return;
-  const quoteDotsElement = gmailComposeView.getElement().querySelector('.ajR');
+  const quoteDotsElement = gmailComposeView
+    .getElement()
+    .querySelector<HTMLElement>('.ajR');
   if (quoteDotsElement) simulateClick(quoteDotsElement);
 }

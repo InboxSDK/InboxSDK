@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
@@ -12,6 +14,8 @@ export default class CreateParentAccessoryButtonView implements ButtonViewI {
     this._setupElement();
     this._setupEventStream();
   }
+  addClass(className: string): void {}
+  removeClass(className: string): void {}
 
   activate() {
     const innerButtonElement = this._element.firstElementChild;

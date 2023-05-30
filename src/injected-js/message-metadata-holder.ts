@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import querystring from 'querystring';
 import startsWith from 'lodash/startsWith';
 import type { Message } from '../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
@@ -10,13 +11,13 @@ export function setup() {
   document.addEventListener(
     'inboxSDKtellMeThisMessageDate',
     function (event: Record<string, any>) {
-      exposeMetadata(event, 'data-inboxsdk-sortdate', (m) => m.date);
+      exposeMetadata(event, 'data-inboxsdk-sortdate', (m: any) => m.date);
     }
   );
   document.addEventListener(
     'inboxSDKtellMeThisMessageRecipients',
     function (event: Record<string, any>) {
-      exposeMetadata(event, 'data-inboxsdk-recipients', (m) => {
+      exposeMetadata(event, 'data-inboxsdk-recipients', (m: any) => {
         if (m.recipients) return m.recipients;
         else return null;
       });
@@ -24,14 +25,19 @@ export function setup() {
   );
 }
 
-function exposeMetadata(event, attribute, processor) {
+function exposeMetadata(event: any, attribute: string, processor: any) {
   const {
     target,
     detail: { threadId, ikValue, btaiHeader, xsrfToken },
   } = event;
   (async () => {
     const messageIndex = Array.from(target.parentElement.children)
-      .filter((el) => !el.classList.contains('inboxsdk__custom_message_view'))
+      .filter(
+        (el) =>
+          !(el as HTMLElement).classList.contains(
+            'inboxsdk__custom_message_view'
+          )
+      )
       .indexOf(target);
 
     if (messageIndex < 0) {
@@ -125,7 +131,7 @@ function addDataForThread(
               messages: syncThread.extraMetaData.syncMessageData.map(
                 (syncMessage) => ({
                   date: syncMessage.date,
-                  recipients: syncMessage.recipients,
+                  recipients: syncMessage.recipients as any,
                 })
               ),
             },

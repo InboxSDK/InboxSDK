@@ -20,8 +20,8 @@ export function getSelectedTextInElement(
   element: HTMLElement,
   lastRange?: Range | null | undefined
 ): string | null | undefined {
-  const selection = (document as any).getSelection();
-  return t.toArray(
+  const selection = document.getSelection();
+  return t.toArray<any, string | null | undefined>(
     [
       selection && selection.rangeCount ? selection.getRangeAt(0) : null,
       lastRange,
@@ -39,7 +39,7 @@ export function getSelectedHTMLInElement(
   lastRange?: Range | null | undefined
 ): string | null | undefined {
   const selection = (document as any).getSelection();
-  return t.toArray(
+  return t.toArray<any, string | null | undefined>(
     [
       selection && selection.rangeCount ? selection.getRangeAt(0) : null,
       lastRange,

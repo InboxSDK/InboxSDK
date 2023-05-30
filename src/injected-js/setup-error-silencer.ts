@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export default function setupErrorSilencer() {
-  var oldErrorHandlers = [];
+  var oldErrorHandlers: OnErrorEventHandler[] = [];
   document.addEventListener(
     'inboxSDKsilencePageErrors',
     function (event: Event) {
@@ -17,7 +18,7 @@ export default function setupErrorSilencer() {
   document.addEventListener(
     'inboxSDKunsilencePageErrors',
     function (event: Event) {
-      window.onerror = oldErrorHandlers.pop();
+      window.onerror = oldErrorHandlers.pop()!;
     }
   );
 }

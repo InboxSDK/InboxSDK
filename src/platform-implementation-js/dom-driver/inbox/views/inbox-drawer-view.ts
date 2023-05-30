@@ -1,4 +1,5 @@
-import Kefir from 'kefir';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import InboxBackdrop from './inbox-backdrop';
@@ -11,11 +12,11 @@ const zIndex = 500;
 
 class InboxDrawerView {
   _chrome: boolean;
-  _exitEl: HTMLElement;
-  _containerEl: HTMLElement;
-  _el: HTMLElement;
+  _exitEl!: HTMLElement;
+  _containerEl!: HTMLElement;
+  _el!: HTMLElement;
   _backdrop: InboxBackdrop | null | undefined = null;
-  _slideAnimationDone: Kefir.Observable<null>;
+  _slideAnimationDone: Kefir.Observable<null, unknown>;
   _closing = kefirStopper();
   _closed = kefirStopper();
   _composeChanges = kefirBus();
@@ -78,9 +79,9 @@ class InboxDrawerView {
           return origPreventDefault.call(this);
         };
       });
-    Kefir.fromEvents(document, 'keydown')
+    Kefir.fromEvents<KeyboardEvent, unknown>(document, 'keydown')
       .filter((e) => (e.key ? e.key === 'Escape' : e.which === 27))
-      .filter((e) => !e._defaultPreventedInContext)
+      .filter((e: any) => !e._defaultPreventedInContext)
       .filter((event) => {
         let isCanceled = false;
         const appEvent = {
@@ -122,7 +123,7 @@ class InboxDrawerView {
 
     const closeEvents = [
       Kefir.fromEvents(composeView, 'restored'),
-      Kefir.later(10).flatMap(() =>
+      Kefir.later(10, undefined).flatMap(() =>
         Kefir.fromEvents(composeView, 'fullscreenChanged')
       ),
     ];
@@ -278,7 +279,7 @@ class InboxDrawerView {
       this._el.classList.remove('inboxsdk__active');
 
       Kefir.fromEvents(this._el, 'transitionend')
-        .merge(Kefir.later(200)) // transition might not finish if element is hidden
+        .merge(Kefir.later(200, undefined)) // transition might not finish if element is hidden
         .take(1)
         .onValue(() => {
           this._closed.destroy();
@@ -338,7 +339,9 @@ class InboxDrawerView {
         })
         .flatMap(
           () =>
-            Kefir.fromEvents(parentEl, 'transitionend').merge(Kefir.later(200)) // transition might not finish if element is hidden
+            Kefir.fromEvents(parentEl, 'transitionend').merge(
+              Kefir.later(200, undefined)
+            ) // transition might not finish if element is hidden
         )
         .merge(this._composeChanges)
         .take(1)

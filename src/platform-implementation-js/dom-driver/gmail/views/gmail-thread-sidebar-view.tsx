@@ -7,7 +7,7 @@ It was a strange world, can you believe who the President of the United States w
 import findIndex from 'lodash/findIndex';
 import asap from 'asap';
 import autoHtml from 'auto-html';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import React from 'react';
@@ -41,13 +41,13 @@ import {
 class GmailAppSidebarView {
   _stopper = kefirStopper();
   _driver: GmailDriver;
-  _instanceId: string;
+  _instanceId!: string;
 
   constructor(
     driver: GmailDriver,
     sidebarContainerEl?: HTMLElement | null | undefined,
-    addonSidebarElement: HTMLElement | null | undefined,
-    widthManager: WidthManager | null | undefined
+    addonSidebarElement?: HTMLElement | null | undefined,
+    widthManager?: WidthManager | null | undefined
   ) {
     this._driver = driver;
     // We need to be able to cooperate with other apps/extensions that are
@@ -76,7 +76,7 @@ class GmailAppSidebarView {
     this._stopper.destroy();
   }
 
-  getStopper(): Kefir.Observable<any> {
+  getStopper() {
     return this._stopper;
   }
 
@@ -106,7 +106,7 @@ class GmailAppSidebarView {
     _addonSidebarContainerEl: HTMLElement | null | undefined,
     widthManager: WidthManager | null | undefined
   ) {
-    let container, iconArea;
+    let container: any, iconArea: any;
     let component: AppSidebar;
     this._instanceId = `${Date.now()}-${Math.random()}`;
     {
@@ -122,7 +122,7 @@ class GmailAppSidebarView {
     el.className = idMap('app_sidebar_container');
     const buttonContainers: Map<string, HTMLElement> = new Map();
     let activatedWhileLoading: boolean = false;
-    let contentContainer;
+    let contentContainer: HTMLElement | null;
     let usedAddonsSidebar = false;
     const updateHighlightedAppIconBus = kefirBus();
 
@@ -162,7 +162,7 @@ class GmailAppSidebarView {
           window.innerWidth >= 1024 && window.innerHeight >= 600;
 
         if (
-          !global._APP_SIDEBAR_TEST &&
+          !(global as any)._APP_SIDEBAR_TEST &&
           (elRect.width == 0 ||
             elRect.height == 0 ||
             (supportedScreenSize &&
@@ -218,17 +218,13 @@ class GmailAppSidebarView {
       sidebarContainerEl.classList.add(idMap('app_sidebar_in_use'));
     }
 
-    if (
-      !(document.body as any as HTMLElement).querySelector(
-        sidebarWaitingPlatformSelector
-      )
-    ) {
+    if (!document.body.querySelector(sidebarWaitingPlatformSelector)) {
       const waitingPlatform = document.createElement('div');
       waitingPlatform.className = cx(
         sidebarWaitingPlatformClassName,
         idMap('app_sidebar_waiting_platform')
       );
-      (document.body as any as HTMLElement).appendChild(waitingPlatform);
+      document.body.appendChild(waitingPlatform);
     }
 
     if (addonSidebarContainerEl) {
@@ -244,7 +240,7 @@ class GmailAppSidebarView {
     }
 
     const currentIds = new Set();
-    const orderManager = new OrderManager({
+    const orderManager = new OrderManager<any>({
       get() {
         try {
           return JSON.parse(
@@ -309,7 +305,7 @@ class GmailAppSidebarView {
         }
       });
 
-    const _appSidebarRefSetter = (threadSidebarComponent) => {
+    const _appSidebarRefSetter = (threadSidebarComponent: AppSidebar) => {
       if (threadSidebarComponent) {
         component = threadSidebarComponent;
       }
@@ -337,7 +333,7 @@ class GmailAppSidebarView {
     };
 
     render();
-    Kefir.fromEvents(window, 'storage')
+    Kefir.fromEvents<StorageEvent, unknown>(window, 'storage')
       .filter((e) => e.key === 'inboxsdk__sidebar_ordering')
       .takeUntilBy(this._stopper)
       .onValue(() => {
@@ -364,7 +360,10 @@ class GmailAppSidebarView {
       }
     });
 
-    Kefir.fromEvents(document.body as any, 'inboxsdkNewSidebarPanel')
+    Kefir.fromEvents<{ detail: any; target: any }, unknown>(
+      document.body,
+      'inboxsdkNewSidebarPanel'
+    )
       .filter((e) => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue((event) => {
@@ -415,7 +414,7 @@ class GmailAppSidebarView {
           // If there's an existing button for the app, then just increment its
           // data-count attribute instead of adding a new button.
           const existingButtonContainer = buttonContainers.get(appName);
-          let buttonContainer;
+          let buttonContainer: HTMLElement;
 
           if (existingButtonContainer) {
             const currentCount =
@@ -488,7 +487,7 @@ class GmailAppSidebarView {
                   if (addonSidebarContainerEl) {
                     // check and deactivate add-on sidebar
                     const activeAddOnIcon =
-                      addonSidebarContainerEl.querySelector(
+                      addonSidebarContainerEl.querySelector<HTMLElement>(
                         ACTIVE_ADD_ON_ICON_SELECTOR
                       );
                     if (activeAddOnIcon) simulateClick(activeAddOnIcon);
@@ -562,7 +561,10 @@ class GmailAppSidebarView {
           }
         });
       });
-    Kefir.fromEvents(document.body as any, 'inboxsdkUpdateSidebarPanel')
+    Kefir.fromEvents<{ detail: any; target: any }, unknown>(
+      document.body,
+      'inboxsdkUpdateSidebarPanel'
+    )
       .filter((e) => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue((event) => {
@@ -586,7 +588,10 @@ class GmailAppSidebarView {
         });
         render();
       });
-    Kefir.fromEvents(document.body as any, 'inboxsdkRemoveSidebarPanel')
+    Kefir.fromEvents<{ detail: any }, unknown>(
+      document.body,
+      'inboxsdkRemoveSidebarPanel'
+    )
       .filter((e) => e.detail.sidebarId === this._instanceId)
       .takeUntilBy(this._stopper)
       .onValue((event) => {
@@ -643,12 +648,18 @@ class GmailAppSidebarView {
           }
         }
       });
-    Kefir.fromEvents(document.body as any, 'inboxsdkSidebarPanelScrollIntoView')
+    Kefir.fromEvents<{ detail: any }, unknown>(
+      document.body,
+      'inboxsdkSidebarPanelScrollIntoView'
+    )
       .takeUntilBy(this._stopper)
       .onValue((event) => {
         component.scrollPanelIntoView(event.detail.instanceId);
       });
-    Kefir.fromEvents(document.body as any, 'inboxsdkSidebarPanelClose')
+    Kefir.fromEvents<{ detail: any }, unknown>(
+      document.body,
+      'inboxsdkSidebarPanelClose'
+    )
       .takeUntilBy(this._stopper)
       .onValue((event) => {
         component.closePanel(event.detail.instanceId);
@@ -679,9 +690,10 @@ class GmailAppSidebarView {
 
             // we need to suppress this sidebar from loading
             if (activatedWhileLoading) {
-              const activeAddOnIcon = addonSidebarContainerEl.querySelector(
-                ACTIVE_ADD_ON_ICON_SELECTOR
-              );
+              const activeAddOnIcon =
+                addonSidebarContainerEl.querySelector<HTMLElement>(
+                  ACTIVE_ADD_ON_ICON_SELECTOR
+                );
               if (activeAddOnIcon) simulateClick(activeAddOnIcon);
               return;
             }
@@ -721,7 +733,9 @@ class GmailAppSidebarView {
     }
   }
 
-  addSidebarContentPanel(descriptor: Kefir.Observable<Record<string, any>>) {
+  addSidebarContentPanel(
+    descriptor: Kefir.Observable<Record<string, any>, unknown>
+  ) {
     const panel = new ContentPanelViewDriver(
       this._driver,
       descriptor,

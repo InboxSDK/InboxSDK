@@ -1,5 +1,5 @@
 import isEqual from 'lodash/isEqual';
-import Kefir from 'kefir';
+import Kefir, { Observable } from 'kefir';
 import kefirCast from 'kefir-cast';
 import defer from '../../common/defer';
 import get from '../../common/get-or-fail';
@@ -7,7 +7,17 @@ import EventEmitter from '../lib/safe-event-emitter';
 import NAV_ITEM_TYPES from '../constants/nav-item-types';
 import type { Driver } from '../driver-interfaces/driver';
 import type GmailNavItemView from '../dom-driver/gmail/views/gmail-nav-item-view';
-const memberMap = new WeakMap(); // documented in src/docs/
+import { NavItemDescriptor } from '../dom-driver/gmail/views/gmail-nav-item-view';
+import { RouteViewDriver } from '../driver-interfaces/route-view-driver';
+interface Members {
+  appId: string;
+  driver: Driver;
+  navItemDescriptorPropertyStream: Observable<NavItemDescriptor, unknown>;
+  navItemViews: NavItemView[];
+  navItemViewDriver: GmailNavItemView | null | undefined;
+  navItemViewDriverPromise: Promise<GmailNavItemView>;
+}
+const memberMap = new WeakMap<NavItemView, Members>(); // documented in src/docs/
 
 export default class NavItemView extends EventEmitter {
   destroyed: boolean = false;
@@ -15,7 +25,7 @@ export default class NavItemView extends EventEmitter {
   constructor(
     appId: string,
     driver: Driver,
-    navItemDescriptorPropertyStream: Record<string, any>,
+    navItemDescriptorPropertyStream: Observable<NavItemDescriptor, unknown>,
     navItemViewDriverPromise: Promise<GmailNavItemView>
   ) {
     super();
@@ -37,7 +47,10 @@ export default class NavItemView extends EventEmitter {
       const driver = members.driver;
       members.navItemViewDriver = navItemViewDriver;
       members.navItemDescriptorPropertyStream
-        .sampledBy(navItemViewDriver.getEventStream(), (a, b) => [a, b])
+        .sampledBy(
+          navItemViewDriver.getEventStream(),
+          (a, b) => [a, b] as const
+        )
         .onValue((navItemDescriptor) =>
           _handleViewDriverStreamEvent(
             this,
@@ -77,13 +90,15 @@ export default class NavItemView extends EventEmitter {
       appId,
       driver,
       navItemDescriptorPropertyStream,
-      members.navItemViewDriverPromise.then((navItemViewDriver) => {
-        const childNavItemViewDriver = navItemViewDriver.addNavItem(
-          members.appId,
-          navItemDescriptorPropertyStream
-        );
-        return childNavItemViewDriver;
-      })
+      members.navItemViewDriverPromise.then(
+        (navItemViewDriver: GmailNavItemView) => {
+          const childNavItemViewDriver = navItemViewDriver.addNavItem(
+            members.appId,
+            navItemDescriptorPropertyStream
+          );
+          return childNavItemViewDriver;
+        }
+      )
     );
     navItemViews.push(childNavItemView);
     return childNavItemView;
@@ -101,9 +116,11 @@ export default class NavItemView extends EventEmitter {
     navItemViews.forEach(function (navItemView) {
       navItemView.remove();
     });
-    members.navItemViewDriverPromise.then((navItemViewDriver) => {
-      navItemViewDriver.destroy();
-    });
+    members.navItemViewDriverPromise.then(
+      (navItemViewDriver: GmailNavItemView) => {
+        navItemViewDriver.destroy();
+      }
+    );
   }
 
   isCollapsed(): boolean {
@@ -118,17 +135,19 @@ export default class NavItemView extends EventEmitter {
   }
 
   setCollapsed(collapseValue: boolean) {
-    get(memberMap, this).navItemViewDriverPromise.then((navItemViewDriver) => {
-      navItemViewDriver.setCollapsed(collapseValue);
-    });
+    get(memberMap, this).navItemViewDriverPromise.then(
+      (navItemViewDriver: GmailNavItemView) => {
+        navItemViewDriver.setCollapsed(collapseValue);
+      }
+    );
   }
 }
 
 function _handleViewDriverStreamEvent(
-  eventEmitter,
-  navItemViewDriver,
-  driver,
-  [navItemDescriptor, event]
+  eventEmitter: EventEmitter,
+  navItemViewDriver: GmailNavItemView,
+  driver: Driver,
+  [navItemDescriptor, event]: readonly [NavItemDescriptor, any]
 ) {
   switch (event.eventName) {
     case 'click':
@@ -142,7 +161,8 @@ function _handleViewDriverStreamEvent(
             defaultPrevented = true;
           },
         };
-        navItemDescriptor.onClick(syntheticEvent);
+        // TODO: is this synthetic event ever used?
+        (navItemDescriptor.onClick as any)(syntheticEvent);
 
         if (defaultPrevented) {
           break;
@@ -165,8 +185,8 @@ function _handleViewDriverStreamEvent(
 }
 
 function _handleRouteViewChange(
-  navItemViewDriver,
-  [navItemDescriptor, routeViewDriver]
+  navItemViewDriver: GmailNavItemView,
+  [navItemDescriptor, routeViewDriver]: [NavItemDescriptor, RouteViewDriver]
 ) {
   navItemViewDriver.setActive(
     navItemDescriptor &&

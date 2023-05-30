@@ -1,8 +1,8 @@
 import asap from 'asap';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 
-const dispatchCancel = (element) =>
+const dispatchCancel = (element: Element) =>
   asap(() =>
     element.dispatchEvent(
       new CustomEvent('inboxSDKdiscardCanceled', {
@@ -19,7 +19,7 @@ export default function getDiscardStream({
 }: {
   element: HTMLElement;
   discardButton: HTMLElement;
-}): Kefir.Observable<Record<string, any>> {
+}): Kefir.Observable<Record<string, any>, unknown> {
   const domEventStream = Kefir.merge([
     fromEventTargetCapture(element, 'keydown')
       .filter(

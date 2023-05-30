@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import sortBy from 'lodash/sortBy';
 import escape from 'lodash/escape';
 import asap from 'asap';
@@ -29,11 +31,11 @@ type BoundingBoxWrapper = {
   smallestDistance?: number;
 };
 export default class GmailTooltipView {
-  _element: HTMLElement;
-  _eventStream: Bus<any> = kefirBus();
+  _element!: HTMLElement;
+  _eventStream: Bus<any, unknown> = kefirBus();
   _stopper = kefirStopper();
 
-  constructor(options?: Record<string, any> = {}) {
+  constructor(options: Record<string, any> = {}) {
     this._setupElement(options);
   }
 
@@ -49,11 +51,11 @@ export default class GmailTooltipView {
     return this._element;
   }
 
-  getStopper(): Kefir.Observable<null> {
+  getStopper() {
     return this._stopper;
   }
 
-  getEventStream(): Kefir.Observable<Record<string, any>> {
+  getEventStream() {
     return this._eventStream;
   }
 
@@ -81,7 +83,7 @@ export default class GmailTooltipView {
               targetBoundingBox,
               tipBoundingBox
             ),
-          };
+          } as const;
           break;
 
         case 'bottom':
@@ -91,7 +93,7 @@ export default class GmailTooltipView {
               targetBoundingBox,
               tipBoundingBox
             ),
-          };
+          } as const;
           break;
       }
     }
@@ -176,7 +178,7 @@ export default class GmailTooltipView {
       ].join('');
       this._element.innerHTML = html;
 
-      let closeElement = this._element.querySelector(
+      let closeElement = this._element.querySelector<HTMLElement>(
         '.inboxsdk__tooltip_close'
       );
 
@@ -231,28 +233,28 @@ export default class GmailTooltipView {
   ): BoundingBoxWrapper {
     var boundingBoxWrappers = [
       {
-        type: 'top',
+        type: 'top' as const,
         value: this._getTopPositionBoundingBox(
           targetBoundingBox,
           tipBoundingBox
         ),
       },
       {
-        type: 'left',
+        type: 'left' as const,
         value: this._getLeftPositionBoundingBox(
           targetBoundingBox,
           tipBoundingBox
         ),
       },
       {
-        type: 'right',
+        type: 'right' as const,
         value: this._getRightPositionBoundingBox(
           targetBoundingBox,
           tipBoundingBox
         ),
       },
       {
-        type: 'bottom',
+        type: 'bottom' as const,
         value: this._getBottomPositionBoundingBox(
           targetBoundingBox,
           tipBoundingBox
@@ -439,7 +441,7 @@ export default class GmailTooltipView {
     containedBoundingBox: BoundingBox,
     targetBoundingBox: ClientRect
   ) {
-    var position = {};
+    var position: Record<string, any> = {};
 
     switch (type) {
       case 'top':

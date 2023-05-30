@@ -1,4 +1,4 @@
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
 import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
@@ -16,9 +16,9 @@ export default class NativeGmailNavItemView {
   _element: HTMLElement;
   _navItemName: string;
   _activeMarkerElement: HTMLElement | null | undefined = null;
-  _eventStream: Bus<any>;
-  _elementBus: Bus<HTMLElement>;
-  _elementStream: Kefir.Observable<HTMLElement>;
+  _eventStream: Bus<any, unknown>;
+  _elementBus: Bus<HTMLElement, unknown>;
+  _elementStream: Kefir.Observable<HTMLElement, unknown>;
   _isActive: boolean = false;
   _itemContainerElement: HTMLElement | null | undefined = null;
 
@@ -43,10 +43,12 @@ export default class NativeGmailNavItemView {
         childList: true,
       })
         .map(() =>
-          parentElement.querySelector(`.aim a[href*="#${this._navItemName}"]`)
+          parentElement.querySelector<HTMLElement>(
+            `.aim a[href*="#${this._navItemName}"]`
+          )
         )
         .filter(Boolean)
-        .map((link) => findParent(link, (el) => el.classList.contains('aim')))
+        .map((link) => findParent(link!, (el) => el.classList.contains('aim')))
         .filter(Boolean)
         .filter((newElement) => newElement !== this._element)
         .onValue((newElement) => {
@@ -89,13 +91,13 @@ export default class NativeGmailNavItemView {
     return this._element;
   }
 
-  getEventStream(): Kefir.Observable<Record<string, any>> {
+  getEventStream() {
     return this._eventStream;
   }
 
   addNavItem(
     orderGroup: number,
-    navItemDescriptor: Record<string, any>
+    navItemDescriptor: Kefir.Observable<any, any>
   ): GmailNavItemView {
     const gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, 2);
     Kefir.merge([
@@ -192,7 +194,9 @@ export default class NativeGmailNavItemView {
 
     if (!itemContainerElement) {
       itemContainerElement = this._itemContainerElement =
-        this._element.querySelector('.inboxsdk__navItem_container');
+        this._element.querySelector<HTMLElement>(
+          '.inboxsdk__navItem_container'
+        );
 
       if (!itemContainerElement) {
         itemContainerElement = this._createItemContainerElement();

@@ -37,9 +37,9 @@ class CollapsibleSectionView extends EventEmitter {
 }
 
 function _bindToEventStream(
-  collapsibleSectionView,
-  collapsibleSectionViewDriver,
-  driver
+  collapsibleSectionView: CollapsibleSectionView,
+  collapsibleSectionViewDriver: GmailCollapsibleSectionView,
+  driver: Driver
 ) {
   collapsibleSectionViewDriver.getEventStream().onValue(({ eventName }) => {
     collapsibleSectionView.emit(eventName);

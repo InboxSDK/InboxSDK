@@ -1,4 +1,4 @@
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import get from '../../common/get-or-fail';
 import ThreadView from '../views/conversations/thread-view';
 import MessageView from '../views/conversations/message-view';
@@ -116,23 +116,21 @@ class Conversations {
 }
 
 function _setupViewDriverWatcher(
-  appId,
-  stream: Kefir.Observable<Record<string, any>>,
-  ViewClass,
-  handlerRegistry,
-  ConversationsInstance,
-  membrane,
-  driver
+  appId: string,
+  stream: Kefir.Observable<Record<string, any>, unknown>,
+  ViewClass: typeof MessageView | typeof ThreadView,
+  handlerRegistry: any,
+  ConversationsInstance: any,
+  membrane: Membrane,
+  driver: Driver
 ) {
-  var combinedStream: Kefir.Observable<Record<string, any>> = stream.map(
-    function (viewDriver) {
-      const view = membrane.get(viewDriver);
-      return {
-        viewDriver,
-        view,
-      };
-    }
-  );
+  var combinedStream = stream.map(function (viewDriver) {
+    const view = membrane.get(viewDriver);
+    return {
+      viewDriver,
+      view,
+    };
+  });
   // A delay is currently necessary so that ThreadView can wait for its MessageViews.
   combinedStream
     .flatMap((event) =>
@@ -141,7 +139,7 @@ function _setupViewDriverWatcher(
         .map(() => event)
         .takeUntilBy(Kefir.fromEvents(event.view, 'destroy'))
     )
-    .onValue(function (event) {
+    .onValue(function (event: any) {
       handlerRegistry.addTarget(event.view);
     });
 }

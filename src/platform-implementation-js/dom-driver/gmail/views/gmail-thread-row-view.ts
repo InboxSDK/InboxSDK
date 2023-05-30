@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import once from 'lodash/once';
 import flatten from 'lodash/flatten';
 import includes from 'lodash/includes';
@@ -6,7 +7,7 @@ import uniqBy from 'lodash/uniqBy';
 import flatMap from 'lodash/flatMap';
 import { defonce } from 'ud';
 import assert from 'assert';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import asap from 'asap';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
@@ -24,6 +25,7 @@ import GmailActionButtonView from '../widgets/gmail-action-button-view';
 import type GmailDriver from '../gmail-driver';
 import type GmailRowListView from './gmail-row-list-view';
 import updateIcon from '../../../driver-common/update-icon';
+import { Contact } from '../../../../inboxsdk';
 type LabelMod = {
   gmailLabelView: Record<string, any>;
   remove(): void;
@@ -78,12 +80,12 @@ const cachedModificationsByRow: WeakMap<HTMLElement, Mods> = defonce(
   () => new WeakMap()
 );
 
-function focusAndNoPropagation(event) {
+function focusAndNoPropagation(this: any, event: Event) {
   this.focus();
   event.stopImmediatePropagation();
 }
 
-function starGroupEventInterceptor(event) {
+function starGroupEventInterceptor(this: any, event: MouseEvent) {
   const isOnStar = this.firstElementChild.contains(event.target);
   const isOnSDKButton = !isOnStar && this !== event.target;
 
@@ -133,9 +135,9 @@ class GmailThreadRowView {
     | null
     | undefined;
   _stopper = kefirStopper();
-  _refresher: Kefir.Observable<any> | null | undefined;
-  _subjectRefresher: Kefir.Observable<any> | null | undefined;
-  _imageRefresher: Kefir.Observable<any> | null | undefined;
+  _refresher: Kefir.Observable<any, any> | null | undefined;
+  _subjectRefresher: Kefir.Observable<any, any> | null | undefined;
+  _imageRefresher: Kefir.Observable<any, any> | null | undefined;
   _counts: Counts | null | undefined;
   _isVertical: boolean;
   _isDestroyed: boolean = false;
@@ -280,10 +282,10 @@ class GmailThreadRowView {
   // a few cases such as with multiple inbox or the drafts page that it needs a moment.
   // make sure you take until by on the gmailThreadRowView.getStopper() because waitForReady
   // must not be called after the gmailThreadRowView is destroyed
-  waitForReady(): Kefir.Observable<GmailThreadRowView> {
+  waitForReady(): Kefir.Observable<GmailThreadRowView, unknown> {
     const time = [0, 10, 100, 1000, 15000];
 
-    const step = () => {
+    const step: any = () => {
       if (this._threadIdReady()) {
         asap(() => {
           if (this._elements.length) this._removeUnclaimedModifications();
@@ -299,7 +301,7 @@ class GmailThreadRowView {
           );
           return Kefir.never();
         } else {
-          return Kefir.later(stepTime).flatMap(step);
+          return Kefir.later(stepTime, undefined).flatMap(step);
         }
       }
     };
@@ -370,13 +372,15 @@ class GmailThreadRowView {
       return;
     }
 
-    const prop: Kefir.Observable<Record<string, any> | null | undefined> =
-      kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
-    let labelMod = null;
+    const prop: Kefir.Observable<
+      Record<string, any> | null | undefined,
+      unknown
+    > = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
+    let labelMod: LabelMod | null | undefined = null;
     prop
       .combine(this._getRefresher())
       .takeUntilBy(this._stopper)
-      .onValue(([labelDescriptor]) => {
+      .onValue(([labelDescriptor]: any) => {
         if (!labelDescriptor) {
           if (labelMod) {
             labelMod.remove();
@@ -439,8 +443,8 @@ class GmailThreadRowView {
         ])
       )
       .takeUntilBy(this._stopper);
-    let imageMod = null;
-    prop.onValue(([iconDescriptor]) => {
+    let imageMod: ImageMod | null | undefined = null;
+    prop.onValue(([iconDescriptor]: any) => {
       if (!iconDescriptor) {
         if (imageMod) {
           imageMod.remove();
@@ -510,12 +514,14 @@ class GmailThreadRowView {
 
     if (this._elements.length != 1) return; // buttons not supported in vertical preview pane
 
-    let activeDropdown = null;
-    let buttonMod = null;
-    const prop: Kefir.Observable<Record<string, any> | null | undefined> =
-      kefirCast(Kefir, buttonDescriptor)
-        .toProperty()
-        .takeUntilBy(this._stopper);
+    let activeDropdown: any = null;
+    let buttonMod: any = null;
+    const prop: Kefir.Observable<
+      Record<string, any> | null | undefined,
+      unknown
+    > = kefirCast(Kefir, buttonDescriptor)
+      .toProperty()
+      .takeUntilBy(this._stopper);
     prop.merge(this._stopper).onValue((buttonDescriptor) => {
       if (!buttonDescriptor) {
         if (activeDropdown) {
@@ -531,7 +537,7 @@ class GmailThreadRowView {
       }
     });
 
-    prop.combine(this._getRefresher()).onValue(([_buttonDescriptor]) => {
+    prop.combine(this._getRefresher()).onValue(([_buttonDescriptor]: any) => {
       const buttonDescriptor = _buttonDescriptor;
 
       if (!buttonDescriptor) {
@@ -552,10 +558,10 @@ class GmailThreadRowView {
           delete buttonDescriptor.className;
         }
 
-        let buttonSpan, iconSettings;
+        let buttonSpan: HTMLElement, iconSettings;
 
         const buttonToolbar =
-          this._elements[0].querySelector('ul[role=toolbar]');
+          this._elements[0].querySelector<HTMLElement>('ul[role=toolbar]');
 
         if (!buttonMod) {
           buttonMod = this._modifications.button.unclaimed.shift();
@@ -583,10 +589,7 @@ class GmailThreadRowView {
               'data-order-hint',
               String(buttonDescriptor.orderHint || 0)
             );
-            (buttonSpan as any).addEventListener(
-              'onmousedown',
-              focusAndNoPropagation
-            );
+            buttonSpan.addEventListener('onmousedown', focusAndNoPropagation);
             iconSettings = {};
             buttonMod = {
               buttonSpan,
@@ -606,7 +609,7 @@ class GmailThreadRowView {
         iconSettings = buttonMod.iconSettings;
 
         if (buttonDescriptor.onClick) {
-          (buttonSpan as any).onclick = (event) => {
+          buttonSpan.onclick = (event) => {
             const appEvent = {
               dropdown: null as DropdownView | null | undefined,
               threadRowView: this._userView,
@@ -677,8 +680,7 @@ class GmailThreadRowView {
           // Click events that are on one of our buttons should be stopped. Click events
           // that aren't on the star button or our buttons should be re-emitted from the
           // thread row so it counts as clicking on the thread.
-          (starGroup as any).onmouseover = (starGroup as any).onclick =
-            starGroupEventInterceptor;
+          starGroup.onmouseover = starGroup.onclick = starGroupEventInterceptor;
         }
       }
     });
@@ -689,11 +691,13 @@ class GmailThreadRowView {
       return;
     }
 
-    const prop: Kefir.Observable<Record<string, any> | null | undefined> =
-      kefirCast(Kefir, actionButtonDescriptor)
-        .takeUntilBy(this._stopper)
-        .toProperty();
-    let actionMod = null;
+    const prop: Kefir.Observable<
+      Record<string, any> | null | undefined,
+      unknown
+    > = kefirCast(Kefir, actionButtonDescriptor)
+      .takeUntilBy(this._stopper)
+      .toProperty();
+    let actionMod: any = null;
 
     this._stopper.onEnd(() => {
       if (actionMod) {
@@ -738,7 +742,7 @@ class GmailThreadRowView {
           actionButtonDescriptor
         );
         const { url, onClick } = actionButtonDescriptor;
-        actionMod.gmailActionButtonView.setOnClick((event) => {
+        actionMod.gmailActionButtonView.setOnClick((event: Event) => {
           event.stopPropagation();
           window.open(url, '_blank');
 
@@ -784,13 +788,15 @@ class GmailThreadRowView {
       return div;
     });
     var added = false;
-    var currentIconUrl;
-    var prop: Kefir.Observable<Record<string, any> | null | undefined> =
-      kefirCast(Kefir, opts).toProperty();
+    var currentIconUrl: string;
+    var prop: Kefir.Observable<
+      Record<string, any> | null | undefined,
+      unknown
+    > = kefirCast(Kefir, opts).toProperty();
     prop
       .combine(this._getRefresher())
       .takeUntilBy(this._stopper)
-      .onValue(([opts]) => {
+      .onValue(([opts]: any) => {
         const attachmentDiv = querySelector(this._elements[0], 'td.yf.xY');
 
         if (!opts) {
@@ -896,14 +902,16 @@ class GmailThreadRowView {
       return;
     }
 
-    let labelMod;
-    let draftElement, countElement;
-    const prop: Kefir.Observable<Record<string, any> | null | undefined> =
-      kefirCast(Kefir, opts).toProperty();
+    let labelMod: any;
+    let draftElement: HTMLElement, countElement: HTMLElement;
+    const prop: Kefir.Observable<
+      Record<string, any> | null | undefined,
+      unknown
+    > = kefirCast(Kefir, opts).toProperty();
     prop
       .combine(this._getRefresher())
       .takeUntilBy(this._stopper)
-      .onValue(([opts]) => {
+      .onValue(([opts]: any) => {
         const originalLabel = querySelector(this._elements[0], 'td > div.yW');
         const recipientsContainer = originalLabel.parentElement;
         if (!recipientsContainer) throw new Error('Should not happen');
@@ -957,7 +965,7 @@ class GmailThreadRowView {
             );
 
             if (materiaUIlDraftElements.length > 0) {
-              materiaUIlDraftElements.forEach((el) => el.remove());
+              materiaUIlDraftElements.forEach((el) => (el as Element).remove());
               draftElement = Object.assign(document.createElement('span'), {
                 className: 'boq',
               });
@@ -1001,13 +1009,15 @@ class GmailThreadRowView {
       return;
     }
 
-    let dateMod;
-    const prop: Kefir.Observable<Record<string, any> | null | undefined> =
-      kefirCast(Kefir, opts).toProperty();
+    let dateMod: any;
+    const prop: Kefir.Observable<
+      Record<string, any> | null | undefined,
+      unknown
+    > = kefirCast(Kefir, opts).toProperty();
     prop
       .combine(this._getRefresher())
       .takeUntilBy(this._stopper)
-      .onValue(([opts]) => {
+      .onValue(([opts]: any) => {
         const dateContainer = querySelector(
           this._elements[0],
           'td.xW, td.yf > div.apm'
@@ -1071,16 +1081,16 @@ class GmailThreadRowView {
       });
   }
 
-  getEventStream(): Kefir.Observable<any> {
+  getEventStream() {
     return this._stopper;
   }
 
-  getStopper(): Kefir.Observable<any> {
+  getStopper() {
     return this._stopper;
   }
 
   getSubject(): string {
-    return this._getSubjectSelector().textContent;
+    return this._getSubjectSelector().textContent!;
   }
 
   _getSubjectSelector(): HTMLElement {
@@ -1127,10 +1137,10 @@ class GmailThreadRowView {
 
       if (elementWithId) {
         this._cachedSyncThreadID = elementWithId
-          .getAttribute('data-thread-id')
+          .getAttribute('data-thread-id')!
           .replace('#', '');
         this._cachedThreadID = elementWithId
-          .getAttribute('data-legacy-thread-id')
+          .getAttribute('data-legacy-thread-id')!
           .replace('#', '');
         return this._cachedThreadID;
       } else {
@@ -1187,7 +1197,7 @@ class GmailThreadRowView {
       this._cachedSyncDraftIDPromise = Promise.resolve(
         elementWithId
           ? elementWithId
-              .getAttribute('data-standalone-draft-id')
+              .getAttribute('data-standalone-draft-id')!
               .replace('#msg-a:', '')
           : null
       );
@@ -1212,8 +1222,8 @@ class GmailThreadRowView {
     const senderSpans = this._elements[0].querySelectorAll('[email]');
 
     const contacts = Array.from(senderSpans).map((span) => ({
-      emailAddress: span.getAttribute('email'),
-      name: span.getAttribute('name'),
+      emailAddress: span.getAttribute('email')!,
+      name: span.getAttribute('name')!,
     }));
     return uniqBy(contacts, (contact) => contact.emailAddress);
   }
@@ -1236,10 +1246,10 @@ class GmailThreadRowView {
   _getWatchElement(): HTMLElement {
     return this._elements.length === 1
       ? this._elements[0]
-      : (this._elements[0].children[2] as any);
+      : (this._elements[0].children[2] as HTMLElement);
   }
 
-  _getRefresher(): Kefir.Observable<any> {
+  _getRefresher() {
     // Stream that emits an event after whenever Gmail replaces the ThreadRow DOM
     // nodes. One time this happens is when you have a new email in your inbox,
     // you read the email, return to the inbox, get another email, and then the
@@ -1265,7 +1275,7 @@ class GmailThreadRowView {
     return refresher;
   }
 
-  _getSubjectRefresher(): Kefir.Observable<any> {
+  _getSubjectRefresher(): Kefir.Observable<any, unknown> {
     // emit an event whenever the subject element is swapped out for a new one.
     let subjectRefresher = this._subjectRefresher;
 
@@ -1289,7 +1299,7 @@ class GmailThreadRowView {
     return subjectRefresher;
   }
 
-  _getImageContainerRefresher(): Kefir.Observable<any> {
+  _getImageContainerRefresher(): Kefir.Observable<any, unknown> {
     let imageRefresher = this._imageRefresher;
 
     if (!imageRefresher) {
@@ -1344,7 +1354,7 @@ export function removeAllThreadRowUnclaimedModifications() {
   }, 15);
 }
 
-function _removeThreadRowUnclaimedModifications(modifications) {
+function _removeThreadRowUnclaimedModifications(modifications: Mods) {
   for (let ii = 0; ii < modifications.label.unclaimed.length; ii++) {
     const mod = modifications.label.unclaimed[ii];
     //console.log('removing unclaimed label mod', mod);

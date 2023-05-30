@@ -13,7 +13,16 @@ import type {
   MessageViewToolbarButtonDescriptor,
 } from '../../driver-interfaces/message-view-driver';
 import type { Driver } from '../../driver-interfaces/driver';
-const memberMap = defonce(module, () => new WeakMap()); // documented in src/docs/
+import { Contact } from '../../../inboxsdk';
+import { Observable } from 'kefir';
+interface Members {
+  Conversations: Record<string, any>;
+  driver: Driver;
+  linksInBody: Array<MessageViewLinkDescriptor> | null | undefined;
+  membrane: Membrane;
+  messageViewImplementation: MessageViewDriver;
+}
+const memberMap = defonce(module, () => new WeakMap<MessageView, Members>()); // documented in src/docs/
 
 class MessageView extends EventEmitter {
   destroyed: boolean = false;
@@ -162,9 +171,9 @@ class MessageView extends EventEmitter {
 
     if (!members.linksInBody) {
       const anchors = this.getBodyElement().querySelectorAll('a');
-      members.linksInBody = Array.from(anchors as any).map(
+      members.linksInBody = Array.from(anchors).map(
         (anchor: HTMLAnchorElement) => ({
-          text: anchor.textContent,
+          text: anchor.textContent!,
           html: anchor.innerHTML,
           href: anchor.href,
           element: anchor,
@@ -189,7 +198,7 @@ class MessageView extends EventEmitter {
       );
     return this.getRecipientEmailAddresses().map((emailAddress) => ({
       emailAddress,
-      name: null,
+      name: null!,
     }));
   }
 
@@ -238,7 +247,11 @@ class MessageView extends EventEmitter {
   }
 }
 
-function _bindToEventStream(messageView, members, stream) {
+function _bindToEventStream(
+  messageView: MessageView,
+  members: Members,
+  stream: Observable<any, any>
+) {
   stream.onEnd(function () {
     messageView.destroyed = true;
     messageView.emit('destroy');

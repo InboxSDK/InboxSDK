@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 export default function setupEventReemitter() {
   // Webkit has bugs that stop certain types of events from being created. We
   // can manually fake creation of those events, but we have to do it from
@@ -20,7 +21,7 @@ export default function setupEventReemitter() {
         const { files, fileNames } = event.detail.dataTransfer;
 
         if (fileNames) {
-          fileNames.forEach((fileName, i) => {
+          fileNames.forEach((fileName: string, i: number) => {
             const file = files[i];
 
             if (typeof file.name !== 'string') {
@@ -33,7 +34,7 @@ export default function setupEventReemitter() {
           dropEffect: 'none',
           effectAllowed: 'all',
           files,
-          items: files.map(({ type }, i) => ({
+          items: files.map(({ type }: any, i: number) => ({
             kind: 'file',
             type,
 

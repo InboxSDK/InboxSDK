@@ -1,3 +1,4 @@
+/* eslint-disable prefer-const */
 import gmailAjax from '../../../driver-common/gmailAjax';
 import { extractThreadsFromThreadResponse } from '../gmail-sync-response-processor';
 import getAccountUrlPart from '../../../driver-common/getAccountUrlPart';
@@ -63,7 +64,7 @@ export async function getThreadFromSyncThreadIdUsingHeaders(
   const threadDescriptors = extractThreadsFromThreadResponse(responseText);
 
   if (threadDescriptors.length > 0) {
-    const thread = threadDescriptors[0];
+    const thread = threadDescriptors[0] as any;
 
     if (thread.oldGmailThreadID) {
       return thread;

@@ -13,7 +13,18 @@ import censorHTMLtree from '../../../../../common/censorHTMLtree';
 import positionFormattingToolbar from './position-formatting-toolbar';
 import type GmailComposeView from '../gmail-compose-view';
 import get from '../../../../../common/get-or-fail';
-const memberMap = defonce(module, () => new Map());
+const memberMap = defonce(
+  module,
+  () =>
+    new Map<
+      GmailComposeView,
+      {
+        formattingToolbarMutationObserver?: MutationObserver;
+        groupedActionToolbarContainer?: HTMLElement;
+        groupedToolbarButtonViewController?: BasicButtonViewController;
+      }
+    >()
+);
 export default defn(
   module,
   function manageButtonGrouping(gmailComposeView: GmailComposeView) {
@@ -62,7 +73,9 @@ export default defn(
   }
 );
 
-function _handleComposeFullscreenStateChanged(gmailComposeView) {
+function _handleComposeFullscreenStateChanged(
+  gmailComposeView: GmailComposeView
+) {
   if (
     gmailComposeView
       .getElement()
@@ -74,14 +87,14 @@ function _handleComposeFullscreenStateChanged(gmailComposeView) {
   _handleButtonAdded(gmailComposeView);
 }
 
-function _ungroupButtons(gmailComposeView) {
+function _ungroupButtons(gmailComposeView: GmailComposeView) {
   const members = get(memberMap, gmailComposeView);
   if (members.groupedToolbarButtonViewController)
     members.groupedToolbarButtonViewController.destroy();
   if (members.formattingToolbarMutationObserver)
     members.formattingToolbarMutationObserver.disconnect();
-  const buttonToolbar: HTMLElement | null | undefined = members
-    .groupedActionToolbarContainer.firstElementChild as any;
+  const buttonToolbar = members.groupedActionToolbarContainer!
+    .firstElementChild as HTMLElement | null;
 
   if (buttonToolbar) {
     _moveNoOverflowButtonsToContainer(gmailComposeView, buttonToolbar);
@@ -141,7 +154,7 @@ function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView) {
       _narrowButtonsIfNeeded(gmailComposeView);
 
       gmailComposeView.getStopper().onValue(function () {
-        (groupedActionToolbarContainer as any).remove();
+        groupedActionToolbarContainer.remove();
         groupToggleButtonViewController.destroy();
       });
     }
@@ -224,15 +237,15 @@ function _createGroupToggleButtonViewController(
 
       if (_isToggleExpanded()) {
         get(memberMap, gmailComposeView)
-          .groupedActionToolbarContainer.querySelectorAll(
+          .groupedActionToolbarContainer!.querySelectorAll<HTMLElement>(
             '.inboxsdk__composeButton'
           )[0]
           .focus();
       }
     },
   });
-  members.groupedActionToolbarContainer.addEventListener('keydown', function (
-    event
+  members.groupedActionToolbarContainer!.addEventListener('keydown', function (
+    event: KeyboardEvent
   ) {
     if (event.which === 27) {
       //escape
@@ -258,7 +271,10 @@ function _createGroupToggleButtonView() {
   return buttonView;
 }
 
-function _swapToActionToolbar(gmailComposeView, buttonViewController) {
+function _swapToActionToolbar(
+  gmailComposeView: GmailComposeView,
+  buttonViewController: BasicButtonViewController
+) {
   const actionToolbar = querySelector(
     gmailComposeView.getElement(),
     '.inboxsdk__compose_actionToolbar > div'
@@ -268,10 +284,8 @@ function _swapToActionToolbar(gmailComposeView, buttonViewController) {
   const newActionToolbar = document.createElement('div');
   newActionToolbar.appendChild(buttonViewController.getView().getElement());
   actionToolbarContainer.appendChild(newActionToolbar);
-  const groupedActionToolbarContainer: HTMLElement = get(
-    memberMap,
-    gmailComposeView
-  ).groupedActionToolbarContainer;
+  const groupedActionToolbarContainer = get(memberMap, gmailComposeView)
+    .groupedActionToolbarContainer!;
   groupedActionToolbarContainer.insertBefore(
     actionToolbar,
     groupedActionToolbarContainer.firstElementChild as any
@@ -281,7 +295,9 @@ function _swapToActionToolbar(gmailComposeView, buttonViewController) {
   _moveNoOverflowButtonsToActionToolbar(gmailComposeView);
 }
 
-function _moveNoOverflowButtonsToActionToolbar(gmailComposeView) {
+function _moveNoOverflowButtonsToActionToolbar(
+  gmailComposeView: GmailComposeView
+) {
   const actionToolbar = querySelector(
     gmailComposeView.getElement(),
     '.inboxsdk__compose_actionToolbar > div'
@@ -291,20 +307,22 @@ function _moveNoOverflowButtonsToActionToolbar(gmailComposeView) {
 }
 
 function _moveNoOverflowButtonsToContainer(
-  gmailComposeView,
+  gmailComposeView: GmailComposeView,
   container: HTMLElement
 ) {
   const noOverflowButtons = gmailComposeView
     .getElement()
-    .querySelectorAll('.inboxsdk__composeButton[data-no-overflow]');
-  Array.from(noOverflowButtons).forEach((buttonElement: HTMLElement) =>
+    .querySelectorAll<HTMLElement>(
+      '.inboxsdk__composeButton[data-no-overflow]'
+    );
+  Array.from(noOverflowButtons).forEach((buttonElement) =>
     insertElementInOrder(container, buttonElement, undefined, true)
   );
 }
 
 function _checkAndSetInitialState(
-  gmailComposeView,
-  groupToggleButtonViewController
+  gmailComposeView: GmailComposeView,
+  groupToggleButtonViewController: BasicButtonViewController
 ) {
   if (_isToggleExpanded()) {
     _expandGroupButtonToolbar(
@@ -314,9 +332,14 @@ function _checkAndSetInitialState(
   }
 }
 
-function _collapseGroupButtonToolbar(gmailComposeView, buttonViewController) {
-  get(memberMap, gmailComposeView).groupedActionToolbarContainer.style.display =
-    'none';
+function _collapseGroupButtonToolbar(
+  gmailComposeView: GmailComposeView,
+  buttonViewController: BasicButtonViewController
+) {
+  get(
+    memberMap,
+    gmailComposeView
+  ).groupedActionToolbarContainer!.style.display = 'none';
   gmailComposeView
     .getElement()
     .classList.remove('inboxsdk__compose_groupedActionToolbar_visible');
@@ -337,9 +360,14 @@ function _collapseGroupButtonToolbar(gmailComposeView, buttonViewController) {
   }
 }
 
-function _expandGroupButtonToolbar(gmailComposeView, buttonViewController) {
-  get(memberMap, gmailComposeView).groupedActionToolbarContainer.style.display =
-    '';
+function _expandGroupButtonToolbar(
+  gmailComposeView: GmailComposeView,
+  buttonViewController: BasicButtonViewController
+) {
+  get(
+    memberMap,
+    gmailComposeView
+  ).groupedActionToolbarContainer!.style.display = '';
   gmailComposeView
     .getElement()
     .classList.add('inboxsdk__compose_groupedActionToolbar_visible');
@@ -367,7 +395,10 @@ function _expandGroupButtonToolbar(gmailComposeView, buttonViewController) {
   }
 }
 
-function _toggleGroupButtonToolbar(gmailComposeView, buttonViewController) {
+function _toggleGroupButtonToolbar(
+  gmailComposeView: GmailComposeView,
+  buttonViewController: BasicButtonViewController
+) {
   if (_isToggleExpanded()) {
     _collapseGroupButtonToolbar(gmailComposeView, buttonViewController);
   } else {
@@ -383,7 +414,7 @@ function _isToggleExpanded() {
 
 const fixToolbarPositionMap = new WeakSet();
 
-function _fixToolbarPosition(gmailComposeView) {
+function _fixToolbarPosition(gmailComposeView: GmailComposeView) {
   if (fixToolbarPositionMap.has(gmailComposeView)) return;
   fixToolbarPositionMap.add(gmailComposeView);
   window.requestAnimationFrame(() => {
@@ -392,7 +423,7 @@ function _fixToolbarPosition(gmailComposeView) {
     positionFormattingToolbar(gmailComposeView);
     var groupedActionToolbarContainer = gmailComposeView
       .getElement()
-      .querySelector('.inboxsdk__compose_groupedActionToolbar');
+      .querySelector<HTMLElement>('.inboxsdk__compose_groupedActionToolbar');
 
     if (!groupedActionToolbarContainer) {
       return;
@@ -406,14 +437,14 @@ function _fixToolbarPosition(gmailComposeView) {
   });
 }
 
-function _positionGroupToolbar(gmailComposeView) {
+function _positionGroupToolbar(gmailComposeView: GmailComposeView) {
   if (gmailComposeView.isMinimized()) {
     return;
   }
 
   var groupedActionToolbarContainer = gmailComposeView
     .getElement()
-    .querySelector('.inboxsdk__compose_groupedActionToolbar');
+    .querySelector<HTMLElement>('.inboxsdk__compose_groupedActionToolbar');
 
   if (!groupedActionToolbarContainer) {
     return;
@@ -452,7 +483,9 @@ function _positionGroupToolbar(gmailComposeView) {
   groupedActionToolbarContainer.style.bottom = `${bottomToolbarHeight + 1}px`;
 
   if (bottomToolbarHeight < 1) {
-    const heElements = gmailComposeView.getElement().querySelectorAll('td.HE');
+    const heElements = gmailComposeView
+      .getElement()
+      .querySelectorAll<HTMLElement>('td.HE');
     Logger.error(new Error('bottom toolbar had bad height'), {
       bottomToolbarHeight,
       heElementHeights: Array.from(heElements).map((el) => el.clientHeight),
@@ -462,8 +495,8 @@ function _positionGroupToolbar(gmailComposeView) {
 }
 
 function _startMonitoringFormattingToolbar(
-  gmailComposeView,
-  groupToggleButtonViewController
+  gmailComposeView: GmailComposeView,
+  groupToggleButtonViewController: BasicButtonViewController
 ) {
   waitFor(function () {
     if (gmailComposeView.isDestroyed()) throw 'skip';

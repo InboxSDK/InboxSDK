@@ -11,9 +11,11 @@ export default class MoleView extends EventEmitter {
       driver: options.moleViewDriver,
     };
     memberMap.set(this, members);
-    members.driver.getEventStream().onValue((e) => {
-      this.emit(e.eventName, e.detail);
-    });
+    members.driver
+      .getEventStream()
+      .onValue((e: { eventName: string; detail: unknown }) => {
+        this.emit(e.eventName, e.detail);
+      });
     members.driver.getEventStream().onEnd(() => {
       this.destroyed = true;
       this.emit('destroy');

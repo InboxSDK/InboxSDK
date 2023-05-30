@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable flowtype/require-valid-file-annotation, no-undef */
-if (!global.__InboxSDKInjected) {
-  global.__InboxSDKInjected = true;
+declare let define: any;
+
+if (!(global as any).__InboxSDKInjected) {
+  (global as any).__InboxSDKInjected = true;
 
   const logger = require('./injected-logger');
 

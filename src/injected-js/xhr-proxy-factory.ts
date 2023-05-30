@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable prefer-const */
+/* eslint-disable prefer-rest-params */
 import has from 'lodash/has';
 import noop from 'lodash/noop';
 import each from 'lodash/each';
@@ -8,7 +11,7 @@ import assert from 'assert';
 import EventEmitter from 'events';
 import { parse as deparam } from 'querystring';
 export type Opts = {
-  logError: (error: Error, details: any) => void;
+  logError: (error: unknown, details?: any) => void;
 };
 const WARNING_TIMEOUT = 60 * 1000;
 
@@ -139,8 +142,12 @@ export default function XHRProxyFactory(
       }, 1);
     };
 
-  function transformEvent(oldTarget, newTarget, event) {
-    const newEvent = {};
+  function transformEvent(
+    oldTarget: unknown,
+    newTarget: Record<string, any>,
+    event: any
+  ) {
+    const newEvent: any = {};
     Object.keys(event)
       .concat([
         'bubbles',
@@ -165,7 +172,7 @@ export default function XHRProxyFactory(
       ])
       .filter((name) => name in event)
       .forEach((name) => {
-        const value = (event as any)[name];
+        const value = event[name];
 
         if (value === oldTarget) {
           newEvent[name] = newTarget;
@@ -178,8 +185,8 @@ export default function XHRProxyFactory(
     return newEvent;
   }
 
-  function wrapEventListener(oldTarget, newTarget, listener) {
-    return function (event) {
+  function wrapEventListener(oldTarget: any, newTarget: any, listener: any) {
+    return function (event: any) {
       return listener.call(
         newTarget,
         transformEvent(oldTarget, newTarget, event)
@@ -187,7 +194,10 @@ export default function XHRProxyFactory(
     };
   }
 
-  function findApplicableWrappers(wrappers, connection) {
+  function findApplicableWrappers(
+    wrappers: Wrapper[],
+    connection: XHRProxyConnectionDetails
+  ) {
     return filter(wrappers, function (wrapper) {
       try {
         return wrapper.isRelevantTo(connection);
@@ -197,7 +207,27 @@ export default function XHRProxyFactory(
     });
   }
 
-  function XHRProxy() {
+  type XHRProxyThis = {
+    _activeWrappers: any[];
+    _boundListeners: Record<string, any>;
+    _clientStartedSend: boolean;
+    _connection: any;
+    _events: unknown;
+    _fakeRscEvent(): void;
+    _listeners: unknown;
+    _openState: unknown;
+    _realStartedSend: unknown;
+    _realxhr: XMLHttpRequest;
+    _requestChangers: unknown[];
+    _responseTextChangers: any[];
+    _wrappers: Wrapper[];
+    readyState: unknown;
+    responseText: unknown;
+    status: number;
+    [key: `on${string}`]: any;
+  };
+
+  function XHRProxy(this: XHRProxyThis) {
     this._wrappers = wrappers;
     this._listeners = {};
     this._boundListeners = {};
@@ -206,11 +236,11 @@ export default function XHRProxyFactory(
     this.responseText = '';
     this._openState = false;
 
-    if (XHR.bind && XHR.bind.apply) {
+    if (XHR.bind && (XHR.bind.apply as any)) {
       // call constructor with variable number of arguments
       this._realxhr = new ((XHR as any).bind.apply(
         XHR,
-        [null].concat(arguments)
+        [null].concat(arguments as any)
       ))();
     } else {
       // Safari's XMLHttpRequest lacks a bind method, but its constructor
@@ -221,13 +251,14 @@ export default function XHRProxyFactory(
 
     const self = this;
 
-    const triggerEventListeners = (name, event) => {
-      if (this['on' + name]) {
+    const triggerEventListeners = (name: string, event: unknown) => {
+      if ((this as any)['on' + name]) {
         try {
-          wrapEventListener(this._realxhr, this, this['on' + name]).call(
+          wrapEventListener(
+            this._realxhr,
             this,
-            event
-          );
+            (this as any)['on' + name]
+          ).call(this, event);
         } catch (e) {
           logError(e, 'XMLHttpRequest event listener error');
         }
@@ -242,7 +273,7 @@ export default function XHRProxyFactory(
       });
     };
 
-    const runRscListeners = (event) => {
+    const runRscListeners = (event: unknown) => {
       triggerEventListeners('readystatechange', event);
     };
 
@@ -269,7 +300,7 @@ export default function XHRProxyFactory(
       );
     };
 
-    const deliverFinalRsc = (event) => {
+    const deliverFinalRsc = (event: unknown) => {
       this.readyState = 4;
       // Remember the status now before any event handlers are called, just in
       // case one aborts the request.
@@ -477,18 +508,18 @@ export default function XHRProxyFactory(
         get: function () {
           // If we give the original native methods directly, they'll be called
           // with `this` as the XHRProxy object, which they aren't made for.
-          if (typeof self._realxhr[prop] == 'function') {
-            return self._realxhr[prop].bind(self._realxhr);
+          if (typeof (self._realxhr as any)[prop] == 'function') {
+            return (self._realxhr as any)[prop].bind(self._realxhr);
           }
 
-          return self._realxhr[prop];
+          return (self._realxhr as any)[prop];
         },
         set: function (v) {
           if (typeof v == 'function') {
             v = wrapEventListener(this._realxhr, this, v);
           }
 
-          self._realxhr[prop] = v;
+          (self._realxhr as any)[prop] = v;
         },
       });
     });
@@ -529,7 +560,10 @@ export default function XHRProxyFactory(
     this._realxhr.abort();
   };
 
-  XHRProxy.prototype.setRequestHeader = function (name, value) {
+  XHRProxy.prototype.setRequestHeader = function (
+    name: string,
+    value: unknown
+  ) {
     var self = this;
 
     if (this.readyState != 1) {
@@ -553,7 +587,10 @@ export default function XHRProxyFactory(
     }
   };
 
-  XHRProxy.prototype.addEventListener = function (name, listener) {
+  XHRProxy.prototype.addEventListener = function (
+    name: string,
+    listener: unknown
+  ) {
     if (!this._listeners[name]) {
       this._listeners[name] = [];
       this._boundListeners[name] = [];
@@ -574,7 +611,10 @@ export default function XHRProxyFactory(
     }
   };
 
-  XHRProxy.prototype.removeEventListener = function (name, listener) {
+  XHRProxy.prototype.removeEventListener = function (
+    name: string,
+    listener: unknown
+  ) {
     if (!this._listeners[name]) {
       return;
     }
@@ -594,10 +634,15 @@ export default function XHRProxyFactory(
     }
   };
 
-  XHRProxy.prototype.open = function (method, url, async) {
+  XHRProxy.prototype.open = function (
+    this: XHRProxyThis,
+    method: string,
+    url: string,
+    async: boolean
+  ) {
     // Work around MailTrack issue
     if (!(this instanceof XHRProxy)) {
-      return XHR.prototype.open.apply(this, arguments);
+      return XHR.prototype.open.apply(this, arguments as any);
     }
 
     var self = this;
@@ -625,7 +670,7 @@ export default function XHRProxyFactory(
     this.responseText = '';
     this._openState = true;
 
-    function finish(method, url) {
+    function finish(method: string, url: string) {
       return self._realxhr.open(method, url, self._connection.async);
     }
 
@@ -650,7 +695,7 @@ export default function XHRProxyFactory(
     }
   };
 
-  XHRProxy.prototype.send = function (body) {
+  XHRProxy.prototype.send = function (body: unknown) {
     var self = this;
     this._clientStartedSend = true;
     this._openState = false;
@@ -671,7 +716,7 @@ export default function XHRProxyFactory(
       }
     });
 
-    function finish(body) {
+    function finish(body: unknown) {
       self._realStartedSend = true;
 
       self._realxhr.send(body);

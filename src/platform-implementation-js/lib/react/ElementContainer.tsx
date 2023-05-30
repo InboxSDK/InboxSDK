@@ -4,8 +4,7 @@ type Props = {
   el: HTMLElement;
 };
 export default class ElementContainer extends React.Component<Props> {
-  props: Props;
-  _content: HTMLElement;
+  _content!: HTMLElement;
   _contentRefCb = (el: HTMLElement | null | undefined) => {
     if (el) this._content = el;
   };
@@ -32,6 +31,6 @@ export default class ElementContainer extends React.Component<Props> {
   }
 
   render() {
-    return <div className={this.props.className} ref={this._contentRefCb} />;
+    return <div className={this.props.className!} ref={this._contentRefCb} />;
   }
 }

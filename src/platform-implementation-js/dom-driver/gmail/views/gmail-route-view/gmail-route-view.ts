@@ -1,7 +1,7 @@
 import includes from 'lodash/includes';
 import last from 'lodash/last';
 import once from 'lodash/once';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
@@ -32,7 +32,7 @@ class GmailRouteView {
   _rowListViews: GmailRowListView[];
   _gmailRouteProcessor: GmailRouteProcessor;
   _driver: GmailDriver;
-  _eventStream: Bus<any>;
+  _eventStream: Bus<any, unknown>;
   _customViewElement: HTMLElement | null | undefined;
   _threadView: GmailThreadView | null | undefined;
   _sectionsContainer: HTMLElement | null | undefined;
@@ -74,7 +74,7 @@ class GmailRouteView {
     }
 
     if (this._type === 'CUSTOM_LIST') {
-      Kefir.later(500)
+      Kefir.later(500, undefined)
         .takeUntilBy(this._stopper)
         .onValue(() => {
           var last = driver.getLastCustomThreadListActivity();
@@ -82,7 +82,7 @@ class GmailRouteView {
           if (
             !last ||
             last.customRouteID !== this._customRouteID ||
-            Date.now() - last.timestamp > 5000
+            Date.now() - (last.timestamp as unknown as number) > 5000
           ) {
             this.refresh();
           }
@@ -116,11 +116,11 @@ class GmailRouteView {
     return this._hash;
   }
 
-  getEventStream(): Kefir.Observable<Record<string, any>> {
+  getEventStream() {
     return this._eventStream;
   }
 
-  getStopper(): Kefir.Observable<null> {
+  getStopper() {
     return this._stopper;
   }
 
@@ -149,7 +149,7 @@ class GmailRouteView {
   }
 
   getParams: () => Record<string, string> = once(() => {
-    let params;
+    let params: any;
 
     if (this._customRouteID) {
       params = this._getCustomParams();
@@ -160,7 +160,7 @@ class GmailRouteView {
       if (routeID) {
         const routeIDParams = this._extractParamKeysFromRouteID(routeID);
 
-        const routeParams = {};
+        const routeParams: any = {};
         routeIDParams.forEach(function (param) {
           if (params[param]) {
             routeParams[param] = params[param];
@@ -175,7 +175,8 @@ class GmailRouteView {
 
   addCollapsibleSection(
     sectionDescriptorProperty: Kefir.Observable<
-      Record<string, any> | null | undefined
+      Record<string, any> | null | undefined,
+      unknown
     >,
     groupOrderHint: any
   ): GmailCollapsibleSectionView {
@@ -188,7 +189,8 @@ class GmailRouteView {
 
   addSection(
     sectionDescriptorProperty: Kefir.Observable<
-      Record<string, any> | null | undefined
+      Record<string, any> | null | undefined,
+      unknown
     >,
     groupOrderHint: any
   ): GmailCollapsibleSectionView {
@@ -200,7 +202,7 @@ class GmailRouteView {
   }
 
   _addCollapsibleSection(
-    collapsibleSectionDescriptorProperty: Record<string, any>,
+    collapsibleSectionDescriptorProperty: any,
     groupOrderHint: any,
     isCollapsible: boolean
   ): GmailCollapsibleSectionView {
@@ -340,7 +342,7 @@ class GmailRouteView {
       // This element is always present in thread lists, but it only has contents
       // when in preview pane mode. We want to monitor it in either case
       // because the user could switch into preview pane mode.
-      const previewPaneContainer = document.querySelector(
+      const previewPaneContainer = document.querySelector<HTMLElement>(
         'div[role=main] .aia'
       );
 
@@ -360,7 +362,7 @@ class GmailRouteView {
         scrollContainer.scrollTop = cachedScrollTop;
       }
 
-      Kefir.fromEvents(scrollContainer, 'scroll')
+      Kefir.fromEvents<any, unknown>(scrollContainer, 'scroll')
         .throttle(SCROLL_DEBOUNCE_MS)
         .map((e) => e.target.scrollTop)
         .takeUntilBy(this._stopper)
@@ -405,7 +407,9 @@ class GmailRouteView {
   _getSectionsContainer(): HTMLElement {
     const main = document.querySelector("div[role='main']");
     if (!main) throw new Error('should not happen');
-    let sectionsContainer = main.querySelector('.inboxsdk__custom_sections');
+    let sectionsContainer = main.querySelector<HTMLElement>(
+      '.inboxsdk__custom_sections'
+    );
 
     if (!sectionsContainer) {
       sectionsContainer = this._sectionsContainer =
@@ -591,7 +595,7 @@ class GmailRouteView {
 
     if (!threadID) {
       // Happens if gmonkey isn't available, like on a standalone thread page.
-      threadID = parse(document.location.search, null, null).th || '';
+      threadID = parse(document.location.search, null!, null!).th || '';
     }
 
     return {
@@ -629,16 +633,19 @@ class GmailRouteView {
     } else if (this._isSpaceRoute()) {
       return this._gmailRouteProcessor.NativeRouteIDs.SPACE;
     } else {
-      return this._gmailRouteProcessor.getRouteID(this._name);
+      return this._gmailRouteProcessor.getRouteID(this._name)!;
     }
   }
 
   // Used to click gmail refresh button in thread lists
   refresh() {
-    var el = GmailElementGetter.getToolbarElement().querySelector('div.T-I.nu');
+    var el =
+      GmailElementGetter.getToolbarElement().querySelector<HTMLElement>(
+        'div.T-I.nu'
+      );
 
     if (el) {
-      var prevActive = document.activeElement;
+      var prevActive = document.activeElement as HTMLElement;
       var prevClassName = el.className;
       simulateClick(el);
       el.className = prevClassName; // remove the gmail focus class

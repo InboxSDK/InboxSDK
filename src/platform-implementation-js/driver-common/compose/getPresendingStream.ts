@@ -1,9 +1,9 @@
 import asap from 'asap';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 
 const dispatchCancel = (
-  element // asap necessary so we don't emit this event during the click/keydown event dispatch
+  element: Element // asap necessary so we don't emit this event during the click/keydown event dispatch
 ) =>
   asap(() =>
     element.dispatchEvent(
@@ -23,7 +23,7 @@ export default function ({
   element: HTMLElement;
   sendButton: HTMLElement;
   sendAndArchive?: HTMLElement | null | undefined;
-}): Kefir.Observable<Record<string, any>> {
+}): Kefir.Observable<Record<string, any>, unknown> {
   const domEventStream = Kefir.merge([
     fromEventTargetCapture(element, 'keydown')
       .filter((domEvent) => domEvent.ctrlKey || domEvent.metaKey)
@@ -37,12 +37,14 @@ export default function ({
       .filter(
         (domEvent) =>
           (sendButton && sendButton.contains(domEvent.target)) ||
-          (sendAndArchive && sendAndArchive.contains(domEvent.target))
+          ((sendAndArchive &&
+            sendAndArchive.contains(domEvent.target)) as boolean)
       ),
     fromEventTargetCapture(element, 'click').filter(
       (domEvent) =>
         (sendButton && sendButton.contains(domEvent.target)) ||
-        (sendAndArchive && sendAndArchive.contains(domEvent.target))
+        ((sendAndArchive &&
+          sendAndArchive.contains(domEvent.target)) as boolean)
     ),
   ]);
   return domEventStream

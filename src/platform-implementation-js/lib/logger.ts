@@ -222,7 +222,7 @@ export default class Logger {
   trackFunctionPerformance(
     fn: Function,
     sampleRate: number,
-    details: { type: string }
+    details: { type: string; [key: string]: any }
   ) {
     if (
       Math.random() < sampleRate &&

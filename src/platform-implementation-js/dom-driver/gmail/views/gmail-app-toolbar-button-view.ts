@@ -1,6 +1,6 @@
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import type { Stopper } from 'kefir-stopper';
 import updateIcon from '../../../driver-common/update-icon';
@@ -19,7 +19,7 @@ export default class GmailAppToolbarButtonView {
 
   constructor(
     driver: Driver,
-    inButtonDescriptor: Kefir.Observable<Record<string, any>>
+    inButtonDescriptor: Kefir.Observable<Record<string, any>, unknown>
   ) {
     this._driver = driver;
     this._stopper = kefirStopper();
@@ -48,7 +48,7 @@ export default class GmailAppToolbarButtonView {
     }
   }
 
-  getStopper(): Kefir.Observable<null> {
+  getStopper() {
     return this._stopper;
   }
 
@@ -121,7 +121,7 @@ export default class GmailAppToolbarButtonView {
     if (this._activeDropdown) {
       this._activeDropdown.close();
     } else {
-      var appEvent = {};
+      var appEvent: { dropdown?: DropdownView } = {};
       var tooltipView = new GmailTooltipView();
       tooltipView
         .getContainerElement()
@@ -179,7 +179,7 @@ function _createAppButtonElement(
 
   if (!topAccountContainer) {
     const err = new Error('Could not make button');
-    const banner = document.querySelector('[role=banner]');
+    const banner = document.querySelector<HTMLElement>('[role=banner]');
     driver.getLogger().error(err, {
       type: 'failed to make appToolbarButton',
       gbsfwPresent: !!document.getElementById('gbsfw'),

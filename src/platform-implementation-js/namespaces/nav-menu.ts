@@ -39,12 +39,12 @@ export default class NavMenu {
   static SENT_MAIL: Record<string, any> | null | undefined = null;
 }
 
-function _setupSentMail(appId, driver) {
+function _setupSentMail(appId: string, driver: Driver) {
   const nativeNavItemView = new NativeNavItemView(
     appId,
     driver,
     'sent',
-    driver.getSentMailNativeNavItem()
+    driver.getSentMailNativeNavItem() as any
   );
   return nativeNavItemView;
 }

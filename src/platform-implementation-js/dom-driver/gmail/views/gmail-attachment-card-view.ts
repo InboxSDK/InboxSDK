@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import find from 'lodash/find';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import util from 'util';
 import autoHtml from 'auto-html';
@@ -14,19 +15,19 @@ import waitFor from '../../../lib/wait-for';
 import streamWaitFor from '../../../lib/stream-wait-for';
 
 class GmailAttachmentCardView {
-  _element: HTMLElement;
+  _element!: HTMLElement;
   _driver: GmailDriver;
   _messageViewDriver: GmailMessageView | null | undefined;
   _cachedType: any;
-  _stopper: Kefir.Observable<null> & {
+  _stopper: Kefir.Observable<null, unknown> & {
     destroy(): void;
   } = kefirStopper();
-  _previewClicks = Kefir.pool();
+  _previewClicks = Kefir.pool<Event, unknown>();
 
   constructor(
     options: Record<string, any>,
     driver: GmailDriver,
-    messageViewDriver: GmailMessageView | null | undefined
+    messageViewDriver?: GmailMessageView | null
   ) {
     this._driver = driver;
     this._messageViewDriver = messageViewDriver;
@@ -50,11 +51,11 @@ class GmailAttachmentCardView {
     return this._messageViewDriver;
   }
 
-  getStopper(): Kefir.Observable<null> {
+  getStopper() {
     return this._stopper;
   }
 
-  getPreviewClicks(): Kefir.Observable<Event> {
+  getPreviewClicks() {
     return this._previewClicks.takeUntilBy(this._stopper);
   }
 
@@ -125,7 +126,7 @@ class GmailAttachmentCardView {
   getTitle(): string {
     const title = this._element.querySelector('span .aV3');
 
-    return title ? title.textContent : '';
+    return title ? title.textContent! : '';
   }
 
   _getDownloadLink(): string | null | undefined {
@@ -202,7 +203,7 @@ class GmailAttachmentCardView {
   }
 
   _extractFileNameFromElement(): string {
-    return querySelector(this._element, '.aQA > span').textContent;
+    return querySelector(this._element, '.aQA > span').textContent!;
   }
 
   _createNewElement(options: Record<string, any>) {
@@ -292,11 +293,12 @@ class GmailAttachmentCardView {
 
     var self = this;
 
-    // :any to work around https://github.com/facebook/flow/issues/1155
     this._previewClicks.plug(
-      Kefir.fromEvents(this._element, 'click').map((event) => ({
-        preventDefault: () => event.preventDefault(),
-      }))
+      Kefir.fromEvents<MouseEvent, unknown>(this._element, 'click').map(
+        (event) => ({
+          preventDefault: () => event.preventDefault(),
+        })
+      ) as any
     );
 
     if (options.previewThumbnailUrl && options.failoverPreviewIconUrl) {
@@ -386,7 +388,7 @@ class GmailAttachmentCardView {
           downloadLink.setAttribute('target', '_blank');
         }
 
-        (document.body as any as HTMLElement).appendChild(downloadLink);
+        document.body.appendChild(downloadLink);
         simulateClick(downloadLink);
         downloadLink.remove();
       },

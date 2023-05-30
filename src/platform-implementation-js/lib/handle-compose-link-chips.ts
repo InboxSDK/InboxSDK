@@ -1,15 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import once from 'lodash/once';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import { defn } from 'ud';
 import querySelector from './dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chunked-stream';
 import type { ComposeViewDriver } from '../driver-interfaces/compose-view-driver';
+import GmailComposeView from '../dom-driver/gmail/views/gmail-compose-view';
 const extId = '' + Math.random();
 const Z_SPACE_CHAR = '\u200b';
 const X_URL = 'https://ssl.gstatic.com/ui/v1/icons/common/x_8px.png';
 const handleComposeLinkChips = defn(
   module,
-  function (composeView: ComposeViewDriver) {
+  function (composeView: GmailComposeView) {
     // Abort if we're missing elements we'll need.
     try {
       composeView.getBodyElement();
@@ -49,7 +51,7 @@ const handleComposeLinkChips = defn(
 export default handleComposeLinkChips;
 const doFixing = defn(
   module,
-  function (composeView: ComposeViewDriver) {
+  function (composeView: GmailComposeView) {
     const bodyElement = composeView.getBodyElement();
 
     const chips = _getChipElements(bodyElement);
@@ -60,7 +62,7 @@ const doFixing = defn(
 );
 const doPresendFixing = defn(
   module,
-  function (composeView: ComposeViewDriver) {
+  function (composeView: GmailComposeView) {
     const bodyElement = composeView.getBodyElement();
 
     const chips = _getChipElements(bodyElement);
@@ -72,7 +74,7 @@ const doPresendFixing = defn(
         xBtn.remove();
       }
 
-      const title = chip.querySelector('a > span');
+      const title = chip.querySelector<HTMLElement>('a > span');
 
       if (title) {
         title.style.textDecoration = 'none';
@@ -90,8 +92,8 @@ function _getChipElements(bodyElement: HTMLElement): HTMLElement[] {
   ];
 }
 
-function _waitToClaim(el: HTMLElement): Kefir.Observable<boolean> {
-  return Kefir.later(0)
+function _waitToClaim(el: HTMLElement): Kefir.Observable<boolean, unknown> {
+  return Kefir.later(0, undefined)
     .merge(
       makeMutationObserverChunkedStream(el, {
         attributes: true,

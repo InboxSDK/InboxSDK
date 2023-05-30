@@ -29,22 +29,34 @@ class SectionView extends EventEmitter {
   }
 }
 
-function _bindToEventStream(sectionView, sectionViewDriver, driver) {
+function _bindToEventStream(
+  sectionView: SectionView,
+  sectionViewDriver: GmailCollapsibleSectionView,
+  driver: Driver
+) {
   sectionViewDriver.getEventStream().onValue((e) => {
     sectionView.emit(e.eventName);
   });
   sectionViewDriver
     .getEventStream()
-    .filter(({ eventName }) => eventName === 'rowClicked')
-    .onValue(({ rowDescriptor }) => {
-      if (rowDescriptor.routeID) {
-        driver.goto(rowDescriptor.routeID, rowDescriptor.routeParams);
-      }
+    .filter(
+      ({ eventName }: { eventName: unknown }) => eventName === 'rowClicked'
+    )
+    .onValue(
+      ({
+        rowDescriptor,
+      }: {
+        rowDescriptor: { routeID?: string; routeParams: any; onClick: unknown };
+      }) => {
+        if (rowDescriptor.routeID) {
+          driver.goto(rowDescriptor.routeID, rowDescriptor.routeParams);
+        }
 
-      if (typeof rowDescriptor.onClick === 'function') {
-        rowDescriptor.onClick();
+        if (typeof rowDescriptor.onClick === 'function') {
+          rowDescriptor.onClick();
+        }
       }
-    });
+    );
   sectionViewDriver
     .getEventStream()
     .filter(({ eventName }) => eventName === 'summaryClicked')
