@@ -1934,4 +1934,4 @@ class GmailComposeView {
     }
   }
 }
-export default ud.defn(module, GmailComposeView);
+export default GmailComposeView;

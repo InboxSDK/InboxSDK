@@ -2,7 +2,6 @@
 
 import find from 'lodash/find';
 import findIndex from 'lodash/findIndex';
-import { defn } from 'ud';
 import autoHtml from 'auto-html';
 import asap from 'asap';
 import Kefir from 'kefir';
@@ -1053,4 +1052,4 @@ class GmailAppSidebarPrimary {
   }
 }
 
-export default defn(module, GmailAppSidebarPrimary);
+export default GmailAppSidebarPrimary;

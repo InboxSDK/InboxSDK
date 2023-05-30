@@ -1,6 +1,5 @@
 /* @flow */
 
-import { defn } from 'ud';
 import udKefir from 'ud-kefir';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -130,4 +129,4 @@ class GmailAppSidebarView {
   }
 }
 
-export default defn(module, GmailAppSidebarView);
+export default GmailAppSidebarView;

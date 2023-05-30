@@ -64,4 +64,4 @@ class User {
   }
 }
 
-export default ud.defn(module, User);
+export default User;

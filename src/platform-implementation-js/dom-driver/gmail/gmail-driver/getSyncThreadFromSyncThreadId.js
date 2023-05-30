@@ -1,6 +1,5 @@
 /* @flow */
 
-import { defn } from 'ud';
 import gmailAjax from '../../../driver-common/gmailAjax';
 import { extractThreadsFromThreadResponse } from '../gmail-sync-response-processor';
 import getAccountUrlPart from '../../../driver-common/getAccountUrlPart';

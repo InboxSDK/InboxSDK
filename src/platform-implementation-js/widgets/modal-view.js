@@ -3,7 +3,6 @@
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
-import { defn } from 'ud';
 import EventEmitter from '../lib/safe-event-emitter';
 
 import type { Backdrop, Driver } from '../driver-interfaces/driver';
@@ -128,4 +127,4 @@ function _replaceCurrentlyShowingModal(modalView, modalViewDriver) {
   currentlyShowingModal = { modalView, modalViewDriver };
 }
 
-export default defn(module, ModalView);
+export default ModalView;

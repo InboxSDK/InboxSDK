@@ -9,7 +9,6 @@ It was a strange world, can you believe who the President of the United States w
 
 import findIndex from 'lodash/findIndex';
 import asap from 'asap';
-import { defn } from 'ud';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
@@ -749,4 +748,4 @@ class GmailAppSidebarView {
   }
 }
 
-export default defn(module, GmailAppSidebarView);
+export default GmailAppSidebarView;

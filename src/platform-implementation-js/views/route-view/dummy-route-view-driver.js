@@ -3,7 +3,6 @@
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
-import { defn } from 'ud';
 
 import type { MinRouteViewDriver } from '../../driver-interfaces/route-view-driver';
 
@@ -37,4 +36,4 @@ class DummyRouteViewDriver {
   }
 }
 
-export default defn(module, DummyRouteViewDriver);
+export default DummyRouteViewDriver;

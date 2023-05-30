@@ -2,7 +2,7 @@
 
 import find from 'lodash/find';
 import intersection from 'lodash/intersection';
-import { defn, defonce } from 'ud';
+import { defonce } from 'ud';
 
 import HandlerRegistry from '../lib/handler-registry';
 import get from '../../common/get-or-fail';
@@ -214,4 +214,4 @@ function _updateNavMenu(members, newRouteViewDriver) {
   );
 }
 
-export default defn(module, Router);
+export default Router;

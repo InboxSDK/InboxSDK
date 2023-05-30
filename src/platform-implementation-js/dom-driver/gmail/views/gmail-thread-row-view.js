@@ -6,7 +6,7 @@ import includes from 'lodash/includes';
 import intersection from 'lodash/intersection';
 import uniqBy from 'lodash/uniqBy';
 import flatMap from 'lodash/flatMap';
-import { defn, defonce } from 'ud';
+import { defonce } from 'ud';
 import assert from 'assert';
 import Kefir from 'kefir';
 import asap from 'asap';
@@ -1237,7 +1237,7 @@ class GmailThreadRowView {
   }
 }
 
-export default defn(module, GmailThreadRowView);
+export default GmailThreadRowView;
 
 export function removeAllThreadRowUnclaimedModifications() {
   // run in a setTimeout so that the thread rows get destroyed

@@ -10,7 +10,6 @@ import type { Bus } from 'kefir-bus';
 import { parse } from 'querystring';
 
 import asap from 'asap';
-import { defn } from 'ud';
 
 import makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
 import makeElementViewStream from '../../../../lib/dom/make-element-view-stream';
@@ -651,4 +650,4 @@ class GmailRouteView {
   });
 }
 
-export default defn(module, GmailRouteView);
+export default GmailRouteView;

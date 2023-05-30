@@ -2,7 +2,6 @@
 
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
-import { defn } from 'ud';
 
 import ModalView from '../widgets/modal-view';
 import MoleView from '../widgets/mole-view';
@@ -86,4 +85,4 @@ class Widgets {
 
 const memberMap: Map<Widgets, { driver: Driver }> = new Map();
 
-export default defn(module, Widgets);
+export default Widgets;

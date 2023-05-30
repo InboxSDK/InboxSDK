@@ -1,6 +1,6 @@
 /* @flow */
 
-import { defn, defonce } from 'ud';
+import { defonce } from 'ud';
 import RouteView from './route-view';
 import type { RouteViewDriver } from '../../driver-interfaces/route-view-driver';
 import get from '../../../common/get-or-fail';
@@ -29,4 +29,4 @@ class CustomRouteView extends RouteView {
 
 const membersMap = defonce(module, () => new WeakMap());
 
-export default defn(module, CustomRouteView);
+export default CustomRouteView;

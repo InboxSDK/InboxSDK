@@ -1,6 +1,5 @@
 /* @flow */
 
-import { defn } from 'ud';
 import util from 'util';
 import EventEmitter from '../../lib/safe-event-emitter';
 import type Membrane from '../../lib/Membrane';
@@ -66,4 +65,4 @@ class AttachmentCardView extends EventEmitter {
   }
 }
 
-export default defn(module, AttachmentCardView);
+export default AttachmentCardView;

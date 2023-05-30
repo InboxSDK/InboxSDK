@@ -2,7 +2,6 @@
 import constant from 'lodash/constant';
 import asap from 'asap';
 import delay from 'pdelay';
-import { defn } from 'ud';
 import util from 'util';
 import Kefir from 'kefir';
 import { parse } from 'querystring';
@@ -890,4 +889,4 @@ class GmailThreadView {
   }
 }
 
-export default defn(module, GmailThreadView);
+export default GmailThreadView;

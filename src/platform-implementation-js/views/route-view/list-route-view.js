@@ -1,6 +1,5 @@
 /* @flow */
 
-import { defn } from 'ud';
 import RouteView from './route-view';
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
@@ -75,4 +74,4 @@ function _bindToEventStream(routeViewDriver, routeView) {
   });
 }
 
-export default defn(module, ListRouteView);
+export default ListRouteView;

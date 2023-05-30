@@ -1,7 +1,6 @@
 /* @flow */
 
 import EventEmitter from '../../lib/safe-event-emitter';
-import { defn } from 'ud';
 import get from '../../../common/get-or-fail';
 import type { MinRouteViewDriver } from '../../driver-interfaces/route-view-driver';
 
@@ -65,4 +64,4 @@ function _bindToEventStream(routeViewDriver, routeView) {
   });
 }
 
-export default defn(module, RouteView);
+export default RouteView;

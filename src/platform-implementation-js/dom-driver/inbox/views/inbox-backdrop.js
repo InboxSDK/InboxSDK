@@ -1,6 +1,5 @@
 /* @flow */
 
-import { defn } from 'ud';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
@@ -71,4 +70,4 @@ class InboxBackdrop {
   }
 }
 
-export default defn(module, InboxBackdrop);
+export default InboxBackdrop;

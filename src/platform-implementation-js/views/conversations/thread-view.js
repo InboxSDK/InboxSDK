@@ -1,6 +1,6 @@
 /* @flow */
 
-import { defn, defonce } from 'ud';
+import { defonce } from 'ud';
 import EventEmitter from '../../lib/safe-event-emitter';
 import type Membrane from '../../lib/Membrane';
 import type SimpleElementView from '../../views/SimpleElementView';
@@ -129,7 +129,7 @@ class ThreadView extends EventEmitter {
   }
 }
 
-export default defn(module, ThreadView);
+export default ThreadView;
 
 function _bindToStreamEvents(threadView, threadViewImplementation) {
   threadViewImplementation.getEventStream().onEnd(function () {

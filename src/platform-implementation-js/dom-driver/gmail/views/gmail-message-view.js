@@ -4,7 +4,6 @@ import sortBy from 'lodash/sortBy';
 import once from 'lodash/once';
 import autoHtml from 'auto-html';
 import asap from 'asap';
-import { defn } from 'ud';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
@@ -937,7 +936,7 @@ function _extractContactInformation(span) {
   };
 }
 
-export default defn(module, GmailMessageView);
+export default GmailMessageView;
 
 // This function does not get executed. It's only checked by Flow to make sure
 // this class successfully implements the type interface.

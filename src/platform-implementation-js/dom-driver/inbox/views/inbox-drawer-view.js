@@ -1,6 +1,5 @@
 /* @flow */
 
-import { defn } from 'ud';
 import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
@@ -383,4 +382,4 @@ class InboxDrawerView {
   }
 }
 
-export default defn(module, InboxDrawerView);
+export default InboxDrawerView;

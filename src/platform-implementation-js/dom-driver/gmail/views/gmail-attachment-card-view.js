@@ -5,7 +5,6 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import util from 'util';
 import autoHtml from 'auto-html';
-import { defn } from 'ud';
 import type GmailDriver from '../gmail-driver';
 
 import type GmailMessageView from './gmail-message-view';
@@ -419,4 +418,4 @@ class GmailAttachmentCardView {
   }
 }
 
-export default defn(module, GmailAttachmentCardView);
+export default GmailAttachmentCardView;

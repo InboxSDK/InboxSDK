@@ -1,6 +1,5 @@
 /* @flow */
 
-import { defn } from 'ud';
 import EventEmitter from '../lib/safe-event-emitter';
 import get from '../../common/get-or-fail';
 import type { Driver } from '../driver-interfaces/driver';
@@ -85,4 +84,4 @@ function _bindToEventStream(
   });
 }
 
-export default defn(module, CollapsibleSectionView);
+export default CollapsibleSectionView;

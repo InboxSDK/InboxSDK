@@ -1,6 +1,5 @@
 /* @flow */
 
-import { defn } from 'ud';
 import isEqual from 'lodash/isEqual';
 import updateIcon from '../../../driver-common/update-icon';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
@@ -145,4 +144,4 @@ class GmailLabelView {
   }
 }
 
-export default defn(module, GmailLabelView);
+export default GmailLabelView;

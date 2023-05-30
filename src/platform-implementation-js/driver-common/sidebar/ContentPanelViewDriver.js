@@ -1,6 +1,5 @@
 /* @flow */
 
-import { defn } from 'ud';
 import autoHtml from 'auto-html';
 import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -194,4 +193,4 @@ class ContentPanelViewDriver {
   }
 }
 
-export default defn(module, ContentPanelViewDriver);
+export default ContentPanelViewDriver;
