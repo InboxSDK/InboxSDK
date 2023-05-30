@@ -1,8 +1,4 @@
 .inboxsdk__notransition {
-  -webkit-transition: none !important;
-  -moz-transition: none !important;
-  -o-transition: none !important;
-  -ms-transition: none !important;
   transition: none !important;
 }
 
@@ -18,23 +14,24 @@
   outline: none;
   cursor: pointer;
 }
+
 .inboxsdk__close_button:focus,
 .inboxsdk__close_button:hover {
   opacity: 1;
 }
+
 .inboxsdk__close_button:focus::before {
-  background-color: rgba(0, 0, 0, 0.12);
+  background-color: rgb(0 0 0 / 12%);
 }
+
 .inboxsdk__close_button::before {
   border-radius: 50%;
   position: absolute;
-  top: -4px;
-  bottom: -4px;
-  left: -4px;
-  right: -4px;
+  inset: -4px -4px -4px -4px;
   padding: 4px;
   content: ' ';
 }
+
 .inboxsdk__close_button::after {
   content: ' ';
   background: url(https://www.gstatic.com/images/icons/material/system/1x/close_black_24dp.png);
@@ -62,6 +59,7 @@
   z-index: 51;
   pointer-events: none;
 }
+
 .inboxsdk__drawer_view {
   position: absolute;
   pointer-events: auto;
@@ -71,14 +69,11 @@
   width: 452px;
   font: normal normal normal normal 13px / normal 'Helvetica Neue', Helvetica,
     Arial, sans-serif;
-  display: -webkit-flex;
   display: flex;
-  -webkit-flex-direction: column;
   flex-direction: column;
   background-color: #fff;
   outline: none;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.18), 0 8px 16px rgba(0, 0, 0, 0.36);
-  -webkit-transform: translateX(100%);
+  box-shadow: 0 0 8px rgb(0 0 0 / 18%), 0 8px 16px rgb(0 0 0 / 36%);
   transform: translateX(100%);
   transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -88,24 +83,23 @@
 }
 
 .inboxsdk__drawer_view.inboxsdk__active {
-  -webkit-transform: none;
   transform: none;
 }
+
 .inboxsdk__drawer_title_bar {
   background-color: #f5f5f5;
   border-bottom: 1px solid #e0e0e0;
   padding: 16px 20px;
   white-space: nowrap;
-  display: -webkit-flex;
   display: flex;
   flex: 0 0 auto;
-  -webkit-flex: 0 0 auto;
 }
+
 .inboxsdk__drawer_title_bar .inboxsdk__close_button {
   margin-right: 20px;
-  -webkit-flex-shrink: 0;
   flex-shrink: 0;
 }
+
 .inboxsdk__drawer_title {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -127,8 +121,9 @@
   background-color: transparent;
   transition: background-color 150ms cubic-bezier(0.4, 0, 1, 1);
 }
+
 .inboxsdk__inbox_backdrop.inboxsdk__active {
-  background-color: rgba(10, 10, 10, 0.6);
+  background-color: rgb(10 10 10 / 60%);
   transition: background-color 70ms cubic-bezier(0, 0, 0.2, 1);
 }
 
@@ -139,9 +134,7 @@
 /* sidebar */
 
 :local(.app_sidebar_main) {
-  display: -webkit-flex;
   display: flex;
-  -webkit-flex-direction: column;
   flex-direction: column;
 }
 
@@ -164,10 +157,7 @@
 
 :local(.app_sidebar_content_panel_top_line) {
   white-space: nowrap;
-  display: -webkit-flex;
   display: flex;
-  -moz-user-select: none;
-  -webkit-user-select: none;
   user-select: none;
   cursor: default;
 }
@@ -181,7 +171,7 @@
   :local(.app_sidebar_content_panel_top_line):hover,
 :local(.app_sidebar_content_panel):local(.dragged)
   :local(.app_sidebar_content_panel_top_line) {
-  background: rgba(0, 0, 0, 0.03);
+  background: rgb(0 0 0 / 3%);
 }
 
 :local(.app_sidebar_content_panel_title) {
@@ -199,7 +189,7 @@
   padding-left: 6px;
   vertical-align: middle;
   font: bold 13px / 40px 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  color: rgba(0, 0, 0, 0.87);
+  color: rgb(0 0 0 / 87%);
 }
 
 :local(.app_sidebar):local(.hideTitleBar)
@@ -237,7 +227,6 @@
 }
 
 :local(.app_sidebar_content_panel_toggle) {
-  -webkit-flex: 1;
   flex: 1;
   text-align: right;
   visibility: hidden;
@@ -257,7 +246,6 @@
   border: none;
   width: 14px;
   height: 14px;
-  -webkit-transform: rotate(-90deg);
   transform: rotate(-90deg);
   transition: -webkit-transform 0.15s, transform 0.15s;
   outline: none;
@@ -275,7 +263,6 @@
 
 :local(.app_sidebar_content_panel):local(.expanded)
   :local(.app_sidebar_content_panel_toggle_button) {
-  -webkit-transform: rotate(0);
   transform: rotate(0);
 }
 
@@ -320,7 +307,7 @@ a.inboxsdk__appid_register {
   background: #1989ff;
   border-radius: 3px;
   text-decoration: none;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 5px rgb(0 0 0 / 30%);
   padding: 7px;
   font-size: 10pt;
   vertical-align: middle;
@@ -355,7 +342,7 @@ a.inboxsdk__appid_register {
 /* buttons */
 
 div.T-I.inboxsdk__button {
-  -webkit-user-select: none;
+  user-select: none;
   min-width: 27px;
 }
 
@@ -380,16 +367,16 @@ div.T-I.inboxsdk__button {
   width: 20px;
   vertical-align: middle;
   margin-top: -2px;
+  /* stylelint-disable-next-line property-no-unknown */
   user-drag: none;
-  -moz-user-select: none;
+  user-select: none;
   -webkit-user-drag: none;
 }
 
 .inboxsdk__button_green_inactive {
-  -webkit-box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 0 rgb(0 0 0 / 5%);
   background-color: #53a93f;
-  background-image: -webkit-linear-gradient(top, transparent, transparent);
+  /* stylelint-disable-next-line function-linear-gradient-no-nonstandard-direction */
   background-image: linear-gradient(top, transparent, transparent);
   border: 1px solid transparent;
   color: #fff;
@@ -397,10 +384,9 @@ div.T-I.inboxsdk__button {
 }
 
 .inboxsdk__button_green_hover {
-  -webkit-box-shadow: inset 0 -1px 0 #4c8534;
   box-shadow: inset 0 -1px 0 #4c8534;
   background-color: #65b045;
-  background-image: -webkit-linear-gradient(top, transparent, transparent);
+  /* stylelint-disable-next-line function-linear-gradient-no-nonstandard-direction */
   background-image: linear-gradient(top, transparent, transparent);
   border: 1px solid transparent;
   border-bottom: 1px solid #4c8534;
@@ -408,7 +394,6 @@ div.T-I.inboxsdk__button {
 }
 
 .inboxsdk__button_green_active {
-  -webkit-box-shadow: inset 0 1px 0 #2f6124;
   box-shadow: inset 0 1px 0 #2f6124;
   background: #3e802f;
   border: 1px solid transparent;
@@ -434,10 +419,10 @@ div.T-I.inboxsdk__button {
 
 .inboxsdk__menu > .inboxsdk__menuContent {
   padding: 0;
-  box-shadow: 0 8px 10px 1px rgba(0, 0, 0, 0.14),
-    0 3px 14px 2px rgba(0, 0, 0, 0.12), 0 5px 5px -3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%),
+    0 5px 5px -3px rgb(0 0 0 / 20%);
   transition: opacity 0.218s;
-  border: 1px solid rgba(0, 0, 0, 0.2);
+  border: 1px solid rgb(0 0 0 / 20%);
   background: #fff;
   outline: none;
 }
@@ -453,6 +438,7 @@ div.T-I.inboxsdk__button {
 /* compose buttons */
 
 /* fix compose mole position when sidebar is open */
+
 /*
 steps to repro:
 1. open compose mole
@@ -535,10 +521,7 @@ steps to repro:
   position: absolute;
   transition-duration: 0.15s;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
-  top: 0px;
+  inset: 0px 0px 0px 0px;
   background: none;
   box-sizing: border-box;
   transform: scale(0);
@@ -547,7 +530,7 @@ steps to repro:
 }
 
 .inboxsdk__composeButton:hover::before {
-  background-color: rgba(32, 33, 36, 0.059);
+  background-color: rgb(32 33 36 / 5.9%);
   border: none;
   box-shadow: none;
   opacity: 1;
@@ -556,7 +539,7 @@ steps to repro:
 
 .inboxsdk__composeButton:focus::before,
 .inboxsdk__composeButton.inboxsdk__composeButton_active::before {
-  background-color: rgba(32, 33, 36, 0.122);
+  background-color: rgb(32 33 36 / 12.2%);
   border: none;
   box-shadow: none;
   opacity: 1;
@@ -579,6 +562,7 @@ steps to repro:
   border-radius: 4px;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__compose_sendButton {
   padding: 6px 4px;
   margin-left: 2px;
@@ -588,6 +572,7 @@ steps to repro:
   height: 20px;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__compose_inlineReply .inboxsdk__compose_sendButton {
   height: 24px;
 }
@@ -595,8 +580,8 @@ steps to repro:
 .inboxsdk__compose_sendButton:focus,
 .inboxsdk__compose_sendButton.inboxsdk__composeButton_active {
   background-color: #5094ed;
-  box-shadow: 0 1px 1px 0 rgba(66, 133, 244, 0.3),
-    0 1px 3px 1px rgba(66, 133, 244, 0.15);
+  box-shadow: 0 1px 1px 0 rgb(66 133 244 / 30%),
+    0 1px 3px 1px rgb(66 133 244 / 15%);
   border: none;
 }
 
@@ -608,6 +593,7 @@ steps to repro:
   white-space: nowrap;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__compose_actionToolbar {
   padding-left: 6px;
 }
@@ -642,11 +628,12 @@ steps to repro:
   z-index: 10;
   left: 0px;
   border-radius: 2px;
-  box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12),
-    0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 5px 0 rgb(0 0 0 / 14%), 0 1px 10px 0 rgb(0 0 0 / 12%),
+    0 2px 4px -1px rgb(0 0 0 / 20%);
   padding: 5px 15px;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__compose_groupedActionToolbar {
   margin-bottom: 7px;
   padding: 4px 5px;
@@ -684,6 +671,7 @@ the actionToolbar is visible
   z-index: 1;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__compose_groupedActionToolbar div.inboxsdk__button {
   margin-right: 0px;
 }
@@ -705,6 +693,7 @@ the actionToolbar is visible
   vertical-align: middle;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__compose_customSendContainer {
   height: 36px;
   line-height: 36px;
@@ -718,7 +707,6 @@ the actionToolbar is visible
 
 .inboxsdk__compose_hasCustomTitleBarText,
 .inboxsdk__compose_hasCustomTitleBarText > tbody > tr {
-  display: -webkit-flex;
   display: flex;
 }
 
@@ -816,13 +804,12 @@ input.inboxsdk__x_close_button {
   float: right;
   position: relative;
   background-color: grey;
-  border: 1px solid black;
   margin-left: 1em;
   cursor: default;
   padding: 0 6px;
-  background-image: -webkit-linear-gradient(top, #e9e9e9, #e6e6e6);
+  /* stylelint-disable-next-line function-linear-gradient-no-nonstandard-direction */
   background-image: linear-gradient(top, #e9e9e9, #e6e6e6);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgb(0 0 0 / 10%);
   border-color: #ccc;
   color: #444;
   height: 17px;
@@ -842,13 +829,13 @@ input.inboxsdk__x_close_button {
 }
 
 .inboxsdk__gmail_action:active {
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 10%);
 }
 
 .inboxsdk__gmail_action:hover {
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 1px rgb(0 0 0 / 5%);
   background-color: #ededed;
-  background-image: -webkit-linear-gradient(top, #ededed, #eaeaea);
+  /* stylelint-disable-next-line function-linear-gradient-no-nonstandard-direction */
   background-image: linear-gradient(top, #ededed, #eaeaea);
   border-color: #b8b8b8;
 }
@@ -943,6 +930,7 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
   margin-left: 3px;
   margin-right: 0px;
 }
+
 /* end narrow vertical preview pane */
 
 .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_icon,
@@ -951,6 +939,7 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
   width: 18px;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__thread_row_icon_wrapper {
   width: 20px;
   margin-right: 3px;
@@ -959,6 +948,7 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
   flex: 0 0 auto;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__thread_row_icon_wrapper .inboxsdk__button_iconImg {
   vertical-align: top;
 }
@@ -1039,6 +1029,7 @@ span.inboxsdk__thread_row_custom_draft_label + div.yW {
   width: 18px;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .aQw .inboxsdk__button_iconImg {
   margin-top: 2px;
 }
@@ -1106,7 +1097,7 @@ body .dw {
   position: absolute;
   bottom: 0px;
   width: 100%;
-  border-top: 1px solid rgb(206, 206, 206);
+  border-top: 1px solid rgb(206 206 206);
   display: block;
 }
 
@@ -1164,10 +1155,12 @@ body:not(.inboxsdk_hack_disableComposeSizeFixer)
 .inboxsdk__compose_inlineReply.inboxsdk__compose_statusbarActive .HM .I5 {
   padding-bottom: var(--inboxsdk-total-added-statusbar-height, 0px);
 }
+
 /* Extend the message foreground outline downwards to contain our added status bars */
 .inboxsdk__compose_inlineReply.inboxsdk__compose_statusbarActive .aDj::before {
   height: calc(100% + var(--inboxsdk-total-added-statusbar-height, 0px));
 }
+
 /* When we have a status bar added and the reply status is in position absolute or fixed mode (.aDi),
 use a background color on the element containing our added status bars so the message background outline
 isn't visible behind it. */
@@ -1230,7 +1223,7 @@ isn't visible behind it. */
   color: #5f6368;
 }
 
-[data-toolbar-icononly='false'] .asa:before {
+[data-toolbar-icononly='false'] .asa::before {
   border-radius: 4px;
   border: none !important;
 }
@@ -1240,7 +1233,6 @@ isn't visible behind it. */
   border: none;
   display: inline-flex;
   justify-content: center;
-  outline: none;
   position: relative;
   z-index: 0;
   -webkit-font-smoothing: antialiased;
@@ -1274,17 +1266,11 @@ isn't visible behind it. */
 
 .inboxsdk__modal_fullscreen {
   position: fixed;
-  top: 0px;
-  left: 0px;
-  bottom: 0px;
-  right: 0px;
+  inset: 0px 0px 0px 0px;
   z-index: 503;
   display: flex;
-  display: -webkit-flex;
   justify-content: center;
-  -webkit-justify-content: center;
   align-items: center;
-  -webkit-align-items: center;
   padding: 110px 50px 50px 50px;
 }
 
@@ -1357,12 +1343,10 @@ isn't visible behind it. */
 }
 
 .inboxsdk__modal_toprow.inboxsdk__modal_toprow--constrain-title-width {
-  display: -webkit-flex;
   display: flex;
 }
 
 .inboxsdk__modal_toprow--constrain-title-width > span[role='heading'] {
-  -webkit-flex: 1;
   flex: 1;
   width: 0;
   word-wrap: break-word;
@@ -1379,6 +1363,7 @@ isn't visible behind it. */
   left: auto !important;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__drawers_in_use .aDi,
 .inboxsdk__moles_in_use .aDi {
   position: static;
@@ -1389,9 +1374,11 @@ isn't visible behind it. */
 .inboxsdk__moles_in_use .nH > .nH > .no {
   white-space: nowrap;
 }
+
 .inboxsdk__moles_in_use .nH > .nH > .no > * {
   white-space: initial;
 }
+
 .inboxsdk__moles_in_use .nH > .nH > .no > .nn {
   display: inline-block;
   float: none;
@@ -1403,20 +1390,19 @@ isn't visible behind it. */
   height: 100vh;
   vertical-align: top;
   display: inline-flex;
-  display: -webkit-inline-flex;
   align-items: flex-end;
-  -webkit-align-items: flex-end;
 }
 
 .inboxsdk__mole_view_inner {
   visibility: visible;
   box-sizing: border-box;
   margin-right: 5px;
-  box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px;
+  box-shadow: rgb(0 0 0 / 20%) 0 2px 6px;
   min-width: 260px;
   min-height: 36px;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__mole_view_inner {
   min-height: 40px;
 }
@@ -1484,7 +1470,7 @@ isn't visible behind it. */
 }
 
 .inboxsdk__mole_title_buttons:not(.inboxsdk__original_view) > img:hover {
-  background-color: rgba(68, 71, 70, 0.078);
+  background-color: rgb(68 71 70 / 7.8%);
 }
 
 .inboxsdk__mole_title_buttons.inboxsdk__original_view > img:hover {
@@ -1620,10 +1606,12 @@ body.inboxsdk__hasTopMessageBar .bq9 {
   will-change: position;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 :local(.app_sidebar_content_panel) {
-  background: #ffffff;
+  background: #fff;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 :local(.app_sidebar_content_area) {
   padding: 4px 0 12px;
 }
@@ -1637,16 +1625,13 @@ body.inboxsdk__hasTopMessageBar .bq9 {
 .container_app_sidebar_in_use.no,
 :local(.container_app_sidebar_no_icons).no {
   display: flex;
-  display: -webkit-flex;
   flex-direction: row;
-  -webkit-flex-direction: row;
   width: 100%;
 }
 
 body[dir='rtl'] .container_app_sidebar_in_use.no[dir='ltr'],
 body[dir='rtl'] .idm5_container_app_sidebar_no_icons.no[dir='ltr'] {
   flex-direction: row-reverse;
-  -webkit-flex-direction: row-reverse;
 }
 
 /* overwrite margin right of the gmail page next/back and settings icon buttons
@@ -1685,7 +1670,6 @@ body[dir='rtl'] .idm5_container_app_sidebar_no_icons.no[dir='ltr'] {
 :local(.container_app_sidebar_no_icons) .bkK.nn {
   width: auto !important;
   flex: 1;
-  -webkit-flex: 1;
   min-width: 0px;
 }
 
@@ -1698,7 +1682,6 @@ body[dir='rtl'] .idm5_container_app_sidebar_no_icons.no[dir='ltr'] {
 .container_app_sidebar_in_use :local(.app_sidebar_in_use) {
   min-width: 57px !important;
   flex-shrink: 0;
-  -webkit-flex-shrink: 0;
 }
 
 .container_app_sidebar_in_use :local(.app_sidebar_in_use).app_sidebar_visible {
@@ -1764,14 +1747,11 @@ body :local(.sidebar_iconArea) .inboxsdk__button_icon {
 :local(.sidebar_iconArea)
   .sidebar_button_container_active
   .inboxsdk__button_icon::before,
-:local(.sidebar_iconArea) .inboxsdk__button_icon:hover:before {
+:local(.sidebar_iconArea) .inboxsdk__button_icon:hover::before {
   content: '';
   background: #f1f3f4;
   position: absolute;
-  top: -10px;
-  left: -10px;
-  right: -10px;
-  bottom: -10px;
+  inset: -10px -10px -10px -10px;
   border-radius: 50%;
   z-index: 0;
 }
@@ -1803,7 +1783,7 @@ body :local(.sidebar_iconArea) .inboxsdk__button_icon {
   position: absolute;
   right: 0px;
   bottom: 0px;
-  background-color: rgb(66, 133, 244);
+  background-color: rgb(66 133 244);
   border-radius: 3px 0 0 3px;
 }
 
@@ -1856,6 +1836,7 @@ body :local(.sidebar_iconArea) .inboxsdk__button_icon {
   display: none;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 :local(.app_sidebar_content_panel_title_icon_container) {
   margin-left: 0px;
 }
@@ -1898,6 +1879,7 @@ body.inboxsdk__custom_view_active
 .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) {
   border-left-color: transparent;
 }
+
 .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .nU:not(.n1) .n0 {
   font-weight: normal;
 }
@@ -1905,27 +1887,24 @@ body.inboxsdk__custom_view_active
 .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .bsU {
   font-weight: normal;
 }
+
 .inboxsdk__hide_native_marker .ain:not(.inboxsdk__navItem) .TO {
   background: none;
 }
 
 .inboxsdk__hide_addon_container {
   display: flex !important;
-  display: -webkit-flex !important;
   flex-direction: row;
-  -webkit-flex-direction: row;
   width: 100% !important;
 }
 
 body[dir='rtl'] .inboxsdk__hide_addon_container[dir='ltr'] {
   flex-direction: row-reverse;
-  -webkit-flex-direction: row-reverse;
 }
 
 .inboxsdk__hide_addon_container > .bkK.nn {
   width: auto !important;
   flex: 1;
-  -webkit-flex: 1;
   min-width: 0;
 }
 
@@ -1971,7 +1950,7 @@ shows up on our elements preventing them from collapsing.
 }
 
 .inboxsdk__navItem > .TO .qj:empty::after {
-  background-color: rgb(118, 118, 118);
+  background-color: rgb(118 118 118);
   border-radius: 50%;
   content: '';
   height: 18px;
@@ -1985,7 +1964,6 @@ shows up on our elements preventing them from collapsing.
 
 .inboxsdk__navItem > .TO:hover .pM {
   display: flex;
-  display: -webkit-flex;
   visibility: visible;
 }
 
@@ -2023,20 +2001,20 @@ shows up on our elements preventing them from collapsing.
   visibility: visible;
 }
 
-.inboxsdk__appMenuItem .CL.V6:before,
-.inboxsdk__collapsiblePanel .T-I.T-I-KE.L3:before {
+.inboxsdk__appMenuItem .CL.V6::before,
+.inboxsdk__collapsiblePanel .T-I.T-I-KE.L3::before {
   background-image: var(--background-image);
 }
 
-.inboxsdk__collapsiblePanel.apV.aJu .T-I.T-I-KE.L3:before {
+.inboxsdk__collapsiblePanel.apV.aJu .T-I.T-I-KE.L3::before {
   background-image: var(--background-image--hover);
 }
 
-.inboxsdk__appMenuItem.apV .CL.V6:before {
+.inboxsdk__appMenuItem.apV .CL.V6::before {
   background-image: var(--background-image--active);
 }
 
-.inboxsdk__collapsiblePanel .T-I.T-I-KE.L3:before {
+.inboxsdk__collapsiblePanel .T-I.T-I-KE.L3::before {
   background-size: 24px;
 }
 
@@ -2136,7 +2114,7 @@ shows up on our elements preventing them from collapsing.
 .WR[role="navigation"].bhZ:not(.bym) /* .WR is the new left nav */
   .inboxsdk__navItem
   .Yh:empty {
-  background-color: rgba(32, 33, 36, 0.71);
+  background-color: rgb(32 33 36 / 71%);
   border-radius: 50%;
   display: inherit;
   height: 18px;
@@ -2166,6 +2144,7 @@ shows up on our elements preventing them from collapsing.
   margin-bottom: 0px;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__custom_sections {
   margin-bottom: 8px;
 }
@@ -2197,20 +2176,17 @@ shows up on our elements preventing them from collapsing.
 
 .inboxsdk__results_collapsedContainer > div {
   display: flex;
-  display: -webkit-flex;
   flex-wrap: wrap;
-  -webkit-flex-wrap: wrap;
   flex: 1 0 100%;
-  -webkit-flex: 1 0 100%;
 }
 
 /* lone collapsed SectionView in Gmailv2 */
+
 /* If only a single SectionView is collapsed then its dropdown button and titleTextLink are still shown */
 .inboxsdk__results_collapsedContainer
   > div
   > .inboxsdk__resultsSection_collapsed:first-child:last-child {
   flex: 1;
-  -webkit-flex: 1;
   margin-right: 0;
 }
 
@@ -2219,11 +2195,8 @@ shows up on our elements preventing them from collapsing.
   > .inboxsdk__resultsSection_collapsed:first-child:last-child
   > .inboxsdk__resultsSection_header {
   display: flex;
-  display: -webkit-flex;
   align-items: center;
-  -webkit-align-items: center;
   flex: 1;
-  -webkit-flex: 1;
 }
 
 .inboxsdk__results_collapsedContainer
@@ -2232,9 +2205,7 @@ shows up on our elements preventing them from collapsing.
   > .inboxsdk__resultsSection_header
   > .Cr {
   display: flex;
-  display: -webkit-flex;
   align-items: center;
-  -webkit-align-items: center;
   margin-left: auto;
 }
 
@@ -2245,6 +2216,7 @@ shows up on our elements preventing them from collapsing.
   margin-right: 20px;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
   display: inline-flex;
 }
@@ -2262,6 +2234,8 @@ shows up on our elements preventing them from collapsing.
   cursor: pointer;
   display: inline-block;
 }
+
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__resultsSection_title {
   display: flex;
   align-items: center;
@@ -2323,7 +2297,6 @@ shows up on our elements preventing them from collapsing.
 
 .inboxsdk__resultsSection .inboxsdk__resultsSection_tableRow .xT {
   align-items: center;
-  -webkit-align-items: center;
 }
 
 .inboxsdk__resultsSection .xX {
@@ -2356,6 +2329,7 @@ shows up on our elements preventing them from collapsing.
   align-self: center;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__thread_row_label {
   align-self: flex-end;
 }
@@ -2373,6 +2347,7 @@ shows up on our elements preventing them from collapsing.
   margin-left: 4px;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__resultsSection_label_icon {
   margin-top: 1px;
 }
@@ -2400,8 +2375,7 @@ shows up on our elements preventing them from collapsing.
 /* gmail styles */
 
 .inboxsdk__tooltip .T-P {
-  -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
   background-color: #fff;
   border: 1px solid;
   border-color: #bbb #bbb #a8a8a8;
@@ -2445,6 +2419,7 @@ shows up on our elements preventing them from collapsing.
   transition: left 200ms ease, top 200ms ease;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__tooltip .T-P {
   position: relative;
   width: auto;
@@ -2459,7 +2434,7 @@ shows up on our elements preventing them from collapsing.
 }
 
 .inboxsdk__tooltip .inboxsdk__tooltip_close {
-  -webkit-user-select: none;
+  user-select: none;
 }
 
 .inboxsdk__tooltip .inboxsdk__button {
@@ -2552,11 +2527,8 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 
 .asor.inboxsdk__custom_suggestion {
   display: flex;
-  display: -webkit-flex;
   justify-content: center;
-  -webkit-justify-content: center;
   align-items: center;
-  -webkit-align-items: center;
 }
 
 .inboxsdk__custom_suggestion img {
@@ -2618,6 +2590,7 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 .inboxsdk__gmail_dark_theme .inboxsdk__appButton a {
   color: #eee;
 }
+
 .inboxsdk__gmail_dark_theme .inboxsdk__appButton a:hover {
   color: #fff;
 }
@@ -2625,7 +2598,7 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
 .inboxsdk__appButton_tooltip {
   outline: none;
   transition: none;
-  -webkit-animation: gb__a 0.2s;
+  animation: gb__a 0.2s;
 }
 
 .inboxsdk__appButton_tooltip .inboxsdk__tooltip_close {
@@ -2722,6 +2695,7 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   min-width: 32px;
 }
 
+/* stylelint-disable-next-line no-duplicate-selectors */
 .inboxsdk__custom_message_view_app_notice_content {
   align-items: center;
   display: flex;
@@ -2770,14 +2744,14 @@ table[role='presentation'].inboxsdk__thread_view_with_custom_view > tr {
 }
 
 .inboxsdk__butterbar.inboxsdk__butterbar_error [role='button']::before {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgb(255 255 255 / 8%);
 }
 
 /* end butter/snack bar */
 
 /* support menu item */
 .inboxsdk__support_menuItem:hover {
-  background-color: #eeeeee;
+  background-color: #eee;
   outline: 1px dashed transparent;
 }
 
