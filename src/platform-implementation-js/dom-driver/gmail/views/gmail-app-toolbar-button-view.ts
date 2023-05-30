@@ -1,0 +1,223 @@
+import querySelector from '../../../lib/dom/querySelectorOrFail';
+import censorHTMLtree from '../../../../common/censorHTMLtree';
+import Kefir from 'kefir';
+import kefirStopper from 'kefir-stopper';
+import type { Stopper } from 'kefir-stopper';
+import updateIcon from '../../../driver-common/update-icon';
+import GmailElementGetter from '../gmail-element-getter';
+import GmailTooltipView from '../widgets/gmail-tooltip-view';
+import DropdownView from '../../../widgets/buttons/dropdown-view';
+import monitorTopBannerSizeAndReact from './gmail-app-toolbar-button-view/monitor-top-banner-size-and-react';
+import type Driver from '../gmail-driver';
+export default class GmailAppToolbarButtonView {
+  _stopper: Stopper;
+  _iconSettings: Record<string, any>;
+  _element: HTMLElement | null | undefined = null;
+  _activeDropdown: DropdownView | null | undefined;
+  _buttonDescriptor: Record<string, any> | null | undefined;
+  _driver: Driver;
+
+  constructor(
+    driver: Driver,
+    inButtonDescriptor: Kefir.Observable<Record<string, any>>
+  ) {
+    this._driver = driver;
+    this._stopper = kefirStopper();
+    this._iconSettings = {};
+    inButtonDescriptor
+      .takeUntilBy(this._stopper)
+      .onValue((buttonDescriptor) => {
+        try {
+          this._handleButtonDescriptor(buttonDescriptor);
+        } catch (err) {
+          this._driver.getLogger().error(err);
+        }
+      });
+    monitorTopBannerSizeAndReact();
+  }
+
+  destroy() {
+    this._stopper.destroy();
+
+    if (this._element) {
+      this._element.remove();
+    }
+
+    if (this._activeDropdown) {
+      this._activeDropdown.close();
+    }
+  }
+
+  getStopper(): Kefir.Observable<null> {
+    return this._stopper;
+  }
+
+  getElement(): HTMLElement | null | undefined {
+    return this._element;
+  }
+
+  open() {
+    try {
+      if (!this._activeDropdown) {
+        this._handleClick();
+      }
+    } catch (err) {
+      this._driver.getLogger().error(err);
+    }
+  }
+
+  close() {
+    try {
+      if (this._activeDropdown) {
+        this._handleClick();
+      }
+    } catch (err) {
+      this._driver.getLogger().error(err);
+    }
+  }
+
+  _handleButtonDescriptor(buttonDescriptor: Record<string, any>) {
+    if (!buttonDescriptor) {
+      throw new Error(
+        'The application passed an invalid value for buttonDescriptor'
+      );
+    }
+
+    const element = (this._element =
+      this._element ||
+      _createAppButtonElement(this._driver, () => {
+        this._handleClick();
+      }));
+
+    this._buttonDescriptor = buttonDescriptor;
+    updateIcon(
+      this._iconSettings,
+      querySelector(element, 'a'),
+      false,
+      buttonDescriptor.iconClass,
+      buttonDescriptor.iconUrl
+    );
+
+    _updateTitle(querySelector(element, 'span'), buttonDescriptor);
+  }
+
+  _handleClick() {
+    const element = this._element;
+
+    if (!element) {
+      // We must have failed to create the element. An error would have already
+      // been logged.
+      return;
+    }
+
+    const buttonDescriptor = this._buttonDescriptor;
+
+    if (!buttonDescriptor) {
+      throw new Error(
+        'app toolbar button clicked before receiving button descriptor'
+      );
+    }
+
+    if (this._activeDropdown) {
+      this._activeDropdown.close();
+    } else {
+      var appEvent = {};
+      var tooltipView = new GmailTooltipView();
+      tooltipView
+        .getContainerElement()
+        .classList.add('inboxsdk__appButton_tooltip');
+      tooltipView.getContentElement().innerHTML = '';
+
+      if (buttonDescriptor.arrowColor) {
+        querySelector(
+          tooltipView.getContainerElement(),
+          '.T-P-atC'
+        ).style.borderTopColor = buttonDescriptor.arrowColor;
+      }
+
+      appEvent.dropdown = this._activeDropdown = new DropdownView(
+        tooltipView,
+        element,
+        {
+          manualPosition: true,
+        }
+      );
+      appEvent.dropdown.on('destroy', () => {
+        this._activeDropdown = null;
+      });
+
+      if (buttonDescriptor.onClick) {
+        buttonDescriptor.onClick.call(null, appEvent);
+      }
+
+      if (this._element) {
+        tooltipView.anchor(this._element, {
+          position: 'bottom',
+          offset: {
+            top: 8,
+          },
+        });
+      }
+    }
+  }
+}
+
+function _createAppButtonElement(
+  driver: Driver,
+  onclick: (event: Record<string, any>) => void
+): HTMLElement {
+  const element = document.createElement('div');
+  element.setAttribute('class', 'inboxsdk__appButton');
+  element.innerHTML = `<a href="#">
+               <span class="inboxsdk__appButton_title"></span>
+             </a>`;
+  element.addEventListener('click', (event: MouseEvent) => {
+    event.preventDefault();
+    onclick(event);
+  });
+  const topAccountContainer = GmailElementGetter.getTopAccountContainer();
+
+  if (!topAccountContainer) {
+    const err = new Error('Could not make button');
+    const banner = document.querySelector('[role=banner]');
+    driver.getLogger().error(err, {
+      type: 'failed to make appToolbarButton',
+      gbsfwPresent: !!document.getElementById('gbsfw'),
+      bannerHtml: banner && censorHTMLtree(banner),
+    });
+    throw err;
+  }
+
+  const insertionElement: HTMLElement | null | undefined = topAccountContainer;
+
+  if (!insertionElement) {
+    const err = new Error('Could not make button');
+    driver.getLogger().error(err, {
+      type: 'failed to make appToolbarButton',
+      topAccountContainerHTML: censorHTMLtree(topAccountContainer),
+    });
+    throw err;
+  }
+
+  try {
+    if (!GmailElementGetter.isGplusEnabled()) {
+      element.classList.add('inboxsdk__appButton_noGPlus');
+    }
+
+    insertionElement.insertBefore(element, insertionElement.lastElementChild);
+    return element;
+  } catch (err) {
+    driver.getLogger().error(err, {
+      type: 'failed to make appToolbarButton',
+      insertionElementHTML: censorHTMLtree(insertionElement),
+    });
+    throw err;
+  }
+}
+
+function _updateTitle(element: HTMLElement, descriptor: Record<string, any>) {
+  element.textContent = descriptor.title;
+  element.className = `inboxsdk__appButton_title ${
+    descriptor.titleClass || ''
+  }`;
+}

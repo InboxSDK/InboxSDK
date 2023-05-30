@@ -1,0 +1,57 @@
+import isEqual from 'lodash/isEqual';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
+
+class GmailActionButtonView {
+  _element: HTMLElement;
+  _actionDescriptor: Record<string, any> | null | undefined;
+
+  constructor() {
+    this._element = document.createElement('div');
+    this._element.tabIndex = 0;
+
+    this._element.setAttribute('role', 'button');
+
+    this._element.className = 'inboxsdk__gmail_action ';
+    this._element.innerHTML = `
+			<div>
+			</div>`;
+    this._actionDescriptor = null;
+  }
+
+  getElement(): HTMLElement {
+    return this._element;
+  }
+
+  updateDescriptor(
+    actionButtonDescriptor: Record<string, any> | null | undefined
+  ) {
+    if (!actionButtonDescriptor) {
+      this._actionDescriptor = actionButtonDescriptor;
+      return;
+    }
+
+    if (isEqual(this._actionDescriptor, actionButtonDescriptor)) {
+      return;
+    }
+
+    this._updateTitle(actionButtonDescriptor.title);
+
+    this._element.className =
+      'inboxsdk__gmail_action ' + (actionButtonDescriptor.className || '');
+    this._actionDescriptor = actionButtonDescriptor;
+  }
+
+  setOnClick(callback: ((event: MouseEvent) => void) | null | undefined) {
+    (this._element as any).onclick = callback;
+  }
+
+  _updateTitle(title: string) {
+    if (this._actionDescriptor && this._actionDescriptor.title === title) {
+      return;
+    }
+
+    querySelector(this._element, 'div').textContent = title;
+  }
+}
+
+export default GmailActionButtonView;
