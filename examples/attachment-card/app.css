@@ -3,11 +3,11 @@
 }
 
 .eye_icon {
-  -webkit-mask-image: url(https://www.streak.com/build/images/pixelTrackerIcon.png);
-  -webkit-mask-size: 21px;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  background-color: rgb(253,148,39);
+  mask-image: url(https://www.streak.com/build/images/pixelTrackerIcon.png);
+  mask-size: 21px;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  background-color: rgb(253 148 39);
 }
 
 .test-custom-class {
