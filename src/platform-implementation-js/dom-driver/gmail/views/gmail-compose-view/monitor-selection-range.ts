@@ -10,6 +10,7 @@ export default function (gmailComposeView: GmailComposeView) {
       .filter((e) => e.eventName === 'bodyChanged'),
   ])
     .takeUntilBy(gmailComposeView.getStopper())
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     .onValue((event) => {
       var body = gmailComposeView.getMaybeBodyElement();
       var selection = (document as any).getSelection();

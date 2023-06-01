@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /*
 This is used for PRE MATERIAL GMAIL, when sidebar only existed on threads.
 If you're reading this in the future, do you remember a time when there wasn't a global sidebar?

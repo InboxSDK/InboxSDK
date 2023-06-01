@@ -33,6 +33,7 @@ export default function getNativeNavItem(
     .catch((err) => {
       if (GmailElementGetter.isStandalone()) {
         // never resolve
+
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         return new Promise((_resolve, _reject) => {});
       }

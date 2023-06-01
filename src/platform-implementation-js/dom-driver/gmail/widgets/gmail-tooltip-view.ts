@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import sortBy from 'lodash/sortBy';
 import escape from 'lodash/escape';
@@ -136,7 +135,7 @@ export default class GmailTooltipView {
     this._element.setAttribute('class', 'inboxsdk__tooltip');
 
     if (options.el) {
-      let html = `<div class="T-P aRL">
+      const html = `<div class="T-P aRL">
 						<div class="T-P-Jz-UR">
 							<div class="aRM" tabindex="0">
 							</div>
@@ -153,7 +152,7 @@ export default class GmailTooltipView {
 
       querySelector(this._element, '.aRM').appendChild(options.el);
     } else {
-      let html = [
+      const html = [
         '<div class="T-P aRL">',
         '<div class="T-P-Jz-UR">',
         '<div class="aRM" tabindex="0">',
@@ -178,7 +177,7 @@ export default class GmailTooltipView {
       ].join('');
       this._element.innerHTML = html;
 
-      let closeElement = this._element.querySelector<HTMLElement>(
+      const closeElement = this._element.querySelector<HTMLElement>(
         '.inboxsdk__tooltip_close'
       );
 

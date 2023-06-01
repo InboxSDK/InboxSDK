@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import flatMap from 'lodash/flatMap';
 import sortBy from 'lodash/sortBy';
@@ -120,7 +119,7 @@ export default class AppSidebar extends React.Component<Props, State> {
 
   _expandedToggle(appId: string, id: string, expanded: boolean) {
     // Operate on the latest value from localStorage
-    let expansionSettings = this._readExpansionSettings();
+    const expansionSettings = this._readExpansionSettings();
 
     if (!Object.prototype.hasOwnProperty.call(expansionSettings.apps, appId)) {
       expansionSettings.apps[appId] = {

@@ -6,7 +6,7 @@ export default function getFormattingAreaOffsetLeft(
   forceGet?: boolean
 ): number {
   if (!forceGet) {
-    let existingValue = leftMap.get(gmailComposeView);
+    const existingValue = leftMap.get(gmailComposeView);
 
     if (existingValue != null) {
       return existingValue;

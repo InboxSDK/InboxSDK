@@ -236,6 +236,7 @@ class MessageView extends EventEmitter {
   }
 
   hasOpenReply(): boolean {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { driver, messageViewImplementation } = get(memberMap, this);
     driver.getLogger().deprecationWarning('MessageView.hasOpenReply');
 
@@ -279,6 +280,7 @@ function _bindToEventStream(
   } else {
     stream
       .filter((event) => event.eventName === 'messageLoad')
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       .onValue((event) => {
         messageView.emit('load', {
           messageView: messageView,

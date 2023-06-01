@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable prefer-const */
 /* eslint-disable prefer-rest-params */
 import has from 'lodash/has';
 import noop from 'lodash/noop';
@@ -400,7 +399,7 @@ export default function XHRProxyFactory(
                   startConnection.originalResponseText;
                 startConnection.modifiedResponseText = modifiedResponseText;
 
-                for (let responseTextChanger of this._responseTextChangers) {
+                for (const responseTextChanger of this._responseTextChangers) {
                   const longRunWarningTimer = setTimeout(() => {
                     console.warn(
                       'responseTextChanger is taking too long',
@@ -736,7 +735,7 @@ export default function XHRProxyFactory(
       (async () => {
         let modifiedRequest = request;
 
-        for (let requestChanger of this._requestChangers) {
+        for (const requestChanger of this._requestChangers) {
           const longRunWarningTimer = setTimeout(() => {
             console.warn(
               'requestChanger is taking too long',

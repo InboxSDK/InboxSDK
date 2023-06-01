@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type * as Kefir from 'kefir';
 import type KeyboardShortcutHandle from '../views/keyboard-shortcut-handle';
 import type Logger from '../lib/logger';

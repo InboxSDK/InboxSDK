@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import type GmailComposeView from '../gmail-compose-view';
 type Options = {
   title: string;

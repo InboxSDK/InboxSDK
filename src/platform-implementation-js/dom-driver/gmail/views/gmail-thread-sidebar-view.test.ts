@@ -1,4 +1,5 @@
-/* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 jest.mock('../../../lib/idMap', () => {
   function idMap(key: string) {
     const legacyMapping: Record<string, string> = {

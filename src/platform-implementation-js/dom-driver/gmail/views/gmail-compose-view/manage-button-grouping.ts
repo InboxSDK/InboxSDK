@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import asap from 'asap';
 import { defn, defonce } from 'ud';
 import GmailComposeButtonView from './gmail-compose-button-view';

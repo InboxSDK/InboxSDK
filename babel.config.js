@@ -1,5 +1,3 @@
-/* eslint-disable flowtype/require-valid-file-annotation */
-
 function isBabelRegister(caller) {
   return !!(caller && caller.name === '@babel/register');
 }
@@ -26,6 +24,7 @@ module.exports = (api) => {
         },
       ],
       '@babel/preset-react',
+      ['@babel/preset-typescript', { optimizeConstEnums: true }],
     ],
     plugins: [
       [
@@ -34,17 +33,6 @@ module.exports = (api) => {
           regenerator: false,
         },
       ],
-    ],
-    overrides: [
-      {
-        test: ['**/*.ts', '**/*.tsx'],
-        presets: [['@babel/preset-typescript', { optimizeConstEnums: true }]],
-      },
-      {
-        test: ['**/*.js', '**/*.js.flow'],
-        presets: ['@babel/preset-flow'],
-        plugins: [],
-      },
     ],
   };
 };

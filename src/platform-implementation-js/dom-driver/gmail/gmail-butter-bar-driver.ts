@@ -101,6 +101,7 @@ export default class GmailButterBarDriver {
 
     // Force stream to be in active state. sdkRemovedNotice is prone to missing
     // events if it only becomes active once a message has started.
+
     // eslint-disable-next-line @typescript-eslint/no-empty-function
     noticeAvailableStream.onValue(() => {});
   }

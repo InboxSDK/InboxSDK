@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import sortBy from 'lodash/sortBy';
 import once from 'lodash/once';
 import autoHtml from 'auto-html';
@@ -467,7 +468,7 @@ class GmailMessageView {
       throw err;
     }
 
-    let m = messageEl.className.match(/\bm([0-9a-f]+)\b/);
+    const m = messageEl.className.match(/\bm([0-9a-f]+)\b/);
 
     if (m) {
       if (!hasSeenOldElement) {

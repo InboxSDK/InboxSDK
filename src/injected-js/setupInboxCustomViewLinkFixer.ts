@@ -20,6 +20,7 @@ export default function setupInboxCustomViewLinkFixer() {
       const startTerm = m[1];
       if (!allowedStartTerms.has(startTerm)) return;
 
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       (event as any).preventDefault = () => {};
     },
     true

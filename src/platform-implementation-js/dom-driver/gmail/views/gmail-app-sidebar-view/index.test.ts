@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 jest.mock('../../../../lib/idMap', () => {
   function idMap(key: string) {
@@ -122,6 +120,7 @@ function makeDriver(appId?: string, opts?: any): any {
 
     getLogger() {
       return {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         eventSdkPassive() {},
 
         error(err: unknown, details: unknown) {

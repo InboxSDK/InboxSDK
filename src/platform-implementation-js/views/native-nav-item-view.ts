@@ -1,6 +1,7 @@
 import EventEmitter from '../lib/safe-event-emitter';
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import defer from '../../common/defer';
 import get from '../../common/get-or-fail';
 import NavItemView from './nav-item-view';

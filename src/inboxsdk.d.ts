@@ -757,8 +757,7 @@ export interface StatusBarView extends SimpleElementView {
   setHeight(newHeight: number): any;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ComposeNoticeView extends SimpleElementView {}
+export type ComposeNoticeView = SimpleElementView;
 
 export interface MessageButtonDescriptor {
   onClick(): void;

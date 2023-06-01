@@ -1,3 +1,4 @@
+/* global chrome */
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'inboxsdk__injectPageWorld' && sender.tab) {
     if (chrome.scripting) {

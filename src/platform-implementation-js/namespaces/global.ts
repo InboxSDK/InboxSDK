@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
 import ContentPanelView from '../views/content-panel-view';
