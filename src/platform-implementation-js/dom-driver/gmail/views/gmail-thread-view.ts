@@ -381,8 +381,8 @@ class GmailThreadView {
       )
       .filter(
         () =>
-          hiddenNoticeMessageElement != null &&
-          !hiddenNoticeMessageElement.classList.contains('kQ')
+          (hiddenNoticeMessageElement &&
+            !hiddenNoticeMessageElement.classList.contains('kQ')) as boolean
       ) //when kQ is gone, message is visible
       .onValue(() => {
         customMessageView
