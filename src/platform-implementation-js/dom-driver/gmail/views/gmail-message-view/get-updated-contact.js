@@ -63,12 +63,12 @@ function updateContactCacheFromModal(headerContact) {
 
   for (let ii = 0; ii < spans.length; ii++) {
     const span = spans[ii];
-    let emailAddress = span.getAttribute('email');
+    const emailAddress = span.getAttribute('email');
     if (!emailAddress) continue;
     if (cache[emailAddress]) continue;
 
     let modalContact: Contact = { emailAddress, name: null };
-    let name = span.getAttribute('name');
+    const name = span.getAttribute('name');
     if (name) {
       modalContact.name = name;
     } else {

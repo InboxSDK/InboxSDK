@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import Kefir, { Observable } from 'kefir';
 import get from '../../../../common/get-or-fail';
 
@@ -45,14 +44,14 @@ export default function setupRouteViewDriverStream(
     .map((event) => event.new)
     .map((urlObject) => {
       const { hash, name } = urlObject;
-      for (let routeIDs of customRouteIDs) {
-        let routeID = routeIDmatchesHash(routeIDs, hash);
+      for (const routeIDs of customRouteIDs) {
+        const routeID = routeIDmatchesHash(routeIDs, hash);
         if (routeID) {
           return { urlObject, type: 'CUSTOM', routeID };
         }
       }
-      for (let [routeIDs] of customListRouteIDs) {
-        let routeID = routeIDmatchesHash(routeIDs, name);
+      for (const [routeIDs] of customListRouteIDs) {
+        const routeID = routeIDmatchesHash(routeIDs, name);
         if (routeID) {
           return { urlObject, type: 'CUSTOM_LIST_TRIGGER', routeID };
         }

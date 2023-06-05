@@ -25,6 +25,7 @@ class Keyboard {
   }) {
     const members = get(memberMap, this);
 
+    // eslint-disable-next-line prefer-const
     let { chord, description } = shortcutDescriptor;
     if (!chord) throw new Error('Keyboard.createShortcutHandle chord missing');
     if (description == null) {
