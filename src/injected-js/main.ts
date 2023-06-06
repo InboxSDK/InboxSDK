@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable flowtype/require-valid-file-annotation, no-undef */
 declare let define: any;
 
 if (!(global as any).__InboxSDKInjected) {

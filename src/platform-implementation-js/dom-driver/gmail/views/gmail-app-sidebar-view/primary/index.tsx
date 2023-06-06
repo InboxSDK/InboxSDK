@@ -165,7 +165,6 @@ class GmailAppSidebarPrimary {
 
     this._containerProp = () => threadSidebarContainerEl;
 
-    // Kefir flow type def has wrong type for bufferWithTimeOrCount
     this._updateHighlightedAppThreadIconBus
       .bufferWithTimeOrCount(150, 100)
       .filter((events: any[]) => events.length > 0)
