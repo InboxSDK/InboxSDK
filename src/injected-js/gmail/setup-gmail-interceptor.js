@@ -85,7 +85,7 @@ export function setupGmailInterceptorOnFrames(
 
   //email sending modifier/notifier
   {
-    let modifiers: { [key: string]: Array<string> } = {};
+    const modifiers: { [key: string]: Array<string> } = {};
 
     Kefir.fromEvents(
       document,
@@ -155,7 +155,7 @@ export function setupGmailInterceptorOnFrames(
             },
           });
 
-          let newComposeParams = await modificationPromise;
+          const newComposeParams = await modificationPromise;
           composeParams = Object.assign({}, composeParams, newComposeParams);
         }
 
@@ -820,7 +820,7 @@ export function setupGmailInterceptorOnFrames(
       requestChanger: function (connection, request) {
         return (connection: any)._queryReplacement.newQuery.promise.then(
           function (newQuery) {
-            let newParams = clone(connection.params);
+            const newParams = clone(connection.params);
             newParams.q = newQuery;
             return {
               method: request.method,

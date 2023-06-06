@@ -28,7 +28,7 @@ export async function getThreadFromSyncThreadIdUsingHeaders(
 ): Promise<?SyncThread> {
   let responseText = null;
   try {
-    let { text } = await gmailAjax({
+    const { text } = await gmailAjax({
       method: 'POST',
       url: `https://mail.google.com/sync${getAccountUrlPart()}/i/fd`,
       headers: {
@@ -49,7 +49,7 @@ export async function getThreadFromSyncThreadIdUsingHeaders(
     responseText = text;
   } catch (err) {
     // try sending request with new format 2022_09_09
-    let { text } = await gmailAjax({
+    const { text } = await gmailAjax({
       method: 'POST',
       url: `https://mail.google.com/sync${getAccountUrlPart()}/i/fd?rt=r&pt=ji`,
       headers: {

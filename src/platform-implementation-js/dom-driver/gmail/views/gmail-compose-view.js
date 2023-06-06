@@ -180,8 +180,8 @@ class GmailComposeView {
               return { eventName: 'sending' };
             }
             case 'emailSent': {
-              let syncThreadID = event.threadID;
-              let syncMessageID = event.messageID;
+              const syncThreadID = event.threadID;
+              const syncMessageID = event.messageID;
 
               if (event.oldMessageID) this._messageId = event.oldMessageID;
               if (event.oldThreadID) this._threadID = event.oldThreadID;
@@ -1141,7 +1141,7 @@ class GmailComposeView {
     const endDrag = once(() => simulateDragEnd(this._element, files));
     try {
       let firstLoop = true;
-      for (let partitionedFiles of t.partition(files, 3)) {
+      for (const partitionedFiles of t.partition(files, 3)) {
         if (firstLoop) {
           firstLoop = false;
         } else {
@@ -1302,7 +1302,7 @@ class GmailComposeView {
   }
 
   getStatusArea(): HTMLElement {
-    let statusArea = this._element.querySelector('.aDg .aDj > .aDh');
+    const statusArea = this._element.querySelector('.aDg .aDj > .aDh');
     if (!statusArea) throw new Error('Failed to find status area');
     return statusArea;
   }

@@ -36,6 +36,7 @@ module.exports = {
       files: ['*.js', '*.js.flow'],
       plugins: ['flowtype'],
       rules: {
+        'prefer-const': ['error'],
         'flowtype/define-flow-type': 1,
         'flowtype/require-valid-file-annotation': ['error', 'always'],
         'no-unused-vars': ['off'],

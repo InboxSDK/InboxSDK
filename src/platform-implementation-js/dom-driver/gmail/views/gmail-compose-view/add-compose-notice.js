@@ -38,7 +38,7 @@ class ComposeNotice extends SimpleElementView {
   _stopper = kefirStopper();
 
   constructor(gmailComposeView: GmailComposeView, orderHint: number) {
-    let el = document.createElement('div');
+    const el = document.createElement('div');
     el.style.fontFamily = 'Roboto,RobotoDraft,Helvetica,Arial,sans-serif';
     el.style.fontSize = '14px';
 

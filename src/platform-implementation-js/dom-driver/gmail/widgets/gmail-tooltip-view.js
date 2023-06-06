@@ -133,7 +133,7 @@ export default class GmailTooltipView {
     this._element.setAttribute('class', 'inboxsdk__tooltip');
 
     if (options.el) {
-      let html = `<div class="T-P aRL">
+      const html = `<div class="T-P aRL">
 						<div class="T-P-Jz-UR">
 							<div class="aRM" tabindex="0">
 							</div>
@@ -150,7 +150,7 @@ export default class GmailTooltipView {
       this._element.classList.add('inboxdk__tooltip_content');
       querySelector(this._element, '.aRM').appendChild(options.el);
     } else {
-      let html = [
+      const html = [
         '<div class="T-P aRL">',
         '<div class="T-P-Jz-UR">',
         '<div class="aRM" tabindex="0">',
@@ -178,7 +178,7 @@ export default class GmailTooltipView {
 
       this._element.innerHTML = html;
 
-      let closeElement = this._element.querySelector(
+      const closeElement = this._element.querySelector(
         '.inboxsdk__tooltip_close'
       );
       if (closeElement) {

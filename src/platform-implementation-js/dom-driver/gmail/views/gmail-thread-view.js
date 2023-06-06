@@ -175,7 +175,7 @@ class GmailThreadView {
       this._newMessageMutationObserver.disconnect();
     }
 
-    for (let customMessageView of this._customMessageViews) {
+    for (const customMessageView of this._customMessageViews) {
       customMessageView.destroy();
     }
   }
@@ -283,7 +283,7 @@ class GmailThreadView {
         const messageDate = customMessageView.getSortDate();
         if (!messageDate) return;
 
-        for (let message of messages) {
+        for (const message of messages) {
           isInHidden = message.isHidden;
 
           if (
@@ -857,7 +857,7 @@ class GmailThreadView {
         ])
           .takeUntilBy(this._stopper)
           .onValue(() => {
-            for (let customMessageView of this._customMessageViews) {
+            for (const customMessageView of this._customMessageViews) {
               customMessageView.expand();
             }
           });
@@ -880,7 +880,7 @@ class GmailThreadView {
         ])
           .takeUntilBy(this._stopper)
           .onValue(() => {
-            for (let customMessageView of this._customMessageViews) {
+            for (const customMessageView of this._customMessageViews) {
               customMessageView.collapse();
             }
           });
