@@ -63,7 +63,6 @@ export function setFromEmail(
   email: string
 ) {
   const currentFromAddress = gmailComposeView.getFromContact().emailAddress;
-
   if (currentFromAddress === email) {
     return;
   }

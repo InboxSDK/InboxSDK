@@ -79,7 +79,6 @@ function updateContactCacheFromModal(headerContact: Contact) {
       name: null!,
     };
     const name = span.getAttribute('name');
-
     if (name) {
       modalContact.name = name;
     } else {

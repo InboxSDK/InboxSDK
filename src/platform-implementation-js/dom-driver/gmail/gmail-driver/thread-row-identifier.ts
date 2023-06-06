@@ -53,8 +53,7 @@ class ThreadRowIdentifier {
       // get a result, and the compose will be restored, so we counteract that
       // here if we failed.
       const minimizedComposes = [];
-      // eslint-disable-next-line prefer-const
-      for (let composeView of this._composeViews) {
+      for (const composeView of this._composeViews) {
         const minimized = composeView.isMinimized();
         if (minimized) {
           minimizedComposes.push(composeView);
@@ -66,8 +65,7 @@ class ThreadRowIdentifier {
       if (threadID) {
         return threadID;
       }
-      // eslint-disable-next-line prefer-const
-      for (let composeView of minimizedComposes) {
+      for (const composeView of minimizedComposes) {
         composeView.setMinimized(true);
       }
     }
@@ -101,8 +99,7 @@ class ThreadRowIdentifier {
   ): GmailComposeView | null | undefined {
     const candidates = [];
     const subject = gmailThreadRowView.getSubject();
-    // eslint-disable-next-line prefer-const
-    for (let gmailComposeView of this._composeViews) {
+    for (const gmailComposeView of this._composeViews) {
       if (subject === gmailComposeView.getSubject()) {
         candidates.push(gmailComposeView);
       }

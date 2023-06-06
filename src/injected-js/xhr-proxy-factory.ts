@@ -734,7 +734,6 @@ export default function XHRProxyFactory(
       };
       (async () => {
         let modifiedRequest = request;
-
         for (const requestChanger of this._requestChangers) {
           const longRunWarningTimer = setTimeout(() => {
             console.warn(

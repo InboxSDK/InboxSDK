@@ -469,7 +469,6 @@ class GmailMessageView {
     }
 
     const m = messageEl.className.match(/\bm([0-9a-f]+)\b/);
-
     if (m) {
       if (!hasSeenOldElement) {
         hasSeenOldElement = true;
