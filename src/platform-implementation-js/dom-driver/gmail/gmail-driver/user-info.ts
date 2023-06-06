@@ -30,7 +30,7 @@ export default class UserInfo {
     return this._userEmail;
   }
 
-  /* @deprecated */
+  /** @deprecated */
   getAccountSwitcherContactList(): Contact[] {
     const main: Contact[] = Array.from(
       document.querySelectorAll<HTMLElement>(
