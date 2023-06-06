@@ -18,24 +18,18 @@ export const NATIVE_ROUTE_IDS = Object.freeze({
   CONTACTS: 'contacts/:page',
   CONTACT: 'contacts/:contactID',
   SETTINGS: 'settings/:section',
-  SCHEDULED: 'scheduled',
-
   /** DEC 2022 */
+  SCHEDULED: 'scheduled',
+  /** FEB 2023 */
   CHAT_WELCOME: 'chat/welcome',
-
   /** FEB 2023 */
   CHAT_DM: 'chat/dm/:chatID',
-
   /** FEB 2023 */
   SPACES_WELCOME: 'rooms/welcome',
-
   /** FEB 2023 */
   SPACE: 'chat/space/:spaceID',
-
   /** FEB 2023 */
   MEET: 'calls',
-
-  /** FEB 2023 */
   ANY_LIST: '*',
 } as const);
 export const NATIVE_LIST_ROUTE_IDS: Record<string, string> = Object.freeze({
