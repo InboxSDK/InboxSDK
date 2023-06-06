@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { defn } from 'ud';
 import type GmailDriver from '../gmail-driver';
 import type GmailMessageView from './gmail-message-view';

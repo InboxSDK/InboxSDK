@@ -1,6 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import autoHtml from 'auto-html';
 import t from 'transducers.js';
 import once from 'lodash/once';
@@ -188,8 +188,8 @@ class GmailComposeView {
             }
 
             case 'emailSent': {
-              let syncThreadID = event.threadID;
-              let syncMessageID = event.messageID;
+              const syncThreadID = event.threadID;
+              const syncMessageID = event.messageID;
               if (event.oldMessageID) this._messageId = event.oldMessageID;
               if (event.oldThreadID) this._threadID = event.oldThreadID;
               driver.removeCachedGmailMessageIdForSyncMessageId(syncMessageID);
@@ -1228,7 +1228,7 @@ class GmailComposeView {
     try {
       let firstLoop = true;
 
-      for (let partitionedFiles of (t.partition as any)(files, 3)) {
+      for (const partitionedFiles of (t.partition as any)(files, 3)) {
         if (firstLoop) {
           firstLoop = false;
         } else {
@@ -1398,7 +1398,7 @@ class GmailComposeView {
   }
 
   getStatusArea(): HTMLElement {
-    let statusArea =
+    const statusArea =
       this._element.querySelector<HTMLElement>('.aDg .aDj > .aDh');
 
     if (!statusArea) throw new Error('Failed to find status area');

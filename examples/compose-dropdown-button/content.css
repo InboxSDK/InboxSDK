@@ -1,6 +1,6 @@
 .send_modifier_icon {
-  -webkit-mask: url(https://www.streak.com/build/images/sendLaterMask.png) no-repeat;
-  -webkit-mask-size: 18px 18px;
+  mask: url(https://www.streak.com/build/images/sendLaterMask.png) no-repeat;
+  mask-size: 18px 18px;
   background: white;
   display: inline-block;
   height: 18px;

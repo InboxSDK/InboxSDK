@@ -21,7 +21,6 @@ document.head.setAttribute(
 );
 document.head.setAttribute('data-inboxsdk-using-sync-api', 'false');
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST').default;
 //preload implementation
 require('../src/platform-implementation-js/platform-implementation');

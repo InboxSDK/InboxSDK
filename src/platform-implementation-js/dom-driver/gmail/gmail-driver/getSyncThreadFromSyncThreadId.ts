@@ -1,4 +1,3 @@
-/* eslint-disable prefer-const */
 import gmailAjax from '../../../driver-common/gmailAjax';
 import { extractThreadsFromThreadResponse } from '../gmail-sync-response-processor';
 import getAccountUrlPart from '../../../driver-common/getAccountUrlPart';
@@ -26,7 +25,7 @@ export async function getThreadFromSyncThreadIdUsingHeaders(
   let responseText = null;
 
   try {
-    let { text } = await gmailAjax({
+    const { text } = await gmailAjax({
       method: 'POST',
       url: `https://mail.google.com/sync${getAccountUrlPart()}/i/fd`,
       headers: {
@@ -47,7 +46,7 @@ export async function getThreadFromSyncThreadIdUsingHeaders(
     responseText = text;
   } catch (err) {
     // try sending request with new format 2022_09_09
-    let { text } = await gmailAjax({
+    const { text } = await gmailAjax({
       method: 'POST',
       url: `https://mail.google.com/sync${getAccountUrlPart()}/i/fd?rt=r&pt=ji`,
       headers: {

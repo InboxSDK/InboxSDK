@@ -55,7 +55,7 @@ jobs:
       - run:
           name: Clean
           command: yarn gulp clean
-  lint:
+  lint JS and TS:
     executor: sdk
     steps:
       - checkout
@@ -67,6 +67,15 @@ jobs:
       - run:
           name: Prettier
           command: yarn prettier:check
+  lint CSS:
+    executor: sdk
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn-berry
+      - run:
+          name: Stylelint
+          command: yarn lint:stylelint
   test:
     executor: sdk
     steps:
@@ -86,9 +95,6 @@ jobs:
       - run:
           name: Typecheck (tsc)
           command: yarn tsc
-      - run:
-          name: Typecheck (flow)
-          command: yarn flow check
 
 workflows:
   version: 2
@@ -97,6 +103,7 @@ workflows:
       - 'build inboxsdk core'
       - 'build REMOTE'
       - 'build NONREMOTE-INTEGRATED-PAGEWORLD'
-      - lint
+      - lint JS and TS
+      - lint CSS
       - test
       - typecheck

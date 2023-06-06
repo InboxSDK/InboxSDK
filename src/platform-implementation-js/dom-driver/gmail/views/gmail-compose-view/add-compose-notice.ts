@@ -5,7 +5,6 @@ import Logger from '../../../../lib/logger';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import SimpleElementView from '../../../../views/SimpleElementView';
 import type GmailComposeView from '../gmail-compose-view';
-import type { Stopper } from 'kefir-stopper';
 export default function addComposeNotice(
   gmailComposeView: GmailComposeView,
   options: {
@@ -30,7 +29,7 @@ class ComposeNotice extends SimpleElementView {
   _stopper = kefirStopper();
 
   constructor(gmailComposeView: GmailComposeView, orderHint: number) {
-    let el = document.createElement('div');
+    const el = document.createElement('div');
     el.style.fontFamily = 'Roboto,RobotoDraft,Helvetica,Arial,sans-serif';
     el.style.fontSize = '14px';
     super(el);

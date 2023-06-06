@@ -4,8 +4,6 @@ const readFile = fs.promises.readFile;
 
 import * as GmailResponseProcessor from './gmail-response-processor';
 
-/* eslint-disable @typescript-eslint/no-var-requires */
-
 function readJSONnullToUndefined(filename: string) {
   return JSON.parse(fs.readFileSync(filename, 'utf8'), (k, v) =>
     v == null ? undefined : v

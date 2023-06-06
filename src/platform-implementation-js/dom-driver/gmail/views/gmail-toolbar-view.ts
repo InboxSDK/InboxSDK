@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import uniq from 'lodash/uniq';
 import escape from 'lodash/escape';
 import asap from 'asap';

@@ -1,6 +1,6 @@
 .test {
-  -webkit-mask-image: url(https://www.streak.com/build/images/pixelTrackerIcon.png);
-  -webkit-mask-size: 20px;
-  -webkit-mask-repeat: no-repeat;
+  mask-image: url(https://www.streak.com/build/images/pixelTrackerIcon.png);
+  mask-size: 20px;
+  mask-repeat: no-repeat;
   background: orange;
 }

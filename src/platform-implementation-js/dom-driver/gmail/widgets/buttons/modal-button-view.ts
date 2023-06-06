@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import includes from 'lodash/includes';
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';

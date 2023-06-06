@@ -20,6 +20,7 @@ import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import type GmailDriver from '../../gmail-driver';
 import type GmailRouteProcessor from '../gmail-route-view/gmail-route-processor';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type GmailPageCommunicator from '../../gmail-page-communicator';
 
 class GmailRouteView {
@@ -658,6 +659,7 @@ class GmailRouteView {
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   setFullWidth(fullWidth: boolean) {
     // The setFullWidth method does not do anything in Gmail
   }

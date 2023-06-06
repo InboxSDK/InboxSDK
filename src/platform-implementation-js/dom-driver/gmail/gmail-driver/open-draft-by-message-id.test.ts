@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import openDraftByMessageID, { makeNewHash } from './open-draft-by-message-id';
 describe('makeNewHash', () => {
   it('1', () => {

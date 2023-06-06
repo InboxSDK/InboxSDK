@@ -122,6 +122,7 @@ function _setupViewDriverWatcher(
   handlerRegistry: any,
   ConversationsInstance: any,
   membrane: Membrane,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   driver: Driver
 ) {
   var combinedStream = stream.map(function (viewDriver) {

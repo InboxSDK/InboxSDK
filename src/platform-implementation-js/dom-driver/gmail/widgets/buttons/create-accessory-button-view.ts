@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';

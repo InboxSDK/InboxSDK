@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';

@@ -1,5 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-empty-function */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 import SafeEventEmitter from './lib/safe-event-emitter';
 import { BUILD_VERSION } from '../common/version';
 import get from '../common/get-or-fail';

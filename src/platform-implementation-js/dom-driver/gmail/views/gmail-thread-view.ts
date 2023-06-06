@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import constant from 'lodash/constant';
 import asap from 'asap';
 import delay from 'pdelay';
@@ -187,7 +188,7 @@ class GmailThreadView {
       this._newMessageMutationObserver.disconnect();
     }
 
-    for (let customMessageView of this._customMessageViews) {
+    for (const customMessageView of this._customMessageViews) {
       customMessageView.destroy();
     }
   }
@@ -296,7 +297,7 @@ class GmailThreadView {
         const messageDate = customMessageView.getSortDate();
         if (!messageDate) return;
 
-        for (let message of messages) {
+        for (const message of messages) {
           isInHidden = message.isHidden;
 
           if (
@@ -380,8 +381,8 @@ class GmailThreadView {
       )
       .filter(
         () =>
-          hiddenNoticeMessageElement != null &&
-          !hiddenNoticeMessageElement.classList.contains('kQ')
+          (hiddenNoticeMessageElement &&
+            !hiddenNoticeMessageElement.classList.contains('kQ')) as boolean
       ) //when kQ is gone, message is visible
       .onValue(() => {
         customMessageView
@@ -898,7 +899,7 @@ class GmailThreadView {
         ])
           .takeUntilBy(this._stopper)
           .onValue(() => {
-            for (let customMessageView of this._customMessageViews) {
+            for (const customMessageView of this._customMessageViews) {
               customMessageView.expand();
             }
           });
@@ -928,7 +929,7 @@ class GmailThreadView {
         ])
           .takeUntilBy(this._stopper)
           .onValue(() => {
-            for (let customMessageView of this._customMessageViews) {
+            for (const customMessageView of this._customMessageViews) {
               customMessageView.collapse();
             }
           });

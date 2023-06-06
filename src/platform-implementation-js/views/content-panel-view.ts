@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as Kefir from 'kefir';
 import EventEmitter from '../lib/safe-event-emitter';
 import get from '../../common/get-or-fail';

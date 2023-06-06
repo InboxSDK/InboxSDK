@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import autoHtml from 'auto-html';
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -59,6 +60,7 @@ class ContentPanelViewDriver {
     // property retains its value.
     const afterAsap = delayAsap()
       .toProperty()
+
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       .onValue(() => {});
     let hasPlacedAlready = false;
