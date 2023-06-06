@@ -1,8 +1,0 @@
-/* @flow */
-
-import type GmailComposeView from '../gmail-compose-view';
-
-declare export default function getAddressInformationExtractor(
-  addressType: string,
-  composeView: GmailComposeView
-): (node: HTMLElement) => Contact | null;

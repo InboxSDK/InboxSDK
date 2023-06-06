@@ -1,6 +1,0 @@
-/* @flow */
-
-declare export default function querySelector(
-  el: Document | DocumentFragment | Element,
-  selector: string
-): HTMLElement;

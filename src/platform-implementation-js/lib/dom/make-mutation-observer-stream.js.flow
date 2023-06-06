@@ -1,9 +1,0 @@
-/* @flow */
-
-import Kefir from 'kefir';
-
-// Creates a mutation observer watching the given element and emits the events in a stream.
-declare export default function makeMutationObserverStream(
-  element: HTMLElement,
-  options: MutationObserverInit
-): Kefir.Observable<MutationRecord>;

@@ -1,9 +1,0 @@
-/* @flow */
-
-import type GmailComposeView from '../gmail-compose-view';
-
-declare export default function setRecipients(
-  gmailComposeView: GmailComposeView,
-  addressType: ReceiverType,
-  emailAddresses: string[]
-): void;

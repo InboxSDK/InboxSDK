@@ -1,5 +1,0 @@
-/* @flow */
-
-declare export default function blockAndReemiteKeyboardEvents(
-  element: HTMLElement
-): void;

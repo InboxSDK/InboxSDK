@@ -1,9 +1,0 @@
-/* @flow */
-
-// Returns a wrapped version of the function which throws an exception if it's
-// called more than count times within period amount of time.
-declare export default function rateLimit<T: Function>(
-  fn: T,
-  period: number,
-  count: number
-): T;

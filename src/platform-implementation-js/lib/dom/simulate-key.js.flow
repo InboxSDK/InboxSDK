@@ -1,7 +1,0 @@
-/* @flow */
-
-declare export default function simulateKey(
-  element: HTMLElement,
-  keyCode: number,
-  charCode: number
-): void;

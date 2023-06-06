@@ -1,5 +1,0 @@
-/* @flow */
-
-// Quick function for converting HTML with entities into text without
-// introducing an XSS vulnerability.
-declare export default function htmlToText(html: string): string;

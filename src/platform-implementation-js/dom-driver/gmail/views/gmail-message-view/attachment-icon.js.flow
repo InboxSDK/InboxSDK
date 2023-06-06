@@ -1,5 +1,0 @@
-/* @flow */
-
-import SafeEventEmitter from '../../../../lib/safe-event-emitter';
-
-declare export default class AttachmentIcon extends SafeEventEmitter {}

@@ -1,7 +1,0 @@
-/* @flow */
-
-declare export default function waitFor<T>(
-  condition: () => ?T,
-  timeout?: number,
-  steptime?: number
-): Promise<T>;

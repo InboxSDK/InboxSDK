@@ -1,3 +1,0 @@
-/* eslint-disable flowtype/require-valid-file-annotation -- flow support is deprecated */
-
-export type addAppMenuItem = Object;
