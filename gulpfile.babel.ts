@@ -188,8 +188,7 @@ async function webpackTask({
                 insert: (htmlElement: HTMLStyleElement) => {
                   htmlElement.setAttribute(
                     'data-inboxsdk-version',
-
-                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- webpack provides SDK_VERSION at runtime
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- this is injected by webpack
                     ///@ts-ignore
                     SDK_VERSION
                   );
