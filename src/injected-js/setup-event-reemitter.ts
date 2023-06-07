@@ -16,20 +16,16 @@ export default function setupEventReemitter() {
         event.detail.cancelable
       );
       Object.assign(newEvent, event.detail.props);
-
       if (event.detail.dataTransfer) {
         const { files, fileNames } = event.detail.dataTransfer;
-
         if (fileNames) {
           fileNames.forEach((fileName: string, i: number) => {
             const file = files[i];
-
             if (typeof file.name !== 'string') {
               file.name = fileName;
             }
           });
         }
-
         (newEvent as any).dataTransfer = {
           dropEffect: 'none',
           effectAllowed: 'all',
@@ -37,27 +33,21 @@ export default function setupEventReemitter() {
           items: files.map(({ type }: any, i: number) => ({
             kind: 'file',
             type,
-
             getAsFile() {
               return files[i];
             },
-
             getAsString() {
               throw new Error('getAsString not supported');
             },
           })),
           types: ['Files'],
-
           getData() {
             return '';
           },
-
           setData() {},
-
           setDragImage() {},
         };
       }
-
       event.target.dispatchEvent(newEvent);
     }
   );
