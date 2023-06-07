@@ -13,7 +13,6 @@ import type GmailDriver from '../gmail-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailMessageView from './gmail-message-view';
 import GmailToolbarView from './gmail-toolbar-view';
-import GmailThreadSidebarView from './gmail-thread-sidebar-view';
 import WidthManager from './gmail-thread-view/width-manager';
 import type { CustomMessageDescriptor } from '../../../views/conversations/custom-message-view';
 let hasLoggedAddonInfo = false;
@@ -25,7 +24,6 @@ class GmailThreadView {
   _isPreviewedThread: boolean;
   _eventStream: Bus<any, unknown>;
   _stopper = kefirStopper();
-  _threadSidebar: GmailThreadSidebarView | null | undefined = null;
   _widthManager: WidthManager | null | undefined = null;
   _toolbarView: any;
   _messageViewDrivers: any[];
@@ -169,7 +167,6 @@ class GmailThreadView {
     this._stopper.destroy();
 
     if (this._toolbarView) this._toolbarView.destroy();
-    if (this._threadSidebar) this._threadSidebar.destroy();
 
     this._messageViewDrivers.forEach((messageView) => {
       messageView.destroy();
