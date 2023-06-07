@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { defn } from 'ud';
 import type GmailDriver from '../gmail-driver';
 import type GmailMessageView from './gmail-message-view';
 import GmailAttachmentCardView from './gmail-attachment-card-view';
@@ -135,7 +133,7 @@ class GmailAttachmentAreaView {
     });
     buttonView.addClass('aZj');
     buttonView.getElement().children[0].className = 'asa';
-    var basicButtonViewController = new BasicButtonViewController({
+    new BasicButtonViewController({
       activateFunction: () => {
         if (options.onClick) {
           options.onClick();

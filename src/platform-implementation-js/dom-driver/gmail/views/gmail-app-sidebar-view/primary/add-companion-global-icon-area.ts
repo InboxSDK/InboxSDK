@@ -1,6 +1,4 @@
 import { defn } from 'ud';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import querySelector from '../../../../../lib/dom/querySelectorOrFail';
 import type Logger from '../../../../../lib/logger';
 
 /*

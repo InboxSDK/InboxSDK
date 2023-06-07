@@ -1,9 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { defn } from 'ud';
 import * as Kefir from 'kefir';
-import kefirStopper from 'kefir-stopper';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
-import querySelector from '../../../../lib/dom/querySelectorOrFail';
 
 /*
 As of Dec 2nd, 2017.

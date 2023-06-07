@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as ud from 'ud';
 import Kefir from 'kefir';
 var insertHTMLatCursor = ud.defn(
@@ -100,7 +99,7 @@ var insertHTMLatCursor = ud.defn(
           // Whenever the body element gets focus, manually make sure the cursor
           // is in the right position, because Chrome likes to put it in the
           // previous location instead because it hates us.
-          var focus = Kefir.fromEvents(element, 'focus')
+          Kefir.fromEvents(element, 'focus')
             .takeUntilBy(nextUserCursorMove)
             .onValue(function () {
               sel.removeAllRanges();

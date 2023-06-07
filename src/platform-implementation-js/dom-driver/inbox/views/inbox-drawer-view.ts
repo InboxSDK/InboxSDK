@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import kefirBus from 'kefir-bus';
@@ -256,7 +255,7 @@ class InboxDrawerView {
       closeButton.type = 'button';
       closeButton.title = 'Close';
       closeButton.className = 'inboxsdk__close_button';
-      closeButton.addEventListener('click', (e: MouseEvent) => {
+      closeButton.addEventListener('click', () => {
         this.close();
       });
       titleBar.appendChild(closeButton);

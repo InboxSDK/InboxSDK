@@ -72,8 +72,7 @@ class ModalView extends EventEmitter {
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  addButton(options: any): void {
+  addButton(): void {
     throw new Error('not implemented');
   }
 }

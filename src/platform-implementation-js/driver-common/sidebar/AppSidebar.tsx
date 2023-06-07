@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import flatMap from 'lodash/flatMap';
 import sortBy from 'lodash/sortBy';
 import cx from 'classnames';
@@ -7,7 +6,6 @@ import kefirStopper from 'kefir-stopper';
 import React from 'react';
 import DraggableList from 'react-draggable-list';
 import SmoothCollapse from 'react-smooth-collapse';
-import get from '../../../common/get-or-fail';
 import idMap from '../../lib/idMap';
 import ElementContainer from '../../lib/react/ElementContainer';
 const springConfig = {

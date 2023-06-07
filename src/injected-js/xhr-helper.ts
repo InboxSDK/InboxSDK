@@ -1,4 +1,3 @@
-import ajax from '../common/ajax';
 export default function xhrHelper() {
   document.addEventListener('inboxSDKpageAjax', function (event: any) {
     const id = event.detail.id;
@@ -13,72 +12,37 @@ export default function xhrHelper() {
     // It's important to use fetch when possible because it's needed for
     // getDownloadURL() in Gmail v2: Gmail v2's ServiceWorker in Chrome causes
     // xhr.responseURL to have the wrong value (possibly a Chrome bug).
-    // TODO: This condition will always return true since this function is always defined. Did you mean to call it instead? ts(2774)
-    if (global.fetch as any) {
-      (async () => {
-        const response = await fetch(opts.url, {
-          method: opts.method || 'GET',
-          credentials: 'include',
-        });
-        document.dispatchEvent(
-          new CustomEvent('inboxSDKpageAjaxDone', {
-            bubbles: false,
-            cancelable: false,
-            detail: {
-              id,
-              error: false,
-              text: await response.text(),
-              responseURL: response.url,
-            },
-          })
-        );
-      })().catch((err) => {
-        document.dispatchEvent(
-          new CustomEvent('inboxSDKpageAjaxDone', {
-            bubbles: false,
-            cancelable: false,
-            detail: {
-              id,
-              error: true,
-              message: err && err.message,
-              stack: err && err.stack,
-              status: err && err.xhr && err.xhr.status,
-            },
-          })
-        );
+    (async () => {
+      const response = await fetch(opts.url, {
+        method: opts.method || 'GET',
+        credentials: 'include',
       });
-    } else {
-      ajax(opts).then(
-        ({ text, xhr }) => {
-          document.dispatchEvent(
-            new CustomEvent('inboxSDKpageAjaxDone', {
-              bubbles: false,
-              cancelable: false,
-              detail: {
-                id,
-                error: false,
-                text,
-                responseURL: (xhr as any).responseURL,
-              },
-            })
-          );
-        },
-        (err) => {
-          document.dispatchEvent(
-            new CustomEvent('inboxSDKpageAjaxDone', {
-              bubbles: false,
-              cancelable: false,
-              detail: {
-                id,
-                error: true,
-                message: err && err.message,
-                stack: err && err.stack,
-                status: err && err.xhr && err.xhr.status,
-              },
-            })
-          );
-        }
+      document.dispatchEvent(
+        new CustomEvent('inboxSDKpageAjaxDone', {
+          bubbles: false,
+          cancelable: false,
+          detail: {
+            id,
+            error: false,
+            text: await response.text(),
+            responseURL: response.url,
+          },
+        })
       );
-    }
+    })().catch((err) => {
+      document.dispatchEvent(
+        new CustomEvent('inboxSDKpageAjaxDone', {
+          bubbles: false,
+          cancelable: false,
+          detail: {
+            id,
+            error: true,
+            message: err && err.message,
+            stack: err && err.stack,
+            status: err && err.xhr && err.xhr.status,
+          },
+        })
+      );
+    });
   });
 }

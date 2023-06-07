@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import SafeEventEmitter from './lib/safe-event-emitter';
 import { BUILD_VERSION } from '../common/version';
@@ -197,7 +196,7 @@ export function makePlatformImplementation(
 
   if (origin !== 'https://mail.google.com') {
     // never resolve
-    return new Promise((resolve, reject) => {});
+    return new Promise(() => {});
   }
 
   const driver = new GmailDriver(
@@ -229,19 +228,6 @@ https://www.inboxsdk.com/docs/#RequiredSetup
 
     logger.eventSdkPassive('instantiate');
     const pi = new PlatformImplementation(driver, appId, opts);
-
-    // TODO: drop. This condition isn't possible.
-    if (origin === ('https://inbox.google.com' as any) && !opts.inboxBeta) {
-      console.log('InboxSDK: Unsupported origin', origin);
-
-      if (!loadedAppIds.has(appId)) {
-        loadedAppIds.add(appId);
-        logger.eventSdkPassive('not load');
-      }
-
-      // never resolve and give pi to app
-      return new Promise((resolve, reject) => {});
-    }
 
     if (!loadedAppIds.has(appId)) {
       loadedAppIds.add(appId);

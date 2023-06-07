@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import Kefir from 'kefir';
-import kefirBus from 'kefir-bus';
 import EventEmitter from '../lib/safe-event-emitter';
 import ComposeView from '../views/compose-view';
 import type { DrawerViewDriver } from '../driver-interfaces/driver'; // documented in src/docs/

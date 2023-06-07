@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 jest.mock('../../../lib/idMap', () => {
   function idMap(key: string) {
     const legacyMapping: Record<string, string> = {
@@ -15,15 +14,11 @@ jest.mock('../../../lib/idMap', () => {
     legacyIdMap: idMap,
   };
 });
-import _ from 'lodash';
 import Kefir from 'kefir';
-import kefirBus from 'kefir-bus';
-import kefirStopper from 'kefir-stopper';
 import delay from 'pdelay';
 import fs from 'fs';
 import idMap from '../../../lib/idMap';
 import GmailThreadSidebarView from './gmail-thread-sidebar-view';
-import ContentPanelViewDriver from '../../../driver-common/sidebar/ContentPanelViewDriver';
 import GmailElementGetter from '../gmail-element-getter';
 import MockWebStorage from 'mock-webstorage';
 jest.mock('../../../lib/dom/make-element-child-stream', () => {

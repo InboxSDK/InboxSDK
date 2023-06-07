@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import openDraftByMessageID, { makeNewHash } from './open-draft-by-message-id';
+import { makeNewHash } from './open-draft-by-message-id';
 describe('makeNewHash', () => {
   it('1', () => {
     expect(makeNewHash('', '123')).toBe('#?compose=123');

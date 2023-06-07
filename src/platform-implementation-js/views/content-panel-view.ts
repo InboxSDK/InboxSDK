@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import * as Kefir from 'kefir';
 import EventEmitter from '../lib/safe-event-emitter';
 import get from '../../common/get-or-fail';
 import type ContentPanelViewDriver from '../driver-common/sidebar/ContentPanelViewDriver';

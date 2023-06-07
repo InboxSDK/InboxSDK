@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as Kefir from 'kefir';
 import type GmailDriver from '../../gmail-driver';
 import GmailComposeButtonView from './gmail-compose-button-view';
@@ -17,7 +16,7 @@ export default function addButton(
   groupOrderHint: string,
   extraOnClickOptions: Record<string, any>
 ): Promise<Record<string, any> | null | undefined> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     let buttonViewController:
       | BasicButtonViewController
       | DropdownButtonViewController

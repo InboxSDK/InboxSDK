@@ -1,11 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import find from 'lodash/find';
 import * as logger from './injected-logger';
 import waitFor from '../platform-implementation-js/lib/wait-for';
-declare var GLOBALS: any[];
-declare var gbar: {
-  _CONFIG: any[];
-};
 
 function stupidToBool(stupid: any): boolean {
   switch ('' + stupid) {
@@ -25,7 +20,11 @@ function getSettingValue(settings: any[], name: string): boolean {
 }
 
 function getContext() {
-  let context = global as any;
+  type Context = {
+    GLOBALS: any[];
+    gbar: { _CONFIG: any[] };
+  };
+  let context = global as unknown as Context;
 
   try {
     // our current tab has globals defined
@@ -39,7 +38,7 @@ function getContext() {
       context = global.opener.top;
     }
   } catch (err) {
-    context = global; //we got an error from requesting global.opener.top.location.href;
+    context = global as unknown as Context; //we got an error from requesting global.opener.top.location.href;
   }
 
   return context;

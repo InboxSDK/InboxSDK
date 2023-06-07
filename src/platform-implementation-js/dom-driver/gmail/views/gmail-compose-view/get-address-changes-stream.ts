@@ -1,15 +1,12 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as Kefir from 'kefir';
-import t from 'transducers.js';
-import Logger from '../../../../lib/logger';
 import makeMutationObserverStream from '../../../../lib/dom/make-mutation-observer-stream';
 import getAddressInformationExtractor from './get-address-information-extractor';
 import { getRecipientRowElements } from './page-parser';
 import type GmailComposeView from '../gmail-compose-view';
-import makeElementChildStream from '../../../../lib/dom/make-element-child-stream';
 import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
 import { ReceiverType } from './set-recipients';
 import { Contact } from '../../../../../inboxsdk';
+
 export default function getAddressChangesStream(
   gmailComposeView: GmailComposeView
 ): Kefir.Observable<any, any> {

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import querystring from 'querystring';
 import startsWith from 'lodash/startsWith';
 import type { Message } from '../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import { extractMessages } from '../platform-implementation-js/dom-driver/gmail/gmail-response-processor';

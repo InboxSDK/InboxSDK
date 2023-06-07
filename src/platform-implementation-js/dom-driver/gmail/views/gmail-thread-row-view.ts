@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import once from 'lodash/once';
 import flatten from 'lodash/flatten';
 import includes from 'lodash/includes';
@@ -9,8 +8,6 @@ import { defonce } from 'ud';
 import assert from 'assert';
 import * as Kefir from 'kefir';
 import asap from 'asap';
-import kefirBus from 'kefir-bus';
-import type { Bus } from 'kefir-bus';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';

@@ -138,17 +138,15 @@ class GmailModalViewDriver {
 
   _addButton(buttonContainer: HTMLElement, buttonDescriptor: any) {
     const buttonOptions = { ...buttonDescriptor };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const buttonColor =
-      ['blue', 'red', 'green'].includes(buttonDescriptor.color) &&
+
+    ['blue', 'red', 'green'].includes(buttonDescriptor.color) &&
       buttonDescriptor.color;
     buttonOptions.isPrimary = buttonDescriptor.type === 'PRIMARY_ACTION';
 
     const buttonView = new ModalButtonView(buttonOptions);
 
     buttonOptions.buttonView = buttonView;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const buttonViewController = new BasicButtonViewController(buttonOptions);
+    new BasicButtonViewController(buttonOptions);
 
     if (buttonDescriptor.type === 'PRIMARY_ACTION') {
       buttonContainer.insertBefore(

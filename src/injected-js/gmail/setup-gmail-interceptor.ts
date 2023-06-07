@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import clone from 'lodash/clone';
 import flatten from 'lodash/flatten';
 import find from 'lodash/find';
@@ -257,7 +256,7 @@ export function setupGmailInterceptorOnFrames(
           const composeRequestDetails = parseComposeRequestBody(request.body);
           if (!composeRequestDetails || composeRequestDetails.type !== 'SEND')
             return request;
-          const { draftID, body, type } = composeRequestDetails;
+          const { draftID } = composeRequestDetails;
           const composeModifierIds = modifiers[draftID];
           if (!composeModifierIds || composeModifierIds.length === 0)
             return request;
@@ -557,7 +556,6 @@ export function setupGmailInterceptorOnFrames(
       },
       originalResponseTextLogger(connection) {
         if (connection.status === 200) {
-          const search = connection.params.search;
           const responseText = connection.originalResponseText;
           threadIdentifier.processThreadListResponse(responseText);
         }
@@ -954,7 +952,6 @@ export function setupGmailInterceptorOnFrames(
     });
     js_frame_wrappers.push({
       isRelevantTo: function (connection) {
-        let customSearchQuery;
         const params = connection.params;
 
         if (
@@ -964,7 +961,7 @@ export function setupGmailInterceptorOnFrames(
           connection.url.match(/^\?/) &&
           params.q &&
           !params.act &&
-          (customSearchQuery = find(customSearchQueries, (x) => x === params.q))
+          find(customSearchQueries, (x) => x === params.q)
         ) {
           if (customListJob) {
             // Resolve the old one with something because no one else is going

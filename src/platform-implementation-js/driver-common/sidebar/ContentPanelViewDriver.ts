@@ -1,8 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import autoHtml from 'auto-html';
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
-import kefirStopper from 'kefir-stopper';
 import delayAsap from '../../lib/delay-asap';
 import type { Driver } from '../../driver-interfaces/driver';
 import querySelector from '../../lib/dom/querySelectorOrFail';

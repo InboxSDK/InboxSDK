@@ -81,8 +81,7 @@ test('threadIdentifier works', () => {
   expect(pageCommunicator.getThreadIdForThreadRowByClick(twi2)).toBe(null);
 
   // Give the first one a click handler and identify it.
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  twi1.addEventListener('click', function (event: MouseEvent) {
+  twi1.addEventListener('click', function () {
     window.open(
       '?ui=2&view=btop&ver=v0f5rr5r5c17&search=inbox&th=14a0c5f5571b501c&cvid=1',
       '_blank'

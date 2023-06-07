@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /*
 This is used for PRE MATERIAL GMAIL, when sidebar only existed on threads.
 If you're reading this in the future, do you remember a time when there wasn't a global sidebar?
@@ -14,8 +13,6 @@ import kefirBus from 'kefir-bus';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import findParent from '../../../../common/find-parent';
-import delayAsap from '../../../lib/delay-asap';
-import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import OrderManager from 'order-manager';
 import idMap from '../../../lib/idMap';
 import incrementName from '../../../lib/incrementName';
@@ -287,7 +284,6 @@ class GmailAppSidebarView {
         });
 
         if (titleBar) {
-          const instanceId = titleBar.getAttribute('data-instance-id');
           const appName = titleBar.getAttribute('data-app-name');
           if (!appName) return;
           const appButton = buttonContainers.get(appName);
@@ -675,7 +671,7 @@ class GmailAppSidebarView {
         ADD_ON_SIDEBAR_CONTENT_SELECTOR
       );
       makeElementChildStream(addonSidebarContentContainerElement)
-        .flatMap(({ el, removalStream }) =>
+        .flatMap(({ el }) =>
           makeMutationObserverChunkedStream(el, {
             attributes: true,
             attributeFilter: ['style'],

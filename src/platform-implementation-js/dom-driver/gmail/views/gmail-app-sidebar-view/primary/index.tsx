@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import find from 'lodash/find';
 import findIndex from 'lodash/findIndex';
 import autoHtml from 'auto-html';
 import asap from 'asap';
@@ -18,7 +16,6 @@ import idMap from '../../../../../lib/idMap';
 import incrementName from '../../../../../lib/incrementName';
 import querySelector from '../../../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../../../lib/dom/make-mutation-observer-chunked-stream';
-import makeElementChildStream from '../../../../../lib/dom/make-element-child-stream';
 import { simulateClick } from '../../../../../lib/dom/simulate-mouse-event';
 import fakeWindowResize from '../../../../../lib/fake-window-resize';
 import addCompanionThreadIconArea from './add-companion-thread-icon-area';

@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import sortBy from 'lodash/sortBy';
 import escape from 'lodash/escape';
 import asap from 'asap';
-import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
@@ -182,7 +180,7 @@ export default class GmailTooltipView {
       );
 
       if (closeElement) {
-        closeElement.addEventListener('click', (e: MouseEvent) => {
+        closeElement.addEventListener('click', () => {
           this.destroy();
         });
       }
@@ -193,7 +191,7 @@ export default class GmailTooltipView {
         querySelector(this._element, '.inboxsdk__tooltip_image').appendChild(
           image
         );
-        image.addEventListener('load', (domEvent: any) => {
+        image.addEventListener('load', () => {
           asap(() => {
             this._eventStream.emit({
               eventName: 'imageLoaded',
@@ -216,9 +214,7 @@ export default class GmailTooltipView {
         };
 
         buttonOptions.buttonView = new ButtonView(buttonOptions);
-        const buttonViewController = new BasicButtonViewController(
-          buttonOptions
-        );
+        new BasicButtonViewController(buttonOptions);
         querySelector(this._element, '.inboxsdk__tooltip_button').appendChild(
           buttonOptions.buttonView.getElement()
         );
