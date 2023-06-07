@@ -75,7 +75,7 @@ the extension to include its own non-trivial CSS.
 
 ## Technology Choices
 
-We're trying to use Typescript as much as possible now. There are still a lot of classic Javascript and Flow Javascript files left over. As needed, you can make `.d.ts` type-def files so Typescript can see them, and you can make `.js.flow` type-def files so Flow can see Typescript files. If you're working on a bit of code that's not in a Typescript file, consider changing the file to be Typescript.
+We've moved our Flow code over to Typescript. There are still a lot of rougher typing from our Flow days. If you see types that could be tightened up, consider doing so if you are working around them.
 
 React is done for some UIs, but there's a complication to using it generally: we often need to integrate with elements from Gmail itself or other instances of the InboxSDK. React only works well for the case where there are a lot of elements created and managed by the InboxSDK itself, we have many places where we have to integrate with outside elements, and most of our additions into the page are pretty simple DOM-wise, so we're pretty picky about where we use React.
 
@@ -91,7 +91,7 @@ In general, we should try to add error logging that makes it obvious whenever
 Gmail's HTML structure or ajax formats aren't what we expect. For example, if
 we have code that calls `.querySelector(...)` on an element and then requires
 an element to be returned, we should either import and use
-'querySelectorOrFail.js' (which throws an error with a useful message if no
+'querySelectorOrFail.ts' (which throws an error with a useful message if no
 element is found), or we should handle null being returned from
 `.querySelector(...)` with code like the following:
 
@@ -112,7 +112,7 @@ censoring function (so we don't risk getting users' message contents; use
 either `censorHTMLstring(el.outerHTML)`, or `censorHTMLtree(el)` if information
 about the element's parents is useful too), or restrict the logging to only
 happen for Streak users (by checking the extension's appId with the
-`isStreakAppId.js` function). Same rule of thumb applies for logging ajax
+`isStreakAppId.ts` function). Same rule of thumb applies for logging ajax
 request/responses too (see `censorJSONTree`).
 
 See the _Querying for Error Logs_ section below for instructions on reading the
@@ -146,19 +146,8 @@ platform-implementation bundle, you'll need to run Chrome with the
 
 # Tests
 
-This project has different kinds of unit tests and integration tests.
-
-All .js files under `__tests__` and all `*.test.js` files are tests executed by
+All .ts files under `__tests__` and all `*.test.ts` files are tests executed by
 Jest. All new tests should be Jest tests.
-
-The `*.test.js` files inside of `test/chrome` are Puppeteer-based integration tests.
-These tests open a browser with a test InboxSDK extension and test that various
-InboxSDK features work correctly in Gmail. These tests are primarily about checking
-whether Gmail has broken support with us, and our CI system runs these for us. These
-tests require that the InboxSDK has been built first and that the
-".inboxsdk_test_secret" file or the INBOXSDK_TEST_SECRET environment variable
-contains the decryption key for the Google test account credentials. These
-tests can be run with `yarn puppeteer`.
 
 # Implementation Notes
 
@@ -209,8 +198,8 @@ tracking system, and is more vulnerable to being affected by or affecting
 Gmail's own Javascript variables, so we try to minimize what functionality
 lives in the injected script.
 
-The file "src/injected-js/main.js" is browserified into "dist/injected.js",
-which is then included by "src/platform-implementation-js/lib/inject-script.js"
+The file "src/injected-js/main.ts" is browserified into "dist/injected.js",
+which is then included by "src/platform-implementation-js/lib/inject-script.ts"
 and built into "dist/platform-implementation.js".
 
 ## Element Detection Notes
@@ -230,7 +219,7 @@ about Inbox should be referred to instead for it.
 (Inbox support is no more, but this knowledge is true of some newer Google web
 app code and parts of Gmail.)
 
-Like Gmail, Inbox uses a lot of randomly generated class names, but the class
+Like Gmail, Inbox used a lot of randomly generated class names, but the class
 names appear to be regenerated every few weeks. CSS class names, id values,
 jstcache properties, and jsl properties are not dependable for using to find
 elements. The presence of the id and usually the class properties can be used.
