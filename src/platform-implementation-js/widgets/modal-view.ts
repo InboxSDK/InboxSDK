@@ -41,9 +41,7 @@ class ModalView extends EventEmitter {
       Kefir.fromEvents(this, 'destroy'),
       hideStream.filter((modalView) => modalView === this),
     ]);
-    (document.body as any as HTMLElement).appendChild(
-      modalViewDriver.getModalContainerElement()
-    );
+    document.body.appendChild(modalViewDriver.getModalContainerElement());
     modalViewDriver.getModalContainerElement().focus();
     Kefir.fromEvents<KeyboardEvent, unknown>(document.body, 'keydown')
       .filter((domEvent) => domEvent.keyCode === 27)

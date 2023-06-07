@@ -32,7 +32,7 @@ class ContentPanelViewDriver {
     const document = global.document; //fix for unit test
 
     this._eventStream.plug(
-      Kefir.fromEvents(document.body as any, 'inboxsdkSidebarPanelActivated')
+      Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelActivated')
         .filter((e: any) => e.detail.instanceId === this._instanceId)
         .map(() => {
           this._isActive = true;
@@ -85,7 +85,7 @@ class ContentPanelViewDriver {
         appName =
           descriptor.appName || driver.getOpts().appName || descriptor.title;
 
-        if (!(document.body as any as HTMLElement).contains(el)) {
+        if (!document.body.contains(el)) {
           waitingPlatform.appendChild(el);
         }
 
@@ -121,7 +121,7 @@ class ContentPanelViewDriver {
 
     this._stopper.onValue(() => {
       if (!hasPlacedAlready) return;
-      (document.body as any as HTMLElement).dispatchEvent(
+      document.body.dispatchEvent(
         new CustomEvent('inboxsdkRemoveSidebarPanel', {
           bubbles: true,
           cancelable: false,
@@ -144,7 +144,7 @@ class ContentPanelViewDriver {
   }
 
   scrollIntoView() {
-    (document.body as any as HTMLElement).dispatchEvent(
+    document.body.dispatchEvent(
       new CustomEvent('inboxsdkSidebarPanelScrollIntoView', {
         bubbles: true,
         cancelable: false,
@@ -157,7 +157,7 @@ class ContentPanelViewDriver {
   }
 
   close() {
-    (document.body as any as HTMLElement).dispatchEvent(
+    document.body.dispatchEvent(
       new CustomEvent('inboxsdkSidebarPanelClose', {
         bubbles: true,
         cancelable: false,
@@ -171,7 +171,7 @@ class ContentPanelViewDriver {
   }
 
   open() {
-    (document.body as any as HTMLElement).dispatchEvent(
+    document.body.dispatchEvent(
       new CustomEvent('inboxsdkSidebarPanelOpen', {
         bubbles: true,
         cancelable: false,

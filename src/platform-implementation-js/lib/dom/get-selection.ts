@@ -38,7 +38,7 @@ export function getSelectedHTMLInElement(
   element: HTMLElement,
   lastRange?: Range | null | undefined
 ): string | null | undefined {
-  const selection = (document as any).getSelection();
+  const selection = document.getSelection();
   return t.toArray<any, string | null | undefined>(
     [
       selection && selection.rangeCount ? selection.getRangeAt(0) : null,

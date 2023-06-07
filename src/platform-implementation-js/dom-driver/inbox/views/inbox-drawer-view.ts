@@ -23,7 +23,7 @@ class InboxDrawerView {
 
   constructor(options: DrawerViewOptions) {
     this._chrome = typeof options.chrome === 'boolean' ? options.chrome : true;
-    let insertionTarget = document.body as any as HTMLElement;
+    let insertionTarget = document.body;
     let composeRect = null;
     const { composeView, closeWithCompose } = options;
 
@@ -161,7 +161,7 @@ class InboxDrawerView {
         (el) =>
           window.getComputedStyle(el).getPropertyValue('z-index') !== 'auto' &&
           el.getBoundingClientRect().left === 0
-      ) || (document.body as any as HTMLElement);
+      ) || document.body;
     composeEl.dispatchEvent(
       new CustomEvent(TAKE_OVER_EVENT, {
         bubbles: false,

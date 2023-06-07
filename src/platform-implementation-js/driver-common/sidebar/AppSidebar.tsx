@@ -315,7 +315,7 @@ class Panel extends React.Component<PanelProps> {
     const expanded = !this.props.item.showControls || this.props.item.expanded;
 
     if (expanded) {
-      (document.body as any as HTMLElement).dispatchEvent(
+      document.body.dispatchEvent(
         new CustomEvent('inboxsdkSidebarPanelActivated', {
           bubbles: true,
           cancelable: false,
@@ -333,7 +333,7 @@ class Panel extends React.Component<PanelProps> {
     const expanded = !this.props.item.showControls || this.props.item.expanded;
 
     if (!prevExpanded && expanded) {
-      (document.body as any as HTMLElement).dispatchEvent(
+      document.body.dispatchEvent(
         new CustomEvent('inboxsdkSidebarPanelActivated', {
           bubbles: true,
           cancelable: false,
@@ -343,7 +343,7 @@ class Panel extends React.Component<PanelProps> {
         })
       );
     } else if (prevExpanded && !expanded) {
-      (document.body as any as HTMLElement).dispatchEvent(
+      document.body.dispatchEvent(
         new CustomEvent('inboxsdkSidebarPanelDeactivated', {
           bubbles: true,
           cancelable: false,

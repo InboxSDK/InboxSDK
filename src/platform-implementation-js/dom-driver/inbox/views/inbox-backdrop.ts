@@ -10,10 +10,7 @@ class InboxBackdrop {
   } = kefirStopper();
   _el: HTMLElement;
 
-  constructor(
-    zIndex: number = 500,
-    target: HTMLElement = document.body as any
-  ) {
+  constructor(zIndex: number = 500, target: HTMLElement = document.body) {
     const el = (this._el = document.createElement('div'));
     el.className = 'inboxsdk__inbox_backdrop';
     el.style.zIndex = String(zIndex);
@@ -32,7 +29,7 @@ class InboxBackdrop {
 
         return !isCanceled;
       })
-      .onValue((e: MouseEvent) => {
+      .onValue(() => {
         this.destroy();
       });
     if (!target) throw new Error('no target');

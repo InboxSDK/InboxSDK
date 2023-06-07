@@ -3,7 +3,7 @@ import fromEventTargetCapture from '../../../../lib/from-event-target-capture';
 import type GmailComposeView from '../gmail-compose-view';
 export default function (gmailComposeView: GmailComposeView) {
   Kefir.merge([
-    fromEventTargetCapture(document.body as any, 'mousedown'),
+    fromEventTargetCapture(document.body, 'mousedown'),
     fromEventTargetCapture(gmailComposeView.getBodyElement(), 'keydown'),
     gmailComposeView
       .getEventStream()
@@ -12,7 +12,7 @@ export default function (gmailComposeView: GmailComposeView) {
     .takeUntilBy(gmailComposeView.getStopper())
     .onValue(() => {
       var body = gmailComposeView.getMaybeBodyElement();
-      var selection = (document as any).getSelection();
+      var selection = document.getSelection()!;
 
       if (
         body &&
