@@ -75,7 +75,7 @@ the extension to include its own non-trivial CSS.
 
 ## Technology Choices
 
-We've moved our Flow code over to Typescript. There are still a lot of rougher typing from our Flow days. If you see types that could be tightened up, consider doing so if you are working around them.
+We've moved our Flow code over to Typescript. There are still a lot of rougher types from our Flow days. If you see types that could be tightened up, consider doing so if you are working around them.
 
 React is done for some UIs, but there's a complication to using it generally: we often need to integrate with elements from Gmail itself or other instances of the InboxSDK. React only works well for the case where there are a lot of elements created and managed by the InboxSDK itself, we have many places where we have to integrate with outside elements, and most of our additions into the page are pretty simple DOM-wise, so we're pretty picky about where we use React.
 
