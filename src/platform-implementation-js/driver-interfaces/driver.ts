@@ -1,7 +1,7 @@
 import type * as Kefir from 'kefir';
 import type ComposeView from '../views/compose-view';
 import type InboxBackdrop from '../dom-driver/inbox/views/inbox-backdrop';
-export type Backdrop = InboxBackdrop;
+export type Backdrop = GmailBackdrop | InboxBackdrop;
 import type GmailThreadView from '../dom-driver/gmail/views/gmail-thread-view';
 export type ThreadViewDriver = GmailThreadView;
 import type GmailAttachmentCardView from '../dom-driver/gmail/views/gmail-attachment-card-view';
@@ -17,6 +17,7 @@ export type DrawerViewOptions = {
 import type InboxDrawerView from '../dom-driver/inbox/views/inbox-drawer-view';
 export type DrawerViewDriver = InboxDrawerView;
 import GmailDriver from '../dom-driver/gmail/gmail-driver';
+import GmailBackdrop from '../dom-driver/gmail/views/gmail-backdrop';
 export type Driver = GmailDriver;
 export type ButterBarDriver = {
   getNoticeAvailableStream(): Kefir.Observable<any, any>;
