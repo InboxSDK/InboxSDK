@@ -156,7 +156,7 @@ async function webpackTask({
     devtool:
       options.devtool === 'remote' ? false : options.devtool ?? 'source-map',
     entry: [
-      willMinify || args.production ? './src/inboxsdk-js/header.js' : null,
+      willMinify || args.production ? './src/inboxsdk-js/header' : null,
       entry,
     ].flatMap((x) => (x != null ? [x] : [])),
     mode: args.production ? 'production' : 'development',
