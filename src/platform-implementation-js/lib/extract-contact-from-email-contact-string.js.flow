@@ -1,5 +1,0 @@
-/* @flow */
-
-declare export default function extractContactFromEmailContactString(
-  contactInfoString: string
-): Contact;

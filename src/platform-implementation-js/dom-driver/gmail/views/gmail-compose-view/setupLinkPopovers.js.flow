@@ -1,7 +1,0 @@
-// @flow
-import type GmailComposeView from '../gmail-compose-view';
-import * as Kefir from 'kefir';
-
-declare export default function setupLinkPopOvers(
-  gmailComposeView: GmailComposeView
-): Kefir.Observable<any, any>;

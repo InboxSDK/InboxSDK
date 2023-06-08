@@ -1,5 +1,3 @@
-/* @flow */
-
 import includes from 'lodash/includes';
 import * as ud from 'ud';
 import { NATIVE_ROUTE_IDS } from '../../../constants/router';

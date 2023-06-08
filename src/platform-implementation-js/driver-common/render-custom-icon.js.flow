@@ -1,8 +1,0 @@
-/* @flow */
-
-declare export default function renderCustomIcon(
-  containerElement: HTMLElement,
-  customIconElement: HTMLElement,
-  append: boolean,
-  insertBeforeEl: ?HTMLElement
-): void;

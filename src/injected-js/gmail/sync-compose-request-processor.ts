@@ -1,5 +1,3 @@
-/* @flow */
-
 import intersection from 'lodash/intersection';
 import { ComposeRequest, ComposeRequestType, SEND_ACTIONS } from './constants';
 import { Contact } from '../../inboxsdk';

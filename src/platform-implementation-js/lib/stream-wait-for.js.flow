@@ -1,9 +1,0 @@
-/* @flow */
-
-import Kefir from 'kefir';
-
-declare export default function streamWaitFor<T>(
-  condition: () => ?T,
-  timeout?: number,
-  steptime?: number
-): Kefir.Observable<T>;

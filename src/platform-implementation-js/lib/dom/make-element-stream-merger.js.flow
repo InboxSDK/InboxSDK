@@ -1,8 +1,0 @@
-/* @flow */
-
-import Kefir from 'kefir';
-import type { ItemWithLifetime } from './make-element-child-stream';
-
-declare export default function makeElementStreamMerger<T>(): (
-  event: ItemWithLifetime<T>
-) => Kefir.Observable<ItemWithLifetime<T>>;

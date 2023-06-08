@@ -1,5 +1,3 @@
-/* @flow */
-
 import type GmailDriver from '../gmail-driver';
 import isIntegratedViewGmail, {
   isCollapsiblePanelHidden,

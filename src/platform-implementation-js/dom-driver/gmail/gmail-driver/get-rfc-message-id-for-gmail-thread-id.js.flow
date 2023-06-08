@@ -1,8 +1,0 @@
-/* @flow */
-
-import type GmailDriver from '../gmail-driver';
-
-declare export default function getRfcMessageIdForGmailThreadId(
-  driver: GmailDriver,
-  gmailThreadId: string
-): Promise<string>;

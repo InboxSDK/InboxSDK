@@ -1,3 +1,0 @@
-/* @flow */
-
-declare export default function cachebustUrl(url: string): string;

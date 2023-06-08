@@ -1,4 +1,0 @@
-/* @flow */
-
-declare export var sidebarWaitingPlatformSelector: string;
-declare export var sidebarWaitingPlatformClassName: string;

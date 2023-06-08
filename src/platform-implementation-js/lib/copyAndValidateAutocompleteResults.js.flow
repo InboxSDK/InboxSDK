@@ -1,8 +1,0 @@
-/* @flow */
-import type { Driver } from '../driver-interfaces/driver';
-import type { AutocompleteSearchResult } from '../../injected-js/gmail/modify-suggestions';
-
-declare export default function copyAndValidateAutocompleteResults(
-  driver: Driver,
-  results: Array<AutocompleteSearchResult>
-): Array<AutocompleteSearchResult>;

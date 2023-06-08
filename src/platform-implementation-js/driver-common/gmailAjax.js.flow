@@ -1,7 +1,0 @@
-/* @flow */
-
-import type { AjaxOpts, AjaxResponse } from '../../common/ajax';
-
-declare export default function gmailAjax(
-  opts: AjaxOpts
-): Promise<AjaxResponse>;

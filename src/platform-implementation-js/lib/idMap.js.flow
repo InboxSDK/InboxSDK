@@ -1,7 +1,0 @@
-/* @flow */
-
-// Pass a name and you'll get a unique identifier associated with that name.
-// The returned identifier will only contain alphabetic characters.
-declare export default function idMap(name: string): string;
-
-declare export function legacyIdMap(name: string): string;

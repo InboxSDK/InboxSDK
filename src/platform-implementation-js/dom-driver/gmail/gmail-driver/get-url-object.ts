@@ -1,5 +1,3 @@
-/* @flow */
-
 export type URLObject = {
   name: string;
   params: string[];

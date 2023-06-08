@@ -1,5 +1,3 @@
-/* @flow */
-
 import * as Kefir from 'kefir';
 import { parse } from 'querystring';
 import PageCommunicator from './gmail-page-communicator';

@@ -1,9 +1,0 @@
-/* @flow */
-
-import type { Driver } from '../../driver-interfaces/driver';
-import type PageParserTree from 'page-parser-tree';
-
-declare export default function makePageParserTree(
-  driver: Driver | null,
-  root: Document | HTMLElement
-): PageParserTree;

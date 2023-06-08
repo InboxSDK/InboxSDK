@@ -319,7 +319,7 @@ gulp.task('clean', async () => {
 });
 
 /**
- * Copy handwritten type definitions and plain js to a appease tsc in our mixed TS/flow setup.
+ * Copy handwritten type definitions and plain js to a appease tsc in our TS setup.
  */
 gulp.task('types', async () => {
   const files = await fg(['./src/**/*.d.ts'], {

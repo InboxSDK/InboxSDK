@@ -1,5 +1,3 @@
-/* @flow */
-
 import type * as Kefir from 'kefir';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailAppToolbarButtonView from '../views/gmail-app-toolbar-button-view';

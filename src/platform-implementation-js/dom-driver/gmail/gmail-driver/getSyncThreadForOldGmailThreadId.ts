@@ -1,5 +1,3 @@
-/* @flow */
-
 import BigNumber from 'bignumber.js';
 
 import getSyncThreadsForSearch from '../../../driver-common/getSyncThreadsForSearch';
