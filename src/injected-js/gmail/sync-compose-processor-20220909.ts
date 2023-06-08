@@ -1,13 +1,13 @@
 import sortBy from 'lodash/sortBy';
 import intersection from 'lodash/intersection';
 
-import type { Contact } from '../../platform-implementation-js/driver-interfaces/compose-view-driver';
 import isNotNil from '../../platform-implementation-js/lib/isNotNil';
 import {
   ComposeRequestType,
   DRAFT_SAVING_ACTIONS,
   SEND_ACTIONS,
 } from './constants';
+import { Contact } from '../../inboxsdk';
 
 const ACTION_TYPE_PRIORITY_RANK: [ComposeRequestType, ComposeRequestType] = [
   'SEND',

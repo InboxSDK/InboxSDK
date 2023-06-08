@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 declare global {
   var __InboxSDKImpLoader: any;
 }
@@ -8,7 +9,6 @@ if (!global.__InboxSDKImpLoader) {
     '[role=banner] div[aria-label] div div a[href^="https://myaccount.google."], [role=banner]+div div[aria-label] div div a[href^="https://myaccount.google."]'
   );
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   var Kefir = require('kefir');
 
   var onready = new Promise<void>((resolve) => {
@@ -46,7 +46,6 @@ if (!global.__InboxSDKImpLoader) {
       return onready.then(() => {
         const {
           makePlatformImplementation,
-          // eslint-disable-next-line @typescript-eslint/no-var-requires
         } = require('./platform-implementation');
         return makePlatformImplementation(appId, opts, {
           piMainStarted,

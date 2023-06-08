@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 import * as SCRP from './sync-compose-processor-20220909';
 
 const expectedOutputByFile = {

@@ -1,10 +1,10 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 export function injectScriptEmbedded() {
   const url = 'https://www.inboxsdk.com/build/pageWorld.js';
 
   const script = document.createElement('script');
   script.type = 'text/javascript';
 
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const originalCode = require('raw-loader!../../../packages/core/pageWorld.js');
 
   const codeParts: string[] = [];

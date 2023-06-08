@@ -11,8 +11,8 @@ import {
   ComposeViewDriver,
   ComposeNotice,
   StatusBar,
-  Contact,
 } from '../driver-interfaces/compose-view-driver';
+import { Contact } from '../../inboxsdk';
 
 const memberMap = ud.defonce(module, () => new WeakMap());
 

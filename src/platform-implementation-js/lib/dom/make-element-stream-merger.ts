@@ -9,7 +9,7 @@ export default function makeElementStreamMerger<T>(): (
   const knownElementStopperPools: Map<T, StopperPool<null, never>> = new Map();
 
   return (event) => {
-    let stopperPool = knownElementStopperPools.get(event.el);
+    let stopperPool = knownElementStopperPools.get(event.el)!;
     if (stopperPool) {
       if (stopperPool.getSize() > 1) {
         console.warn(
@@ -18,10 +18,12 @@ export default function makeElementStreamMerger<T>(): (
           event.el
         );
       }
-      stopperPool.add(event.removalStream.flatMap(delayAsap));
+      stopperPool.add(event.removalStream.flatMap(delayAsap) as any);
       return Kefir.never();
     } else {
-      stopperPool = new StopperPool(event.removalStream.flatMap(delayAsap));
+      stopperPool = new StopperPool(
+        event.removalStream.flatMap(delayAsap) as any
+      );
       stopperPool.stream.onValue(function () {
         knownElementStopperPools.delete(event.el);
       });

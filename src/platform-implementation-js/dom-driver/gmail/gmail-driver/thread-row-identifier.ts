@@ -13,15 +13,13 @@ class ThreadRowIdentifier {
     this._driver = driver;
     this._composeViews = new Set();
 
-    this._driver
-      .getComposeViewDriverStream()
-      .onValue((gmailComposeView: GmailComposeView) => {
-        this._composeViews.add(gmailComposeView);
+    this._driver.getComposeViewDriverStream().onValue((gmailComposeView) => {
+      this._composeViews.add(gmailComposeView);
 
-        gmailComposeView.getStopper().onValue(() => {
-          this._composeViews.delete(gmailComposeView);
-        });
+      gmailComposeView.getStopper().onValue(() => {
+        this._composeViews.delete(gmailComposeView);
       });
+    });
   }
 
   getThreadIdForThreadRow(

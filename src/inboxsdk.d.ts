@@ -447,7 +447,13 @@ export interface ButtonDescriptor {
   iconUrl?: string;
   iconClass?: string;
   hasDropdown?: boolean;
-  onClick(): void;
+  onClick(e: MouseEvent): void;
+  activateFunction(e: Event): void;
+  buttonColor?: string;
+  dropdownShowFunction(e: Event): void;
+  noArrow?: boolean;
+  tooltip?: string;
+  type: string;
 }
 
 export interface MoleView extends EventEmitter {
@@ -751,8 +757,7 @@ export interface StatusBarView extends SimpleElementView {
   setHeight(newHeight: number): any;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface ComposeNoticeView extends SimpleElementView {}
+export type ComposeNoticeView = SimpleElementView;
 
 export interface MessageButtonDescriptor {
   onClick(): void;

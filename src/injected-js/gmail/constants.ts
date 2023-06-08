@@ -1,4 +1,4 @@
-import { Contact } from '../../platform-implementation-js/driver-interfaces/compose-view-driver';
+import { Contact } from '../../inboxsdk';
 
 export type ComposeRequestType = 'FIRST_DRAFT_SAVE' | 'DRAFT_SAVE' | 'SEND';
 

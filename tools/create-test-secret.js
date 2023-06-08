@@ -2,6 +2,7 @@
 'use strict';
 const { createEncryptor } = require('simple-encryptor');
 const fs = require('fs');
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const readline = require('readline');
 
 async function read(stream) {

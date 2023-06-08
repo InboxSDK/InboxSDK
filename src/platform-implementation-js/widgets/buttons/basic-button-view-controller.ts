@@ -3,11 +3,15 @@ import kefirStopper from 'kefir-stopper';
 
 // GmailComposeButtonView | ButtonView | CreateAccessoryButtonView | ModalButtonView
 export interface ButtonViewI {
+  addClass(className: string): void;
+  removeClass(className: string): void;
   update(options: Options): void;
   getEventStream(): Kefir.Observable<any, any>;
   getElement(): HTMLElement;
   setEnabled(enabled: boolean): void;
   destroy(): void;
+  activate(): void;
+  deactivate(): void;
 }
 
 export interface Options {

@@ -4,7 +4,7 @@ import extractContactFromEmailContactString from '../../../../lib/extract-contac
 import censorHTMLstring from '../../../../../common/censorHTMLstring';
 
 import GmailComposeView from '../gmail-compose-view';
-import { Contact } from '../../../../driver-interfaces/compose-view-driver';
+import { Contact } from '../../../../../inboxsdk';
 
 export default function getAddressInformationExtractor(
   addressType: string,

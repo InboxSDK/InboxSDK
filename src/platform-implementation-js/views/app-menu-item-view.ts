@@ -169,7 +169,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
       const [, gmailView] =
         results.find(([descriptor]) => {
-          return descriptor?.isRouteActive(routeView);
+          return descriptor?.isRouteActive(routeView as any);
         }) ?? [];
 
       if (gmailView?.element) {

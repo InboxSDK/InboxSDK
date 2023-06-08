@@ -1,8 +1,8 @@
 /* @flow */
 
 import intersection from 'lodash/intersection';
-import { Contact } from '../../platform-implementation-js/driver-interfaces/compose-view-driver';
 import { ComposeRequest, ComposeRequestType, SEND_ACTIONS } from './constants';
+import { Contact } from '../../inboxsdk';
 
 export function getDetailsOfComposeRequest(
   parsed: Record<any, any>

@@ -95,9 +95,6 @@ jobs:
       - run:
           name: Typecheck (tsc)
           command: yarn tsc
-      - run:
-          name: Typecheck (flow)
-          command: yarn flow check
 
 workflows:
   version: 2
