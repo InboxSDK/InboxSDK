@@ -448,12 +448,12 @@ export interface ButtonDescriptor {
   iconClass?: string;
   hasDropdown?: boolean;
   onClick(e: MouseEvent): void;
-  activateFunction(e: Event): void;
+  activateFunction?: (e: Event) => void;
   buttonColor?: string;
-  dropdownShowFunction(e: Event): void;
+  dropdownShowFunction?: (e: Event) => void;
   noArrow?: boolean;
   tooltip?: string;
-  type: string;
+  type?: string;
 }
 
 export interface MoleView extends EventEmitter {
