@@ -54,6 +54,7 @@ export type ComposeViewDriver = {
   popOut(): void;
   replaceSendButton(el: HTMLElement): () => void;
   hideDiscardButton(): () => void;
+  overrideEditSubject?: () => void;
   registerRequestModifier(modifier: Record<string, any>): void;
   attachFiles(files: Blob[]): Promise<void>;
   attachInlineFiles(files: Blob[]): Promise<void>;
@@ -70,7 +71,7 @@ export type ComposeViewDriver = {
     >,
     groupOrderHint: string,
     extraOnClickOptions: Record<string, any>
-  ): Promise<Record<string, any> | null | undefined>;
+  ): Promise<any | null | undefined>;
   addRecipientRow(
     options: Kefir.Observable<Record<string, any> | null | undefined, unknown>
   ): () => void;

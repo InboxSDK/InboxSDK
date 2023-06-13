@@ -5,16 +5,22 @@ import * as ud from 'ud';
 import get from '../../common/get-or-fail';
 import ComposeButtonView from './compose-button-view';
 
-import Membrane from '../lib/Membrane';
-import { Driver } from '../driver-interfaces/driver';
-import {
+import type Membrane from '../lib/Membrane';
+import type { Driver } from '../driver-interfaces/driver';
+import type {
   ComposeViewDriver,
   ComposeNotice,
   StatusBar,
 } from '../driver-interfaces/compose-view-driver';
-import { Contact } from '../../inboxsdk';
+import type { Contact } from '../../inboxsdk';
 
-const memberMap = ud.defonce(module, () => new WeakMap());
+interface Members {
+  driver: Driver;
+  membrane: Membrane;
+  composeViewImplementation: ComposeViewDriver;
+}
+
+const memberMap = ud.defonce(module, () => new WeakMap<ComposeView, Members>());
 
 // documented in src/docs/
 export default class ComposeView extends EventEmitter {
@@ -178,11 +184,11 @@ export default class ComposeView extends EventEmitter {
   }
 
   getSubjectInput(): HTMLInputElement {
-    return get(memberMap, this).composeViewImplementation.getSubjectInput();
+    return get(memberMap, this).composeViewImplementation.getSubjectInput()!;
   }
 
   getBodyElement(): HTMLElement {
-    return get(memberMap, this).composeViewImplementation.getBodyElement();
+    return get(memberMap, this).composeViewImplementation.getBodyElement()!;
   }
 
   // NOT DOCUMENTED BECAUSE NOT SURE IF API USERS NEED THIS
@@ -197,7 +203,10 @@ export default class ComposeView extends EventEmitter {
   }
 
   getInitialMessageID(): string {
-    return get(memberMap, this).composeViewImplementation.getInitialMessageID();
+    return get(
+      memberMap,
+      this
+    ).composeViewImplementation.getInitialMessageID()!;
   }
 
   /* deprecated */
@@ -209,11 +218,11 @@ export default class ComposeView extends EventEmitter {
     if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
       throw new Error('This method was discontinued after API version 1');
     }
-    return composeViewImplementation.getMessageID();
+    return composeViewImplementation.getMessageID()!;
   }
 
   getThreadID(): string {
-    return get(memberMap, this).composeViewImplementation.getThreadID();
+    return get(memberMap, this).composeViewImplementation.getThreadID()!;
   }
 
   getDraftID(): Promise<string | null | void> {
