@@ -62,7 +62,7 @@ export type AppMenuItemPanelDescriptor = {
 };
 
 /**
- * @alpha
+ * If the user has Chat, Meet, or both enabled, this namespace allows you to add app menu items and optionally collapsible panels to the app menu.
  */
 export default class AppMenu {
   #driver;
@@ -71,11 +71,17 @@ export default class AppMenu {
     this.#driver = driver;
   }
 
+  /**
+   * @note This method expects @see AppMenu#isShown to be true to be called successfully.
+   */
   addMenuItem(menuItemDescriptor: AppMenuItemDescriptor): AppMenuItemView {
     const navItemView = new AppMenuItemView(this.#driver, menuItemDescriptor);
     return navItemView;
   }
 
+  /**
+   * @returns true if the user has Chat, Meet, or both enabled.
+   */
   async isShown() {
     const result = await GmailElementGetter.getAppMenuAsync();
     return !!result;
