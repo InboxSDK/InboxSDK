@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import uniq from 'lodash/uniq';
 import escape from 'lodash/escape';
 import asap from 'asap';
 import * as Kefir from 'kefir';
@@ -139,8 +137,6 @@ class GmailToolbarView {
     this._stopper.takeUntilBy(buttonStopper).onValue(() => {
       buttonStopper.destroy();
     });
-
-    const appId = this._driver.getAppId();
 
     const toolbarSections = SECTION_NAMES;
 
@@ -587,13 +583,13 @@ class GmailToolbarView {
       escape(buttonDescriptor.title),
       '</div>',
     ].join('');
-    itemElement.addEventListener('mouseenter', (e: MouseEvent) =>
+    itemElement.addEventListener('mouseenter', () =>
       itemElement.classList.add('J-N-JT')
     );
-    itemElement.addEventListener('mouseleave', (e: MouseEvent) =>
+    itemElement.addEventListener('mouseleave', () =>
       itemElement.classList.remove('J-N-JT')
     );
-    itemElement.addEventListener('click', (e: MouseEvent) => {
+    itemElement.addEventListener('click', () => {
       if (buttonDescriptor.onClick) {
         buttonDescriptor.onClick({});
       }

@@ -18,9 +18,7 @@ export default function addTooltipToButton(
     .getStopper()
     .takeUntilBy(gmailTooltipView.getStopper())
     .onValue(() => gmailTooltipView.destroy());
-  (document.body as any as HTMLElement).appendChild(
-    gmailTooltipView.getElement()
-  );
+  document.body.appendChild(gmailTooltipView.getElement());
 
   _anchorTooltip(
     gmailTooltipView,

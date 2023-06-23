@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import sortBy from 'lodash/sortBy';
 import escape from 'lodash/escape';
 import asap from 'asap';
-import Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
@@ -182,7 +180,7 @@ export default class GmailTooltipView {
       );
 
       if (closeElement) {
-        closeElement.addEventListener('click', (e: MouseEvent) => {
+        closeElement.addEventListener('click', () => {
           this.destroy();
         });
       }
@@ -193,7 +191,7 @@ export default class GmailTooltipView {
         querySelector(this._element, '.inboxsdk__tooltip_image').appendChild(
           image
         );
-        image.addEventListener('load', (domEvent: any) => {
+        image.addEventListener('load', () => {
           asap(() => {
             this._eventStream.emit({
               eventName: 'imageLoaded',
@@ -216,9 +214,7 @@ export default class GmailTooltipView {
         };
 
         buttonOptions.buttonView = new ButtonView(buttonOptions);
-        const buttonViewController = new BasicButtonViewController(
-          buttonOptions
-        );
+        new BasicButtonViewController(buttonOptions);
         querySelector(this._element, '.inboxsdk__tooltip_button').appendChild(
           buttonOptions.buttonView.getElement()
         );
@@ -371,10 +367,8 @@ export default class GmailTooltipView {
     var distances = [
       boundingBoxWrapper.value[0].y, //top
       boundingBoxWrapper.value[0].x, //left
-      (document.body as any as HTMLElement).clientWidth -
-        boundingBoxWrapper.value[1].x, //right
-      (document.body as any as HTMLElement).clientHeight -
-        boundingBoxWrapper.value[1].y, //bottom
+      document.body.clientWidth - boundingBoxWrapper.value[1].x, //right
+      document.body.clientHeight - boundingBoxWrapper.value[1].y, //bottom
     ];
     return sortBy(distances, function (distance) {
       return distance;
@@ -394,24 +388,16 @@ export default class GmailTooltipView {
     if (boundingBox[0].y < -1) {
       boundingBox[0].y = 0;
       boundingBox[1].y = boundingBox[0].y + boundingBoxHeight;
-    } else if (
-      boundingBox[1].y > (document.body as any as HTMLElement).clientHeight
-    ) {
-      boundingBox[0].y =
-        (document.body as any as HTMLElement).clientHeight - boundingBoxHeight;
+    } else if (boundingBox[1].y > document.body.clientHeight) {
+      boundingBox[0].y = document.body.clientHeight - boundingBoxHeight;
       boundingBox[1].y = boundingBox[0].y + boundingBoxHeight;
     }
 
     if (boundingBox[0].x < -1) {
       boundingBox[0].x = 0;
       boundingBox[1].x = boundingBox[0].x + boundingBoxWidth;
-    } else if (
-      boundingBox[1].x > (document.body as any as HTMLElement).clientWidth
-    ) {
-      boundingBox[0].x =
-        (document.body as any as HTMLElement).clientWidth -
-        boundingBoxWidth -
-        20;
+    } else if (boundingBox[1].x > document.body.clientWidth) {
+      boundingBox[0].x = document.body.clientWidth - boundingBoxWidth - 20;
       boundingBox[1].x = boundingBox[0].x + boundingBoxWidth;
     }
 

@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import includes from 'lodash/includes';
 import startsWith from 'lodash/startsWith';
 import findIndex from 'lodash/findIndex';
 import once from 'lodash/once';
-import Kefir from 'kefir';
 import delayAsap from '../../../../lib/delay-asap';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import cssSelectorEscape from '../../../../lib/css-selector-escape';
@@ -90,7 +88,7 @@ export default function sizeFixer(
       );
     });
   resizeEvents
-    .bufferBy(resizeEvents.flatMap((x) => delayAsap(null)))
+    .bufferBy(resizeEvents.flatMap(() => delayAsap(null)))
     .filter((x) => x.length > 0)
     .merge(
       makeMutationObserverChunkedStream(scrollBody, {

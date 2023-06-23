@@ -80,8 +80,7 @@ export default class Toolbars extends EventEmitter {
     } else {
       const stopper = kefirStopper();
       let currentRemover: null | (() => void) = null;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const sub = members.driver
+      members.driver
         .getRouteViewDriverStream()
         .takeUntilBy(stopper)
         .onValue((routeViewDriver) => {

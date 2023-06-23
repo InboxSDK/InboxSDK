@@ -1,10 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
 import ContentPanelView from '../views/content-panel-view';
 import get from '../../common/get-or-fail';
 import type { PiOpts } from '../platform-implementation';
-import type Membrane from '../lib/Membrane';
 import type { Driver } from '../driver-interfaces/driver';
 import GmailSupportItemView from '../dom-driver/gmail/views/gmail-support-item-view';
 import type { SupportItemDescriptor } from '../dom-driver/gmail/views/gmail-support-item-view';

@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import find from 'lodash/find';
 import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-import util from 'util';
 import autoHtml from 'auto-html';
 import type GmailDriver from '../gmail-driver';
 import type GmailMessageView from './gmail-message-view';
@@ -12,7 +10,6 @@ import ButtonView from '../widgets/buttons/button-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 import waitFor from '../../../lib/wait-for';
-import streamWaitFor from '../../../lib/stream-wait-for';
 
 class GmailAttachmentCardView {
   _element!: HTMLElement;

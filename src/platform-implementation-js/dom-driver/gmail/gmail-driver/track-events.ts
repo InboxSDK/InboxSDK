@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import Kefir from 'kefir';
-import { ComposeViewDriver } from '../../../driver-interfaces/compose-view-driver';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import type GmailDriver from '../gmail-driver';
 import GmailComposeView from '../views/gmail-compose-view';

@@ -1,20 +1,14 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import find from 'lodash/find';
 import zip from 'lodash/zip';
-import asap from 'asap';
 import assert from 'assert';
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
-import get from '../../../../common/get-or-fail';
 import delayAsap from '../../../lib/delay-asap';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import GmailToolbarView from './gmail-toolbar-view';
 import GmailThreadRowView from './gmail-thread-row-view';
-import streamWaitFor from '../../../lib/stream-wait-for';
-import type { ElementWithLifetime } from '../../../lib/dom/make-element-child-stream';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
-import makeElementViewStream from '../../../lib/dom/make-element-view-stream';
 import type GmailDriver from '../gmail-driver';
 import type GmailRouteView from './gmail-route-view/gmail-route-view';
 const THREAD_ROW_SELECTED_CLASSNAME = 'x7';

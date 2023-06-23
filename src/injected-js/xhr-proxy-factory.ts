@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prefer-rest-params */
 import has from 'lodash/has';
 import noop from 'lodash/noop';
@@ -134,7 +133,7 @@ export default function XHRProxyFactory(
 ): typeof XMLHttpRequest {
   const logError =
     (opts && opts.logError) ||
-    function (error, label) {
+    function (error) {
       setTimeout(function () {
         // let window.onerror log this
         throw error;

@@ -1,10 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import constant from 'lodash/constant';
-import asap from 'asap';
 import delay from 'pdelay';
-import util from 'util';
 import * as Kefir from 'kefir';
-import { parse } from 'querystring';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import type { Bus } from 'kefir-bus';
@@ -14,13 +9,10 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import idMap from '../../../lib/idMap';
 import SimpleElementView from '../../../views/SimpleElementView';
 import CustomMessageView from '../../../views/conversations/custom-message-view';
-import delayAsap from '../../../lib/delay-asap';
 import type GmailDriver from '../gmail-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import GmailMessageView from './gmail-message-view';
 import GmailToolbarView from './gmail-toolbar-view';
-import type GmailAppSidebarView from './gmail-app-sidebar-view';
-import GmailThreadSidebarView from './gmail-thread-sidebar-view';
 import WidthManager from './gmail-thread-view/width-manager';
 import type { CustomMessageDescriptor } from '../../../views/conversations/custom-message-view';
 let hasLoggedAddonInfo = false;
@@ -32,7 +24,6 @@ class GmailThreadView {
   _isPreviewedThread: boolean;
   _eventStream: Bus<any, unknown>;
   _stopper = kefirStopper();
-  _threadSidebar: GmailThreadSidebarView | null | undefined = null;
   _widthManager: WidthManager | null | undefined = null;
   _toolbarView: any;
   _messageViewDrivers: any[];
@@ -176,7 +167,6 @@ class GmailThreadView {
     this._stopper.destroy();
 
     if (this._toolbarView) this._toolbarView.destroy();
-    if (this._threadSidebar) this._threadSidebar.destroy();
 
     this._messageViewDrivers.forEach((messageView) => {
       messageView.destroy();

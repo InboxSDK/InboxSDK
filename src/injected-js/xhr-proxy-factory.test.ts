@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import assert from 'assert';
 import _ from 'lodash';
 import noop from 'lodash/noop';
@@ -275,47 +274,38 @@ beforeEach(() => {
           let simpleFired = false,
             addedFired = false;
 
-          xhr.onreadystatechange = function (event) {
+          xhr.onreadystatechange = function () {
             simpleFired = true;
           };
 
-          xhr.addEventListener(
-            'readystatechange',
-            function (event: Record<string, any>) {
-              addedFired = true;
+          xhr.addEventListener('readystatechange', function () {
+            addedFired = true;
+          });
+          xhr.addEventListener('readystatechange', function () {
+            if (this.readyState == 4) {
+              assert(
+                simpleFired && addedFired,
+                'check that both listeners fired'
+              );
+              done();
             }
-          );
-          xhr.addEventListener(
-            'readystatechange',
-            function (event: Record<string, any>) {
-              if (this.readyState == 4) {
-                assert(
-                  simpleFired && addedFired,
-                  'check that both listeners fired'
-                );
-                done();
-              }
-            }
-          );
+          });
           xhr.open('GET', '/foo');
           xhr.send();
         });
       });
       describe('removeEventListener', () => {
         it('should work', (done) => {
-          const badListener = function (event: Record<string, any>) {
+          const badListener = function () {
             throw new Error('this listener should have been removed');
           };
 
           xhr.addEventListener('readystatechange', badListener);
-          xhr.addEventListener(
-            'readystatechange',
-            function (event: Record<string, any>) {
-              if (this.readyState == 4) {
-                done();
-              }
+          xhr.addEventListener('readystatechange', function () {
+            if (this.readyState == 4) {
+              done();
             }
-          );
+          });
           xhr.removeEventListener('readystatechange', badListener);
           xhr.open('GET', '/foo');
           xhr.send();
@@ -423,25 +413,17 @@ beforeEach(() => {
         it('readystatechange', (done) => {
           const step = _.after(2, done);
 
-          function checkEvent(event: Event) {
-            assert.strictEqual(event.target, xhr);
-            step();
-          }
-
-          xhr.onreadystatechange = function (event) {
+          xhr.onreadystatechange = function () {
             if (this.readyState == 4) {
               step();
             }
           };
 
-          xhr.addEventListener(
-            'readystatechange',
-            function (event: Record<string, any>) {
-              if (this.readyState == 4) {
-                step();
-              }
+          xhr.addEventListener('readystatechange', function () {
+            if (this.readyState == 4) {
+              step();
             }
-          );
+          });
           xhr.open('GET', '/foo');
           xhr.send();
         });
@@ -774,16 +756,16 @@ describe('XHRProxyFactory', () => {
             assert.equal(response, origResponse + '-modified' + runCount);
           },
 
-          afterListeners(connection) {
+          afterListeners() {
             firstAfterListenersRan++;
           },
         },
         {
-          isRelevantTo(connection) {
+          isRelevantTo() {
             return true;
           },
 
-          originalSendBodyLogger(connection, body) {
+          originalSendBodyLogger() {
             originalSendBodyLoggerRan++;
           },
 
@@ -797,7 +779,7 @@ describe('XHRProxyFactory', () => {
             assert.equal(response, origResponse + '-modified' + runCount);
           },
 
-          afterListeners(connection) {
+          afterListeners() {
             assert.equal(
               firstAfterListenersRan,
               1 * runCount,
@@ -817,27 +799,27 @@ describe('XHRProxyFactory', () => {
           },
         },
         {
-          isRelevantTo(connection) {
+          isRelevantTo() {
             return false;
           },
 
-          originalSendBodyLogger(connection, body) {
+          originalSendBodyLogger() {
             throw new Error('should not run');
           },
 
-          originalResponseTextLogger(connection, response) {
+          originalResponseTextLogger() {
             throw new Error('should not run');
           },
 
-          responseTextChanger(connection, response) {
+          responseTextChanger() {
             throw new Error('should not run');
           },
 
-          finalResponseTextLogger(connection, response) {
+          finalResponseTextLogger() {
             throw new Error('should not run');
           },
 
-          afterListeners(connection) {
+          afterListeners() {
             throw new Error('should not run');
           },
         },
@@ -907,7 +889,7 @@ describe('XHRProxyFactory', () => {
       let finalResponseTextLoggerRan = 0;
       const wrappers: Wrappers = [
         {
-          isRelevantTo(connection) {
+          isRelevantTo() {
             return true;
           },
 
@@ -924,11 +906,11 @@ describe('XHRProxyFactory', () => {
           },
         },
         {
-          isRelevantTo(connection) {
+          isRelevantTo() {
             return false;
           },
 
-          responseTextChanger(connection, response) {
+          responseTextChanger() {
             throw new Error('should not run');
           },
         },
@@ -968,54 +950,54 @@ describe('XHRProxyFactory', () => {
       let loggerRan = 0;
       const wrappers: Wrappers = [
         {
-          isRelevantTo(connection) {
+          isRelevantTo() {
             throw testError;
           },
 
-          originalResponseTextLogger(connection, response) {
+          originalResponseTextLogger() {
             throw new Error('should not run');
           },
         },
         {
-          isRelevantTo(connection) {
+          isRelevantTo() {
             return true;
           },
 
-          originalSendBodyLogger(connection, body) {
+          originalSendBodyLogger() {
             throw testError;
           },
 
-          requestChanger(connection, body) {
+          requestChanger() {
             throw testError;
           },
 
-          originalResponseTextLogger(connection, response) {
+          originalResponseTextLogger() {
             loggerRan++;
             throw testError;
           },
 
-          responseTextChanger(connection, response) {
+          responseTextChanger() {
             throw testError;
           },
 
-          finalResponseTextLogger(connection, response) {
+          finalResponseTextLogger() {
             throw testError;
           },
         },
         {
-          isRelevantTo(connection) {
+          isRelevantTo() {
             return true;
           },
 
-          originalSendBodyLogger(connection, body) {
+          originalSendBodyLogger() {
             throw testError;
           },
 
-          originalResponseTextLogger(connection, response) {
+          originalResponseTextLogger() {
             throw testError;
           },
 
-          finalResponseTextLogger(connection, response) {
+          finalResponseTextLogger() {
             throw testError;
           },
         },
@@ -1048,11 +1030,11 @@ describe('XHRProxyFactory', () => {
     it('can have wrappers changed after construction', (done) => {
       const wrappers: Wrappers = [
         {
-          isRelevantTo(connection) {
+          isRelevantTo() {
             throw new Error('should not run');
           },
 
-          originalResponseTextLogger(connection, response) {
+          originalResponseTextLogger() {
             throw new Error('should not run');
           },
         },
@@ -1063,11 +1045,11 @@ describe('XHRProxyFactory', () => {
       let loggerRan = 0;
       wrappers.length = 0;
       wrappers.push({
-        isRelevantTo(connection) {
+        isRelevantTo() {
           return true;
         },
 
-        originalResponseTextLogger(connection, response) {
+        originalResponseTextLogger() {
           loggerRan++;
         },
       });
@@ -1137,7 +1119,7 @@ describe('XHRProxyFactory', () => {
           },
         },
         {
-          isRelevantTo(connection) {
+          isRelevantTo() {
             return true;
           },
 
@@ -1147,7 +1129,7 @@ describe('XHRProxyFactory', () => {
           },
         },
         {
-          isRelevantTo(connection) {
+          isRelevantTo() {
             return false;
           },
 
@@ -1155,11 +1137,11 @@ describe('XHRProxyFactory', () => {
             throw new Error('should not run');
           },
 
-          responseTextChanger(connection, response) {
+          responseTextChanger() {
             throw new Error('should not run');
           },
 
-          finalResponseTextLogger(connection, response) {
+          finalResponseTextLogger() {
             throw new Error('should not run');
           },
         },
@@ -1231,7 +1213,7 @@ describe('XHRProxyFactory', () => {
             return response + '-modified';
           },
 
-          finalResponseTextLogger(connection, response) {
+          finalResponseTextLogger() {
             throw new Error('should not run');
           },
         },
@@ -1303,7 +1285,7 @@ describe('XHRProxyFactory', () => {
         {
           isRelevantTo: () => true,
 
-          responseTextChanger(connection, response) {
+          responseTextChanger() {
             return null as any;
           },
         },

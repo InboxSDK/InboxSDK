@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import autoHtml from 'auto-html';
 import t from 'transducers.js';
@@ -11,7 +10,6 @@ import find from 'lodash/find';
 import asap from 'asap';
 import delay from 'pdelay';
 import * as Kefir from 'kefir';
-import * as ud from 'ud';
 import closest from 'closest-ng';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
@@ -47,7 +45,6 @@ import addRecipientRow from './gmail-compose-view/add-recipient-row';
 import addButton from './gmail-compose-view/add-button';
 import setRecipients from './gmail-compose-view/set-recipients';
 import focus from './gmail-compose-view/focus';
-// import addOuterSidebar from './gmail-compose-view/add-outer-sidebar';
 import monitorSelectionRange from './gmail-compose-view/monitor-selection-range';
 import manageButtonGrouping from './gmail-compose-view/manage-button-grouping';
 import type { TooltipDescriptor } from '../../../views/compose-button-view';
@@ -69,7 +66,6 @@ import setupLinkPopOvers from './gmail-compose-view/setupLinkPopovers';
 import getFormattingAreaOffsetLeft from './gmail-compose-view/get-formatting-area-offset-left';
 import overrideEditSubject from './gmail-compose-view/override-edit-subject';
 import detectClassicRecipientsArea from './gmail-compose-view/detectClassicRecipientsArea';
-import censorHTMLtree from '../../../../common/censorHTMLtree';
 import {
   makePageParser,
   getRecipientRowElements,
@@ -82,7 +78,6 @@ import type {
   ComposeViewDriver,
   StatusBar,
 } from '../../../driver-interfaces/compose-view-driver';
-import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
 import { ButtonDescriptor, Contact } from '../../../../inboxsdk';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
@@ -1592,8 +1587,7 @@ class GmailComposeView {
           try {
             // If this succeeds, then the draft must exist on the server and we
             // can safely return the draft id we know.
-            const gmailMessageId =
-              await this._driver.getGmailMessageIdForSyncDraftId(syncMessageId);
+            await this._driver.getGmailMessageIdForSyncDraftId(syncMessageId);
           } catch (e) {
             // ignore error, it's probably that the draft isn't saved yet.
             return null;

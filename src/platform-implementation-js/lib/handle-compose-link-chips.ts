@@ -1,13 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import once from 'lodash/once';
 import * as Kefir from 'kefir';
 import { defn } from 'ud';
 import querySelector from './dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chunked-stream';
-import type { ComposeViewDriver } from '../driver-interfaces/compose-view-driver';
 import GmailComposeView from '../dom-driver/gmail/views/gmail-compose-view';
 const extId = '' + Math.random();
-const Z_SPACE_CHAR = '\u200b';
 const X_URL = 'https://ssl.gstatic.com/ui/v1/icons/common/x_8px.png';
 const handleComposeLinkChips = defn(
   module,
@@ -148,7 +144,7 @@ function _addEnhancements(chipElement: HTMLElement) {
   );
   xElement.addEventListener(
     'mousedown',
-    function (e: MouseEvent) {
+    function () {
       chipElement.remove();
     },
     true

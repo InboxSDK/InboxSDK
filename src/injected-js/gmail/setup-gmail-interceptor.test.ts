@@ -1,7 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-
 import Kefir from 'kefir';
-import kefirBus from 'kefir-bus';
 import MockServer from '../../../test/lib/MockServer';
 
 jest.mock('../injected-logger', () => {
@@ -11,7 +8,7 @@ jest.mock('../injected-logger', () => {
       throw err;
     },
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    eventSdkPassive(name: string, details?: any) {},
+    eventSdkPassive() {},
   };
 });
 

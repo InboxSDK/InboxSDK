@@ -52,8 +52,7 @@ class Conversations {
       ThreadView,
       members.threadViewHandlerRegistry,
       this,
-      membrane,
-      driver
+      membrane
     );
 
     _setupViewDriverWatcher(
@@ -62,8 +61,7 @@ class Conversations {
       MessageView,
       members.messageViewHandlerRegistries.all,
       this,
-      membrane,
-      driver
+      membrane
     );
 
     _setupViewDriverWatcher(
@@ -80,8 +78,7 @@ class Conversations {
       MessageView,
       members.messageViewHandlerRegistries.loaded,
       this,
-      membrane,
-      driver
+      membrane
     );
   }
 
@@ -121,9 +118,7 @@ function _setupViewDriverWatcher(
   ViewClass: typeof MessageView | typeof ThreadView,
   handlerRegistry: any,
   ConversationsInstance: any,
-  membrane: Membrane,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  driver: Driver
+  membrane: Membrane
 ) {
   var combinedStream = stream.map(function (viewDriver) {
     const view = membrane.get(viewDriver);

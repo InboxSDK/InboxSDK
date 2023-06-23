@@ -1,11 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as ud from 'ud';
 import * as Kefir from 'kefir';
 import get from '../../common/get-or-fail';
 import ComposeView from '../views/compose-view';
 import HandlerRegistry from '../lib/handler-registry';
 import type Membrane from '../lib/Membrane';
-import type { PiOpts } from '../platform-implementation';
 import type { Handler } from '../lib/handler-registry';
 import type { Driver } from '../driver-interfaces/driver';
 interface Members {

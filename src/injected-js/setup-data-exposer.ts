@@ -1,11 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import find from 'lodash/find';
 import * as logger from './injected-logger';
 import waitFor from '../platform-implementation-js/lib/wait-for';
-declare var GLOBALS: any[];
-declare var gbar: {
-  _CONFIG: any[];
-};
 
 function stupidToBool(stupid: any): boolean {
   switch ('' + stupid) {
@@ -25,7 +20,11 @@ function getSettingValue(settings: any[], name: string): boolean {
 }
 
 function getContext() {
-  let context = global as any;
+  type Context = {
+    GLOBALS: any[];
+    gbar: { _CONFIG: any[] };
+  };
+  let context = global as unknown as Context;
 
   try {
     // our current tab has globals defined
@@ -39,7 +38,7 @@ function getContext() {
       context = global.opener.top;
     }
   } catch (err) {
-    context = global; //we got an error from requesting global.opener.top.location.href;
+    context = global as unknown as Context; //we got an error from requesting global.opener.top.location.href;
   }
 
   return context;
@@ -56,29 +55,23 @@ export default function setupDataExposer() {
       var userEmail = context.GLOBALS
         ? context.GLOBALS[10]
         : context.gbar._CONFIG[0][10][5];
-      (document.head as any).setAttribute(
-        'data-inboxsdk-user-email-address',
-        userEmail
-      );
+      document.head.setAttribute('data-inboxsdk-user-email-address', userEmail);
       var userLanguage: string = context.GLOBALS
         ? context.GLOBALS[4].split('.')[1]
         : context.gbar._CONFIG[0][0][4];
-      (document.head as any).setAttribute(
-        'data-inboxsdk-user-language',
-        userLanguage
-      );
-      (document.head as any).setAttribute(
+      document.head.setAttribute('data-inboxsdk-user-language', userLanguage);
+      document.head.setAttribute(
         'data-inboxsdk-using-sync-api',
         context.GM_SPT_ENABLED
       );
 
       if (context.GLOBALS) {
         // Gmail
-        (document.head as any).setAttribute(
+        document.head.setAttribute(
           'data-inboxsdk-ik-value',
           context.GLOBALS[9]
         );
-        (document.head as any).setAttribute(
+        document.head.setAttribute(
           'data-inboxsdk-action-token-value',
           context.GM_ACTION_TOKEN
         );
@@ -105,7 +98,7 @@ export default function setupDataExposer() {
                   ? 'vertical'
                   : 'horizontal'
                 : 'none';
-            (document.head as any).setAttribute(
+            document.head.setAttribute(
               'data-inboxsdk-user-preview-pane-mode',
               previewPaneMode
             );
@@ -148,10 +141,7 @@ export default function setupDataExposer() {
           if (typeof ikValue !== 'string') {
             logger.error(new Error('Could not find valid ikValue'));
           } else {
-            (document.head as any).setAttribute(
-              'data-inboxsdk-ik-value',
-              ikValue
-            );
+            document.head.setAttribute('data-inboxsdk-ik-value', ikValue);
           }
 
           const xsrfToken = preloadData[12];
@@ -159,10 +149,7 @@ export default function setupDataExposer() {
           if (typeof xsrfToken !== 'string') {
             logger.error(new Error('Could not find valid xsrfToken'));
           } else {
-            (document.head as any).setAttribute(
-              'data-inboxsdk-xsrf-token',
-              xsrfToken
-            );
+            document.head.setAttribute('data-inboxsdk-xsrf-token', xsrfToken);
           }
         }
       }

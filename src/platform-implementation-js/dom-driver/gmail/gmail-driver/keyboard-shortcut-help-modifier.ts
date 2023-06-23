@@ -83,8 +83,7 @@ export default class KeyboardShortcutHelpModifier {
       return;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    var keys = this._shortcuts.keys();
+    this._shortcuts.keys();
 
     var header = this._renderHeader();
     var table = this._renderTable();

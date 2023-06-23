@@ -1,7 +1,5 @@
 import type * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import once from 'lodash/once';
 import SafeEventEmitter from '../../lib/safe-event-emitter';
 export type CustomMessageDescriptor = {
   collapsedEl: HTMLElement;

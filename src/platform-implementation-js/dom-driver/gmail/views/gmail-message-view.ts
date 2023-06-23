@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import sortBy from 'lodash/sortBy';
 import once from 'lodash/once';
 import autoHtml from 'auto-html';
-import asap from 'asap';
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
@@ -12,8 +10,6 @@ import GmailAttachmentAreaView from './gmail-attachment-area-view';
 import GmailAttachmentCardView from './gmail-attachment-card-view';
 import getUpdatedContact from './gmail-message-view/get-updated-contact';
 import AttachmentIcon from './gmail-message-view/attachment-icon';
-import delayAsap from '../../../lib/delay-asap';
-import waitFor from '../../../lib/wait-for';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
@@ -24,11 +20,7 @@ import findParent from '../../../../common/find-parent';
 import reemitClickEvent from '../../../lib/dom/reemitClickEventForReact';
 import type GmailDriver from '../gmail-driver';
 import type GmailThreadView from './gmail-thread-view';
-import type GmailToolbarView from './gmail-toolbar-view';
-import type {
-  MessageViewDriver,
-  VIEW_STATE,
-} from '../../../driver-interfaces/message-view-driver';
+import type { VIEW_STATE } from '../../../driver-interfaces/message-view-driver';
 import { Contact } from '../../../../inboxsdk';
 let hasSeenOldElement = false;
 
@@ -389,13 +381,13 @@ class GmailMessageView {
         itemEl.className = 'J-N';
         itemEl.setAttribute('role', 'menuitem');
         itemEl.innerHTML = autoHtml`<div class="J-N-Jz">${options.title}</div>`;
-        itemEl.addEventListener('mouseenter', (event: MouseEvent) =>
+        itemEl.addEventListener('mouseenter', () =>
           itemEl.classList.add('J-N-JT')
         );
-        itemEl.addEventListener('mouseleave', (event: MouseEvent) =>
+        itemEl.addEventListener('mouseleave', () =>
           itemEl.classList.remove('J-N-JT')
         );
-        itemEl.addEventListener('click', (event: MouseEvent) => {
+        itemEl.addEventListener('click', () => {
           this._closeActiveEmailMenu();
 
           options.onClick();

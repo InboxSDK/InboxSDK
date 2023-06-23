@@ -1,8 +1,6 @@
 import isEqual from 'lodash/isEqual';
 import Kefir, { Observable } from 'kefir';
 import kefirCast from 'kefir-cast';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import defer from '../../common/defer';
 import get from '../../common/get-or-fail';
 import EventEmitter from '../lib/safe-event-emitter';
 import NAV_ITEM_TYPES from '../constants/nav-item-types';

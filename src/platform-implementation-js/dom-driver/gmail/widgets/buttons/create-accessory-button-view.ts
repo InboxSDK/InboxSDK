@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -15,8 +14,8 @@ export default class CreateAccessoryButtonView implements ButtonViewI {
     this._setupElement();
     this._setupEventStream();
   }
-  addClass(className: string): void {}
-  removeClass(className: string): void {}
+  addClass(_className: string): void {}
+  removeClass(_className: string): void {}
 
   update() {
     // noop

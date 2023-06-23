@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
-import setValueAndDispatchEvent from '../../../../lib/dom/set-value-and-dispatch-event';
 import type GmailComposeView from '../gmail-compose-view';
 export default function insertLinkIntoBody(
   gmailComposeView: GmailComposeView,

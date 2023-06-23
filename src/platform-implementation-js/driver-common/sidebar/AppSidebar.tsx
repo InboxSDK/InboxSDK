@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import flatMap from 'lodash/flatMap';
 import sortBy from 'lodash/sortBy';
 import cx from 'classnames';
@@ -7,7 +6,6 @@ import kefirStopper from 'kefir-stopper';
 import React from 'react';
 import DraggableList from 'react-draggable-list';
 import SmoothCollapse from 'react-smooth-collapse';
-import get from '../../../common/get-or-fail';
 import idMap from '../../lib/idMap';
 import ElementContainer from '../../lib/react/ElementContainer';
 const springConfig = {
@@ -317,7 +315,7 @@ class Panel extends React.Component<PanelProps> {
     const expanded = !this.props.item.showControls || this.props.item.expanded;
 
     if (expanded) {
-      (document.body as any as HTMLElement).dispatchEvent(
+      document.body.dispatchEvent(
         new CustomEvent('inboxsdkSidebarPanelActivated', {
           bubbles: true,
           cancelable: false,
@@ -335,7 +333,7 @@ class Panel extends React.Component<PanelProps> {
     const expanded = !this.props.item.showControls || this.props.item.expanded;
 
     if (!prevExpanded && expanded) {
-      (document.body as any as HTMLElement).dispatchEvent(
+      document.body.dispatchEvent(
         new CustomEvent('inboxsdkSidebarPanelActivated', {
           bubbles: true,
           cancelable: false,
@@ -345,7 +343,7 @@ class Panel extends React.Component<PanelProps> {
         })
       );
     } else if (prevExpanded && !expanded) {
-      (document.body as any as HTMLElement).dispatchEvent(
+      document.body.dispatchEvent(
         new CustomEvent('inboxsdkSidebarPanelDeactivated', {
           bubbles: true,
           cancelable: false,

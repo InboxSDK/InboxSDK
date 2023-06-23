@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 jest.mock('../../../../lib/idMap', () => {
   function idMap(key: string) {
     const legacyMapping: Record<string, string> = {
@@ -16,20 +15,19 @@ jest.mock('../../../../lib/idMap', () => {
 import idMap from '../../../../lib/idMap';
 import _ from 'lodash';
 import Kefir from 'kefir';
-import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import delay from 'pdelay';
-import fs from 'fs';
 import GmailAppSidebarView from './index';
-import ContentPanelViewDriver from '../../../../driver-common/sidebar/ContentPanelViewDriver';
 import MockWebStorage from 'mock-webstorage';
 import GmailThreadView from '../gmail-thread-view';
+
 jest.mock('../../../../lib/dom/make-element-child-stream', () => {
   return () => require('kefir-bus')();
 });
 jest.mock('../../../../lib/dom/make-mutation-observer-chunked-stream', () => {
   return () => require('kefir-bus')();
 });
+
 global.localStorage = new MockWebStorage();
 (global as any)._APP_SIDEBAR_TEST = true;
 describe('GmailAppSidebarView Primary', function () {

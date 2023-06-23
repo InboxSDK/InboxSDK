@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 import includes from 'lodash/includes';
 import * as Kefir from 'kefir';
@@ -36,8 +35,8 @@ export default class ModalButtonView implements ButtonViewI {
     this._eventStream = kefirBus();
     this._setupEventStream();
   }
-  addClass(className: string): void {}
-  removeClass(className: string): void {}
+  addClass(_className: string): void {}
+  removeClass(_className: string): void {}
   activate(): void {}
   deactivate(): void {}
 

@@ -1,10 +1,6 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import asap from 'asap';
 import { defn, defonce } from 'ud';
 import GmailComposeButtonView from './gmail-compose-button-view';
 import BasicButtonViewController from '../../../../widgets/buttons/basic-button-view-controller';
-import DropdownButtonViewController from '../../../../widgets/buttons/dropdown-button-view-controller';
-import GmailDropdownView from '../../widgets/gmail-dropdown-view';
 import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import waitFor from '../../../../lib/wait-for';

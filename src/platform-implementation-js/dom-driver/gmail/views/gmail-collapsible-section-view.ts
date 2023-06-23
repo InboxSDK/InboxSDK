@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import escape from 'lodash/escape';
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -81,7 +80,7 @@ class GmailCollapsibleSectionView {
       this._eventStream.filter(() => false).beforeEnd(() => null)
     );
     stoppedProperty.onValue((x) => this._updateValues(x));
-    stoppedProperty.take(1).onValue((x) => this._isReadyDeferred.resolve(this));
+    stoppedProperty.take(1).onValue(() => this._isReadyDeferred.resolve(this));
   }
 
   setCollapsed(value: boolean) {
@@ -171,7 +170,7 @@ class GmailCollapsibleSectionView {
       document.createElement('div'));
     bodyContentsElement.appendChild(tableBodyElement);
 
-    this._setupFooter(collapsibleSectionDescriptor);
+    this._setupFooter();
 
     if (this._isCollapsible && this._titleElement) {
       Kefir.fromEvents(this._titleElement, 'click').onValue(() =>
@@ -223,7 +222,7 @@ class GmailCollapsibleSectionView {
     headerElement.appendChild(floatRightElement);
   }
 
-  _setupFooter(collapsibleSectionDescriptor: Record<string, any>) {
+  _setupFooter() {
     const footerElement = (this._footerElement = document.createElement('div'));
     footerElement.classList.add('inboxsdk__resultsSection_footer');
     if (this._bodyElement) this._bodyElement.appendChild(footerElement);
@@ -632,7 +631,7 @@ class GmailCollapsibleSectionView {
       if (!previousSibling) throw new Error('previousSibling does not exist');
       if (!otherCollapseContainer)
         throw new Error('otherCollapseContainer does not exist');
-      const anchor = previousSibling.children[0].appendChild(element);
+      previousSibling.children[0].appendChild(element);
       //now we need to "merge" the two collapse containers. This can be done by taking all the result sections out of the collapsed container
       //and calling our "recollapse" helper function on them
       const elementsToRecollapse = Array.from(

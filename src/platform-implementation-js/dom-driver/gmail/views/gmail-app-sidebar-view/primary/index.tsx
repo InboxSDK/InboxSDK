@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import find from 'lodash/find';
 import findIndex from 'lodash/findIndex';
 import autoHtml from 'auto-html';
 import asap from 'asap';
@@ -18,7 +16,6 @@ import idMap from '../../../../../lib/idMap';
 import incrementName from '../../../../../lib/incrementName';
 import querySelector from '../../../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../../../lib/dom/make-mutation-observer-chunked-stream';
-import makeElementChildStream from '../../../../../lib/dom/make-element-child-stream';
 import { simulateClick } from '../../../../../lib/dom/simulate-mouse-event';
 import fakeWindowResize from '../../../../../lib/fake-window-resize';
 import addCompanionThreadIconArea from './add-companion-thread-icon-area';
@@ -416,7 +413,7 @@ class GmailAppSidebarPrimary {
               );
 
               // let app listen for activate event
-              (document.body as any as HTMLElement).dispatchEvent(
+              document.body.dispatchEvent(
                 new CustomEvent('inboxsdkSidebarPanelActivated', {
                   bubbles: true,
                   cancelable: false,
@@ -462,7 +459,7 @@ class GmailAppSidebarPrimary {
                     .error(new Error('Unexpected: contentEl not set'));
                 }
 
-                (document.body as any as HTMLElement).dispatchEvent(
+                document.body.dispatchEvent(
                   new CustomEvent('inboxsdkSidebarPanelDeactivated', {
                     bubbles: true,
                     cancelable: false,
@@ -696,17 +693,13 @@ class GmailAppSidebarPrimary {
       idMap('app_sidebar_in_use')
     );
 
-    if (
-      !(document.body as any as HTMLElement).querySelector(
-        sidebarWaitingPlatformSelector
-      )
-    ) {
+    if (!document.body.querySelector(sidebarWaitingPlatformSelector)) {
       const waitingPlatform = document.createElement('div');
       waitingPlatform.className = cx(
         sidebarWaitingPlatformClassName,
         idMap('app_sidebar_waiting_platform')
       );
-      (document.body as any as HTMLElement).appendChild(waitingPlatform);
+      document.body.appendChild(waitingPlatform);
     }
 
     // thread sidebar content panels

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import find from 'lodash/find';
 import * as GmailResponseProcessor from '../../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
 import { parse } from 'querystring';
@@ -146,8 +145,7 @@ function getGmailThreadIdForThreadRowByClick(
   // Simulate a ctrl-click on the thread row to get the thread id, then
   // simulate a ctrl-click on the previously selected thread row (or the
   // first thread row) to put the cursor back where it was.
-  const domRowMetadata =
-    threadRowParser.extractMetadataFromThreadRow(threadRow);
+  threadRowParser.extractMetadataFromThreadRow(threadRow);
   const parent = findParent(
     threadRow,
     (el) => el.nodeName === 'DIV' && el.getAttribute('role') === 'main'

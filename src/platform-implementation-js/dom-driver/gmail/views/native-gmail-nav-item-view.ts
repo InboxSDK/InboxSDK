@@ -1,17 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
 import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
-import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import findParent from '../../../../common/find-parent';
-import GmailElementGetter from '../gmail-element-getter';
 import GmailNavItemView, {
   getLeftIndentationPaddingValue,
 } from './gmail-nav-item-view';
 import type GmailDriver from '../gmail-driver';
+
 export default class NativeGmailNavItemView {
   _driver: GmailDriver;
   _element: HTMLElement;
