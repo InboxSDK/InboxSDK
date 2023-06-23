@@ -30,10 +30,21 @@ const loadingElementSelector = `.${loadingElementClass}` as const;
 const NAV_MENU_CONTAINER_ELEMENT_SELECTOR = '.at9 .n3 .TK' as const;
 
 type MessageEvents = {
+  /**
+   * Fires when this view is destroyed.
+   */
   destroy: () => void;
+  /**
+   * Fires when this CollapsiblePanelView's panel has a `mouseenter` event triggered.
+   */
   blur: (e: MouseEvent) => void;
 };
 
+/**
+ * Each AppMenuItem can have a CollapsiblePanelView.
+ *
+ * Typically the main action of a CollapsiblePanelView is performed when the user clicks or hovers on the app menu item.
+ */
 export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitter<MessageEvents>) {
   static elementSelectors = {
     NATIVE: '.aqn.oy8Mbf',
@@ -59,6 +70,9 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     return this.#loading;
   }
 
+  /**
+   * Updates the loading property of the CollapsiblePanelView.
+   */
   setLoading(loading: boolean) {
     const changed = this.#loading !== loading;
     this.#loading = loading;
@@ -106,6 +120,9 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       });
   }
 
+  /**
+   * Remove this CollapsiblePanelView from its parent
+   */
   remove() {
     if (this.#destroyed) return;
     this.#destroyed = true;
@@ -113,6 +130,9 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     this.emit('destroy');
   }
 
+  /**
+   * @param navItemDescriptor Add a single or Kefir.Observable nav menu item to the CollapsiblePanel.
+   */
   addNavItem(
     navItemDescriptor:
       | NavItemDescriptor

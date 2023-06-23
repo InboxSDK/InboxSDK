@@ -24,8 +24,17 @@ import GmailElementGetter from '../dom-driver/gmail/gmail-element-getter';
 import defer from '../../common/defer';
 
 type MessageEvents = {
+  /**
+   * Fires when this AppMenuItemView's menuItem has a `mouseleave` event triggered.
+   */
   blur: () => void;
+  /**
+   * Fires when this AppMenuItemView's menuItem has a `click` event triggered.
+   */
   click: () => void;
+  /**
+   * Fires when this AppMenuItemView's menuItem has a `mouseenter` event triggered.
+   */
   hover: () => void;
   destroy: () => void;
 };
@@ -68,7 +77,9 @@ type StreamType =
   | ['mouseenter' | 'mouseleave', HTMLElement, MouseEvent];
 
 /**
- * Contains both a native Gmail app menu item and a collapsible panel.
+ * Each AppMenuItemView represents an entry in the app menu of Gmail. Typically the main action of a AppMenuItemView is performed when the user clicks or hovers on the app menu item.
+ *
+ * @note Contains both a native Gmail app menu item and a collapsible panel.
  */
 export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<MessageEvents>) {
   static #menuItemChangeStream = Kefir.pool<StreamType, unknown>();
@@ -530,6 +541,13 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     AppMenuItemView.#appMenuItemViews.add(this);
   }
 
+  /**
+   * Add a panel to an AppMenuItemView.
+   *
+   * @param panelDescriptor A single descriptor for the app menu item panel.
+   *
+   * @returns A promise that resolves to the CollapsiblePanelView instance. The result is undefined if the SDK doesn't detect the AppMenu being shown.
+   */
   async addCollapsiblePanel(panelDescriptor: AppMenuItemPanelDescriptor) {
     const descriptor = {
       ...panelDescriptor,
@@ -573,12 +591,20 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     return collapsiblePanel;
   }
 
+  /**
+   * Updates the AppMenuItem's AppMenuItemDescriptor
+   *
+   * @param menuItemDescriptor The new descriptor for the app menu item panel.
+   */
   async update(menuItemDescriptor: AppMenuItemDescriptor) {
     const gmailView = await this.#gmailViewPromise;
     gmailView.menuItemDescriptor = menuItemDescriptor;
     this.#menuItemDescriptor = menuItemDescriptor;
   }
 
+  /**
+   * Remove this AppMenuItemView from its parent
+   */
   remove() {
     if (this.#destroyed) return;
     this.#destroyed = true;
