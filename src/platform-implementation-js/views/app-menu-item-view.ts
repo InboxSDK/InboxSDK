@@ -25,7 +25,7 @@ import defer from '../../common/defer';
 
 type MessageEvents = {
   /**
-   * Fires when this AppMenuItemView's menuItem has a `leave` event triggered.
+   * Fires when this AppMenuItemView's menuItem has a `mouseleave` event triggered.
    */
   blur: () => void;
   /**
