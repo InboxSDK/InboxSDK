@@ -111,7 +111,7 @@ export default class AppMenu {
       open: boolean;
       /**
        * 'start' is when a `transactionstart` event is fired on a collapsible panel.
-       * 'end' is 200ms after 'start' and based on the transition time of width animation in Gmail. */
+       * 'end' is when a `transactioncancel` event is fired on a collapsible panel. */
       stage: 'start' | 'end';
     },
     unknown
@@ -129,33 +129,34 @@ export default class AppMenu {
         return;
       }
 
-      appMenu.parentElement!.addEventListener(
-        'transitionstart',
-        async ({ target }) => {
+      const onTransition =
+        (stage: 'start' | 'end') =>
+        async ({ target }: TransitionEvent) => {
+          const { TOGGLE_OPEN_STATE } = CollapsiblePanelView.elementCss;
+
           if (
             target instanceof HTMLElement &&
-            // Is the target a collapsible panel with the transition class?
             target.matches(CollapsiblePanelView.elementSelectors.NATIVE) &&
-            target.classList.contains(
-              CollapsiblePanelView.elementCss.TOGGLE_OPEN_STATE
-            )
+            ((stage === 'start' &&
+              target.classList.contains(TOGGLE_OPEN_STATE)) ||
+              // TOGGLE_OPEN_STATE is removed on transitioncancel TransitionEvents
+              stage === 'end')
           ) {
             emitter.emit({
               type: 'collapseToggled',
               open: this.isMenuCollapsed(),
-              stage: 'start',
-            });
-
-            // `transitionend` TransitionEvents don't seem to fire reliably for collapsible panels. This may
-            // be because .aak, the class applying transition properties, is removed before the transitionend would fire.
-            await new Promise((resolve) => setTimeout(resolve, 200));
-            emitter.emit({
-              type: 'collapseToggled',
-              open: this.isMenuCollapsed(),
-              stage: 'end',
+              stage,
             });
           }
-        }
+        };
+
+      appMenu.parentElement!.addEventListener(
+        'transitionstart',
+        onTransition('start')
+      );
+      appMenu.parentElement!.addEventListener(
+        'transitioncancel',
+        onTransition('end')
       );
     };
 
