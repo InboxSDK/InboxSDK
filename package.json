@@ -138,6 +138,7 @@
     "jest-environment-jsdom": "^29.5.0",
     "raw-loader": "^4.0.2",
     "style-loader": "^3.3.2",
+    "terser": "^5.18.1",
     "webpack": "^5.76.3"
   }
 }
