@@ -1,7 +1,9 @@
+import { stream } from 'kefir';
 import { RouteView } from '../../inboxsdk';
 import GmailDriver from '../dom-driver/gmail/gmail-driver';
 import GmailElementGetter from '../dom-driver/gmail/gmail-element-getter';
 import { AppMenuItemView } from '../views/app-menu-item-view';
+import { CollapsiblePanelView } from '../views/collapsible-panel-view';
 
 type ThemedIcon =
   | string
@@ -102,9 +104,82 @@ Items with CollapsiblePanels can also have accessories which provide primary act
 */
 export default class AppMenu {
   #driver;
+  #events = stream<
+    {
+      type: 'collapseToggled';
+      /** Whether or not the AppMenuBurger is open or not. */
+      open: boolean;
+      /**
+       * 'start' is when a `transactionstart` event is fired on a collapsible panel.
+       * 'end' is 200ms after 'start' and based on the transition time of width animation in Gmail. */
+      stage: 'start' | 'end';
+    },
+    unknown
+  >((emitter) => {
+    const f = async () => {
+      const isShown = await this.isShown();
+
+      if (!isShown) {
+        return;
+      }
+
+      const appMenu = await GmailElementGetter.getAppMenuAsync();
+
+      if (!appMenu) {
+        return;
+      }
+
+      appMenu.parentElement!.addEventListener(
+        'transitionstart',
+        async ({ target }) => {
+          if (
+            target instanceof HTMLElement &&
+            // Is the target a collapsible panel with the transition class?
+            target.matches(CollapsiblePanelView.elementSelectors.NATIVE) &&
+            target.classList.contains(
+              CollapsiblePanelView.elementCss.TOGGLE_OPEN_STATE
+            )
+          ) {
+            emitter.emit({
+              type: 'collapseToggled',
+              open: this.isMenuCollapsed(),
+              stage: 'start',
+            });
+
+            // `transitionend` TransitionEvents don't seem to fire reliably for collapsible panels. This may
+            // be because .aak, the class applying transition properties, is removed before the transitionend would fire.
+            await new Promise((resolve) => setTimeout(resolve, 200));
+            emitter.emit({
+              type: 'collapseToggled',
+              open: this.isMenuCollapsed(),
+              stage: 'end',
+            });
+          }
+        }
+      );
+    };
+
+    f();
+  });
 
   constructor(driver: GmailDriver) {
     this.#driver = driver;
+  }
+
+  /**
+   * A stream of events related to the AppMenu.
+   *
+   * @note If the AppMenu is not shown, this stream will not emit any events.
+   */
+  get events() {
+    return this.#events;
+  }
+
+  /**
+   * @returns whether or not the AppMenu Burger is collapsed or not.
+   */
+  isMenuCollapsed() {
+    return GmailElementGetter.isAppBurgerMenuOpen();
   }
 
   /**

@@ -111,4 +111,6 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
       name: 'Nav Item 1',
       onClick: () => sdk.Router.goto('custom-route-3'),
     })
+
+    sdk.AppMenu.events.filter(event => event.type === 'collapseToggled').onValue(event => {console.log('collapseToggled', event)})
 });

@@ -47,6 +47,7 @@ type MessageEvents = {
  */
 export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitter<MessageEvents>) {
   static elementSelectors = {
+    /** Custom elements match this selector as well. */
     NATIVE: '.aqn.oy8Mbf',
     CUSTOM: '.inboxsdk__collapsiblePanel',
   } as const;
@@ -57,6 +58,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     HOVER: 'aJu',
     COLLAPSED_HOVER: 'bym',
     PANEL_LESS: 'a3W',
+    TOGGLE_OPEN_STATE: 'aak',
   } as const;
   #panelDescriptor: AppMenuItemPanelDescriptor;
   #element: HTMLElement;
