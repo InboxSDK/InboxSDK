@@ -140,6 +140,12 @@ export default class NavItemView extends EventEmitter {
       }
     );
   }
+
+  getElement() {
+    return get(memberMap, this).navItemViewDriverPromise.then(
+      (navItemViewDriver) => navItemViewDriver.getElement()
+    );
+  }
 }
 
 function _handleViewDriverStreamEvent(
