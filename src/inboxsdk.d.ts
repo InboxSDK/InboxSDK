@@ -536,7 +536,7 @@ export interface ContentPanelDescriptor {
 }
 
 export interface MessageAttachmentIconDescriptor {
-  iconUrl: string;
+  iconUrl?: string;
   iconClass?: string;
   iconHtml?: string | null;
   tooltip: string | HTMLElement;

@@ -3,18 +3,17 @@ import asap from 'asap';
 import EventEmitter from '../../lib/safe-event-emitter';
 import type Membrane from '../../lib/Membrane';
 import get from '../../../common/get-or-fail';
-import AttachmentCardView from './attachment-card-view';
+import type AttachmentCardView from './attachment-card-view';
 import { MessageViewToolbarSectionNames } from '../../namespaces/conversations';
-import type ThreadView from './thread-view';
 import type {
   MessageViewDriver,
   VIEW_STATE,
   MessageViewLinkDescriptor,
-  MessageViewToolbarButtonDescriptor,
 } from '../../driver-interfaces/message-view-driver';
 import type { Driver } from '../../driver-interfaces/driver';
-import { Contact } from '../../../inboxsdk';
-import { Observable } from 'kefir';
+import type { Contact, MessageView as IMessageView } from '../../../inboxsdk';
+import type { Observable } from 'kefir';
+
 interface Members {
   Conversations: Record<string, any>;
   driver: Driver;
@@ -24,7 +23,7 @@ interface Members {
 }
 const memberMap = defonce(module, () => new WeakMap<MessageView, Members>()); // documented in src/docs/
 
-class MessageView extends EventEmitter {
+class MessageView extends EventEmitter implements IMessageView {
   destroyed: boolean = false;
 
   constructor(
@@ -90,13 +89,15 @@ class MessageView extends EventEmitter {
     });
   }
 
-  addToolbarButton(buttonOptions: MessageViewToolbarButtonDescriptor) {
+  addToolbarButton(
+    buttonOptions?: Parameters<IMessageView['addToolbarButton']>[0]
+  ) {
     if (
-      typeof buttonOptions.onClick !== 'function' ||
-      typeof buttonOptions.title !== 'string' ||
+      typeof buttonOptions!.onClick !== 'function' ||
+      typeof buttonOptions!.title !== 'string' ||
       !Object.prototype.hasOwnProperty.call(
         MessageViewToolbarSectionNames,
-        buttonOptions.section
+        buttonOptions!.section
       )
     ) {
       throw new Error(
@@ -105,7 +106,7 @@ class MessageView extends EventEmitter {
     }
 
     const { messageViewImplementation } = get(memberMap, this);
-    messageViewImplementation.addMoreMenuItem(buttonOptions);
+    messageViewImplementation.addMoreMenuItem(buttonOptions!);
   }
 
   getBodyElement(): HTMLElement {
@@ -213,7 +214,7 @@ class MessageView extends EventEmitter {
     return get(memberMap, this).messageViewImplementation.getRecipientsFull();
   }
 
-  getThreadView(): ThreadView {
+  getThreadView(): ReturnType<IMessageView['getThreadView']> {
     const { messageViewImplementation, membrane } = get(memberMap, this);
     return membrane.get(messageViewImplementation.getThreadViewDriver());
   }
@@ -222,7 +223,9 @@ class MessageView extends EventEmitter {
     return get(memberMap, this).messageViewImplementation.getDateString();
   }
 
-  addAttachmentIcon(iconDescriptor: Record<string, any>) {
+  addAttachmentIcon(
+    iconDescriptor: Parameters<IMessageView['addAttachmentIcon']>[0]
+  ) {
     return get(memberMap, this).messageViewImplementation.addAttachmentIcon(
       iconDescriptor
     );
