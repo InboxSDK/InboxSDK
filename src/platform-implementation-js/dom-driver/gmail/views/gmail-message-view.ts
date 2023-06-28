@@ -21,7 +21,10 @@ import reemitClickEvent from '../../../lib/dom/reemitClickEventForReact';
 import type GmailDriver from '../gmail-driver';
 import type GmailThreadView from './gmail-thread-view';
 import type { VIEW_STATE } from '../../../driver-interfaces/message-view-driver';
-import { Contact } from '../../../../inboxsdk';
+import type {
+  Contact,
+  MessageAttachmentIconDescriptor,
+} from '../../../../inboxsdk';
 let hasSeenOldElement = false;
 
 class GmailMessageView {
@@ -504,7 +507,7 @@ class GmailMessageView {
     return this.getMessageID();
   }
 
-  addAttachmentIcon(iconDescriptor: Record<string, any>) {
+  addAttachmentIcon(iconDescriptor: MessageAttachmentIconDescriptor) {
     const attachmentIcon = new AttachmentIcon();
 
     if (!this._element) {
