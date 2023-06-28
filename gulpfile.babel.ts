@@ -384,6 +384,7 @@ if (args.remote) {
       disableMinification: true,
       standalone: 'InboxSDK',
       afterBuild: async () => {
+        setupExamples();
         const { minify } = await import('terser');
 
         const sourceOutput = await fs.promises.readFile(
@@ -399,7 +400,6 @@ if (args.remote) {
             encoding: 'utf8',
           }
         );
-        setupExamples();
       },
     });
   });
