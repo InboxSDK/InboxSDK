@@ -381,8 +381,26 @@ if (args.remote) {
     return webpackTask({
       entry: './src/inboxsdk-js/inboxsdk-NONREMOTE',
       destName: sdkFilename,
+      disableMinification: true,
       standalone: 'InboxSDK',
-      afterBuild: setupExamples,
+      afterBuild: async () => {
+        setupExamples();
+        const { minify } = await import('terser');
+
+        const sourceOutput = await fs.promises.readFile(
+          'packages/core/inboxsdk.js',
+          'utf8'
+        );
+
+        const minified = await minify(sourceOutput);
+        await fs.promises.writeFile(
+          'packages/core/inboxsdk.min.js',
+          minified.code!,
+          {
+            encoding: 'utf8',
+          }
+        );
+      },
     });
   });
   gulp.task('remote', () => {
