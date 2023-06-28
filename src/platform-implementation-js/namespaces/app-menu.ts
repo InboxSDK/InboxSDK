@@ -1,7 +1,9 @@
+import kefir, { stream } from 'kefir';
 import { RouteView } from '../../inboxsdk';
 import GmailDriver from '../dom-driver/gmail/gmail-driver';
 import GmailElementGetter from '../dom-driver/gmail/gmail-element-getter';
 import { AppMenuItemView } from '../views/app-menu-item-view';
+import { CollapsiblePanelView } from '../views/collapsible-panel-view';
 
 type ThemedIcon =
   | string
@@ -102,9 +104,81 @@ Items with CollapsiblePanels can also have accessories which provide primary act
 */
 export default class AppMenu {
   #driver;
+  #events = stream<
+    {
+      name: 'collapseToggled';
+      /**
+       * The TransitionEvent that was fired when the AppMenu's collapsiblepanel toggle collapsed or open started, canceled, or ended.
+       * `transactionstart` and `transitioncancel` are currently fired. We also theoretically handle `transactionend`, but it isn't currently fired.
+       */
+      event: TransitionEvent;
+    },
+    unknown
+  >((emitter) => {
+    const f = async () => {
+      const isShown = await this.isShown();
+
+      if (!isShown) {
+        return;
+      }
+
+      const appMenu = await GmailElementGetter.getAppMenuAsync();
+
+      if (!appMenu) {
+        return;
+      }
+
+      const onTransition = async (e: TransitionEvent) => {
+        const { TOGGLE_OPEN_STATE } = CollapsiblePanelView.elementCss;
+
+        const { target, type } = e;
+
+        if (
+          target instanceof HTMLElement &&
+          target.matches(CollapsiblePanelView.elementSelectors.NATIVE) &&
+          ((type === 'transitionstart' &&
+            target.classList.contains(TOGGLE_OPEN_STATE)) ||
+            // TOGGLE_OPEN_STATE is removed on transitioncancel TransitionEvents
+            type === 'transitioncancel' ||
+            type === 'transitionend')
+        ) {
+          emitter.emit({
+            name: 'collapseToggled',
+            event: e,
+          });
+        }
+      };
+
+      kefir
+        .merge<TransitionEvent, unknown>(
+          (
+            ['transitionstart', 'transitioncancel', 'transitionend'] as const
+          ).map((x) => kefir.fromEvents(appMenu.parentElement!, x))
+        )
+        .onValue(onTransition);
+    };
+
+    f();
+  });
 
   constructor(driver: GmailDriver) {
     this.#driver = driver;
+  }
+
+  /**
+   * A stream of events related to the AppMenu.
+   *
+   * @note If the AppMenu is not shown, this stream will not emit any events.
+   */
+  get events() {
+    return this.#events;
+  }
+
+  /**
+   * @returns whether or not the AppMenu Burger is uncollapsed or not.
+   */
+  isMenuOpen() {
+    return GmailElementGetter.isAppBurgerMenuOpen();
   }
 
   /**

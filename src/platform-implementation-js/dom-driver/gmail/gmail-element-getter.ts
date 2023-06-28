@@ -216,13 +216,15 @@ const GmailElementGetter = {
     }
   }),
 
+  getAppBurgerMenu() {
+    return document.querySelector<HTMLElement>(
+      'header[role="banner"] > div > div > div[aria-expanded]'
+    );
+  },
+
   isAppBurgerMenuOpen() {
     return (
-      document
-        .querySelector<HTMLElement>(
-          'header[role="banner"] > div > div > div[aria-expanded]'
-        )
-        ?.getAttribute('aria-expanded') === 'true' ?? false
+      this.getAppBurgerMenu()?.getAttribute('aria-expanded') === 'true' ?? false
     );
   },
 
