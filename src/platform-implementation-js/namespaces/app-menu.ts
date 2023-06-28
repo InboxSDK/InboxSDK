@@ -1,4 +1,4 @@
-import { stream } from 'kefir';
+import kefir, { stream } from 'kefir';
 import { RouteView } from '../../inboxsdk';
 import GmailDriver from '../dom-driver/gmail/gmail-driver';
 import GmailElementGetter from '../dom-driver/gmail/gmail-element-getter';
@@ -106,13 +106,12 @@ export default class AppMenu {
   #driver;
   #events = stream<
     {
-      type: 'collapseToggled';
-      /** Whether or not the AppMenuBurger is open or not. */
-      open: boolean;
+      name: 'collapseToggled';
       /**
-       * 'start' is when a `transactionstart` event is fired on a collapsible panel.
-       * 'end' is when a `transactioncancel` event is fired on a collapsible panel. */
-      stage: 'start' | 'end';
+       * The TransitionEvent that was fired when the AppMenu's collapsiblepanel toggle collapsed or open started, canceled, or ended.
+       * `transactionstart` and `transitioncancel` are currently fired. We also theoretically handle `transactionend`, but it isn't currently fired.
+       */
+      event: TransitionEvent;
     },
     unknown
   >((emitter) => {
@@ -129,35 +128,34 @@ export default class AppMenu {
         return;
       }
 
-      const onTransition =
-        (stage: 'start' | 'end') =>
-        async ({ target }: TransitionEvent) => {
-          const { TOGGLE_OPEN_STATE } = CollapsiblePanelView.elementCss;
+      const onTransition = async (e: TransitionEvent) => {
+        const { TOGGLE_OPEN_STATE } = CollapsiblePanelView.elementCss;
 
-          if (
-            target instanceof HTMLElement &&
-            target.matches(CollapsiblePanelView.elementSelectors.NATIVE) &&
-            ((stage === 'start' &&
-              target.classList.contains(TOGGLE_OPEN_STATE)) ||
-              // TOGGLE_OPEN_STATE is removed on transitioncancel TransitionEvents
-              stage === 'end')
-          ) {
-            emitter.emit({
-              type: 'collapseToggled',
-              open: this.isMenuCollapsed(),
-              stage,
-            });
-          }
-        };
+        const { target, type } = e;
 
-      appMenu.parentElement!.addEventListener(
-        'transitionstart',
-        onTransition('start')
-      );
-      appMenu.parentElement!.addEventListener(
-        'transitioncancel',
-        onTransition('end')
-      );
+        if (
+          target instanceof HTMLElement &&
+          target.matches(CollapsiblePanelView.elementSelectors.NATIVE) &&
+          ((type === 'transitionstart' &&
+            target.classList.contains(TOGGLE_OPEN_STATE)) ||
+            // TOGGLE_OPEN_STATE is removed on transitioncancel TransitionEvents
+            type === 'transitioncancel' ||
+            type === 'transitionend')
+        ) {
+          emitter.emit({
+            name: 'collapseToggled',
+            event: e,
+          });
+        }
+      };
+
+      kefir
+        .merge<TransitionEvent, unknown>(
+          (
+            ['transitionstart', 'transitioncancel', 'transitionend'] as const
+          ).map((x) => kefir.fromEvents(appMenu.parentElement!, x))
+        )
+        .onValue(onTransition);
     };
 
     f();
@@ -177,9 +175,9 @@ export default class AppMenu {
   }
 
   /**
-   * @returns whether or not the AppMenu Burger is collapsed or not.
+   * @returns whether or not the AppMenu Burger is uncollapsed or not.
    */
-  isMenuCollapsed() {
+  isMenuOpen() {
     return GmailElementGetter.isAppBurgerMenuOpen();
   }
 
