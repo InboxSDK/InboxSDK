@@ -132,8 +132,8 @@ const enum OutputLibraryType {
   ESM = 'module',
 }
 
-interface BrowserifyTaskOptions {
-  entry: string;
+interface WebpackTaskOptions {
+  entry: webpack.Configuration['entry'];
   destName: string;
   devtool?: 'source-map' | 'inline-source-map' | 'remote';
   standalone?: string;
@@ -147,7 +147,7 @@ async function webpackTask({
   destName,
   disableMinification,
   ...options
-}: BrowserifyTaskOptions): Promise<void> {
+}: WebpackTaskOptions): Promise<void> {
   const willMinify = args.minify && !disableMinification;
 
   const VERSION = await getVersion();
@@ -155,10 +155,7 @@ async function webpackTask({
   const bundler = webpack({
     devtool:
       options.devtool === 'remote' ? false : options.devtool ?? 'source-map',
-    entry: [
-      willMinify || args.production ? './src/inboxsdk-js/header' : null,
-      entry,
-    ].flatMap((x) => (x != null ? [x] : [])),
+    entry,
     mode: args.production ? 'production' : 'development',
     module: {
       rules: [
@@ -237,6 +234,15 @@ async function webpackTask({
       new webpack.DefinePlugin({
         SDK_VERSION: JSON.stringify(VERSION),
       }),
+      ...(willMinify || args.production
+        ? [
+            new webpack.BannerPlugin({
+              banner: fs.readFileSync('../src/inboxsdk-js/header', 'utf8'),
+              raw: true,
+              entryOnly: true,
+            }),
+          ]
+        : []),
       // Work around for Buffer is undefined:
       // https://github.com/webpack/changelog-v5/issues/10
       new webpack.ProvidePlugin({
