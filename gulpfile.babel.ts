@@ -316,85 +316,91 @@ gulp.task('types', async () => {
   await exec('yarn typedefs');
 });
 
+let config: WebpackTaskOptions;
+const remoteCompatConfig = {
+  devtool: 'inline-source-map',
+  afterBuild: setupExamples,
+} as const;
+
 if (args.remote) {
-  gulp.task('sdk', () => {
-    return webpackTask({
-      devtool: 'inline-source-map',
-      entry: {
-        ...pageWorld,
-        [sdkFilename]: {
-          library: {
-            export: 'default',
-            name: 'InboxSDK',
-            type: OutputLibraryType.UMD,
-          },
-          import: './src/inboxsdk-js/inboxsdk-REMOTE',
+  config = {
+    ...remoteCompatConfig,
+    entry: {
+      [sdkFilename]: {
+        library: {
+          export: 'default',
+          name: 'InboxSDK',
+          type: OutputLibraryType.UMD,
         },
-        'platform-implementation':
-          './src/platform-implementation-js/main-INTEGRATED-PAGEWORLD',
+        import: './src/inboxsdk-js/inboxsdk-REMOTE',
       },
-      afterBuild: setupExamples,
-    });
-  });
-  gulp.task('default', gulp.series('sdk'));
+      'platform-implementation':
+        './src/platform-implementation-js/main-INTEGRATED-PAGEWORLD',
+    },
+  };
 } else if (args.integratedPageWorld) {
   // non-remote bundle built for compatibility with remote bundle
-  gulp.task('sdk', () => {
-    return webpackTask({
-      devtool: 'inline-source-map',
-      entry: {
-        ...pageWorld,
-        [sdkFilename]: {
-          library: {
-            export: 'default',
-            name: 'InboxSDK',
-            type: OutputLibraryType.Var,
-          },
-          import: './src/inboxsdk-js/inboxsdk-NONREMOTE-INTEGRATED-PAGEWORLD',
+  config = {
+    ...remoteCompatConfig,
+    entry: {
+      [sdkFilename]: {
+        library: {
+          export: 'default',
+          name: 'InboxSDK',
+          type: OutputLibraryType.Var,
         },
+        import: './src/inboxsdk-js/inboxsdk-NONREMOTE-INTEGRATED-PAGEWORLD',
       },
-      afterBuild: setupExamples,
-    });
-  });
-  gulp.task('default', gulp.parallel('sdk', 'types'));
+    },
+  };
 } else {
   // standard npm non-remote bundle
-  gulp.task('sdk', async () => {
-    return webpackTask({
-      entry: {
-        ...pageWorld,
-        [sdkFilename]: {
-          library: {
-            export: 'default',
-            name: 'InboxSDK',
-            type: OutputLibraryType.UMD,
-          },
-          import: './src/inboxsdk-js/inboxsdk-NONREMOTE',
+  config = {
+    entry: {
+      ...pageWorld,
+      [sdkFilename]: {
+        library: {
+          export: 'default',
+          name: 'InboxSDK',
+          type: OutputLibraryType.UMD,
         },
+        import: './src/inboxsdk-js/inboxsdk-NONREMOTE',
       },
-      disableMinification: false,
-      afterBuild: async () => {
-        setupExamples();
-        const { minify } = await import('terser');
+    },
+    disableMinification: true,
+    afterBuild: async () => {
+      setupExamples();
+      const { minify } = await import('terser');
 
-        const sourceOutput = await fs.promises.readFile(
-          'packages/core/inboxsdk.js',
-          'utf8'
-        );
+      const sourceOutput = await fs.promises.readFile(
+        'packages/core/inboxsdk.js',
+        'utf8'
+      );
 
-        const minified = await minify(sourceOutput);
-        await fs.promises.writeFile(
-          'packages/core/inboxsdk.min.js',
-          minified.code!,
-          {
-            encoding: 'utf8',
-          }
-        );
-      },
-    });
-  });
-  gulp.task('default', gulp.parallel('sdk', 'types'));
+      const minified = await minify(sourceOutput);
+      await fs.promises.writeFile(
+        'packages/core/inboxsdk.min.js',
+        minified.code!,
+        {
+          encoding: 'utf8',
+        }
+      );
+    },
+  };
 }
+
+gulp.task('sdk', async () => {
+  if (args.remote || args.integratedPageWorld) {
+    await webpackTask({
+      entry: pageWorld,
+      devtool: 'inline-source-map',
+    });
+  }
+
+  return webpackTask(config);
+});
+
+gulp.task('default', gulp.parallel('sdk', 'types'));
 
 gulp.task(
   'server',

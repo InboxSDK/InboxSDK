@@ -3,7 +3,7 @@ export function injectScriptEmbedded() {
   const script = document.createElement('script');
   script.type = 'text/javascript';
 
-  const originalCode = require('../../injected-js/main?raw');
+  const originalCode = require('../../../packages/core/pageWorld?raw');
 
   script.text = originalCode;
 
