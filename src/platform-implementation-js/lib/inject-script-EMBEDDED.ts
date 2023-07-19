@@ -5,10 +5,10 @@ export function injectScriptEmbedded() {
   const script = document.createElement('script');
   script.type = 'text/javascript';
 
-  const originalCode = require('raw-loader!../../../packages/core/pageWorld.js');
+  const originalCode = require('../../../packages/core/pageWorld?raw');
 
   const codeParts: string[] = [];
-  codeParts.push(originalCode.default);
+  codeParts.push(originalCode);
   codeParts.push('\n//# sourceURL=' + url + '\n');
 
   const codeToRun = codeParts.join('');
