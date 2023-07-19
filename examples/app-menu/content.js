@@ -1,4 +1,4 @@
-/// <reference path="types.d.ts" />
+/// <reference path="../types.d.ts" />
 
 function log() {
   console.log(...['app-menu'].concat(arguments));
