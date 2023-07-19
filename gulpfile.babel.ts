@@ -163,6 +163,10 @@ async function webpackTask({
     module: {
       rules: [
         {
+          resourceQuery: /raw/,
+          type: 'asset/source',
+        },
+        {
           exclude: /(node_modules|dist|packages\/core)/,
           test: /\.m?[jt]sx?$/,
           use: {
