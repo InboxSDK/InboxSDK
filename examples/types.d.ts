@@ -1,4 +1,4 @@
-import { InboxSDK as InboxSDK_ } from '../../src/inboxsdk';
+import { InboxSDK as InboxSDK_ } from '../src/inboxsdk';
 
 declare global {
   var InboxSDK: {
