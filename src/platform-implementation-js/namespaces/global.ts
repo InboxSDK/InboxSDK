@@ -6,7 +6,16 @@ import type { PiOpts } from '../platform-implementation';
 import type { Driver } from '../driver-interfaces/driver';
 import GmailSupportItemView from '../dom-driver/gmail/views/gmail-support-item-view';
 import type { SupportItemDescriptor } from '../dom-driver/gmail/views/gmail-support-item-view';
-const memberMap = new WeakMap();
+
+const memberMap = new WeakMap<
+  Global,
+  {
+    appId: string;
+    driver: Driver;
+    piOpts: PiOpts;
+  }
+>();
+
 export default class Global {
   constructor(appId: string, driver: Driver, piOpts: PiOpts) {
     const members = {
@@ -20,10 +29,7 @@ export default class Global {
   async addSidebarContentPanel(
     descriptor: Record<string, any>
   ): Promise<ContentPanelView | null | undefined> {
-    const descriptorPropertyStream = kefirCast(
-      Kefir as any,
-      descriptor
-    ).toProperty();
+    const descriptorPropertyStream = kefirCast(Kefir, descriptor).toProperty();
     const members = get(memberMap, this);
     members.driver.getLogger().eventSdkPassive('global.addSidebarContentPanel');
     const contentPanelImplementation =
