@@ -121,8 +121,6 @@ function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView) {
     groupButtonsIfNeededMap.delete(gmailComposeView);
     if (gmailComposeView.isDestroyed()) return;
 
-    _narrowButtonsIfNeeded(gmailComposeView);
-
     if (_doButtonsNeedToGroup(gmailComposeView)) {
       var groupedActionToolbarContainer =
         _createGroupedActionToolbarContainer(gmailComposeView);
@@ -142,38 +140,12 @@ function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView) {
         groupToggleButtonViewController
       );
 
-      // remove narrow buttons class
-      gmailComposeView
-        .getElement()
-        .classList.remove('inboxsdk__compose_narrow_buttons');
-
-      // see if we should narrow buttons again
-      _narrowButtonsIfNeeded(gmailComposeView);
-
       gmailComposeView.getStopper().onValue(function () {
         groupedActionToolbarContainer.remove();
         groupToggleButtonViewController.destroy();
       });
     }
   });
-}
-
-function _narrowButtonsIfNeeded(gmailComposeView: GmailComposeView) {
-  if (
-    gmailComposeView.getElement().clientWidth >
-      _getBottomBarTableWidth(gmailComposeView) ||
-    gmailComposeView.getElement().querySelectorAll('.inboxsdk__composeButton')
-      .length === 0 ||
-    gmailComposeView
-      .getElement()
-      .classList.contains('inboxsdk__compose_narrow_buttons')
-  )
-    return;
-  gmailComposeView
-    .getElement()
-    .classList.add('inboxsdk__compose_narrow_buttons');
-  //force reflow
-  gmailComposeView.getElement().offsetTop;
 }
 
 function _doButtonsNeedToGroup(gmailComposeView: GmailComposeView): boolean {
