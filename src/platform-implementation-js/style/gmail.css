@@ -453,15 +453,6 @@ steps to repro:
   width: 376px !important;
 }
 
-/* fix native button wrapping */
-.inboxsdk__compose .a8X {
-  overflow: visible;
-}
-
-.inboxsdk__compose .a8X > .bAK {
-  flex-wrap: nowrap;
-}
-
 /* mimic button styling */
 .inboxsdk__composeButton,
 .inboxsdk__compose_sendButton {
