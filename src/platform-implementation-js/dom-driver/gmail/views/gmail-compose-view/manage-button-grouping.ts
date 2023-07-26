@@ -51,7 +51,7 @@ export default defn(
         return event.eventName === 'buttonAdded';
       })
       .onValue(() => {
-        _handleButtonAdded(gmailComposeView);
+        groupButtonsAndAdjustToolbarPosition(gmailComposeView);
       });
     gmailComposeView
       .getEventStream()
@@ -60,7 +60,7 @@ export default defn(
           event.eventName === 'resize' || event.eventName === 'restored'
       )
       .onValue(() => {
-        _handleButtonAdded(gmailComposeView);
+        groupButtonsAndAdjustToolbarPosition(gmailComposeView);
       });
     var el = gmailComposeView.getElement();
     gmailComposeView.getStopper().onValue(function () {
@@ -81,7 +81,7 @@ function _handleComposeFullscreenStateChanged(
     _ungroupButtons(gmailComposeView);
   }
 
-  _handleButtonAdded(gmailComposeView);
+  groupButtonsAndAdjustToolbarPosition(gmailComposeView);
 }
 
 function _ungroupButtons(gmailComposeView: GmailComposeView) {
@@ -106,7 +106,9 @@ function _ungroupButtons(gmailComposeView: GmailComposeView) {
   }
 }
 
-function _handleButtonAdded(gmailComposeView: GmailComposeView) {
+function groupButtonsAndAdjustToolbarPosition(
+  gmailComposeView: GmailComposeView
+) {
   _groupButtonsIfNeeded(gmailComposeView);
 
   _fixToolbarPosition(gmailComposeView);
@@ -149,31 +151,53 @@ function _groupButtonsIfNeeded(gmailComposeView: GmailComposeView) {
 }
 
 function _doButtonsNeedToGroup(gmailComposeView: GmailComposeView): boolean {
+  const composeEl = gmailComposeView.getElement();
+  if (composeEl.querySelector('.inboxsdk__compose_groupedActionToolbar'))
+    return false;
+
   if (
-    gmailComposeView
-      .getElement()
-      .querySelector('.inboxsdk__compose_groupedActionToolbar')
+    composeEl.querySelectorAll(
+      '.inboxsdk__composeButton:not([data-no-overflow])'
+    ).length < 2
   )
     return false;
-  if (
-    gmailComposeView
-      .getElement()
-      .querySelectorAll('.inboxsdk__composeButton:not([data-no-overflow])')
-      .length < 2
-  )
-    return false;
-  return (
-    _getBottomBarTableWidth(gmailComposeView) >
-    gmailComposeView.getBottomToolbarContainer().clientWidth
-  );
+
+  if (areNativeToolbarButtonsGrouped(composeEl)) {
+    return true;
+  }
+
+  return false;
 }
 
-function _getBottomBarTableWidth(gmailComposeView: GmailComposeView): number {
-  const bottomBarTable = gmailComposeView.getBottomBarTable();
-  return Array.from(bottomBarTable.querySelectorAll('.btC > td')).reduce(
-    (total, el) => total + el.clientWidth,
-    0
+const toolbarButtonStyles = new WeakMap<HTMLElement, CSSStyleDeclaration>();
+
+function areNativeToolbarButtonsGrouped(composeEl: HTMLElement) {
+  const nativeButtonsContainer = composeEl.querySelector<HTMLElement>('.bAK');
+  const containerWidth = nativeButtonsContainer?.offsetWidth ?? 0;
+  const nativeButtons = Array.from(
+    nativeButtonsContainer?.querySelectorAll<HTMLElement>('.wG') ?? []
   );
+
+  let buttonsWidth = 0;
+
+  for (const button of nativeButtons) {
+    const style = toolbarButtonStyles.get(button) ?? getComputedStyle(button);
+
+    if (!toolbarButtonStyles.has(button)) {
+      toolbarButtonStyles.set(button, style);
+    }
+
+    const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
+
+    buttonsWidth += button.offsetWidth;
+    buttonsWidth += margin;
+
+    if (buttonsWidth > containerWidth) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function _createGroupedActionToolbarContainer(
