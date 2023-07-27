@@ -24,7 +24,7 @@ const PlatformImplementationLoader = {
       nowrap: true,
       // webpack adds a sourceURL comment.
       // This sourceURL includes cache breaking for error reporting in remote builds.
-      disableSourceMappingURL: true,
+      disableSourceURL: true,
     });
   }),
 
