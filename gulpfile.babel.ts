@@ -252,7 +252,9 @@ async function webpackTask({
         ? [
             new webpack.SourceMapDevToolPlugin({
               fileContext: '../',
-              filename: '[file].map',
+              // Adds hash to the end of the sourcemap URL so that
+              // remote code source maps are not cached erroneously by Sentry.
+              filename: '[file].map?hash=[contenthash]',
               publicPath: 'https://www.inboxsdk.com/build/',
             }),
           ]

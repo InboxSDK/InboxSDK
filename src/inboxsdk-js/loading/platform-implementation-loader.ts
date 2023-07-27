@@ -20,7 +20,11 @@ const PlatformImplementationLoader = {
 
   _loadScript: once(function () {
     return loadScript(process.env.IMPLEMENTATION_URL!, {
-      nowrap: true, // platform-implementation has no top-level vars so no need for function wrapping
+      // platform-implementation has no top-level vars so no need for function wrapping
+      nowrap: true,
+      // webpack adds a sourceMappingURL comment.
+      // This source mapping URL includes cache breaking for error reporting in remote builds.
+      disableSourceMappingURL: true,
     });
   }),
 
