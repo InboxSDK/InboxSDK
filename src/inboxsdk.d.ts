@@ -1,21 +1,22 @@
 import { EventEmitter } from 'events';
-import * as Kefir from 'kefir';
-import TypedEmitter from 'typed-emitter';
+import type * as Kefir from 'kefir';
+import type TypedEmitter from 'typed-emitter';
 import AppMenu from './platform-implementation-js/namespaces/app-menu';
-import {
+import type {
   NavItemTypes,
   NavItemDescriptor,
 } from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 import NavItemView from './platform-implementation-js/views/nav-item-view';
 import type { Stopper } from 'kefir-stopper';
-import GmailRouteProcessor from './platform-implementation-js/dom-driver/gmail/views/gmail-route-view/gmail-route-processor';
-import GmailDriver from './platform-implementation-js/dom-driver/gmail/gmail-driver';
-import GmailRowListView from './platform-implementation-js/dom-driver/gmail/views/gmail-row-list-view';
+import type GmailRouteProcessor from './platform-implementation-js/dom-driver/gmail/views/gmail-route-view/gmail-route-processor';
+import type GmailDriver from './platform-implementation-js/dom-driver/gmail/gmail-driver';
+import type GmailRowListView from './platform-implementation-js/dom-driver/gmail/views/gmail-row-list-view';
 import type { AppLogger } from './platform-implementation-js/lib/logger';
 import type { IThreadRowView as ThreadRowView } from './platform-implementation-js/views/thread-row-view';
 import TypedEventEmitter from 'typed-emitter';
 import { MessageViewEvent } from './platform-implementation-js/views/conversations/message-view';
 import type { ThreadViewEvents } from './platform-implementation-js/views/conversations/thread-view';
+import type { ComposeViewEvent } from './platform-implementation-js/views/compose-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 
 export const LOADER_VERSION: string;
@@ -594,7 +595,13 @@ export interface DropdownView extends EventEmitter {
   reposition(): void;
 }
 
-export interface ComposeView extends EventEmitter {
+export {
+  ComposeViewEvent,
+  LinkPopOver,
+  LinkPopOverSection,
+} from './platform-implementation-js/views/compose-view';
+
+export interface ComposeView extends TypedEmitter<ComposeViewEvent> {
   destroyed: boolean;
   addButton(
     buttonOptions:
@@ -615,10 +622,9 @@ export interface ComposeView extends EventEmitter {
   getBccRecipients(): Array<Contact>;
   getBodyElement(): HTMLElement;
   getCcRecipients(): Array<Contact>;
-  getCurrentDraftID(): Promise<string | null>;
+  getCurrentDraftID(): Promise<string | null | undefined>;
   getElement(): HTMLElement;
-  getDraftID(): Promise<string | null>;
-  getMessageIDAsync(): Promise<string>;
+  getDraftID(): Promise<string | null | undefined>;
   getSubject(): string;
   getSubjectInput(): HTMLInputElement | null;
   getThreadID(): string;
@@ -630,7 +636,7 @@ export interface ComposeView extends EventEmitter {
   isMinimized(): boolean;
   setMinimized(minimized: boolean): void;
   isFullscreen(): boolean;
-  insertHTMLIntoBodyAtCursor(html: string): HTMLElement;
+  insertHTMLIntoBodyAtCursor(html: string): HTMLElement | null | undefined;
   isForward(): boolean;
   isInlineReplyForm(): boolean;
   isReply(): boolean;
@@ -657,10 +663,9 @@ export interface SendOptions {
   sendAndArchive?: boolean;
 }
 
-export interface ComposeViewDestroyEvent {
-  messageID: string | null;
-  closedByInboxSDK: boolean;
-}
+export type ComposeViewDestroyEvent = Parameters<
+  ComposeViewEvent['destroy']
+>[0];
 
 export interface ComposeButtonDescriptor {
   title: string;

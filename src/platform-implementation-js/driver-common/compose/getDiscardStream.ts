@@ -19,7 +19,7 @@ export default function getDiscardStream({
 }: {
   element: HTMLElement;
   discardButton: HTMLElement;
-}): Kefir.Observable<Record<string, any>, unknown> {
+}) {
   const domEventStream = Kefir.merge([
     fromEventTargetCapture(element, 'keydown')
       .filter(
@@ -35,7 +35,7 @@ export default function getDiscardStream({
     ),
   ]);
   return domEventStream.map((domEvent) => ({
-    eventName: 'discard',
+    eventName: 'discard' as const,
     data: {
       cancel() {
         domEvent.preventDefault();

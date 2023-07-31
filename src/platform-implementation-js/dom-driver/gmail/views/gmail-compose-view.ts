@@ -70,13 +70,14 @@ import {
   makePageParser,
   getRecipientRowElements,
 } from './gmail-compose-view/page-parser';
-import PageParserTree from 'page-parser-tree';
-import { TagTree } from 'tag-tree';
+import type PageParserTree from 'page-parser-tree';
+import type { TagTree } from 'tag-tree';
 import * as fromManager from './gmail-compose-view/from-manager';
 import type {
   ComposeButtonDescriptor,
   ComposeNotice,
   ComposeViewDriver,
+  ComposeViewDriverEvent,
   StatusBar,
 } from '../../../driver-interfaces/compose-view-driver';
 import type GmailDriver from '../gmail-driver';
@@ -96,7 +97,7 @@ class GmailComposeView implements ComposeViewDriver {
   _managedViewControllers: Array<{
     destroy(): void;
   }>;
-  _eventStream: Bus<any, unknown>;
+  _eventStream: Bus<ComposeViewDriverEvent, unknown>;
   _isTriggeringADraftSavePending: boolean;
   _buttonViewControllerTooltipMap: WeakMap<
     Record<string, any>,
