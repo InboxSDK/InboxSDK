@@ -606,6 +606,7 @@ class GmailThreadRowView {
         iconSettings = buttonMod.iconSettings;
 
         if (buttonDescriptor.onClick) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           buttonSpan.onclick = (event) => {
             const appEvent = {
               dropdown: null as DropdownView | null | undefined,
@@ -1019,6 +1020,7 @@ class GmailThreadRowView {
           this._elements[0],
           'td.xW, td.yf > div.apm'
         );
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const originalDateSpan = dateContainer.firstElementChild;
 
         if (!opts) {

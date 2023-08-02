@@ -38,10 +38,7 @@ describe('GmailAppSidebarView Primary', function () {
     removeSidebarContainerElement();
   });
   it('construction works', () => {
-    const gmailAppSidebarView = new GmailAppSidebarView(
-      makeDriver(),
-      makeContentContainerElement()
-    );
+    new GmailAppSidebarView(makeDriver(), makeContentContainerElement());
   });
   it('sidebar is added', async () => {
     const container = makeContentContainerElement();
