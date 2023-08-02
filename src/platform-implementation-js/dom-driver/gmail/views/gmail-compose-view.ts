@@ -1634,6 +1634,7 @@ class GmailComposeView implements ComposeViewDriver {
           try {
             // If this succeeds, then the draft must exist on the server and we
             // can safely return the draft id we know.
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const gmailMessageId =
               await this._driver.getGmailMessageIdForSyncDraftId(syncMessageId);
           } catch (e) {

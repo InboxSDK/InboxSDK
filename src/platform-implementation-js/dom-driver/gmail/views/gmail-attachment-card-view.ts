@@ -106,16 +106,6 @@ class GmailAttachmentCardView {
       iconUrl: options.iconUrl,
       tooltip: options.tooltip,
     });
-    var basicButtonViewController = new BasicButtonViewController({
-      activateFunction: () => {
-        if (options.onClick) {
-          options.onClick({
-            getDownloadURL: () => this.getDownloadURL(),
-          });
-        }
-      },
-      buttonView: buttonView,
-    });
 
     this._addButton(buttonView);
   }
@@ -288,6 +278,7 @@ class GmailAttachmentCardView {
       this._addMoreButtons(options.buttons);
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     var self = this;
 
     this._previewClicks.plug(
@@ -304,6 +295,7 @@ class GmailAttachmentCardView {
         '.inboxsdk__attachmentCard_previewThumbnailUrl'
       );
 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       previewThumbnailUrlImage.onerror = (e) => {
         var iconDiv = document.createElement('div');
         iconDiv.classList.add('aYv');
@@ -350,6 +342,7 @@ class GmailAttachmentCardView {
     buttonView
       .getElement()
       .setAttribute('data-inboxsdk-download-url', options.downloadUrl);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const basicButtonViewController = new BasicButtonViewController({
       activateFunction: function () {
         let prevented = false;
