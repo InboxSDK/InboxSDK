@@ -1194,7 +1194,7 @@ class GmailComposeView implements ComposeViewDriver {
 
       const top = parseInt(dropzone.style.top, 10);
       /**
-       * Fullscreen compose dropzones have no inline height style. `bottom` is NaN because of this.
+       * Fullscreen compose dropzones have no explicit `Element.prototype.style.height`. `bottom` is NaN because of this.
        */
       const bottom = top + parseInt(dropzone.style.height, 10);
       const left = parseInt(dropzone.style.left, 10);
