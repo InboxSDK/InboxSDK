@@ -220,6 +220,7 @@ class GmailAppSidebarPrimary {
         }
 
         if (titleBar) {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const instanceId = titleBar.getAttribute('data-instance-id');
           const appName = titleBar.getAttribute('data-app-name');
           if (!appName) return;
@@ -859,6 +860,7 @@ class GmailAppSidebarPrimary {
         )
         .takeUntilBy(this._stopper)
         .onValue((e) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
           this._renderThreadSidebar().then((threadSidebarComponent) => {
             const descriptor = this._instanceIdsToDescriptors.get(
               e.detail.instanceId

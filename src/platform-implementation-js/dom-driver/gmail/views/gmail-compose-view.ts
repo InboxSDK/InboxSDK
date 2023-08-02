@@ -74,16 +74,18 @@ import PageParserTree from 'page-parser-tree';
 import { TagTree } from 'tag-tree';
 import * as fromManager from './gmail-compose-view/from-manager';
 import type {
+  ComposeButtonDescriptor,
   ComposeNotice,
   ComposeViewDriver,
   StatusBar,
 } from '../../../driver-interfaces/compose-view-driver';
 import type GmailDriver from '../gmail-driver';
-import { ButtonDescriptor, Contact } from '../../../../inboxsdk';
+import { Contact } from '../../../../inboxsdk';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
+
 let hasReportedMissingBody = false;
 
-class GmailComposeView {
+class GmailComposeView implements ComposeViewDriver {
   _element: HTMLElement;
   _seenBodyElement!: HTMLElement;
   _isInlineReplyForm: boolean;
@@ -893,7 +895,7 @@ class GmailComposeView {
 
   addButton(
     buttonDescriptor: Kefir.Observable<
-      ButtonDescriptor | null | undefined,
+      ComposeButtonDescriptor | null | undefined,
       unknown
     >,
     groupOrderHint: string,
@@ -1632,6 +1634,7 @@ class GmailComposeView {
           try {
             // If this succeeds, then the draft must exist on the server and we
             // can safely return the draft id we know.
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const gmailMessageId =
               await this._driver.getGmailMessageIdForSyncDraftId(syncMessageId);
           } catch (e) {

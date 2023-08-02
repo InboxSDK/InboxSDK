@@ -156,6 +156,10 @@ async function webpackTask({
     module: {
       rules: [
         {
+          resourceQuery: /raw/,
+          type: 'asset/source',
+        },
+        {
           exclude: /(node_modules|dist|packages\/core)/,
           test: /\.m?[jt]sx?$/,
           use: {
@@ -338,7 +342,10 @@ if (args.remote) {
     plugins: [
       new webpack.SourceMapDevToolPlugin({
         fileContext: '../',
-        filename: '[file].map',
+        // Adds hash to the end of the sourcemap URL so that
+        // remote code source maps are not cached erroneously by Sentry.
+        filename: '[file].map?hash=[contenthash]',
+        append: `\n//# sourceURL=https://www.inboxsdk.com/build/[file]?hash=[contenthash]`,
         publicPath: 'https://www.inboxsdk.com/build/',
       }),
     ],
