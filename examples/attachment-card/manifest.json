@@ -3,10 +3,14 @@
   "version": "0.1",
   "content_scripts": [
     {
-      "matches": [
-        "https://mail.google.com/*"
+      "matches": ["https://mail.google.com/*"],
+      "js": [
+        "kefir.min.js",
+        "react.production.min.js",
+        "react-dom.production.min.js",
+        "inboxsdk.js",
+        "app.js"
       ],
-      "js": ["kefir.min.js", "react.production.min.js", "react-dom.production.min.js", "inboxsdk.js", "app.js"],
       "css": ["app.css"],
       "run_at": "document_end"
     }

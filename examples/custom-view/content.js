@@ -1,60 +1,74 @@
 function log() {
-  console.log.apply(console, ['custom-view'].concat(Array.prototype.slice.call(arguments)));
+  console.log.apply(
+    console,
+    ['custom-view'].concat(Array.prototype.slice.call(arguments))
+  );
 }
 
-InboxSDK.load(2, 'custom-view').then(function(sdk) {
+InboxSDK.load(2, 'custom-view').then(function (sdk) {
   window._sdk = sdk;
   var threadIds = new Set();
 
-  sdk.Lists.registerThreadRowViewHandler(function(threadRowView) {
-    threadRowView.getThreadIDAsync().then(threadId => {
+  sdk.Lists.registerThreadRowViewHandler(function (threadRowView) {
+    threadRowView.getThreadIDAsync().then((threadId) => {
       threadIds.add(threadId);
     });
   });
 
-  sdk.Router.handleCustomRoute('example/:monkeyName', function(customRouteView) {
-    customRouteView.setFullWidth(false);
+  sdk.Router.handleCustomRoute(
+    'example/:monkeyName',
+    function (customRouteView) {
+      customRouteView.setFullWidth(false);
 
-    customRouteView.getElement().textContent = 'hello world! ' + customRouteView.getParams().monkeyName;
-    const focusTest = document.createElement('div');
-    focusTest.innerHTML = `
+      customRouteView.getElement().textContent =
+        'hello world! ' + customRouteView.getParams().monkeyName;
+      const focusTest = document.createElement('div');
+      focusTest.innerHTML = `
       <input value="foo">
       <div tabindex="-1">focusable element</div>
     `;
-    customRouteView.getElement().appendChild(focusTest);
+      customRouteView.getElement().appendChild(focusTest);
 
-    const list = document.createElement('ul');
-    threadIds.forEach(function(threadId) {
-      const link = document.createElement('a');
-      link.href = sdk.Router.createLink(sdk.Router.NativeRouteIDs.THREAD, {threadID: threadId});
-      link.textContent = threadId;
-      const item = document.createElement('li');
-      item.appendChild(link);
-      list.appendChild(item);
-    });
+      const list = document.createElement('ul');
+      threadIds.forEach(function (threadId) {
+        const link = document.createElement('a');
+        link.href = sdk.Router.createLink(sdk.Router.NativeRouteIDs.THREAD, {
+          threadID: threadId,
+        });
+        link.textContent = threadId;
+        const item = document.createElement('li');
+        item.appendChild(link);
+        list.appendChild(item);
+      });
 
-    {
-      const link = document.createElement('a');
-      link.href = sdk.Router.createLink('example/:monkeyName', {monkeyName: 'linktest'});
-      link.textContent = 'linktest';
-      const item = document.createElement('li');
-      item.appendChild(link);
-      list.appendChild(item);
+      {
+        const link = document.createElement('a');
+        link.href = sdk.Router.createLink('example/:monkeyName', {
+          monkeyName: 'linktest',
+        });
+        link.textContent = 'linktest';
+        const item = document.createElement('li');
+        item.appendChild(link);
+        list.appendChild(item);
+      }
+
+      customRouteView.getElement().appendChild(list);
     }
+  );
 
-    customRouteView.getElement().appendChild(list);
-  });
-
-  sdk.Router.handleAllRoutes(function(routeView) {
+  sdk.Router.handleAllRoutes(function (routeView) {
     log(
-      'id', routeView.getRouteID(),
-      'type', routeView.getRouteType(),
-      'params', routeView.getParams()
+      'id',
+      routeView.getRouteID(),
+      'type',
+      routeView.getRouteType(),
+      'params',
+      routeView.getParams()
     );
   });
 
   sdk.NavMenu.SENT_MAIL.addNavItem({
-    name: 'Sent Monkeys'
+    name: 'Sent Monkeys',
   });
 
   const customIconElement = document.createElement('div');
@@ -69,11 +83,11 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     accessory: {
       type: 'DROPDOWN_BUTTON',
       buttonBackgroundColor: 'red',
-      onClick: function(event) {
+      onClick: function (event) {
         event.dropdown.el.innerHTML = 'Hello world!';
-      }
+      },
     },
-    tooltipAlignment: 'top'
+    tooltipAlignment: 'top',
   });
 
   sdk.NavMenu.addNavItem({
@@ -84,14 +98,14 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     accessory: {
       type: 'DROPDOWN_BUTTON',
       buttonBackgroundColor: 'red',
-      onClick: function(event) {
+      onClick: function (event) {
         event.dropdown.el.innerHTML = 'Hello world!';
-      }
+      },
     },
-    tooltipAlignment: 'right'
+    tooltipAlignment: 'right',
   });
 
-  sdk.Router.handleCustomRoute('beep', function(customRouteView) {
+  sdk.Router.handleCustomRoute('beep', function (customRouteView) {
     customRouteView.getElement().innerHTML = 'beep';
   });
 
@@ -105,32 +119,32 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
     iconElement: customMonkeyElement,
     routeID: 'example/:monkeyName',
-    routeParams: {monkeyName: 'george {} {} {}'},
+    routeParams: { monkeyName: 'george {} {} {}' },
     type: sdk.NavMenu.NavItemTypes.LINK,
     accessory: {
       type: 'CREATE',
-      onClick: function() {
+      onClick: function () {
         log('create monkeys');
-      }
+      },
     },
-    tooltipAlignment: 'bottom'
+    tooltipAlignment: 'bottom',
   });
 
   var lion = navItem.addNavItem({
     name: 'Lions',
     routeID: sdk.Router.NativeRouteIDs.THREAD,
     routeParams: {
-      threadID: '14aa1bcd3deefcf7'
+      threadID: '14aa1bcd3deefcf7',
     },
     iconUrl: chrome.runtime.getURL('lion.png'),
     accessory: {
       type: 'ICON_BUTTON',
       iconUrl: chrome.runtime.getURL('lion.png'),
-      onClick: function() {
+      onClick: function () {
         log('lions rocks!');
-      }
+      },
     },
-    tooltipAlignment: 'left'
+    tooltipAlignment: 'left',
   });
 
   var monkey = lion.addNavItem({
@@ -139,10 +153,10 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     subtitle: '456',
     accessory: {
       type: 'SETTINGS_BUTTON',
-      onClick: function(event) {
+      onClick: function (event) {
         event.dropdown.el.innerHTML = 'Hello world!';
-      }
-    }
+      },
+    },
   });
 
   sdk.NavMenu.addNavItem({
@@ -152,17 +166,17 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     accessory: {
       type: 'DROPDOWN_BUTTON',
       buttonBackgroundColor: 'red',
-      onClick: function(event) {
+      onClick: function (event) {
         event.dropdown.el.innerHTML = 'Hello world!';
-      }
-    }
+      },
+    },
   });
 
   lion.addNavItem({
     name: 'Lion item',
     onClick: () => {
       console.log('LION ITEM WAS CLICKED');
-    }
+    },
   });
 
   const customLionIcon = document.createElement('div');
@@ -174,7 +188,7 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     iconElement: customLionIcon,
     onClick: () => {
       console.log('LION ITEM WAS CLICKED');
-    }
+    },
   });
 
   var grouperNavItem = navItem.addNavItem({
@@ -184,16 +198,16 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     // All the following options should be ignored in Gmailv2
     iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
     routeID: 'example/:monkeyName',
-    routeParams: {monkeyName: 'george {} {} {}'},
+    routeParams: { monkeyName: 'george {} {} {}' },
     onClick: () => {
       console.log('GROUPER ITEM WAS CLICKED');
     },
     accessory: {
       type: 'CREATE',
-      onClick: function() {
+      onClick: function () {
         log('create monkeys');
-      }
-    }
+      },
+    },
   });
 
   grouperNavItem.addNavItem({
@@ -204,10 +218,10 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     },
     accessory: {
       type: 'DROPDOWN_BUTTON',
-      onClick: function(event) {
+      onClick: function (event) {
         event.dropdown.el.innerHTML = 'Hello world!';
-      }
-    }
+      },
+    },
   });
 
   const grouperSub = grouperNavItem.addNavItem({
@@ -216,16 +230,16 @@ InboxSDK.load(2, 'custom-view').then(function(sdk) {
     subtitle: '456',
     accessory: {
       type: 'SETTINGS_BUTTON',
-      onClick: function(event) {
+      onClick: function (event) {
         event.dropdown.el.innerHTML = 'Hello world!';
-      }
-    }
+      },
+    },
   });
 
   grouperSub.addNavItem({
     name: 'Lion item',
     onClick: () => {
       console.log('LION ITEM WAS CLICKED');
-    }
+    },
   });
 });

@@ -4,17 +4,13 @@
   "version": "0.1",
   "content_scripts": [
     {
-      "matches": [
-        "https://mail.google.com/*"
-      ],
-      "js": ["inboxsdk.js","bacon.js", "content.js"],
+      "matches": ["https://mail.google.com/*"],
+      "js": ["inboxsdk.js", "bacon.js", "content.js"],
       "css": ["extension.css"],
       "run_at": "document_end"
     }
   ],
-  "permissions": [
-    "https://mail.google.com/"
-  ],
+  "permissions": ["https://mail.google.com/"],
   "web_accessible_resources": [
     "inboxsdk.js.map",
     "pageWorld.js",
