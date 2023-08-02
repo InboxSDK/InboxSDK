@@ -1,12 +1,14 @@
-/flow-typed
-/flow-libs
 /dist
-/examples
+examples/*/*
+!**/examples/*/manifest.json
+!**/examples/*/content.js
 /test/data/**/*.html
 /__tests__/**/*.html
 *.snap
 /packages/core/inboxsdk.js*
+/packages/core/inboxsdk.min.js
 /packages/core/pageWorld.js*
+/packages/core/platform-implementation.js*
 /packages/core/src
 .pnp.*
 .yarn/*

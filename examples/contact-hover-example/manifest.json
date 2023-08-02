@@ -4,18 +4,15 @@
   "version": "0.1",
   "content_scripts": [
     {
-      "matches": [
-        "https://mail.google.com/*"
-      ],
-      "js": ["inboxsdk.js","app.js"],
+      "matches": ["https://mail.google.com/*"],
+      "js": ["inboxsdk.js", "app.js"],
       "run_at": "document_end"
     }
   ],
-  "permissions": [
-    "https://mail.google.com/"
-  ],
+  "permissions": ["https://mail.google.com/"],
   "web_accessible_resources": [
-    "inboxsdk.js.map", "monkey-face.jpg",
+    "inboxsdk.js.map",
+    "monkey-face.jpg",
     "pageWorld.js",
     "pageWorld.js.map"
   ],

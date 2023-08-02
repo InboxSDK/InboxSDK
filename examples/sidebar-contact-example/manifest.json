@@ -4,18 +4,14 @@
   "version": "0.1",
   "content_scripts": [
     {
-      "matches": [
-        "https://mail.google.com/*"
-      ],
+      "matches": ["https://mail.google.com/*"],
       "js": ["inboxsdk.js", "content.js"],
       "run_at": "document_end"
     }
   ],
-  "permissions": [
-    "https://mail.google.com/"
-  ],
+  "permissions": ["https://mail.google.com/"],
 
-  "web_accessible_resources": [ "pageWorld.js" ],
+  "web_accessible_resources": ["pageWorld.js"],
   "background": {
     "scripts": ["background.js"],
     "persistent": false

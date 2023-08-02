@@ -5,42 +5,48 @@ function log(...args) {
 }
 
 function delay(time, value) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function (resolve, reject) {
     setTimeout(resolve.bind(null, value), time);
   });
 }
 
-InboxSDK.load(2, 'search-suggestions').then(inboxSDK => {
+InboxSDK.load(2, 'search-suggestions').then((inboxSDK) => {
   window._sdk = inboxSDK;
 
-  inboxSDK.Router.handleCustomRoute('example2/:monkeyName', function(customRouteView) {
-    customRouteView.setFullWidth(false);
+  inboxSDK.Router.handleCustomRoute(
+    'example2/:monkeyName',
+    function (customRouteView) {
+      customRouteView.setFullWidth(false);
 
-    customRouteView.getElement().textContent = 'hello world! ' + customRouteView.getParams().monkeyName;
+      customRouteView.getElement().textContent =
+        'hello world! ' + customRouteView.getParams().monkeyName;
+    }
+  );
+
+  inboxSDK.Search.registerSearchQueryRewriter({
+    term: 'has:testing',
+    termReplacer: () => '.',
   });
 
-
-  inboxSDK.Search.registerSearchQueryRewriter({term: 'has:testing', termReplacer: () => '.'});
-
-  inboxSDK.Search.registerSearchSuggestionsProvider(query => {
+  inboxSDK.Search.registerSearchSuggestionsProvider((query) => {
     log('search autocompleter', query);
     return delay(0, [
       {
         name: 'new window',
         description: 'opens in new window',
-        externalURL: 'https://www.xkcd.com'
+        externalURL: 'https://www.xkcd.com',
       },
       {
         name: 'search term',
         description: 'sets a search term',
-        searchTerm: 'foobar'
+        searchTerm: 'foobar',
       },
       {
         name: 'alert box',
         description: 'opens an alert box',
         onClick() {
           alert('foo of bar');
-        }
+        },
       },
       {
         name: 'alert box+link',
@@ -48,77 +54,90 @@ InboxSDK.load(2, 'search-suggestions').then(inboxSDK => {
         externalURL: 'https://www.xkcd.com',
         onClick() {
           alert('foo of bar');
-        }
+        },
       },
       {
-        "nameHTML": "<span class=\"streak__suggestion_box_name\">\n\t\t\t Launc<b>he</b>d Today*\n\t\t</span>\n\t\t<div class=\"streak__suggestion_box_updated\">\n\t\t\tPipeline: Eng - S29, 9/26\n\t\t</div>",
-        "iconUrl": "https://mailfoogae.appspot.com/images/extension/saved-views-icon.png",
-        "descriptionHTML": "Filter: Stage Is Any Of Launched and Date of Last Stage Change In a range , Group By: Date Last Updated",
-        "routeName": "example2/:monkeyName",
-        "routeParams": {
-          "monkeyName": "bob"
-        }
+        nameHTML:
+          '<span class="streak__suggestion_box_name">\n\t\t\t Launc<b>he</b>d Today*\n\t\t</span>\n\t\t<div class="streak__suggestion_box_updated">\n\t\t\tPipeline: Eng - S29, 9/26\n\t\t</div>',
+        iconUrl:
+          'https://mailfoogae.appspot.com/images/extension/saved-views-icon.png',
+        descriptionHTML:
+          'Filter: Stage Is Any Of Launched and Date of Last Stage Change In a range , Group By: Date Last Updated',
+        routeName: 'example2/:monkeyName',
+        routeParams: {
+          monkeyName: 'bob',
+        },
       },
       {
-        "nameHTML": "<span class=\"streak__suggestion_box_name\">\n\t\t\t Launc<b>he</b>d Today\n\t\t</span>\n\t\t<div class=\"streak__suggestion_box_updated\">\n\t\t\tPipeline: Eng - S29, 9/26\n\t\t</div>",
-        "iconUrl": "https://mailfoogae.appspot.com/images/extension/saved-views-icon.png",
-        "descriptionHTML": "Filter: Stage Is Any Of Launched and Date of Last Stage Change In a range , Group By: Date Last Updated",
-        "routeName": "pipeline/:key/:viewKey",
-        "routeParams": {
-          "key": "agxzfm1haWxmb29nYWVyMgsSDE9yZ2FuaXphdGlvbiIRb2lzbWFpbEBnbWFpbC5jb20MCxIIV29ya2Zsb3cY6TYM",
-          "viewKey": "5d47c367-860c-4af8-b8ab-77d808c18fd1"
-        }
+        nameHTML:
+          '<span class="streak__suggestion_box_name">\n\t\t\t Launc<b>he</b>d Today\n\t\t</span>\n\t\t<div class="streak__suggestion_box_updated">\n\t\t\tPipeline: Eng - S29, 9/26\n\t\t</div>',
+        iconUrl:
+          'https://mailfoogae.appspot.com/images/extension/saved-views-icon.png',
+        descriptionHTML:
+          'Filter: Stage Is Any Of Launched and Date of Last Stage Change In a range , Group By: Date Last Updated',
+        routeName: 'pipeline/:key/:viewKey',
+        routeParams: {
+          key: 'agxzfm1haWxmb29nYWVyMgsSDE9yZ2FuaXphdGlvbiIRb2lzbWFpbEBnbWFpbC5jb20MCxIIV29ya2Zsb3cY6TYM',
+          viewKey: '5d47c367-860c-4af8-b8ab-77d808c18fd1',
+        },
       },
       {
-        "nameHTML": "<span class=\"streak__suggestion_box_name\">\n\t\t\t Needs to be Pus<b>he</b>d by Me\n\t\t</span>\n\t\t<div class=\"streak__suggestion_box_updated\">\n\t\t\tPipeline: Hiring\n\t\t</div>",
-        "iconUrl": "https://mailfoogae.appspot.com/images/extension/saved-views-icon.png",
-        "descriptionHTML": "Filter: Stage Is Any Of First Interview, Simulation, Decision Making for Next Round, Second Interview, Onsite, Offer and Assigned To Is Any Of Me and Last Email From Does Not Contain streak.com or Stage Is Any Of First Interview, Simulation, Decision Making for Next Round, Second Interview, Onsite, Offer and Assigned To Is Any Of Me and Date of Last Sent Email Before , Group By: Stage",
-        "routeName": "pipeline/:key/:viewKey",
-        "routeParams": {
-          "key": "agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICgnvaXCgw",
-          "viewKey": "93e92925-e36b-4a0e-a994-222ecee8d185"
-        }
-      }
+        nameHTML:
+          '<span class="streak__suggestion_box_name">\n\t\t\t Needs to be Pus<b>he</b>d by Me\n\t\t</span>\n\t\t<div class="streak__suggestion_box_updated">\n\t\t\tPipeline: Hiring\n\t\t</div>',
+        iconUrl:
+          'https://mailfoogae.appspot.com/images/extension/saved-views-icon.png',
+        descriptionHTML:
+          'Filter: Stage Is Any Of First Interview, Simulation, Decision Making for Next Round, Second Interview, Onsite, Offer and Assigned To Is Any Of Me and Last Email From Does Not Contain streak.com or Stage Is Any Of First Interview, Simulation, Decision Making for Next Round, Second Interview, Onsite, Offer and Assigned To Is Any Of Me and Date of Last Sent Email Before , Group By: Stage',
+        routeName: 'pipeline/:key/:viewKey',
+        routeParams: {
+          key: 'agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICgnvaXCgw',
+          viewKey: '93e92925-e36b-4a0e-a994-222ecee8d185',
+        },
+      },
     ]);
   });
 
-  inboxSDK.Search.registerSearchSuggestionsProvider(query => {
+  inboxSDK.Search.registerSearchSuggestionsProvider((query) => {
     return [
       {
-        "iconUrl": "https://mailfoogae.appspot.com/images/extension/pipeline-icon.png",
-        "nameHTML": "<b>He</b>lp and Tours",
-        "descriptionHTML": "<div class=\"streak__suggestion streak__suggestion_pipeline\">Idea: 4 boxes, Planned: 2 boxes, Implemented: 0 boxes, Reviewed: 0 boxes, Launched: 6 boxes</div>",
-        "routeName": "pipeline/:key",
-        "routeParams": {
-          "key": "agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICg9NqLCgw"
-        }
+        iconUrl:
+          'https://mailfoogae.appspot.com/images/extension/pipeline-icon.png',
+        nameHTML: '<b>He</b>lp and Tours',
+        descriptionHTML:
+          '<div class="streak__suggestion streak__suggestion_pipeline">Idea: 4 boxes, Planned: 2 boxes, Implemented: 0 boxes, Reviewed: 0 boxes, Launched: 6 boxes</div>',
+        routeName: 'pipeline/:key',
+        routeParams: {
+          key: 'agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICg9NqLCgw',
+        },
       },
       {
-        "iconHTML": "<div>x</div>",
-        "nameHTML": "<b>He</b>lp and test icon html",
-        "descriptionHTML": "<div class=\"streak__suggestion streak__suggestion_pipeline\">Idea: 4 boxes, Planned: 2 boxes, Implemented: 0 boxes, Reviewed: 0 boxes, Launched: 6 boxes</div>",
-        "routeName": "pipeline/:key",
-        "routeParams": {
-          "key": "agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICg9NqLCgw"
-        }
+        iconHTML: '<div>x</div>',
+        nameHTML: '<b>He</b>lp and test icon html',
+        descriptionHTML:
+          '<div class="streak__suggestion streak__suggestion_pipeline">Idea: 4 boxes, Planned: 2 boxes, Implemented: 0 boxes, Reviewed: 0 boxes, Launched: 6 boxes</div>',
+        routeName: 'pipeline/:key',
+        routeParams: {
+          key: 'agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICg9NqLCgw',
+        },
       },
       {
-        "iconHTML": "<div>x</div>",
-        "nameHTML": "<b>He</b>lp and no description html",
-        "routeName": "pipeline/:key",
-        "routeParams": {
-          "key": "agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICg9NqLCgw"
-        }
+        iconHTML: '<div>x</div>',
+        nameHTML: '<b>He</b>lp and no description html',
+        routeName: 'pipeline/:key',
+        routeParams: {
+          key: 'agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICg9NqLCgw',
+        },
       },
       {
-        "iconHTML": "<div>x</div>",
-        "nameHTML": "<b>He</b>lp and dfsdf",
-        "descriptionHTML": "<div class=\"streak__suggestion streak__suggestion_pipeline\">Idea: 4 boxes, Planned: 2 boxes, Implemented: 0 boxes, Reviewed: 0 boxes, Launched: 6 boxes</div>",
-        "routeName": "pipeline/:key",
-        "routeParams": {
-          "key": "agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICg9NqLCgw"
-        }
-      }
+        iconHTML: '<div>x</div>',
+        nameHTML: '<b>He</b>lp and dfsdf',
+        descriptionHTML:
+          '<div class="streak__suggestion streak__suggestion_pipeline">Idea: 4 boxes, Planned: 2 boxes, Implemented: 0 boxes, Reviewed: 0 boxes, Launched: 6 boxes</div>',
+        routeName: 'pipeline/:key',
+        routeParams: {
+          key: 'agxzfm1haWxmb29nYWVyMQsSDE9yZ2FuaXphdGlvbiIKc3RyZWFrLmNvbQwLEghXb3JrZmxvdxiAgICg9NqLCgw',
+        },
+      },
     ];
   });
 
