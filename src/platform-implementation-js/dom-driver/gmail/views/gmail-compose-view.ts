@@ -1185,31 +1185,28 @@ class GmailComposeView implements ComposeViewDriver {
     const dropzoneSelector = inline
       ? 'body > .aC7:not(.aWP)'
       : 'body > .aC7.aWP';
-    const el: HTMLElement | null | undefined = t.toArray<
-      any,
-      HTMLElement | null | undefined
-    >(
-      Array.prototype.slice.call(
-        document.querySelectorAll<HTMLElement>(dropzoneSelector)
-      ),
-      t.compose(
-        t.filter(isElementVisible),
-        t.filter((dropzone: HTMLElement) => {
-          const top = parseInt(dropzone.style.top, 10);
-          const bottom = top + parseInt(dropzone.style.height, 10);
-          const left = parseInt(dropzone.style.left, 10);
-          const right = left + parseInt(dropzone.style.width, 10);
-          return (
-            top >= rect.top &&
-            left >= rect.left &&
-            right <= rect.right &&
-            bottom <= rect.bottom
-          );
-        }),
-        t.take(1)
-      )
-    )[0];
+    const el = [
+      ...document.querySelectorAll<HTMLElement>(dropzoneSelector),
+    ].find((dropzone) => {
+      if (!isElementVisible(dropzone)) {
+        return false;
+      }
 
+      const top = parseInt(dropzone.style.top, 10);
+      /**
+       * Fullscreen compose dropzones have no inline height style. `bottom` is NaN because of this.
+       */
+      const bottom = top + parseInt(dropzone.style.height, 10);
+      const left = parseInt(dropzone.style.left, 10);
+      const right = left + parseInt(dropzone.style.width, 10);
+
+      return (
+        top >= rect.top &&
+        left >= rect.left &&
+        right <= rect.right &&
+        (this.isFullscreen() || bottom <= rect.bottom)
+      );
+    });
     if (!el) {
       throw new Error('Failed to find dropzone');
     }
