@@ -12,7 +12,6 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import kefirCast from 'kefir-cast';
-import type { ThreadRowViewDriver } from '../../../driver-interfaces/thread-row-view-driver';
 import delayAsap from '../../../lib/delay-asap';
 import kefirStopper from 'kefir-stopper';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
@@ -124,7 +123,7 @@ type Counts = {
   draftCount: number;
 };
 
-class GmailThreadRowView implements ThreadRowViewDriver {
+class GmailThreadRowView {
   _elements: HTMLElement[];
   _modifications: Mods;
   _alreadyHadModifications: boolean;
