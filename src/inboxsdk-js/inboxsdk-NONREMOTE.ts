@@ -1,7 +1,7 @@
-import shimLoadScript from './loading/load-platform-implementation-NONREMOTE';
+import shimLoaderLoadScript from './loading/load-platform-implementation-NONREMOTE';
 import loader from './loading/platform-implementation-loader';
 
-loader._loadScript = shimLoadScript(500);
+loader._loadScript = shimLoaderLoadScript(500);
 
 import * as SDK from './inboxsdk';
 

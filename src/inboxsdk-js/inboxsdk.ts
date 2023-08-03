@@ -1,13 +1,20 @@
 import PlatformImplementationLoader from './loading/platform-implementation-loader';
 import { BUILD_VERSION } from '../common/version';
-import _loadScript from '../common/load-script';
 
 declare global {
   var __test_origin: string | undefined;
 }
 
 export const LOADER_VERSION = BUILD_VERSION;
-export const loadScript = _loadScript;
+export let loadScript: Function = () => {
+  throw new Error(
+    "loadScript is not available in the NPM version of the InboxSDK. This function is not usable in Chrome MV3 extensions. If you need this and you're not using an MV3 extension, use the NPM module <TODO> instead."
+  );
+};
+// TODO make this not be publicly exposed and callable
+export function _setLoadScript(fn: Function) {
+  loadScript = fn;
+}
 export function load(version: any, appId: string, opts: any) {
   opts = Object.assign(
     {

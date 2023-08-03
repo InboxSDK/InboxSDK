@@ -15,18 +15,7 @@ import type { AppLogger } from './platform-implementation-js/lib/logger';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 
 export const LOADER_VERSION: string;
-export interface LoadScriptOptions {
-  // By default, the script is executed within a function, so that top-level
-  // variables defined in it don't become global variables. Setting nowrap to
-  // true disables this behavior.
-  nowrap?: boolean;
-  disableSourceMappingURL?: boolean;
-  XMLHttpRequest?: typeof XMLHttpRequest;
-}
-export function loadScript(
-  url: string,
-  opts?: LoadScriptOptions
-): Promise<void>;
+
 export function load(
   version: number,
   appId: string,
