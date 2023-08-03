@@ -278,15 +278,18 @@ class GmailThreadRowView {
     return this._alreadyHadModifications;
   }
 
-  // Returns a Kefir stream that emits this object once this object is ready for the
-  // user. It should almost always synchronously ready immediately, but there's
-  // a few cases such as with multiple inbox or the drafts page that it needs a moment.
-  // make sure you take until by on the gmailThreadRowView.getStopper() because waitForReady
-  // must not be called after the gmailThreadRowView is destroyed
+  /**
+   * @returns a Kefir stream that emits this object once this object is ready for the user.
+   *
+   * It should almost always synchronously ready immediately, but there's
+   * a few cases such as with multiple inbox or the drafts page that it needs a moment.
+   * make sure you take until by on the @see GmailThreadRowView#getStopper because waitForReady
+   * must not be called after the GmailThreadRowView is destroyed
+   */
   waitForReady(): Kefir.Observable<GmailThreadRowView, unknown> {
     const time = [0, 10, 100, 1000, 15000];
 
-    const step: any = () => {
+    const step = (): Kefir.Observable<GmailThreadRowView | never, unknown> => {
       if (this._threadIdReady()) {
         asap(() => {
           if (this._elements.length) this._removeUnclaimedModifications();
