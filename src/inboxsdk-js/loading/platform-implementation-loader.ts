@@ -1,6 +1,3 @@
-import once from 'lodash/once';
-import loadScript from '../../common/load-script';
-
 import { PlatformImplementation } from '../../platform-implementation-js/platform-implementation';
 
 const PlatformImplementationLoader = {
@@ -18,15 +15,9 @@ const PlatformImplementationLoader = {
       .then(() => (global as any).__InboxSDKImpLoader.load('0.1', appId, opts));
   },
 
-  _loadScript: once(function () {
-    return loadScript(process.env.IMPLEMENTATION_URL!, {
-      // platform-implementation has no top-level vars so no need for function wrapping
-      nowrap: true,
-      // webpack adds a sourceURL comment.
-      // This sourceURL includes cache breaking for error reporting in remote builds.
-      disableSourceURL: true,
-    });
-  }),
+  _loadScript: function (): Promise<void> {
+    throw new Error('Unexpected error: This function must be overridden');
+  },
 
   preload() {
     // Prime the load by calling it and letting the promise be memoized.

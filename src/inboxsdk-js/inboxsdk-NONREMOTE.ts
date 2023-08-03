@@ -1,6 +1,8 @@
-import shimLoadScript from './loading/load-platform-implementation-DEV';
+import shimLoadScript from './loading/load-platform-implementation-NONREMOTE';
 import loader from './loading/platform-implementation-loader';
 
 loader._loadScript = shimLoadScript(500);
 
-export default require('./inboxsdk');
+import * as SDK from './inboxsdk';
+
+export default SDK;
