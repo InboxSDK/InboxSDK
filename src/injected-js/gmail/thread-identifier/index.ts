@@ -140,6 +140,12 @@ function getGmailThreadIdForThreadRowByDatabase(
 ): string | null | undefined {
   const domRowMetadata =
     threadRowParser.extractMetadataFromThreadRow(threadRow);
+
+  if (domRowMetadata === threadRowParser.ThreadRowAd) {
+    // TODO do we want to do anything here?
+    return;
+  }
+
   const key = threadMetadataKey(domRowMetadata);
   const value = threadIdsByKey.get(key);
 
