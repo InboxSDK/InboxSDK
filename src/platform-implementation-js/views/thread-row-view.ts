@@ -90,8 +90,8 @@ export default class ThreadRowView
     const members = {
       threadRowViewDriver,
     };
-    this.destroyed = false;
     membersMap.set(this, members);
+    this.destroyed = false;
     threadRowViewDriver.getEventStream().onEnd(() => {
       this.destroyed = true;
       this.emit('destroy');
