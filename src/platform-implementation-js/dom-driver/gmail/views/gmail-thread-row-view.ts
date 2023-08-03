@@ -22,7 +22,8 @@ import GmailActionButtonView from '../widgets/gmail-action-button-view';
 import type GmailDriver from '../gmail-driver';
 import type GmailRowListView from './gmail-row-list-view';
 import updateIcon from '../../../driver-common/update-icon';
-import { Contact } from '../../../../inboxsdk';
+import type { Contact, ThreadDateDescriptor } from '../../../../inboxsdk';
+
 type LabelMod = {
   gmailLabelView: Record<string, any>;
   remove(): void;
@@ -118,7 +119,7 @@ type Counts = {
   draftCount: number;
 };
 
-class GmailThreadRowView {
+class GmailThreadRowView implements ThreadRowViewDriver {
   _elements: HTMLElement[];
   _modifications: Mods;
   _alreadyHadModifications: boolean;
@@ -144,7 +145,6 @@ class GmailThreadRowView {
     rowListViewDriver: GmailRowListView,
     gmailDriver: GmailDriver
   ) {
-    this as ThreadRowViewDriver;
     assert(element.hasAttribute('id'), 'check element is main thread row');
     this._isVertical =
       intersection(Array.from(element.classList), ['zA', 'apv']).length === 2;
@@ -894,7 +894,12 @@ class GmailThreadRowView {
     });
   }
 
-  replaceDraftLabel(opts: Record<string, any>) {
+  replaceDraftLabel(
+    opts:
+      | ThreadDateDescriptor
+      | null
+      | Kefir.Observable<ThreadDateDescriptor | null, any>
+  ) {
     if (!this._elements.length) {
       console.warn('replaceDraftLabel called on destroyed thread row');
       return;
@@ -1001,7 +1006,12 @@ class GmailThreadRowView {
       });
   }
 
-  replaceDate(opts: Record<string, any>) {
+  replaceDate(
+    opts:
+      | ThreadDateDescriptor
+      | null
+      | Kefir.Observable<ThreadDateDescriptor | null, any>
+  ) {
     if (!this._elements.length) {
       console.warn('replaceDate called on destroyed thread row');
       return;
@@ -1176,6 +1186,10 @@ class GmailThreadRowView {
     return threadID;
   }
 
+  /**
+   * This method is never called in the view proper.
+   * GmailThreadRowView#getThreadIDAsync is called though.
+   */
   getSyncThreadID(): Promise<string | null | undefined> {
     return Promise.resolve(this._cachedSyncThreadID);
   }

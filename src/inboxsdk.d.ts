@@ -12,6 +12,7 @@ import GmailRouteProcessor from './platform-implementation-js/dom-driver/gmail/v
 import GmailDriver from './platform-implementation-js/dom-driver/gmail/gmail-driver';
 import GmailRowListView from './platform-implementation-js/dom-driver/gmail/views/gmail-row-list-view';
 import type { AppLogger } from './platform-implementation-js/lib/logger';
+import type { IThreadRowView as ThreadRowView } from './platform-implementation-js/views/thread-row-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 
 export const LOADER_VERSION: string;
@@ -263,59 +264,10 @@ export interface User {
   isConversationViewDisabled(): Promise<boolean>;
 }
 
-interface Destroyable extends EventEmitter {
-  readonly destroyed: boolean;
-  addListener(event: 'destroy', listener: () => void): this;
-  // emit(event: "destroy"): boolean;
-  on(event: 'destroy', listener: () => void): this;
-  off(event: 'destroy', listener: () => void): this;
-  once(event: 'destroy', listener: () => void): this;
-  prependListener(event: 'destroy', listener: () => void): this;
-  prependOnceListener(event: 'destroy', listener: () => void): this;
-  removeListener(event: 'destroy', listener: () => void): this;
-}
-
-export interface ImageDescriptor {
-  imageUrl?: string;
-  imageClass?: string;
-  tooltip?: string;
-  orderHint?: number;
-}
-
-export interface ThreadRowView extends Destroyable {
-  addLabel(labelDescriptor: LabelDescriptor | any): void;
-  addAttachmentIcon(threadRowAttachmentIconDescriptor: any): void;
-  addImage(
-    imageDescriptor:
-      | ImageDescriptor
-      | Kefir.Observable<ImageDescriptor | null, any>
-  ): void;
-  getElement(): HTMLElement;
-  getVisibleDraftCount(): number;
-  getThreadIDIfStable(): string | null;
-  getThreadIDIfStableAsync(): Promise<string | null>;
-  addButton(threadRowButtonDescriptor: any): void;
-  getThreadID(): string;
-  getThreadIDAsync(): Promise<string>;
-  getDraftID(): Promise<string>;
-  isSelected(): boolean;
-  replaceDate(
-    threadDateDescriptor:
-      | ThreadDateDescriptor
-      | null
-      | Kefir.Observable<ThreadDateDescriptor | null, any>
-  ): void;
-  getVisibleMessageCount(): number;
-  getSubject(): string;
-  replaceSubject(newSubjectStr: string): void;
-  getContacts(): Array<{ name: string | null; emailAddress: string }>;
-  replaceDraftLabel(
-    descriptor:
-      | DraftLabelDescriptor
-      | null
-      | Kefir.Observable<DraftLabelDescriptor | null, any>
-  ): void;
-}
+export {
+  IThreadRowView as ThreadRowView,
+  ImageDescriptor,
+} from './platform-implementation-js/views/thread-row-view';
 
 export interface ThreadDateDescriptor {
   text: string;
