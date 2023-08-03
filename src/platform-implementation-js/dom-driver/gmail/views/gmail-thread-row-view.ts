@@ -22,7 +22,12 @@ import GmailActionButtonView from '../widgets/gmail-action-button-view';
 import type GmailDriver from '../gmail-driver';
 import type GmailRowListView from './gmail-row-list-view';
 import updateIcon from '../../../driver-common/update-icon';
-import type { Contact, ThreadDateDescriptor } from '../../../../inboxsdk';
+import type {
+  Contact,
+  ImageDescriptor,
+  LabelDescriptor,
+  ThreadDateDescriptor,
+} from '../../../../inboxsdk';
 
 type LabelMod = {
   gmailLabelView: Record<string, any>;
@@ -363,7 +368,12 @@ class GmailThreadRowView implements ThreadRowViewDriver {
     this._rowListViewDriver.expandColumn(colSelector, width);
   }
 
-  addLabel(label: Record<string, any>) {
+  addLabel(
+    label:
+      | LabelDescriptor
+      | null
+      | Kefir.Observable<LabelDescriptor | null, unknown>
+  ) {
     if (!this._elements.length) {
       console.warn('addLabel called on destroyed thread row');
       return;
@@ -424,7 +434,11 @@ class GmailThreadRowView implements ThreadRowViewDriver {
       });
   }
 
-  addImage(inIconDescriptor: Record<string, any>) {
+  addImage(
+    inIconDescriptor:
+      | ImageDescriptor
+      | Kefir.Observable<ImageDescriptor | null, any>
+  ) {
     if (!this._elements.length) {
       console.warn('addImage called on destroyed thread row');
       return;

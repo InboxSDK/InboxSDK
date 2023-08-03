@@ -24,7 +24,12 @@ export type IThreadRowView = EmitterType & {
    * This property is set to true once the view is destroyed
    */
   readonly destroyed: boolean;
-  addLabel(labelDescriptor: LabelDescriptor): void;
+  addLabel(
+    labelDescriptor:
+      | LabelDescriptor
+      | Observable<LabelDescriptor | null, unknown>
+      | null
+  ): void;
   addAttachmentIcon(threadRowAttachmentIconDescriptor: any): void;
   addImage(
     imageDescriptor: ImageDescriptor | Observable<ImageDescriptor | null, any>
@@ -94,7 +99,12 @@ export default class ThreadRowView
     threadRowViewDriver.setUserView(this);
   }
 
-  addLabel(labelDescriptor: LabelDescriptor) {
+  addLabel(
+    labelDescriptor:
+      | LabelDescriptor
+      | null
+      | Observable<LabelDescriptor | null, unknown>
+  ) {
     get(membersMap, this).threadRowViewDriver.addLabel(labelDescriptor);
   }
 

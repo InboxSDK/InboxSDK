@@ -1,8 +1,8 @@
 import type { Observable } from 'kefir';
-import type { ThreadDateDescriptor } from '../../inboxsdk';
+import type { LabelDescriptor, ThreadDateDescriptor } from '../../inboxsdk';
 
 export type ThreadRowViewDriver = {
-  addLabel(label: Record<string, any>): void;
+  addLabel(label: LabelDescriptor | null): void;
   addButton(buttonDescriptor: Record<string, any>): void;
   addAttachmentIcon(opts: Record<string, any>): void;
   replaceDate(
