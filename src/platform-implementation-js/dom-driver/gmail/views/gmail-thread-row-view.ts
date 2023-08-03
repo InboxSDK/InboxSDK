@@ -12,7 +12,6 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import kefirCast from 'kefir-cast';
-import type { ThreadRowViewDriver } from '../../../driver-interfaces/thread-row-view-driver';
 import delayAsap from '../../../lib/delay-asap';
 import kefirStopper from 'kefir-stopper';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
@@ -22,7 +21,13 @@ import GmailActionButtonView from '../widgets/gmail-action-button-view';
 import type GmailDriver from '../gmail-driver';
 import type GmailRowListView from './gmail-row-list-view';
 import updateIcon from '../../../driver-common/update-icon';
-import { Contact } from '../../../../inboxsdk';
+import type {
+  Contact,
+  ImageDescriptor,
+  LabelDescriptor,
+  ThreadDateDescriptor,
+} from '../../../../inboxsdk';
+
 type LabelMod = {
   gmailLabelView: Record<string, any>;
   remove(): void;
@@ -144,7 +149,6 @@ class GmailThreadRowView {
     rowListViewDriver: GmailRowListView,
     gmailDriver: GmailDriver
   ) {
-    this as ThreadRowViewDriver;
     assert(element.hasAttribute('id'), 'check element is main thread row');
     this._isVertical =
       intersection(Array.from(element.classList), ['zA', 'apv']).length === 2;
@@ -363,7 +367,12 @@ class GmailThreadRowView {
     this._rowListViewDriver.expandColumn(colSelector, width);
   }
 
-  addLabel(label: Record<string, any>) {
+  addLabel(
+    label:
+      | LabelDescriptor
+      | null
+      | Kefir.Observable<LabelDescriptor | null, unknown>
+  ) {
     if (!this._elements.length) {
       console.warn('addLabel called on destroyed thread row');
       return;
@@ -424,7 +433,11 @@ class GmailThreadRowView {
       });
   }
 
-  addImage(inIconDescriptor: Record<string, any>) {
+  addImage(
+    inIconDescriptor:
+      | ImageDescriptor
+      | Kefir.Observable<ImageDescriptor | null, any>
+  ) {
     if (!this._elements.length) {
       console.warn('addImage called on destroyed thread row');
       return;
@@ -894,7 +907,12 @@ class GmailThreadRowView {
     });
   }
 
-  replaceDraftLabel(opts: Record<string, any>) {
+  replaceDraftLabel(
+    opts:
+      | ThreadDateDescriptor
+      | null
+      | Kefir.Observable<ThreadDateDescriptor | null, any>
+  ) {
     if (!this._elements.length) {
       console.warn('replaceDraftLabel called on destroyed thread row');
       return;
@@ -1001,7 +1019,12 @@ class GmailThreadRowView {
       });
   }
 
-  replaceDate(opts: Record<string, any>) {
+  replaceDate(
+    opts:
+      | ThreadDateDescriptor
+      | null
+      | Kefir.Observable<ThreadDateDescriptor | null, any>
+  ) {
     if (!this._elements.length) {
       console.warn('replaceDate called on destroyed thread row');
       return;
@@ -1176,6 +1199,10 @@ class GmailThreadRowView {
     return threadID;
   }
 
+  /**
+   * This method is never called in the view proper.
+   * GmailThreadRowView#getThreadIDAsync is called though.
+   */
   getSyncThreadID(): Promise<string | null | undefined> {
     return Promise.resolve(this._cachedSyncThreadID);
   }

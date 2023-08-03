@@ -1,10 +1,88 @@
 import EventEmitter from '../lib/safe-event-emitter';
 import type GmailThreadRowView from '../dom-driver/gmail/views/gmail-thread-row-view';
 import get from '../../common/get-or-fail';
-import { Contact } from '../../inboxsdk';
-const membersMap = new WeakMap(); // documented in src/docs/
+import type {
+  Contact,
+  LabelDescriptor,
+  ThreadDateDescriptor,
+  DraftLabelDescriptor,
+} from '../../inboxsdk';
+import { Observable } from 'kefir';
+import type TypedEventEmitter from 'typed-emitter';
 
-export default class ThreadRowView extends EventEmitter {
+export interface ImageDescriptor {
+  imageUrl?: string;
+  imageClass?: string;
+  tooltip?: string;
+  orderHint?: number;
+}
+
+type EmitterType = TypedEventEmitter<{ destroy: () => void }>;
+
+export type IThreadRowView = EmitterType & {
+  /**
+   * This property is set to true once the view is destroyed
+   */
+  readonly destroyed: boolean;
+  addLabel(
+    labelDescriptor:
+      | LabelDescriptor
+      | Observable<LabelDescriptor | null, unknown>
+      | null
+  ): void;
+  addAttachmentIcon(threadRowAttachmentIconDescriptor: any): void;
+  addImage(
+    imageDescriptor: ImageDescriptor | Observable<ImageDescriptor | null, any>
+  ): void;
+  getElement(): HTMLElement;
+  getVisibleDraftCount(): number;
+  /** @deprecated */
+  getThreadIDIfStable(): string | null | undefined;
+  /**
+   * Gets the Gmail Thread ID of the thread only if the thread ID is stable. Some threads such as those with only a single Draft message in them will occasionally change their thread ID. If you're using the thread ID as a key, you may experience unexpected behavior if you're not careful about this fact. This method provides you with an easy way to tell if the thread has a stable ID.
+   *
+   * @return a Promise<String> for the thread ID if it is expected to stay the same, otherwise it will return a Promise<null>
+   */
+  getThreadIDIfStableAsync(): Promise<string | null>;
+  addButton(threadRowButtonDescriptor: any): void;
+  /** @deprecated */
+  getThreadID(): string;
+  /**
+   * @returns a Promise<String> of the Gmail Thread ID of the thread
+   */
+  getThreadIDAsync(): Promise<string>;
+
+  /**
+   * Returns a Promise<String> for the thread row's draft ID, if the thread row represents a single draft. Otherwise the promise may resolve to null.
+   */
+  getDraftID(): Promise<string | null | undefined>;
+  replaceDate(
+    threadDateDescriptor:
+      | ThreadDateDescriptor
+      | null
+      | Observable<ThreadDateDescriptor | null, any>
+  ): void;
+  getVisibleMessageCount(): number;
+  getSubject(): string;
+  replaceSubject(newSubjectStr: string): void;
+  getContacts(): Array<{ name: string | null; emailAddress: string }>;
+  replaceDraftLabel(
+    descriptor:
+      | DraftLabelDescriptor
+      | null
+      | Observable<DraftLabelDescriptor | null, any>
+  ): void;
+};
+
+const membersMap = new WeakMap<
+  ThreadRowView,
+  { threadRowViewDriver: GmailThreadRowView }
+>();
+
+export default class ThreadRowView
+  extends (EventEmitter as new () => EmitterType)
+  implements IThreadRowView
+{
   destroyed: boolean;
 
   constructor(threadRowViewDriver: GmailThreadRowView) {
@@ -21,15 +99,22 @@ export default class ThreadRowView extends EventEmitter {
     threadRowViewDriver.setUserView(this);
   }
 
-  addLabel(labelDescriptor: Record<string, any>) {
+  addLabel(
+    labelDescriptor:
+      | LabelDescriptor
+      | null
+      | Observable<LabelDescriptor | null, unknown>
+  ) {
     get(membersMap, this).threadRowViewDriver.addLabel(labelDescriptor);
   }
 
-  addImage(imageDescriptor: Record<string, any>) {
+  addImage(
+    imageDescriptor: ImageDescriptor | Observable<ImageDescriptor | null, any>
+  ) {
     get(membersMap, this).threadRowViewDriver.addImage(imageDescriptor);
   }
 
-  addButton(buttonDescriptor: Record<string, any>) {
+  addButton(buttonDescriptor: any) {
     get(membersMap, this).threadRowViewDriver.addButton(buttonDescriptor);
   }
 
@@ -45,13 +130,23 @@ export default class ThreadRowView extends EventEmitter {
     );
   }
 
-  replaceDate(threadRowDateDescriptor: Record<string, any>) {
+  replaceDate(
+    threadRowDateDescriptor:
+      | ThreadDateDescriptor
+      | null
+      | Observable<ThreadDateDescriptor | null, any>
+  ) {
     get(membersMap, this).threadRowViewDriver.replaceDate(
       threadRowDateDescriptor
     );
   }
 
-  replaceDraftLabel(draftLabelDescriptor: Record<string, any>) {
+  replaceDraftLabel(
+    draftLabelDescriptor:
+      | DraftLabelDescriptor
+      | null
+      | Observable<DraftLabelDescriptor | null, any>
+  ) {
     get(membersMap, this).threadRowViewDriver.replaceDraftLabel(
       draftLabelDescriptor
     );
@@ -73,6 +168,7 @@ export default class ThreadRowView extends EventEmitter {
     return get(membersMap, this).threadRowViewDriver.getDateString();
   }
 
+  /** @deprecated */
   getThreadID(): string {
     // TODO mark deprecated
     return get(membersMap, this).threadRowViewDriver.getThreadID();
@@ -82,6 +178,7 @@ export default class ThreadRowView extends EventEmitter {
     return get(membersMap, this).threadRowViewDriver.getThreadIDAsync();
   }
 
+  /** @deprecated */
   getThreadIDIfStable(): string | null | undefined {
     // TODO mark deprecated
     if (this.getVisibleMessageCount() > 0) {
