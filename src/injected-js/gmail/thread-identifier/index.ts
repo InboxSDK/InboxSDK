@@ -5,6 +5,8 @@ import * as logger from '../../injected-logger';
 import * as threadRowParser from './thread-row-parser';
 import clickAndGetPopupUrl from './click-and-get-popup-url';
 import findParent from '../../../common/find-parent';
+import { CustomDomEvent } from '../../../platform-implementation-js/lib/dom/custom-events';
+
 export function setup() {
   try {
     processPreloadedThreads();
@@ -13,9 +15,12 @@ export function setup() {
   }
 
   document.addEventListener(
-    'inboxSDKtellMeThisThreadIdByDatabase',
-    function (event: any) {
+    CustomDomEvent.tellMeThisThreadIdByDatabase,
+    function (event) {
       try {
+        if (!(event.target instanceof HTMLElement)) {
+          throw new Error('event.target is not an HTMLElement');
+        }
         const threadId = getGmailThreadIdForThreadRowByDatabase(event.target);
 
         if (threadId) {
@@ -27,9 +32,13 @@ export function setup() {
     }
   );
   document.addEventListener(
-    'inboxSDKtellMeThisThreadIdByClick',
-    function (event: any) {
+    CustomDomEvent.tellMeThisThreadIdByClick,
+    function (event) {
       try {
+        if (!(event.target instanceof HTMLElement)) {
+          throw new Error('event.target is not an HTMLElement');
+        }
+
         const threadId = getGmailThreadIdForThreadRowByClick(event.target);
 
         if (threadId) {
