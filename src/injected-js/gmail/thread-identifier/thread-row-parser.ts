@@ -20,9 +20,8 @@ export function extractMetadataFromThreadRow(
   var timeSpan, subjectSpan, peopleDiv;
   assert(threadRow.hasAttribute('id'), 'check element is main thread row');
   var errors = [];
-  const threadRowClasses = Array.from(threadRow.classList);
   var threadRowIsVertical =
-    intersection(threadRowClasses, ['zA', 'apv']).length === 2;
+    intersection(Array.from(threadRow.classList), ['zA', 'apv']).length === 2;
   const isThreadRowAd = threadRow.querySelector('.am0');
 
   if (isThreadRowAd) {
