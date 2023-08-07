@@ -1,5 +1,3 @@
-/* @flow */
-
 import fs from 'fs';
 
 it('has a yarn lockfile', () => {

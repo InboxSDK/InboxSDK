@@ -1,5 +1,4 @@
 #!/usr/bin/env babel-node
-/* @flow */
 
 import concatStream from 'concat-stream';
 import { serialize } from '../src/platform-implementation-js/dom-driver/gmail/gmail-response-processor';

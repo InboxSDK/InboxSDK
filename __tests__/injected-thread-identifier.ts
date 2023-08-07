@@ -1,5 +1,3 @@
-/* @flow */
-
 import fs from 'fs';
 
 import PageCommunicator from '../src/platform-implementation-js/dom-driver/gmail/gmail-page-communicator';
