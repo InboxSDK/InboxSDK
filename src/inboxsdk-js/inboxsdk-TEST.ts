@@ -1,7 +1,10 @@
-import LOADER from './loading/platform-implementation-loader';
+import { PlatformImplementationLoader as LOADER } from './loading/platform-implementation-loader';
 
-LOADER._loadScript =
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  require('./loading/load-platform-implementation-DEV').default(0);
+LOADER.loadScript = async () =>
+  await (
+    await import(
+      /* webpackMode: 'eager' */ './loading/load-platform-implementation-NONREMOTE'
+    )
+  ).loadPi(0)();
 
 export default require('./inboxsdk');

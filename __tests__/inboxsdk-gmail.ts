@@ -21,7 +21,7 @@ document.head.setAttribute(
 );
 document.head.setAttribute('data-inboxsdk-using-sync-api', 'false');
 
-const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST').default;
+import InboxSDK from '../src/inboxsdk-js/inboxsdk-TEST';
 //preload implementation
 require('../src/platform-implementation-js/platform-implementation');
 

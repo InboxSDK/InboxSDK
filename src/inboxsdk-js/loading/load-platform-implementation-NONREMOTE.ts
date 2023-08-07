@@ -1,17 +1,9 @@
 import once from 'lodash/once';
 
-export default function (delay: number): () => Promise<void> {
-  return once(
-    () =>
-      new Promise((resolve, reject) => {
-        setTimeout(() => {
-          try {
-            require('../../platform-implementation-js/main');
-            resolve();
-          } catch (e) {
-            reject(e);
-          }
-        }, delay);
-      })
-  );
+export function loadPi(_delay: number): () => Promise<void> {
+  return once(async () => {
+    await import(
+      /* webpackMode: 'eager' */ '../../platform-implementation-js/main'
+    );
+  });
 }

@@ -1,28 +1,38 @@
-import { PlatformImplementation } from '../../platform-implementation-js/platform-implementation';
+import defer from '../../common/defer';
+import type {
+  PiOpts,
+  PlatformImplementation,
+} from '../../platform-implementation-js/platform-implementation';
 
-const PlatformImplementationLoader = {
-  load(appId: string, opts: any): Promise<PlatformImplementation> {
-    return Promise.resolve()
-      .then(() => {
-        if (!(global as any).__InboxSDKImpLoader) {
-          return PlatformImplementationLoader._loadScript().then(() => {
-            if (!(global as any).__InboxSDKImpLoader) {
-              throw new Error('Implementation file did not load correctly');
-            }
-          });
-        }
-      })
-      .then(() => (global as any).__InboxSDKImpLoader.load('0.1', appId, opts));
-  },
+export class PlatformImplementationLoader {
+  static #loadScriptSet = defer<void>();
 
-  _loadScript: function (): Promise<void> {
+  static async load(
+    appId: string,
+    opts: PiOpts
+  ): Promise<PlatformImplementation> {
+    if (!global.__InboxSDKImpLoader) {
+      await PlatformImplementationLoader.#loadScriptSet.promise;
+      await PlatformImplementationLoader.#loadScript();
+      if (!global.__InboxSDKImpLoader) {
+        throw new Error('Implementation file did not load correctly');
+      }
+    }
+    return global.__InboxSDKImpLoader.load('0.1', appId, opts);
+  }
+
+  static set loadScript(fn: () => Promise<void>) {
+    PlatformImplementationLoader.#loadScript = fn;
+    PlatformImplementationLoader.#loadScriptSet.resolve();
+  }
+
+  static #loadScript: () => Promise<void> = () => {
     throw new Error('Unexpected error: This function must be overridden');
-  },
+  };
 
-  preload() {
+  static async preload() {
+    await PlatformImplementationLoader.#loadScriptSet.promise;
     // Prime the load by calling it and letting the promise be memoized.
-    PlatformImplementationLoader._loadScript();
-  },
-};
-
-export default PlatformImplementationLoader;
+    await PlatformImplementationLoader.#loadScript();
+  }
+}
