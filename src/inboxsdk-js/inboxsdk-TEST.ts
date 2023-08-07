@@ -1,4 +1,5 @@
 import { PlatformImplementationLoader as LOADER } from './loading/platform-implementation-loader';
+import * as SDK from './inboxsdk';
 
 LOADER.loadScript = async () =>
   await (
@@ -7,4 +8,4 @@ LOADER.loadScript = async () =>
     )
   ).loadPi(0)();
 
-export default require('./inboxsdk');
+export default SDK;
