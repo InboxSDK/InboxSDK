@@ -20,17 +20,57 @@ import findParent from '../../../../common/find-parent';
 import reemitClickEvent from '../../../lib/dom/reemitClickEventForReact';
 import type GmailDriver from '../gmail-driver';
 import type GmailThreadView from './gmail-thread-view';
-import type { VIEW_STATE } from '../../../driver-interfaces/message-view-driver';
+import type {
+  MessageViewDriver,
+  VIEW_STATE,
+} from '../../../driver-interfaces/message-view-driver';
 import type {
   Contact,
   MessageAttachmentIconDescriptor,
+  MessageView,
+  ThreadView,
 } from '../../../../inboxsdk';
 let hasSeenOldElement = false;
 
-class GmailMessageView {
+export type MessageViewDriverEventByName = {
+  viewStateChange: {
+    eventName: 'viewStateChange';
+    newValue?: VIEW_STATE;
+    oldValue?: VIEW_STATE;
+  };
+  contactHover: {
+    eventName: 'contactHover';
+    contact: Contact;
+    contactType: string;
+    messageView: MessageView;
+    threadView: ThreadView;
+    internal?: undefined;
+  };
+  replyElement: {
+    change: ElementWithLifetime;
+    eventName: 'replyElement';
+    type: 'internal';
+  };
+};
+
+export type MessageViewDriverEvents = (
+  | MessageViewDriverEventByName['viewStateChange']
+  | MessageViewDriverEventByName['contactHover']
+  | MessageViewDriverEventByName['replyElement']
+  | {
+      eventName: 'load' | 'destroy';
+    }
+  | {
+      eventName: 'messageLoad';
+    }
+) & {
+  type?: 'internal';
+};
+
+class GmailMessageView implements MessageViewDriver {
   _element: HTMLElement;
   _driver!: GmailDriver;
-  _eventStream: Bus<any, unknown> = kefirBus();
+  _eventStream: Bus<MessageViewDriverEvents, unknown> = kefirBus();
   _stopper = kefirStopper();
   _threadViewDriver: GmailThreadView;
   _moreMenuItemDescriptors: Array<Record<string, any>>;
@@ -59,7 +99,9 @@ class GmailMessageView {
     this._replyElement = null;
     // Outputs the same type of stream as makeElementChildStream does.
     this._replyElementStream = this._eventStream
-      .filter(function (event) {
+      .filter(function (
+        event
+      ): event is MessageViewDriverEventByName['replyElement'] {
         return event.eventName === 'replyElement';
       })
       .map((event) => event.change);
@@ -507,7 +549,11 @@ class GmailMessageView {
     return this.getMessageID();
   }
 
-  addAttachmentIcon(iconDescriptor: MessageAttachmentIconDescriptor) {
+  addAttachmentIcon(
+    iconDescriptor:
+      | MessageAttachmentIconDescriptor
+      | Kefir.Stream<MessageAttachmentIconDescriptor, never>
+  ) {
     const attachmentIcon = new AttachmentIcon();
 
     if (!this._element) {
@@ -707,10 +753,10 @@ class GmailMessageView {
       })
         .takeUntilBy(this._stopper)
         .map(function (mutation) {
-          const currentClassList = (mutation.target as any).classList;
-          const mutationOldValue: string = mutation.oldValue as any;
-          let oldValue;
-          let newValue;
+          const currentClassList = (mutation.target as HTMLElement).classList;
+          const mutationOldValue = mutation.oldValue!;
+          let oldValue: VIEW_STATE | undefined;
+          let newValue: VIEW_STATE | undefined;
 
           if (
             mutationOldValue.indexOf('kQ') > -1 ||
@@ -838,8 +884,9 @@ class GmailMessageView {
       .onValue((mutation) => {
         if (mutation !== 'END' && replyContainer.classList.contains('adB')) {
           if (!currentReplyElementRemovalStream) {
-            const replyElement = replyContainer.firstElementChild;
-            self._replyElement = replyElement as any;
+            const replyElement =
+              replyContainer.firstElementChild as HTMLElement | null;
+            self._replyElement = replyElement;
 
             if (replyElement) {
               currentReplyElementRemovalStream = kefirBus();

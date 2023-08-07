@@ -13,6 +13,8 @@ import GmailDriver from './platform-implementation-js/dom-driver/gmail/gmail-dri
 import GmailRowListView from './platform-implementation-js/dom-driver/gmail/views/gmail-row-list-view';
 import type { AppLogger } from './platform-implementation-js/lib/logger';
 import type { IThreadRowView as ThreadRowView } from './platform-implementation-js/views/thread-row-view';
+import TypedEventEmitter from 'typed-emitter';
+import { MessageViewEvent } from './platform-implementation-js/views/conversations/message-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 
 export const LOADER_VERSION: string;
@@ -511,7 +513,7 @@ export interface MessageViewToolbarButtonDescriptor {
   orderHint?: number;
 }
 
-export interface MessageView extends EventEmitter {
+export interface MessageView extends TypedEventEmitter<MessageViewEvent> {
   addAttachmentIcon(
     opts:
       | MessageAttachmentIconDescriptor
