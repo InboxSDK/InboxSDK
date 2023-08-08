@@ -36,7 +36,8 @@ export type ComposeViewDriverEvent =
         | 'restored'
         | 'sendCanceled'
         | 'sending'
-        | 'sent';
+        | 'sent'
+        | 'subjectChanged';
       // Added to appease tsc where `unknown` or omitting `data` causes errors
       data?: any;
     }

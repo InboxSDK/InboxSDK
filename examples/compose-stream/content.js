@@ -1,3 +1,4 @@
+/// <reference path="../types.d.ts" />
 'use strict';
 
 InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
@@ -213,6 +214,9 @@ InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
     });
     composeView.on('sendCanceled', console.log.bind(console, 'sendCanceled'));
 
+    composeView.on('subjectChanged', () => {
+      console.log('subject changed', composeView.getSubject());
+    });
     composeView.on(
       'toContactAdded',
       console.log.bind(console, 'toContactAdded')

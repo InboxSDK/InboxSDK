@@ -602,9 +602,19 @@ class GmailComposeView implements ComposeViewDriver {
     return this._destroyed;
   }
 
+  #getSubjectChangesStream() {
+    const subjectElement = this.getSubjectInput();
+    return Kefir.fromEvents(subjectElement, 'input').map(() => {
+      return {
+        eventName: 'subjectChanged' as const,
+      };
+    });
+  }
+
   _setupStreams() {
     this._eventStream.plug(getAddressChangesStream(this));
 
+    this._eventStream.plug(this.#getSubjectChangesStream());
     this._eventStream.plug(getBodyChangesStream(this));
 
     this._eventStream.plug(getResponseTypeChangesStream(this));
