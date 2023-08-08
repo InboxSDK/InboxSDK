@@ -15,6 +15,7 @@ import GmailMessageView from './gmail-message-view';
 import GmailToolbarView from './gmail-toolbar-view';
 import WidthManager from './gmail-thread-view/width-manager';
 import type { CustomMessageDescriptor } from '../../../views/conversations/custom-message-view';
+
 let hasLoggedAddonInfo = false;
 
 class GmailThreadView {

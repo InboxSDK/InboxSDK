@@ -10,9 +10,11 @@ import type MessageView from './message-view';
 import type { Driver, ThreadViewDriver } from '../../driver-interfaces/driver';
 import type CustomMessageView from '../../views/conversations/custom-message-view';
 import type {
+  Contact,
   ContentPanelDescriptor,
   ThreadView as IThreadView,
 } from '../../../inboxsdk';
+import type TypedEventEmitter from 'typed-emitter';
 
 interface Members {
   threadViewImplementation: ThreadViewDriver;
@@ -21,10 +23,22 @@ interface Members {
   membrane: Membrane;
 }
 
+export type ThreadViewEvents = {
+  destroy(): void;
+  contactHover(data: {
+    messageView: MessageView;
+    contact: Contact;
+    threadView: ThreadView;
+  }): void;
+};
+
 const memberMap = defonce(module, () => new WeakMap<ThreadView, Members>());
 
-class ThreadView extends EventEmitter implements IThreadView {
-  destroyed: boolean = false;
+class ThreadView
+  extends (EventEmitter as new () => TypedEventEmitter<ThreadViewEvents>)
+  implements IThreadView
+{
+  destroyed = false;
 
   constructor(
     threadViewImplementation: ThreadViewDriver,
