@@ -9,6 +9,13 @@ import get from '../../../common/get-or-fail';
 import type MessageView from './message-view';
 import type { Driver, ThreadViewDriver } from '../../driver-interfaces/driver';
 import type CustomMessageView from '../../views/conversations/custom-message-view';
+import type {
+  Contact,
+  ContentPanelDescriptor,
+  ThreadView as IThreadView,
+} from '../../../inboxsdk';
+import type TypedEventEmitter from 'typed-emitter';
+
 interface Members {
   threadViewImplementation: ThreadViewDriver;
   appId: string;
@@ -16,10 +23,22 @@ interface Members {
   membrane: Membrane;
 }
 
-const memberMap = defonce(module, () => new WeakMap<ThreadView, Members>()); // documented in src/docs/
+export type ThreadViewEvents = {
+  destroy(): void;
+  contactHover(data: {
+    messageView: MessageView;
+    contact: Contact;
+    threadView: ThreadView;
+  }): void;
+};
 
-class ThreadView extends EventEmitter {
-  destroyed: boolean = false;
+const memberMap = defonce(module, () => new WeakMap<ThreadView, Members>());
+
+class ThreadView
+  extends (EventEmitter as new () => TypedEventEmitter<ThreadViewEvents>)
+  implements IThreadView
+{
+  destroyed = false;
 
   constructor(
     threadViewImplementation: ThreadViewDriver,
@@ -39,13 +58,8 @@ class ThreadView extends EventEmitter {
     _bindToStreamEvents(this, threadViewImplementation);
   }
 
-  addSidebarContentPanel(
-    descriptor: Record<string, any>
-  ): ContentPanelView | null | undefined {
-    const descriptorPropertyStream = kefirCast(
-      Kefir as any,
-      descriptor
-    ).toProperty();
+  addSidebarContentPanel(descriptor: ContentPanelDescriptor): ContentPanelView {
+    const descriptorPropertyStream = kefirCast(Kefir, descriptor).toProperty();
     const members = get(memberMap, this);
     members.driver
       .getLogger()
@@ -59,7 +73,7 @@ class ThreadView extends EventEmitter {
       return new ContentPanelView(contentPanelImplementation);
     }
 
-    return null;
+    return null!;
   }
 
   addNoticeBar(): SimpleElementView {

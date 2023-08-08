@@ -15,6 +15,7 @@ import type { AppLogger } from './platform-implementation-js/lib/logger';
 import type { IThreadRowView as ThreadRowView } from './platform-implementation-js/views/thread-row-view';
 import TypedEventEmitter from 'typed-emitter';
 import { MessageViewEvent } from './platform-implementation-js/views/conversations/message-view';
+import type { ThreadViewEvents } from './platform-implementation-js/views/conversations/thread-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 
 export const LOADER_VERSION: string;
@@ -423,7 +424,7 @@ export interface SimpleElementView extends EventEmitter {
   destroy(): void;
 }
 
-export interface ThreadView extends EventEmitter {
+export interface ThreadView extends TypedEventEmitter<ThreadViewEvents> {
   addLabel(): SimpleElementView;
   addSidebarContentPanel(
     contentPanelDescriptor: ContentPanelDescriptor
