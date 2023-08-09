@@ -23,7 +23,7 @@ export default function ({
   element: HTMLElement;
   sendButton: HTMLElement;
   sendAndArchive?: HTMLElement | null | undefined;
-}): Kefir.Observable<Record<string, any>, unknown> {
+}) {
   const domEventStream = Kefir.merge([
     fromEventTargetCapture(element, 'keydown')
       .filter((domEvent) => domEvent.ctrlKey || domEvent.metaKey)
@@ -59,7 +59,7 @@ export default function ({
       return true;
     })
     .map((domEvent) => ({
-      eventName: 'presending',
+      eventName: 'presending' as const,
       data: {
         cancel() {
           domEvent.preventDefault();

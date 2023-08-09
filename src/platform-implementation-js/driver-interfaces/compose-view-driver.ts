@@ -23,8 +23,68 @@ export type ComposeButtonDescriptor = {
   orderHint?: number | null | undefined;
   enabled?: boolean | null | undefined;
 };
+
+export type ComposeViewDriverEvent =
+  | {
+      eventName:
+        | 'buttonAdded'
+        | 'bodyChanged'
+        | 'discardCanceled'
+        | 'draftSaved'
+        | 'minimized'
+        | 'resize'
+        | 'restored'
+        | 'sendCanceled'
+        | 'sending'
+        | 'sent';
+      // Added to appease tsc where `unknown` or omitting `data` causes errors
+      data?: any;
+    }
+  | {
+      eventName: 'destroy';
+      data: {
+        messageID: string | null | undefined;
+        closedByInboxSDK: boolean;
+      };
+    }
+  | {
+      eventName: 'fullscreenChanged';
+      data: {
+        fullscreen: boolean;
+      };
+    }
+  | {
+      eventName: 'responseTypeChanged';
+      data: {
+        isForward: boolean;
+      };
+    }
+  | {
+      eventName: 'presending';
+      data: {
+        cancel(): void;
+      };
+    }
+  | {
+      eventName: 'sent';
+      data: {
+        getMessageID(): Promise<string>;
+        getThreadID(): Promise<string>;
+      };
+    }
+  | {
+      eventName: 'discard';
+      data: {
+        cancel(): void;
+      };
+    }
+  | {
+      eventName: 'messageIDChange';
+      data: string | null | undefined;
+    };
+
 export type ComposeViewDriver = {
-  getEventStream(): Kefir.Observable<Record<string, any>, unknown>;
+  getEventStream(): Kefir.Observable<ComposeViewDriverEvent, unknown>;
   getStopper(): Kefir.Observable<any, unknown>;
   getElement(): HTMLElement;
   insertBodyTextAtCursor(text: string): HTMLElement | null | undefined;

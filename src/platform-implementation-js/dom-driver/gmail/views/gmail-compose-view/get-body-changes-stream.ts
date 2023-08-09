@@ -1,9 +1,6 @@
-import * as Kefir from 'kefir';
 import makeMutationObserverStream from '../../../../lib/dom/make-mutation-observer-stream';
 import type GmailComposeView from '../gmail-compose-view';
-export default function (
-  gmailComposeView: GmailComposeView
-): Kefir.Observable<Record<string, any>, unknown> {
+export default function (gmailComposeView: GmailComposeView) {
   var bodyElement = gmailComposeView.getBodyElement();
   return makeMutationObserverStream(bodyElement, {
     childList: true,
@@ -11,7 +8,7 @@ export default function (
     characterData: true,
   }).map(function () {
     return {
-      eventName: 'bodyChanged',
+      eventName: 'bodyChanged' as const,
     };
   });
 }
