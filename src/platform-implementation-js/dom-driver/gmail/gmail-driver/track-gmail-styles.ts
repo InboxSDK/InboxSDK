@@ -1,6 +1,6 @@
 import kefirBus from 'kefir-bus';
 import Logger from '../../../lib/logger';
-import waitFor from '../../../lib/wait-for';
+import waitFor, { WaitForError } from '../../../lib/wait-for';
 import GmailElementGetter from '../gmail-element-getter';
 
 const RGB_REGEX = /^rgb\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/;
@@ -18,10 +18,31 @@ function getDensity(): 'compact' | 'default' {
 
 const navItemSelector = '.aio' as const;
 
-export function isDarkTheme(): boolean {
+function getNavItem() {
+  return document.querySelector(navItemSelector);
+}
+
+/**
+ * @returns true if Gmail is in dark theme mode, false if not, or null if it can't be determined
+ */
+export async function checkForDarkThemeSafe() {
+  try {
+    await waitFor(() => getNavItem());
+  } catch (e: unknown) {
+    if (e instanceof WaitForError) {
+      return null;
+    }
+
+    throw e;
+  }
+
+  return isDarkTheme();
+}
+
+function isDarkTheme(): boolean {
   // get the color of the left-nav-menu entries to determine whether Gmail is
   // in dark theme mode.
-  const navItem = document.querySelector(navItemSelector);
+  const navItem = getNavItem();
   if (!navItem) {
     Logger.error(new Error('Failed to find nav item'));
     return false;
