@@ -289,7 +289,7 @@ class GmailThreadRowView {
   waitForReady(): Kefir.Observable<GmailThreadRowView, unknown> {
     const time = [0, 10, 100, 1000, 15000];
 
-    const step = (): Kefir.Observable<GmailThreadRowView | never, unknown> => {
+    const step = (): Kefir.Observable<GmailThreadRowView, unknown> => {
       if (this._threadIdReady()) {
         asap(() => {
           if (this._elements.length) this._removeUnclaimedModifications();
