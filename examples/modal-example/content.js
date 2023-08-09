@@ -1,3 +1,5 @@
+/// <reference path="../types.d.ts" />
+
 'use strict';
 
 var div = document.createElement('div');
