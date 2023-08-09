@@ -1,10 +1,5 @@
 {
   "author": "Streak",
-  "browserify": {
-    "transform": [
-      "brfs"
-    ]
-  },
   "dependencies": {
     "@babel/cli": "^7.19.3",
     "@babel/core": "^7.19.3",
@@ -39,7 +34,6 @@
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "bignumber.js": "^9.0.1",
     "bimapcache": "^2.0.0",
-    "brfs": "^2.0.1",
     "browserify": "^17.0.0",
     "buffer": "^6.0.3",
     "classnames": "^2.2.5",
