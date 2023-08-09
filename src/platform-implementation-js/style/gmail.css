@@ -42,6 +42,13 @@
   left: 0;
 }
 
+@media (min-resolution: 192dpi) {
+  .inboxsdk__close_button::after {
+    background: url(https://www.gstatic.com/images/icons/material/system/2x/close_black_24dp.png);
+    background-size: contain;
+  }
+}
+
 :local(.app_sidebar_waiting_platform) {
   display: none;
 }
