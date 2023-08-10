@@ -16,7 +16,7 @@ export const MessageViewViewStates = Object.freeze({
    */
   HIDDEN: 'HIDDEN',
   /**
-   * {@link MessageView} are collapsed when they are partially shown. The {@link MessageView}'s subject line and timestamp is visible, but the body of the message may be truncated.
+   * {@link MessageView}s are collapsed when they are partially shown. The {@link MessageView}'s subject line and timestamp is visible, but the body of the message may be truncated.
    */
   COLLAPSED: 'COLLAPSED',
   EXPANDED: 'EXPANDED',
