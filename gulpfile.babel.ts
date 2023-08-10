@@ -245,7 +245,7 @@ async function webpackTask({
       // https://github.com/webpack/changelog-v5/issues/10
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
-        // https://github.com/algolia/places/issues/847#issuecomment-748202652 For Algolia
+        // transitively from react-draggable-list -> react-motion -> performance-now uses 'process/browser'
         process: 'process/browser',
       }),
       ...(options.devtool === 'remote'
@@ -263,7 +263,10 @@ async function webpackTask({
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       fallback: {
-        buffer: require.resolve('buffer'),
+        // 'assert' used in the SDK directly
+        assert: require.resolve('assert/'),
+        // 'querystring' used in the SDK directly
+        querystring: require.resolve('querystring-es3/'),
       },
     },
     stats: {
