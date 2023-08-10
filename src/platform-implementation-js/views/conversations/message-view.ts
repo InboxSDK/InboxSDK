@@ -7,11 +7,6 @@ import type AttachmentCardView from './attachment-card-view';
 import Conversations, {
   MessageViewToolbarSectionNames,
 } from '../../namespaces/conversations';
-import type {
-  MessageViewDriver,
-  VIEW_STATE,
-  MessageViewLinkDescriptor,
-} from '../../driver-interfaces/message-view-driver';
 import type { Driver } from '../../driver-interfaces/driver';
 import type { Contact, MessageView as IMessageView } from '../../../inboxsdk';
 import type { Observable } from 'kefir';
@@ -20,6 +15,17 @@ import type {
   MessageViewDriverEventByName,
 } from '../../dom-driver/gmail/views/gmail-message-view';
 import type TypedEventEmitter from 'typed-emitter';
+import type MessageViewDriver from '../../dom-driver/gmail/views/gmail-message-view';
+
+export type VIEW_STATE = 'HIDDEN' | 'COLLAPSED' | 'EXPANDED';
+
+type MessageViewLinkDescriptor = {
+  text: string;
+  html: string;
+  element: HTMLElement;
+  href: string;
+  isInQuotedArea: boolean;
+};
 
 interface Members {
   Conversations: Conversations;
