@@ -21,15 +21,13 @@ import reemitClickEvent from '../../../lib/dom/reemitClickEventForReact';
 import type GmailDriver from '../gmail-driver';
 import type GmailThreadView from './gmail-thread-view';
 import type {
-  MessageViewDriver,
-  VIEW_STATE,
-} from '../../../driver-interfaces/message-view-driver';
-import type {
   Contact,
   MessageAttachmentIconDescriptor,
   MessageView,
   ThreadView,
 } from '../../../../inboxsdk';
+import type { VIEW_STATE } from '../../../views/conversations/message-view';
+
 let hasSeenOldElement = false;
 
 export type MessageViewDriverEventByName = {
@@ -67,7 +65,7 @@ export type MessageViewDriverEvents = (
   type?: 'internal';
 };
 
-class GmailMessageView implements MessageViewDriver {
+class GmailMessageView {
   _element: HTMLElement;
   _driver!: GmailDriver;
   _eventStream: Bus<MessageViewDriverEvents, unknown> = kefirBus();
