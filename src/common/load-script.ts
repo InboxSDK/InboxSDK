@@ -56,7 +56,6 @@ export interface LoadScriptOptions {
   // true disables this behavior.
   nowrap?: boolean;
   disableSourceMappingURL?: boolean;
-  disableSourceURL?: boolean;
   XMLHttpRequest?: typeof XMLHttpRequest;
 }
 
@@ -114,9 +113,7 @@ export default function loadScript(
           codeParts.push('\n});');
         }
 
-        if (opts?.disableSourceURL !== true) {
-          codeParts.push('\n//# sourceURL=' + url + '\n');
-        }
+        codeParts.push('\n//# sourceURL=' + url + '\n');
 
         const codeToRun = codeParts.join('');
         let program;
