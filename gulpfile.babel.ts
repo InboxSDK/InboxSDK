@@ -403,7 +403,8 @@ if (args.remote) {
 }
 
 gulp.task('sdk', async () => {
-  if (args.remote || args.integratedPageWorld) {
+  // Only the npm build contains pageWorld as of writing.
+  if (!config.entry.pageWorld) {
     await webpackTask({
       entry: pageWorld,
       devtool: args.remote ? false : 'inline-source-map',
