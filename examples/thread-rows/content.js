@@ -1,3 +1,5 @@
+/// <reference path="../types.d.ts" />
+
 function log() {
   console.log.apply(
     console,
