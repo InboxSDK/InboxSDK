@@ -6,9 +6,18 @@ import AttachmentCardView from '../views/conversations/attachment-card-view';
 import HandlerRegistry from '../lib/handler-registry';
 import type Membrane from '../lib/Membrane';
 import type { Driver } from '../driver-interfaces/driver';
+
 const memberMap = new WeakMap();
+
 export const MessageViewViewStates = Object.freeze({
+  /**
+   * One case where a {@link MessageView} is 'HIDDEN' is when there are too many messages in a thread,
+   * and the message doesn't show at all.
+   */
   HIDDEN: 'HIDDEN',
+  /**
+   * {@link MessageView} are collapsed when they are partially shown. The {@link MessageView}'s subject line and timestamp is visible, but the body of the message may be truncated.
+   */
   COLLAPSED: 'COLLAPSED',
   EXPANDED: 'EXPANDED',
 });
