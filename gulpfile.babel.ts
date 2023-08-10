@@ -404,7 +404,7 @@ if (args.remote) {
 
 gulp.task('sdk', async () => {
   // Only the npm build contains pageWorld as of writing.
-  if (!config.entry.pageWorld) {
+  if (config.entry instanceof Object && !('pageWorld' in config.entry)) {
     await webpackTask({
       entry: pageWorld,
       devtool: args.remote ? false : 'inline-source-map',
