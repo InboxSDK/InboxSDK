@@ -106,6 +106,16 @@ class GmailAttachmentCardView {
       iconUrl: options.iconUrl,
       tooltip: options.tooltip,
     });
+    new BasicButtonViewController({
+      activateFunction: () => {
+        if (options.onClick) {
+          options.onClick({
+            getDownloadURL: () => this.getDownloadURL(),
+          });
+        }
+      },
+      buttonView: buttonView,
+    });
 
     this._addButton(buttonView);
   }
