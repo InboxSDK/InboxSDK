@@ -124,9 +124,6 @@ InboxSDK.load(2, 'attachment-card-exmaple').then(function (sdk) {
         tooltip: 'Foo2',
         onClick(event) {
           console.log('click2', event);
-          card.getDownloadURL().then((url) => {
-            console.log('old, url', url);
-          });
           event.getDownloadURL().then((url) => {
             console.log('new, url', url);
           });
