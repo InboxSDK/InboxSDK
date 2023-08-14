@@ -17,7 +17,12 @@ export interface CustomButtonDescriptor {
   onClick?: (event?: { getDownloadURL: () => Promise<string | null> }) => void;
 }
 
-export type AttachmentType = 'FILE' | 'DRIVE' | 'CUSTOM' | 'UNKNOWN';
+export type AttachmentType =
+  | 'FILE'
+  | 'DRIVE'
+  | 'CUSTOM'
+  | 'UNKNOWN'
+  | 'UNLOADED';
 
 class GmailAttachmentCardView {
   _element!: HTMLElement;
