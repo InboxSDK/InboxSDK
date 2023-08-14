@@ -1,3 +1,5 @@
+/// <reference path="../types.d.ts" />
+
 function kefirStopper() {
   var emitter = null;
 

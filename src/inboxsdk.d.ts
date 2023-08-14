@@ -17,6 +17,7 @@ import TypedEventEmitter from 'typed-emitter';
 import { MessageViewEvent } from './platform-implementation-js/views/conversations/message-view';
 import type { ThreadViewEvents } from './platform-implementation-js/views/conversations/thread-view';
 import type { ComposeViewEvent } from './platform-implementation-js/views/compose-view';
+import type AttachmentCardView from './platform-implementation-js/views/conversations/attachment-card-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 
 export const LOADER_VERSION: string;
@@ -525,6 +526,7 @@ export interface MessageView extends TypedEventEmitter<MessageViewEvent> {
   getBodyElement(): HTMLElement;
   isElementInQuotedArea(element: HTMLElement): boolean;
   isLoaded(): boolean;
+  getFileAttachmentCardViews(): AttachmentCardView[];
   getSender(): Contact;
   getRecipients(): Array<Contact>;
   getRecipientsFull(): Promise<Array<Contact>>;

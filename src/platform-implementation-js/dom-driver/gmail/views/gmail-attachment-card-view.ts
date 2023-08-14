@@ -11,11 +11,19 @@ import BasicButtonViewController from '../../../widgets/buttons/basic-button-vie
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 import waitFor from '../../../lib/wait-for';
 
+export interface CustomButtonDescriptor {
+  iconUrl?: string;
+  tooltip?: string;
+  onClick?: (event?: { getDownloadURL: () => Promise<string | null> }) => void;
+}
+
+export type AttachmentType = 'FILE' | 'DRIVE' | 'CUSTOM' | 'UNKNOWN';
+
 class GmailAttachmentCardView {
   _element!: HTMLElement;
   _driver: GmailDriver;
   _messageViewDriver: GmailMessageView | null | undefined;
-  _cachedType: any;
+  _cachedType: AttachmentType | undefined;
   _stopper: Kefir.Observable<null, unknown> & {
     destroy(): void;
   } = kefirStopper();
@@ -60,7 +68,7 @@ class GmailAttachmentCardView {
     return this.getAttachmentType() === 'FILE';
   }
 
-  getAttachmentType(): string {
+  getAttachmentType(): AttachmentType {
     if (this._cachedType) {
       return this._cachedType;
     }
@@ -74,7 +82,7 @@ class GmailAttachmentCardView {
     return type;
   }
 
-  _readAttachmentType(): string {
+  _readAttachmentType() {
     if (this._element.classList.contains('inboxsdk__attachmentCard')) {
       return 'CUSTOM';
     }
@@ -101,7 +109,7 @@ class GmailAttachmentCardView {
     return 'UNKNOWN';
   }
 
-  addButton(options: Record<string, any>) {
+  addButton(options: CustomButtonDescriptor) {
     var buttonView = new ButtonView({
       iconUrl: options.iconUrl,
       tooltip: options.tooltip,
@@ -153,7 +161,7 @@ class GmailAttachmentCardView {
   }
 
   // Resolves the short-lived cookie-less download URL
-  async getDownloadURL(): Promise<string | null | undefined> {
+  async getDownloadURL(): Promise<string | null> {
     try {
       if (this._isStandardAttachment()) {
         const downloadUrl = await waitFor(() => this._getDownloadLink());
