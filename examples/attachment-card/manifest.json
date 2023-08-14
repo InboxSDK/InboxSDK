@@ -9,7 +9,7 @@
         "react.production.min.js",
         "react-dom.production.min.js",
         "inboxsdk.js",
-        "app.js"
+        "content.js"
       ],
       "css": ["app.css"],
       "run_at": "document_end"
