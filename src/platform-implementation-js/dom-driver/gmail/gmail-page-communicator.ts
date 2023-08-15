@@ -136,6 +136,13 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     return s;
   }
 
+  /**
+   * This method seems to have existed to distinguish between Inbox and Gmail. Since Inbox support was dropped in '19, it exists only as a vestige.
+   *
+   * TODO: Remove this method and its machinery.
+   *
+   * @returns effectively only {true} or, very rarely, {null} or {false}.
+   */
   isUsingSyncAPI(): boolean {
     const s = document.head.getAttribute('data-inboxsdk-using-sync-api');
     if (s == null) throw new Error('Failed to read value');

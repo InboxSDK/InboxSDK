@@ -9,7 +9,7 @@ async function getGmailThreadIdForRfcMessageId(
   driver: Driver,
   rfcMessageId: string
 ): Promise<string> {
-  if ((driver as any).isUsingSyncAPI && (driver as any).isUsingSyncAPI()) {
+  if (driver.isUsingSyncAPI()) {
     const { threads: threadDescriptors } = await getSyncThreadsForSearch(
       driver,
       'rfc822msgid:' + rfcMessageId

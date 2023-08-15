@@ -73,7 +73,7 @@ import type Logger from '../../lib/logger';
 import type PageCommunicator from './gmail-page-communicator';
 import type { RouteParams } from '../../namespaces/router';
 import type ButterBar from '../../namespaces/butter-bar';
-import type { Driver, DrawerViewOptions } from '../../driver-interfaces/driver';
+import type { DrawerViewOptions } from '../../driver-interfaces/driver';
 import type GmailComposeView from './views/gmail-compose-view';
 import type GmailMessageView from './views/gmail-message-view';
 import type GmailThreadView from './views/gmail-thread-view';
@@ -92,7 +92,7 @@ import { MoleOptions } from '../../driver-interfaces/mole-view-driver';
 import { Contact } from '../../../inboxsdk';
 import GmailAttachmentCardView from './views/gmail-attachment-card-view';
 
-class GmailDriver implements Driver {
+class GmailDriver {
   _appId: string;
   _logger: Logger;
   _opts: PiOpts;
@@ -909,6 +909,9 @@ class GmailDriver implements Driver {
     return !!((global as any).GLOBALS && (global as any)._GM_main);
   }
 
+  /**
+   * @see PageCommunicator#isUsingSyncAPI
+   */
   isUsingSyncAPI(): boolean {
     return this._pageCommunicator.isUsingSyncAPI();
   }
