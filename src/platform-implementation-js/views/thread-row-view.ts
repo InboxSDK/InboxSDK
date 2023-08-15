@@ -35,6 +35,9 @@ export type IThreadRowView = EmitterType & {
     imageDescriptor: ImageDescriptor | Observable<ImageDescriptor | null, any>
   ): void;
   getElement(): HTMLElement;
+  /**
+   * @returns the {number} of visible draft messages in the row. This is purely an estimate based on what is visible in the row.
+   */
   getVisibleDraftCount(): number;
   /** @deprecated */
   getThreadIDIfStable(): string | null | undefined;
@@ -62,6 +65,9 @@ export type IThreadRowView = EmitterType & {
       | null
       | Observable<ThreadDateDescriptor | null, any>
   ): void;
+  /**
+   * @returns the {number} of visible messages in the thread based on the visible numeric marker.
+   */
   getVisibleMessageCount(): number;
   getSubject(): string;
   replaceSubject(newSubjectStr: string): void;

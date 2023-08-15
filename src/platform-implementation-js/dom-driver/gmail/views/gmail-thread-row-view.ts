@@ -27,6 +27,7 @@ import type {
   LabelDescriptor,
   ThreadDateDescriptor,
 } from '../../../../inboxsdk';
+import { querySelectorOrWarn } from '../../../lib/dom/querySelectorOrWarn';
 
 type LabelMod = {
   gmailLabelView: Record<string, any>;
@@ -140,7 +141,7 @@ class GmailThreadRowView {
   _refresher: Kefir.Observable<any, any> | null | undefined;
   _subjectRefresher: Kefir.Observable<any, any> | null | undefined;
   _imageRefresher: Kefir.Observable<any, any> | null | undefined;
-  _counts: Counts | null | undefined;
+  #counts: Counts | null = null;
   _isVertical: boolean;
   _isDestroyed: boolean = false;
 
@@ -214,7 +215,6 @@ class GmailThreadRowView {
     this._refresher = null;
     this._subjectRefresher = null;
     this._imageRefresher = null;
-    this._counts = null;
 
     this._elements[0].setAttribute('data-inboxsdk-thread-row', 'true');
   }
@@ -317,53 +317,39 @@ class GmailThreadRowView {
     this._userView = userView;
   }
 
-  getCounts(): Counts {
-    let counts = this._counts;
-
-    if (!counts) {
-      const recipientsElement = querySelector(this._elements[0], 'td div.yW');
-
-      if (this._driver.isUsingSyncAPI()) {
-        const draftCount = recipientsElement.querySelectorAll('.boq').length;
-        const messageCountMatch = recipientsElement.querySelector('.bx0');
-        const messageCount =
-          messageCountMatch && messageCountMatch.innerHTML
-            ? +messageCountMatch.innerHTML
-            : draftCount
-            ? 0
-            : 1;
-        counts = this._counts = {
-          messageCount,
-          draftCount,
-        };
-      } else {
-        const [preDrafts, drafts] = recipientsElement.innerHTML.split(
-          /<font color=[^>]+>[^>]+<\/font>/
-        );
-        const preDraftsWithoutNames = preDrafts.replace(
-          /<span\b[^>]*>.*?<\/span>/g,
-          ''
-        );
-        const messageCountMatch = preDraftsWithoutNames.match(/\((\d+)\)/);
-        const messageCount = messageCountMatch
-          ? +messageCountMatch[1]
-          : preDrafts
-          ? 1
-          : 0;
-        const draftCountMatch = drafts && drafts.match(/\((\d+)\)/);
-        const draftCount = draftCountMatch
-          ? +draftCountMatch[1]
-          : drafts != null
-          ? 1
-          : 0;
-        counts = this._counts = {
-          messageCount,
-          draftCount,
-        };
-      }
+  #getCounts(): Counts {
+    if (this.#counts) {
+      return this.#counts;
     }
 
-    return counts;
+    /**
+     * If the SDK is used alongside the https://chrome.google.com/webstore/detail/mailtrack-for-gmail-inbox/ndnaehgpjlnokgebbaldlmgkapkpjkkb/utm_source/gmail/utm_medium/signature/utm_campaign/signaturevirality/th138p9fIBkLHUhniapN extension, the recipientsElement will sometimes be null.
+     */
+    const recipientsElement = querySelectorOrWarn<HTMLElement>(
+      this._elements[0],
+      'td div.yW'
+    );
+
+    if (!recipientsElement) {
+      return (this.#counts = {
+        messageCount: 0,
+        draftCount: 0,
+      });
+    }
+
+    const draftCount = recipientsElement.querySelectorAll('.boq').length;
+    const messageCountMatch = recipientsElement.querySelector('.bx0');
+    const messageCount = messageCountMatch?.innerHTML
+      ? +messageCountMatch.innerHTML
+      : draftCount
+      ? 0
+      : 1;
+    this.#counts = {
+      messageCount,
+      draftCount,
+    };
+
+    return this.#counts;
   }
 
   _expandColumn(colSelector: string, width: number) {
@@ -1240,11 +1226,11 @@ class GmailThreadRowView {
   }
 
   getVisibleDraftCount(): number {
-    return this.getCounts().draftCount;
+    return this.#getCounts().draftCount;
   }
 
   getVisibleMessageCount(): number {
-    return this.getCounts().messageCount;
+    return this.#getCounts().messageCount;
   }
 
   getContacts(): Contact[] {
