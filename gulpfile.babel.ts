@@ -252,7 +252,7 @@ async function webpackTask({
         ? [
             new webpack.SourceMapDevToolPlugin({
               fileContext: '../',
-              filename: '[file].map',
+              filename: '[file].[contenthash].map',
               publicPath: 'https://www.inboxsdk.com/build/',
             }),
           ]
