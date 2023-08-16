@@ -1,5 +1,3 @@
-/* @flow */
-
 import fs from 'fs';
 
 import PageCommunicator from '../src/platform-implementation-js/dom-driver/gmail/gmail-page-communicator';
@@ -57,6 +55,13 @@ test('threadIdentifier works', () => {
     }, 0);
   });
   expect(pageCommunicator.getThreadIdForThreadRowByDatabase(amb)).toBe(null);
+  // With Node 18.16.0 and jest@29.6.5, not including the following lines causes src/injected-js/gmail/thread-identifier/click-and-get-popup-url to fail with
+  // TypeError: Cannot redefine property: onerror
+  const oldOnError = window.onerror;
+  Object.defineProperty(window, 'onerror', {
+    value: oldOnError,
+    writable: true,
+  });
   expect(pageCommunicator.getThreadIdForThreadRowByClick(amb)).toBe(
     '14a5f1c5ad340727'
   );

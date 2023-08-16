@@ -19,3 +19,6 @@ rules:
   selector-id-pattern: null
   shorthand-property-no-redundant-values: null
   value-keyword-case: null
+  media-feature-range-notation:
+    # Until Safari 16.3 and Chrome 103 are no longer supported (https://caniuse.com/css-media-range-syntax)
+    - 'prefix'

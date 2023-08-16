@@ -1,5 +1,6 @@
 import { AutocompleteSearchResultWithId } from '../../../injected-js/gmail/modify-suggestions';
 import CommonPageCommunicator from '../../lib/common-page-communicator';
+import { CustomDomEvent } from '../../lib/dom/custom-events';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
 import Kefir from 'kefir';
@@ -80,7 +81,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     let threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     if (!threadid) {
       threadRow.dispatchEvent(
-        new CustomEvent('inboxSDKtellMeThisThreadIdByDatabase', {
+        new CustomEvent(CustomDomEvent.tellMeThisThreadIdByDatabase, {
           bubbles: true,
           cancelable: false,
           detail: null,
@@ -95,7 +96,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     let threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     if (!threadid) {
       threadRow.dispatchEvent(
-        new CustomEvent('inboxSDKtellMeThisThreadIdByClick', {
+        new CustomEvent(CustomDomEvent.tellMeThisThreadIdByClick, {
           bubbles: true,
           cancelable: false,
           detail: null,

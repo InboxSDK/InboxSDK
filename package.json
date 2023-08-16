@@ -1,10 +1,5 @@
 {
   "author": "Streak",
-  "browserify": {
-    "transform": [
-      "brfs"
-    ]
-  },
   "dependencies": {
     "@babel/cli": "^7.19.3",
     "@babel/core": "^7.19.3",
@@ -34,13 +29,12 @@
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
     "asap": "^2.0.3",
+    "assert": "^2.0.0",
     "auto-html": "^1.0.4",
     "babel-jest": "^29",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
     "bignumber.js": "^9.0.1",
     "bimapcache": "^2.0.0",
-    "brfs": "^2.0.1",
-    "browserify": "^17.0.0",
     "buffer": "^6.0.3",
     "classnames": "^2.2.5",
     "closest-ng": "^1.0.0",
@@ -79,6 +73,8 @@
     "postcss-loader": "^7.2.4",
     "postcss-selector-parser": "^2.2.0",
     "prettier": "^2.8.7",
+    "process": "^0.11.10",
+    "querystring-es3": "^0.2.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-draggable-list": "^4.0.2",
@@ -108,9 +104,8 @@
   "name": "inboxsdk",
   "private": true,
   "scripts": {
-    "transpile-code": "babel -d packages/core/src --source-type module --ignore '*.test.ts' --no-copy-ignored src",
     "typecheck": "tsc",
-    "typedefs": "yarn transpile-code && tsc -p tsconfig.declarations.json",
+    "typedefs": "tsc -p tsconfig.declarations.json",
     "prepare": "husky install",
     "publish-npm": "gulp clean && gulp --production --minify && yarn workspace @inboxsdk/core npm publish && git push --follow-tags",
     "lint": "yarn run lint:eslint && yarn run prettier:check",

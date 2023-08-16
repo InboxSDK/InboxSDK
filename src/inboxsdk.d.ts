@@ -1,17 +1,23 @@
 import { EventEmitter } from 'events';
-import * as Kefir from 'kefir';
-import TypedEmitter from 'typed-emitter';
+import type * as Kefir from 'kefir';
+import type TypedEmitter from 'typed-emitter';
 import AppMenu from './platform-implementation-js/namespaces/app-menu';
-import {
+import type {
   NavItemTypes,
   NavItemDescriptor,
 } from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 import NavItemView from './platform-implementation-js/views/nav-item-view';
 import type { Stopper } from 'kefir-stopper';
-import GmailRouteProcessor from './platform-implementation-js/dom-driver/gmail/views/gmail-route-view/gmail-route-processor';
-import GmailDriver from './platform-implementation-js/dom-driver/gmail/gmail-driver';
-import GmailRowListView from './platform-implementation-js/dom-driver/gmail/views/gmail-row-list-view';
+import type GmailRouteProcessor from './platform-implementation-js/dom-driver/gmail/views/gmail-route-view/gmail-route-processor';
+import type GmailDriver from './platform-implementation-js/dom-driver/gmail/gmail-driver';
+import type GmailRowListView from './platform-implementation-js/dom-driver/gmail/views/gmail-row-list-view';
 import type { AppLogger } from './platform-implementation-js/lib/logger';
+import type { IThreadRowView as ThreadRowView } from './platform-implementation-js/views/thread-row-view';
+import TypedEventEmitter from 'typed-emitter';
+import { MessageViewEvent } from './platform-implementation-js/views/conversations/message-view';
+import type { ThreadViewEvents } from './platform-implementation-js/views/conversations/thread-view';
+import type { ComposeViewEvent } from './platform-implementation-js/views/compose-view';
+import type AttachmentCardView from './platform-implementation-js/views/conversations/attachment-card-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 
 export const LOADER_VERSION: string;
@@ -263,59 +269,10 @@ export interface User {
   isConversationViewDisabled(): Promise<boolean>;
 }
 
-interface Destroyable extends EventEmitter {
-  readonly destroyed: boolean;
-  addListener(event: 'destroy', listener: () => void): this;
-  // emit(event: "destroy"): boolean;
-  on(event: 'destroy', listener: () => void): this;
-  off(event: 'destroy', listener: () => void): this;
-  once(event: 'destroy', listener: () => void): this;
-  prependListener(event: 'destroy', listener: () => void): this;
-  prependOnceListener(event: 'destroy', listener: () => void): this;
-  removeListener(event: 'destroy', listener: () => void): this;
-}
-
-export interface ImageDescriptor {
-  imageUrl?: string;
-  imageClass?: string;
-  tooltip?: string;
-  orderHint?: number;
-}
-
-export interface ThreadRowView extends Destroyable {
-  addLabel(labelDescriptor: LabelDescriptor | any): void;
-  addAttachmentIcon(threadRowAttachmentIconDescriptor: any): void;
-  addImage(
-    imageDescriptor:
-      | ImageDescriptor
-      | Kefir.Observable<ImageDescriptor | null, any>
-  ): void;
-  getElement(): HTMLElement;
-  getVisibleDraftCount(): number;
-  getThreadIDIfStable(): string | null;
-  getThreadIDIfStableAsync(): Promise<string | null>;
-  addButton(threadRowButtonDescriptor: any): void;
-  getThreadID(): string;
-  getThreadIDAsync(): Promise<string>;
-  getDraftID(): Promise<string>;
-  isSelected(): boolean;
-  replaceDate(
-    threadDateDescriptor:
-      | ThreadDateDescriptor
-      | null
-      | Kefir.Observable<ThreadDateDescriptor | null, any>
-  ): void;
-  getVisibleMessageCount(): number;
-  getSubject(): string;
-  replaceSubject(newSubjectStr: string): void;
-  getContacts(): Array<{ name: string | null; emailAddress: string }>;
-  replaceDraftLabel(
-    descriptor:
-      | DraftLabelDescriptor
-      | null
-      | Kefir.Observable<DraftLabelDescriptor | null, any>
-  ): void;
-}
+export {
+  IThreadRowView as ThreadRowView,
+  ImageDescriptor,
+} from './platform-implementation-js/views/thread-row-view';
 
 export interface ThreadDateDescriptor {
   text: string;
@@ -329,9 +286,9 @@ export interface DraftLabelDescriptor {
 }
 
 export interface LabelDescriptor {
-  title: string;
+  title?: string;
   titleHtml?: string;
-  iconUrl: string;
+  iconUrl?: string;
   iconClass?: string;
   iconHtml?: string;
   foregroundColor?: string;
@@ -469,7 +426,7 @@ export interface SimpleElementView extends EventEmitter {
   destroy(): void;
 }
 
-export interface ThreadView extends EventEmitter {
+export interface ThreadView extends TypedEventEmitter<ThreadViewEvents> {
   addLabel(): SimpleElementView;
   addSidebarContentPanel(
     contentPanelDescriptor: ContentPanelDescriptor
@@ -559,7 +516,7 @@ export interface MessageViewToolbarButtonDescriptor {
   orderHint?: number;
 }
 
-export interface MessageView extends EventEmitter {
+export interface MessageView extends TypedEventEmitter<MessageViewEvent> {
   addAttachmentIcon(
     opts:
       | MessageAttachmentIconDescriptor
@@ -569,6 +526,7 @@ export interface MessageView extends EventEmitter {
   getBodyElement(): HTMLElement;
   isElementInQuotedArea(element: HTMLElement): boolean;
   isLoaded(): boolean;
+  getFileAttachmentCardViews(): AttachmentCardView[];
   getSender(): Contact;
   getRecipients(): Array<Contact>;
   getRecipientsFull(): Promise<Array<Contact>>;
@@ -639,7 +597,13 @@ export interface DropdownView extends EventEmitter {
   reposition(): void;
 }
 
-export interface ComposeView extends EventEmitter {
+export {
+  ComposeViewEvent,
+  LinkPopOver,
+  LinkPopOverSection,
+} from './platform-implementation-js/views/compose-view';
+
+export interface ComposeView extends TypedEmitter<ComposeViewEvent> {
   destroyed: boolean;
   addButton(
     buttonOptions:
@@ -660,10 +624,9 @@ export interface ComposeView extends EventEmitter {
   getBccRecipients(): Array<Contact>;
   getBodyElement(): HTMLElement;
   getCcRecipients(): Array<Contact>;
-  getCurrentDraftID(): Promise<string | null>;
+  getCurrentDraftID(): Promise<string | null | undefined>;
   getElement(): HTMLElement;
-  getDraftID(): Promise<string | null>;
-  getMessageIDAsync(): Promise<string>;
+  getDraftID(): Promise<string | null | undefined>;
   getSubject(): string;
   getSubjectInput(): HTMLInputElement | null;
   getThreadID(): string;
@@ -675,7 +638,7 @@ export interface ComposeView extends EventEmitter {
   isMinimized(): boolean;
   setMinimized(minimized: boolean): void;
   isFullscreen(): boolean;
-  insertHTMLIntoBodyAtCursor(html: string): HTMLElement;
+  insertHTMLIntoBodyAtCursor(html: string): HTMLElement | null | undefined;
   isForward(): boolean;
   isInlineReplyForm(): boolean;
   isReply(): boolean;
@@ -702,10 +665,9 @@ export interface SendOptions {
   sendAndArchive?: boolean;
 }
 
-export interface ComposeViewDestroyEvent {
-  messageID: string | null;
-  closedByInboxSDK: boolean;
-}
+export type ComposeViewDestroyEvent = Parameters<
+  ComposeViewEvent['destroy']
+>[0];
 
 export interface ComposeButtonDescriptor {
   title: string;

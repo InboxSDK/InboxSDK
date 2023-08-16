@@ -18,6 +18,26 @@ InboxSDK.load(2, 'simple-example').then(function (inboxSDK) {
       section: 'TRAY_LEFT',
     });
 
+    composeView.setFullscreen(true);
+
+    // From https://stackoverflow.com/a/34670057/1924257
+    composeView.attachFiles([
+      new File(['teehee'], 'filename', { type: 'text/html' }),
+    ]);
+
+    var button = composeView.addButton({
+      title: 'Monkeys!',
+      iconUrl: chrome.runtime.getURL('monkey.png'),
+      hasDropdown: true,
+      onClick(event) {
+        event.dropdown.el.innerHTML =
+          'hello world! <br> <button type="button">Foo</button>';
+        event.dropdown.el.addEventListener('click', function () {
+          console.log('selection', composeView.getSelectedBodyText());
+        });
+      },
+      section: 'TRAY_LEFT',
+    });
     var button2 = composeView.addButton({
       title: 'Monkeys 2',
       iconUrl: chrome.runtime.getURL('monkey.png'),
