@@ -17,6 +17,7 @@ import TypedEventEmitter from 'typed-emitter';
 import { MessageViewEvent } from './platform-implementation-js/views/conversations/message-view';
 import type { ThreadViewEvents } from './platform-implementation-js/views/conversations/thread-view';
 import type { ComposeViewEvent } from './platform-implementation-js/views/compose-view';
+import type AttachmentCardView from './platform-implementation-js/views/conversations/attachment-card-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 
 export const LOADER_VERSION: string;
@@ -544,6 +545,7 @@ export interface MessageView extends TypedEventEmitter<MessageViewEvent> {
    * Returns whether this message has been loaded yet. If the message has not been loaded, some of the data related methods on this object may return empty results. The message may be loaded once the user clicks on the message stub.
    */
   isLoaded(): boolean;
+  getFileAttachmentCardViews(): AttachmentCardView[];
   /**
    * Get the contact of the sender of this message.
 

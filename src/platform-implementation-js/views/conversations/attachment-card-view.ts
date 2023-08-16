@@ -5,8 +5,12 @@ import type {
   Driver,
   AttachmentCardViewDriver,
 } from '../../driver-interfaces/driver'; // documented in src/docs/
+import type { CustomButtonDescriptor } from '../../dom-driver/gmail/views/gmail-attachment-card-view';
+import TypedEventEmitter from 'typed-emitter';
 
-class AttachmentCardView extends EventEmitter {
+class AttachmentCardView extends (EventEmitter as new () => TypedEventEmitter<{
+  destroy(): void;
+}>) {
   _attachmentCardImplementation: AttachmentCardViewDriver;
   _driver: Driver;
   _membrane: Membrane;
@@ -29,11 +33,11 @@ class AttachmentCardView extends EventEmitter {
     });
   }
 
-  getAttachmentType(): string {
+  getAttachmentType() {
     return this._attachmentCardImplementation.getAttachmentType();
   }
 
-  addButton(buttonOptions: Record<string, any>) {
+  addButton(buttonOptions: CustomButtonDescriptor) {
     this._attachmentCardImplementation.addButton(buttonOptions);
   }
 
@@ -41,6 +45,9 @@ class AttachmentCardView extends EventEmitter {
     return this._attachmentCardImplementation.getTitle();
   }
 
+  /**
+   * @deprecated  Please use the same-named method on the AttachmentCardClickEvent object instead.
+   */
   getDownloadURL(): Promise<string | null | undefined> {
     this._driver
       .getLogger()
@@ -56,7 +63,7 @@ class AttachmentCardView extends EventEmitter {
     return this._attachmentCardImplementation.getDownloadURL();
   }
 
-  getMessageView(): MessageView | null | undefined {
+  getMessageView(): MessageView | null {
     const messageViewDriver =
       this._attachmentCardImplementation.getMessageViewDriver();
 
