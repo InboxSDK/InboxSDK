@@ -354,6 +354,7 @@ if (args.remote) {
         fileContext: '../',
         // Adds hash to the end of the sourcemap URL so that
         // remote code source maps are not cached erroneously by Sentry
+        // if and when https://github.com/getsentry/sentry/issues/54819 is patched up.
         filename: '[file].[contenthash].map',
         publicPath: 'https://www.inboxsdk.com/build/',
       }),
