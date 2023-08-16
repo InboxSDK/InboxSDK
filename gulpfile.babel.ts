@@ -333,7 +333,7 @@ gulp.task('clean', async () => {
 });
 
 /**
- * Copy handwritten type definitions and plain js to a appease tsc in our TS setup.
+ * Copy handwritten type definitions (inboxsdk.d.ts) and those generated from source.
  */
 gulp.task('types', async () => {
   const files = await fg(['./src/**/*.d.ts'], {
