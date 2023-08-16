@@ -104,9 +104,8 @@
   "name": "inboxsdk",
   "private": true,
   "scripts": {
-    "transpile-code": "babel -d packages/core/src --source-type module --ignore '*.test.ts' --no-copy-ignored src",
     "typecheck": "tsc",
-    "typedefs": "yarn transpile-code && tsc -p tsconfig.declarations.json",
+    "typedefs": "tsc -p tsconfig.declarations.json",
     "prepare": "husky install",
     "publish-npm": "gulp clean && gulp --production --minify && yarn workspace @inboxsdk/core npm publish && git push --follow-tags",
     "lint": "yarn run lint:eslint && yarn run prettier:check",

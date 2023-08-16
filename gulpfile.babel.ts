@@ -1,4 +1,4 @@
-import fs from 'fs';
+import fs from 'node:fs';
 import path from 'path';
 const packageJson = JSON.parse(
   fs.readFileSync(__dirname + '/package.json', 'utf8')
@@ -307,26 +307,33 @@ gulp.task('pageWorld', () => {
 });
 
 gulp.task('clean', async () => {
-  await fs.promises.rm('./dist', { force: true, recursive: true });
-  await fs.promises.rm('./packages/core/src', {
-    force: true,
-    recursive: true,
-  });
-  await fs.promises.rm('./packages/core/test', {
-    force: true,
-    recursive: true,
-  });
-  for (const filename of [
+  const folders = ['./dist', './packages/core/src', './packages/core/test'];
+  await Promise.all([
+    ...folders.map((folder) =>
+      fs.promises.rm(folder, { force: true, recursive: true })
+    ),
+    fs.promises.rm('./packages/core/inboxsdk.min.js', { force: true }),
+  ]);
+
+  const outputFiles = [
     './packages/core/inboxsdk.js',
+    './packages/core/platform-implementation.js',
     './packages/core/pageWorld.js',
-  ]) {
-    await fs.promises.rm(filename, { force: true });
-    await fs.promises.rm(filename + '.map', { force: true });
-  }
+  ];
+
+  outputFiles.flatMap((filename) => [
+    fs.promises.rm(filename, { force: true }),
+    fs.promises.rm(filename + '.LICENSE.txt', { force: true }),
+    fg(filename + '*.map', { onlyFiles: true }).then((mapFiles) =>
+      Promise.all(
+        mapFiles.map((mapFile) => fs.promises.rm(mapFile, { force: true }))
+      )
+    ),
+  ]);
 });
 
 /**
- * Copy handwritten type definitions and plain js to a appease tsc in our TS setup.
+ * Copy handwritten type definitions (inboxsdk.d.ts) and those generated from source.
  */
 gulp.task('types', async () => {
   const files = await fg(['./src/**/*.d.ts'], {
