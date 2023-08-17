@@ -1,6 +1,8 @@
 import * as Kefir from 'kefir';
 import GmailElementGetter from '../gmail-element-getter';
-import GmailNavItemView from '../views/gmail-nav-item-view';
+import GmailNavItemView, {
+  type NavItemDescriptor,
+} from '../views/gmail-nav-item-view';
 import Logger from '../../../lib/logger';
 import waitFor from '../../../lib/wait-for';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
@@ -13,7 +15,7 @@ import once from 'lodash/once';
 export default async function addNavItem(
   driver: GmailDriver,
   orderGroup: string,
-  navItemDescriptor: Kefir.Observable<any, any>,
+  navItemDescriptor: Kefir.Observable<NavItemDescriptor, unknown>,
   navMenuInjectionContainer?: HTMLElement
 ): Promise<GmailNavItemView> {
   await waitForMenuReady();
