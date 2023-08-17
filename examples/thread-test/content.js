@@ -1,3 +1,5 @@
+/// <reference path="../types.d.ts" />
+
 function addCustomMessage(sortDate) {
   const collapsedEl = document.createElement('div');
   const headerEl = document.createElement('div');
@@ -20,6 +22,23 @@ InboxSDK.load(2, 'thread-example').then((sdk) => {
   'use strict';
 
   window._sdk = sdk;
+
+  sdk.Toolbars.registerThreadButton({
+    title: 'Start',
+    positions: ['THREAD'],
+    // iconUrl: StartImage,
+    hasDropdown: true,
+    onClick(event) {
+      console.log('clicked');
+      const selectedThreadViews = event.selectedThreadViews;
+      const messages = selectedThreadViews.flatMap((view) =>
+        view.getMessageViewsAll()
+      );
+      const senders = messages.map(
+        (message) => message.getSender().emailAddress
+      );
+    },
+  });
 
   sdk.Conversations.registerThreadViewHandler((threadView) => {
     (async () => {
