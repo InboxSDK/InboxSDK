@@ -5,15 +5,26 @@ import type {
 } from '../../platform-implementation-js/platform-implementation';
 
 export class PlatformImplementationLoader {
-  static #loadScriptSet = defer<void>();
+  static #loadScript = defer<() => Promise<void>>();
 
   static async load(
     appId: string,
     opts: PiOpts
   ): Promise<PlatformImplementation> {
     if (!global.__InboxSDKImpLoader) {
-      await PlatformImplementationLoader.#loadScriptSet.promise;
-      await PlatformImplementationLoader.#loadScript();
+      const loadScript = await Promise.race([
+        PlatformImplementationLoader.#loadScript.promise,
+        new Promise<() => Promise<void>>((_resolve, reject) => {
+          setTimeout(
+            () =>
+              reject(
+                new Error('Unexpected error: This function must be overridden')
+              ),
+            5_000
+          );
+        }),
+      ]);
+      await loadScript();
       if (!global.__InboxSDKImpLoader) {
         throw new Error('Implementation file did not load correctly');
       }
@@ -22,17 +33,12 @@ export class PlatformImplementationLoader {
   }
 
   static set loadScript(fn: () => Promise<void>) {
-    PlatformImplementationLoader.#loadScript = fn;
-    PlatformImplementationLoader.#loadScriptSet.resolve();
+    PlatformImplementationLoader.#loadScript.resolve(fn);
   }
 
-  static #loadScript: () => Promise<void> = () => {
-    throw new Error('Unexpected error: This function must be overridden');
-  };
-
   static async preload() {
-    await PlatformImplementationLoader.#loadScriptSet.promise;
+    const loadScript = await PlatformImplementationLoader.#loadScript.promise;
     // Prime the load by calling it and letting the promise be memoized.
-    await PlatformImplementationLoader.#loadScript();
+    loadScript();
   }
 }
