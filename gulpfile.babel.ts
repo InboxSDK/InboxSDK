@@ -423,7 +423,7 @@ if (args.remote) {
   gulp.task('remote', () => {
     throw new Error('No separate remote bundle in non-remote bundle mode');
   });
-  gulp.task('default', gulp.parallel('sdk', 'pageWorld', 'types'));
+  gulp.task('default', gulp.parallel(gulp.series('pageWorld', 'sdk'), 'types'));
 }
 
 gulp.task(
