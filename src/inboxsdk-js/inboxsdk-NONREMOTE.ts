@@ -2,6 +2,6 @@ import { loadPi as shimLoaderLoadScript } from './loading/load-platform-implemen
 import { PlatformImplementationLoader } from './loading/platform-implementation-loader';
 import * as SDK from './inboxsdk';
 
-PlatformImplementationLoader.loadScript = shimLoaderLoadScript(0);
+PlatformImplementationLoader.loadScript = shimLoaderLoadScript(500);
 
 export default SDK;
