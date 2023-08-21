@@ -1,3 +1,4 @@
+import kefir from 'kefir';
 import { type PlatformImplementation } from './platform-implementation';
 
 declare global {
@@ -16,21 +17,22 @@ if (!global.__InboxSDKImpLoader) {
     '[role=banner] div[aria-label] div div a[href^="https://myaccount.google."], [role=banner]+div div[aria-label] div div a[href^="https://myaccount.google."]'
   );
 
-  var onready = new Promise<void>((resolve) => {
+  var onready = new Promise<null>((resolve) => {
     if (
       document.readyState === 'complete' ||
       document.readyState === 'interactive'
     ) {
-      resolve();
+      resolve(null);
     } else {
-      const fromEvent = async (event: 'DOMContentLoaded' | 'load') =>
-        new Promise<void>((resolve) =>
-          document.addEventListener(event, () => {
-            resolve();
-          })
-        );
-      Promise.all([fromEvent('DOMContentLoaded'), fromEvent('load')]).then(() =>
-        resolve()
+      resolve(
+        kefir
+          .merge([
+            kefir.fromEvents(document, 'DOMContentLoaded'),
+            kefir.fromEvents(window, 'load'),
+          ])
+          .take(1)
+          .map(() => null)
+          .toPromise()
       );
     }
   });
