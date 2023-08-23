@@ -22,7 +22,7 @@ export function extractMetadataFromThreadRow(
   var errors = [];
   var threadRowIsVertical =
     intersection(Array.from(threadRow.classList), ['zA', 'apv']).length === 2;
-  const isThreadRowAd = threadRow.querySelector('.am0');
+  const isThreadRowAd = threadRow.querySelector('.am0,.bvA');
 
   if (isThreadRowAd) {
     return ThreadRowAd;
