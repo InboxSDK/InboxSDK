@@ -12,7 +12,12 @@ import isComposeTitleBarLightColor from '../is-compose-titlebar-light-color';
 
 class GmailMoleViewDriver {
   _driver: GmailDriver;
-  _eventStream = kefirBus();
+  _eventStream = kefirBus<
+    {
+      eventName: 'minimize' | 'restore';
+    },
+    unknown
+  >();
   _stopper = kefirStopper();
   _element: HTMLElement;
 

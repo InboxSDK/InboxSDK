@@ -19,6 +19,7 @@ import type { ThreadViewEvents } from './platform-implementation-js/views/conver
 import type { ComposeViewEvent } from './platform-implementation-js/views/compose-view';
 import type AttachmentCardView from './platform-implementation-js/views/conversations/attachment-card-view';
 import type TopMessageBarView from './platform-implementation-js/widgets/top-message-bar-view';
+import type { IMoleView as MoleView } from './platform-implementation-js/widgets/mole-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 
 export const LOADER_VERSION: string;
@@ -414,12 +415,7 @@ export interface ButtonDescriptor {
   type?: string;
 }
 
-export interface MoleView extends EventEmitter {
-  close(): void;
-  getMinimized(): boolean;
-  setMinimized(value: boolean): void;
-  setTitle(title: string): void;
-}
+export { MoleView };
 
 export interface SimpleElementView extends EventEmitter {
   el: HTMLElement;
