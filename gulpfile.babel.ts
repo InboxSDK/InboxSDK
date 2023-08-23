@@ -373,7 +373,7 @@ if (args.remote) {
         library: {
           export: 'default',
           name: 'InboxSDK',
-          type: OutputLibraryType.Var,
+          type: OutputLibraryType.UMD,
         },
         import: './src/inboxsdk-js/inboxsdk-NONREMOTE-INTEGRATED-PAGEWORLD',
       },
