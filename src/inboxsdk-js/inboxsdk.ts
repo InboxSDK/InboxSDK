@@ -1,4 +1,4 @@
-import PlatformImplementationLoader from './loading/platform-implementation-loader';
+import { PlatformImplementationLoader } from './loading/platform-implementation-loader';
 import { BUILD_VERSION } from '../common/version';
 
 declare global {
@@ -37,9 +37,6 @@ const pageOrigin: string =
   (process.env.NODE_ENV === 'test' && global.__test_origin) ||
   document.location.origin;
 
-if (
-  ['https://mail.google.com', 'https://inbox.google.com'].indexOf(pageOrigin) !=
-  -1
-) {
+if ('https://mail.google.com' === pageOrigin) {
   PlatformImplementationLoader.preload();
 }

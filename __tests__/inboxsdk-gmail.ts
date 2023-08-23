@@ -1,6 +1,8 @@
 import MockMutationObserver from '../test/lib/mock-mutation-observer';
 import _ from 'lodash';
-import type { InboxSDK as InboxSDKT } from '../src/inboxsdk';
+import InboxSDK from '../src/inboxsdk-js/inboxsdk-TEST';
+//preload implementation
+import '../src/platform-implementation-js/platform-implementation';
 
 globalThis.MutationObserver = MockMutationObserver as any;
 document.documentElement.innerHTML = `
@@ -21,17 +23,13 @@ document.head.setAttribute(
 );
 document.head.setAttribute('data-inboxsdk-using-sync-api', 'false');
 
-const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST').default;
-//preload implementation
-require('../src/platform-implementation-js/platform-implementation');
-
 test('loads in gmail mock', () => {
   const appOpts = { globalErrorLogging: false };
 
   expect(InboxSDK.LOADER_VERSION).toBe('beep');
 
   return InboxSDK.load(1, 'sdk_testfoo_2a9c68f994', appOpts).then(
-    (inboxsdk: InboxSDKT) => {
+    (inboxsdk) => {
       const newGlobals = _.difference(
         Object.keys(window),
         originalWindowProperties,

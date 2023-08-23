@@ -1,6 +1,14 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
+import kefir from 'kefir';
+import { type PlatformImplementation } from './platform-implementation';
+
 declare global {
-  var __InboxSDKImpLoader: any;
+  var __InboxSDKImpLoader: {
+    load: (
+      version: string,
+      appId: string,
+      opts: any
+    ) => Promise<PlatformImplementation>;
+  };
 }
 
 if (!global.__InboxSDKImpLoader) {
@@ -9,20 +17,19 @@ if (!global.__InboxSDKImpLoader) {
     '[role=banner] div[aria-label] div div a[href^="https://myaccount.google."], [role=banner]+div div[aria-label] div div a[href^="https://myaccount.google."]'
   );
 
-  var Kefir = require('kefir');
-
-  var onready = new Promise<void>((resolve) => {
+  var onready = new Promise<null>((resolve) => {
     if (
       document.readyState === 'complete' ||
       document.readyState === 'interactive'
     ) {
-      resolve();
+      resolve(null);
     } else {
       resolve(
-        Kefir.merge([
-          Kefir.fromEvents(document, 'DOMContentLoaded'),
-          Kefir.fromEvents(window, 'load'),
-        ])
+        kefir
+          .merge([
+            kefir.fromEvents(document, 'DOMContentLoaded'),
+            kefir.fromEvents(window, 'load'),
+          ])
           .take(1)
           .map(() => null)
           .toPromise()
@@ -31,7 +38,7 @@ if (!global.__InboxSDKImpLoader) {
   });
 
   global.__InboxSDKImpLoader = {
-    load: function (version: string, appId: string, opts: any) {
+    async load(version, appId, opts) {
       if (version !== '0.1') {
         throw new Error('Unsupported InboxSDK version');
       }
@@ -43,15 +50,15 @@ if (!global.__InboxSDKImpLoader) {
       }
 
       var piLoadStarted = Date.now();
-      return onready.then(() => {
-        const {
-          makePlatformImplementation,
-        } = require('./platform-implementation');
-        return makePlatformImplementation(appId, opts, {
-          piMainStarted,
-          piLoadStarted,
-          wasAccountSwitcherReadyAtStart,
-        });
+      await onready;
+      const { makePlatformImplementation } = await import(
+        /* webpackMode: 'eager' */
+        './platform-implementation'
+      );
+      return makePlatformImplementation(appId, opts, {
+        piMainStarted,
+        piLoadStarted,
+        wasAccountSwitcherReadyAtStart,
       });
     },
   };
