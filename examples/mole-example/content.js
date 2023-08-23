@@ -1,3 +1,5 @@
+/// <reference path="../types.d.ts" />
+
 'use strict';
 
 InboxSDK.load(2, 'simple-example').then(function (inboxSDK) {

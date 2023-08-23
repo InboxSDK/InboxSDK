@@ -18,6 +18,7 @@ import { MessageViewEvent } from './platform-implementation-js/views/conversatio
 import type { ThreadViewEvents } from './platform-implementation-js/views/conversations/thread-view';
 import type { ComposeViewEvent } from './platform-implementation-js/views/compose-view';
 import type AttachmentCardView from './platform-implementation-js/views/conversations/attachment-card-view';
+import type TopMessageBarView from './platform-implementation-js/widgets/top-message-bar-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 
 export const LOADER_VERSION: string;
@@ -201,7 +202,7 @@ export interface Widgets {
   showModalView(descriptor: ModalDescriptor): ModalView;
   showMoleView(descriptor: MoleDescriptor): MoleView;
   showDrawerView(descriptor: DrawerDescriptor): DrawerView;
-  showTopMessageBarView(opts: { el: Element }): Element;
+  showTopMessageBarView(opts: { el: Element }): TopMessageBarView;
 }
 
 export interface Toolbars {
