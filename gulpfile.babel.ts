@@ -1,9 +1,5 @@
 import fs from 'node:fs';
-import path from 'path';
-const packageJson = JSON.parse(
-  fs.readFileSync(__dirname + '/package.json', 'utf8')
-);
-
+import path from 'node:path';
 import gulp from 'gulp';
 import destAtomic from 'gulp-dest-atomic';
 import webpack from 'webpack';
@@ -112,6 +108,13 @@ async function getVersion(): Promise<string> {
   ]);
   const commit = results[0].toString().trim().slice(0, 16);
   const isModified = /^\s*M/m.test(results[1].toString());
+
+  const packageJson = JSON.parse(
+    await fs.promises.readFile(
+      path.join(__dirname, 'packages/core/package.json'),
+      'utf8'
+    )
+  );
 
   let version = `${packageJson.version}-${Date.now()}-${commit}`;
   if (isModified) {

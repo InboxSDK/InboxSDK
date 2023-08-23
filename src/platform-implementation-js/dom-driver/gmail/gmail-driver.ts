@@ -87,7 +87,9 @@ import type NativeGmailNavItemView from './views/native-gmail-nav-item-view';
 import type { AppMenuItemDescriptor } from '../../namespaces/app-menu';
 
 import type ContentPanelViewDriver from '../../driver-common/sidebar/ContentPanelViewDriver';
-import GmailNavItemView from './views/gmail-nav-item-view';
+import GmailNavItemView, {
+  type NavItemDescriptor,
+} from './views/gmail-nav-item-view';
 import { MoleOptions } from '../../driver-interfaces/mole-view-driver';
 import { Contact } from '../../../inboxsdk';
 import GmailAttachmentCardView from './views/gmail-attachment-card-view';
@@ -637,7 +639,10 @@ class GmailDriver implements Driver {
 
   addNavItem(
     appId: string,
-    navItemDescriptorPropertyStream: Kefir.Observable<Object, unknown>,
+    navItemDescriptorPropertyStream: Kefir.Observable<
+      NavItemDescriptor,
+      unknown
+    >,
     navMenuInjectionContainer?: HTMLElement
   ): Promise<GmailNavItemView> {
     return addNavItem(
