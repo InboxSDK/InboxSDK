@@ -2,6 +2,11 @@ import type * as Kefir from 'kefir';
 import type EventEmitter from 'events';
 import type { TooltipDescriptor } from '../views/compose-button-view';
 import type { Contact } from '../../inboxsdk';
+import type {
+  AddressChangeEventName,
+  RecipientsChangedEvent,
+} from '../dom-driver/gmail/views/gmail-compose-view/get-address-changes-stream';
+
 export type ComposeNotice = EventEmitter & {
   destroy(): void;
   destroyed: boolean;
@@ -49,6 +54,10 @@ export type ComposeViewDriverEvent =
       };
     }
   | {
+      eventName: 'recipientsChanged';
+      data: RecipientsChangedEvent;
+    }
+  | {
       eventName: 'fullscreenChanged';
       data: {
         fullscreen: boolean;
@@ -82,6 +91,12 @@ export type ComposeViewDriverEvent =
   | {
       eventName: 'messageIDChange';
       data: string | null | undefined;
+    }
+  | {
+      eventName: AddressChangeEventName;
+      data: {
+        contact: Contact;
+      };
     };
 
 export type ComposeViewDriver = {

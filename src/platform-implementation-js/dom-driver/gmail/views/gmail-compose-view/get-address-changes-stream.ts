@@ -7,9 +7,13 @@ import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
 import { ReceiverType } from './set-recipients';
 import { Contact } from '../../../../../inboxsdk';
 
+export type AddressChangeEventName =
+  | `${'to' | 'cc' | 'bcc'}Contact${'Added' | 'Removed'}`
+  | 'fromContactChanged';
+
 export default function getAddressChangesStream(
   gmailComposeView: GmailComposeView
-): Kefir.Observable<any, any> {
+) {
   const recipientRowElements = getRecipientRowElements(
     gmailComposeView.getElement()
   );
@@ -24,9 +28,21 @@ export default function getAddressChangesStream(
     _makeSubAddressStream('bcc', gmailComposeView),
   ]);
   const umbrellaStream = mergedStream.map(_groupChangeEvents);
-  return Kefir.merge([
+  return Kefir.merge<
+    | {
+        eventName: 'recipientsChanged';
+        data: RecipientsChangedEvent;
+      }
+    | {
+        eventName: AddressChangeEventName;
+        data: {
+          contact: Contact;
+        };
+      },
+    unknown
+  >([
     mergedStream,
-    umbrellaStream as any,
+    umbrellaStream,
     getFromAddressChangeStream(gmailComposeView),
   ]);
 }
@@ -54,15 +70,7 @@ function readContactFromElement(
 function _makeSubAddressStream(
   addressType: ReceiverType,
   gmailComposeView: GmailComposeView
-): Kefir.Observable<
-  {
-    eventName: string;
-    data: {
-      contact: Contact;
-    };
-  },
-  unknown
-> {
+) {
   const contactNodes = gmailComposeView.tagTree.getAllByTag(
     `${addressType}Recipient`
   );
@@ -79,13 +87,13 @@ function _makeSubAddressStream(
       }
 
       return Kefir.constant({
-        eventName: `${addressType}ContactAdded`,
+        eventName: `${addressType}ContactAdded` as const,
         data: {
           contact,
         },
       }).merge(
         removalStream.map(() => ({
-          eventName: `${addressType}ContactRemoved`,
+          eventName: `${addressType}ContactRemoved` as const,
           data: {
             contact,
           },
@@ -95,8 +103,13 @@ function _makeSubAddressStream(
   );
 }
 
+export type RecipientsChangedEvent = Record<
+  'to' | 'cc' | 'bcc',
+  { added: Contact[]; removed: Contact[] }
+>;
+
 function _groupChangeEvents(event: any) {
-  const grouping = {
+  const grouping: RecipientsChangedEvent = {
     to: {
       added: [],
       removed: [],
@@ -114,7 +127,7 @@ function _groupChangeEvents(event: any) {
 
   (grouping as any)[parts[0]][parts[1].toLowerCase()].push(event.data.contact);
   return {
-    eventName: 'recipientsChanged',
+    eventName: 'recipientsChanged' as const,
     data: grouping,
   };
 }
@@ -142,7 +155,7 @@ function getFromAddressChangeStream(gmailComposeView: GmailComposeView) {
   });
 }
 
-function _convertToEvent(eventName: string, addressInfo: Contact) {
+function _convertToEvent<T extends string>(eventName: T, addressInfo: Contact) {
   return {
     eventName,
     data: {

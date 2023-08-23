@@ -14,6 +14,10 @@ import type {
 } from '../driver-interfaces/compose-view-driver';
 import type { Contact, ComposeView as IComposeView } from '../../inboxsdk';
 import type TypedEventEmitter from 'typed-emitter';
+import type {
+  AddressChangeEventName,
+  RecipientsChangedEvent,
+} from '../dom-driver/gmail/views/gmail-compose-view/get-address-changes-stream';
 
 interface Members {
   driver: Driver;
@@ -33,6 +37,10 @@ export interface LinkPopOverSection {
   remove(): void;
 }
 
+type AddressChangeEventsMapped = {
+  [P in AddressChangeEventName]: (data: { contact: Contact }) => void;
+};
+
 export type ComposeViewEvent = {
   newListener: (eventName: string) => void;
   close(): void;
@@ -46,7 +54,7 @@ export type ComposeViewEvent = {
   fullscreenChanged(data: { fullscreen: boolean }): void;
   linkPopOver(data: LinkPopOver): void;
   minimized(): void;
-  recipientsChanged(data: unknown): void;
+  recipientsChanged(data: RecipientsChangedEvent): void;
   resize(): void;
   restored(): void;
   sendCanceled(): void;
@@ -70,7 +78,7 @@ export type ComposeViewEvent = {
   responseTypeChanged(data: { isForward: boolean }): void;
   presending(data: { cancel(): void }): void;
   messageIDChange(data: string | null | undefined): void;
-};
+} & AddressChangeEventsMapped;
 
 export default class ComposeView
   extends (EventEmitter as new () => TypedEventEmitter<ComposeViewEvent>)
