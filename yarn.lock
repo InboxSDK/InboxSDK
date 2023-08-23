@@ -6890,7 +6890,6 @@ __metadata:
     react-dom: ^17.0.2
     react-draggable-list: ^4.0.2
     react-smooth-collapse: ^2.0.1
-    safari-fix-map: ^1.0.4
     seed-random: ^2.2.0
     sha.js: ^2.4.8
     simple-encryptor: ^4.0.0
@@ -10891,15 +10890,6 @@ __metadata:
   dependencies:
     tslib: ^2.1.0
   checksum: e034f60805210cce756dd2f49664a8108780b117cf5d0e2281506e9e6387f7b4f1532d974a8c8b09314fa7a16dd2f6cff3462072a5789672b5dcb45c4173f3c6
-  languageName: node
-  linkType: hard
-
-"safari-fix-map@npm:^1.0.4":
-  version: 1.1.0
-  resolution: "safari-fix-map@npm:1.1.0"
-  dependencies:
-    core-js: ^2.4.0
-  checksum: 672100b8135c697f56596410dfa95baa8c2e58b08efc4e700c68ac8feb328df1c23daa6d8b3a178aa4c2cc83ee3a5def646e7cc80e41106fc12828696e0aa26b
   languageName: node
   linkType: hard
 
