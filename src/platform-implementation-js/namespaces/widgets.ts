@@ -7,10 +7,11 @@ import TopMessageBarView from '../widgets/top-message-bar-view';
 import ComposeView from '../views/compose-view';
 import type { Driver, DrawerViewOptions } from '../driver-interfaces/driver';
 import get from '../../common/get-or-fail';
-import isComposeTitleBarLightColor from '../dom-driver/gmail/is-compose-titlebar-light-color'; // documented in src/docs/
+import isComposeTitleBarLightColor from '../dom-driver/gmail/is-compose-titlebar-light-color';
 import { MoleOptions } from '../driver-interfaces/mole-view-driver';
+import type { Widgets as IWidgets, ModalDescriptor } from '../../inboxsdk';
 
-class Widgets {
+class Widgets implements IWidgets {
   constructor(appId: string, driver: Driver) {
     const members = {
       driver,
@@ -18,7 +19,7 @@ class Widgets {
     memberMap.set(this, members);
   }
 
-  showModalView(options: Record<string, any>): ModalView {
+  showModalView(options: ModalDescriptor): ModalView {
     if (options.buttons) {
       options.buttons = options.buttons.map((button: any) => {
         if (button.onClick) {
@@ -59,11 +60,11 @@ class Widgets {
     return moleView;
   }
 
-  showTopMessageBarView(options: Record<string, any>): TopMessageBarView {
+  showTopMessageBarView(options: { el: Element }): TopMessageBarView {
     const topMessageBarViewDriver = get(
       memberMap,
       this
-    ).driver.createTopMessageBarDriver(kefirCast(Kefir as any, options));
+    ).driver.createTopMessageBarDriver(kefirCast(Kefir, options));
     return new TopMessageBarView({
       topMessageBarViewDriver,
     });

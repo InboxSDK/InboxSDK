@@ -1,7 +1,19 @@
+/// <reference path="../types.d.ts" />
+
 'use strict';
 
 InboxSDK.load(2, 'simple-example').then(function (inboxSDK) {
   let i = 0;
+
+  inboxSDK.Compose.registerComposeViewHandler((composeView) => {
+    composeView.addButton({
+      title: 'My Button',
+      iconUrl: 'https://mailfoogae.appspot.com/build/images/snoozeIcon.png',
+      onClick: (event) => {
+        console.log('button clicked');
+      },
+    });
+  });
 
   window.makeMoleWidget = function () {
     const div = document.createElement('div');

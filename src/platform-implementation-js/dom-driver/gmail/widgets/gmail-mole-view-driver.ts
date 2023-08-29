@@ -5,23 +5,23 @@ import kefirStopper from 'kefir-stopper';
 import streamWaitFor from '../../../lib/stream-wait-for';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import findParent from '../../../../common/find-parent';
-import type {
-  MoleViewDriver,
-  MoleOptions,
-} from '../../../driver-interfaces/mole-view-driver';
+import type { MoleOptions } from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
 import isComposeTitleBarLightColor from '../is-compose-titlebar-light-color';
 
 class GmailMoleViewDriver {
   _driver: GmailDriver;
-  _eventStream = kefirBus();
+  _eventStream = kefirBus<
+    {
+      eventName: 'minimize' | 'restore';
+    },
+    unknown
+  >();
   _stopper = kefirStopper();
   _element: HTMLElement;
 
   constructor(driver: GmailDriver, options: MoleOptions) {
-    this as MoleViewDriver; // interface check
-
     this._driver = driver;
     this._element = Object.assign(document.createElement('div'), {
       className: 'inboxsdk__mole_view ' + (options.className || ''),
