@@ -8,15 +8,20 @@ import type Membrane from '../lib/Membrane';
 import get from '../../common/get-or-fail';
 import AppToolbarButtonView from '../views/app-toolbar-button-view';
 import { SECTION_NAMES } from '../constants/toolbars';
+import type {
+  Toolbars as IToolbars,
+  ToolbarButtonDescriptor,
+} from '../../inboxsdk';
+
 type Members = {
   appId: string;
   driver: Driver;
   membrane: Membrane;
   piOpts: PiOpts;
 };
-const memberMap: WeakMap<Toolbars, Members> = new WeakMap(); // documented in src/docs/
+const memberMap: WeakMap<Toolbars, Members> = new WeakMap();
 
-export default class Toolbars extends EventEmitter {
+export default class Toolbars extends EventEmitter implements IToolbars {
   SectionNames = SECTION_NAMES;
 
   constructor(
@@ -35,7 +40,7 @@ export default class Toolbars extends EventEmitter {
     memberMap.set(this, members);
   }
 
-  registerThreadButton(buttonDescriptor: Record<string, any>) {
+  registerThreadButton(buttonDescriptor: ToolbarButtonDescriptor) {
     const members = get(memberMap, this);
 
     if (
@@ -62,6 +67,7 @@ export default class Toolbars extends EventEmitter {
           if (!_buttonDescriptor.onClick) return;
 
           _buttonDescriptor.onClick({
+            // Is this shape correct, or do we want positions here instead?
             position: event.position,
             dropdown: event.dropdown,
             selectedThreadViews: event.selectedThreadViewDrivers.map((x: any) =>
@@ -70,7 +76,7 @@ export default class Toolbars extends EventEmitter {
             selectedThreadRowViews: event.selectedThreadRowViewDrivers.map(
               (x: any) => members.membrane.get(x)
             ),
-          });
+          } as any);
         },
       });
     };

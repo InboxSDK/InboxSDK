@@ -230,7 +230,10 @@ export default class GmailNavItemView {
   }
 
   setNavItemDescriptor(
-    navItemDescriptorPropertyStream: Kefir.Observable<any, any>
+    navItemDescriptorPropertyStream: Kefir.Observable<
+      NavItemDescriptor,
+      unknown
+    >
   ) {
     navItemDescriptorPropertyStream
       .takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null))

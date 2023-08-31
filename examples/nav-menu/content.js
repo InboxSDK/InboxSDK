@@ -1,10 +1,14 @@
 function log() {
-  console.log.apply(console, ['nav-menu'].concat(Array.prototype.slice.call(arguments)));
+  console.log.apply(
+    console,
+    ['nav-menu'].concat(Array.prototype.slice.call(arguments))
+  );
 }
 
-InboxSDK.load(1, 'nav-menu').then(function(sdk) {
-  var appendStylesheet = function(url) {
-    const css = '.inboxsdk__button_icon.bentoBoxIndicator { background: transparent url(https://assets.streak.com/clientjs-commit-builds/assets/pipelineIndicator.ebfc97a74f09365a433e8537ff414815.png) no-repeat; height: 18px; width: 18px; }';
+InboxSDK.load(1, 'nav-menu').then(function (sdk) {
+  var appendStylesheet = function (url) {
+    const css =
+      '.inboxsdk__button_icon.bentoBoxIndicator { background: transparent url(https://assets.streak.com/clientjs-commit-builds/assets/pipelineIndicator.ebfc97a74f09365a433e8537ff414815.png) no-repeat; height: 18px; width: 18px; }';
     const head = document.head || document.getElementsByTagName('head')[0];
     const style = document.createElement('style');
 
@@ -19,18 +23,23 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
     document.head.appendChild(sheet);
   };
 
+  sdk.Router.handleCustomRoute(
+    'this-is-a-parent-custom-route',
+    (customRouteView) => {
+      const el = document.createElement('span');
+      el.innerHTML = 'This is a parent custom route!';
+      customRouteView.getElement().appendChild(el);
+    }
+  );
 
-  sdk.Router.handleCustomRoute('this-is-a-parent-custom-route', (customRouteView) => {
-    const el = document.createElement('span');
-    el.innerHTML = "This is a parent custom route!";
-    customRouteView.getElement().appendChild(el);
-  });
-
-  sdk.Router.handleCustomRoute('this-is-a-child-custom-route', (customRouteView) => {
-    const el = document.createElement('span');
-    el.innerHTML = "This is a child custom route!";
-    customRouteView.getElement().appendChild(el);
-  });
+  sdk.Router.handleCustomRoute(
+    'this-is-a-child-custom-route',
+    (customRouteView) => {
+      const el = document.createElement('span');
+      el.innerHTML = 'This is a child custom route!';
+      customRouteView.getElement().appendChild(el);
+    }
+  );
 
   const initNavItemAdd = () => {
     const parent = sdk.NavMenu.addNavItem({
@@ -43,7 +52,7 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
               },
               type: 'CREATE',
             },
-            name: "Click to Remove"
+            name: 'Click to Remove',
           });
         },
         type: 'CREATE',
@@ -61,25 +70,25 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
               },
               type: 'CREATE',
             },
-            name: "Click to Remove"
+            name: 'Click to Remove',
           });
         },
         type: 'CREATE',
       },
       name: 'Add New Child',
-    })
-  }
+    });
+  };
 
   const initNavItemSubtitle = () => {
     const parent = sdk.NavMenu.addNavItem({
-      name: 'P - with Subtitle'
+      name: 'P - with Subtitle',
     });
 
     const child = parent.addNavItem({
       name: 'C - with Subtitle',
-      subtitle: '123'
+      subtitle: '123',
     });
-  }
+  };
 
   const initNavItemCollapse = () => {
     const parent = sdk.NavMenu.addNavItem({
@@ -99,70 +108,70 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
         },
         type: 'CREATE',
       },
-      name: 'C - Toggle Collapse'
+      name: 'C - Toggle Collapse',
     });
 
     child.addNavItem({
-      name: 'Child of Child'
+      name: 'Child of Child',
     });
-  }
+  };
 
   const initNavItemChildren = () => {
     const parent = sdk.NavMenu.addNavItem({
-      name: 'P - with Children'
+      name: 'P - with Children',
     });
 
     childIconUrl = parent.addNavItem({
       iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
       name: 'Child iconUrl',
-      orderHint: 2
+      orderHint: 2,
     });
 
     const iconElement = document.createElement('div');
-    iconElement.innerHTML = "S";
+    iconElement.innerHTML = 'S';
     Object.assign(iconElement.style, {
-      alignItems: "center",
-      backgroundColor: "tomato",
-      borderRadius: "50%",
-      color: "white",
-      display: "flex",
-      height: "18px",
-      justifyContent: "center",
-      marginLeft: "1px",
-      width: "18px"
+      alignItems: 'center',
+      backgroundColor: 'tomato',
+      borderRadius: '50%',
+      color: 'white',
+      display: 'flex',
+      height: '18px',
+      justifyContent: 'center',
+      marginLeft: '1px',
+      width: '18px',
     });
 
     childIconElement = parent.addNavItem({
       iconElement,
       name: 'Child iconElement',
-      orderHint: 1
+      orderHint: 1,
     });
 
     childIconClass = parent.addNavItem({
       iconClass: 'navMenu_iconClass_example',
       name: 'Child iconClass',
-      orderHint: 3
+      orderHint: 3,
     });
 
     childIconUrl.addNavItem({
-      name: 'Child of Child'
+      name: 'Child of Child',
     });
 
     childIconElement.addNavItem({
-      name: 'Child of Child'
+      name: 'Child of Child',
     });
 
     childIconClass.addNavItem({
-      name: 'Child of Child '
+      name: 'Child of Child ',
     });
-  }
+  };
 
   const initNavItemAccessoryAndIcon = () => {
     appendStylesheet();
 
     sdk.NavMenu.addNavItem({
       accessory: {
-        onClick: event => {
+        onClick: (event) => {
           event.dropdown.el.innerHTML = 'This is the dropdown el';
         },
         type: 'DROPDOWN_BUTTON',
@@ -172,7 +181,7 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
 
     sdk.NavMenu.addNavItem({
       accessory: {
-        onClick: event => {
+        onClick: (event) => {
           event.dropdown.el.innerHTML = 'This is the dropdown el';
         },
         type: 'CREATE',
@@ -180,12 +189,12 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
       iconClass: 'bentoBoxIndicator',
       name: 'P - Create w/ iconClass',
     });
-  }
+  };
 
   const initNavItemAccessories = () => {
     sdk.NavMenu.addNavItem({
       accessory: {
-        onClick: event => {
+        onClick: (event) => {
           event.dropdown.el.innerHTML = 'This is the dropdown el';
         },
         type: 'DROPDOWN_BUTTON',
@@ -196,13 +205,13 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
     sdk.NavMenu.addNavItem({
       accessory: {
         onClick: () => {
-          alert("Create accessory clicked");
+          alert('Create accessory clicked');
         },
-        type: 'CREATE'
+        type: 'CREATE',
       },
       name: 'P - Create',
     });
-  }
+  };
 
   const initNavItemIcons = () => {
     appendStylesheet();
@@ -210,26 +219,26 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
     sdk.NavMenu.addNavItem({
       iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
       routeID: 'this-is-a-parent-custom-route',
-      name: 'P - iconUrl'
+      name: 'P - iconUrl',
     });
 
     const iconElement = document.createElement('div');
-    iconElement.innerHTML = "S";
+    iconElement.innerHTML = 'S';
     Object.assign(iconElement.style, {
-      alignItems: "center",
-      backgroundColor: "tomato",
-      borderRadius: "50%",
-      color: "white",
-      display: "flex",
-      height: "18px",
-      justifyContent: "center",
-      width: "18px"
+      alignItems: 'center',
+      backgroundColor: 'tomato',
+      borderRadius: '50%',
+      color: 'white',
+      display: 'flex',
+      height: '18px',
+      justifyContent: 'center',
+      width: '18px',
     });
 
     sdk.NavMenu.addNavItem({
       iconElement,
       routeID: 'this-is-a-parent-custom-route',
-      name: 'P - iconElement'
+      name: 'P - iconElement',
     });
 
     const parentIconClass = sdk.NavMenu.addNavItem({
@@ -237,8 +246,7 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
       routeID: 'this-is-a-parent-custom-route',
       name: 'P - iconClass',
     });
-
-  }
+  };
 
   const initNavItemRoute = () => {
     const parent = sdk.NavMenu.addNavItem({
@@ -249,8 +257,8 @@ InboxSDK.load(1, 'nav-menu').then(function(sdk) {
     parent.addNavItem({
       name: 'C - Custom Route',
       routeID: 'this-is-a-child-custom-route',
-    })
-  }
+    });
+  };
 
   // initNavItemAdd();
   // initNavItemSubtitle();

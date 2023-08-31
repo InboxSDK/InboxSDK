@@ -27,11 +27,11 @@ export default function clickAndGetPopupUrl(
     shiftKey: false,
     metaKey: true,
   };
-  (event as any).initMouseEvent(
+  event.initMouseEvent(
     'click',
     options.bubbles,
     options.cancelable,
-    document.defaultView,
+    document.defaultView!,
     options.button,
     options.pointerX,
     options.pointerY,

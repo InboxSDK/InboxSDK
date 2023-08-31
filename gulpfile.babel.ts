@@ -1,9 +1,5 @@
-import fs from 'fs';
-import path from 'path';
-const packageJson = JSON.parse(
-  fs.readFileSync(__dirname + '/package.json', 'utf8')
-);
-
+import fs from 'node:fs';
+import path from 'node:path';
 import gulp from 'gulp';
 import destAtomic from 'gulp-dest-atomic';
 import webpack from 'webpack';
@@ -112,6 +108,13 @@ async function getVersion(): Promise<string> {
   ]);
   const commit = results[0].toString().trim().slice(0, 16);
   const isModified = /^\s*M/m.test(results[1].toString());
+
+  const packageJson = JSON.parse(
+    await fs.promises.readFile(
+      path.join(__dirname, 'packages/core/package.json'),
+      'utf8'
+    )
+  );
 
   let version = `${packageJson.version}-${Date.now()}-${commit}`;
   if (isModified) {
@@ -245,17 +248,14 @@ async function webpackTask({
       // https://github.com/webpack/changelog-v5/issues/10
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
-        // https://github.com/algolia/places/issues/847#issuecomment-748202652 For Algolia
+        // transitively from react-draggable-list -> react-motion -> performance-now uses 'process/browser'
         process: 'process/browser',
       }),
       ...(options.devtool === 'remote'
         ? [
             new webpack.SourceMapDevToolPlugin({
               fileContext: '../',
-              // Adds hash to the end of the sourcemap URL so that
-              // remote code source maps are not cached erroneously by Sentry.
-              filename: '[file].map?hash=[contenthash]',
-              append: `\n//# sourceURL=https://www.inboxsdk.com/build/[file]?hash=[contenthash]`,
+              filename: '[file].[contenthash].map',
               publicPath: 'https://www.inboxsdk.com/build/',
             }),
           ]
@@ -264,7 +264,10 @@ async function webpackTask({
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       fallback: {
-        buffer: require.resolve('buffer'),
+        // 'assert' used in the SDK directly
+        assert: require.resolve('assert/'),
+        // 'querystring' used in the SDK directly
+        querystring: require.resolve('querystring-es3/'),
       },
     },
     stats: {
@@ -307,26 +310,33 @@ gulp.task('pageWorld', () => {
 });
 
 gulp.task('clean', async () => {
-  await fs.promises.rm('./dist', { force: true, recursive: true });
-  await fs.promises.rm('./packages/core/src', {
-    force: true,
-    recursive: true,
-  });
-  await fs.promises.rm('./packages/core/test', {
-    force: true,
-    recursive: true,
-  });
-  for (const filename of [
+  const folders = ['./dist', './packages/core/src', './packages/core/test'];
+  await Promise.all([
+    ...folders.map((folder) =>
+      fs.promises.rm(folder, { force: true, recursive: true })
+    ),
+    fs.promises.rm('./packages/core/inboxsdk.min.js', { force: true }),
+  ]);
+
+  const outputFiles = [
     './packages/core/inboxsdk.js',
+    './packages/core/platform-implementation.js',
     './packages/core/pageWorld.js',
-  ]) {
-    await fs.promises.rm(filename, { force: true });
-    await fs.promises.rm(filename + '.map', { force: true });
-  }
+  ];
+
+  outputFiles.flatMap((filename) => [
+    fs.promises.rm(filename, { force: true }),
+    fs.promises.rm(filename + '.LICENSE.txt', { force: true }),
+    fg(filename + '*.map', { onlyFiles: true }).then((mapFiles) =>
+      Promise.all(
+        mapFiles.map((mapFile) => fs.promises.rm(mapFile, { force: true }))
+      )
+    ),
+  ]);
 });
 
 /**
- * Copy handwritten type definitions and plain js to a appease tsc in our TS setup.
+ * Copy handwritten type definitions (inboxsdk.d.ts) and those generated from source.
  */
 gulp.task('types', async () => {
   const files = await fg(['./src/**/*.d.ts'], {
@@ -413,7 +423,7 @@ if (args.remote) {
   gulp.task('remote', () => {
     throw new Error('No separate remote bundle in non-remote bundle mode');
   });
-  gulp.task('default', gulp.parallel('sdk', 'pageWorld', 'types'));
+  gulp.task('default', gulp.parallel(gulp.series('pageWorld', 'sdk'), 'types'));
 }
 
 gulp.task(

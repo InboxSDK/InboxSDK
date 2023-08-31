@@ -1,17 +1,25 @@
 import { EventEmitter } from 'events';
-import * as Kefir from 'kefir';
-import TypedEmitter from 'typed-emitter';
+import type * as Kefir from 'kefir';
+import type TypedEmitter from 'typed-emitter';
 import AppMenu from './platform-implementation-js/namespaces/app-menu';
-import {
+import type {
   NavItemTypes,
   NavItemDescriptor,
 } from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 import NavItemView from './platform-implementation-js/views/nav-item-view';
 import type { Stopper } from 'kefir-stopper';
-import GmailRouteProcessor from './platform-implementation-js/dom-driver/gmail/views/gmail-route-view/gmail-route-processor';
-import GmailDriver from './platform-implementation-js/dom-driver/gmail/gmail-driver';
-import GmailRowListView from './platform-implementation-js/dom-driver/gmail/views/gmail-row-list-view';
+import type GmailRouteProcessor from './platform-implementation-js/dom-driver/gmail/views/gmail-route-view/gmail-route-processor';
+import type GmailDriver from './platform-implementation-js/dom-driver/gmail/gmail-driver';
+import type GmailRowListView from './platform-implementation-js/dom-driver/gmail/views/gmail-row-list-view';
 import type { AppLogger } from './platform-implementation-js/lib/logger';
+import type { IThreadRowView as ThreadRowView } from './platform-implementation-js/views/thread-row-view';
+import TypedEventEmitter from 'typed-emitter';
+import { MessageViewEvent } from './platform-implementation-js/views/conversations/message-view';
+import type { ThreadViewEvents } from './platform-implementation-js/views/conversations/thread-view';
+import type { ComposeViewEvent } from './platform-implementation-js/views/compose-view';
+import type AttachmentCardView from './platform-implementation-js/views/conversations/attachment-card-view';
+import type TopMessageBarView from './platform-implementation-js/widgets/top-message-bar-view';
+import type { IMoleView as MoleView } from './platform-implementation-js/widgets/mole-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 
 export const LOADER_VERSION: string;
@@ -184,7 +192,7 @@ export interface Widgets {
   showModalView(descriptor: ModalDescriptor): ModalView;
   showMoleView(descriptor: MoleDescriptor): MoleView;
   showDrawerView(descriptor: DrawerDescriptor): DrawerView;
-  showTopMessageBarView(opts: { el: Element }): Element;
+  showTopMessageBarView(opts: { el: Element }): TopMessageBarView;
 }
 
 export interface Toolbars {
@@ -252,59 +260,10 @@ export interface User {
   isConversationViewDisabled(): Promise<boolean>;
 }
 
-interface Destroyable extends EventEmitter {
-  readonly destroyed: boolean;
-  addListener(event: 'destroy', listener: () => void): this;
-  // emit(event: "destroy"): boolean;
-  on(event: 'destroy', listener: () => void): this;
-  off(event: 'destroy', listener: () => void): this;
-  once(event: 'destroy', listener: () => void): this;
-  prependListener(event: 'destroy', listener: () => void): this;
-  prependOnceListener(event: 'destroy', listener: () => void): this;
-  removeListener(event: 'destroy', listener: () => void): this;
-}
-
-export interface ImageDescriptor {
-  imageUrl?: string;
-  imageClass?: string;
-  tooltip?: string;
-  orderHint?: number;
-}
-
-export interface ThreadRowView extends Destroyable {
-  addLabel(labelDescriptor: LabelDescriptor | any): void;
-  addAttachmentIcon(threadRowAttachmentIconDescriptor: any): void;
-  addImage(
-    imageDescriptor:
-      | ImageDescriptor
-      | Kefir.Observable<ImageDescriptor | null, any>
-  ): void;
-  getElement(): HTMLElement;
-  getVisibleDraftCount(): number;
-  getThreadIDIfStable(): string | null;
-  getThreadIDIfStableAsync(): Promise<string | null>;
-  addButton(threadRowButtonDescriptor: any): void;
-  getThreadID(): string;
-  getThreadIDAsync(): Promise<string>;
-  getDraftID(): Promise<string>;
-  isSelected(): boolean;
-  replaceDate(
-    threadDateDescriptor:
-      | ThreadDateDescriptor
-      | null
-      | Kefir.Observable<ThreadDateDescriptor | null, any>
-  ): void;
-  getVisibleMessageCount(): number;
-  getSubject(): string;
-  replaceSubject(newSubjectStr: string): void;
-  getContacts(): Array<{ name: string | null; emailAddress: string }>;
-  replaceDraftLabel(
-    descriptor:
-      | DraftLabelDescriptor
-      | null
-      | Kefir.Observable<DraftLabelDescriptor | null, any>
-  ): void;
-}
+export {
+  IThreadRowView as ThreadRowView,
+  ImageDescriptor,
+} from './platform-implementation-js/views/thread-row-view';
 
 export interface ThreadDateDescriptor {
   text: string;
@@ -318,9 +277,9 @@ export interface DraftLabelDescriptor {
 }
 
 export interface LabelDescriptor {
-  title: string;
+  title?: string;
   titleHtml?: string;
-  iconUrl: string;
+  iconUrl?: string;
   iconClass?: string;
   iconHtml?: string;
   foregroundColor?: string;
@@ -445,12 +404,7 @@ export interface ButtonDescriptor {
   type?: string;
 }
 
-export interface MoleView extends EventEmitter {
-  close(): void;
-  getMinimized(): boolean;
-  setMinimized(value: boolean): void;
-  setTitle(title: string): void;
-}
+export { MoleView };
 
 export interface SimpleElementView extends EventEmitter {
   el: HTMLElement;
@@ -458,12 +412,18 @@ export interface SimpleElementView extends EventEmitter {
   destroy(): void;
 }
 
-export interface ThreadView extends EventEmitter {
+export interface ThreadView extends TypedEventEmitter<ThreadViewEvents> {
   addLabel(): SimpleElementView;
   addSidebarContentPanel(
     contentPanelDescriptor: ContentPanelDescriptor
   ): ContentPanelView;
+  /**
+   * @returns {MessageView[]} of all the loaded MessageView objects currently in the thread. @see MessageView for more information on what "loaded" means. Note that more messages may load into the thread later! If it's important to get future messages, use {@link Conversations#registerMessageViewHandler} instead.
+   */
   getMessageViews(): Array<MessageView>;
+  /**
+   * @returns {MessageView[]} of all the MessageView objects in the thread regardless of their load state. @see MessageView for more information on what "loaded" means.
+   */
   getMessageViewsAll(): Array<MessageView>;
   getSubject(): string;
   /**
@@ -548,7 +508,17 @@ export interface MessageViewToolbarButtonDescriptor {
   orderHint?: number;
 }
 
-export interface MessageView extends EventEmitter {
+export type { MessageViewViewStates } from './platform-implementation-js/namespaces/conversations';
+
+/**
+ * Represents a visible message in the UI. There are properties to access data about the message itself as well as change the state of the UI. MessageViews have a view state as well as a loaded state. These 2 properties are orthogonal to each other.
+
+ * A messages' view state can be one of {@link MessageViewViewStates.EXPANDED}, {@link MessageViewViewStates.COLLAPSED} or {@link MessageViewViewStates.HIDDEN}. Gmail visually display messages in a thread in different ways depending on what they are trying to show a user. These values are described in the enum MessageViewViewStates. The load state of a message determines whether all of the data pertaining to a message has been loaded in the UI. In some case, not all the information (such as recipients or the body) may be loaded, typically when the the view state is COLLAPSED or HIDDEN.
+
+ * @note You should not depend on any relationship between the view state
+ * and load state. Instead, use the provided {MessageView#getViewState} and {MessageView#isLoaded} methods.
+ */
+export interface MessageView extends TypedEventEmitter<MessageViewEvent> {
   addAttachmentIcon(
     opts:
       | MessageAttachmentIconDescriptor
@@ -557,7 +527,19 @@ export interface MessageView extends EventEmitter {
   addToolbarButton(opts?: MessageViewToolbarButtonDescriptor): void;
   getBodyElement(): HTMLElement;
   isElementInQuotedArea(element: HTMLElement): boolean;
+  /**
+   * Returns whether this message has been loaded yet. If the message has not been loaded, some of the data related methods on this object may return empty results. The message may be loaded once the user clicks on the message stub.
+   */
   isLoaded(): boolean;
+  getFileAttachmentCardViews(): AttachmentCardView[];
+  /**
+   * Get the contact of the sender of this message.
+
+    * @returns {Contact} The contact of the sender of this message.
+    * @throws {Error} If the message has not been loaded yet.
+    *
+    * @note If you're using this method on an array of {MessageView}s returned by {@link ThreadRowView#getMessageViewsAll}, make sure to check {@link MessageView#isLoaded} before calling this method.
+   */
   getSender(): Contact;
   getRecipients(): Array<Contact>;
   getRecipientsFull(): Promise<Array<Contact>>;
@@ -628,7 +610,13 @@ export interface DropdownView extends EventEmitter {
   reposition(): void;
 }
 
-export interface ComposeView extends EventEmitter {
+export {
+  ComposeViewEvent,
+  LinkPopOver,
+  LinkPopOverSection,
+} from './platform-implementation-js/views/compose-view';
+
+export interface ComposeView extends TypedEmitter<ComposeViewEvent> {
   destroyed: boolean;
   addButton(
     buttonOptions:
@@ -649,10 +637,9 @@ export interface ComposeView extends EventEmitter {
   getBccRecipients(): Array<Contact>;
   getBodyElement(): HTMLElement;
   getCcRecipients(): Array<Contact>;
-  getCurrentDraftID(): Promise<string | null>;
+  getCurrentDraftID(): Promise<string | null | undefined>;
   getElement(): HTMLElement;
-  getDraftID(): Promise<string | null>;
-  getMessageIDAsync(): Promise<string>;
+  getDraftID(): Promise<string | null | undefined>;
   getSubject(): string;
   getSubjectInput(): HTMLInputElement | null;
   getThreadID(): string;
@@ -664,7 +651,7 @@ export interface ComposeView extends EventEmitter {
   isMinimized(): boolean;
   setMinimized(minimized: boolean): void;
   isFullscreen(): boolean;
-  insertHTMLIntoBodyAtCursor(html: string): HTMLElement;
+  insertHTMLIntoBodyAtCursor(html: string): HTMLElement | null | undefined;
   isForward(): boolean;
   isInlineReplyForm(): boolean;
   isReply(): boolean;
@@ -691,10 +678,9 @@ export interface SendOptions {
   sendAndArchive?: boolean;
 }
 
-export interface ComposeViewDestroyEvent {
-  messageID: string | null;
-  closedByInboxSDK: boolean;
-}
+export type ComposeViewDestroyEvent = Parameters<
+  ComposeViewEvent['destroy']
+>[0];
 
 export interface ComposeButtonDescriptor {
   title: string;

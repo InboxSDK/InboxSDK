@@ -41,7 +41,7 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
       },
       routeID: 'custom-route-1',
       isRouteActive: (route) => {
-        const routeID = route.getRouteID()
+        const routeID = route.getRouteID();
         return routeID === 'custom-route-1';
       },
     }),
@@ -53,12 +53,12 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
       },
       routeID: 'custom-route-2',
       isRouteActive: (route) => {
-        const routeID = route.getRouteID()
+        const routeID = route.getRouteID();
         return routeID === 'custom-route-2';
       },
       iconUrl: {
         lightTheme: chrome.runtime.getURL('monkey.png'),
-      }
+      },
     }),
     /** No panel with this menu item */
     customItem3 = sdk.AppMenu.addMenuItem({
@@ -69,48 +69,54 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
       },
       routeID: 'custom-route-3',
       isRouteActive: (route) => {
-        const routeID = route.getRouteID()
+        const routeID = route.getRouteID();
         return routeID === 'custom-route-3';
       },
       iconUrl: {
         lightTheme: chrome.runtime.getURL('monkey-face.jpg'),
-      }
+      },
     }),
     panel1 = await customItem1.addCollapsiblePanel({
       // title: 'Lion panel',
       primaryButton: {
         name: 'Lion panel',
         onClick: () => alert('clicked custom panel 1'),
-        iconUrl: {lightTheme: chrome.runtime.getURL('lion.png')},
-      }
+        iconUrl: { lightTheme: chrome.runtime.getURL('lion.png') },
+      },
     }),
     panel2 = await customItem2.addCollapsiblePanel({
       loadingIcon: `<div>
         Slow loading...20s&nbsp;
-        <img src="${chrome.runtime.getURL('monkey.png')}" width="20" height="20" />
+        <img src="${chrome.runtime.getURL(
+          'monkey.png'
+        )}" width="20" height="20" />
       </div>`,
       primaryButton: {
         name: 'Monkey panel',
         onClick: () => alert('clicked custom panel 2'),
-        iconUrl: {lightTheme: chrome.runtime.getURL('monkey.png')},
-      }
+        iconUrl: { lightTheme: chrome.runtime.getURL('monkey.png') },
+      },
     });
 
-    panel2.setLoading(true);
+  panel2.setLoading(true);
 
-    // Simulate very slow loading.
-    new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 20_000);
-    }).then(() => {
-      panel2.setLoading(false);
+  // Simulate very slow loading.
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, 20_000);
+  }).then(() => {
+    panel2.setLoading(false);
+  });
+
+  panel1.addNavItem({
+    name: 'Nav Item 1',
+    onClick: () => sdk.Router.goto('custom-route-3'),
+  });
+
+  sdk.AppMenu.events
+    .filter((event) => event.type === 'collapseToggled')
+    .onValue((event) => {
+      console.log('collapseToggled', event);
     });
-
-    panel1.addNavItem({
-      name: 'Nav Item 1',
-      onClick: () => sdk.Router.goto('custom-route-3'),
-    })
-
-    sdk.AppMenu.events.filter(event => event.type === 'collapseToggled').onValue(event => {console.log('collapseToggled', event)})
 });

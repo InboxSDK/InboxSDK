@@ -28,7 +28,10 @@ jest.mock('../../../../lib/dom/make-mutation-observer-chunked-stream', () => {
   return () => require('kefir-bus')();
 });
 
-global.localStorage = new MockWebStorage();
+// https://github.com/jestjs/jest/issues/2098#issuecomment-260733457
+Object.defineProperty(globalThis, 'localStorage', {
+  value: new MockWebStorage(),
+});
 (global as any)._APP_SIDEBAR_TEST = true;
 describe('GmailAppSidebarView Primary', function () {
   beforeEach(() => {
@@ -38,10 +41,7 @@ describe('GmailAppSidebarView Primary', function () {
     removeSidebarContainerElement();
   });
   it('construction works', () => {
-    const gmailAppSidebarView = new GmailAppSidebarView(
-      makeDriver(),
-      makeContentContainerElement()
-    );
+    new GmailAppSidebarView(makeDriver(), makeContentContainerElement());
   });
   it('sidebar is added', async () => {
     const container = makeContentContainerElement();

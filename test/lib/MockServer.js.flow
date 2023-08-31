@@ -1,9 +1,0 @@
-/* @flow */
-
-declare export default class MockServer {
-  XMLHttpRequest: typeof XMLHttpRequest;
-
-  constructor(): MockServer;
-  respondWith(filter: Object, responder: Object): void;
-  setVerbose(verbose: boolean): void;
-}

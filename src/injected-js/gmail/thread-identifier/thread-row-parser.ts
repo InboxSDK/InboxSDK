@@ -2,21 +2,31 @@ import intersection from 'lodash/intersection';
 import assert from 'assert';
 import * as logger from '../../injected-logger';
 import { cleanupPeopleLine } from '../../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
+
 export type ThreadRowMetadata = {
   timeString: string;
   subject: string;
   peopleHtml: string;
 };
+
+/**
+ * Ads in the Promotions tab aren't included with other thread row data.
+ */
+export const ThreadRowAd = Symbol(`ThreadRowAd`);
+
 export function extractMetadataFromThreadRow(
   threadRow: HTMLElement
-): ThreadRowMetadata {
+): ThreadRowMetadata | typeof ThreadRowAd {
   var timeSpan, subjectSpan, peopleDiv;
   assert(threadRow.hasAttribute('id'), 'check element is main thread row');
   var errors = [];
   var threadRowIsVertical =
     intersection(Array.from(threadRow.classList), ['zA', 'apv']).length === 2;
+  const isThreadRowAd = threadRow.querySelector('.am0,.bvA');
 
-  if (threadRowIsVertical) {
+  if (isThreadRowAd) {
+    return ThreadRowAd;
+  } else if (threadRowIsVertical) {
     var threadRow2 = threadRow.nextElementSibling;
 
     if (!threadRow2) {

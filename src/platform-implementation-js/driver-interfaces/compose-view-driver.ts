@@ -2,6 +2,11 @@ import type * as Kefir from 'kefir';
 import type EventEmitter from 'events';
 import type { TooltipDescriptor } from '../views/compose-button-view';
 import type { Contact } from '../../inboxsdk';
+import type {
+  AddressChangeEventName,
+  RecipientsChangedEvent,
+} from '../dom-driver/gmail/views/gmail-compose-view/get-address-changes-stream';
+
 export type ComposeNotice = EventEmitter & {
   destroy(): void;
   destroyed: boolean;
@@ -23,8 +28,79 @@ export type ComposeButtonDescriptor = {
   orderHint?: number | null | undefined;
   enabled?: boolean | null | undefined;
 };
+
+export type ComposeViewDriverEvent =
+  | {
+      eventName:
+        | 'buttonAdded'
+        | 'bodyChanged'
+        | 'discardCanceled'
+        | 'draftSaved'
+        | 'minimized'
+        | 'resize'
+        | 'restored'
+        | 'sendCanceled'
+        | 'sending'
+        | 'sent'
+        | 'subjectChanged';
+      // Added to appease tsc where `unknown` or omitting `data` causes errors
+      data?: any;
+    }
+  | {
+      eventName: 'destroy';
+      data: {
+        messageID: string | null | undefined;
+        closedByInboxSDK: boolean;
+      };
+    }
+  | {
+      eventName: 'recipientsChanged';
+      data: RecipientsChangedEvent;
+    }
+  | {
+      eventName: 'fullscreenChanged';
+      data: {
+        fullscreen: boolean;
+      };
+    }
+  | {
+      eventName: 'responseTypeChanged';
+      data: {
+        isForward: boolean;
+      };
+    }
+  | {
+      eventName: 'presending';
+      data: {
+        cancel(): void;
+      };
+    }
+  | {
+      eventName: 'sent';
+      data: {
+        getMessageID(): Promise<string>;
+        getThreadID(): Promise<string>;
+      };
+    }
+  | {
+      eventName: 'discard';
+      data: {
+        cancel(): void;
+      };
+    }
+  | {
+      eventName: 'messageIDChange';
+      data: string | null | undefined;
+    }
+  | {
+      eventName: AddressChangeEventName;
+      data: {
+        contact: Contact;
+      };
+    };
+
 export type ComposeViewDriver = {
-  getEventStream(): Kefir.Observable<Record<string, any>, unknown>;
+  getEventStream(): Kefir.Observable<ComposeViewDriverEvent, unknown>;
   getStopper(): Kefir.Observable<any, unknown>;
   getElement(): HTMLElement;
   insertBodyTextAtCursor(text: string): HTMLElement | null | undefined;

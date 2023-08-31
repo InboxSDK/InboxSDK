@@ -70,13 +70,14 @@ import {
   makePageParser,
   getRecipientRowElements,
 } from './gmail-compose-view/page-parser';
-import PageParserTree from 'page-parser-tree';
-import { TagTree } from 'tag-tree';
+import type PageParserTree from 'page-parser-tree';
+import type { TagTree } from 'tag-tree';
 import * as fromManager from './gmail-compose-view/from-manager';
 import type {
   ComposeButtonDescriptor,
   ComposeNotice,
   ComposeViewDriver,
+  ComposeViewDriverEvent,
   StatusBar,
 } from '../../../driver-interfaces/compose-view-driver';
 import type GmailDriver from '../gmail-driver';
@@ -96,7 +97,7 @@ class GmailComposeView implements ComposeViewDriver {
   _managedViewControllers: Array<{
     destroy(): void;
   }>;
-  _eventStream: Bus<any, unknown>;
+  _eventStream: Bus<ComposeViewDriverEvent, unknown>;
   _isTriggeringADraftSavePending: boolean;
   _buttonViewControllerTooltipMap: WeakMap<
     Record<string, any>,
@@ -601,9 +602,19 @@ class GmailComposeView implements ComposeViewDriver {
     return this._destroyed;
   }
 
+  #getSubjectChangesStream() {
+    const subjectElement = this.getSubjectInput();
+    return Kefir.fromEvents(subjectElement, 'input').map(() => {
+      return {
+        eventName: 'subjectChanged' as const,
+      };
+    });
+  }
+
   _setupStreams() {
     this._eventStream.plug(getAddressChangesStream(this));
 
+    this._eventStream.plug(this.#getSubjectChangesStream());
     this._eventStream.plug(getBodyChangesStream(this));
 
     this._eventStream.plug(getResponseTypeChangesStream(this));
@@ -1185,31 +1196,28 @@ class GmailComposeView implements ComposeViewDriver {
     const dropzoneSelector = inline
       ? 'body > .aC7:not(.aWP)'
       : 'body > .aC7.aWP';
-    const el: HTMLElement | null | undefined = t.toArray<
-      any,
-      HTMLElement | null | undefined
-    >(
-      Array.prototype.slice.call(
-        document.querySelectorAll<HTMLElement>(dropzoneSelector)
-      ),
-      t.compose(
-        t.filter(isElementVisible),
-        t.filter((dropzone: HTMLElement) => {
-          const top = parseInt(dropzone.style.top, 10);
-          const bottom = top + parseInt(dropzone.style.height, 10);
-          const left = parseInt(dropzone.style.left, 10);
-          const right = left + parseInt(dropzone.style.width, 10);
-          return (
-            top >= rect.top &&
-            left >= rect.left &&
-            right <= rect.right &&
-            bottom <= rect.bottom
-          );
-        }),
-        t.take(1)
-      )
-    )[0];
+    const el = [
+      ...document.querySelectorAll<HTMLElement>(dropzoneSelector),
+    ].find((dropzone) => {
+      if (!isElementVisible(dropzone)) {
+        return false;
+      }
 
+      const top = parseInt(dropzone.style.top, 10);
+      /**
+       * Fullscreen compose dropzones have no explicit `Element.prototype.style.height`. `bottom` is NaN because of this.
+       */
+      const bottom = top + parseInt(dropzone.style.height, 10);
+      const left = parseInt(dropzone.style.left, 10);
+      const right = left + parseInt(dropzone.style.width, 10);
+
+      return (
+        top >= rect.top &&
+        left >= rect.left &&
+        right <= rect.right &&
+        (this.isFullscreen() || bottom <= rect.bottom)
+      );
+    });
     if (!el) {
       throw new Error('Failed to find dropzone');
     }
@@ -1634,6 +1642,7 @@ class GmailComposeView implements ComposeViewDriver {
           try {
             // If this succeeds, then the draft must exist on the server and we
             // can safely return the draft id we know.
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const gmailMessageId =
               await this._driver.getGmailMessageIdForSyncDraftId(syncMessageId);
           } catch (e) {

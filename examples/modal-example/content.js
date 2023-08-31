@@ -1,3 +1,5 @@
+/// <reference path="../types.d.ts" />
+
 'use strict';
 
 var div = document.createElement('div');
@@ -7,13 +9,16 @@ div.style.backgroundColor = 'red';
 
 var sdk;
 
-InboxSDK.load(1, 'modal-example', {inboxBeta:true}).then(function(inboxSDK) {
+InboxSDK.load(1, 'modal-example', { inboxBeta: true }).then(function (
+  inboxSDK
+) {
   window.sdk = sdk = inboxSDK;
 
-  sdk.Compose.registerComposeViewHandler(composeView => {
+  sdk.Compose.registerComposeViewHandler((composeView) => {
     window._cv = composeView;
 
-    const imageUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAPCAIAAABr+ngCAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHVJREFUeNpidNnZwkAuYGKgAFCm2VVKjwxtQF1AxARnkaQTwmBBE9r97BIx2iCAmSFAW5lXHM4HsoHo3ueXmNqQlUGsYYHbhmwqsiswfQR3HQuaEKYRWLWha8ZlBFZt2DVjGoEnCFnwhC3+kB/Y5EmJZoAAAwDdxywx4cg7qwAAAABJRU5ErkJggg==';
+    const imageUri =
+      'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAPCAIAAABr+ngCAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHVJREFUeNpidNnZwkAuYGKgAFCm2VVKjwxtQF1AxARnkaQTwmBBE9r97BIx2iCAmSFAW5lXHM4HsoHo3ueXmNqQlUGsYYHbhmwqsiswfQR3HQuaEKYRWLWha8ZlBFZt2DVjGoEnCFnwhC3+kB/Y5EmJZoAAAwDdxywx4cg7qwAAAABJRU5ErkJggg==';
 
     composeView.addButton({
       title: 'Open Drawer',
@@ -23,13 +28,16 @@ InboxSDK.load(1, 'modal-example', {inboxBeta:true}).then(function(inboxSDK) {
         el.style.flex = '1';
         el.innerHTML = 'foo <div> blah </div>';
         const drawer = sdk.Widgets.showDrawerView({
-          composeView, closeWithCompose: true, el, title: 'Drawer+Compose Test'
+          composeView,
+          closeWithCompose: true,
+          el,
+          title: 'Drawer+Compose Test',
         });
         drawer.on('destroy', () => {
           console.log('drawer destroy');
         });
       },
-      section: 'TRAY_LEFT'
+      section: 'TRAY_LEFT',
     });
   });
 });
@@ -37,130 +45,126 @@ InboxSDK.load(1, 'modal-example', {inboxBeta:true}).then(function(inboxSDK) {
 var PRIMARY_BUTTON_OPTION = {
   type: 'PRIMARY_ACTION',
   text: 'Monkeys',
-  onClick: function(e){
+  onClick: function (e) {
     e.modalView.close();
   },
-  orderHint: 5
+  orderHint: 5,
 };
 
-function showModal1(){
+function showModal1() {
   let el = div.cloneNode(true);
   el.style.backgroundColor = 'green';
-  var modal = window._modal = sdk.Widgets.showModalView({
+  var modal = (window._modal = sdk.Widgets.showModalView({
     el: el,
     chrome: true,
     buttons: [
       PRIMARY_BUTTON_OPTION,
       {
         text: 'Monkeys 2',
-        onClick: function(){
+        onClick: function () {
           alert('bye');
         },
-        orderHint: 10
+        orderHint: 10,
       },
       {
         text: 'Monkeys 3',
-        onClick: function(){
+        onClick: function () {
           alert('bye');
         },
-        orderHint: 0
-      }
-    ]
-  });
-  modal.on('destroy', function() {
+        orderHint: 0,
+      },
+    ],
+  }));
+  modal.on('destroy', function () {
     console.log('modal destroy');
   });
 }
 
-function showModal2(){
+function showModal2() {
   let el = div.cloneNode(true);
   el.style.backgroundColor = 'blue';
-  var modal = window._modal = sdk.Widgets.showModalView({
+  var modal = (window._modal = sdk.Widgets.showModalView({
     el: el,
-    buttons: [PRIMARY_BUTTON_OPTION]
-  });
-
+    buttons: [PRIMARY_BUTTON_OPTION],
+  }));
 }
 
-function showModal3(){
+function showModal3() {
   let el = div.cloneNode(true);
   el.style.backgroundColor = 'orange';
-  var modal = window._modal = sdk.Widgets.showModalView({
+  var modal = (window._modal = sdk.Widgets.showModalView({
     el: el,
-    chrome: false
-  });
-
+    chrome: false,
+  }));
 }
 
-function showModal4(){
+function showModal4() {
   let el = div.cloneNode(true);
   el.style.backgroundColor = 'yellow';
-  var modal = window._modal = sdk.Widgets.showModalView({
-    el: el,
-    chrome: false,
-    buttons: [PRIMARY_BUTTON_OPTION]
-  });
-
-}
-
-function showModal5(){
-  let el = div.cloneNode(true);
-  el.style.backgroundColor = 'black';
-  var modal = window._modal = sdk.Widgets.showModalView({
-    el: el,
-    chrome: false,
-    showCloseButton: true
-  });
-
-}
-
-
-function showModal6(){
-  let el = div.cloneNode(true);
-  el.style.backgroundColor = 'fuscia';
-  var modal = window._modal = sdk.Widgets.showModalView({
+  var modal = (window._modal = sdk.Widgets.showModalView({
     el: el,
     chrome: false,
     buttons: [PRIMARY_BUTTON_OPTION],
-    showCloseButton: true
-  });
-
-  setTimeout(function(){
-    modal.close();
-  }, 5000);
-
+  }));
 }
 
-function showModal7(){
+function showModal5() {
+  let el = div.cloneNode(true);
+  el.style.backgroundColor = 'black';
+  var modal = (window._modal = sdk.Widgets.showModalView({
+    el: el,
+    chrome: false,
+    showCloseButton: true,
+  }));
+}
+
+function showModal6() {
+  let el = div.cloneNode(true);
+  el.style.backgroundColor = 'fuscia';
+  var modal = (window._modal = sdk.Widgets.showModalView({
+    el: el,
+    chrome: false,
+    buttons: [PRIMARY_BUTTON_OPTION],
+    showCloseButton: true,
+  }));
+
+  setTimeout(function () {
+    modal.close();
+  }, 5000);
+}
+
+function showModal7() {
   let el = div.cloneNode(true);
   el.style.backgroundColor = 'purple';
-  var modal = window._modal = sdk.Widgets.showModalView({
+  var modal = (window._modal = sdk.Widgets.showModalView({
     el: div,
-    buttons: []
-  });
+    buttons: [],
+  }));
 }
 
 // with constrainTitleWidth
-function showModal8(){
+function showModal8() {
   let el = div.cloneNode(true);
   el.style.backgroundColor = 'purple';
-  var modal = window._modal = sdk.Widgets.showModalView({
+  var modal = (window._modal = sdk.Widgets.showModalView({
     el: div,
     constrainTitleWidth: true,
-    title: 'The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.',
-    buttons: []
-  });
+    title:
+      'The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.',
+    buttons: [],
+  }));
 }
 
 // without constrainTitleWidth
-function showModal9(){
+function showModal9() {
   let el = div.cloneNode(true);
   el.style.backgroundColor = 'purple';
-  var modal = window._modal = sdk.Widgets.showModalView({
+  var modal = (window._modal = sdk.Widgets.showModalView({
     el: div,
-    title: 'The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.',
-    buttons: []
-  });
+    title:
+      'The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog. The quick brown fox jumps over the lazy dog.',
+    buttons: [],
+  }));
 }
 
 function showDrawer1() {
@@ -169,12 +173,13 @@ function showDrawer1() {
   el.style.background = 'blue';
   el.innerHTML = 'foo <button type="button">open compose</button>';
 
-  const drawer = window._drawer = sdk.Widgets.showDrawerView({
-    el, title: 'Drawer Test'
-  });
+  const drawer = (window._drawer = sdk.Widgets.showDrawerView({
+    el,
+    title: 'Drawer Test',
+  }));
 
   el.querySelector('button').addEventListener('click', () => {
-    sdk.Compose.openNewComposeView().then(cv => {
+    sdk.Compose.openNewComposeView().then((cv) => {
       drawer.associateComposeView(cv, false);
     });
   });

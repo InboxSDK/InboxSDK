@@ -4,33 +4,63 @@ import EventEmitter from '../../lib/safe-event-emitter';
 import type Membrane from '../../lib/Membrane';
 import get from '../../../common/get-or-fail';
 import type AttachmentCardView from './attachment-card-view';
-import { MessageViewToolbarSectionNames } from '../../namespaces/conversations';
-import type {
-  MessageViewDriver,
-  VIEW_STATE,
-  MessageViewLinkDescriptor,
-} from '../../driver-interfaces/message-view-driver';
+import Conversations, {
+  MessageViewToolbarSectionNames,
+} from '../../namespaces/conversations';
 import type { Driver } from '../../driver-interfaces/driver';
 import type { Contact, MessageView as IMessageView } from '../../../inboxsdk';
 import type { Observable } from 'kefir';
+import type {
+  MessageViewDriverEvents,
+  MessageViewDriverEventByName,
+} from '../../dom-driver/gmail/views/gmail-message-view';
+import type TypedEventEmitter from 'typed-emitter';
+import type MessageViewDriver from '../../dom-driver/gmail/views/gmail-message-view';
+
+export type VIEW_STATE = 'HIDDEN' | 'COLLAPSED' | 'EXPANDED';
+
+type MessageViewLinkDescriptor = {
+  text: string;
+  html: string;
+  element: HTMLElement;
+  href: string;
+  isInQuotedArea: boolean;
+};
 
 interface Members {
-  Conversations: Record<string, any>;
+  Conversations: Conversations;
   driver: Driver;
   linksInBody: Array<MessageViewLinkDescriptor> | null | undefined;
   membrane: Membrane;
   messageViewImplementation: MessageViewDriver;
 }
-const memberMap = defonce(module, () => new WeakMap<MessageView, Members>()); // documented in src/docs/
 
-class MessageView extends EventEmitter implements IMessageView {
+export type MessageViewEvent = {
+  contactHover(
+    data: Omit<MessageViewDriverEventByName['contactHover'], 'eventName'>
+  ): void;
+  destroy(): void;
+  load(data: { messageView: MessageView }): void;
+  viewStateChange(data: {
+    oldViewState: VIEW_STATE;
+    newViewState: VIEW_STATE;
+    messageView: MessageView;
+  }): void;
+};
+
+const memberMap = defonce(module, () => new WeakMap<MessageView, Members>());
+
+class MessageView
+  extends (EventEmitter as new () => TypedEventEmitter<MessageViewEvent>)
+  implements IMessageView
+{
   destroyed: boolean = false;
 
   constructor(
     messageViewImplementation: MessageViewDriver,
     appId: string,
     membrane: Membrane,
-    Conversations: Record<string, any>,
+    Conversations: Conversations,
     driver: Driver
   ) {
     super();
@@ -253,7 +283,7 @@ class MessageView extends EventEmitter implements IMessageView {
 function _bindToEventStream(
   messageView: MessageView,
   members: Members,
-  stream: Observable<any, any>
+  stream: Observable<MessageViewDriverEvents, any>
 ) {
   stream.onEnd(function () {
     messageView.destroyed = true;
@@ -261,7 +291,9 @@ function _bindToEventStream(
     messageView.removeAllListeners();
   });
   stream
-    .filter(function (event) {
+    .filter(function (
+      event
+    ): event is MessageViewDriverEventByName['contactHover'] {
       return event.type !== 'internal' && event.eventName === 'contactHover';
     })
     .onValue(function (event) {
@@ -290,15 +322,17 @@ function _bindToEventStream(
   }
 
   stream
-    .filter(function (event) {
+    .filter(function (
+      event
+    ): event is MessageViewDriverEventByName['viewStateChange'] {
       return event.eventName === 'viewStateChange';
     })
     .onValue(function (event) {
       messageView.emit('viewStateChange', {
         oldViewState:
-          members.Conversations.MessageViewViewStates[event.oldValue],
+          members.Conversations.MessageViewViewStates[event.oldValue!],
         newViewState:
-          members.Conversations.MessageViewViewStates[event.newValue],
+          members.Conversations.MessageViewViewStates[event.newValue!],
         messageView: messageView,
       });
     });

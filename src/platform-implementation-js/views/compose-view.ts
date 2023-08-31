@@ -12,7 +12,12 @@ import type {
   ComposeNotice,
   StatusBar,
 } from '../driver-interfaces/compose-view-driver';
-import type { Contact } from '../../inboxsdk';
+import type { Contact, ComposeView as IComposeView } from '../../inboxsdk';
+import type TypedEventEmitter from 'typed-emitter';
+import type {
+  AddressChangeEventName,
+  RecipientsChangedEvent,
+} from '../dom-driver/gmail/views/gmail-compose-view/get-address-changes-stream';
 
 interface Members {
   driver: Driver;
@@ -22,8 +27,63 @@ interface Members {
 
 const memberMap = ud.defonce(module, () => new WeakMap<ComposeView, Members>());
 
-// documented in src/docs/
-export default class ComposeView extends EventEmitter {
+export type LinkPopOver = {
+  getLinkElement(): HTMLAnchorElement;
+  addSection(): LinkPopOverSection;
+} & TypedEventEmitter<{ close(): void }>;
+
+export interface LinkPopOverSection {
+  getElement(): HTMLElement;
+  remove(): void;
+}
+
+type AddressChangeEventsMapped = {
+  [P in AddressChangeEventName]: (data: { contact: Contact }) => void;
+};
+
+export type ComposeViewEvent = {
+  newListener: (eventName: string) => void;
+  close(): void;
+  /*
+   * @see ComposeViewDriverEvent.
+   * TODO use the same underlying type for both here and there. */
+  bodyChanged(): void;
+  buttonAdded(): void;
+  discardCanceled(): void;
+  draftSaved(): void;
+  fullscreenChanged(data: { fullscreen: boolean }): void;
+  linkPopOver(data: LinkPopOver): void;
+  minimized(): void;
+  recipientsChanged(data: RecipientsChangedEvent): void;
+  resize(): void;
+  restored(): void;
+  sendCanceled(): void;
+  sending(): void;
+  sent(data: {
+    getMessageID(): Promise<string>;
+    getThreadID(): Promise<string>;
+  }): void;
+  subjectChanged(): void;
+  destroy(data: {
+    /**
+     * If the composeView was closed without being sent and the draft was saved, then this property will have the draft's message ID after it saved. Otherwise it will be null.
+     */
+    messageID: string | null | undefined;
+    /**
+     * Whether or not the ComposeView was closed by an extension calling ComposeView.close(), including other extensions besides your own. False if the ComposeView was closed due to a user action like clicking the discard/close buttons or hitting escape
+     */
+    closedByInboxSDK: boolean;
+  }): void;
+  discard(data: { cancel(): void }): void;
+  responseTypeChanged(data: { isForward: boolean }): void;
+  presending(data: { cancel(): void }): void;
+  messageIDChange(data: string | null | undefined): void;
+} & AddressChangeEventsMapped;
+
+export default class ComposeView
+  extends (EventEmitter as new () => TypedEventEmitter<ComposeViewEvent>)
+  implements IComposeView
+{
   destroyed: boolean = false;
 
   constructor(
@@ -225,11 +285,11 @@ export default class ComposeView extends EventEmitter {
     return get(memberMap, this).composeViewImplementation.getThreadID()!;
   }
 
-  getDraftID(): Promise<string | null | void> {
+  getDraftID(): Promise<string | undefined | null> {
     return get(memberMap, this).composeViewImplementation.getDraftID();
   }
 
-  getCurrentDraftID(): Promise<string | null | void> {
+  getCurrentDraftID(): Promise<string | null | undefined> {
     return get(memberMap, this).composeViewImplementation.getCurrentDraftID();
   }
 
@@ -276,7 +336,7 @@ export default class ComposeView extends EventEmitter {
     ).composeViewImplementation.insertBodyTextAtCursor(text);
   }
 
-  insertHTMLIntoBodyAtCursor(html: string): HTMLElement | null | void {
+  insertHTMLIntoBodyAtCursor(html: string): HTMLElement | null | undefined {
     return get(
       memberMap,
       this
@@ -449,9 +509,7 @@ export default class ComposeView extends EventEmitter {
   }
 
   registerRequestModifier(
-    modifier: (composeParams: {
-      body: string;
-    }) => { body: string } | Promise<{ body: string }>
+    modifier: (composeParams: { isPlainText?: boolean; body: string }) => void
   ) {
     get(memberMap, this).composeViewImplementation.registerRequestModifier(
       modifier
