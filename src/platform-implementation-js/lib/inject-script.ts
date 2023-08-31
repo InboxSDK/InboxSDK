@@ -11,12 +11,20 @@ let injectScriptImplementation: () => void = () => {
   (window as any).chrome.runtime.sendMessage(
     { type: 'inboxsdk__injectPageWorld' },
     (didExecute: boolean) => {
-      if (NPM_MV2_SUPPORT && !didExecute) {
-        // MV2 support
-        const scr = document.createElement('script');
-        scr.type = 'text/javascript';
-        scr.src = (window as any).chrome.runtime.getURL('pageWorld.js');
-        document.documentElement.appendChild(scr);
+      if (!didExecute) {
+        if (NPM_MV2_SUPPORT) {
+          // MV2 support.
+          // Removed from regular MV3 NPM builds to not falsely set off Chrome Web Store
+          // about dynamically-loaded code.
+          const scr = document.createElement('script');
+          scr.type = 'text/javascript';
+          scr.src = (window as any).chrome.runtime.getURL('pageWorld.js');
+          document.documentElement.appendChild(scr);
+        } else {
+          throw new Error(
+            "Couldn't inject pageWorld.js. Check that the extension is using MV3 and has the correct permissions and host_permissions in its manifest."
+          );
+        }
       }
     }
   );
