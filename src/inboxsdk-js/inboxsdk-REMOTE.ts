@@ -1,7 +1,8 @@
+import { setLoadScript } from './load-script-proxy';
 import './inboxsdk-REMOTE-setup';
 import loadScript from '../common/load-script';
 import * as SDK from './inboxsdk';
 
-SDK._setLoadScript(loadScript);
+setLoadScript(loadScript);
 
 export default SDK;

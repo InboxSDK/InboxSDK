@@ -1,18 +1,25 @@
 import { PlatformImplementationLoader } from './loading/platform-implementation-loader';
 import { BUILD_VERSION } from '../common/version';
+import { loadScript as _loadScript } from './load-script-proxy';
+import type { LoadScriptOptions } from '../common/load-script';
 
 declare global {
   var __test_origin: string | undefined;
 }
 
 export const LOADER_VERSION = BUILD_VERSION;
-export let loadScript: Function = () => {
-  throw new Error('This function is not usable in Chrome MV3 extensions.');
-};
-// TODO make this not be publicly exposed and callable
-export function _setLoadScript(fn: Function) {
-  loadScript = fn;
+
+/**
+ * Only works in the non-npm remote-loaded build for MV2 extensions.
+ * @deprecated
+ */
+export function loadScript(
+  url: string,
+  opts?: LoadScriptOptions
+): Promise<void> {
+  return _loadScript(url, opts);
 }
+
 export function load(version: any, appId: string, opts: any) {
   opts = Object.assign(
     {
