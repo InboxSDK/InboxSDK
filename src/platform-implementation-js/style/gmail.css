@@ -1123,7 +1123,9 @@ TODO Can we restrict this to only composes we've modified? */
   max-height: inherit !important;
 }
 
-/* aDi is initially position: fixed, which messes things up, so we make static */
+/* aDi is initially position: fixed, which messes things up, so we make static
+
+TODO: 2023-08-31 is .aDi still in use anymore? */
 body:not(.inboxsdk_hack_disableComposeSizeFixer)
   .inboxsdk__size_fixer
   .aDj.aDi {
