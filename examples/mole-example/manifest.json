@@ -11,13 +11,13 @@
   ],
   "permissions": ["https://mail.google.com/"],
   "web_accessible_resources": [
-    "inboxsdk.js.map",
-    "pageWorld.js",
-    "pageWorld.js.map"
+    {
+      "matches": ["https://mail.google.com/*"],
+      "resources": ["inboxsdk.js.map", "pageWorld.js", "pageWorld.js.map"]
+    }
   ],
   "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "service_worker": "background.js"
   },
-  "manifest_version": 2
+  "manifest_version": 3
 }
