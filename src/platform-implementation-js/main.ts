@@ -1,4 +1,4 @@
-import kefir from 'kefir';
+import Kefir from 'kefir';
 import { type PlatformImplementation } from './platform-implementation';
 
 declare global {
@@ -25,11 +25,10 @@ if (!global.__InboxSDKImpLoader) {
       resolve(null);
     } else {
       resolve(
-        kefir
-          .merge([
-            kefir.fromEvents(document, 'DOMContentLoaded'),
-            kefir.fromEvents(window, 'load'),
-          ])
+        Kefir.merge([
+          Kefir.fromEvents(document, 'DOMContentLoaded'),
+          Kefir.fromEvents(window, 'load'),
+        ])
           .take(1)
           .map(() => null)
           .toPromise()
