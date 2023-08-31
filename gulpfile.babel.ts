@@ -34,8 +34,8 @@ const args = stdio.getopt({
 // Don't let production be built without minification.
 // Could just make the production flag imply the minify flag, but that seems
 // like it would harm discoverability.
-if (args.production && !args.minify) {
-  throw new Error('--production requires --minify');
+if (args.remote && args.production && !args.minify) {
+  throw new Error('--remote --production requires --minify');
 }
 
 // --watch causes Browserify to use full paths in module references. We don't
@@ -151,7 +151,7 @@ async function webpackTask({
   disableMinification,
   ...options
 }: BrowserifyTaskOptions): Promise<void> {
-  const willMinify = args.minify && !disableMinification;
+  const willMinify = (args.minify && !disableMinification) ?? false;
 
   const VERSION = await getVersion();
 
@@ -243,6 +243,13 @@ async function webpackTask({
     plugins: [
       new webpack.DefinePlugin({
         SDK_VERSION: JSON.stringify(VERSION),
+        /**
+         * This flag would allow us to build an npm build with MV2 support.
+         * We keep this off so npm builds don't trigger false-positives
+         * in Chrome Web Store reviews checking for dynamically loaded code in MV3 extensions.
+         * This flag has no effect for remote/non-npm builds.
+         */
+        NPM_MV2_SUPPORT: JSON.stringify(false),
       }),
       // Work around for Buffer is undefined:
       // https://github.com/webpack/changelog-v5/issues/10
@@ -402,21 +409,6 @@ if (args.remote) {
       standalone: 'InboxSDK',
       afterBuild: async () => {
         setupExamples();
-        const { minify } = await import('terser');
-
-        const sourceOutput = await fs.promises.readFile(
-          'packages/core/inboxsdk.js',
-          'utf8'
-        );
-
-        const minified = await minify(sourceOutput);
-        await fs.promises.writeFile(
-          'packages/core/inboxsdk.min.js',
-          minified.code!,
-          {
-            encoding: 'utf8',
-          }
-        );
       },
     });
   });
