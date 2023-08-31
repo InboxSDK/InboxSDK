@@ -409,21 +409,6 @@ if (args.remote) {
       standalone: 'InboxSDK',
       afterBuild: async () => {
         setupExamples();
-        const { minify } = await import('terser');
-
-        const sourceOutput = await fs.promises.readFile(
-          'packages/core/inboxsdk.js',
-          'utf8'
-        );
-
-        const minified = await minify(sourceOutput);
-        await fs.promises.writeFile(
-          'packages/core/inboxsdk.min.js',
-          minified.code!,
-          {
-            encoding: 'utf8',
-          }
-        );
       },
     });
   });

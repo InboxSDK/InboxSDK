@@ -6902,7 +6902,6 @@ __metadata:
     stylelint-config-standard: ^33.0.0
     synchd: ^1.0.1
     tag-tree: ^1.0.0
-    terser: ^5.18.1
     thirty-two: ^1.0.1
     transducers.js: ^0.3.2
     typed-emitter: ^2.1.0
@@ -11995,20 +11994,6 @@ __metadata:
   bin:
     terser: bin/terser
   checksum: 50988412533bfd5a07294df002d772ad5b1277a9d1164dd19c8876a2094ced7b78fcf36cb32122a9a5238ba2597d77178a2385dfc6c4d506622309493f613cf4
-  languageName: node
-  linkType: hard
-
-"terser@npm:^5.18.1":
-  version: 5.18.1
-  resolution: "terser@npm:5.18.1"
-  dependencies:
-    "@jridgewell/source-map": ^0.3.3
-    acorn: ^8.8.2
-    commander: ^2.20.0
-    source-map-support: ~0.5.20
-  bin:
-    terser: bin/terser
-  checksum: 15d1af05aae451ce844f7dc3627db09ec79f842fa9a3cf2b40221a639249d70fcd91fd3baa9c970842d75e1dd2fb957eb1afd8a0fcfc9b2a3296076a4e72528a
   languageName: node
   linkType: hard
 
