@@ -245,7 +245,7 @@ async function webpackTask({
         SDK_VERSION: JSON.stringify(VERSION),
         /**
          * This flag would allow us to build an npm build with MV2 support.
-         * We keep this off for npm builds in order to not trigger false-positives
+         * We keep this off so npm builds don't trigger false-positives
          * in Chrome Web Store reviews checking for dynamically loaded code in MV3 extensions.
          * This flag has no effect for remote/non-npm builds.
          */
