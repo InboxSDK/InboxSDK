@@ -7,9 +7,7 @@ declare global {
 
 export const LOADER_VERSION = BUILD_VERSION;
 export let loadScript: Function = () => {
-  throw new Error(
-    "loadScript is not available in the NPM version of the InboxSDK. This function is not usable in Chrome MV3 extensions. If you need this and you're not using an MV3 extension, use the NPM module <TODO> instead."
-  );
+  throw new Error('This function is not usable in Chrome MV3 extensions.');
 };
 // TODO make this not be publicly exposed and callable
 export function _setLoadScript(fn: Function) {
