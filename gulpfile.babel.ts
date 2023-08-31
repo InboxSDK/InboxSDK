@@ -34,8 +34,8 @@ const args = stdio.getopt({
 // Don't let production be built without minification.
 // Could just make the production flag imply the minify flag, but that seems
 // like it would harm discoverability.
-if (args.production && !args.minify) {
-  throw new Error('--production requires --minify');
+if (args.remote && args.production && !args.minify) {
+  throw new Error('--remote --production requires --minify');
 }
 
 // --watch causes Browserify to use full paths in module references. We don't
@@ -151,7 +151,7 @@ async function webpackTask({
   disableMinification,
   ...options
 }: BrowserifyTaskOptions): Promise<void> {
-  const willMinify = args.minify && !disableMinification;
+  const willMinify = (args.minify && !disableMinification) ?? false;
 
   const VERSION = await getVersion();
 
