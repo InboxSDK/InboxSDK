@@ -2,11 +2,16 @@ import once from 'lodash/once';
 import Kefir from 'kefir';
 import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chunked-stream';
 
+declare global {
+  /** Set by webpack.DefinePlugin for --remote and --integratedPageWorld builds */
+  var MV2_SUPPORT: boolean | undefined;
+}
+
 let injectScriptImplementation: () => void = () => {
   (window as any).chrome.runtime.sendMessage(
     { type: 'inboxsdk__injectPageWorld' },
     (didExecute: boolean) => {
-      if (!didExecute) {
+      if (MV2_SUPPORT && !didExecute) {
         // MV2 support
         const scr = document.createElement('script');
         scr.type = 'text/javascript';
