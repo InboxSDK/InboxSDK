@@ -243,7 +243,12 @@ async function webpackTask({
     plugins: [
       new webpack.DefinePlugin({
         SDK_VERSION: JSON.stringify(VERSION),
-        /** Because remote builds and integratedPageWorld builds both call setInjectScriptImplementation which overrides the function that checks NPM_MV2_SUPPORT, this key value pair is just to omit code from the npm build around `document.createElement('script')`.  */
+        /**
+         * This flag would allow us to build an npm build with MV2 support.
+         * We keep this off for npm builds in order to not trigger false-positives
+         * in Chrome Web Store reviews checking for dynamically loaded code in MV3 extensions.
+         * This flag has no effect for remote/non-npm builds.
+         */
         NPM_MV2_SUPPORT: JSON.stringify(false),
       }),
       // Work around for Buffer is undefined:
