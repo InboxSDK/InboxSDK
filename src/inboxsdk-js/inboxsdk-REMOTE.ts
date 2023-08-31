@@ -1,9 +1,6 @@
-import loaderLoadScript from './loading/load-platform-implementation-REMOTE';
-import { PlatformImplementationLoader } from './loading/platform-implementation-loader';
+import './inboxsdk-REMOTE-setup';
 import loadScript from '../common/load-script';
 import * as SDK from './inboxsdk';
-
-PlatformImplementationLoader.loadScript = loaderLoadScript;
 
 SDK._setLoadScript(loadScript);
 
