@@ -9,7 +9,9 @@
       "run_at": "document_end"
     }
   ],
-  "permissions": ["https://mail.google.com/"],
+  "host_permissions": ["https://mail.google.com/"],
+  "permissions": ["scripting"],
+
   "web_accessible_resources": [
     {
       "matches": ["https://mail.google.com/*"],
