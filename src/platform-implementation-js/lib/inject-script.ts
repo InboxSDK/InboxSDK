@@ -3,15 +3,15 @@ import Kefir from 'kefir';
 import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chunked-stream';
 
 declare global {
-  /** Set by webpack.DefinePlugin for --remote and --integratedPageWorld builds */
-  var MV2_SUPPORT: boolean | undefined;
+  /** Set by webpack.DefinePlugin to remove a code block potentially flagged by Chrome Web Store reviews. */
+  var NPM_MV2_SUPPORT: false | undefined;
 }
 
 let injectScriptImplementation: () => void = () => {
   (window as any).chrome.runtime.sendMessage(
     { type: 'inboxsdk__injectPageWorld' },
     (didExecute: boolean) => {
-      if (MV2_SUPPORT && !didExecute) {
+      if (NPM_MV2_SUPPORT && !didExecute) {
         // MV2 support
         const scr = document.createElement('script');
         scr.type = 'text/javascript';

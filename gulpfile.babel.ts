@@ -243,9 +243,8 @@ async function webpackTask({
     plugins: [
       new webpack.DefinePlugin({
         SDK_VERSION: JSON.stringify(VERSION),
-        MV2_SUPPORT: JSON.stringify(
-          (args.remote || args.integratedPageWorld) ?? false
-        ),
+        /** Because remote builds and integratedPageWorld builds both call setInjectScriptImplementation which overrides the function that checks NPM_MV2_SUPPORT, this key value pair is just to omit code from the npm build around `document.createElement('script')`.  */
+        NPM_MV2_SUPPORT: JSON.stringify(false),
       }),
       // Work around for Buffer is undefined:
       // https://github.com/webpack/changelog-v5/issues/10
