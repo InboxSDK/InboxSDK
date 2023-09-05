@@ -5,7 +5,6 @@ import intersection from 'lodash/intersection';
 import uniqBy from 'lodash/uniqBy';
 import flatMap from 'lodash/flatMap';
 import { defonce } from 'ud';
-import assert from 'assert';
 import * as Kefir from 'kefir';
 import asap from 'asap';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
@@ -27,6 +26,7 @@ import type {
   LabelDescriptor,
   ThreadDateDescriptor,
 } from '../../../../inboxsdk';
+import { assert } from '../../../../common/assert';
 
 type LabelMod = {
   gmailLabelView: Record<string, any>;
