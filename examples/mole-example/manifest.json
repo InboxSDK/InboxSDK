@@ -1,7 +1,7 @@
 {
   "name": "Example SDK Mole View Extension",
   "description": "Example extension showing use of the Streak Inbox SDK making a mole view",
-  "version": "0.1",
+  "version": "2.0",
   "content_scripts": [
     {
       "matches": ["https://mail.google.com/*"],

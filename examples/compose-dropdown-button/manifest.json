@@ -1,7 +1,7 @@
 {
   "name": "Compose Dropdown Example Extension",
   "description": "Compose dropdown button example!",
-  "version": "0.1",
+  "version": "2.0",
   "content_scripts": [
     {
       "matches": ["https://mail.google.com/*"],
@@ -10,17 +10,16 @@
       "run_at": "document_end"
     }
   ],
-  "permissions": ["https://mail.google.com/"],
+  "permissions": ["scripting"],
   "web_accessible_resources": [
-    "inboxsdk.js.map",
-    "pageWorld.js",
-    "pageWorld.js.map",
-    "monkey.png"
+    {
+      "matches": ["https://mail.google.com/*"],
+      "resources": ["pageWorld.js", "monkey.png"]
+    }
   ],
   "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "service_worker": "background.js"
   },
-
-  "manifest_version": 2
+  "manifest_version": 3,
+  "host_permissions": ["https://mail.google.com/"]
 }
