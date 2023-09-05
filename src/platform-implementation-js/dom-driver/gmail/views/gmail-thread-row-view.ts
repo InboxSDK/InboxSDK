@@ -593,6 +593,7 @@ class GmailThreadRowView {
 
             if (buttonDescriptor.title) {
               buttonSpan.setAttribute('title', buttonDescriptor.title);
+              buttonSpan.setAttribute('data-tooltip', buttonDescriptor.title);
             } else {
               buttonSpan.removeAttribute('title');
             }
