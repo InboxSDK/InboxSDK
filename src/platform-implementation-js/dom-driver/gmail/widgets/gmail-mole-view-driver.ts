@@ -9,6 +9,7 @@ import type { MoleOptions } from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
 import isComposeTitleBarLightColor from '../is-compose-titlebar-light-color';
+import * as styles from './mole-view.module.css';
 
 class GmailMoleViewDriver {
   _driver: GmailDriver;
@@ -110,7 +111,7 @@ class GmailMoleViewDriver {
       );
 
       if (dw) {
-        dw.classList.add('inboxsdk__moles_in_use');
+        dw.classList.add('inboxsdk__moles_in_use', styles.inboxsdkMolesInUse);
       }
     };
 

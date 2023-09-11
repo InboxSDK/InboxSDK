@@ -34,21 +34,13 @@ InboxSDK.load(2, 'simple-example').then(function (inboxSDK) {
       //titleEl: titleEl,
       minimizedTitleEl: minimizedTitleEl,
       titleButtons: [
-        {
-          title: 'a1',
-          iconUrl: 'https://mailfoogae.appspot.com/build/images/snoozeIcon.png',
-          onClick: function () {
-            console.log('click a1');
-          },
-        },
-        {
-          title: 'a2',
-          iconUrl:
-            'https://mailfoogae.appspot.com/build/images/boxIconOnNewCompose.png',
-          onClick: function () {
-            console.log('click a2');
-          },
-        },
+        // {
+        //   title: 'a1',
+        //   iconUrl: 'https://mailfoogae.appspot.com/build/images/snoozeIcon.png',
+        //   onClick: function () {
+        //     console.log('click a1');
+        //   },
+        // },
       ],
     });
 
