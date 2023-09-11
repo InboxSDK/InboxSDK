@@ -24,7 +24,7 @@ class ThreadRowIdentifier {
 
   getThreadIdForThreadRow(
     gmailThreadRowView: GmailThreadRowView,
-    elements: HTMLElement[]
+    elements: HTMLElement[],
   ): string | null | undefined {
     {
       const threadID = this._driver
@@ -74,7 +74,7 @@ class ThreadRowIdentifier {
   }
 
   async getDraftIdForThreadRow(
-    gmailThreadRowView: GmailThreadRowView
+    gmailThreadRowView: GmailThreadRowView,
   ): Promise<string | null | undefined> {
     if (
       gmailThreadRowView.getVisibleMessageCount() > 0 ||
@@ -89,13 +89,13 @@ class ThreadRowIdentifier {
     }
 
     const { draftID } = await this._driver.getDraftIDForMessageID(
-      gmailThreadRowView.getThreadID()
+      gmailThreadRowView.getThreadID(),
     );
     return draftID;
   }
 
   _findComposeForThreadRow(
-    gmailThreadRowView: GmailThreadRowView
+    gmailThreadRowView: GmailThreadRowView,
   ): GmailComposeView | null | undefined {
     const candidates = [];
     const subject = gmailThreadRowView.getSubject();

@@ -33,7 +33,7 @@ class DrawerView extends EventEmitter {
         bubbles: false,
         cancelable: false,
         detail: null,
-      })
+      }),
     );
     Kefir.fromEvents(document, 'inboxSDKcloseDrawers')
       .takeUntilBy(Kefir.fromEvents(this, 'closing'))

@@ -6,7 +6,7 @@ describe('extractThreadsFromSearchResponse', () => {
     const data = fs.readFileSync(
       __dirname +
         '/../../../../__tests__/gmail-sync-response-processor/input-triggered-search-response-2018-01-25.json',
-      'utf8'
+      'utf8',
     );
 
     const threads = GSRP.extractThreadsFromSearchResponse(data);
@@ -63,7 +63,7 @@ describe('extractThreadsFromSearchResponse', () => {
     const data = fs.readFileSync(
       __dirname +
         '/../../../../__tests__/gmail-sync-response-processor/sdk-triggered-search-response-2018-01-25.json',
-      'utf8'
+      'utf8',
     );
 
     const threads = GSRP.extractThreadsFromSearchResponse(data);
@@ -119,7 +119,7 @@ describe('extractThreadsFromThreadResponse', function () {
     const data = fs.readFileSync(
       __dirname +
         '/../../../../__tests__/gmail-sync-response-processor/thread-response-2018-03-08.json',
-      'utf8'
+      'utf8',
     );
 
     const threads = GSRP.extractThreadsFromThreadResponse(data);
@@ -148,7 +148,7 @@ describe('extractThreadsFromThreadResponse', function () {
     const data = fs.readFileSync(
       __dirname +
         '/../../../../__tests__/gmail-sync-response-processor/thread-response-2018-03-14.json',
-      'utf8'
+      'utf8',
     );
     const threads = GSRP.extractThreadsFromThreadResponse(data);
     expect(threads.length).toBe(1);
@@ -169,7 +169,7 @@ describe('extractThreadsFromThreadResponse', function () {
     const data = fs.readFileSync(
       __dirname +
         '/../../../../__tests__/gmail-sync-response-processor/fd-response-20180709.json',
-      'utf8'
+      'utf8',
     );
     const threads = GSRP.extractThreadsFromThreadResponse(data);
     expect(threads.length).toBe(1);
@@ -189,29 +189,29 @@ it('replaceThreadsInSearchResponse works', () => {
   const originalSearchResponse = fs.readFileSync(
     __dirname +
       '/../../../../__tests__/gmail-sync-response-processor/input-triggered-search-response-2018-01-25.json',
-    'utf8'
+    'utf8',
   );
 
   const replacementThreads = GSRP.extractThreadsFromSearchResponse(
     fs.readFileSync(
       __dirname +
         '/../../../../__tests__/gmail-sync-response-processor/sdk-triggered-search-response-2018-01-25.json',
-      'utf8'
-    )
+      'utf8',
+    ),
   );
 
   const responesShouldLookLike = JSON.parse(
     fs.readFileSync(
       __dirname +
         '/../../../../__tests__/gmail-sync-response-processor/replaced-threads-response-example-data-2018-01-25.json',
-      'utf8'
-    )
+      'utf8',
+    ),
   );
 
   const newResponse = GSRP.replaceThreadsInSearchResponse(
     originalSearchResponse,
     replacementThreads,
-    { start: 0 }
+    { start: 0 },
   );
   expect(JSON.parse(newResponse)).toEqual(responesShouldLookLike);
 });

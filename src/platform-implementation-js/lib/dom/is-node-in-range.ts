@@ -1,6 +1,6 @@
 export default function isNodeInRange(
   node: Node | null | undefined,
-  range: Range | null | undefined
+  range: Range | null | undefined,
 ): boolean {
   if (!range) {
     return false;

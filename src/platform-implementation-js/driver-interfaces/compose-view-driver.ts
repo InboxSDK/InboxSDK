@@ -2,6 +2,11 @@ import type * as Kefir from 'kefir';
 import type EventEmitter from 'events';
 import type { TooltipDescriptor } from '../views/compose-button-view';
 import type { Contact } from '../../inboxsdk';
+import type {
+  AddressChangeEventName,
+  RecipientsChangedEvent,
+} from '../dom-driver/gmail/views/gmail-compose-view/get-address-changes-stream';
+
 export type ComposeNotice = EventEmitter & {
   destroy(): void;
   destroyed: boolean;
@@ -49,6 +54,10 @@ export type ComposeViewDriverEvent =
       };
     }
   | {
+      eventName: 'recipientsChanged';
+      data: RecipientsChangedEvent;
+    }
+  | {
       eventName: 'fullscreenChanged';
       data: {
         fullscreen: boolean;
@@ -82,6 +91,12 @@ export type ComposeViewDriverEvent =
   | {
       eventName: 'messageIDChange';
       data: string | null | undefined;
+    }
+  | {
+      eventName: AddressChangeEventName;
+      data: {
+        contact: Contact;
+      };
     };
 
 export type ComposeViewDriver = {
@@ -92,7 +107,7 @@ export type ComposeViewDriver = {
   insertBodyHTMLAtCursor(html: string): HTMLElement | null | undefined;
   insertLinkIntoBody(
     text: string,
-    href: string
+    href: string,
   ): HTMLElement | null | undefined;
   insertLinkChipIntoBody(options: {
     iconUrl?: string;
@@ -131,10 +146,10 @@ export type ComposeViewDriver = {
       unknown
     >,
     groupOrderHint: string,
-    extraOnClickOptions: Record<string, any>
+    extraOnClickOptions: Record<string, any>,
   ): Promise<any | null | undefined>;
   addRecipientRow(
-    options: Kefir.Observable<Record<string, any> | null | undefined, unknown>
+    options: Kefir.Observable<Record<string, any> | null | undefined, unknown>,
   ): () => void;
   forceRecipientRowsOpen(): () => void;
   hideNativeRecipientRows(): () => void;
@@ -173,7 +188,7 @@ export type ComposeViewDriver = {
   addTooltipToButton(
     buttonViewController: Record<string, any>,
     buttonDescriptor: Record<string, any>,
-    tooltipDescriptor: TooltipDescriptor
+    tooltipDescriptor: TooltipDescriptor,
   ): void;
   closeButtonTooltip(buttonViewController: Record<string, any>): void;
   setupLinkPopOvers(): void;

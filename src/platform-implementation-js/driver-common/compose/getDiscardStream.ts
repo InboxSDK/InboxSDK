@@ -9,8 +9,8 @@ const dispatchCancel = (element: Element) =>
         bubbles: false,
         cancelable: false,
         detail: null,
-      })
-    )
+      }),
+    ),
   );
 
 export default function getDiscardStream({
@@ -25,13 +25,13 @@ export default function getDiscardStream({
       .filter(
         (domEvent) =>
           [13, 32].indexOf(domEvent.which) > -1 ||
-          [13, 32].indexOf(domEvent.keyCode) > -1
+          [13, 32].indexOf(domEvent.keyCode) > -1,
       )
       .filter(
-        (domEvent) => discardButton && discardButton.contains(domEvent.target)
+        (domEvent) => discardButton && discardButton.contains(domEvent.target),
       ),
     fromEventTargetCapture(element, 'click').filter(
-      (domEvent) => discardButton && discardButton.contains(domEvent.target)
+      (domEvent) => discardButton && discardButton.contains(domEvent.target),
     ),
   ]);
   return domEventStream.map((domEvent) => ({

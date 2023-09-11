@@ -13,7 +13,7 @@ function getIfOwn(object: Record<string, any>, prop: string): any {
 // window.open, and returns the attempted popup's URL.
 
 export default function clickAndGetPopupUrl(
-  element: HTMLElement
+  element: HTMLElement,
 ): string | null | undefined {
   const event = document.createEvent('MouseEvents');
   const options = {
@@ -42,7 +42,7 @@ export default function clickAndGetPopupUrl(
     options.shiftKey,
     options.metaKey,
     options.button,
-    null
+    null,
   );
   let url;
   const oldWindowOpen = window.open,

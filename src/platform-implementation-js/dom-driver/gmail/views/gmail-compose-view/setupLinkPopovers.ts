@@ -21,7 +21,7 @@ class LinkPopOver extends SafeEventEmitter {
 
   addSection() {
     let containerEl = this._popOverEl.querySelector<HTMLElement>(
-      '.inboxsdk__linkPopOver_section_container'
+      '.inboxsdk__linkPopOver_section_container',
     );
     if (!containerEl) {
       containerEl = document.createElement('div');
@@ -50,7 +50,7 @@ class LinkPopOverSection {
 }
 
 function getSelectedLink(
-  gmailComposeView: GmailComposeView
+  gmailComposeView: GmailComposeView,
 ): HTMLAnchorElement | null {
   const focusNode = document.getSelection()?.focusNode;
   if (!focusNode) {
@@ -73,7 +73,7 @@ function getSelectedLink(
 
 function findLinkParent(
   node: Node | null,
-  composeBody: HTMLElement
+  composeBody: HTMLElement,
 ): HTMLAnchorElement | null {
   if (node instanceof HTMLAnchorElement) {
     return node;
@@ -85,13 +85,13 @@ function findLinkParent(
 }
 
 export default function setupLinkPopOvers(
-  gmailComposeView: GmailComposeView
+  gmailComposeView: GmailComposeView,
 ): Kefir.Observable<any, never> {
   return toItemWithLifetimeStream(
     gmailComposeView
       .getGmailDriver()
       .getTagTree()
-      .getAllByTag('composeLinkPopOverContainer')
+      .getAllByTag('composeLinkPopOverContainer'),
   ).flatMap(
     ({ el, removalStream }: ItemWithLifetime<TagTreeNode<HTMLElement>>) => {
       const popOverEl = el.getValue();
@@ -131,6 +131,6 @@ export default function setupLinkPopOvers(
 
           return Kefir.never();
         });
-    }
+    },
   );
 }

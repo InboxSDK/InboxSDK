@@ -1,7 +1,7 @@
 // Returns a wrapped version of the function which queues up callTimestamps to the
 // function if it is called more than count times within period amount of time.
 export default function rateLimitQueuer<
-  T extends (...args: any) => Promise<any>
+  T extends (...args: any) => Promise<any>,
 >(fn: T, period: number, count: number): T {
   let callTimestamps: Array<number> = [];
   const queue: Array<() => void> = [];

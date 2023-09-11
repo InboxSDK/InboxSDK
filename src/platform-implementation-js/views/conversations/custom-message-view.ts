@@ -21,7 +21,7 @@ export default class CustomMessageView extends SafeEventEmitter {
 
   constructor(
     descriptorStream: Kefir.Observable<CustomMessageDescriptor, unknown>,
-    onReady: () => any
+    onReady: () => any,
   ) {
     super();
 
@@ -32,7 +32,7 @@ export default class CustomMessageView extends SafeEventEmitter {
       .onValue((descriptor) => {
         this._el.setAttribute(
           'data-inboxsdk-sortdate',
-          String(descriptor.sortDate.getTime())
+          String(descriptor.sortDate.getTime()),
         );
 
         const previousDescriptor = this._lastDescriptor;

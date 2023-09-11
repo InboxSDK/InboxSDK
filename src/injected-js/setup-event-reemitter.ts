@@ -13,7 +13,7 @@ export default function setupEventReemitter() {
       (newEvent as any).initEvent(
         event.detail.type,
         event.detail.bubbles,
-        event.detail.cancelable
+        event.detail.cancelable,
       );
       Object.assign(newEvent, event.detail.props);
       if (event.detail.dataTransfer) {
@@ -49,6 +49,6 @@ export default function setupEventReemitter() {
         };
       }
       event.target.dispatchEvent(newEvent);
-    }
+    },
   );
 }

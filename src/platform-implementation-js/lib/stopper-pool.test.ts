@@ -81,7 +81,7 @@ it('stops listening to streams after first event', (done) => {
     Kefir.stream((emitter) => {
       emitter.value(1);
       return done;
-    })
+    }),
   );
 });
 

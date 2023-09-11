@@ -19,7 +19,7 @@ export default class GmailAppToolbarButtonView {
 
   constructor(
     driver: Driver,
-    inButtonDescriptor: Kefir.Observable<Record<string, any>, unknown>
+    inButtonDescriptor: Kefir.Observable<Record<string, any>, unknown>,
   ) {
     this._driver = driver;
     this._stopper = kefirStopper();
@@ -79,7 +79,7 @@ export default class GmailAppToolbarButtonView {
   _handleButtonDescriptor(buttonDescriptor: Record<string, any>) {
     if (!buttonDescriptor) {
       throw new Error(
-        'The application passed an invalid value for buttonDescriptor'
+        'The application passed an invalid value for buttonDescriptor',
       );
     }
 
@@ -95,7 +95,7 @@ export default class GmailAppToolbarButtonView {
       querySelector(element, 'a'),
       false,
       buttonDescriptor.iconClass,
-      buttonDescriptor.iconUrl
+      buttonDescriptor.iconUrl,
     );
 
     _updateTitle(querySelector(element, 'span'), buttonDescriptor);
@@ -114,7 +114,7 @@ export default class GmailAppToolbarButtonView {
 
     if (!buttonDescriptor) {
       throw new Error(
-        'app toolbar button clicked before receiving button descriptor'
+        'app toolbar button clicked before receiving button descriptor',
       );
     }
 
@@ -131,7 +131,7 @@ export default class GmailAppToolbarButtonView {
       if (buttonDescriptor.arrowColor) {
         querySelector(
           tooltipView.getContainerElement(),
-          '.T-P-atC'
+          '.T-P-atC',
         ).style.borderTopColor = buttonDescriptor.arrowColor;
       }
 
@@ -140,7 +140,7 @@ export default class GmailAppToolbarButtonView {
         element,
         {
           manualPosition: true,
-        }
+        },
       );
       appEvent.dropdown.on('destroy', () => {
         this._activeDropdown = null;
@@ -164,7 +164,7 @@ export default class GmailAppToolbarButtonView {
 
 function _createAppButtonElement(
   driver: Driver,
-  onclick: (event: Record<string, any>) => void
+  onclick: (event: Record<string, any>) => void,
 ): HTMLElement {
   const element = document.createElement('div');
   element.setAttribute('class', 'inboxsdk__appButton');

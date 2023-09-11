@@ -28,7 +28,7 @@ export default class Toolbars extends EventEmitter implements IToolbars {
     appId: string,
     driver: Driver,
     membrane: Membrane,
-    piOpts: PiOpts
+    piOpts: PiOpts,
   ) {
     super();
     const members = {
@@ -52,8 +52,8 @@ export default class Toolbars extends EventEmitter implements IToolbars {
         .getLogger()
         .errorApp(
           new Error(
-            'registerThreadButton does not support listSection=OTHER or threadSection=OTHER and hasDropdown=true together'
-          )
+            'registerThreadButton does not support listSection=OTHER or threadSection=OTHER and hasDropdown=true together',
+          ),
         );
       buttonDescriptor = { ...buttonDescriptor, hasDropdown: false };
     }
@@ -71,10 +71,10 @@ export default class Toolbars extends EventEmitter implements IToolbars {
             position: event.position,
             dropdown: event.dropdown,
             selectedThreadViews: event.selectedThreadViewDrivers.map((x: any) =>
-              members.membrane.get(x)
+              members.membrane.get(x),
             ),
             selectedThreadRowViews: event.selectedThreadRowViewDrivers.map(
-              (x: any) => members.membrane.get(x)
+              (x: any) => members.membrane.get(x),
             ),
           } as any);
         },
@@ -132,7 +132,7 @@ export default class Toolbars extends EventEmitter implements IToolbars {
             members.driver
               .getLogger()
               .deprecationWarning(
-                'Toolbars.registerToolbarButtonForList onClick event.threadRowViews'
+                'Toolbars.registerToolbarButtonForList onClick event.threadRowViews',
               );
             return event.selectedThreadRowViews;
           },
@@ -174,7 +174,7 @@ export default class Toolbars extends EventEmitter implements IToolbars {
       .getLogger()
       .deprecationWarning(
         'Toolbars.setAppToolbarButton',
-        'Toolbars.addToolbarButtonForApp'
+        'Toolbars.addToolbarButtonForApp',
       );
 
     if (piOpts.REQUESTED_API_VERSION !== 1) {
@@ -188,11 +188,11 @@ export default class Toolbars extends EventEmitter implements IToolbars {
     const buttonDescriptorStream = kefirCast(Kefir, buttonDescriptor);
     const appToolbarButtonViewDriverPromise = get(
       memberMap,
-      this
+      this,
     ).driver.addToolbarButtonForApp(buttonDescriptorStream);
     const appToolbarButtonView = new AppToolbarButtonView(
       get(memberMap, this).driver,
-      appToolbarButtonViewDriverPromise
+      appToolbarButtonViewDriverPromise,
     );
     return appToolbarButtonView;
   }

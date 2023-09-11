@@ -7,7 +7,7 @@ interface Emitter {
 
 export default function fromEventTargetCapture(
   target: Emitter,
-  eventName: string
+  eventName: string,
 ): Kefir.Observable<any, never> {
   return Kefir.stream((emitter) => {
     function sink(event: any) {

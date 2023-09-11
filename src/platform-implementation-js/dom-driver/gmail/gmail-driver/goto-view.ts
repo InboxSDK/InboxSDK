@@ -11,7 +11,7 @@ const gotoView = ud.defn(
   async function gotoView(
     gmailDriver: GmailDriver,
     viewName: string,
-    params: (RouteParams | string) | null | undefined
+    params: (RouteParams | string) | null | undefined,
   ): Promise<void> {
     if (viewName[0] === '#') {
       if (params) {
@@ -63,7 +63,7 @@ const gotoView = ud.defn(
       // worry about the above issue.
       window.location.hash = newHash;
     }
-  }
+  },
 );
 
 export default gotoView;

@@ -6,7 +6,7 @@ const GMAIL_ALPHABET = 'BCDFGHJKLMNPQRSTVWXZbcdfghjklmnpqrstvwxz';
 
 export default function encodeDraftUrlId(
   syncThreadId: string,
-  syncMessageId: string
+  syncMessageId: string,
 ): string {
   const raw = `${syncThreadId.replace(/^thread-/, '')}+${syncMessageId}`;
   const b64 = Buffer.from(raw).toString('base64').replace(/=/g, '');

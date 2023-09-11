@@ -4,7 +4,7 @@ import delayAsap from '../delay-asap';
 import { ItemWithLifetime } from './make-element-child-stream';
 
 export default function makeElementStreamMerger<T>(): (
-  event: ItemWithLifetime<T>
+  event: ItemWithLifetime<T>,
 ) => Kefir.Observable<ItemWithLifetime<T>, never> {
   const knownElementStopperPools: Map<T, StopperPool<null, never>> = new Map();
 
@@ -15,14 +15,14 @@ export default function makeElementStreamMerger<T>(): (
         console.warn(
           'element is part of multiple element streams',
           stopperPool.getSize(),
-          event.el
+          event.el,
         );
       }
       stopperPool.add(event.removalStream.flatMap(delayAsap) as any);
       return Kefir.never();
     } else {
       stopperPool = new StopperPool(
-        event.removalStream.flatMap(delayAsap) as any
+        event.removalStream.flatMap(delayAsap) as any,
       );
       stopperPool.stream.onValue(function () {
         knownElementStopperPools.delete(event.el);

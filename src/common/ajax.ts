@@ -127,6 +127,6 @@ function _retry(opts: AjaxOpts): Promise<AjaxResponse> {
   const retryTimeout = Math.min(Math.pow(2, retryNum) * 1000, MAX_TIMEOUT);
 
   return delay(retryTimeout).then(() =>
-    ajax(Object.assign({}, opts, { retryNum }))
+    ajax(Object.assign({}, opts, { retryNum })),
   );
 }

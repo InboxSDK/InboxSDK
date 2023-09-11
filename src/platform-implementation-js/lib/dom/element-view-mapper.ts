@@ -5,7 +5,7 @@ type View = { destroy(): void };
 import type { ElementWithLifetime } from './make-element-child-stream';
 
 export default function elementViewMapper<T extends View>(
-  viewFn: (el: HTMLElement) => T
+  viewFn: (el: HTMLElement) => T,
 ): (event: ElementWithLifetime) => T {
   return (event) => {
     const view = viewFn(event.el);

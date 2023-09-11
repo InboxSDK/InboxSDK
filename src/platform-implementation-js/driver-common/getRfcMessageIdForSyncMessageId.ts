@@ -9,7 +9,7 @@ import type { Driver } from '../driver-interfaces/driver';
 // the Gmail API.
 async function getRfcMessageIdForSyncMessageId(
   driver: Driver,
-  syncMessageID: string
+  syncMessageID: string,
 ): Promise<string> {
   const text = await getOriginalMessagePage(driver, {
     syncMessageID: syncMessageID,
@@ -18,7 +18,7 @@ async function getRfcMessageIdForSyncMessageId(
 
   if (!match) {
     throw new Error(
-      "Failed to find rfc id for gmail thread id. Message may not exist in user's account."
+      "Failed to find rfc id for gmail thread id. Message may not exist in user's account.",
     );
   }
 

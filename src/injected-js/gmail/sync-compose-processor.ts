@@ -11,7 +11,7 @@ import {
 import * as logger from '../injected-logger';
 
 export function parseComposeRequestBody(
-  request: string
+  request: string,
 ): ComposeRequest | null {
   const requestParsed = JSON.parse(request);
 
@@ -53,7 +53,7 @@ export function parseComposeResponseBody(response: string) {
 
 export function replaceBodyContentInComposeSendRequestBody(
   request: string,
-  newBodyHtmlContent: string
+  newBodyHtmlContent: string,
 ): string {
   const requestParsed = JSON.parse(request);
 
@@ -62,7 +62,7 @@ export function replaceBodyContentInComposeSendRequestBody(
       const replacedRequestObj =
         replaceBodyContentInComposeSendRequestBody_2022_09_09(
           requestParsed,
-          newBodyHtmlContent
+          newBodyHtmlContent,
         );
 
       if (replacedRequestObj) {

@@ -30,7 +30,7 @@ export default class ComposeButtonView extends EventEmitter {
   constructor(
     optionsPromise: Promise<Options | null | undefined>,
     composeViewDriver: ComposeViewDriver,
-    driver: Driver
+    driver: Driver,
   ) {
     super();
     const members = { optionsPromise, composeViewDriver, driver };
@@ -60,7 +60,7 @@ export default class ComposeButtonView extends EventEmitter {
       members.composeViewDriver.addTooltipToButton(
         options.buttonViewController,
         options.buttonDescriptor,
-        tooltipDescriptor
+        tooltipDescriptor,
       );
     });
   }
@@ -70,7 +70,7 @@ export default class ComposeButtonView extends EventEmitter {
     members.optionsPromise.then((options) => {
       if (!options) return;
       members.composeViewDriver.closeButtonTooltip(
-        options.buttonViewController
+        options.buttonViewController,
       );
     });
   }

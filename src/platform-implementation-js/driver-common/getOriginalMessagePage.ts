@@ -14,7 +14,7 @@ type Options =
 
 async function getOriginalMessagePage(
   driver: Driver,
-  options: Options
+  options: Options,
 ): Promise<string> {
   const data: any = {
     ik: driver.getPageCommunicator().getIkValue(),

@@ -47,7 +47,7 @@ describe('GmailAppSidebarView Primary', function () {
     const container = makeContentContainerElement();
     const gmailAppSidebarView = new GmailAppSidebarView(
       makeDriver(),
-      container
+      container,
     );
     const descriptor = Kefir.constant({
       title: 'foo',
@@ -59,24 +59,24 @@ describe('GmailAppSidebarView Primary', function () {
     } as GmailThreadView;
     const panel = gmailAppSidebarView.addThreadSidebarContentPanel(
       descriptor,
-      fakeThreadView
+      fakeThreadView,
     );
     await delay(0);
     expect(
       container.querySelectorAll('.' + idMap('app_sidebar_content_panel'))
-        .length
+        .length,
     ).toBe(1);
     panel.remove();
     expect(
       container.querySelectorAll('.' + idMap('app_sidebar_content_panel'))
-        .length
+        .length,
     ).toBe(0);
   });
   it('multiple sidebars can be added', async () => {
     const container = makeContentContainerElement();
     const gmailAppSidebarView = new GmailAppSidebarView(
       makeDriver(),
-      container
+      container,
     );
     const descriptor1 = Kefir.constant({
       title: 'foo1',
@@ -93,16 +93,16 @@ describe('GmailAppSidebarView Primary', function () {
     } as GmailThreadView;
     gmailAppSidebarView.addThreadSidebarContentPanel(
       descriptor1,
-      fakeThreadView
+      fakeThreadView,
     );
     gmailAppSidebarView.addThreadSidebarContentPanel(
       descriptor2,
-      fakeThreadView
+      fakeThreadView,
     );
     await delay(0);
     expect(
       container.querySelectorAll('.' + idMap('app_sidebar_content_panel'))
-        .length
+        .length,
     ).toBe(2);
   });
 });

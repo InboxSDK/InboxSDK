@@ -8,7 +8,7 @@ import { SyncThread } from '../dom-driver/gmail/gmail-sync-response-processor';
 
 async function getSyncThreadsForSearch(
   driver: Driver,
-  searchTerm: string
+  searchTerm: string,
 ): Promise<{ threads: SyncThread[]; _text: string }> {
   let responseText = null;
   try {

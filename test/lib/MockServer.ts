@@ -47,7 +47,7 @@ function checkResponderFilter(
   path: string,
   responseType: string,
   requestHeaders: { [name: string]: any },
-  body: string | undefined
+  body: string | undefined,
 ) {
   if (filter.method && filter.method != method) {
     return false;
@@ -67,7 +67,8 @@ function checkResponderFilter(
 
   if (
     !Object.entries(filter.headers || {}).every(
-      ([name, value]) => name in requestHeaders && requestHeaders[name] == value
+      ([name, value]) =>
+        name in requestHeaders && requestHeaders[name] == value,
     )
   ) {
     return false;
@@ -96,7 +97,7 @@ function selectResponder(
   path: string,
   responseType: string,
   requestHeaders: { [name: string]: any },
-  body: string | undefined
+  body: string | undefined,
 ): Responder {
   const foundPair = responders.find((pair) =>
     checkResponderFilter(
@@ -105,8 +106,8 @@ function selectResponder(
       path,
       responseType,
       requestHeaders,
-      body
-    )
+      body,
+    ),
   );
   if (foundPair == null) {
     return defaultResponder;
@@ -181,7 +182,7 @@ export default class MockServer {
                     "The value is only accessible if the object's 'responseType' " +
                       "is '' or 'text' (was '" +
                       this.responseType +
-                      "')."
+                      "').",
                   );
                 }
                 return this._response;
@@ -198,7 +199,7 @@ export default class MockServer {
       open(
         method: string,
         path: string,
-        async: boolean | undefined = undefined
+        async: boolean | undefined = undefined,
       ) {
         if (this._server._verbose) {
           console.log('Connection opened', method, path);
@@ -256,7 +257,7 @@ export default class MockServer {
           this._path!,
           this.responseType || 'text',
           this._requestHeaders,
-          body
+          body,
         );
 
         const delay = this._responder.delay;
@@ -308,7 +309,7 @@ export default class MockServer {
               this._method,
               this._path,
               this._requestHeaders,
-              this._body
+              this._body,
             );
           } else {
             response = this._responder.response;
@@ -348,7 +349,7 @@ export default class MockServer {
       setRequestHeader(header: string, value: string) {
         if (this._readyState != 1 || this._sendFlag) {
           throw new Error(
-            "Can't set headers now at readyState " + this._readyState
+            "Can't set headers now at readyState " + this._readyState,
           );
         }
         this._requestHeaders[header.toLowerCase()] = value;
@@ -386,7 +387,7 @@ export default class MockServer {
       removeEventListener(name: string, listener: Function) {
         if (this._listeners[name]) {
           this._listeners[name] = this._listeners[name].filter(
-            (l) => l !== listener
+            (l) => l !== listener,
           );
         }
       }

@@ -118,7 +118,7 @@ test('recursive rate limited functions work', async () => {
       }
     },
     15,
-    2
+    2,
   );
   const zeroCall = fn(0);
   const zeroCallCb = jest.fn();

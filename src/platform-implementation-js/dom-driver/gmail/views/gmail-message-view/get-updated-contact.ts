@@ -13,7 +13,7 @@ const cache: Record<
 > = {};
 export default function getUpdatedContact(
   headerContact: Contact,
-  element: HTMLElement
+  element: HTMLElement,
 ): Contact {
   let cacheEntry = cache[headerContact.emailAddress];
 
@@ -29,7 +29,7 @@ export default function getUpdatedContact(
   const isMenuElementHidden =
     menuElement && menuElement.style.visibility === 'hidden';
   const menuButtonElement = element.querySelector<HTMLElement>(
-    '.ajy[aria-haspopup=true]'
+    '.ajy[aria-haspopup=true]',
   );
 
   if (menuButtonElement && isMenuElementHidden) {
@@ -83,7 +83,7 @@ function updateContactCacheFromModal(headerContact: Contact) {
       modalContact.name = name;
     } else {
       const stringContact = extractContactFromEmailContactString(
-        span.textContent!
+        span.textContent!,
       );
 
       if (emailAddress === stringContact.emailAddress) {

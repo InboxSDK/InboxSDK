@@ -11,7 +11,7 @@ describe('makeNewHash', () => {
   });
   it('4', () => {
     expect(makeNewHash('#inbox?compose=123', '456')).toBe(
-      '#inbox?compose=123%2C456'
+      '#inbox?compose=123%2C456',
     );
   });
   it('5', () => {

@@ -2,7 +2,7 @@ import { Contact } from '../../inboxsdk';
 import isValidEmail from './is-valid-email';
 
 export default function extractContactFromEmailContactString(
-  contactInfoString: string
+  contactInfoString: string,
 ): Contact {
   let name: string = null!;
   let emailAddress = null;

@@ -11,7 +11,7 @@ interface View {
 import { ElementWithLifetime } from './make-element-child-stream';
 
 export default function makeElementViewStream<T extends View>(
-  viewFn: (el: HTMLElement) => T | null | undefined
+  viewFn: (el: HTMLElement) => T | null | undefined,
 ): (event: ElementWithLifetime) => Kefir.Observable<T, never> {
   return (event) => {
     const view = viewFn(event.el);

@@ -8,13 +8,13 @@ import type { Driver } from '../driver-interfaces/driver';
 // the Gmail API.
 async function getGmailMessageIdForSyncMessageId(
   driver: Driver,
-  syncMessageID: string
+  syncMessageID: string,
 ): Promise<string> {
   const text = await getOriginalMessagePage(driver, {
     syncMessageID: syncMessageID,
   });
   const messageIdMatch = text.match(
-    /<a\b[^<>]+\bhref="\/mail[^"]*(?:\?|&(?:amp;)?)view=att&(?:amp;)?th=([a-f0-9]+)&/i
+    /<a\b[^<>]+\bhref="\/mail[^"]*(?:\?|&(?:amp;)?)view=att&(?:amp;)?th=([a-f0-9]+)&/i,
   );
 
   if (!messageIdMatch) {

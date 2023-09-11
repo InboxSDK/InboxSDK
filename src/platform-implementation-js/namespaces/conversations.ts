@@ -61,7 +61,7 @@ class Conversations {
       ThreadView,
       members.threadViewHandlerRegistry,
       this,
-      membrane
+      membrane,
     );
 
     _setupViewDriverWatcher(
@@ -70,7 +70,7 @@ class Conversations {
       MessageView,
       members.messageViewHandlerRegistries.all,
       this,
-      membrane
+      membrane,
     );
 
     _setupViewDriverWatcher(
@@ -82,41 +82,41 @@ class Conversations {
               .getEventStream()
               .filter((event) => event.eventName === 'messageLoad')
               .map(() => messageViewDriver)
-              .take(1)
+              .take(1),
       ),
       MessageView,
       members.messageViewHandlerRegistries.loaded,
       this,
-      membrane
+      membrane,
     );
   }
 
   registerThreadViewHandler(handler: (v: ThreadView) => void): () => void {
     return get(memberMap, this).threadViewHandlerRegistry.registerHandler(
-      handler
+      handler,
     );
   }
 
   registerMessageViewHandler(handler: (v: MessageView) => void): () => void {
     return get(
       memberMap,
-      this
+      this,
     ).messageViewHandlerRegistries.loaded.registerHandler(handler);
   }
 
   registerMessageViewHandlerAll(handler: (v: MessageView) => void): () => void {
     return get(
       memberMap,
-      this
+      this,
     ).messageViewHandlerRegistries.all.registerHandler(handler);
   }
 
   registerFileAttachmentCardViewHandler(
-    handler: (v: AttachmentCardView) => void
+    handler: (v: AttachmentCardView) => void,
   ): () => void {
     return get(
       memberMap,
-      this
+      this,
     ).attachmentCardViewHandlerRegistry.registerHandler(handler);
   }
 }
@@ -127,7 +127,7 @@ function _setupViewDriverWatcher(
   ViewClass: typeof MessageView | typeof ThreadView,
   handlerRegistry: any,
   ConversationsInstance: any,
-  membrane: Membrane
+  membrane: Membrane,
 ) {
   var combinedStream = stream.map(function (viewDriver) {
     const view = membrane.get(viewDriver);
@@ -142,7 +142,7 @@ function _setupViewDriverWatcher(
       event.viewDriver
         .getReadyStream()
         .map(() => event)
-        .takeUntilBy(Kefir.fromEvents(event.view, 'destroy'))
+        .takeUntilBy(Kefir.fromEvents(event.view, 'destroy')),
     )
     .onValue(function (event: any) {
       handlerRegistry.addTarget(event.view);

@@ -9,7 +9,7 @@ class CollapsibleSectionView extends EventEmitter {
 
   constructor(
     collapsibleSectionViewDriver: GmailCollapsibleSectionView,
-    driver: Driver
+    driver: Driver,
   ) {
     super();
     const members = {
@@ -39,7 +39,7 @@ class CollapsibleSectionView extends EventEmitter {
 function _bindToEventStream(
   collapsibleSectionView: CollapsibleSectionView,
   collapsibleSectionViewDriver: GmailCollapsibleSectionView,
-  driver: Driver
+  driver: Driver,
 ) {
   collapsibleSectionViewDriver.getEventStream().onValue(({ eventName }) => {
     collapsibleSectionView.emit(eventName);

@@ -5,7 +5,7 @@ import * as threadIdentifier from '../src/injected-js/gmail/thread-identifier';
 
 document.documentElement.innerHTML = fs.readFileSync(
   __dirname + '/injected-thread-identifier.html',
-  'utf8'
+  'utf8',
 );
 
 test('threadIdentifier works', () => {
@@ -16,8 +16,8 @@ test('threadIdentifier works', () => {
   // Identify a regular email
   expect(
     pageCommunicator.getThreadIdForThreadRowByDatabase(
-      document.getElementById(':3r')!
-    )
+      document.getElementById(':3r')!,
+    ),
   ).toBe('14a3481b07c29fcf');
 
   // Fail to identify an ambiguous email that has no click handler
@@ -36,7 +36,7 @@ test('threadIdentifier works', () => {
     clickedCount++;
     const win = window.open(
       '?ui=2&view=btop&ver=v0f5rr5r5c17&search=inbox&th=14a5f1c5ad340727&cvid=1',
-      '_blank'
+      '_blank',
     )!;
 
     // Any errors in the click handler are silenced
@@ -63,13 +63,13 @@ test('threadIdentifier works', () => {
     writable: true,
   });
   expect(pageCommunicator.getThreadIdForThreadRowByClick(amb)).toBe(
-    '14a5f1c5ad340727'
+    '14a5f1c5ad340727',
   );
   expect(clickedCount).toBe(1);
 
   // Identify it again by using the cached value. No clicking allowed.
   expect(pageCommunicator.getThreadIdForThreadRowByDatabase(amb)).toBe(
-    '14a5f1c5ad340727'
+    '14a5f1c5ad340727',
   );
   expect(clickedCount).toBe(1);
 
@@ -89,11 +89,11 @@ test('threadIdentifier works', () => {
   twi1.addEventListener('click', function () {
     window.open(
       '?ui=2&view=btop&ver=v0f5rr5r5c17&search=inbox&th=14a0c5f5571b501c&cvid=1',
-      '_blank'
+      '_blank',
     );
   });
   expect(pageCommunicator.getThreadIdForThreadRowByClick(twi1)).toBe(
-    '14a0c5f5571b501c'
+    '14a0c5f5571b501c',
   );
   // Make sure that the other one is *not* identifiable by the database. A
   // successful click should not populate the database because it does not handle
@@ -103,24 +103,24 @@ test('threadIdentifier works', () => {
   // Fail to identify an email that was edited out of the original VIEW_DATA
   const missing: HTMLElement = document.getElementById(':74')!;
   expect(pageCommunicator.getThreadIdForThreadRowByDatabase(missing)).toBe(
-    null
+    null,
   );
   expect(pageCommunicator.getThreadIdForThreadRowByClick(missing)).toBe(null);
 
   // Intercept some AJAX data
   threadIdentifier.processThreadListResponse(
-    fs.readFileSync(__dirname + '/injected-thread-identifier-ajax.txt', 'utf8')
+    fs.readFileSync(__dirname + '/injected-thread-identifier-ajax.txt', 'utf8'),
   );
 
   // Can still identify regular email
   expect(
     pageCommunicator.getThreadIdForThreadRowByDatabase(
-      document.getElementById(':4d')!
-    )
+      document.getElementById(':4d')!,
+    ),
   ).toBe('149bf3ae4702f5a7');
 
   // Can now identify that missing email
   expect(pageCommunicator.getThreadIdForThreadRowByDatabase(missing)).toBe(
-    '1477fe06f5924590'
+    '1477fe06f5924590',
   );
 });

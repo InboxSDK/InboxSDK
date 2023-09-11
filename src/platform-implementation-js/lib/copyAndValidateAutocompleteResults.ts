@@ -3,7 +3,7 @@ import type { AutocompleteSearchResult } from '../../injected-js/gmail/modify-su
 
 export default function copyAndValidateAutocompleteResults(
   driver: Driver,
-  results: Array<AutocompleteSearchResult>
+  results: Array<AutocompleteSearchResult>,
 ): Array<AutocompleteSearchResult> {
   if (!Array.isArray(results)) {
     throw new Error('suggestions must be an array');
@@ -25,7 +25,7 @@ export default function copyAndValidateAutocompleteResults(
     ) {
       throw new Error(
         'suggestion must have routeName, externalURL, ' +
-          'searchTerm, or onClick property'
+          'searchTerm, or onClick property',
       );
     }
     if (typeof resultCopy.iconURL === 'string') {
@@ -34,14 +34,14 @@ export default function copyAndValidateAutocompleteResults(
         .getLogger()
         .deprecationWarning(
           'AutocompleteSearchResult "iconURL" property',
-          'AutocompleteSearchResult.iconUrl'
+          'AutocompleteSearchResult.iconUrl',
         );
       if (!resultCopy.iconUrl) {
         if (driver.getOpts().REQUESTED_API_VERSION === 1) {
           resultCopy.iconUrl = iconURL;
         } else {
           console.error(
-            'Support for iconURL property was dropped after API version 1'
+            'Support for iconURL property was dropped after API version 1',
           );
         }
       }

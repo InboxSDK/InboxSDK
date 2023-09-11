@@ -1,9 +1,10 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-
+import { setLoadScript } from './load-script-proxy';
+import nonremote from './inboxsdk-NONREMOTE';
+import { setInjectScriptImplementation } from '../platform-implementation-js/lib/inject-script';
+import loadScript from '../common/load-script';
 import { injectScriptEmbedded } from '../platform-implementation-js/lib/inject-script-EMBEDDED';
 
-require('../platform-implementation-js/lib/inject-script').setInjectScriptImplementation(
-  injectScriptEmbedded
-);
+setInjectScriptImplementation(injectScriptEmbedded);
+setLoadScript(loadScript);
 
-export default require('./inboxsdk-NONREMOTE').default;
+export default nonremote;

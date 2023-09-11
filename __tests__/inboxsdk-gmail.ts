@@ -1,6 +1,8 @@
 import MockMutationObserver from '../test/lib/mock-mutation-observer';
 import _ from 'lodash';
-import type { InboxSDK as InboxSDKT } from '../src/inboxsdk';
+import InboxSDK from '../src/inboxsdk-js/inboxsdk-TEST';
+//preload implementation
+import '../src/platform-implementation-js/platform-implementation';
 
 globalThis.MutationObserver = MockMutationObserver as any;
 document.documentElement.innerHTML = `
@@ -17,13 +19,9 @@ const originalWindowProperties = Object.keys(window);
 document.head.setAttribute('data-inboxsdk-script-injected', 'true');
 document.head.setAttribute(
   'data-inboxsdk-user-email-address',
-  'cowan@streak.com'
+  'cowan@streak.com',
 );
 document.head.setAttribute('data-inboxsdk-using-sync-api', 'false');
-
-const InboxSDK = require('../src/inboxsdk-js/inboxsdk-TEST').default;
-//preload implementation
-require('../src/platform-implementation-js/platform-implementation');
 
 test('loads in gmail mock', () => {
   const appOpts = { globalErrorLogging: false };
@@ -31,7 +29,7 @@ test('loads in gmail mock', () => {
   expect(InboxSDK.LOADER_VERSION).toBe('beep');
 
   return InboxSDK.load(1, 'sdk_testfoo_2a9c68f994', appOpts).then(
-    (inboxsdk: InboxSDKT) => {
+    (inboxsdk) => {
       const newGlobals = _.difference(
         Object.keys(window),
         originalWindowProperties,
@@ -43,7 +41,7 @@ test('loads in gmail mock', () => {
           '__coverage__',
           // https://github.com/zloirock/core-js/issues/726
           '__core-js_shared__',
-        ]
+        ],
       ).map((x) => `window.${x}`);
       expect(newGlobals).toEqual([]);
 
@@ -57,7 +55,7 @@ test('loads in gmail mock', () => {
       expect(inboxsdk.User.getEmailAddress()).toBe('cowan@streak.com');
 
       expect(inboxsdk.Router.getCurrentRouteView().getRouteType()).toBe(
-        'UNKNOWN'
+        'UNKNOWN',
       );
 
       return Promise.all([
@@ -70,6 +68,6 @@ test('loads in gmail mock', () => {
         expect(apps[1].LOADER_VERSION).toBe('beep');
         expect(apps[1].IMPL_VERSION).toBe('beep');
       });
-    }
+    },
   );
 });

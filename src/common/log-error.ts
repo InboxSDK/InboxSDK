@@ -23,7 +23,7 @@ const sessionId = getSessionId();
 export default function logError(
   err: Error | unknown,
   details: any,
-  context: LogErrorContext
+  context: LogErrorContext,
 ) {
   if (typeof document === 'undefined') {
     // In tests, just throw the error.
@@ -43,7 +43,7 @@ export default function logError(
     if (!(err instanceof Error)) {
       console.warn(
         'First parameter to Logger.error was not an error object:',
-        err
+        err,
       );
       err = new Error('Logger.error called with non-error: ' + err);
       markErrorAsSeen(err);
@@ -124,7 +124,7 @@ export default function logError(
             details,
             sentByApp,
           },
-        })
+        }),
       );
     }
   } catch (err2) {
@@ -215,7 +215,7 @@ const sendError = rateLimit(
     }
   },
   60 * 1000,
-  10
+  10,
 );
 
 function tooManyErrors(err2: unknown, originalArgs: any) {

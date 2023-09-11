@@ -14,7 +14,7 @@ export type ReceiverType = 'to' | 'cc' | 'bcc';
 export default function setRecipients(
   gmailComposeView: GmailComposeView,
   addressType: ReceiverType,
-  emailAddresses: string[]
+  emailAddresses: string[],
 ) {
   if (_areContactsEqual(gmailComposeView, addressType, emailAddresses)) {
     return;
@@ -24,7 +24,7 @@ export default function setRecipients(
 
   let _contactRow = getRecipientRowForType(
     gmailComposeView.getElement(),
-    addressType
+    addressType,
   );
 
   function openRecipientsSectionIfNeeded(button: HTMLElement) {
@@ -44,7 +44,7 @@ export default function setRecipients(
       ccButton.click();
       _contactRow = getRecipientRowForType(
         gmailComposeView.getElement(),
-        addressType
+        addressType,
       );
     }
   } else if (addressType === 'bcc') {
@@ -56,7 +56,7 @@ export default function setRecipients(
       bccButton.click();
       _contactRow = getRecipientRowForType(
         gmailComposeView.getElement(),
-        addressType
+        addressType,
       );
     }
   }
@@ -69,7 +69,7 @@ export default function setRecipients(
 
     const emailAddressEntry = querySelector(
       contactRow,
-      'input[role=combobox][aria-autocomplete=list]'
+      'input[role=combobox][aria-autocomplete=list]',
     );
     if (!(emailAddressEntry instanceof HTMLInputElement)) {
       throw new Error();
@@ -78,8 +78,8 @@ export default function setRecipients(
     // Remove existing recipients
     Array.from(
       contactRow.querySelectorAll<HTMLElement>(
-        'div[role=option][data-name] div.afX[aria-label]'
-      )
+        'div[role=option][data-name] div.afX[aria-label]',
+      ),
     ).forEach((el) => {
       el.click();
     });
@@ -89,7 +89,7 @@ export default function setRecipients(
     const clipboardData = new DataTransfer();
     clipboardData.setData('text/plain', emailAddresses.join(','));
     emailAddressEntry.dispatchEvent(
-      new ClipboardEvent('paste', { clipboardData })
+      new ClipboardEvent('paste', { clipboardData }),
     );
 
     // On fresh composes, if set_Recipients is called immediately, then
@@ -113,8 +113,8 @@ export default function setRecipients(
       // for values shared between InboxSDK instances.
       const claim = String(
         Number(
-          nameEl.getAttribute('data-inboxsdk-tracking-fresh-compose') || 0
-        ) + 1
+          nameEl.getAttribute('data-inboxsdk-tracking-fresh-compose') || 0,
+        ) + 1,
       );
       nameEl.setAttribute('data-inboxsdk-tracking-fresh-compose', claim);
       setTimeout(() => {
@@ -126,7 +126,7 @@ export default function setRecipients(
           // Does it look like our contact chips have all been removed?
           if (
             contactRow.querySelectorAll<HTMLElement>(
-              'div[role=option][data-name] div.afX[aria-label]'
+              'div[role=option][data-name] div.afX[aria-label]',
             ).length === 0
           ) {
             // put a mark in the DOM to be absolutely sure we can't
@@ -146,7 +146,7 @@ export default function setRecipients(
     try {
       contactRow = getOldRecipientRowForType(
         gmailComposeView.getElement(),
-        addressType
+        addressType,
       );
       if (!contactRow) {
         throw new Error('getOldRecipientRowForType failed');
@@ -170,7 +170,7 @@ export default function setRecipients(
     Array.from(contactRow.querySelectorAll<HTMLElement>('.vR .vM')).forEach(
       (el) => {
         simulateClick(el);
-      }
+      },
     );
 
     emailAddressEntry.value = emailAddresses.join(',');
@@ -185,13 +185,13 @@ export default function setRecipients(
     if (addressType === 'cc') {
       const ccButton = querySelector(
         gmailComposeView.getElement(),
-        'span.aB.gQ.pE'
+        'span.aB.gQ.pE',
       );
       simulateClick(ccButton);
     } else if (addressType === 'bcc') {
       const bccButton = querySelector(
         gmailComposeView.getElement(),
-        'span.aB.gQ.pB'
+        'span.aB.gQ.pB',
       );
       simulateClick(bccButton);
     }
@@ -212,11 +212,11 @@ export default function setRecipients(
 function _areContactsEqual(
   gmailComposeView: GmailComposeView,
   addressType: ReceiverType,
-  emailAddresses: string[]
+  emailAddresses: string[],
 ) {
   const existingEmailAddresses = getRecipients(
     gmailComposeView,
-    addressType
+    addressType,
   ).map((c) => c.emailAddress);
 
   if (!emailAddresses) {

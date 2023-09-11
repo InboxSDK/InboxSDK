@@ -7,12 +7,12 @@ import censorHTMLtree from '../../../common/censorHTMLtree';
 
 const pageParserOptionsStream: Kefir.Observable<any, any> = udKefir(
   module,
-  pageParserOptions
+  pageParserOptions,
 );
 
 export default function makePageParserTree(
   driver: Driver | null,
-  root: Document | HTMLElement
+  root: Document | HTMLElement,
 ): PageParserTree {
   const _driver = driver;
 

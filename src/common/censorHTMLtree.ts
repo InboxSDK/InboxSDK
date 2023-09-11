@@ -10,7 +10,7 @@ export default function censorHTMLtree(target: HTMLElement): string {
     const attrHtml: string = Array.from(parent.attributes)
       .map(
         ({ name, value }) =>
-          autoHtml` ${name}="${ATTRIBUTE_WHITELIST.has(name) ? value : '...'}"`
+          autoHtml` ${name}="${ATTRIBUTE_WHITELIST.has(name) ? value : '...'}"`,
       )
       .join('');
     const headerElCount = lastIndex;
@@ -22,7 +22,7 @@ export default function censorHTMLtree(target: HTMLElement): string {
     openers.push(
       autoHtml`<${parent.nodeName.toLowerCase()}${{
         __html: attrHtml,
-      }}>${headers}`
+      }}>${headers}`,
     );
     closers.push(autoHtml`${footers}</${parent.nodeName.toLowerCase()}>`);
 

@@ -13,7 +13,7 @@ export default class GmailSupportItemView {
 
   constructor(
     driver: GmailDriver,
-    supportItemDescriptor: SupportItemDescriptor
+    supportItemDescriptor: SupportItemDescriptor,
   ) {
     this._driver = driver;
     this._setup(supportItemDescriptor);
@@ -37,7 +37,7 @@ export default class GmailSupportItemView {
         if (change.type === 'add') {
           this._addSupportElement(
             change.value.getValue(),
-            supportItemDescriptor
+            supportItemDescriptor,
           );
         } else if (change.type === 'remove') {
           if (this._insertElementContainer) {
@@ -53,7 +53,7 @@ export default class GmailSupportItemView {
 
   _addSupportElement(
     supportElement: HTMLElement,
-    supportItemDescriptor: SupportItemDescriptor
+    supportItemDescriptor: SupportItemDescriptor,
   ) {
     const insertElementContainer = document.createElement('div');
     const menuItemAttributes = supportElement.children.item(0)!.attributes;
@@ -83,7 +83,7 @@ export default class GmailSupportItemView {
     if (lastSeparatorItem) {
       lastSeparatorItem.insertAdjacentElement(
         'beforebegin',
-        insertElementContainer
+        insertElementContainer,
       );
     } else {
       supportElement.append(insertElementContainer);

@@ -36,9 +36,9 @@ export default function censorHTMLstring(html: string): string {
     .replace(
       /(^|>)([^<]+)/g,
       (match: string, start: string, text: string) =>
-        start + (text.trim().length ? '...' : '')
+        start + (text.trim().length ? '...' : ''),
     )
     .replace(/\s([^\s=]+)\s*=\s*"[^"]+"/g, (match: string, attr: string) =>
-      ATTRIBUTE_WHITELIST.has(attr) ? match : ` ${attr}="..."`
+      ATTRIBUTE_WHITELIST.has(attr) ? match : ` ${attr}="..."`,
     );
 }

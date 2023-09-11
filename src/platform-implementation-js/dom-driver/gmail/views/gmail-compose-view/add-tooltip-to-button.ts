@@ -8,7 +8,7 @@ export default function addTooltipToButton(
   gmailComposeView: GmailComposeView,
   buttonViewController: BasicButtonViewController,
   buttonDescriptor: Record<string, any>,
-  tooltipDescriptor: TooltipDescriptor
+  tooltipDescriptor: TooltipDescriptor,
 ): GmailTooltipView {
   var gmailTooltipView = new GmailTooltipView(tooltipDescriptor);
   var tooltipStopperStream: Kefir.Observable<any, unknown> = gmailTooltipView
@@ -24,7 +24,7 @@ export default function addTooltipToButton(
     gmailTooltipView,
     gmailComposeView,
     buttonViewController,
-    buttonDescriptor
+    buttonDescriptor,
   );
 
   gmailComposeView
@@ -32,12 +32,12 @@ export default function addTooltipToButton(
     .filter(
       (event) =>
         event.eventName === 'buttonAdded' ||
-        event.eventName === 'fullscreenChanged'
+        event.eventName === 'fullscreenChanged',
     )
     .merge(
       gmailTooltipView
         .getEventStream()
-        .filter(({ eventName }) => eventName === 'imageLoaded')
+        .filter(({ eventName }) => eventName === 'imageLoaded'),
     )
     .debounce(10)
     .takeUntilBy(tooltipStopperStream)
@@ -47,8 +47,8 @@ export default function addTooltipToButton(
         gmailTooltipView,
         gmailComposeView,
         buttonViewController,
-        buttonDescriptor
-      )
+        buttonDescriptor,
+      ),
     );
   buttonViewController
     .getView()
@@ -59,16 +59,16 @@ export default function addTooltipToButton(
     })
     .onValue(gmailTooltipView.destroy.bind(gmailTooltipView));
   var stoppedIntervalStream = Kefir.interval(50, undefined).takeUntilBy(
-    tooltipStopperStream
+    tooltipStopperStream,
   );
   var left = 0;
   var top = 0;
   stoppedIntervalStream
     .takeWhile(
-      () => !!buttonViewController.getView() && !!gmailTooltipView.getElement()
+      () => !!buttonViewController.getView() && !!gmailTooltipView.getElement(),
     )
     .map(() =>
-      buttonViewController.getView().getElement().getBoundingClientRect()
+      buttonViewController.getView().getElement().getBoundingClientRect(),
     )
     .filter((rect) => rect.left !== left || rect.top !== top)
     .map((rect) => {
@@ -82,14 +82,14 @@ export default function addTooltipToButton(
         buttonViewController.getView().getElement(),
         {
           position: 'top',
-        }
-      )
+        },
+      ),
     );
   stoppedIntervalStream
     .filter(
       () =>
         !buttonViewController.getView() ||
-        !buttonViewController.getView().getElement().offsetParent
+        !buttonViewController.getView().getElement().offsetParent,
     )
     .onValue(gmailTooltipView.destroy.bind(gmailTooltipView));
   return gmailTooltipView;
@@ -99,7 +99,7 @@ function _anchorTooltip(
   gmailTooltipView: GmailTooltipView,
   gmailComposeView: GmailComposeView,
   buttonViewController: BasicButtonViewController,
-  buttonDescriptor: any
+  buttonDescriptor: any,
 ) {
   try {
     gmailComposeView.ensureGroupingIsOpen(buttonDescriptor.type);

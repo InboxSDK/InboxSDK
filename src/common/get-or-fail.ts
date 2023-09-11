@@ -5,7 +5,7 @@ interface Get {
 
 const get: Get = function get<K, V>(
   map: Map<K, V> | WeakMap<any, V>,
-  key: K
+  key: K,
 ): V {
   const value = map.get(key);
   if (value === undefined) {

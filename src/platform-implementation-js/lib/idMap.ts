@@ -21,7 +21,7 @@ export function legacyIdMap(name: string): string {
       // current timestamp in hour resolution.
       const hasher = new Sha256();
       hasher.update(
-        'PWVe' + Math.floor(Date.now() / (1000 * 60 * 60)) + 'PYiE0'
+        'PWVe' + Math.floor(Date.now() / (1000 * 60 * 60)) + 'PYiE0',
       );
       seed =
         hasher.digest('hex').slice(0, 16) +
@@ -36,7 +36,7 @@ export function legacyIdMap(name: string): string {
     .digest('hex')
     .slice(0, 16)
     .replace(/[0-9]/g, (match) =>
-      String.fromCharCode('A'.charCodeAt(0) + Number(match))
+      String.fromCharCode('A'.charCodeAt(0) + Number(match)),
     );
   cache.set(name, newId);
   return newId;

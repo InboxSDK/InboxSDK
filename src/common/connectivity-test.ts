@@ -23,6 +23,6 @@ export default function connectivityTest(): Promise<{
   [url: string]: boolean;
 }> {
   return Promise.all(
-    URLS.map((url) => imageTest(url).then((success) => [url, success]))
+    URLS.map((url) => imageTest(url).then((success) => [url, success])),
   ).then((results) => fromPairs(results));
 }

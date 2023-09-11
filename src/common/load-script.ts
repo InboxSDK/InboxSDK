@@ -27,11 +27,11 @@ function addScriptToPage(url: string, cors: boolean): Promise<void> {
               event.message || 'Load failure: ' + url,
               event.filename,
               event.lineno,
-              event.column
-            )
+              event.column,
+            ),
         );
       },
-      false
+      false,
     );
     script.addEventListener(
       'load',
@@ -40,7 +40,7 @@ function addScriptToPage(url: string, cors: boolean): Promise<void> {
         // resolves.
         setTimeout(resolve, 1);
       },
-      false
+      false,
     );
   });
 
@@ -61,13 +61,13 @@ export interface LoadScriptOptions {
 
 export default function loadScript(
   url: string,
-  opts?: LoadScriptOptions
+  opts?: LoadScriptOptions,
 ): Promise<void> {
   let pr;
   if (isContentScript()) {
     const attempt = function (
       retryNum: number,
-      lastErr: Error | null
+      lastErr: Error | null,
     ): Promise<void> {
       if (retryNum > 3) {
         throw (
@@ -101,8 +101,8 @@ export default function loadScript(
           codeParts.push(
             originalCode.replace(
               /\/\/# sourceMappingURL=(?!data:)[^\n]*\n?$/,
-              ''
-            )
+              '',
+            ),
           );
         } else {
           codeParts.push(originalCode);
@@ -129,7 +129,7 @@ export default function loadScript(
                 url,
                 message: `SyntaxError in loading ${url}. Did we not load it fully? Trying again...`,
               },
-              {}
+              {},
             );
             return delay(5000).then(() => attempt(retryNum + 1, err));
           }
@@ -153,7 +153,7 @@ export default function loadScript(
         console.warn(
           'Script ' +
             url +
-            ' included without CORS headers. Error logs might be censored by the browser.'
+            ' included without CORS headers. Error logs might be censored by the browser.',
         );
       });
     });
@@ -169,7 +169,7 @@ export default function loadScript(
           response: err && err.xhr ? err.xhr.responseText : null,
           message: 'Failed to load script',
         },
-        {}
+        {},
       );
     });
   });

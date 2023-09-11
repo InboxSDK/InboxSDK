@@ -34,15 +34,15 @@ const args = stdio.getopt({
 // Don't let production be built without minification.
 // Could just make the production flag imply the minify flag, but that seems
 // like it would harm discoverability.
-if (args.production && !args.minify) {
-  throw new Error('--production requires --minify');
+if (args.remote && args.production && !args.minify) {
+  throw new Error('--remote --production requires --minify');
 }
 
 // --watch causes Browserify to use full paths in module references. We don't
 // want those visible in production.
 if (args.production && (args.watch || args.integratedPageWorld)) {
   throw new Error(
-    '--production can not be used with --watch, or --integratedPageWorld'
+    '--production can not be used with --watch, or --integratedPageWorld',
   );
 }
 
@@ -112,8 +112,8 @@ async function getVersion(): Promise<string> {
   const packageJson = JSON.parse(
     await fs.promises.readFile(
       path.join(__dirname, 'packages/core/package.json'),
-      'utf8'
-    )
+      'utf8',
+    ),
   );
 
   let version = `${packageJson.version}-${Date.now()}-${commit}`;
@@ -127,8 +127,6 @@ async function getVersion(): Promise<string> {
 }
 
 const enum OutputLibraryType {
-  /** Used for the integrated page world build */
-  Var = 'var',
   /** Remote and npm output format for compatibility's sake */
   UMD = 'umd',
   /** Future output format */
@@ -148,7 +146,7 @@ async function webpackTask({
   disableMinification,
   ...options
 }: WebpackTaskOptions): Promise<void> {
-  const willMinify = args.minify && !disableMinification;
+  const willMinify = (args.minify && !disableMinification) ?? false;
 
   const VERSION = await getVersion();
 
@@ -190,7 +188,7 @@ async function webpackTask({
                     'data-inboxsdk-version',
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- this is injected by webpack
                     ///@ts-ignore
-                    SDK_VERSION
+                    SDK_VERSION,
                   );
                   document.head.append(htmlElement);
                 },
@@ -226,6 +224,13 @@ async function webpackTask({
     plugins: [
       new webpack.DefinePlugin({
         SDK_VERSION: JSON.stringify(VERSION),
+        /**
+         * This flag would allow us to build an npm build with MV2 support.
+         * We keep this off so npm builds don't trigger false-positives
+         * in Chrome Web Store reviews checking for dynamically loaded code in MV3 extensions.
+         * This flag has no effect for remote/non-npm builds.
+         */
+        NPM_MV2_SUPPORT: JSON.stringify(false),
       }),
       ...(willMinify || args.production
         ? [
@@ -248,8 +253,6 @@ async function webpackTask({
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       fallback: {
-        // 'assert' used in the SDK directly
-        assert: require.resolve('assert/'),
         // 'querystring' used in the SDK directly
         querystring: require.resolve('querystring-es3/'),
       },
@@ -293,7 +296,7 @@ gulp.task('clean', async () => {
   const folders = ['./dist', './packages/core/src', './packages/core/test'];
   await Promise.all([
     ...folders.map((folder) =>
-      fs.promises.rm(folder, { force: true, recursive: true })
+      fs.promises.rm(folder, { force: true, recursive: true }),
     ),
     fs.promises.rm('./packages/core/inboxsdk.min.js', { force: true }),
   ]);
@@ -309,8 +312,8 @@ gulp.task('clean', async () => {
     fs.promises.rm(filename + '.LICENSE.txt', { force: true }),
     fg(filename + '*.map', { onlyFiles: true }).then((mapFiles) =>
       Promise.all(
-        mapFiles.map((mapFile) => fs.promises.rm(mapFile, { force: true }))
-      )
+        mapFiles.map((mapFile) => fs.promises.rm(mapFile, { force: true })),
+      ),
     ),
   ]);
 });
@@ -396,21 +399,6 @@ if (args.remote) {
     disableMinification: true,
     afterBuild: async () => {
       setupExamples();
-      const { minify } = await import('terser');
-
-      const sourceOutput = await fs.promises.readFile(
-        'packages/core/inboxsdk.js',
-        'utf8'
-      );
-
-      const minified = await minify(sourceOutput);
-      await fs.promises.writeFile(
-        'packages/core/inboxsdk.min.js',
-        minified.code!,
-        {
-          encoding: 'utf8',
-        }
-      );
     },
   };
 }
@@ -434,5 +422,5 @@ gulp.task(
   gulp.series('sdk', async function serverRun() {
     const app = await import('./live/app');
     app.run();
-  })
+  }),
 );

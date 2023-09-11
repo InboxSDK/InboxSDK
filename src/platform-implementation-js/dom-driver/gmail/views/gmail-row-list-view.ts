@@ -1,6 +1,5 @@
 import find from 'lodash/find';
 import zip from 'lodash/zip';
-import assert from 'assert';
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
@@ -11,6 +10,7 @@ import GmailThreadRowView from './gmail-thread-row-view';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import type GmailDriver from '../gmail-driver';
 import type GmailRouteView from './gmail-route-view/gmail-route-view';
+import { assert } from '../../../../common/assert';
 const THREAD_ROW_SELECTED_CLASSNAME = 'x7';
 const THREAD_ROW_SELECTED_CLASSNAME_REGEX = /\bx7\b/;
 
@@ -32,7 +32,7 @@ class GmailRowListView {
   constructor(
     rootElement: HTMLElement,
     routeViewDriver: GmailRouteView,
-    gmailDriver: GmailDriver
+    gmailDriver: GmailDriver,
   ) {
     this._eventStreamBus = kefirBus();
     this._stopper = this._eventStreamBus.ignoreValues().beforeEnd(() => null);
@@ -46,10 +46,10 @@ class GmailRowListView {
         const mutation = mutations[i];
         const target: any = mutation.target;
         const wasSelected = THREAD_ROW_SELECTED_CLASSNAME_REGEX.test(
-          (mutation as any).oldValue
+          (mutation as any).oldValue,
         );
         const isSelected = THREAD_ROW_SELECTED_CLASSNAME_REGEX.test(
-          target.className
+          target.className,
         );
 
         if (wasSelected !== isSelected) {
@@ -140,7 +140,7 @@ class GmailRowListView {
         toolbarElement,
         this._gmailDriver,
         this._routeViewDriver,
-        this
+        this,
       );
     } else {
       this._toolbarView = null;
@@ -162,7 +162,7 @@ class GmailRowListView {
           (this._element as any).parentElement.parentElement.parentElement
             .parentElement.parentElement ||
         toolbarContainerElement.parentElement!.parentElement ===
-          this._element.parentElement
+          this._element.parentElement,
     );
     return el ? el.querySelector<HTMLElement>('[gh=mtb]') : null;
   }
@@ -179,12 +179,12 @@ class GmailRowListView {
 
     if (firstTableParent !== newTableParent && firstTableParent) {
       const firstCols = firstTableParent.querySelectorAll<HTMLElement>(
-        'table.cf > colgroup > col'
+        'table.cf > colgroup > col',
       );
       const newCols = newTableParent.querySelectorAll<HTMLElement>(
-        'table.cf > colgroup > col'
+        'table.cf > colgroup > col',
       );
-      assert.strictEqual(firstCols.length, newCols.length);
+      assert(Object.is(firstCols.length, newCols.length));
       zip(firstCols, newCols).forEach(([firstCol, newCol]) => {
         newCol!.style.width = firstCol!.style.width;
       });
@@ -211,7 +211,7 @@ class GmailRowListView {
           if (isNaN(currentWidth) || currentWidth < width) {
             col.style.width = width + 'px';
           }
-        }
+        },
       );
     });
 
@@ -237,10 +237,10 @@ class GmailRowListView {
 
   _startWatchingForRowViews() {
     const tableDivParents = Array.from(
-      this._element.querySelectorAll<HTMLElement>('div.Cp')
+      this._element.querySelectorAll<HTMLElement>('div.Cp'),
     );
     const elementStream = Kefir.merge(
-      tableDivParents.map(makeElementChildStream)
+      tableDivParents.map(makeElementChildStream),
     ).flatMap((event) => {
       this._fixColumnWidths(event.el);
 

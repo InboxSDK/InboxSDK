@@ -6,13 +6,13 @@ import type GmailComposeView from '../gmail-compose-view';
 let hasLoggedError = false;
 export default function overrideEditSubject(
   gmailDriver: GmailDriver,
-  gmailComposeView: GmailComposeView
+  gmailComposeView: GmailComposeView,
 ) {
   if (!gmailComposeView.isReply()) return;
   const menuItem = gmailComposeView
     .getElement()
     .querySelector<HTMLElement>(
-      'div.J-M.jQjAxd.HX[role=menu] > div.SK.AX > [role=menuitem]:nth-last-child(2)'
+      'div.J-M.jQjAxd.HX[role=menu] > div.SK.AX > [role=menuitem]:nth-last-child(2)',
     );
 
   if (!menuItem) {
@@ -33,7 +33,7 @@ export default function overrideEditSubject(
     (e: MouseEvent) => {
       e.stopPropagation();
     },
-    true
+    true,
   );
   menuItem.addEventListener(
     'mouseup',
@@ -42,13 +42,13 @@ export default function overrideEditSubject(
 
       _cloneContentToNewCompose(gmailDriver, gmailComposeView);
     },
-    true
+    true,
   );
 }
 
 function _cloneContentToNewCompose(
   gmailDriver: Driver,
-  gmailComposeView: GmailComposeView
+  gmailComposeView: GmailComposeView,
 ) {
   const toRecipients = gmailComposeView.getToRecipients();
   const ccRecipients = gmailComposeView.getCcRecipients();
@@ -69,7 +69,7 @@ function _cloneContentToNewCompose(
         newComposeView.setCcRecipients(ccRecipients.map((c) => c.emailAddress));
       if (bccRecipients.length > 0)
         newComposeView.setBccRecipients(
-          bccRecipients.map((c) => c.emailAddress)
+          bccRecipients.map((c) => c.emailAddress),
         );
       newComposeView.setFromEmail(fromAddress.emailAddress);
       newComposeView.setSubject(subject);

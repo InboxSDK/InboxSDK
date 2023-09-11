@@ -25,7 +25,7 @@ export default class NavItemView extends EventEmitter {
     appId: string,
     driver: Driver,
     navItemDescriptorPropertyStream: Observable<NavItemDescriptor, unknown>,
-    navItemViewDriverPromise: Promise<GmailNavItemView>
+    navItemViewDriverPromise: Promise<GmailNavItemView>,
   ) {
     super();
     const members = {
@@ -48,15 +48,15 @@ export default class NavItemView extends EventEmitter {
       members.navItemDescriptorPropertyStream
         .sampledBy(
           navItemViewDriver.getEventStream(),
-          (a, b) => [a, b] as const
+          (a, b) => [a, b] as const,
         )
         .onValue((navItemDescriptor) =>
           _handleViewDriverStreamEvent(
             this,
             navItemViewDriver,
             driver,
-            navItemDescriptor
-          )
+            navItemDescriptor,
+          ),
         );
       Kefir.combine([
         members.navItemDescriptorPropertyStream,
@@ -66,7 +66,7 @@ export default class NavItemView extends EventEmitter {
           navItemViewDriver
             .getEventStream()
             .filter(() => false)
-            .beforeEnd(() => null)
+            .beforeEnd(() => null),
         )
         .onValue((x) => {
           _handleRouteViewChange(navItemViewDriver, x);
@@ -83,7 +83,7 @@ export default class NavItemView extends EventEmitter {
     const navItemViews = members.navItemViews;
     const navItemDescriptorPropertyStream = kefirCast(
       Kefir,
-      navItemDescriptor
+      navItemDescriptor,
     ).toProperty();
     const childNavItemView = new NavItemView(
       appId,
@@ -93,11 +93,11 @@ export default class NavItemView extends EventEmitter {
         (navItemViewDriver: GmailNavItemView) => {
           const childNavItemViewDriver = navItemViewDriver.addNavItem(
             members.appId,
-            navItemDescriptorPropertyStream
+            navItemDescriptorPropertyStream,
           );
           return childNavItemViewDriver;
-        }
-      )
+        },
+      ),
     );
     navItemViews.push(childNavItemView);
     return childNavItemView;
@@ -118,7 +118,7 @@ export default class NavItemView extends EventEmitter {
     members.navItemViewDriverPromise.then(
       (navItemViewDriver: GmailNavItemView) => {
         navItemViewDriver.destroy();
-      }
+      },
     );
   }
 
@@ -137,13 +137,13 @@ export default class NavItemView extends EventEmitter {
     get(memberMap, this).navItemViewDriverPromise.then(
       (navItemViewDriver: GmailNavItemView) => {
         navItemViewDriver.setCollapsed(collapseValue);
-      }
+      },
     );
   }
 
   getElement() {
     return get(memberMap, this).navItemViewDriverPromise.then(
-      (navItemViewDriver) => navItemViewDriver.getElement()
+      (navItemViewDriver) => navItemViewDriver.getElement(),
     );
   }
 }
@@ -152,7 +152,7 @@ function _handleViewDriverStreamEvent(
   eventEmitter: EventEmitter,
   navItemViewDriver: GmailNavItemView,
   driver: Driver,
-  [navItemDescriptor, event]: readonly [NavItemDescriptor, any]
+  [navItemDescriptor, event]: readonly [NavItemDescriptor, any],
 ) {
   switch (event.eventName) {
     case 'click':
@@ -191,11 +191,11 @@ function _handleViewDriverStreamEvent(
 
 function _handleRouteViewChange(
   navItemViewDriver: GmailNavItemView,
-  [navItemDescriptor, routeViewDriver]: [NavItemDescriptor, RouteViewDriver]
+  [navItemDescriptor, routeViewDriver]: [NavItemDescriptor, RouteViewDriver],
 ) {
   navItemViewDriver.setActive(
     navItemDescriptor &&
       routeViewDriver.getRouteID() === navItemDescriptor.routeID &&
-      isEqual(navItemDescriptor.routeParams || {}, routeViewDriver.getParams())
+      isEqual(navItemDescriptor.routeParams || {}, routeViewDriver.getParams()),
   );
 }

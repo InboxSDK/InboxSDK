@@ -55,7 +55,7 @@ export default class CreateParentAccessoryButtonView implements ButtonViewI {
   private _setupElement() {
     this._element.setAttribute(
       'class',
-      'Yh inboxsdk__navItem_parent_accessory_button'
+      'Yh inboxsdk__navItem_parent_accessory_button',
     );
     this._element.setAttribute('role', 'button');
     this._element.setAttribute('tabindex', '0');
@@ -65,7 +65,7 @@ export default class CreateParentAccessoryButtonView implements ButtonViewI {
   private _setupEventStream() {
     const clickEventStream = Kefir.fromEvents<any, never>(
       this._element,
-      'click'
+      'click',
     );
 
     clickEventStream.onValue((event) => {
@@ -74,7 +74,10 @@ export default class CreateParentAccessoryButtonView implements ButtonViewI {
     });
 
     this._eventStream.plug(
-      clickEventStream.map((event) => ({ eventName: 'click', domEvent: event }))
+      clickEventStream.map((event) => ({
+        eventName: 'click',
+        domEvent: event,
+      })),
     );
   }
 }

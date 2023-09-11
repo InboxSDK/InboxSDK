@@ -8,17 +8,17 @@ import getRfcMessageIdForGmailMessageId from './get-rfc-message-id-for-gmail-mes
 
 export default async function openDraftByMessageID(
   driver: GmailDriver,
-  messageID: string
+  messageID: string,
 ) {
   let newHash;
   if (driver.isUsingSyncAPI()) {
     const rfcMessageID = await getRfcMessageIdForGmailMessageId(
       driver,
-      messageID
+      messageID,
     );
     const { threads } = await getSyncThreadsForSearch(
       driver,
-      'rfc822msgid:' + rfcMessageID
+      'rfc822msgid:' + rfcMessageID,
     );
 
     if (threads.length === 0) {
@@ -27,7 +27,7 @@ export default async function openDraftByMessageID(
 
     const thread = threads[0];
     const syncMessageData = thread.extraMetaData.syncMessageData.find(
-      (m) => m.oldMessageID === messageID
+      (m) => m.oldMessageID === messageID,
     );
     if (!syncMessageData) {
       throw new Error('Failed to find syncMessageData');
@@ -38,7 +38,7 @@ export default async function openDraftByMessageID(
     newHash = makeNewSyncHash(
       window.location.hash,
       thread.syncThreadID,
-      syncMessageID
+      syncMessageID,
     );
   } else {
     newHash = makeNewHash(window.location.hash, messageID);
@@ -61,7 +61,7 @@ export function makeNewHash(oldHash: string, messageID: string): string {
 export function makeNewSyncHash(
   oldHash: string,
   syncThreadID: string,
-  syncMessageID: string
+  syncMessageID: string,
 ): string {
   oldHash = '#' + oldHash.replace(/^#/, '');
   const [pre, query] = oldHash.split('?');

@@ -8,7 +8,7 @@ const cancelIdleCallback = (global as any).cancelIdleCallback || clearTimeout;
 // with flatmap.
 export default function delayIdle<T>(
   timeout: number | null,
-  value: T
+  value: T,
 ): Kefir.Observable<T, never> {
   return Kefir.stream((emitter) => {
     const t = requestIdleCallback(
@@ -16,7 +16,7 @@ export default function delayIdle<T>(
         emitter.emit(value);
         emitter.end();
       },
-      timeout == null ? null : { timeout }
+      timeout == null ? null : { timeout },
     );
 
     return () => {

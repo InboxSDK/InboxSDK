@@ -22,7 +22,7 @@ export default class NativeNavItemView extends EventEmitter {
     appId: string,
     driver: Driver,
     labelName: string,
-    navItemViewDriverPromise: Promise<GmailNavItemView>
+    navItemViewDriverPromise: Promise<GmailNavItemView>,
   ) {
     super();
     const members = {
@@ -51,7 +51,7 @@ export default class NativeNavItemView extends EventEmitter {
     const members = get(memberMap, this);
     const navItemDescriptorPropertyStream = kefirCast(
       Kefir,
-      navItemDescriptor
+      navItemDescriptor,
     ).toProperty();
     const childNavItemView = new NavItemView(
       members.appId,
@@ -60,10 +60,10 @@ export default class NativeNavItemView extends EventEmitter {
       members.navItemViewDriverPromise.then((navItemViewDriver) => {
         const childNavItemViewDriver = navItemViewDriver.addNavItem(
           members.appId,
-          navItemDescriptorPropertyStream
+          navItemDescriptorPropertyStream,
         );
         return childNavItemViewDriver;
-      })
+      }),
     );
     members.navItemViews.push(childNavItemView);
     return childNavItemView;
@@ -72,7 +72,7 @@ export default class NativeNavItemView extends EventEmitter {
   isCollapsed(): boolean {
     return (
       localStorage.getItem(
-        'inboxsdk__nativeNavItem__state_' + get(memberMap, this).labelName
+        'inboxsdk__nativeNavItem__state_' + get(memberMap, this).labelName,
       ) === 'collapsed'
     );
   }
@@ -85,7 +85,7 @@ export default class NativeNavItemView extends EventEmitter {
     } else {
       localStorage.setItem(
         'inboxsdk__nativeNavItem__state_' + members.labelName,
-        collapseValue ? 'collapsed' : 'expanded'
+        collapseValue ? 'collapsed' : 'expanded',
       );
     }
   }
@@ -93,7 +93,7 @@ export default class NativeNavItemView extends EventEmitter {
 
 function _handleStreamEvent(
   emitter: NativeNavItemView,
-  event: { eventName: string }
+  event: { eventName: string },
 ) {
   switch (event.eventName) {
     case 'expanded':

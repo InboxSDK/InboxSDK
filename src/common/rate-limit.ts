@@ -3,7 +3,7 @@
 export default function rateLimit<T extends Function>(
   fn: T,
   period: number,
-  count: number
+  count: number,
 ): T {
   let calls: number[] = [];
   return function (this: any, ...args: any[]) {

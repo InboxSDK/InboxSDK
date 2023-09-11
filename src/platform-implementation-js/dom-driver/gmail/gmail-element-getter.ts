@@ -24,7 +24,7 @@ const NAV_MENU = '.aeN.WR.nH.oy8Mbf[role=navigation]';
 const GmailElementGetter = {
   getActiveMoreMenu(): HTMLElement | null {
     const elements = document.querySelectorAll<HTMLElement>(
-      '.J-M.aX0.aYO.jQjAxd'
+      '.J-M.aX0.aYO.jQjAxd',
     );
 
     for (let ii = 0; ii < elements.length; ii++) {
@@ -79,12 +79,12 @@ const GmailElementGetter = {
       if (el !== oldMethodEl) {
         Logger.error(
           new Error(
-            'getContentSectionElement old and new method inconsistency'
+            'getContentSectionElement old and new method inconsistency',
           ),
           {
             elClassName: el?.className,
             oldMethodClassName: oldMethodEl?.className,
-          }
+          },
         );
       }
       return oldMethodEl;
@@ -104,7 +104,7 @@ const GmailElementGetter = {
       makeElementChildStream(document.body)
         .filter(({ el }) => el.classList.contains('aSs'))
         .flatMap(({ el, removalStream }) =>
-          makeElementChildStream(el).takeUntilBy(removalStream)
+          makeElementChildStream(el).takeUntilBy(removalStream),
         )
         .filter(({ el }) => el.classList.contains('aSt'))
         // Assume that only one element will come through and will never be removed from the page.
@@ -144,7 +144,7 @@ const GmailElementGetter = {
   },
 
   getMainContentElementChangedStream: once(function (
-    this: any
+    this: any,
   ): Kefir.Observable<HTMLElement, never> {
     return getMainContentElementChangedStream(this);
   }),
@@ -164,7 +164,7 @@ const GmailElementGetter = {
     }
 
     const leftNavElement = document.querySelector(
-      '.aeN[role=navigation], .aeN [role=navigation]'
+      '.aeN[role=navigation], .aeN [role=navigation]',
     );
     if (!leftNavElement) {
       throw new Error('shouldAddNavItemsInline failed to find leftNavElement');
@@ -191,7 +191,7 @@ const GmailElementGetter = {
 
       try {
         const element = await waitFor(() =>
-          document.querySelector<HTMLElement>(`${APP_MENU}, ${NAV_MENU}`)
+          document.querySelector<HTMLElement>(`${APP_MENU}, ${NAV_MENU}`),
         );
 
         if (!document.querySelector(APP_MENU)) {
@@ -207,7 +207,7 @@ const GmailElementGetter = {
 
   getAppBurgerMenu() {
     return document.querySelector<HTMLElement>(
-      'header[role="banner"] > div > div > div[aria-expanded]'
+      'header[role="banner"] > div > div > div[aria-expanded]',
     );
   },
 
@@ -251,7 +251,7 @@ const GmailElementGetter = {
 
   getSearchInput(): HTMLInputElement | null {
     return document.querySelector(
-      'form[role=search] input'
+      'form[role=search] input',
     ) as HTMLInputElement | null;
   },
 
@@ -284,7 +284,7 @@ const GmailElementGetter = {
 
   getTopAccountContainer(): HTMLElement | null {
     return document.querySelector(
-      'header[role="banner"] > div:nth-child(2) > div:nth-child(2)'
+      'header[role="banner"] > div:nth-child(2) > div:nth-child(2)',
     );
   },
 
@@ -296,7 +296,7 @@ const GmailElementGetter = {
 
     return (
       topAccountContainer.querySelectorAll(
-        'a[href*="https://plus"][href*="upgrade"]'
+        'a[href*="https://plus"][href*="upgrade"]',
       ).length === 0
     );
   },

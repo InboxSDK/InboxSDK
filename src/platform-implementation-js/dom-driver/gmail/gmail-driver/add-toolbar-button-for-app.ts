@@ -5,7 +5,7 @@ import type GmailDriver from '../gmail-driver';
 
 export default function addToolbarButtonForApp(
   gmailDriver: GmailDriver,
-  buttonDescriptor: Kefir.Observable<any, unknown>
+  buttonDescriptor: Kefir.Observable<any, unknown>,
 ): Promise<GmailAppToolbarButtonView> {
   return GmailElementGetter.waitForGmailModeToSettle().then(() => {
     if (GmailElementGetter.isStandalone()) {

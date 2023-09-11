@@ -13,7 +13,7 @@ class GmailAttachmentAreaView {
   constructor(
     element: HTMLElement | null | undefined,
     driver: GmailDriver,
-    messageViewDriver: GmailMessageView
+    messageViewDriver: GmailMessageView,
   ) {
     this._driver = driver;
     this._messageViewDriver = messageViewDriver;
@@ -49,7 +49,7 @@ class GmailAttachmentAreaView {
             element: attachment,
           },
           this._driver,
-          this._messageViewDriver
+          this._messageViewDriver,
         );
 
         this._elsToCardViews.set(attachment, cardView);
@@ -118,7 +118,7 @@ class GmailAttachmentAreaView {
 
     zone.insertBefore(
       gmailAttachmentCardView.getElement(),
-      zone.lastElementChild
+      zone.lastElementChild,
     );
 
     this._updateToolbarCardCount();

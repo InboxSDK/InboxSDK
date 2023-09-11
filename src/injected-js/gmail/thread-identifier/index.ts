@@ -29,7 +29,7 @@ export function setup() {
       } catch (err) {
         logger.error(err, 'Error in inboxSDKtellMeThisThreadIdByDatabase');
       }
-    }
+    },
   );
   document.addEventListener(
     CustomDomEvent.tellMeThisThreadIdByClick,
@@ -47,7 +47,7 @@ export function setup() {
       } catch (err) {
         logger.error(err, 'Error in inboxSDKtellMeThisThreadIdByClick');
       }
-    }
+    },
   );
 }
 export function processThreadListResponse(threadListResponse: string) {
@@ -79,7 +79,7 @@ function storeThreadMetadata(threadMetadata: GmailResponseProcessor.Thread) {
 }
 
 function threadMetadataKey(
-  threadRowMetadata: threadRowParser.ThreadRowMetadata
+  threadRowMetadata: threadRowParser.ThreadRowMetadata,
 ): string {
   return (
     threadRowMetadata.subject.trim() +
@@ -94,7 +94,7 @@ function processPreloadedThreads() {
   const preloadScript = find(
     document.querySelectorAll<HTMLScriptElement>('script:not([src])'),
     (script) =>
-      script.text && script.text.slice(0, 500).indexOf('var VIEW_DATA=[[') > -1
+      script.text && script.text.slice(0, 500).indexOf('var VIEW_DATA=[[') > -1,
   ) as HTMLScriptElement | undefined;
 
   if (!preloadScript) {
@@ -105,12 +105,12 @@ function processPreloadedThreads() {
     const lastBracket = preloadScript.text.lastIndexOf(']');
     const viewDataString = preloadScript.text.slice(
       firstBracket,
-      lastBracket + 1
+      lastBracket + 1,
     );
     processThreads(
       GmailResponseProcessor.extractThreadsFromDeserialized([
         GmailResponseProcessor.deserializeArray(viewDataString),
-      ])
+      ]),
     );
   }
 }
@@ -136,7 +136,7 @@ function getThreadIdFromUrl(url: string): string | null | undefined {
 }
 
 function getGmailThreadIdForThreadRowByDatabase(
-  threadRow: HTMLElement
+  threadRow: HTMLElement,
 ): string | null | undefined {
   const domRowMetadata =
     threadRowParser.extractMetadataFromThreadRow(threadRow);
@@ -155,7 +155,7 @@ function getGmailThreadIdForThreadRowByDatabase(
 }
 
 function getGmailThreadIdForThreadRowByClick(
-  threadRow: HTMLElement
+  threadRow: HTMLElement,
 ): string | null | undefined {
   // Simulate a ctrl-click on the thread row to get the thread id, then
   // simulate a ctrl-click on the previously selected thread row (or the
@@ -163,7 +163,7 @@ function getGmailThreadIdForThreadRowByClick(
   threadRowParser.extractMetadataFromThreadRow(threadRow);
   const parent = findParent(
     threadRow,
-    (el) => el.nodeName === 'DIV' && el.getAttribute('role') === 'main'
+    (el) => el.nodeName === 'DIV' && el.getAttribute('role') === 'main',
   );
 
   if (!parent) {

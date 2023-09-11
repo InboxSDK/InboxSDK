@@ -37,7 +37,7 @@ interface Members {
 
 export type MessageViewEvent = {
   contactHover(
-    data: Omit<MessageViewDriverEventByName['contactHover'], 'eventName'>
+    data: Omit<MessageViewDriverEventByName['contactHover'], 'eventName'>,
   ): void;
   destroy(): void;
   load(data: { messageView: MessageView }): void;
@@ -61,7 +61,7 @@ class MessageView
     appId: string,
     membrane: Membrane,
     Conversations: Conversations,
-    driver: Driver
+    driver: Driver,
   ) {
     super();
     const members = {
@@ -76,7 +76,7 @@ class MessageView
     _bindToEventStream(
       this,
       members,
-      messageViewImplementation.getEventStream()
+      messageViewImplementation.getEventStream(),
     );
   }
 
@@ -98,7 +98,7 @@ class MessageView
 
   // TODO why is this a separate method?
   addAttachmentCardViewNoPreview(
-    cardOptions: Record<string, any>
+    cardOptions: Record<string, any>,
   ): AttachmentCardView {
     return this.addAttachmentCardView(cardOptions);
   }
@@ -120,18 +120,18 @@ class MessageView
   }
 
   addToolbarButton(
-    buttonOptions?: Parameters<IMessageView['addToolbarButton']>[0]
+    buttonOptions?: Parameters<IMessageView['addToolbarButton']>[0],
   ) {
     if (
       typeof buttonOptions!.onClick !== 'function' ||
       typeof buttonOptions!.title !== 'string' ||
       !Object.prototype.hasOwnProperty.call(
         MessageViewToolbarSectionNames,
-        buttonOptions!.section
+        buttonOptions!.section,
       )
     ) {
       throw new Error(
-        'Missing required properties on MessageViewToolbarButtonDescriptor object'
+        'Missing required properties on MessageViewToolbarButtonDescriptor object',
       );
     }
 
@@ -148,7 +148,7 @@ class MessageView
       .driver.getLogger()
       .deprecationWarning(
         'messageView.getMessageID',
-        'messageView.getMessageIDAsync'
+        'messageView.getMessageIDAsync',
       );
     return get(memberMap, this).messageViewImplementation.getMessageID();
   }
@@ -166,7 +166,7 @@ class MessageView
       .getAttachmentCardViewDrivers()
       .filter((cardDriver) => cardDriver.getAttachmentType() === 'FILE')
       .map((attachmentCardViewDriver) =>
-        membrane.get(attachmentCardViewDriver)
+        membrane.get(attachmentCardViewDriver),
       );
   }
 
@@ -177,7 +177,7 @@ class MessageView
       .getLogger()
       .deprecationWarning(
         'MessageView.getAttachmentCardViews',
-        'MessageView.getFileAttachmentCardViews'
+        'MessageView.getFileAttachmentCardViews',
       );
 
     if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
@@ -189,7 +189,7 @@ class MessageView
 
   isElementInQuotedArea(element: HTMLElement): boolean {
     return get(memberMap, this).messageViewImplementation.isElementInQuotedArea(
-      element
+      element,
     );
   }
 
@@ -209,7 +209,7 @@ class MessageView
           href: anchor.href,
           element: anchor,
           isInQuotedArea: this.isElementInQuotedArea(anchor),
-        })
+        }),
       );
     }
 
@@ -225,7 +225,7 @@ class MessageView
       .driver.getLogger()
       .deprecationWarning(
         'MessageView.getRecipients',
-        'MessageView.getRecipientEmailAddresses() or MessageView.getRecipientsFull()'
+        'MessageView.getRecipientEmailAddresses() or MessageView.getRecipientsFull()',
       );
     return this.getRecipientEmailAddresses().map((emailAddress) => ({
       emailAddress,
@@ -236,7 +236,7 @@ class MessageView
   getRecipientEmailAddresses(): Array<string> {
     return get(
       memberMap,
-      this
+      this,
     ).messageViewImplementation.getRecipientEmailAddresses();
   }
 
@@ -254,10 +254,10 @@ class MessageView
   }
 
   addAttachmentIcon(
-    iconDescriptor: Parameters<IMessageView['addAttachmentIcon']>[0]
+    iconDescriptor: Parameters<IMessageView['addAttachmentIcon']>[0],
   ) {
     return get(memberMap, this).messageViewImplementation.addAttachmentIcon(
-      iconDescriptor
+      iconDescriptor,
     );
   }
 
@@ -283,7 +283,7 @@ class MessageView
 function _bindToEventStream(
   messageView: MessageView,
   members: Members,
-  stream: Observable<MessageViewDriverEvents, any>
+  stream: Observable<MessageViewDriverEvents, any>,
 ) {
   stream.onEnd(function () {
     messageView.destroyed = true;
@@ -291,11 +291,11 @@ function _bindToEventStream(
     messageView.removeAllListeners();
   });
   stream
-    .filter(function (
-      event
-    ): event is MessageViewDriverEventByName['contactHover'] {
-      return event.type !== 'internal' && event.eventName === 'contactHover';
-    })
+    .filter(
+      function (event): event is MessageViewDriverEventByName['contactHover'] {
+        return event.type !== 'internal' && event.eventName === 'contactHover';
+      },
+    )
     .onValue(function (event) {
       messageView.emit(event.eventName, {
         contactType: event.contactType,
@@ -322,11 +322,13 @@ function _bindToEventStream(
   }
 
   stream
-    .filter(function (
-      event
-    ): event is MessageViewDriverEventByName['viewStateChange'] {
-      return event.eventName === 'viewStateChange';
-    })
+    .filter(
+      function (
+        event,
+      ): event is MessageViewDriverEventByName['viewStateChange'] {
+        return event.eventName === 'viewStateChange';
+      },
+    )
     .onValue(function (event) {
       messageView.emit('viewStateChange', {
         oldViewState:

@@ -6,13 +6,13 @@ import Logger from '../../../lib/logger';
 
 export async function addAppMenuItem(
   driver: GmailDriver,
-  menuItemDescriptor: AppMenuItemDescriptor
+  menuItemDescriptor: AppMenuItemDescriptor,
 ) {
   const appMenuInjectionContainer = await GmailElementGetter.getAppMenuAsync();
 
   const gmailAppMenuItemView = new GmailAppMenuItemView(
     driver,
-    menuItemDescriptor
+    menuItemDescriptor,
   );
 
   try {
@@ -24,7 +24,7 @@ export async function addAppMenuItem(
       : null;
     appMenuInjectionContainer.insertBefore(
       gmailAppMenuItemView.element,
-      siblingElement
+      siblingElement,
     );
   } catch (err) {
     Logger.error(err);
