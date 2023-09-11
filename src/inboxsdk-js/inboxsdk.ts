@@ -1,13 +1,25 @@
-import PlatformImplementationLoader from './loading/platform-implementation-loader';
+import { PlatformImplementationLoader } from './loading/platform-implementation-loader';
 import { BUILD_VERSION } from '../common/version';
-import _loadScript from '../common/load-script';
+import { loadScript as _loadScript } from './load-script-proxy';
+import type { LoadScriptOptions } from '../common/load-script';
 
 declare global {
   var __test_origin: string | undefined;
 }
 
 export const LOADER_VERSION = BUILD_VERSION;
-export const loadScript = _loadScript;
+
+/**
+ * Only works in the non-npm remote-loaded build for MV2 extensions.
+ * @deprecated
+ */
+export function loadScript(
+  url: string,
+  opts?: LoadScriptOptions
+): Promise<void> {
+  return _loadScript(url, opts);
+}
+
 export function load(version: any, appId: string, opts: any) {
   opts = Object.assign(
     {
@@ -30,9 +42,6 @@ const pageOrigin: string =
   (process.env.NODE_ENV === 'test' && global.__test_origin) ||
   document.location.origin;
 
-if (
-  ['https://mail.google.com', 'https://inbox.google.com'].indexOf(pageOrigin) !=
-  -1
-) {
+if ('https://mail.google.com' === pageOrigin) {
   PlatformImplementationLoader.preload();
 }

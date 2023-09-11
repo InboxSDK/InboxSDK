@@ -5,7 +5,7 @@ import each from 'lodash/each';
 import filter from 'lodash/filter';
 import includes from 'lodash/includes';
 import once from 'lodash/once';
-import assert from 'assert';
+import { assert } from '../common/assert';
 import EventEmitter from 'events';
 import { parse as deparam } from 'querystring';
 export type Opts = {

@@ -29,7 +29,6 @@
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
     "asap": "^2.0.3",
-    "assert": "^2.0.0",
     "auto-html": "^1.0.4",
     "babel-jest": "^29",
     "babel-plugin-transform-inline-environment-variables": "^0.4.3",
@@ -106,7 +105,7 @@
     "typecheck": "tsc",
     "typedefs": "tsc -p tsconfig.declarations.json",
     "prepare": "husky install",
-    "publish-npm": "gulp clean && gulp --production --minify && yarn workspace @inboxsdk/core npm publish && git push --follow-tags",
+    "publish-npm": "gulp clean && gulp --production && yarn workspace @inboxsdk/core npm publish && git push --follow-tags",
     "lint": "yarn run lint:eslint && yarn run prettier:check",
     "lint:fix": "yarn run lint:eslint --fix && yarn run prettier:fix",
     "lint:eslint": "eslint . --report-unused-disable-directives --max-warnings 0",
@@ -131,7 +130,6 @@
     "jest-css-modules": "^2.1.0",
     "jest-environment-jsdom": "^29.5.0",
     "style-loader": "^3.3.2",
-    "terser": "^5.18.1",
     "webpack": "^5.76.3"
   }
 }

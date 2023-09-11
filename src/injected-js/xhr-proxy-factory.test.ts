@@ -1,4 +1,4 @@
-import assert from 'assert';
+import assert from 'node:assert';
 import _ from 'lodash';
 import noop from 'lodash/noop';
 import sinon from 'sinon';

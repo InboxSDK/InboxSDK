@@ -1,7 +1,7 @@
 import intersection from 'lodash/intersection';
-import assert from 'assert';
 import * as logger from '../../injected-logger';
 import { cleanupPeopleLine } from '../../../platform-implementation-js/dom-driver/gmail/gmail-response-processor';
+import { assert } from '../../../common/assert';
 
 export type ThreadRowMetadata = {
   timeString: string;
