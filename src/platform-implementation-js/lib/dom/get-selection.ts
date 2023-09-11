@@ -18,7 +18,7 @@ function isRangeSuitable(range: Range, el: HTMLElement): boolean {
 
 export function getSelectedTextInElement(
   element: HTMLElement,
-  lastRange?: Range | null | undefined
+  lastRange?: Range | null | undefined,
 ): string | null | undefined {
   const selection = document.getSelection();
   return t.toArray<any, string | null | undefined>(
@@ -30,13 +30,13 @@ export function getSelectedTextInElement(
       t.keep(),
       t.filter((range: Range) => isRangeSuitable(range, element)),
       t.map((range: Range) => range.toString()),
-      t.take(1)
-    )
+      t.take(1),
+    ),
   )[0];
 }
 export function getSelectedHTMLInElement(
   element: HTMLElement,
-  lastRange?: Range | null | undefined
+  lastRange?: Range | null | undefined,
 ): string | null | undefined {
   const selection = document.getSelection();
   return t.toArray<any, string | null | undefined>(
@@ -52,7 +52,7 @@ export function getSelectedHTMLInElement(
         div.appendChild(range.cloneContents());
         return div.innerHTML;
       }),
-      t.take(1)
-    )
+      t.take(1),
+    ),
   )[0];
 }

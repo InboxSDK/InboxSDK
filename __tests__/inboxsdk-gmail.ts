@@ -19,7 +19,7 @@ const originalWindowProperties = Object.keys(window);
 document.head.setAttribute('data-inboxsdk-script-injected', 'true');
 document.head.setAttribute(
   'data-inboxsdk-user-email-address',
-  'cowan@streak.com'
+  'cowan@streak.com',
 );
 document.head.setAttribute('data-inboxsdk-using-sync-api', 'false');
 
@@ -41,7 +41,7 @@ test('loads in gmail mock', () => {
           '__coverage__',
           // https://github.com/zloirock/core-js/issues/726
           '__core-js_shared__',
-        ]
+        ],
       ).map((x) => `window.${x}`);
       expect(newGlobals).toEqual([]);
 
@@ -55,7 +55,7 @@ test('loads in gmail mock', () => {
       expect(inboxsdk.User.getEmailAddress()).toBe('cowan@streak.com');
 
       expect(inboxsdk.Router.getCurrentRouteView().getRouteType()).toBe(
-        'UNKNOWN'
+        'UNKNOWN',
       );
 
       return Promise.all([
@@ -68,6 +68,6 @@ test('loads in gmail mock', () => {
         expect(apps[1].LOADER_VERSION).toBe('beep');
         expect(apps[1].IMPL_VERSION).toBe('beep');
       });
-    }
+    },
   );
 });

@@ -5,7 +5,7 @@ export default class WidthManager {
 
   constructor(
     contentContainerEl: HTMLElement,
-    addonSidebarContainerEl: HTMLElement
+    addonSidebarContainerEl: HTMLElement,
   ) {
     this._contentContainerEl = contentContainerEl;
     this._addonSidebarContainerEl = addonSidebarContainerEl;
@@ -22,26 +22,26 @@ export default class WidthManager {
 
     if (
       this._addonSidebarContainerEl.classList.contains(
-        idMap('app_sidebar_in_use')
+        idMap('app_sidebar_in_use'),
       )
     ) {
       this._contentContainerEl.classList.remove(
-        idMap('container_app_sidebar_no_icons')
+        idMap('container_app_sidebar_no_icons'),
       );
 
       return;
     }
 
     const noIconsVisible = ![...tabList.children].some(
-      (child) => (child as HTMLElement).style.display !== 'none'
+      (child) => (child as HTMLElement).style.display !== 'none',
     );
     if (noIconsVisible)
       this._contentContainerEl.classList.add(
-        idMap('container_app_sidebar_no_icons')
+        idMap('container_app_sidebar_no_icons'),
       );
     else
       this._contentContainerEl.classList.remove(
-        idMap('container_app_sidebar_no_icons')
+        idMap('container_app_sidebar_no_icons'),
       );
   }
 }

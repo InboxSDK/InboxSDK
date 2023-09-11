@@ -5,18 +5,18 @@ import makeMutationObserverStream from '../../../../lib/dom/make-mutation-observ
 import type GmailComposeView from '../gmail-compose-view';
 const fnStream = udKefir(module, getMinimizedStream_);
 export default function getMinimizedStream(
-  gmailComposeView: GmailComposeView
+  gmailComposeView: GmailComposeView,
 ): Kefir.Observable<boolean, unknown> {
   return fnStream.flatMapLatest((fn) => fn(gmailComposeView));
 }
 
 function getMinimizedStream_(
-  gmailComposeView: GmailComposeView
+  gmailComposeView: GmailComposeView,
 ): Kefir.Observable<boolean, unknown> {
   const element = gmailComposeView.getElement();
   const bodyElement = gmailComposeView.getBodyElement();
   const bodyContainer = find(element.children, (child) =>
-    child.contains(bodyElement)
+    child.contains(bodyElement),
   );
   return makeMutationObserverStream(bodyContainer as HTMLElement, {
     attributes: true,

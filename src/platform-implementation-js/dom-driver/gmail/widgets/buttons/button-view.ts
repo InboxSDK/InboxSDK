@@ -153,7 +153,7 @@ export default class ButtonView implements ButtonViewI {
     this._element.setAttribute(
       'class',
       'T-I J-J5-Ji ar7 inboxsdk__button ' +
-        BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS
+        BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS,
     );
     if (options.tooltip) {
       this._element.setAttribute('aria-label', options.tooltip);
@@ -172,7 +172,7 @@ export default class ButtonView implements ButtonViewI {
     if (options.tooltip || options.title) {
       this._element.setAttribute(
         'data-tooltip',
-        String(options.tooltip || options.title)
+        String(options.tooltip || options.title),
       );
     }
 
@@ -208,7 +208,7 @@ export default class ButtonView implements ButtonViewI {
     } else {
       this._innerElement.insertBefore(
         this._textElement,
-        this._innerElement.firstElementChild
+        this._innerElement.firstElementChild,
       );
     }
   }
@@ -225,7 +225,7 @@ export default class ButtonView implements ButtonViewI {
       iconElement.innerHTML = '&nbsp;';
       iconElement.setAttribute(
         'class',
-        'inboxsdk__button_icon ' + this._iconClass
+        'inboxsdk__button_icon ' + this._iconClass,
       );
     }
 
@@ -235,7 +235,7 @@ export default class ButtonView implements ButtonViewI {
 
     this._innerElement.insertBefore(
       iconElement,
-      this._innerElement.firstElementChild
+      this._innerElement.firstElementChild,
     );
   }
 
@@ -258,8 +258,8 @@ export default class ButtonView implements ButtonViewI {
     } else {
       Logger.error(
         new Error(
-          '_createIconImgElement should not be called with null _iconUrl'
-        )
+          '_createIconImgElement should not be called with null _iconUrl',
+        ),
       );
     }
 
@@ -268,12 +268,12 @@ export default class ButtonView implements ButtonViewI {
 
   private _updateButtonColor(newButtonColor: string) {
     this._element.classList.remove(
-      BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS
+      BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS,
     );
     this._buttonColor = newButtonColor;
 
     this._element.classList.add(
-      BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS
+      BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS,
     );
   }
 
@@ -325,7 +325,7 @@ export default class ButtonView implements ButtonViewI {
     if (this._iconElement) {
       this._iconElement.setAttribute(
         'class',
-        'inboxsdk__button_icon ' + (newIconClass || '')
+        'inboxsdk__button_icon ' + (newIconClass || ''),
       );
     }
   }
@@ -355,7 +355,7 @@ export default class ButtonView implements ButtonViewI {
   private _setupEventStream() {
     const clickEventStream = Kefir.fromEvents<any, never>(
       this._element,
-      'click'
+      'click',
     );
 
     clickEventStream.onValue(function (event) {
@@ -371,14 +371,14 @@ export default class ButtonView implements ButtonViewI {
             eventName: 'click',
             domEvent: event,
           };
-        })
+        }),
     );
 
     const isEnterOrSpace = (event: any) =>
       includes([32 /* space */, 13 /* enter */], event.which);
     const keydownEventStream = Kefir.fromEvents<any, never>(
       this._element,
-      'keydown'
+      'keydown',
     ).filter(() => this.isEnabled());
     const enterEventStream = keydownEventStream.filter(isEnterOrSpace);
 
@@ -388,7 +388,7 @@ export default class ButtonView implements ButtonViewI {
           eventName: 'click',
           domEvent: event,
         };
-      })
+      }),
     );
 
     enterEventStream.onValue(function (event) {
@@ -408,14 +408,14 @@ export default class ButtonView implements ButtonViewI {
                 event.eventName === 'enabledChanged' &&
                 event.isEnabled === false
               );
-            })
+            }),
           )
           .map(function (domEvent) {
             return {
               eventName: 'click',
               domEvent: domEvent,
             };
-          })
+          }),
       );
     }
   }
@@ -425,14 +425,14 @@ export default class ButtonView implements ButtonViewI {
       .filter(() => this.isEnabled())
       .onValue(() => {
         this._element.classList.add(
-          BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS
+          BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS,
         );
         this._element.classList.add('inboxsdk__button_hover');
       });
 
     Kefir.fromEvents(this._element, 'mouseleave').onValue(() => {
       this._element.classList.remove(
-        BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS
+        BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS,
       );
       this._element.classList.remove('inboxsdk__button_hover');
     });

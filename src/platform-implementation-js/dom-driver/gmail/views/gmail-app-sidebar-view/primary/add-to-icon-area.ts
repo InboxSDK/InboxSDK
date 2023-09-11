@@ -7,20 +7,20 @@ function addToIconArea(
   orderManager: OrderManager<any>,
   appName: string,
   container: HTMLElement,
-  iconArea: HTMLElement
+  iconArea: HTMLElement,
 ) {
   //first set icon order hints
   [...iconArea.querySelectorAll('[data-app-name]')].forEach((el) => {
     const elAppName = el.getAttribute('data-app-name');
     const index = findIndex(
       orderManager.getOrderedItems(),
-      ({ value }) => value.appName === elAppName
+      ({ value }) => value.appName === elAppName,
     );
     el.setAttribute('data-order-hint', index as unknown as string);
   });
   const index = findIndex(
     orderManager.getOrderedItems(),
-    ({ value }) => value.appName === appName
+    ({ value }) => value.appName === appName,
   );
   if (index > -1)
     container.setAttribute('data-order-hint', index as unknown as string);

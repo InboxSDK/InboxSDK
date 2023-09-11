@@ -10,7 +10,7 @@ class GmailLabelView {
   constructor(
     opts: {
       classes?: string[] | null | undefined;
-    } = {}
+    } = {},
   ) {
     this._element = document.createElement('div');
     this._element.className =
@@ -30,13 +30,13 @@ class GmailLabelView {
   }
 
   updateLabelDescriptor(
-    labelDescriptor: Record<string, any> | null | undefined
+    labelDescriptor: Record<string, any> | null | undefined,
   ) {
     this._handleNewLabelDescriptor(labelDescriptor);
   }
 
   _handleNewLabelDescriptor(
-    labelDescriptor: Record<string, any> | null | undefined
+    labelDescriptor: Record<string, any> | null | undefined,
   ) {
     if (!labelDescriptor) {
       this._labelDescriptor = {};
@@ -51,7 +51,7 @@ class GmailLabelView {
         //light grey
         maxWidth: '90px',
       },
-      labelDescriptor
+      labelDescriptor,
     );
 
     if (isEqual(this._labelDescriptor, labelDescriptor)) {
@@ -65,7 +65,7 @@ class GmailLabelView {
       labelDescriptor.iconClass,
       labelDescriptor.iconUrl,
       undefined,
-      labelDescriptor.iconHtml
+      labelDescriptor.iconHtml,
     );
 
     if (
@@ -124,7 +124,7 @@ class GmailLabelView {
 
   _updateIconBackgroundColor(iconBackgroundColor: string | null | undefined) {
     const icon = this.getElement().querySelector<HTMLElement>(
-      '.inboxsdk__button_icon'
+      '.inboxsdk__button_icon',
     );
 
     if (icon) {

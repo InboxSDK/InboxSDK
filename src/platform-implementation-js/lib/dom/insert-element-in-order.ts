@@ -10,7 +10,7 @@ export default function insertElementInOrder(
   container: HTMLElement,
   el: HTMLElement,
   orderAttrs: string[] = DEFAULT_ORDER_ATTRS,
-  insertBeforeNonSdk: boolean = false
+  insertBeforeNonSdk: boolean = false,
 ) {
   // get the first element with higher order hints
   const insertBeforeElement = t.toArray(
@@ -39,8 +39,8 @@ export default function insertElementInOrder(
           return false;
         }
       }),
-      t.take(1)
-    )
+      t.take(1),
+    ),
   )[0] as null | HTMLElement;
 
   container.insertBefore(el, insertBeforeElement);

@@ -66,7 +66,7 @@ const routeIDtoMenuItemClass = Object.fromEntries([
   ...MAIL_ROUTES.map((route) => [route, NativeAppMenuClassName.MAIL] as const),
   ...CHAT_ROUTES.map((route) => [route, NativeAppMenuClassName.CHAT] as const),
   ...SPACES_ROUTES.map(
-    (route) => [route, NativeAppMenuClassName.SPACES] as const
+    (route) => [route, NativeAppMenuClassName.SPACES] as const,
   ),
   ...MEET_ROUTES.map((route) => [route, NativeAppMenuClassName.MEET] as const),
 ]);
@@ -95,7 +95,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     const { ACTIVE } = CollapsiblePanelView.elementCss;
 
     const nativePanel = appMenuElement?.querySelector<HTMLElement>(
-      `.${PANEL_NATIVE_CLASS}.${ACTIVE}`
+      `.${PANEL_NATIVE_CLASS}.${ACTIVE}`,
     );
 
     return nativePanel;
@@ -105,7 +105,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     const { ACTIVE } = GmailAppMenuItemView.elementCss;
 
     const button = appMenuElement?.querySelector<HTMLElement>(
-      `.${NATIVE_CLASS}.${ACTIVE}`
+      `.${NATIVE_CLASS}.${ACTIVE}`,
     );
 
     return button;
@@ -118,7 +118,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     // adjust all menu items' collapsible panel's tooltip nub position
     const appMenuElement = GmailElementGetter.getAppMenu();
     for (const menuItem of appMenuElement?.querySelectorAll<HTMLElement>(
-      `.${NATIVE_CLASS}`
+      `.${NATIVE_CLASS}`,
     ) ?? []) {
       const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
       if (!panel) continue;
@@ -173,7 +173,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         async (appMenuItemView) => {
           const gmailView = await appMenuItemView.#gmailViewPromise;
           return [gmailView.menuItemDescriptor, gmailView] as const;
-        }
+        },
       );
 
       const results = await Promise.all(descriptors);
@@ -221,24 +221,24 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       }
 
       AppMenuItemView.#menuItemChangeStream.plug(
-        AppMenuItemView.#menuItemChangeBus
+        AppMenuItemView.#menuItemChangeBus,
       );
 
       // Set up menu item panel -> menu collapsible panel element mappings
       for (const [menuItemClass, panelClass] of nativeButtonToPanelMap) {
         const menuItemElement = document.querySelector<HTMLElement>(
-          `.${NATIVE_CLASS}.${menuItemClass}`
+          `.${NATIVE_CLASS}.${menuItemClass}`,
         );
         const panelElement = panelClass
           ? document.querySelector<HTMLElement>(
-              `.${PANEL_NATIVE_CLASS}.${panelClass}`
+              `.${PANEL_NATIVE_CLASS}.${panelClass}`,
             )
           : null;
 
         if (menuItemElement) {
           AppMenuItemView.#menuItemToPanelMap.set(
             menuItemElement,
-            panelElement ?? undefined
+            panelElement ?? undefined,
           );
         }
       }
@@ -251,7 +251,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       // Thus, some native event handlers won't be invoked so we replicate the Gmail's behavior by ourselves.
       const appMenuElement = GmailElementGetter.getAppMenuContainer();
       for (const nativeMenuItem of appMenuElement?.querySelectorAll<HTMLElement>(
-        `.${NATIVE_CLASS}:not(.${INBOXSDK_CLASS})`
+        `.${NATIVE_CLASS}:not(.${INBOXSDK_CLASS})`,
       ) ?? []) {
         // Gmail uses this listener for panel hover state activation. It's prevented from propagation and we handle UI updates
         const buttonElement =
@@ -266,7 +266,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
               e,
             ]);
           },
-          true
+          true,
         );
 
         // Gmail uses this listener for panel hover state deactivation. It's prevented from propagation and we handle UI updates
@@ -280,7 +280,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
               e,
             ]);
           },
-          true
+          true,
         );
 
         // Click event isn't prevented from propagation to let Gmail handle routing. The styling is handled by us
@@ -319,13 +319,13 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
         // deactivate menu items and handle keyboard accessibility
         for (const menuItem_ of appMenuElement?.querySelectorAll(
-          `.${NATIVE_CLASS}`
+          `.${NATIVE_CLASS}`,
         ) ?? []) {
           menuItem_.classList.remove(ACTIVE);
           menuItem_.classList.remove(HOVER);
           // update tabindex
           const iconElement = menuItem_.querySelector<HTMLElement>(
-            ICON_ELEMENT_SELECTOR
+            ICON_ELEMENT_SELECTOR,
           );
           if (iconElement) {
             iconElement.tabIndex = menuItem_ === menuItem ? 0 : -1;
@@ -360,7 +360,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           if (activePanel) {
             activePanel.style.removeProperty('height');
             activePanel.classList.remove(
-              CollapsiblePanelView.elementCss.ACTIVE
+              CollapsiblePanelView.elementCss.ACTIVE,
             );
             activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
           }
@@ -377,10 +377,10 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
             // handle burger menu collapsed
             if (!burgerMenuOpen) {
               for (const panel of document.querySelectorAll(
-                CollapsiblePanelView.elementSelectors.NATIVE
+                CollapsiblePanelView.elementSelectors.NATIVE,
               ) ?? []) {
                 panel.classList.add(
-                  CollapsiblePanelView.elementCss.COLLAPSED_HOVER
+                  CollapsiblePanelView.elementCss.COLLAPSED_HOVER,
                 );
               }
             }
@@ -422,10 +422,10 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
           // handle burger menu collapsed
           for (const panel of document.querySelectorAll(
-            CollapsiblePanelView.elementSelectors.NATIVE
+            CollapsiblePanelView.elementSelectors.NATIVE,
           ) ?? []) {
             panel.classList.remove(
-              CollapsiblePanelView.elementCss.COLLAPSED_HOVER
+              CollapsiblePanelView.elementCss.COLLAPSED_HOVER,
             );
           }
 
@@ -433,7 +433,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           if (activePanel) {
             activePanel.style.removeProperty('height');
             activePanel.classList.remove(
-              CollapsiblePanelView.elementCss.ACTIVE
+              CollapsiblePanelView.elementCss.ACTIVE,
             );
             activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
           }
@@ -441,7 +441,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           // activate active menu item panel
           if (activeMenuItemPanel) {
             activeMenuItemPanel.classList.add(
-              CollapsiblePanelView.elementCss.ACTIVE
+              CollapsiblePanelView.elementCss.ACTIVE,
             );
           }
           break;
@@ -454,17 +454,17 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           const isPanelLess = AppMenuItemView.#isPanelLess();
 
           for (const panel of document.querySelectorAll(
-            CollapsiblePanelView.elementSelectors.NATIVE
+            CollapsiblePanelView.elementSelectors.NATIVE,
           ) ?? []) {
             panel.classList.toggle(
               CollapsiblePanelView.elementCss.PANEL_LESS,
-              isPanelLess
+              isPanelLess,
             );
           }
           GmailElementGetter.getAppMenu()?.classList.toggle('aTO', isPanelLess);
           GmailElementGetter.getAppHeader()?.classList.toggle(
             'aTO',
-            isPanelLess
+            isPanelLess,
           );
           break;
         }
@@ -562,7 +562,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     const collapsiblePanel = await addCollapsiblePanel(
       this.#driver,
       descriptor,
-      this.menuItemDescriptor.insertIndex
+      this.menuItemDescriptor.insertIndex,
     );
 
     if (collapsiblePanel) {
@@ -580,7 +580,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
           AppMenuItemView.#menuItemToPanelMap.set(
             gmailElement,
-            collapsiblePanel.element
+            collapsiblePanel.element,
           );
           AppMenuItemView.#adjustTooltipNub();
         }

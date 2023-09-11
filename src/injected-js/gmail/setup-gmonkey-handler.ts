@@ -14,7 +14,7 @@ export default function setupGmonkeyHandler() {
         event.initCustomEvent('inboxSDKgmonkeyResponse', false, false, answer);
         document.dispatchEvent(event);
       });
-    }
+    },
   );
 
   document.addEventListener(
@@ -43,7 +43,7 @@ export default function setupGmonkeyHandler() {
         threadId = threadId.replace('#', '');
         event.target.setAttribute('data-inboxsdk-currentthreadid', threadId);
       }
-    }
+    },
   );
 }
 

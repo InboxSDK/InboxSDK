@@ -60,7 +60,7 @@ class Router {
           {
             type: 'handleRouteViewChange',
             routeID: routeViewDriver.getRouteID(),
-          }
+          },
         );
     });
     driver.getStopper().onValue(function () {
@@ -73,14 +73,14 @@ class Router {
 
   createLink(
     routeID: string,
-    params?: (RouteParams | null | undefined) | string
+    params?: (RouteParams | null | undefined) | string,
   ): string {
     return get(memberMap, this).driver.createLink(routeID, params);
   }
 
   goto(
     routeID: string,
-    params?: (RouteParams | null | undefined) | string
+    params?: (RouteParams | null | undefined) | string,
   ): Promise<void> {
     if (typeof routeID !== 'string') {
       throw new Error('routeID must be a string');
@@ -93,7 +93,7 @@ class Router {
         .getLogger()
         .deprecationWarning(
           'Router.goto param string',
-          'param object (e.g. {param: value})'
+          'param object (e.g. {param: value})',
         );
     }
 
@@ -102,7 +102,7 @@ class Router {
 
   handleCustomRoute(
     routeID: string,
-    handler: HandlerRegistry<CustomRouteView>
+    handler: HandlerRegistry<CustomRouteView>,
   ): () => void {
     const customRouteDescriptor = {
       routeID: routeID,
@@ -110,7 +110,7 @@ class Router {
     };
     const removeCustomRouteFromDriver = get(
       memberMap,
-      this
+      this,
     ).driver.addCustomRouteID(routeID);
     const { customRoutes, driver } = get(memberMap, this);
     customRoutes.push(customRouteDescriptor);
@@ -127,13 +127,13 @@ class Router {
 
   handleAllRoutes(handler: Handler<any>): () => void {
     return get(memberMap, this).allRoutesHandlerRegistry.registerHandler(
-      handler
+      handler,
     );
   }
 
   handleListRoute(
     routeID: string,
-    handler: Handler<ListRouteView>
+    handler: Handler<ListRouteView>,
   ): () => void {
     const { listRouteHandlerRegistries } = get(memberMap, this);
 
@@ -146,7 +146,7 @@ class Router {
 
   handleCustomListRoute(
     routeID: string,
-    handler: (...args: Array<any>) => any
+    handler: (...args: Array<any>) => any,
   ): () => void {
     return get(memberMap, this).driver.addCustomListRouteID(routeID, handler);
   }
@@ -160,7 +160,7 @@ class Router {
 function _handleRouteViewChange(
   router: Router,
   members: Members,
-  routeViewDriver: RouteViewDriver
+  routeViewDriver: RouteViewDriver,
 ) {
   if (members.currentRouteViewDriver instanceof DummyRouteViewDriver) {
     members.currentRouteViewDriver.destroy();
@@ -181,7 +181,7 @@ function _handleRouteViewChange(
     const listRouteView = new ListRouteView(
       routeViewDriver,
       members.driver,
-      members.appId
+      members.appId,
     );
     const listRouteHandlerRegistry =
       members.listRouteHandlerRegistries[routeView.getRouteID()];
@@ -191,7 +191,7 @@ function _handleRouteViewChange(
     }
 
     members.listRouteHandlerRegistries[NATIVE_ROUTE_IDS.ANY_LIST].addTarget(
-      listRouteView
+      listRouteView,
     );
   }
 }
@@ -199,7 +199,7 @@ function _handleRouteViewChange(
 function _informRelevantCustomRoutes(
   members: Members,
   routeViewDriver: RouteViewDriver,
-  routeView: RouteView
+  routeView: RouteView,
 ) {
   const routeID = routeView.getRouteID();
   const routeIDArray = Array.isArray(routeID) ? routeID : [routeID];
@@ -210,8 +210,8 @@ function _informRelevantCustomRoutes(
         Array.isArray(customRoute.routeID)
           ? customRoute.routeID
           : [customRoute.routeID],
-        routeIDArray
-      ).length
+        routeIDArray,
+      ).length,
   );
 
   if (relevantCustomRoute) {
@@ -230,10 +230,10 @@ function _informRelevantCustomRoutes(
 
 function _updateNavMenu(members: Members, newRouteViewDriver: RouteViewDriver) {
   members.driver.setShowNativeNavMarker(
-    newRouteViewDriver.getType() !== ROUTE_TYPES.CUSTOM
+    newRouteViewDriver.getType() !== ROUTE_TYPES.CUSTOM,
   );
   members.driver.setShowNativeAddonSidebar(
-    newRouteViewDriver.getType() !== ROUTE_TYPES.CUSTOM
+    newRouteViewDriver.getType() !== ROUTE_TYPES.CUSTOM,
   );
 }
 

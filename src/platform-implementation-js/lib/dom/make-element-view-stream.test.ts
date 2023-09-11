@@ -38,7 +38,7 @@ it('should work with makeElementChildStream', (done) => {
             }
           },
         };
-      })
+      }),
     )
     .onValue((view) => {
       switch (++call) {

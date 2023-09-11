@@ -7,12 +7,12 @@ import type { Driver } from '../driver-interfaces/driver';
 
 async function getGmailThreadIdForRfcMessageId(
   driver: Driver,
-  rfcMessageId: string
+  rfcMessageId: string,
 ): Promise<string> {
   if ((driver as any).isUsingSyncAPI && (driver as any).isUsingSyncAPI()) {
     const { threads: threadDescriptors } = await getSyncThreadsForSearch(
       driver,
-      'rfc822msgid:' + rfcMessageId
+      'rfc822msgid:' + rfcMessageId,
     );
     return threadDescriptors[0].oldGmailThreadID;
   } else {
@@ -22,7 +22,7 @@ async function getGmailThreadIdForRfcMessageId(
 
 async function forOldAPI(
   driver: Driver,
-  rfcMessageId: string
+  rfcMessageId: string,
 ): Promise<string> {
   const response = await gmailAjax({
     method: 'POST',
@@ -50,7 +50,7 @@ async function forOldAPI(
 
   if (threads.length !== 1) {
     throw new Error(
-      "Failed to find gmail thread id for rfc message id. Message may not exist in user's account."
+      "Failed to find gmail thread id for rfc message id. Message may not exist in user's account.",
     );
   }
 

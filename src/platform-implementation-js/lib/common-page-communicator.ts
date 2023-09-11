@@ -10,7 +10,7 @@ export default class CommonPageCommunicator {
   constructor() {
     this.ajaxInterceptStream = Kefir.fromEvents<any, never>(
       document,
-      'inboxSDKajaxIntercept'
+      'inboxSDKajaxIntercept',
     ).map((x) => x.detail);
   }
 
@@ -34,7 +34,7 @@ export default class CommonPageCommunicator {
     // For standalone windows.
     if (window.opener) {
       const openerIk = window.opener.document.head.getAttribute(
-        'data-inboxsdk-ik-value'
+        'data-inboxsdk-ik-value',
       );
       if (openerIk) {
         return openerIk;
@@ -51,7 +51,7 @@ export default class CommonPageCommunicator {
 
   async getXsrfToken(): Promise<string> {
     const existingHeader = document.head.getAttribute(
-      'data-inboxsdk-xsrf-token'
+      'data-inboxsdk-xsrf-token',
     );
     if (existingHeader) {
       return existingHeader;
@@ -69,7 +69,7 @@ export default class CommonPageCommunicator {
 
   async getBtaiHeader(): Promise<string> {
     const existingHeader = document.head.getAttribute(
-      'data-inboxsdk-btai-header'
+      'data-inboxsdk-btai-header',
     );
     if (existingHeader) {
       return existingHeader;
@@ -87,12 +87,12 @@ export default class CommonPageCommunicator {
 
   resolveUrlRedirects(url: string): Promise<string> {
     return this.pageAjax({ url, method: 'HEAD' }).then(
-      (result) => result.responseURL
+      (result) => result.responseURL,
     );
   }
 
   pageAjax(
-    opts: CommonAjaxOpts
+    opts: CommonAjaxOpts,
   ): Promise<{ text: string; responseURL: string }> {
     const id = `${Date.now()}-${Math.random()}`;
     const promise = Kefir.fromEvents(document, 'inboxSDKpageAjaxDone')
@@ -102,7 +102,7 @@ export default class CommonPageCommunicator {
         if (event.detail.error) {
           const err = Object.assign(
             new Error(event.detail.message || 'Connection error') as any,
-            { status: event.detail.status }
+            { status: event.detail.status },
           );
           if (event.detail.stack) {
             err.stack = event.detail.stack;
@@ -122,7 +122,7 @@ export default class CommonPageCommunicator {
         bubbles: false,
         cancelable: false,
         detail: Object.assign({}, opts, { id }),
-      })
+      }),
     );
 
     return promise;
@@ -134,7 +134,7 @@ export default class CommonPageCommunicator {
         bubbles: false,
         cancelable: false,
         detail: null,
-      })
+      }),
     );
     // create error here for stacktrace
     const error = new Error('Forgot to unsilence page errors');
@@ -146,7 +146,7 @@ export default class CommonPageCommunicator {
           bubbles: false,
           cancelable: false,
           detail: null,
-        })
+        }),
       );
     });
     asap(() => {
@@ -164,7 +164,7 @@ export default class CommonPageCommunicator {
         bubbles: false,
         cancelable: false,
         detail: { term },
-      })
+      }),
     );
   }
 }

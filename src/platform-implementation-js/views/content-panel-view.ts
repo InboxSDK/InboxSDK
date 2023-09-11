@@ -38,7 +38,7 @@ export default class ContentPanelView extends EventEmitter {
   _bindToStreamEvents() {
     const stream = get(
       membersMap,
-      this
+      this,
     ).contentPanelViewImplementation.getEventStream();
     stream.onValue(({ eventName }) => {
       this.emit(eventName);

@@ -19,7 +19,7 @@ setupErrorTracking();
 function incrementStat(attribute) {
   document.head.setAttribute(
     attribute,
-    Number(document.head.getAttribute(attribute)) + 1
+    Number(document.head.getAttribute(attribute)) + 1,
   );
 }
 
@@ -71,10 +71,10 @@ InboxSDK.load(2, 'simple-example')
         .catch(rethrow);
 
       composeView.on('destroy', () =>
-        incrementStat('data-test-composeDestroyEmitted')
+        incrementStat('data-test-composeDestroyEmitted'),
       );
       composeView.on('discard', () =>
-        incrementStat('data-test-composeDiscardEmitted')
+        incrementStat('data-test-composeDiscardEmitted'),
       );
       composeView.on('presending', ({ cancel }) => {
         if (
@@ -85,7 +85,7 @@ InboxSDK.load(2, 'simple-example')
         incrementStat('data-test-composePresendingEmitted');
       });
       composeView.on('sendCanceled', () =>
-        incrementStat('data-test-composeSendCanceledEmitted')
+        incrementStat('data-test-composeSendCanceledEmitted'),
       );
       composeView.on('sending', () => {
         incrementStat('data-test-composeSendingEmitted');

@@ -5,7 +5,7 @@ const hasStreakInstalled = once(() => {
   const appIds = JSON.parse(
     (typeof document !== 'undefined' &&
       document.documentElement.getAttribute('data-inboxsdk-active-app-ids')) ||
-      '[]'
+      '[]',
   );
   return appIds.find(({ appId }: any) => isStreakAppId(appId));
 });

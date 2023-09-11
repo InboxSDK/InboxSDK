@@ -74,7 +74,7 @@ export default class ButterBar {
       stopper.plug(
         Kefir.later(0, null)
           .flatMap(() => members.driver.getRouteViewDriverStream().changes())
-          .map(() => null)
+          .map(() => null),
       );
     }
 
@@ -88,7 +88,7 @@ export default class ButterBar {
       Kefir.later(ancientComplainTime, null).map((x) => {
         members.driver.getLogger().errorApp(timeoutErr);
         return x;
-      })
+      }),
     );
 
     stopper.take(1).onValue(() => {
@@ -97,7 +97,7 @@ export default class ButterBar {
       }
       const queue = butterBarDriver.getSharedMessageQueue();
       butterBarDriver.setSharedMessageQueue(
-        queue.filter((item) => item.messageId !== messageId)
+        queue.filter((item) => item.messageId !== messageId),
       );
     });
 
@@ -179,7 +179,7 @@ export default class ButterBar {
       },
       () => {
         savingMessage.destroy();
-      }
+      },
     );
 
     return deferred;

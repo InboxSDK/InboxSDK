@@ -15,14 +15,14 @@ export default class UserInfo {
   // deprecated
   getUserName(): string {
     const nameEl = document.querySelector<HTMLElement>(
-      'div.gb_w div.gb_B .gb_D'
+      'div.gb_w div.gb_B .gb_D',
     );
     if (nameEl) {
       return nameEl.textContent!;
     }
     const contact: Contact = find(
       this.getAccountSwitcherContactList(),
-      (contact: Contact) => contact.emailAddress === this._userEmail
+      (contact: Contact) => contact.emailAddress === this._userEmail,
     )!;
     if (contact && contact.name != null) {
       return contact.name;
@@ -34,8 +34,8 @@ export default class UserInfo {
   getAccountSwitcherContactList(): Contact[] {
     const main: Contact[] = Array.from(
       document.querySelectorAll<HTMLElement>(
-        '[role=banner] div[aria-label] div div a[href^="https://myaccount.google."]'
-      )
+        '[role=banner] div[aria-label] div div a[href^="https://myaccount.google."]',
+      ),
     )
       .slice(0, 1)
       .map((btn: HTMLElement) => {
@@ -51,8 +51,8 @@ export default class UserInfo {
       .filter(Boolean) as Contact[];
     const extras: Contact[] = Array.from(
       document.querySelectorAll<HTMLElement>(
-        '[role=banner] div[aria-label] div > a[target="_blank"] > img + div'
-      )
+        '[role=banner] div[aria-label] div > a[target="_blank"] > img + div',
+      ),
     ).map((el: HTMLElement) => {
       const match = el.children[1].textContent!.match(/\S+/);
       if (!match) {

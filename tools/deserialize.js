@@ -7,5 +7,5 @@ process.stdin.pipe(
   concatStream((buffer) => {
     const parsed = deserialize(buffer.toString());
     console.log(JSON.stringify(parsed, null, 2));
-  })
+  }),
 );

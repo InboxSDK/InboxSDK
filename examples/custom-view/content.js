@@ -1,7 +1,7 @@
 function log() {
   console.log.apply(
     console,
-    ['custom-view'].concat(Array.prototype.slice.call(arguments))
+    ['custom-view'].concat(Array.prototype.slice.call(arguments)),
   );
 }
 
@@ -53,7 +53,7 @@ InboxSDK.load(2, 'custom-view').then(function (sdk) {
       }
 
       customRouteView.getElement().appendChild(list);
-    }
+    },
   );
 
   sdk.Router.handleAllRoutes(function (routeView) {
@@ -63,7 +63,7 @@ InboxSDK.load(2, 'custom-view').then(function (sdk) {
       'type',
       routeView.getRouteType(),
       'params',
-      routeView.getParams()
+      routeView.getParams(),
     );
   });
 

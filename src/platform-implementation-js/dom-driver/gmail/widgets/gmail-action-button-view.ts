@@ -23,7 +23,7 @@ class GmailActionButtonView {
   }
 
   updateDescriptor(
-    actionButtonDescriptor: Record<string, any> | null | undefined
+    actionButtonDescriptor: Record<string, any> | null | undefined,
   ) {
     if (!actionButtonDescriptor) {
       this._actionDescriptor = actionButtonDescriptor;

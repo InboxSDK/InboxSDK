@@ -71,7 +71,7 @@
     "postcss-csso": "^6.0.1",
     "postcss-loader": "^7.2.4",
     "postcss-selector-parser": "^2.2.0",
-    "prettier": "^2.8.7",
+    "prettier": "^3.0.3",
     "process": "^0.11.10",
     "querystring-es3": "^0.2.1",
     "react": "^17.0.2",

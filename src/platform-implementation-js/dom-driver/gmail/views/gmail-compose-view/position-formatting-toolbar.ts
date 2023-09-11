@@ -1,6 +1,6 @@
 import type GmailComposeView from '../gmail-compose-view';
 export default function positionFormattingToolbar(
-  gmailComposeView: GmailComposeView
+  gmailComposeView: GmailComposeView,
 ) {
   const formattingToolbar = gmailComposeView.getFormattingToolbar();
 

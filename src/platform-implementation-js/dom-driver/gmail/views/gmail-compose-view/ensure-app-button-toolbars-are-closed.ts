@@ -1,9 +1,9 @@
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 export default function ensureAppButtonToolbarsAreClosed(
-  gmailComposeViewElement: HTMLElement
+  gmailComposeViewElement: HTMLElement,
 ) {
   var groupedButton = gmailComposeViewElement.querySelector<HTMLElement>(
-    '.inboxsdk__compose_groupedActionButton'
+    '.inboxsdk__compose_groupedActionButton',
   );
 
   if (!groupedButton) {
@@ -12,7 +12,7 @@ export default function ensureAppButtonToolbarsAreClosed(
 
   if (
     gmailComposeViewElement.classList.contains(
-      'inboxsdk__compose_groupedActionToolbar_visible'
+      'inboxsdk__compose_groupedActionToolbar_visible',
     )
   ) {
     simulateClick(groupedButton);

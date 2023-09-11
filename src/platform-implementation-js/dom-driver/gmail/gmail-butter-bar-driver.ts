@@ -5,15 +5,15 @@ import querySelector from '../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../lib/dom/make-mutation-observer-chunked-stream';
 
 const elements = streamWaitFor(() =>
-  document.body.querySelector<HTMLElement>('div.b8[role="alert"]')
+  document.body.querySelector<HTMLElement>('div.b8[role="alert"]'),
 )
   .map((noticeContainer: HTMLElement) => {
     const googleNotice = querySelector(
       noticeContainer,
-      '.vh:not(.inboxsdk__butterbar)'
+      '.vh:not(.inboxsdk__butterbar)',
     );
     let sdkNotice = noticeContainer.querySelector<HTMLElement>(
-      '.vh.inboxsdk__butterbar'
+      '.vh.inboxsdk__butterbar',
     );
     if (!sdkNotice) {
       sdkNotice = document.createElement('div');
@@ -53,13 +53,13 @@ const elements = streamWaitFor(() =>
   .toProperty();
 
 const googleNoticeMutationChunks = elements.flatMapLatest(({ googleNotice }) =>
-  makeMutationObserverChunkedStream(googleNotice, { childList: true })
+  makeMutationObserverChunkedStream(googleNotice, { childList: true }),
 );
 const googleAddedNotice = googleNoticeMutationChunks.filter((mutations) =>
-  mutations.some((m) => m.addedNodes.length > 0)
+  mutations.some((m) => m.addedNodes.length > 0),
 );
 const googleRemovedNotice = googleNoticeMutationChunks.filter(
-  (mutations) => !mutations.some((m) => m.addedNodes.length > 0)
+  (mutations) => !mutations.some((m) => m.addedNodes.length > 0),
 );
 
 const sdkRemovedNotice = elements
@@ -67,7 +67,7 @@ const sdkRemovedNotice = elements
     makeMutationObserverChunkedStream(sdkNotice, {
       attributes: true,
       attributeFilter: ['data-inboxsdk-id'],
-    }).map(() => sdkNotice.getAttribute('data-inboxsdk-id'))
+    }).map(() => sdkNotice.getAttribute('data-inboxsdk-id')),
   )
   .filter((id) => id == null);
 
@@ -79,7 +79,7 @@ const noticeAvailableStream = Kefir.merge([
 function hideMessage(
   noticeContainer: HTMLElement,
   googleNotice: HTMLElement,
-  sdkNotice: HTMLElement
+  sdkNotice: HTMLElement,
 ) {
   googleNotice.style.display = '';
   noticeContainer.style.top = '-10000px';
@@ -96,7 +96,7 @@ export default class GmailButterBarDriver {
         googleNotice.style.display = '';
         sdkNotice.style.display = 'none';
         sdkNotice.setAttribute('data-inboxsdk-id', 'gmail');
-      }
+      },
     );
 
     // Force stream to be in active state. sdkRemovedNotice is prone to missing
@@ -154,7 +154,7 @@ export default class GmailButterBarDriver {
 
       const textContainer = querySelector(
         sdkNotice,
-        '.inboxsdk__butterbar-text'
+        '.inboxsdk__butterbar-text',
       );
       while (textContainer.firstChild) {
         textContainer.removeChild(textContainer.firstChild);
@@ -162,7 +162,7 @@ export default class GmailButterBarDriver {
 
       const buttonsContainer = querySelector(
         sdkNotice,
-        '.inboxsdk__butterbar-buttons'
+        '.inboxsdk__butterbar-buttons',
       );
       while (buttonsContainer.firstChild) {
         buttonsContainer.removeChild(buttonsContainer.firstChild);
@@ -190,7 +190,7 @@ export default class GmailButterBarDriver {
 
       const closeButton = querySelector(
         sdkNotice,
-        '.inboxsdk__butterbar-close'
+        '.inboxsdk__butterbar-close',
       );
       if (closeButton) {
         Kefir.fromEvents(closeButton, 'click').take(1).onValue(destroy);

@@ -25,7 +25,7 @@ const showCustomRouteView = defn(
     }
 
     const customViewContainerElement = _getCustomViewContainerElement(
-      contentSectionElement
+      contentSectionElement,
     );
     customViewContainerElement.appendChild(element);
 
@@ -44,7 +44,7 @@ const showCustomRouteView = defn(
     if (companionSidebarIconContainerEl) {
       const activeThreadAddOnIcon =
         companionSidebarIconContainerEl.querySelector<HTMLElement>(
-          ACTIVE_ADD_ON_ICON_SELECTOR
+          ACTIVE_ADD_ON_ICON_SELECTOR,
         );
       if (activeThreadAddOnIcon) {
         simulateClick(activeThreadAddOnIcon);
@@ -52,12 +52,12 @@ const showCustomRouteView = defn(
     }
 
     document.body.classList.add('inboxsdk__custom_view_active');
-  }
+  },
 );
 export default showCustomRouteView;
 
 function _getCustomViewContainerElement(
-  contentSectionElement: HTMLElement
+  contentSectionElement: HTMLElement,
 ): HTMLElement {
   let customViewContainerElement =
     contentSectionElement.querySelector<HTMLElement>('.inboxsdk__custom_view');

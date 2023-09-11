@@ -1,7 +1,7 @@
 function log() {
   console.log.apply(
     console,
-    ['search-term'].concat(Array.prototype.slice.call(arguments))
+    ['search-term'].concat(Array.prototype.slice.call(arguments)),
   );
 }
 

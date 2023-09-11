@@ -8,7 +8,7 @@ import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import _GmailElementGetter from '../gmail-element-getter';
 
 export default function getMainContentElementChangedStream(
-  GmailElementGetter: typeof _GmailElementGetter
+  GmailElementGetter: typeof _GmailElementGetter,
 ): Kefir.Observable<HTMLElement, never> {
   const s = waitForMainContentContainer(GmailElementGetter)
     .flatMap((mainContentContainer) =>
@@ -25,8 +25,8 @@ export default function getMainContentElementChangedStream(
             })
             .filter(_isNowVisible)
             .map((e) => e.target)
-            .takeUntilBy(removalStream)
-        )
+            .takeUntilBy(removalStream),
+        ),
     )
     .toProperty();
 
@@ -40,7 +40,7 @@ export default function getMainContentElementChangedStream(
 }
 
 function waitForMainContentContainer(
-  GmailElementGetter: typeof _GmailElementGetter
+  GmailElementGetter: typeof _GmailElementGetter,
 ) {
   if (GmailElementGetter.isStandaloneComposeWindow()) {
     return Kefir.never();

@@ -8,7 +8,7 @@ export interface OutsideEvent {
 }
 
 export default function outsideClicksAndEscape(
-  elements: HTMLElement[]
+  elements: HTMLElement[],
 ): Kefir.Observable<OutsideEvent, never> {
   return Kefir.merge([
     fromEventTargetCapture(document, 'click'),
@@ -26,9 +26,9 @@ export default function outsideClicksAndEscape(
             if (node === el) return false;
           }
           return true;
-        })
+        }),
     )
-    .map((event) => ({ type: 'outsideInteraction', cause: event } as const))
+    .map((event) => ({ type: 'outsideInteraction', cause: event }) as const)
     .merge(
       Kefir.fromEvents<any, never>(document, 'keydown')
         .filter((e) => (e.key ? e.key === 'Escape' : e.which === 27))
@@ -36,14 +36,14 @@ export default function outsideClicksAndEscape(
           event.preventDefault();
           event.stopPropagation();
           return { type: 'escape', cause: event } as const;
-        })
+        }),
     )
     .map((e) => {
       if (process.env.NODE_ENV !== 'production') {
         const allElsStillInPage = elements.every((el) => document.contains(el));
         if (!allElsStillInPage) {
           console.error(
-            'outsideClicksAndEscape not unsubscribed from when elements were removed from the page'
+            'outsideClicksAndEscape not unsubscribed from when elements were removed from the page',
           );
         }
       }

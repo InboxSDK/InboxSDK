@@ -38,7 +38,7 @@ class Compose {
         {
           type: 'composeViewHandler',
           isInlineReplyForm: view.isInlineReplyForm(),
-        }
+        },
       );
     });
   }
@@ -60,8 +60,8 @@ class Compose {
     return Kefir.fromPromise(newComposePromise)
       .merge(
         Kefir.later(15 * 1000, null).flatMap(() =>
-          Kefir.constantError(new Error('draft did not open in time'))
-        )
+          Kefir.constantError(new Error('draft did not open in time')),
+        ),
       )
       .take(1)
       .takeErrors(1)
@@ -74,7 +74,7 @@ class Compose {
       .getLogger()
       .deprecationWarning(
         'Compose.getComposeView',
-        'Compose.openNewComposeView'
+        'Compose.openNewComposeView',
       );
 
     if (driver.getOpts().REQUESTED_API_VERSION !== 1) {

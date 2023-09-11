@@ -9,9 +9,9 @@ const onMouseDownAndUp = defn(
   function onMouseDownAndUp(el: HTMLElement): Kefir.Observable<Event, unknown> {
     const elMouseDowns = fromEventTargetCapture(el, 'mousedown');
     return elMouseDowns.flatMapLatest(() =>
-      pageMouseUps.take(1).filter((event) => el.contains(event.target))
+      pageMouseUps.take(1).filter((event) => el.contains(event.target)),
     );
-  }
+  },
 );
 
 export default onMouseDownAndUp;

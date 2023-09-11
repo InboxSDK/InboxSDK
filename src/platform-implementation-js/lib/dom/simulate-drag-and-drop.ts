@@ -2,7 +2,7 @@ import triggerRelayEvent from './trigger-relay-event';
 
 function makeDataTransferObj(files: Array<Blob | File>) {
   const fileNames: Array<string | null | undefined> = Array.from(files).map(
-    (file) => (typeof file.name === 'string' ? file.name : undefined)
+    (file) => (typeof file.name === 'string' ? file.name : undefined),
   );
   return {
     files,

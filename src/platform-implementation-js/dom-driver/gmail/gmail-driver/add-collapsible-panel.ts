@@ -10,13 +10,13 @@ import GmailDriver from '../gmail-driver';
 export async function addCollapsiblePanel(
   driver: GmailDriver,
   panelDescriptor: AppMenuItemPanelDescriptor,
-  insertIndex?: number
+  insertIndex?: number,
 ) {
   const injectionContainer = await waitForAppMenuParentReady();
 
   const collapsiblePanelView = new CollapsiblePanelView(
     driver,
-    panelDescriptor
+    panelDescriptor,
   );
 
   if (!injectionContainer || !collapsiblePanelView.element) return;
@@ -27,7 +27,7 @@ export async function addCollapsiblePanel(
 
   const panelNodes =
     injectionContainer.querySelectorAll<HTMLElement>(
-      CollapsiblePanelView.elementSelectors.NATIVE
+      CollapsiblePanelView.elementSelectors.NATIVE,
     ) ?? [];
   const siblingElement = Number.isInteger(insertIndex)
     ? panelNodes[insertIndex!] ?? null
@@ -36,7 +36,7 @@ export async function addCollapsiblePanel(
   if (siblingElement) {
     siblingElement.insertAdjacentElement(
       'beforebegin',
-      collapsiblePanelView.element
+      collapsiblePanelView.element,
     );
   } else {
     [...panelNodes]
@@ -51,7 +51,7 @@ const waitForAppMenuParentReady = once(async () => {
   if (!GmailElementGetter.isStandalone()) {
     try {
       const menuParentElement = await waitFor(() =>
-        GmailElementGetter.getAppMenuContainer()
+        GmailElementGetter.getAppMenuContainer(),
       );
 
       return menuParentElement;

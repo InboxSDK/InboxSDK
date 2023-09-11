@@ -7,7 +7,7 @@ export default function addRecipientRow(
   recipientRowOptionStream: Kefir.Observable<
     Record<string, any> | null | undefined,
     unknown
-  >
+  >,
 ): () => void {
   let row: HTMLElement | null;
   recipientRowOptionStream
@@ -28,7 +28,7 @@ export default function addRecipientRow(
           bubbles: false,
           cancelable: false,
           detail: null,
-        })
+        }),
       );
     });
   return () => {
@@ -40,7 +40,7 @@ export default function addRecipientRow(
           bubbles: false,
           cancelable: false,
           detail: null,
-        })
+        }),
       );
     }
   };
@@ -48,7 +48,7 @@ export default function addRecipientRow(
 
 function _createRecipientRowElement(
   gmailComposeView: GmailComposeView,
-  options: Record<string, any>
+  options: Record<string, any>,
 ): HTMLElement {
   var row = document.createElement('tr');
   var labelTD = document.createElement('td');
@@ -79,7 +79,7 @@ function _createRecipientRowElement(
   }
 
   var firstRowElement = getRecipientRowElements(
-    gmailComposeView.getElement()
+    gmailComposeView.getElement(),
   )[0];
   var parent: HTMLElement = firstRowElement.parentElement as any;
   parent.insertBefore(row, firstRowElement.nextSibling);

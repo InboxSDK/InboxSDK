@@ -15,7 +15,7 @@ it('should work', (cb) => {
       return ready;
     },
     10,
-    1
+    1,
   );
 
   const onValueSpy = sinon.spy();
@@ -60,7 +60,7 @@ it('should stop calling condition when unsubscribed from inside condition', (cb)
       }
     },
     10,
-    1
+    1,
   );
   s.takeUntilBy(stopper).onValue(() => {
     throw new Error('Should not happen');

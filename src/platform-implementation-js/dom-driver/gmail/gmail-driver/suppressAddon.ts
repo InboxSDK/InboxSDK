@@ -9,13 +9,15 @@ export default function suppressAddon(driver: GmailDriver, addonTitle: string) {
     .map((iconContainerElement) => {
       // .J-KU-Jg is pre-2018-07-30 element?
       const elementToWatch = iconContainerElement.querySelector(
-        '.J-KU-Jg, [role=tablist], .brC-bsf-aT5-aOt'
+        '.J-KU-Jg, [role=tablist], .brC-bsf-aT5-aOt',
       );
       if (!elementToWatch) {
         driver
           .getLogger()
           .error(
-            new Error('_waitForAddonTitleAndSuppress: elementToWatch not found')
+            new Error(
+              '_waitForAddonTitleAndSuppress: elementToWatch not found',
+            ),
           );
         return null;
       }
@@ -27,7 +29,7 @@ export default function suppressAddon(driver: GmailDriver, addonTitle: string) {
       ({ el }: any) =>
         el.getAttribute('role') === 'tab' &&
         (el.getAttribute('data-tooltip') || el.getAttribute('aria-label')) ===
-          addonTitle
+          addonTitle,
     )
     .takeUntilBy(driver.getStopper())
     .onValue(({ el }: any) => {

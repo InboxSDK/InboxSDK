@@ -37,14 +37,14 @@ class GmailModalViewDriver {
     this.setChromeClass(
       options.chrome,
       options.showCloseButton,
-      (options.buttons || []).length > 0
+      (options.buttons || []).length > 0,
     );
   }
 
   setTitle(title: string) {
     const heading = querySelector(
       this._modalContainerElement,
-      '[role=heading]'
+      '[role=heading]',
     );
     if (!title) {
       heading.style.display = 'none';
@@ -57,7 +57,7 @@ class GmailModalViewDriver {
   setContentElement(element: HTMLElement) {
     const content = querySelector(
       this._modalContainerElement,
-      '.inboxsdk__modal_content'
+      '.inboxsdk__modal_content',
     );
     content.innerHTML = '';
     if (typeof element === 'string') {
@@ -70,31 +70,31 @@ class GmailModalViewDriver {
   setButtons(buttons: any[]) {
     const buttonsEl = querySelector(
       this._modalContainerElement,
-      '.inboxsdk__modal_buttons'
+      '.inboxsdk__modal_buttons',
     );
     buttonsEl.innerHTML = '';
 
     if (buttons.length === 0) {
       buttonsEl.style.display = 'none';
       this._modalContainerElement.classList.add(
-        'inboxsdk__modal_content_no_buttons'
+        'inboxsdk__modal_content_no_buttons',
       );
     } else {
       buttonsEl.style.display = '';
       this._modalContainerElement.classList.remove(
-        'inboxsdk__modal_content_no_buttons'
+        'inboxsdk__modal_content_no_buttons',
       );
     }
 
     sortBy(buttons, (button) => button.orderHint || 0).forEach(
-      this._addButton.bind(this, buttonsEl)
+      this._addButton.bind(this, buttonsEl),
     );
   }
 
   setChromeClass(
     chrome: boolean,
     showCloseButton: boolean,
-    hasButtons: boolean
+    hasButtons: boolean,
   ) {
     this._modalContainerElement.classList.remove('inboxsdk__modal_hideSides');
     this._modalContainerElement.classList.remove('inboxsdk__modal_hideTop');
@@ -151,7 +151,7 @@ class GmailModalViewDriver {
     if (buttonDescriptor.type === 'PRIMARY_ACTION') {
       buttonContainer.insertBefore(
         buttonView.getElement(),
-        buttonContainer.firstElementChild
+        buttonContainer.firstElementChild,
       );
     } else {
       buttonContainer.appendChild(buttonView.getElement());
@@ -161,7 +161,7 @@ class GmailModalViewDriver {
   _setupEventStream() {
     const closeElement = querySelector(
       this._modalContainerElement,
-      '.inboxsdk__modal_close'
+      '.inboxsdk__modal_close',
     );
 
     closeElement.addEventListener('click', (event: MouseEvent) => {

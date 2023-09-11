@@ -12,10 +12,10 @@ export type AddressChangeEventName =
   | 'fromContactChanged';
 
 export default function getAddressChangesStream(
-  gmailComposeView: GmailComposeView
+  gmailComposeView: GmailComposeView,
 ) {
   const recipientRowElements = getRecipientRowElements(
-    gmailComposeView.getElement()
+    gmailComposeView.getElement(),
   );
 
   if (!recipientRowElements || recipientRowElements.length === 0) {
@@ -50,7 +50,7 @@ export default function getAddressChangesStream(
 function readContactFromElement(
   contactNode: HTMLElement,
   addressType: ReceiverType,
-  gmailComposeView: GmailComposeView
+  gmailComposeView: GmailComposeView,
 ): Contact | null {
   if (contactNode.getAttribute('role') === 'option') {
     // Handling updated compose recipients
@@ -62,24 +62,24 @@ function readContactFromElement(
   } else {
     return getAddressInformationExtractor(
       addressType,
-      gmailComposeView
+      gmailComposeView,
     )(contactNode);
   }
 }
 
 function _makeSubAddressStream(
   addressType: ReceiverType,
-  gmailComposeView: GmailComposeView
+  gmailComposeView: GmailComposeView,
 ) {
   const contactNodes = gmailComposeView.tagTree.getAllByTag(
-    `${addressType}Recipient`
+    `${addressType}Recipient`,
   );
   return toItemWithLifetimeStream(contactNodes).flatMap(
     ({ el, removalStream }) => {
       const contact = readContactFromElement(
         el.getValue(),
         addressType,
-        gmailComposeView
+        gmailComposeView,
       );
 
       if (!contact) {
@@ -97,9 +97,9 @@ function _makeSubAddressStream(
           data: {
             contact,
           },
-        }))
+        })),
       );
-    }
+    },
   );
 }
 
@@ -138,7 +138,7 @@ function getFromAddressChangeStream(gmailComposeView: GmailComposeView) {
       .getElement()
       .querySelector<HTMLElement>('input[name="from"]');
     return Kefir.constant(
-      _convertToEvent('fromContactChanged', gmailComposeView.getFromContact())
+      _convertToEvent('fromContactChanged', gmailComposeView.getFromContact()),
     ).merge(
       !fromInput
         ? Kefir.never()
@@ -148,9 +148,9 @@ function getFromAddressChangeStream(gmailComposeView: GmailComposeView) {
           }).map(() =>
             _convertToEvent(
               'fromContactChanged',
-              gmailComposeView.getFromContact()
-            )
-          )
+              gmailComposeView.getFromContact(),
+            ),
+          ),
     );
   });
 }

@@ -41,7 +41,7 @@ class GmailRouteView {
   constructor(
     { urlObject, type, routeID, cachedRouteData }: Record<string, any>,
     gmailRouteProcessor: GmailRouteProcessor,
-    driver: GmailDriver
+    driver: GmailDriver,
   ) {
     // Check we implement interface
     this as RouteViewDriver;
@@ -177,12 +177,12 @@ class GmailRouteView {
       Record<string, any> | null | undefined,
       unknown
     >,
-    groupOrderHint: any
+    groupOrderHint: any,
   ): GmailCollapsibleSectionView {
     return this._addCollapsibleSection(
       sectionDescriptorProperty,
       groupOrderHint,
-      true
+      true,
     );
   }
 
@@ -191,26 +191,26 @@ class GmailRouteView {
       Record<string, any> | null | undefined,
       unknown
     >,
-    groupOrderHint: any
+    groupOrderHint: any,
   ): GmailCollapsibleSectionView {
     return this._addCollapsibleSection(
       sectionDescriptorProperty,
       groupOrderHint,
-      false
+      false,
     );
   }
 
   _addCollapsibleSection(
     collapsibleSectionDescriptorProperty: any,
     groupOrderHint: any,
-    isCollapsible: boolean
+    isCollapsible: boolean,
   ): GmailCollapsibleSectionView {
     this._hasAddedCollapsibleSection = true;
     var gmailResultsSectionView = new GmailCollapsibleSectionView(
       this._driver,
       groupOrderHint,
       this.getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH,
-      isCollapsible
+      isCollapsible,
     );
 
     var sectionsContainer = this._getSectionsContainer();
@@ -225,20 +225,20 @@ class GmailRouteView {
         var insertBeforeElement = getInsertBeforeElement(
           gmailResultsSectionView.getElement(),
           children,
-          ['data-group-order-hint', 'data-order-hint']
+          ['data-group-order-hint', 'data-order-hint'],
         );
 
         if (insertBeforeElement) {
           sectionsContainer.insertBefore(
             gmailResultsSectionView.getElement(),
-            insertBeforeElement
+            insertBeforeElement,
           );
         } else {
           sectionsContainer.appendChild(gmailResultsSectionView.getElement());
         }
       });
     gmailResultsSectionView.setCollapsibleSectionDescriptorProperty(
-      collapsibleSectionDescriptorProperty
+      collapsibleSectionDescriptorProperty,
     );
     return gmailResultsSectionView;
   }
@@ -311,7 +311,7 @@ class GmailRouteView {
     var gmailRowListView = new GmailRowListView(
       rootElement as any,
       this,
-      this._driver
+      this._driver,
     );
 
     this._rowListViews.push(gmailRowListView);
@@ -329,7 +329,7 @@ class GmailRouteView {
       var gmailThreadView = new GmailThreadView(
         threadContainerElement,
         this,
-        this._driver
+        this._driver,
       );
       this._threadView = gmailThreadView;
 
@@ -342,7 +342,7 @@ class GmailRouteView {
       // when in preview pane mode. We want to monitor it in either case
       // because the user could switch into preview pane mode.
       const previewPaneContainer = document.querySelector<HTMLElement>(
-        'div[role=main] .aia'
+        'div[role=main] .aia',
       );
 
       if (previewPaneContainer) {
@@ -374,15 +374,15 @@ class GmailRouteView {
   _startMonitoringPreviewPaneForThread(previewPaneContainer: HTMLElement) {
     const threadContainerTableElement = querySelector(
       previewPaneContainer,
-      'table.Bs > tr'
+      'table.Bs > tr',
     );
     const elementStream = makeElementChildStream(
-      threadContainerTableElement
+      threadContainerTableElement,
     ).filter(
       (event) =>
         !!event.el.querySelector('.if') ||
         !!event.el.querySelector('.PeIF1d') ||
-        !!event.el.querySelector('.a98.iY')
+        !!event.el.querySelector('.a98.iY'),
     );
 
     this._eventStream.plug(
@@ -390,8 +390,8 @@ class GmailRouteView {
         .flatMap(
           makeElementViewStream(
             (element) =>
-              new (GmailThreadView as any)(element, this, this._driver, true)
-          )
+              new (GmailThreadView as any)(element, this, this._driver, true),
+          ),
         )
         .map((view) => {
           this._threadView = view;
@@ -399,7 +399,7 @@ class GmailRouteView {
             eventName: 'newGmailThreadView',
             view: view,
           };
-        })
+        }),
     );
   }
 
@@ -407,7 +407,7 @@ class GmailRouteView {
     const main = document.querySelector("div[role='main']");
     if (!main) throw new Error('should not happen');
     let sectionsContainer = main.querySelector<HTMLElement>(
-      '.inboxsdk__custom_sections'
+      '.inboxsdk__custom_sections',
     );
 
     if (!sectionsContainer) {
@@ -429,7 +429,7 @@ class GmailRouteView {
     var params: Record<string, any> = Object.create(null);
     if (!this._customRouteID)
       throw new Error(
-        "Should not happen, can't get custom params for non-custom view"
+        "Should not happen, can't get custom params for non-custom view",
       );
 
     this._customRouteID
@@ -640,7 +640,7 @@ class GmailRouteView {
   refresh() {
     var el =
       GmailElementGetter.getToolbarElement().querySelector<HTMLElement>(
-        'div.T-I.nu'
+        'div.T-I.nu',
       );
 
     if (el) {
@@ -672,7 +672,7 @@ class GmailRouteView {
   _getThreadContainerElement: () => HTMLElement | null | undefined = once(
     () => {
       return GmailElementGetter.getThreadContainerElement();
-    }
+    },
   );
 }
 

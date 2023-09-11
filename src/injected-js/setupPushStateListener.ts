@@ -10,7 +10,7 @@ export default function setupPushStateListener() {
         detail: {
           args,
         },
-      })
+      }),
     );
     return ret;
   };

@@ -87,7 +87,7 @@ class GmailMessageView {
   constructor(
     element: HTMLElement,
     gmailThreadView: GmailThreadView,
-    driver: GmailDriver
+    driver: GmailDriver,
   ) {
     this._element = element;
     this._threadViewDriver = gmailThreadView;
@@ -97,11 +97,13 @@ class GmailMessageView {
     this._replyElement = null;
     // Outputs the same type of stream as makeElementChildStream does.
     this._replyElementStream = this._eventStream
-      .filter(function (
-        event
-      ): event is MessageViewDriverEventByName['replyElement'] {
-        return event.eventName === 'replyElement';
-      })
+      .filter(
+        function (
+          event,
+        ): event is MessageViewDriverEventByName['replyElement'] {
+          return event.eventName === 'replyElement';
+        },
+      )
       .map((event) => event.change);
 
     this._setupMessageStateStream();
@@ -141,12 +143,12 @@ class GmailMessageView {
                 try {
                   const gmailMessageId =
                     await this._driver.getGmailMessageIdForSyncMessageId(
-                      syncMessageId.replace('#', '')
+                      syncMessageId.replace('#', ''),
                     );
                   // set the legacy message id attribute so subsequent calls to getMessageId find the legacy message id in the dom
                   messageIdElement.setAttribute(
                     'data-legacy-message-id',
-                    gmailMessageId
+                    gmailMessageId,
                   );
                   return null;
                 } catch (e) {
@@ -155,7 +157,7 @@ class GmailMessageView {
               }
 
               throw new Error('gmail message id never became available');
-            })()
+            })(),
           );
         }
       } else {
@@ -238,7 +240,7 @@ class GmailMessageView {
     let recipients = this._recipients;
     if (recipients) return recipients;
     const receipientSpans = Array.from(
-      this._element.querySelectorAll('.hb span[email]')
+      this._element.querySelectorAll('.hb span[email]'),
     );
     recipients = this._recipients = receipientSpans.map((span) => {
       return this._getUpdatedContact({
@@ -253,10 +255,10 @@ class GmailMessageView {
     let recipients = this._recipientEmailAddresses;
     if (recipients) return recipients;
     const receipientSpans = Array.from(
-      this._element.querySelectorAll('.hb span[email]')
+      this._element.querySelectorAll('.hb span[email]'),
     );
     recipients = this._recipientEmailAddresses = receipientSpans.map(
-      (span) => span.getAttribute('email') || ''
+      (span) => span.getAttribute('email') || '',
     );
     return recipients;
   }
@@ -283,7 +285,7 @@ class GmailMessageView {
       }
     } else {
       const receipientSpans = Array.from(
-        this._element.querySelectorAll('.hb span[email]')
+        this._element.querySelectorAll('.hb span[email]'),
       );
       recipients = this._recipientsFull = receipientSpans.map((span) => {
         return this._getUpdatedContact({
@@ -329,7 +331,7 @@ class GmailMessageView {
   addMoreMenuItem(options: Record<string, any>) {
     this._moreMenuItemDescriptors = sortBy(
       this._moreMenuItemDescriptors.concat([options]),
-      (o) => o.orderHint
+      (o) => o.orderHint,
     );
 
     this._updateMoreMenu();
@@ -357,7 +359,7 @@ class GmailMessageView {
         }).map(() =>
           moreButton.getAttribute('aria-expanded') === 'true'
             ? this._getOpenMoreMenu()
-            : null
+            : null,
         );
       })
       .takeUntilBy(this._stopper)
@@ -374,7 +376,7 @@ class GmailMessageView {
     }
 
     return this._element.querySelector<HTMLElement>(
-      'tr.acZ div.T-I.J-J5-Ji.aap.L3[role=button][aria-haspopup]'
+      'tr.acZ div.T-I.J-J5-Ji.aap.L3[role=button][aria-haspopup]',
     );
   }
 
@@ -388,7 +390,7 @@ class GmailMessageView {
     return (
       maybeMoreMenu ||
       document.body.querySelector<HTMLElement>(
-        'td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]'
+        'td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]',
       )
     );
   }
@@ -425,10 +427,10 @@ class GmailMessageView {
         itemEl.setAttribute('role', 'menuitem');
         itemEl.innerHTML = autoHtml`<div class="J-N-Jz">${options.title}</div>`;
         itemEl.addEventListener('mouseenter', () =>
-          itemEl.classList.add('J-N-JT')
+          itemEl.classList.add('J-N-JT'),
         );
         itemEl.addEventListener('mouseleave', () =>
-          itemEl.classList.remove('J-N-JT')
+          itemEl.classList.remove('J-N-JT'),
         );
         itemEl.addEventListener('click', () => {
           this._closeActiveEmailMenu();
@@ -481,7 +483,7 @@ class GmailMessageView {
     }
 
     const messageIdElement = this._element.querySelector(
-      '[data-legacy-message-id]'
+      '[data-legacy-message-id]',
     );
 
     if (messageIdElement) {
@@ -550,7 +552,7 @@ class GmailMessageView {
   addAttachmentIcon(
     iconDescriptor:
       | MessageAttachmentIconDescriptor
-      | Kefir.Stream<MessageAttachmentIconDescriptor, never>
+      | Kefir.Stream<MessageAttachmentIconDescriptor, never>,
   ) {
     const attachmentIcon = new AttachmentIcon();
 
@@ -561,7 +563,7 @@ class GmailMessageView {
 
     this._element.setAttribute(
       'inboxsdk__message_added_attachment_icon',
-      'true'
+      'true',
     );
 
     const getImgElement = once(() => {
@@ -594,7 +596,7 @@ class GmailMessageView {
         this._eventStream
           .filter((event) => event.eventName === 'viewStateChange')
           .toProperty(() => null),
-        (opts) => opts
+        (opts) => opts,
       )
       .takeUntilBy(this._stopper)
       .onValue((opts) => {
@@ -722,7 +724,7 @@ class GmailMessageView {
     var gmailAttachmentCardView = new GmailAttachmentCardView(
       options,
       this._driver,
-      this
+      this,
     );
 
     if (!this._gmailAttachmentAreaView) {
@@ -734,7 +736,7 @@ class GmailMessageView {
     }
 
     this._gmailAttachmentAreaView.addGmailAttachmentCardView(
-      gmailAttachmentCardView
+      gmailAttachmentCardView,
     );
 
     return gmailAttachmentCardView;
@@ -810,7 +812,7 @@ class GmailMessageView {
             oldValue: event.oldValue,
             newValue: event.newValue,
           };
-        })
+        }),
     );
   }
 
@@ -842,7 +844,7 @@ class GmailMessageView {
     try {
       this._driver.associateThreadAndMessageIDs(
         this._threadViewDriver.getThreadID(),
-        messageId
+        messageId,
       );
     } catch (err) {
       this._driver.getLogger().error(err);
@@ -943,7 +945,7 @@ class GmailMessageView {
           return {
             get contact() {
               return self._getUpdatedContact(
-                _extractContactInformation(element)
+                _extractContactInformation(element),
               );
             },
 
@@ -951,7 +953,7 @@ class GmailMessageView {
             eventName: 'contactHover',
             messageViewDriver: self,
           };
-        } as any)
+        } as any),
     );
   }
 
@@ -960,7 +962,7 @@ class GmailMessageView {
       return new GmailAttachmentAreaView(
         this._element.querySelector<HTMLElement>('.hq'),
         this._driver,
-        this
+        this,
       );
     }
 
@@ -971,14 +973,14 @@ class GmailMessageView {
     const gmailAttachmentAreaView = new GmailAttachmentAreaView(
       null,
       this._driver,
-      this
+      this,
     );
     const beforeElement = querySelector(this._element, '.hi');
     const parentNode = beforeElement.parentNode;
     if (!parentNode) throw new Error('parentNode not found');
     parentNode.insertBefore(
       gmailAttachmentAreaView.getElement(),
-      beforeElement
+      beforeElement,
     );
     return gmailAttachmentAreaView;
   }

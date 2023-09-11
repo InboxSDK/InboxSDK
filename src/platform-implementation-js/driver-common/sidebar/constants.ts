@@ -30,5 +30,5 @@ export const sidebarWaitingPlatformClassName = cx(
   cssGlobal,
   SidebarClassName.v1_1_0,
   SidebarClassName.v1_1_1,
-  legacyIdMap('app_sidebar_waiting_platform')
+  legacyIdMap('app_sidebar_waiting_platform'),
 );

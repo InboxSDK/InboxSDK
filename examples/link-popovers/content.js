@@ -4,7 +4,7 @@ InboxSDK.load(2, 'popover-example').then(function (sdk) {
     composeView.on('linkPopOver', (linkPopOver) => {
       console.log(
         `popover in compose (with subject ${composeView.getSubject()})`,
-        linkPopOver.getLinkElement()
+        linkPopOver.getLinkElement(),
       );
 
       // Create our custom sections

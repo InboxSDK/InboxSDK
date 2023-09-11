@@ -89,12 +89,12 @@ export default class GmailTopMessageBarDriver {
     ];
     const height = topMessageBars.reduce(
       (acc, currValue) => acc + currValue.offsetHeight,
-      0
+      0,
     );
 
     document.body.style.setProperty(
       '--inboxsdk__topMessageBar-height',
-      `${height}px`
+      `${height}px`,
     );
   }
 }

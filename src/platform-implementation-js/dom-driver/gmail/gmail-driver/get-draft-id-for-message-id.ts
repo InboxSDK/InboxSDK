@@ -12,7 +12,7 @@ export type GetDraftIdResult = {
 
 async function uncachedGetDraftIDForMessageID(
   driver: GmailDriver,
-  messageID: string
+  messageID: string,
 ): Promise<GetDraftIdResult> {
   const response = await gmailAjax({
     method: 'GET',
@@ -47,16 +47,16 @@ async function uncachedGetDraftIDForMessageID(
 
 const cachedGetDraftIDForMessageID: (
   driver: GmailDriver,
-  messageID: string
+  messageID: string,
 ) => Promise<GetDraftIdResult> = memoize(
   uncachedGetDraftIDForMessageID,
-  (driver, messageID) => messageID
+  (driver, messageID) => messageID,
 );
 
 function getDraftIDForMessageID(
   driver: GmailDriver,
   messageID: string,
-  skipCache: boolean = false
+  skipCache: boolean = false,
 ): Promise<GetDraftIdResult> {
   if (skipCache) {
     return uncachedGetDraftIDForMessageID(driver, messageID);

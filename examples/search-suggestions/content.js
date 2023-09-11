@@ -20,7 +20,7 @@ InboxSDK.load(2, 'search-suggestions').then((inboxSDK) => {
 
       customRouteView.getElement().textContent =
         'hello world! ' + customRouteView.getParams().monkeyName;
-    }
+    },
   );
 
   inboxSDK.Search.registerSearchQueryRewriter({

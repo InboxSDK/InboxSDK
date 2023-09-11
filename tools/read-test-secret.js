@@ -11,7 +11,7 @@ const rl = readline.createInterface({
 
 const encryptor = createEncryptor(
   process.env.INBOXSDK_TEST_SECRET ||
-    fs.readFileSync(__dirname + '/../.inboxsdk_test_secret', 'utf8').trim()
+    fs.readFileSync(__dirname + '/../.inboxsdk_test_secret', 'utf8').trim(),
 );
 
 rl.question('Enter ciphertext: ', (ciphertext) => {

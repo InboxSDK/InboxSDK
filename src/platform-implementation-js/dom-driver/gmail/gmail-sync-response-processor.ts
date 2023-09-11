@@ -35,7 +35,7 @@ export interface MinimalSyncThread {
 }
 
 export function extractThreadsFromSearchResponse(
-  response: string
+  response: string,
 ): SyncThread[] {
   const parsedResponse = JSON.parse(response);
 
@@ -85,7 +85,7 @@ export function extractThreadsFromSearchResponse(
 }
 
 export function extractThreadsFromSearchResponse_20220909(
-  parsedResponse: any[]
+  parsedResponse: any[],
 ): SyncThread[] {
   const threadDescriptors: any[] | null = parsedResponse && parsedResponse[2];
 
@@ -125,7 +125,7 @@ export function extractThreadsFromSearchResponse_20220909(
 }
 
 export function extractThreadsFromThreadResponse(
-  response: string
+  response: string,
 ): Array<SyncThread | MinimalSyncThread> {
   const parsedResponse = JSON.parse(response);
 
@@ -214,7 +214,7 @@ export function extractThreadsFromThreadResponse(
 }
 
 function extractThreadsFromThreadResponse_20220909(
-  parsedResponse: any[]
+  parsedResponse: any[],
 ): Array<SyncThread | MinimalSyncThread> {
   const threadDescriptors: any[] | null = parsedResponse && parsedResponse[1];
 
@@ -297,7 +297,7 @@ function extractThreadsFromThreadResponse_20220909(
 }
 
 function getRecipientsFromMessageDescriptor(
-  messageDescriptor: Array<any>
+  messageDescriptor: Array<any>,
 ): Recipient[] | void {
   if (!messageDescriptor[2]) return;
 
@@ -315,7 +315,7 @@ function getRecipientsFromMessageDescriptor(
 }
 
 function getRecipientsFromMessageDescriptor_20220909(
-  messageDescriptor: Array<any>
+  messageDescriptor: Array<any>,
 ): Recipient[] | void {
   if (!messageDescriptor[1]) return;
 
@@ -335,7 +335,7 @@ function getRecipientsFromMessageDescriptor_20220909(
 export function replaceThreadsInSearchResponse(
   response: string,
   replacementThreads: SyncThread[],
-  _unused: { start: number; total?: number | 'MANY' } // TODO why is this unused?
+  _unused: { start: number; total?: number | 'MANY' }, // TODO why is this unused?
 ): string {
   const parsedResponse = JSON.parse(response);
 
@@ -344,7 +344,7 @@ export function replaceThreadsInSearchResponse(
       return replaceThreadsInSearchResponse_20220909(
         parsedResponse,
         replacementThreads,
-        _unused
+        _unused,
       );
     } catch (err) {
       console.error('Caught err in replaceThreadsInSearchResponse', err);
@@ -364,7 +364,7 @@ export function replaceThreadsInSearchResponse(
       ...parsedResponse[15],
       '1': replacementThreads.map(({ extraMetaData }) => extraMetaData.snippet),
       '2': replacementThreads.map(({ extraMetaData }) =>
-        extraMetaData.syncMessageData.map(({ syncMessageID }) => syncMessageID)
+        extraMetaData.syncMessageData.map(({ syncMessageID }) => syncMessageID),
       ),
     };
   }
@@ -375,7 +375,7 @@ export function replaceThreadsInSearchResponse(
 export function replaceThreadsInSearchResponse_20220909(
   parsedResponse: any[],
   replacementThreads: SyncThread[],
-  _unused: { start: number; total?: number | 'MANY' } // TODO why is this unused?
+  _unused: { start: number; total?: number | 'MANY' }, // TODO why is this unused?
 ): string {
   if (parsedResponse[2] || replacementThreads.length) {
     parsedResponse[2] = replacementThreads.map(({ rawResponse }, index) => {
@@ -388,7 +388,7 @@ export function replaceThreadsInSearchResponse_20220909(
   if (parsedResponse[14] || replacementThreads.length) {
     parsedResponse[14] = [...parsedResponse[14]];
     parsedResponse[14][0] = replacementThreads.map(
-      ({ extraMetaData }) => extraMetaData.snippet
+      ({ extraMetaData }) => extraMetaData.snippet,
     );
 
     if (
@@ -402,7 +402,7 @@ export function replaceThreadsInSearchResponse_20220909(
       ]);
     } else {
       parsedResponse[14][1] = replacementThreads.map(({ extraMetaData }) =>
-        extraMetaData.syncMessageData.map(({ syncMessageID }) => syncMessageID)
+        extraMetaData.syncMessageData.map(({ syncMessageID }) => syncMessageID),
       );
     }
   }

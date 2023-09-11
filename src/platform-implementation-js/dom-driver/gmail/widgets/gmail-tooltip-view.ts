@@ -19,7 +19,7 @@ type BoundingBox = [
   {
     x: number;
     y: number;
-  }
+  },
 ];
 type PositionType = 'left' | 'right' | 'top' | 'bottom';
 type BoundingBoxWrapper = {
@@ -78,7 +78,7 @@ export default class GmailTooltipView {
             type: 'top',
             value: this._getTopPositionBoundingBox(
               targetBoundingBox,
-              tipBoundingBox
+              tipBoundingBox,
             ),
           } as const;
           break;
@@ -88,7 +88,7 @@ export default class GmailTooltipView {
             type: 'bottom',
             value: this._getBottomPositionBoundingBox(
               targetBoundingBox,
-              tipBoundingBox
+              tipBoundingBox,
             ),
           } as const;
           break;
@@ -98,12 +98,12 @@ export default class GmailTooltipView {
     if (!theBoundingBoxWrapperToUse)
       theBoundingBoxWrapperToUse = this._getAutomaticPlacementBoundingBox(
         targetBoundingBox,
-        tipBoundingBox
+        tipBoundingBox,
       );
 
     var containedBoundingBox = this._containBoundingBox(
       theBoundingBoxWrapperToUse.value,
-      placementOptions && placementOptions.offset
+      placementOptions && placementOptions.offset,
     );
 
     this._setPositionAtBoundingBox(containedBoundingBox);
@@ -111,7 +111,7 @@ export default class GmailTooltipView {
     this._setArrowPosition(
       theBoundingBoxWrapperToUse.type,
       containedBoundingBox,
-      targetBoundingBox
+      targetBoundingBox,
     );
   }
 
@@ -176,7 +176,7 @@ export default class GmailTooltipView {
       this._element.innerHTML = html;
 
       const closeElement = this._element.querySelector<HTMLElement>(
-        '.inboxsdk__tooltip_close'
+        '.inboxsdk__tooltip_close',
       );
 
       if (closeElement) {
@@ -189,7 +189,7 @@ export default class GmailTooltipView {
         const image = document.createElement('img');
         image.src = options.imageUrl;
         querySelector(this._element, '.inboxsdk__tooltip_image').appendChild(
-          image
+          image,
         );
         image.addEventListener('load', () => {
           asap(() => {
@@ -216,7 +216,7 @@ export default class GmailTooltipView {
         buttonOptions.buttonView = new ButtonView(buttonOptions);
         new BasicButtonViewController(buttonOptions);
         querySelector(this._element, '.inboxsdk__tooltip_button').appendChild(
-          buttonOptions.buttonView.getElement()
+          buttonOptions.buttonView.getElement(),
         );
       }
     }
@@ -224,35 +224,35 @@ export default class GmailTooltipView {
 
   _getAutomaticPlacementBoundingBox(
     targetBoundingBox: ClientRect,
-    tipBoundingBox: ClientRect
+    tipBoundingBox: ClientRect,
   ): BoundingBoxWrapper {
     var boundingBoxWrappers = [
       {
         type: 'top' as const,
         value: this._getTopPositionBoundingBox(
           targetBoundingBox,
-          tipBoundingBox
+          tipBoundingBox,
         ),
       },
       {
         type: 'left' as const,
         value: this._getLeftPositionBoundingBox(
           targetBoundingBox,
-          tipBoundingBox
+          tipBoundingBox,
         ),
       },
       {
         type: 'right' as const,
         value: this._getRightPositionBoundingBox(
           targetBoundingBox,
-          tipBoundingBox
+          tipBoundingBox,
         ),
       },
       {
         type: 'bottom' as const,
         value: this._getBottomPositionBoundingBox(
           targetBoundingBox,
-          tipBoundingBox
+          tipBoundingBox,
         ),
       },
     ];
@@ -265,7 +265,7 @@ export default class GmailTooltipView {
 
   _getTopPositionBoundingBox(
     targetBoundingBox: ClientRect,
-    tipBoundingBox: ClientRect
+    tipBoundingBox: ClientRect,
   ): BoundingBox {
     var top =
       targetBoundingBox.top - tipBoundingBox.height - ARROW_HORIZONTAL_HEIGHT;
@@ -287,7 +287,7 @@ export default class GmailTooltipView {
 
   _getRightPositionBoundingBox(
     targetBoundingBox: ClientRect,
-    tipBoundingBox: ClientRect
+    tipBoundingBox: ClientRect,
   ): BoundingBox {
     var left = targetBoundingBox.right + ARROW_VERTICAL_WIDTH;
     var top =
@@ -308,7 +308,7 @@ export default class GmailTooltipView {
 
   _getBottomPositionBoundingBox(
     targetBoundingBox: ClientRect,
-    tipBoundingBox: ClientRect
+    tipBoundingBox: ClientRect,
   ): BoundingBox {
     var top = targetBoundingBox.bottom + ARROW_HORIZONTAL_HEIGHT;
     var left =
@@ -329,7 +329,7 @@ export default class GmailTooltipView {
 
   _getLeftPositionBoundingBox(
     targetBoundingBox: ClientRect,
-    tipBoundingBox: ClientRect
+    tipBoundingBox: ClientRect,
   ): BoundingBox {
     var left =
       targetBoundingBox.left - ARROW_VERTICAL_WIDTH - tipBoundingBox.width;
@@ -350,11 +350,11 @@ export default class GmailTooltipView {
   }
 
   _figureOutBestBoundingBox(
-    boundingBoxWrappers: Array<BoundingBoxWrapper>
+    boundingBoxWrappers: Array<BoundingBoxWrapper>,
   ): BoundingBoxWrapper {
     for (var ii = 0; ii < boundingBoxWrappers.length; ii++) {
       boundingBoxWrappers[ii].smallestDistance = this._getSmallestDistance(
-        boundingBoxWrappers[ii]
+        boundingBoxWrappers[ii],
       );
     }
 
@@ -380,7 +380,7 @@ export default class GmailTooltipView {
     offset?: {
       left?: number;
       top?: number;
-    }
+    },
   ): BoundingBox {
     var boundingBoxHeight = boundingBox[1].y - boundingBox[0].y;
     var boundingBoxWidth = boundingBox[1].x - boundingBox[0].x;
@@ -424,7 +424,7 @@ export default class GmailTooltipView {
   _setArrowPosition(
     type: PositionType,
     containedBoundingBox: BoundingBox,
-    targetBoundingBox: ClientRect
+    targetBoundingBox: ClientRect,
   ) {
     var position: Record<string, any> = {};
 

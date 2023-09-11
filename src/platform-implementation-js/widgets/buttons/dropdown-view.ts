@@ -29,7 +29,7 @@ export default class DropdownView extends EventEmitter {
   constructor(
     dropdownViewDriver: any,
     anchorElement: HTMLElement,
-    options: Options | null | undefined
+    options: Options | null | undefined,
   ) {
     super();
 
@@ -95,7 +95,7 @@ export default class DropdownView extends EventEmitter {
             this._scrollableContainByScreen = new ScrollableContainByScreen(
               containerEl,
               anchorElement,
-              this._userPlacementOptions
+              this._userPlacementOptions,
             );
           });
 
@@ -106,7 +106,7 @@ export default class DropdownView extends EventEmitter {
             attributes: true,
             characterData: true,
             subtree: true,
-          }
+          },
         )
           .throttle(200)
           .takeUntilBy(onDestroy)
@@ -127,7 +127,7 @@ export default class DropdownView extends EventEmitter {
   setPlacementOptions(options: ContainByScreenOptions) {
     if (this._options.manualPosition) {
       console.error(
-        'DropdownView.setPlacementOptions() was called on a manually-positioned DropdownView.'
+        'DropdownView.setPlacementOptions() was called on a manually-positioned DropdownView.',
       );
       return;
     }

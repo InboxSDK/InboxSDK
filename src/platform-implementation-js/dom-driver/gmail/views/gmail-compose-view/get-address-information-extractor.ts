@@ -8,7 +8,7 @@ import { Contact } from '../../../../../inboxsdk';
 
 export default function getAddressInformationExtractor(
   addressType: string,
-  composeView: GmailComposeView
+  composeView: GmailComposeView,
 ): (node: HTMLElement) => Contact | null {
   return function (node: HTMLElement): Contact | null {
     const contactNode =

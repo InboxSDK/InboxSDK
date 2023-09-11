@@ -58,7 +58,7 @@ app-provided suggestions into the search term/contact suggestions array.
 
 function modifySuggestions(
   responseText: string,
-  modifications: AutocompleteSearchResultWithId[]
+  modifications: AutocompleteSearchResultWithId[],
 ): string {
   const { value: parsed, options } = GRP.deserialize(responseText);
   const query = parsed[0][1];
@@ -89,7 +89,7 @@ function modifySuggestions(
       externalURL: modification.externalURL,
     };
     nameHTML += autoHtml` <span style="display:none" data-inboxsdk-suggestion="${JSON.stringify(
-      data
+      data,
     )}"></span>`;
 
     if (modification.iconHTML != null) {
@@ -106,7 +106,7 @@ function modifySuggestions(
             string | null | undefined,
             string,
             string | null | undefined,
-            string
+            string,
           ]
         | null,
       [],

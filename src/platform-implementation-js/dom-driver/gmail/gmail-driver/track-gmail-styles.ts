@@ -88,7 +88,7 @@ export default async function trackGmailStyles() {
     if (currentDensity !== newDensity) {
       if (currentDensity) {
         document.body.classList.remove(
-          'inboxsdk__gmail_density_' + currentDensity
+          'inboxsdk__gmail_density_' + currentDensity,
         );
       }
       currentDensity = newDensity;
@@ -115,7 +115,7 @@ export default async function trackGmailStyles() {
     await waitFor(
       () =>
         document.querySelector('.TO .TN') &&
-        document.querySelector(navItemSelector)
+        document.querySelector(navItemSelector),
     );
   } catch (err) {
     Logger.error(err);

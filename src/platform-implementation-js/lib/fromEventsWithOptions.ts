@@ -9,7 +9,7 @@ import {
 export default function fromEventsWithOptions(
   target: EventTarget,
   eventName: string,
-  options: Options | boolean
+  options: Options | boolean,
 ): Kefir.Observable<any, never> {
   return Kefir.stream((emitter) => {
     addEventListener(target, eventName, emitter.emit, options);

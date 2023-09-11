@@ -12,7 +12,7 @@ describe('getAttachmentType', () => {
         {
           element: item,
         },
-        driver
+        driver,
       );
       expect(card.getAttachmentType()).toBe('UNLOADED');
     });
@@ -27,7 +27,7 @@ describe('getAttachmentType', () => {
         {
           element: item,
         },
-        driver
+        driver,
       );
       expect(card.getAttachmentType()).toBe('DRIVE');
     });
@@ -40,7 +40,7 @@ describe('getAttachmentType', () => {
         {
           element: item,
         },
-        driver
+        driver,
       );
       expect(card.getAttachmentType()).toBe('DRIVE');
     });
@@ -53,7 +53,7 @@ describe('getAttachmentType', () => {
         {
           element: item,
         },
-        driver
+        driver,
       );
       expect(card.getAttachmentType()).toBe('DRIVE');
     });
@@ -68,7 +68,7 @@ describe('getAttachmentType', () => {
         {
           element: item,
         },
-        driver
+        driver,
       );
       expect(card.getAttachmentType()).toBe('UNKNOWN');
     });
@@ -83,7 +83,7 @@ describe('getAttachmentType', () => {
         {
           element: item,
         },
-        driver
+        driver,
       );
       expect(card.getAttachmentType()).toBe('FILE');
     });
@@ -96,7 +96,7 @@ describe('getAttachmentType', () => {
         {
           element: item,
         },
-        driver
+        driver,
       );
       expect(card.getAttachmentType()).toBe('FILE');
     });
@@ -109,7 +109,7 @@ describe('getAttachmentType', () => {
         {
           element: item,
         },
-        driver
+        driver,
       );
       expect(card.getAttachmentType()).toBe('FILE');
     });
@@ -122,7 +122,7 @@ describe('getAttachmentType', () => {
         {
           element: item,
         },
-        driver
+        driver,
       );
       expect(card.getAttachmentType()).toBe('FILE');
     });
@@ -135,7 +135,7 @@ describe('getAttachmentType', () => {
         {
           element: item,
         },
-        driver
+        driver,
       );
       expect(card.getAttachmentType()).toBe('FILE');
     });
@@ -148,7 +148,7 @@ describe('getAttachmentType', () => {
         {
           element: item,
         },
-        driver
+        driver,
       );
       expect(card.getAttachmentType()).toBe('FILE');
     });
@@ -161,7 +161,7 @@ describe('getAttachmentType', () => {
         {
           element: item,
         },
-        driver
+        driver,
       );
       expect(card.getAttachmentType()).toBe('FILE');
     });
@@ -174,7 +174,7 @@ describe('getAttachmentType', () => {
         {
           element: item,
         },
-        driver
+        driver,
       );
       expect(card.getAttachmentType()).toBe('FILE');
     });
@@ -187,7 +187,7 @@ describe('getAttachmentType', () => {
         {
           element: item,
         },
-        driver
+        driver,
       );
       expect(card.getAttachmentType()).toBe('FILE');
     });

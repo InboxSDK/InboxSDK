@@ -33,18 +33,18 @@ export default class NavMenu implements INavMenu {
   addNavItem(
     navItemDescriptor:
       | NavItemDescriptor
-      | Observable<NavItemDescriptor, unknown>
+      | Observable<NavItemDescriptor, unknown>,
   ): NavItemView {
     const members = get(memberMap, this);
     const navItemDescriptorPropertyStream = kefirCast(
       Kefir,
-      navItemDescriptor
+      navItemDescriptor,
     ).toProperty() as Observable<NavItemDescriptor, unknown>;
     const navItemView = new NavItemView(
       members.appId,
       members.driver,
       navItemDescriptorPropertyStream,
-      members.driver.addNavItem(members.appId, navItemDescriptorPropertyStream)
+      members.driver.addNavItem(members.appId, navItemDescriptorPropertyStream),
     );
     members.navItemViews.push(navItemView);
     return navItemView;
@@ -59,7 +59,7 @@ function _setupSentMail(appId: string, driver: Driver) {
     appId,
     driver,
     'sent',
-    driver.getSentMailNativeNavItem() as any
+    driver.getSentMailNativeNavItem() as any,
   );
   return nativeNavItemView;
 }

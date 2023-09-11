@@ -13,10 +13,10 @@ const GLOBAL_ICON_AREA_SELECTOR = '.brC-aT5-aOt-bsf-Jw';
 function addCompanionGlobalIconArea(
   logger: Logger,
   iconArea: HTMLElement,
-  companionSidebarIconContainerEl: HTMLElement
+  companionSidebarIconContainerEl: HTMLElement,
 ) {
   const sidebarIconArea = companionSidebarIconContainerEl.querySelector(
-    GLOBAL_ICON_AREA_SELECTOR
+    GLOBAL_ICON_AREA_SELECTOR,
   );
 
   if (!sidebarIconArea) {

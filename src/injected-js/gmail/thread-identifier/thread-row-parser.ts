@@ -15,7 +15,7 @@ export type ThreadRowMetadata = {
 export const ThreadRowAd = Symbol(`ThreadRowAd`);
 
 export function extractMetadataFromThreadRow(
-  threadRow: HTMLElement
+  threadRow: HTMLElement,
 ): ThreadRowMetadata | typeof ThreadRowAd {
   var timeSpan, subjectSpan, peopleDiv;
   assert(threadRow.hasAttribute('id'), 'check element is main thread row');
@@ -45,7 +45,7 @@ export function extractMetadataFromThreadRow(
   } else {
     timeSpan = threadRow.querySelector('td.xW > span[title]');
     var subjectAreaDiv = threadRow.querySelector(
-      'td.a4W div[role=link] div.y6'
+      'td.a4W div[role=link] div.y6',
     );
 
     if (subjectAreaDiv && subjectAreaDiv.children.length >= 1) {
