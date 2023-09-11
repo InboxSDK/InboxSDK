@@ -10,7 +10,7 @@ import * as Kefir from 'kefir';
 export default function streamWaitFor<T>(
   condition: () => T | null | undefined,
   timeout: number = 60 * 1000,
-  steptime: number = 250
+  steptime: number = 250,
 ): Kefir.Observable<T, Error> {
   // make this error here so we have a sensible stack.
   const timeoutError = new Error('waitFor timeout');

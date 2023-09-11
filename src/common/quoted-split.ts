@@ -10,7 +10,7 @@ export default function quotedSplit(s: string): string[] {
     split = split.concat(
       (match ? s.substring(lastEnd, match.index) : s.substring(lastEnd))
         .split(/ +/)
-        .filter(Boolean)
+        .filter(Boolean),
     );
     if (!match) break;
     lastEnd = match.index + match[0].length;

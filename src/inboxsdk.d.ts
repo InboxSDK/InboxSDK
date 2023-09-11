@@ -27,7 +27,7 @@ export const LOADER_VERSION: string;
 export function load(
   version: number,
   appId: string,
-  opts: any
+  opts: any,
 ): Promise<InboxSDK>;
 
 // types
@@ -51,10 +51,10 @@ export interface InboxSDK {
 
 export interface Global {
   addSidebarContentPanel(
-    contentPanelDescriptor: ContentPanelDescriptor
+    contentPanelDescriptor: ContentPanelDescriptor,
   ): Promise<ContentPanelView | null>;
   addSupportItem(
-    supportItemDescriptor: SupportItemDescriptor
+    supportItemDescriptor: SupportItemDescriptor,
   ): GmailSupportItemView;
 }
 
@@ -68,10 +68,10 @@ export interface SupportItemDescriptor {
 }
 export interface Conversations {
   registerThreadViewHandler(
-    callback: (threadView: ThreadView) => void
+    callback: (threadView: ThreadView) => void,
   ): () => void;
   registerMessageViewHandler(
-    callback: (messageView: MessageView) => void
+    callback: (messageView: MessageView) => void,
   ): () => void;
 }
 
@@ -116,7 +116,7 @@ export interface NavMenu {
   SENT_MAIL: NativeNavItemView;
   NavItemTypes: NavItemTypes;
   addNavItem(
-    descriptor: NavItemDescriptor | Kefir.Observable<NavItemDescriptor, any>
+    descriptor: NavItemDescriptor | Kefir.Observable<NavItemDescriptor, any>,
   ): NavItemView;
 }
 
@@ -127,15 +127,15 @@ export interface Router {
   handleAllRoutes(handler: (routeView: RouteView) => void): () => void;
   handleCustomRoute(
     routeID: string,
-    handler: (customRouteView: CustomRouteView) => void
+    handler: (customRouteView: CustomRouteView) => void,
   ): () => void;
   handleCustomListRoute(
     routeID: string,
-    handler: (offset: number, max: number) => void
+    handler: (offset: number, max: number) => void,
   ): void;
   handleListRoute(
     routeID: string,
-    handler: (listRouteView: ListRouteView) => void
+    handler: (listRouteView: ListRouteView) => void,
   ): () => void;
   NativeRouteIDs: Record<NativeRouteIdTypes, string>;
   NativeListRouteIDs: Record<
@@ -199,11 +199,11 @@ export interface Toolbars {
   addToolbarButtonForApp(
     descriptor:
       | AppToolbarButtonDescriptor
-      | Kefir.Stream<AppToolbarButtonDescriptor, any>
+      | Kefir.Stream<AppToolbarButtonDescriptor, any>,
   ): AppToolbarButtonView;
   registerThreadButton(descriptor: ToolbarButtonDescriptor): () => void;
   registerToolbarButtonForThreadView(
-    descriptor: LegacyToolbarButtonDescriptor
+    descriptor: LegacyToolbarButtonDescriptor,
   ): () => void;
   SectionNames: {
     INBOX_STATE: 'INBOX_STATE';
@@ -229,24 +229,24 @@ export type AppToolbarButtonView = {
 
 export interface Keyboard {
   createShortcutHandle(
-    descriptor: KeyboardShortcutDescriptor
+    descriptor: KeyboardShortcutDescriptor,
   ): KeyboardShortcutHandle;
 }
 
 export interface Search {
   registerSearchSuggestionsProvider(
     handler: (
-      query: string
+      query: string,
     ) =>
       | Array<AutocompleteSearchResult>
-      | Promise<Array<AutocompleteSearchResult>>
+      | Promise<Array<AutocompleteSearchResult>>,
   ): void;
   registerSearchQueryRewriter(rewriter: SearchQueryRewriter): void;
 }
 
 export interface Lists {
   registerThreadRowViewHandler(
-    handler: (threadRowView: ThreadRowView) => void
+    handler: (threadRowView: ThreadRowView) => void,
   ): () => void;
   getSelectedThreadRowViews(): ThreadRowView[];
   registerThreadRowViewSelectionHandler(handler: () => void): () => void;
@@ -307,7 +307,7 @@ export class RouteView extends EventEmitter {
   constructor(
     options: any,
     gmailRouteProcessor: GmailRouteProcessor,
-    driver: GmailDriver
+    driver: GmailDriver,
   );
   destroy(): void;
   getEventStream(): Kefir.Observable<any, any>;
@@ -366,7 +366,7 @@ export interface DrawerView extends EventEmitter {
   close(): void;
   associateComposeView(
     composeView: ComposeView,
-    closeWithCompose?: boolean
+    closeWithCompose?: boolean,
   ): void;
   disassociateComposeView(): void;
 }
@@ -415,7 +415,7 @@ export interface SimpleElementView extends EventEmitter {
 export interface ThreadView extends TypedEventEmitter<ThreadViewEvents> {
   addLabel(): SimpleElementView;
   addSidebarContentPanel(
-    contentPanelDescriptor: ContentPanelDescriptor
+    contentPanelDescriptor: ContentPanelDescriptor,
   ): ContentPanelView;
   /**
    * @returns {MessageView[]} of all the loaded MessageView objects currently in the thread. @see MessageView for more information on what "loaded" means. Note that more messages may load into the thread later! If it's important to get future messages, use {@link Conversations#registerMessageViewHandler} instead.
@@ -453,8 +453,8 @@ export interface UNSTABLE_ThreadView extends ThreadView {
     provider: (
       numCustomHidden: number,
       numberNativeHidden: number,
-      unmountPromise: Promise<void>
-    ) => HTMLElement | null
+      unmountPromise: Promise<void>,
+    ) => HTMLElement | null,
   ) => void;
   //#endregion
 }
@@ -522,7 +522,7 @@ export interface MessageView extends TypedEventEmitter<MessageViewEvent> {
   addAttachmentIcon(
     opts:
       | MessageAttachmentIconDescriptor
-      | Kefir.Stream<MessageAttachmentIconDescriptor, never>
+      | Kefir.Stream<MessageAttachmentIconDescriptor, never>,
   ): AttachmentIcon;
   addToolbarButton(opts?: MessageViewToolbarButtonDescriptor): void;
   getBodyElement(): HTMLElement;
@@ -621,13 +621,13 @@ export interface ComposeView extends TypedEmitter<ComposeViewEvent> {
   addButton(
     buttonOptions:
       | ComposeButtonDescriptor
-      | Kefir.Observable<ComposeButtonDescriptor, any>
+      | Kefir.Observable<ComposeButtonDescriptor, any>,
   ): void;
   addComposeNotice(): ComposeNoticeView;
   addRecipientRow(
     RecipientRowOptions:
       | RecipientRowOptions
-      | Kefir.Observable<RecipientRowOptions, any>
+      | Kefir.Observable<RecipientRowOptions, any>,
   ): { destroy(): void };
   addStatusBar(statusBarDescriptor: StatusBarDescriptor): StatusBarView;
   close(): void;
@@ -657,7 +657,7 @@ export interface ComposeView extends TypedEmitter<ComposeViewEvent> {
   isReply(): boolean;
   overrideEditSubject(): void;
   registerRequestModifier(
-    cb: (composeParams: { isPlainText?: boolean; body: string }) => void
+    cb: (composeParams: { isPlainText?: boolean; body: string }) => void,
   ): void;
   replaceSendButton({ el }: { el: HTMLElement }): () => void;
   setBccRecipients(emails: string[]): void;

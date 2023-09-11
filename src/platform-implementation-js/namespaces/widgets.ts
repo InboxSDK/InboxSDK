@@ -51,7 +51,7 @@ class Widgets implements IWidgets {
 
   showMoleView(options: MoleOptions): MoleView {
     const moleViewDriver = get(memberMap, this).driver.createMoleViewDriver(
-      options
+      options,
     );
     const moleView = new MoleView({
       moleViewDriver,
@@ -63,7 +63,7 @@ class Widgets implements IWidgets {
   showTopMessageBarView(options: { el: Element }): TopMessageBarView {
     const topMessageBarViewDriver = get(
       memberMap,
-      this
+      this,
     ).driver.createTopMessageBarDriver(kefirCast(Kefir, options));
     return new TopMessageBarView({
       topMessageBarViewDriver,
@@ -79,7 +79,7 @@ class Widgets implements IWidgets {
     if (options.composeView && !(options.composeView instanceof ComposeView))
       throw new Error('composeView option was not a ComposeView');
     const drawerViewDriver = get(memberMap, this).driver.createDrawerViewDriver(
-      options
+      options,
     );
     return new DrawerView(drawerViewDriver);
   }

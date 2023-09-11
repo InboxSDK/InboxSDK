@@ -80,15 +80,15 @@ for the search>
 
 function copyAndOmitExcessThreads(
   ids: Array<ThreadDescriptor>,
-  logger: Logger
+  logger: Logger,
 ): Array<ThreadDescriptor> {
   if (ids.length > MAX_THREADS_PER_PAGE) {
     // upgrade to deprecationWarning later
     logger.error(
       new Error(
         'Received more than the maximum number of threads specified by handler, ' +
-          'ignoring additional threads (https://www.inboxsdk.com/docs/#Router).'
-      )
+          'ignoring additional threads (https://www.inboxsdk.com/docs/#Router).',
+      ),
     );
   }
   return ids.slice(0, MAX_THREADS_PER_PAGE);
@@ -102,12 +102,12 @@ function _findIdFailure(id: string, err: Error) {
 function parseOnActivateResult(
   logger: Logger,
   start: number,
-  result: HandlerResult | Array<ThreadDescriptor>
+  result: HandlerResult | Array<ThreadDescriptor>,
 ): { total: number | 'MANY'; threads: ThreadDescriptor[] } {
   if (Array.isArray(result)) {
     logger.deprecationWarning(
       'Returning an array from a handleCustomListRoute handler',
-      'a CustomListDescriptor object'
+      'a CustomListDescriptor object',
     );
     const threads = copyAndOmitExcessThreads(result, logger);
     return {
@@ -121,7 +121,7 @@ function parseOnActivateResult(
     if (!Array.isArray(threads)) {
       throw new Error(
         'handleCustomListRoute result must contain a "threads" array ' +
-          '(https://www.inboxsdk.com/docs/#Router).'
+          '(https://www.inboxsdk.com/docs/#Router).',
       );
     }
 
@@ -129,7 +129,7 @@ function parseOnActivateResult(
       throw new Error(
         'handleCustomListRoute result must only contain either ' +
           'a "total" or a "hasMore" property, but not both. ' +
-          '(https://www.inboxsdk.com/docs/#Router).'
+          '(https://www.inboxsdk.com/docs/#Router).',
       );
     }
 
@@ -147,19 +147,19 @@ function parseOnActivateResult(
     } else {
       throw new Error(
         'handleCustomListRoute result must contain either a "total" number ' +
-          'or a "hasMore" boolean (https://www.inboxsdk.com/docs/#Router).'
+          'or a "hasMore" boolean (https://www.inboxsdk.com/docs/#Router).',
       );
     }
   } else {
     throw new Error(
       'handleCustomListRoute result must be an array or an object ' +
-        '(https://www.inboxsdk.com/docs/#Router).'
+        '(https://www.inboxsdk.com/docs/#Router).',
     );
   }
 }
 
 function threadDescriptorToInitialIDPair(
-  id: ThreadDescriptor
+  id: ThreadDescriptor,
 ): InitialIDPair | null | undefined {
   if (typeof id === 'string') {
     if (id[0] == '<') {
@@ -183,7 +183,7 @@ type FindIdFailure = any;
 function initialIDPairToIDPairWithRFC(
   driver: GmailDriver,
   pair: InitialIDPair,
-  findIdFailure: FindIdFailure
+  findIdFailure: FindIdFailure,
 ): Promise<IDPairWithRFC | null | undefined> {
   if (typeof (pair as any).rfcId === 'string') {
     return Promise.resolve(pair as IDPairWithRFC);
@@ -191,7 +191,7 @@ function initialIDPairToIDPairWithRFC(
     const gtid = (pair as any).gtid;
     return driver.getRfcMessageIdForGmailThreadId(gtid).then(
       (rfcId) => ({ gtid, rfcId }),
-      (err) => findIdFailure(gtid, err)
+      (err) => findIdFailure(gtid, err),
     );
   }
   throw new Error('Should not happen');
@@ -200,13 +200,13 @@ function initialIDPairToIDPairWithRFC(
 function idPairWithRFCToCompletedIDPair(
   driver: GmailDriver,
   pair: IDPairWithRFC,
-  findIdFailure: FindIdFailure
+  findIdFailure: FindIdFailure,
 ): Promise<CompletedIDPair | null | undefined> {
   return typeof pair.gtid === 'string'
     ? Promise.resolve(pair as CompletedIDPair)
     : driver.getGmailThreadIdForRfcMessageId(pair.rfcId).then(
         (gtid) => ({ gtid, rfcId: pair.rfcId }),
-        (err) => findIdFailure(pair.rfcId, err)
+        (err) => findIdFailure(pair.rfcId, err),
       );
 }
 
@@ -215,7 +215,7 @@ const setupSearchReplacing = (
   driver: GmailDriver,
   customRouteID: string,
   onActivate: Function,
-  findIdFailure: FindIdFailure
+  findIdFailure: FindIdFailure,
 ): string => {
   const preexistingQuery = threadListHandlersToSearchStrings.get(onActivate);
   if (preexistingQuery) {
@@ -226,7 +226,7 @@ const setupSearchReplacing = (
   driver
     .getPageCommunicator()
     .ajaxInterceptStream.filter(
-      (e) => e.type === 'searchForReplacement' && e.query === newQuery
+      (e) => e.type === 'searchForReplacement' && e.query === newQuery,
     )
     .onValue(({ start }: { start: number }) => {
       (async () => {
@@ -240,7 +240,7 @@ const setupSearchReplacing = (
           const parsed = parseOnActivateResult(
             driver.getLogger(),
             start,
-            onActivateResult
+            onActivateResult,
           );
           total = parsed.total;
           threadDescriptors = parsed.threads;
@@ -257,8 +257,8 @@ const setupSearchReplacing = (
         const idPairsWithRFC: IDPairWithRFC[] = (
           await Promise.all(
             initialIDPairs.map((pair) =>
-              initialIDPairToIDPairWithRFC(driver, pair, findIdFailure)
-            )
+              initialIDPairToIDPairWithRFC(driver, pair, findIdFailure),
+            ),
           )
         ).filter(Boolean) as IDPairWithRFC[];
 
@@ -286,7 +286,7 @@ const setupSearchReplacing = (
             (e) =>
               e.type === 'searchResultsResponse' &&
               e.query === newQuery &&
-              e.start === start
+              e.start === start,
           )
           .map((x) => x.response)
           .take(1)
@@ -296,8 +296,8 @@ const setupSearchReplacing = (
         const completedIDPairs: Array<CompletedIDPair> = (
           await Promise.all(
             idPairsWithRFC.map((pair) =>
-              idPairWithRFCToCompletedIDPair(driver, pair, findIdFailure)
-            )
+              idPairWithRFCToCompletedIDPair(driver, pair, findIdFailure),
+            ),
           )
         ).filter(Boolean) as CompletedIDPair[];
 
@@ -315,7 +315,7 @@ const setupSearchReplacing = (
 
             const extractedThreadsInCompletedIDPairsOrder = completedIDPairs
               .map(({ gtid }) =>
-                find(extractedThreads, (t) => t.oldGmailThreadID === gtid)
+                find(extractedThreads, (t) => t.oldGmailThreadID === gtid),
               )
               .filter(Boolean);
 
@@ -325,7 +325,7 @@ const setupSearchReplacing = (
               extractedThreads.some(
                 (extractedThread, index) =>
                   extractedThread !==
-                  extractedThreadsInCompletedIDPairsOrder[index]
+                  extractedThreadsInCompletedIDPairsOrder[index],
               );
 
             let reorderedThreads: typeof extractedThreads;
@@ -367,7 +367,7 @@ const setupSearchReplacing = (
                                     '6': { $set: newTime },
                                     '17': { $set: newTime },
                                     '30': { $set: newTime },
-                                  })
+                                  }),
                                 ),
                             },
                           }
@@ -379,14 +379,14 @@ const setupSearchReplacing = (
                                     '7': { $set: newTime },
                                     '18': { $set: newTime },
                                     '31': { $set: newTime },
-                                  })
+                                  }),
                                 ),
                             },
                           },
                     });
                   }
                   return newThread!;
-                }
+                },
               );
             } else {
               reorderedThreads = extractedThreads;
@@ -395,21 +395,21 @@ const setupSearchReplacing = (
             newResponse = SyncGRP.replaceThreadsInSearchResponse(
               response,
               reorderedThreads,
-              { start, total }
+              { start, total },
             );
           } else {
             const extractedThreads = GRP.extractThreads(response);
 
             const reorderedThreads: typeof extractedThreads = completedIDPairs
               .map(({ gtid }) =>
-                find(extractedThreads, (t) => t.gmailThreadId === gtid)
+                find(extractedThreads, (t) => t.gmailThreadId === gtid),
               )
               .filter(Boolean) as typeof extractedThreads;
 
             newResponse = GRP.replaceThreadsInResponse(
               response,
               reorderedThreads,
-              { start, total }
+              { start, total },
             );
           }
 
@@ -435,14 +435,14 @@ const setupSearchReplacing = (
                 SyncGRP.replaceThreadsInSearchResponse(response, [], {
                   start,
                   total,
-                })
+                }),
               );
             } else {
               driver
                 .getPageCommunicator()
                 .setCustomListResults(
                   newQuery,
-                  GRP.replaceThreadsInResponse(response, [], { start, total })
+                  GRP.replaceThreadsInResponse(response, [], { start, total }),
                 );
             }
           } catch (e2) {
@@ -484,13 +484,13 @@ export default function showCustomThreadList(
   customRouteID: string,
   onActivate: Function,
   params: Array<string>,
-  findIdFailure: typeof _findIdFailure = _findIdFailure
+  findIdFailure: typeof _findIdFailure = _findIdFailure,
 ) {
   const uniqueSearch = setupSearchReplacing(
     driver,
     customRouteID,
     onActivate,
-    findIdFailure
+    findIdFailure,
   );
   const customHash = document.location.hash;
 

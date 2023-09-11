@@ -35,7 +35,7 @@ const _extensionIsLoggerMaster = (function () {
   } else {
     document.documentElement.setAttribute(
       'data-inboxsdk-master-claimed',
-      'true'
+      'true',
     );
     return true;
   }
@@ -65,7 +65,7 @@ export default class Logger {
     appId: string,
     opts: any,
     loaderVersion: string,
-    implVersion: string
+    implVersion: string,
   ) {
     _extensionLoggerSetup(appId, opts, loaderVersion, implVersion);
     this._appId = appId;
@@ -74,14 +74,14 @@ export default class Logger {
         !_extensionUseEventTracking ||
         (typeof document !== 'undefined' &&
           document.documentElement.hasAttribute(
-            'data-inboxsdk-app-logger-master-chosen'
+            'data-inboxsdk-app-logger-master-chosen',
           ))
       ) {
         return false;
       } else {
         document.documentElement.setAttribute(
           'data-inboxsdk-app-logger-master-chosen',
-          'true'
+          'true',
         );
         return true;
       }
@@ -97,7 +97,7 @@ export default class Logger {
         const detail = event.detail;
         this.error(
           Object.assign(new Error(detail.message), { stack: detail.stack }),
-          detail.details
+          detail.details,
         );
       });
 
@@ -106,7 +106,7 @@ export default class Logger {
         (event: any) => {
           const detail = event.detail;
           this.eventSdkPassive(detail.name, detail.details, detail.sensitive);
-        }
+        },
       );
     }
   }
@@ -202,7 +202,7 @@ export default class Logger {
   deprecationWarning(name: string, suggestion?: string) {
     console.warn(
       `InboxSDK: ${name} is deprecated.` +
-        (suggestion ? ` Please use ${suggestion} instead.` : '')
+        (suggestion ? ` Please use ${suggestion} instead.` : ''),
     );
 
     const key = name + (suggestion ? ':' + suggestion : '');
@@ -222,7 +222,7 @@ export default class Logger {
   trackFunctionPerformance(
     fn: Function,
     sampleRate: number,
-    details: { type: string; [key: string]: any }
+    details: { type: string; [key: string]: any },
   ) {
     if (
       Math.random() < sampleRate &&
@@ -249,13 +249,13 @@ function _extensionLoggerSetup(
   appId: string,
   opts: any,
   loaderVersion: string,
-  implVersion: string
+  implVersion: string,
 ) {
   _extensionAppIds.push(
     Object.freeze({
       appId: appId,
       version: opts.appVersion || undefined,
-    })
+    }),
   );
   document.documentElement.setAttribute(
     'data-inboxsdk-active-app-ids',
@@ -265,8 +265,8 @@ function _extensionLoggerSetup(
           appId: appId,
           version: opts.appVersion || undefined,
         },
-      ])
-    )
+      ]),
+    ),
   );
 
   if (_extensionLoaderVersion) {
@@ -357,7 +357,7 @@ function _extensionLoggerSetup(
           // call constructor with variable number of arguments
           return new ((Original.bind as any).apply(
             Original,
-            [null].concat(args)
+            [null].concat(args),
           ))();
         } else {
           // Safari's MutationObserver lacks a bind method, but its constructor
@@ -377,7 +377,7 @@ function _extensionLoggerSetup(
 
 function getAppIdsProperty(
   causedByAppId: string | null | undefined,
-  onlyExtensionApps: boolean = true
+  onlyExtensionApps: boolean = true,
 ): any[] {
   const appIds = onlyExtensionApps ? _extensionAppIds : getAllAppIds();
   if (!causedByAppId) {
@@ -401,7 +401,7 @@ function _logError(
   err: Error | unknown,
   details: any,
   appId: string | undefined,
-  sentByApp: boolean
+  sentByApp: boolean,
 ) {
   logError(err, details, {
     appId,
@@ -424,7 +424,7 @@ function makeLoggedFunction<F extends Function>(func: F, name?: string): F {
 function replaceFunction(
   parent: any,
   name: string,
-  newFnMaker: (original: Function) => Function
+  newFnMaker: (original: Function) => Function,
 ) {
   const newFn = newFnMaker(parent[name]);
   (newFn as any).__original = parent[name];
@@ -441,7 +441,7 @@ function _trackEvent(
   appId: string | null | undefined,
   type: string,
   eventName: string,
-  properties: any
+  properties: any,
 ) {
   if (properties && typeof properties != 'object') {
     throw new Error('properties must be object or null: ' + properties);
@@ -479,7 +479,7 @@ function _trackEvent(
   // Signal to the logger master that a new event is ready to be sent.
   document.documentElement.setAttribute(
     'data-inboxsdk-last-event',
-    '' + Date.now()
+    '' + Date.now(),
   );
 }
 
@@ -505,7 +505,7 @@ async function retrieveNewEventsAccessToken(): Promise<{
   const accessToken: any = JSON.parse(text);
   if (isTimestampExpired(accessToken.expirationDate)) {
     console.warn(
-      'Got an apparently already expired token. Assuming our clock is busted...'
+      'Got an apparently already expired token. Assuming our clock is busted...',
     );
     // Let's assume the token expires in 30 minutes. The server refreshes the
     // token 30 minutes before it expires so it's probably a safe bet.
@@ -551,7 +551,7 @@ if (
         // TODO change to use CommonPageCommunicator.pageAjax()
         await ajax({
           url: `https://pubsub.googleapis.com/v1/projects/mailfoogae/topics/events:publish?key=${encodeURIComponent(
-            apiKey
+            apiKey,
           )}`,
           method: 'POST',
           headers: {
@@ -565,7 +565,7 @@ if (
                   JSON.stringify({
                     data: events,
                     timestamp: Date.now() * 1000,
-                  })
+                  }),
                 ).toString('base64'),
               },
             ],

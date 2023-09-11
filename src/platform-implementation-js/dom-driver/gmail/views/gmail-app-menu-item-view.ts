@@ -68,7 +68,7 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     this.#element.addEventListener('mouseleave', this.#onBlur);
     querySelector(this.#element, ICON_ELEMENT_SELECTOR).addEventListener(
       'mouseenter',
-      this.#onHover
+      this.#onHover,
     );
   }
 
@@ -94,12 +94,12 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     if (!element) return;
 
     const existingClassNames = Object.values(
-      GmailAppMenuItemView.elementCss
+      GmailAppMenuItemView.elementCss,
     ).filter((className) => element.classList.contains(className));
     element.className = cx(
       ELEMENT_CLASS,
       this.#menuItemDescriptor?.className,
-      ...existingClassNames
+      ...existingClassNames,
     );
 
     this.#updateName(element);
@@ -146,7 +146,7 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
       iconContainerEl.style.setProperty('--background-image', `url(${theme})`);
       iconContainerEl.style.setProperty(
         '--background-image--active',
-        `url(${activeImg})`
+        `url(${activeImg})`,
       );
     }
 
@@ -157,7 +157,7 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     const iconContainerEl = querySelector(element, ICON_ELEMENT_SELECTOR);
     iconContainerEl.setAttribute(
       'aria-label',
-      this.#menuItemDescriptor?.name ?? ''
+      this.#menuItemDescriptor?.name ?? '',
     );
   }
 
@@ -168,7 +168,7 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     if (this.#menuItemDescriptor?.routeID) {
       this.#driver.goto(
         this.#menuItemDescriptor.routeID,
-        this.#menuItemDescriptor.routeParams
+        this.#menuItemDescriptor.routeParams,
       );
     }
   }

@@ -51,7 +51,7 @@ class User {
       .getLogger()
       .deprecationWarning(
         'User.getAccountSwitcherContactList',
-        'User.getEmailAddress'
+        'User.getEmailAddress',
       );
     let list = driver.getAccountSwitcherContactList();
     const userEmail = this.getEmailAddress();

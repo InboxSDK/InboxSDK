@@ -5,7 +5,7 @@ var insertLinkChipIntoBody = ud.defn(
   module,
   function (
     composeViewDriver: GmailComposeView,
-    options: Record<string, any>
+    options: Record<string, any>,
   ): HTMLElement {
     composeViewDriver.focus();
 
@@ -31,7 +31,7 @@ var insertLinkChipIntoBody = ud.defn(
 
     composeViewDriver.focus();
     return chipElement;
-  }
+  },
 );
 export default insertLinkChipIntoBody;
 

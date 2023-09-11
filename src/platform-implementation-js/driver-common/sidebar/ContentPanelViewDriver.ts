@@ -20,7 +20,7 @@ class ContentPanelViewDriver {
     driver: Driver,
     descriptor: Kefir.Observable<Record<string, any>, unknown>,
     sidebarId: string,
-    isGlobal?: boolean
+    isGlobal?: boolean,
   ) {
     this._driver = driver;
     this._sidebarId = sidebarId;
@@ -39,7 +39,7 @@ class ContentPanelViewDriver {
           return {
             eventName: 'activate',
           };
-        })
+        }),
     );
 
     this._eventStream.plug(
@@ -50,7 +50,7 @@ class ContentPanelViewDriver {
           return {
             eventName: 'deactivate',
           };
-        })
+        }),
     );
 
     // Attach a value-listener so that it immediately subscribes and the
@@ -64,7 +64,7 @@ class ContentPanelViewDriver {
     let appName: any;
     const waitingPlatform = querySelector(
       document.body,
-      sidebarWaitingPlatformSelector
+      sidebarWaitingPlatformSelector,
     );
     descriptor
       .flatMap((x) => afterAsap.map(() => x))
@@ -115,7 +115,7 @@ class ContentPanelViewDriver {
               sidebarId: this._sidebarId,
               title,
             },
-          })
+          }),
         );
       });
 
@@ -130,7 +130,7 @@ class ContentPanelViewDriver {
             sidebarId: this._sidebarId,
             instanceId: this._instanceId,
           },
-        })
+        }),
       );
     });
   }
@@ -152,7 +152,7 @@ class ContentPanelViewDriver {
           instanceId: this._instanceId,
           sidebarId: this._sidebarId,
         },
-      })
+      }),
     );
   }
 
@@ -166,7 +166,7 @@ class ContentPanelViewDriver {
           isGlobal: this._isGlobal,
           sidebarId: this._sidebarId,
         },
-      })
+      }),
     );
   }
 
@@ -180,7 +180,7 @@ class ContentPanelViewDriver {
           isGlobal: this._isGlobal,
           sidebarId: this._sidebarId,
         },
-      })
+      }),
     );
   }
 

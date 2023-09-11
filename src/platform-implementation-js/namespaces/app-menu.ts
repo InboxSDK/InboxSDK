@@ -153,7 +153,7 @@ export default class AppMenu {
         .merge<TransitionEvent, unknown>(
           (
             ['transitionstart', 'transitioncancel', 'transitionend'] as const
-          ).map((x) => kefir.fromEvents(appMenu.parentElement!, x))
+          ).map((x) => kefir.fromEvents(appMenu.parentElement!, x)),
         )
         .onValue(onTransition);
     };

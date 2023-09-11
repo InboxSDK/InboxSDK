@@ -15,7 +15,7 @@ export const LOADER_VERSION = BUILD_VERSION;
  */
 export function loadScript(
   url: string,
-  opts?: LoadScriptOptions
+  opts?: LoadScriptOptions,
 ): Promise<void> {
   return _loadScript(url, opts);
 }
@@ -32,7 +32,7 @@ export function load(version: any, appId: string, opts: any) {
       // the implementation script.
       VERSION: LOADER_VERSION,
       REQUESTED_API_VERSION: version,
-    }
+    },
   );
 
   return PlatformImplementationLoader.load(appId, opts);

@@ -88,6 +88,6 @@ InboxSDK.load(1.0, 'search-example').then(function (inboxSDK) {
 
       section.on('expanded', console.log.bind(console, 'expanded'));
       section.on('collapsed', console.log.bind(console, 'collapsed'));
-    }
+    },
   );
 });

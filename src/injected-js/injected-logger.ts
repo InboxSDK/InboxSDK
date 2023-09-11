@@ -34,14 +34,14 @@ export function error(err: Error | unknown, details?: any) {
         stack: err && (err as any).stack,
         details,
       },
-    })
+    }),
   );
 }
 
 export function eventSdkPassive(
   name: string,
   details?: any,
-  sensitive?: boolean
+  sensitive?: boolean,
 ) {
   try {
     JSON.stringify(details);
@@ -54,6 +54,6 @@ export function eventSdkPassive(
       bubbles: false,
       cancelable: false,
       detail: { name, details, sensitive },
-    })
+    }),
   );
 }

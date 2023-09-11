@@ -46,7 +46,7 @@ export type Props = {
     newList: PanelDescriptor[],
     item: PanelDescriptor,
     oldIndex: number,
-    newIndex: number
+    newIndex: number,
   ): void;
   onExpandedToggle?: () => void;
   container?: () => HTMLElement;
@@ -90,7 +90,7 @@ export default class AppSidebar extends React.Component<Props, State> {
 
   closePanel(instanceId: string) {
     const panelDescriptor = this.props.panels.find(
-      (desc) => desc.instanceId === instanceId
+      (desc) => desc.instanceId === instanceId,
     );
 
     if (panelDescriptor) {
@@ -100,7 +100,7 @@ export default class AppSidebar extends React.Component<Props, State> {
 
   openPanel(instanceId: string) {
     const panelDescriptor = this.props.panels.find(
-      (desc) => desc.instanceId === instanceId
+      (desc) => desc.instanceId === instanceId,
     );
 
     if (panelDescriptor) {
@@ -133,7 +133,7 @@ export default class AppSidebar extends React.Component<Props, State> {
       {
         expansionSettings,
       },
-      this.props.onExpandedToggle
+      this.props.onExpandedToggle,
     );
 
     this._saveExpansionSettings(expansionSettings);
@@ -145,7 +145,7 @@ export default class AppSidebar extends React.Component<Props, State> {
     try {
       data = JSON.parse(
         global.localStorage.getItem('inboxsdk__sidebar_expansion_settings') ||
-          'null'
+          'null',
       );
     } catch (err) {
       console.error('Failed to read sidebar settings', err);
@@ -159,13 +159,13 @@ export default class AppSidebar extends React.Component<Props, State> {
 
   _saveExpansionSettings(data: ExpansionSettings) {
     const allSidebarIds = flatMap(Object.keys(data.apps), (appId) =>
-      Object.keys(data.apps[appId].ids).map((id) => [appId, id] as const)
+      Object.keys(data.apps[appId].ids).map((id) => [appId, id] as const),
     );
 
     if (allSidebarIds.length > MAX_SIDEBAR_SETTINGS) {
       const idsToRemove = sortBy(
         allSidebarIds,
-        ([appId, id]) => data.apps[appId].ids[id].lastUse
+        ([appId, id]) => data.apps[appId].ids[id].lastUse,
       ).slice(0, allSidebarIds.length - MAX_SIDEBAR_SETTINGS);
       idsToRemove.forEach(([appId, id]) => {
         delete data.apps[appId].ids[id];
@@ -179,7 +179,7 @@ export default class AppSidebar extends React.Component<Props, State> {
     try {
       global.localStorage.setItem(
         'inboxsdk__sidebar_expansion_settings',
-        JSON.stringify(data)
+        JSON.stringify(data),
       );
     } catch (err) {
       console.error('Failed to save sidebar settings', err);
@@ -195,7 +195,7 @@ export default class AppSidebar extends React.Component<Props, State> {
     const panelList = panels.map((panelDescriptor) => {
       const appExpansionSettings = Object.prototype.hasOwnProperty.call(
         expansionSettings.apps,
-        panelDescriptor.appId
+        panelDescriptor.appId,
       )
         ? expansionSettings.apps[panelDescriptor.appId]
         : null;
@@ -213,7 +213,7 @@ export default class AppSidebar extends React.Component<Props, State> {
           this._expandedToggle(
             panelDescriptor.appId,
             panelDescriptor.id,
-            expanded
+            expanded,
           );
         },
       };
@@ -244,7 +244,7 @@ export default class AppSidebar extends React.Component<Props, State> {
                   newList.map((x) => x.panelDescriptor),
                   movedItem.panelDescriptor,
                   oldIndex,
-                  newIndex
+                  newIndex,
                 );
               }}
               springConfig={springConfig}
@@ -289,7 +289,7 @@ class Panel extends React.Component<PanelProps> {
 
   scrollIntoView(
     useContainer: boolean,
-    container?: HTMLElement | null | undefined
+    container?: HTMLElement | null | undefined,
   ) {
     if (useContainer && container) {
       const offsetParent = this._el.parentElement;
@@ -322,7 +322,7 @@ class Panel extends React.Component<PanelProps> {
           detail: {
             instanceId: this.props.item.panelDescriptor.instanceId,
           },
-        })
+        }),
       );
     }
   }
@@ -340,7 +340,7 @@ class Panel extends React.Component<PanelProps> {
           detail: {
             instanceId: this.props.item.panelDescriptor.instanceId,
           },
-        })
+        }),
       );
     } else if (prevExpanded && !expanded) {
       document.body.dispatchEvent(
@@ -350,7 +350,7 @@ class Panel extends React.Component<PanelProps> {
           detail: {
             instanceId: this.props.item.panelDescriptor.instanceId,
           },
-        })
+        }),
       );
     }
   }
@@ -406,13 +406,13 @@ class Panel extends React.Component<PanelProps> {
             <div className={idMap('app_sidebar_content_panel_grip')} />
             <span
               className={idMap(
-                'app_sidebar_content_panel_title_icon_container'
+                'app_sidebar_content_panel_title_icon_container',
               )}
             >
               <span
                 className={cx(
                   idMap('app_sidebar_content_panel_title_icon'),
-                  iconClass
+                  iconClass,
                 )}
               >
                 {iconUrl && <img src={iconUrl} />}

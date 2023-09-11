@@ -64,7 +64,7 @@ export default class DropdownButtonViewController {
     const dropdownView = (this._dropdownView = new DropdownView(
       new this._DropdownViewDriverClass(),
       view.getElement(),
-      undefined
+      undefined,
     ));
 
     if (this._dropdownPositionOptions) {

@@ -15,6 +15,6 @@ export function loadPi(delay: number): () => Promise<void> {
             reject(e);
           }
         }, delay);
-      })
+      }),
   );
 }

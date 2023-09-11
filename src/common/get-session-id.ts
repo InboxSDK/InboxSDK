@@ -9,7 +9,7 @@ export default function getSessionId(): string {
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute(
         'data-inboxsdk-session-id',
-        sessionId
+        sessionId,
       );
     }
     return sessionId;

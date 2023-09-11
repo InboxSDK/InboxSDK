@@ -74,13 +74,18 @@
   bottom: 0;
   right: 0;
   width: 452px;
-  font: normal normal normal normal 13px / normal 'Helvetica Neue', Helvetica,
-    Arial, sans-serif;
+  font:
+    normal normal normal normal 13px / normal 'Helvetica Neue',
+    Helvetica,
+    Arial,
+    sans-serif;
   display: flex;
   flex-direction: column;
   background-color: #fff;
   outline: none;
-  box-shadow: 0 0 8px rgb(0 0 0 / 18%), 0 8px 16px rgb(0 0 0 / 36%);
+  box-shadow:
+    0 0 8px rgb(0 0 0 / 18%),
+    0 8px 16px rgb(0 0 0 / 36%);
   transform: translateX(100%);
   transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -111,8 +116,11 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font: normal normal normal normal 20px / 24px 'Helvetica Neue', Helvetica,
-    Arial, sans-serif;
+  font:
+    normal normal normal normal 20px / 24px 'Helvetica Neue',
+    Helvetica,
+    Arial,
+    sans-serif;
 }
 
 /* backdrop */
@@ -157,7 +165,9 @@
 
 :local(.app_sidebar_content_panel) {
   overflow: hidden;
-  font: 12px Arial, sans-serif;
+  font:
+    12px Arial,
+    sans-serif;
   max-height: 100%;
   box-sizing: border-box;
 }
@@ -195,7 +205,11 @@
 :local(.app_sidebar_content_panel_title_text) {
   padding-left: 6px;
   vertical-align: middle;
-  font: bold 13px / 40px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font:
+    bold 13px / 40px 'Helvetica Neue',
+    Helvetica,
+    Arial,
+    sans-serif;
   color: rgb(0 0 0 / 87%);
 }
 
@@ -254,7 +268,9 @@
   width: 14px;
   height: 14px;
   transform: rotate(-90deg);
-  transition: -webkit-transform 0.15s, transform 0.15s;
+  transition:
+    -webkit-transform 0.15s,
+    transform 0.15s;
   outline: none;
   opacity: 0.6;
   cursor: pointer;
@@ -430,7 +446,9 @@ div.T-I.inboxsdk__button {
 
 .inboxsdk__menu > .inboxsdk__menuContent {
   padding: 0;
-  box-shadow: 0 8px 10px 1px rgb(0 0 0 / 14%), 0 3px 14px 2px rgb(0 0 0 / 12%),
+  box-shadow:
+    0 8px 10px 1px rgb(0 0 0 / 14%),
+    0 3px 14px 2px rgb(0 0 0 / 12%),
     0 5px 5px -3px rgb(0 0 0 / 20%);
   transition: opacity 0.218s;
   border: 1px solid rgb(0 0 0 / 20%);
@@ -554,7 +572,8 @@ steps to repro:
 .inboxsdk__compose_sendButton:focus,
 .inboxsdk__compose_sendButton.inboxsdk__composeButton_active {
   background-color: #5094ed;
-  box-shadow: 0 1px 1px 0 rgb(66 133 244 / 30%),
+  box-shadow:
+    0 1px 1px 0 rgb(66 133 244 / 30%),
     0 1px 3px 1px rgb(66 133 244 / 15%);
   border: none;
 }
@@ -602,7 +621,9 @@ steps to repro:
   z-index: 10;
   left: 0px;
   border-radius: 2px;
-  box-shadow: 0 4px 5px 0 rgb(0 0 0 / 14%), 0 1px 10px 0 rgb(0 0 0 / 12%),
+  box-shadow:
+    0 4px 5px 0 rgb(0 0 0 / 14%),
+    0 1px 10px 0 rgb(0 0 0 / 12%),
     0 2px 4px -1px rgb(0 0 0 / 20%);
   padding: 5px 15px;
 }
@@ -1555,7 +1576,9 @@ table.aKk
 /* old sidebar */
 
 .inboxsdk__sidebar .inboxsdk__contentPanelContainer {
-  font: 12px Arial, sans-serif;
+  font:
+    12px Arial,
+    sans-serif;
   max-width: 220px;
 }
 
@@ -2370,7 +2393,9 @@ shows up on our elements preventing them from collapsing.
   outline: none;
   padding: 13px 10px 16px;
   text-align: center;
-  font: normal normal normal normal 16px / normal arial, sans-serif;
+  font:
+    normal normal normal normal 16px / normal arial,
+    sans-serif;
 }
 
 .inboxdk__tooltip_content.inboxsdk__tooltip .aRM {
@@ -2394,7 +2419,9 @@ shows up on our elements preventing them from collapsing.
 .inboxsdk__tooltip {
   position: fixed;
   z-index: 1300;
-  transition: left 200ms ease, top 200ms ease;
+  transition:
+    left 200ms ease,
+    top 200ms ease;
 }
 
 /* stylelint-disable-next-line no-duplicate-selectors */
@@ -2408,7 +2435,9 @@ shows up on our elements preventing them from collapsing.
   position: fixed;
   z-index: 1400;
   margin-top: -1px;
-  transition: left 200ms ease, top 200ms ease;
+  transition:
+    left 200ms ease,
+    top 200ms ease;
 }
 
 .inboxsdk__tooltip .inboxsdk__tooltip_close {
@@ -2591,7 +2620,9 @@ table.cf.wd.inboxsdk__shortcutHelp_table {
   padding: 0px;
   white-space: initial;
   text-align: center;
-  font: normal normal normal normal 16px / normal arial, sans-serif;
+  font:
+    normal normal normal normal 16px / normal arial,
+    sans-serif;
 }
 
 .inboxsdk__tooltip.inboxsdk__appButton_tooltip .inboxsdk__tooltip_arrow {
@@ -2752,7 +2783,9 @@ table[role='presentation'].inboxsdk__thread_view_with_custom_view > tr {
   background: #fff;
   border: 1px solid;
   border-color: #bbb #bbb #a8a8a8;
-  font: 13px arial, sans-serif;
+  font:
+    13px arial,
+    sans-serif;
   padding: 5px 8px;
   margin-bottom: 5px;
   box-sizing: border-box;

@@ -2,7 +2,7 @@
 export default function getInsertBeforeElement(
   checkElement: HTMLElement,
   childElements: ArrayLike<any>,
-  dataAttributes: string[]
+  dataAttributes: string[],
 ): HTMLElement | null {
   const checkValues: { [attr: string]: any } = {};
 
@@ -26,7 +26,7 @@ export default function getInsertBeforeElement(
 function _isChildAfter(
   checkValues: { [attr: string]: any },
   child: HTMLElement,
-  dataAttributes: string[]
+  dataAttributes: string[],
 ): boolean {
   for (let ii = 0; ii < dataAttributes.length; ii++) {
     const attribute = dataAttributes[ii];

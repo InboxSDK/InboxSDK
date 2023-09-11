@@ -5,7 +5,7 @@ import getAccountUrlPart from './getAccountUrlPart';
 
 async function requestGmailThread(
   ikValue: string,
-  threadId: string
+  threadId: string,
 ): Promise<string> {
   const queryParameters = {
     ui: 2,
@@ -21,7 +21,7 @@ async function requestGmailThread(
   const { text } = await gmailAjax({
     method: 'POST',
     url: `https://mail.google.com/mail${getAccountUrlPart()}?${querystring.stringify(
-      queryParameters
+      queryParameters,
     )}`,
     canRetry: true,
   });

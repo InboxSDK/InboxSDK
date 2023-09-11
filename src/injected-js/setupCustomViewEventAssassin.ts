@@ -51,7 +51,7 @@ function shouldBlockEvent(event: KeyboardEvent): boolean {
     includes(blockedAnyModKeys, key) ||
     /* safari */ includes(
       blockedKeyIdentifiers,
-      (event as any).keyIdentifier
+      (event as any).keyIdentifier,
     ) ||
     includes(blockedAnyModCharacters, key) ||
     (!event.shiftKey &&

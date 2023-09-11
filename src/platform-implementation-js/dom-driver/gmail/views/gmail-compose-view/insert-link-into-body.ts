@@ -2,7 +2,7 @@ import type GmailComposeView from '../gmail-compose-view';
 export default function insertLinkIntoBody(
   gmailComposeView: GmailComposeView,
   text: string,
-  href: string
+  href: string,
 ): HTMLElement | null | undefined {
   return _insertLinkIntoBody(gmailComposeView, text, href);
 }
@@ -10,7 +10,7 @@ export default function insertLinkIntoBody(
 function _insertLinkIntoBody(
   gmailComposeView: GmailComposeView,
   text: string,
-  href: string
+  href: string,
 ) {
   gmailComposeView.focus();
   gmailComposeView.getBodyElement().focus();

@@ -22,11 +22,11 @@ let injectScriptImplementation: () => void = () => {
           document.documentElement.appendChild(scr);
         } else {
           throw new Error(
-            "Couldn't inject pageWorld.js. Check that the extension is using MV3 and has the correct permissions and host_permissions in its manifest."
+            "Couldn't inject pageWorld.js. Check that the extension is using MV3 and has the correct permissions and host_permissions in its manifest.",
           );
         }
       }
-    }
+    },
   );
 };
 
@@ -43,10 +43,10 @@ export const injectScript = once((): Promise<null> => {
     .merge(
       makeMutationObserverChunkedStream(document.head, {
         attributes: true,
-      })
+      }),
     )
     .filter(() =>
-      document.head.hasAttribute('data-inboxsdk-user-email-address')
+      document.head.hasAttribute('data-inboxsdk-user-email-address'),
     )
     .take(1)
     .map(() => null)

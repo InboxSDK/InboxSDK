@@ -176,8 +176,8 @@ export default class GmailComposeButtonView implements ButtonViewI {
     } else {
       Logger.error(
         new Error(
-          '_createIconImgElement should not be called with null _iconUrl'
-        )
+          '_createIconImgElement should not be called with null _iconUrl',
+        ),
       );
     }
 
@@ -211,7 +211,7 @@ export default class GmailComposeButtonView implements ButtonViewI {
     this._iconClass = newIconClass;
     this._iconElement.setAttribute(
       'class',
-      'inboxsdk__button_icon ' + (newIconClass || '')
+      'inboxsdk__button_icon ' + (newIconClass || ''),
     );
   }
 
@@ -240,7 +240,7 @@ export default class GmailComposeButtonView implements ButtonViewI {
   private _setupEventStream() {
     const clickEventStream = Kefir.fromEvents<any, never>(
       this._element,
-      'click'
+      'click',
     );
 
     clickEventStream.onValue(function (event) {
@@ -256,14 +256,14 @@ export default class GmailComposeButtonView implements ButtonViewI {
             eventName: 'click',
             domEvent: event,
           };
-        })
+        }),
     );
 
     const isEnterOrSpace = (event: any) =>
       includes([32 /* space */, 13 /* enter */], event.which);
     const keydownEventStream = Kefir.fromEvents<any, never>(
       this._element,
-      'keydown'
+      'keydown',
     ).filter(() => this.isEnabled());
     const enterEventStream = keydownEventStream.filter(isEnterOrSpace);
 
@@ -273,7 +273,7 @@ export default class GmailComposeButtonView implements ButtonViewI {
           eventName: 'click',
           domEvent: event,
         };
-      })
+      }),
     );
 
     enterEventStream.onValue(function (event) {
@@ -293,14 +293,14 @@ export default class GmailComposeButtonView implements ButtonViewI {
                 event.eventName === 'enabledChanged' &&
                 event.isEnabled === false
               );
-            })
+            }),
           )
           .map(function (domEvent) {
             return {
               eventName: 'click',
               domEvent: domEvent,
             };
-          })
+          }),
       );
     }
   }

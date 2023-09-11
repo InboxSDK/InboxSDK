@@ -18,14 +18,14 @@ export type RouteViewDriver = MinRouteViewDriver & {
       Record<string, any> | null | undefined,
       unknown
     >,
-    groupOrderHint: any
+    groupOrderHint: any,
   ): GmailCollapsibleSectionView;
   addCollapsibleSection(
     sectionDescriptorProperty: Kefir.Observable<
       Record<string, any> | null | undefined,
       unknown
     >,
-    groupOrderHint: any
+    groupOrderHint: any,
   ): GmailCollapsibleSectionView;
   getCustomViewElement(): HTMLElement | null | undefined;
   setFullWidth(fullWidth: boolean): void;

@@ -6,7 +6,7 @@ declare global {
     load: (
       version: string,
       appId: string,
-      opts: any
+      opts: any,
     ) => Promise<PlatformImplementation>;
   };
 }
@@ -14,7 +14,7 @@ declare global {
 if (!global.__InboxSDKImpLoader) {
   var piMainStarted = Date.now();
   var wasAccountSwitcherReadyAtStart = !!document.querySelector(
-    '[role=banner] div[aria-label] div div a[href^="https://myaccount.google."], [role=banner]+div div[aria-label] div div a[href^="https://myaccount.google."]'
+    '[role=banner] div[aria-label] div div a[href^="https://myaccount.google."], [role=banner]+div div[aria-label] div div a[href^="https://myaccount.google."]',
   );
 
   var onready = new Promise<null>((resolve) => {
@@ -31,7 +31,7 @@ if (!global.__InboxSDKImpLoader) {
         ])
           .take(1)
           .map(() => null)
-          .toPromise()
+          .toPromise(),
       );
     }
   });

@@ -20,7 +20,7 @@ function addStatusBar(
     height?: number;
     orderHint?: number;
     addAboveNativeStatusBar?: boolean;
-  }
+  },
 ): StatusBar {
   const { height, orderHint, addAboveNativeStatusBar } = {
     height: 40,
@@ -33,7 +33,7 @@ function addStatusBar(
     gmailComposeView,
     height,
     orderHint,
-    addAboveNativeStatusBar
+    addAboveNativeStatusBar,
   );
 
   gmailComposeView
@@ -66,14 +66,14 @@ class StatusBar extends SimpleElementView implements IStatusBar {
     gmailComposeView: GmailComposeView,
     height: number,
     orderHint: number,
-    addAboveNativeStatusBar: boolean
+    addAboveNativeStatusBar: boolean,
   ) {
     super(createElement(orderHint, addAboveNativeStatusBar));
     this._addAboveNativeStatusBar = addAboveNativeStatusBar;
     this._gmailComposeView = gmailComposeView;
     this._nativeStatusContainer = querySelector(
       gmailComposeView.getElement(),
-      '.iN > tbody .aDj'
+      '.iN > tbody .aDj',
     );
 
     this._setStatusBar();
@@ -106,7 +106,7 @@ class StatusBar extends SimpleElementView implements IStatusBar {
     const totalAddedStatusBarHeight = Array.from(
       this._gmailComposeView
         .getElement()
-        .querySelectorAll<HTMLElement>('.inboxsdk__compose_statusbar')
+        .querySelectorAll<HTMLElement>('.inboxsdk__compose_statusbar'),
     )
       .map((el) => el.getBoundingClientRect().height)
       .reduce((a, b) => a + b, 0);
@@ -115,7 +115,7 @@ class StatusBar extends SimpleElementView implements IStatusBar {
       .getElement()
       .style.setProperty(
         '--inboxsdk-total-added-statusbar-height',
-        totalAddedStatusBarHeight + 'px'
+        totalAddedStatusBarHeight + 'px',
       );
   }
 
@@ -129,10 +129,10 @@ class StatusBar extends SimpleElementView implements IStatusBar {
       if (this._addAboveNativeStatusBar) {
         const prependContainer = (this._prependContainer =
           (statusArea.querySelector(
-            '.inboxsdk__compose_statusBarPrependContainer'
+            '.inboxsdk__compose_statusBarPrependContainer',
           ) as HTMLElement) || document.createElement('div'));
         prependContainer.classList.add(
-          'inboxsdk__compose_statusBarPrependContainer'
+          'inboxsdk__compose_statusBarPrependContainer',
         );
         statusArea.insertAdjacentElement('afterbegin', prependContainer);
 
@@ -141,7 +141,7 @@ class StatusBar extends SimpleElementView implements IStatusBar {
         if (this._gmailComposeView.isInlineReplyForm()) {
           const nativeStatusBar = querySelector(
             this._gmailComposeView.getElement(),
-            '.iN > tbody .aDj .aDh .IZ'
+            '.iN > tbody .aDj .aDh .IZ',
           );
           insertElementInOrder(nativeStatusBar, this.el);
         } else {

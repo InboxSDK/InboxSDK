@@ -12,7 +12,7 @@ const TAB_LIST_SELECTOR = '[role=tablist],.J-KU-Jg';
 function addCompanionThreadIconArea(
   logger: Logger,
   iconArea: HTMLElement,
-  companionSidebarIconContainerEl: HTMLElement
+  companionSidebarIconContainerEl: HTMLElement,
 ) {
   const tabList =
     companionSidebarIconContainerEl.querySelector(TAB_LIST_SELECTOR);
@@ -27,14 +27,14 @@ function addCompanionThreadIconArea(
 
   if (!separator) {
     logger.error(
-      new Error('addCompanionThreadIconArea: failed to find separator')
+      new Error('addCompanionThreadIconArea: failed to find separator'),
     );
     tabList.insertAdjacentElement('beforebegin', iconArea);
   } else {
     if (!separator.parentElement) throw new Error();
     separator.parentElement.insertBefore(
       iconArea,
-      separator.nextElementSibling
+      separator.nextElementSibling,
     );
   }
 }

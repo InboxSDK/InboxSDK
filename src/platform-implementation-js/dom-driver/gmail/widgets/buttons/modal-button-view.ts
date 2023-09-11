@@ -78,7 +78,7 @@ export default class ModalButtonView implements ButtonViewI {
     if (options.tooltip || options.title) {
       this._element.setAttribute(
         'data-tooltip',
-        String(options.tooltip || options.title)
+        String(options.tooltip || options.title),
       );
     }
   }
@@ -104,7 +104,7 @@ export default class ModalButtonView implements ButtonViewI {
   private _setupEventStream() {
     const clickEventStream = Kefir.fromEvents<any, never>(
       this._element,
-      'click'
+      'click',
     );
 
     clickEventStream.onValue(function (event) {
@@ -120,14 +120,14 @@ export default class ModalButtonView implements ButtonViewI {
             eventName: 'click',
             domEvent: event,
           };
-        })
+        }),
     );
 
     const isEnterOrSpace = (event: any) =>
       includes([32 /* space */, 13 /* enter */], event.which);
     const keydownEventStream = Kefir.fromEvents<any, never>(
       this._element,
-      'keydown'
+      'keydown',
     ).filter(() => this.isEnabled());
     const enterEventStream = keydownEventStream.filter(isEnterOrSpace);
 
@@ -137,7 +137,7 @@ export default class ModalButtonView implements ButtonViewI {
           eventName: 'click',
           domEvent: event,
         };
-      })
+      }),
     );
 
     enterEventStream.onValue(function (event) {

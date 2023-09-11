@@ -9,7 +9,7 @@ export default function addComposeNotice(
   gmailComposeView: GmailComposeView,
   options: {
     orderHint?: number;
-  }
+  },
 ) {
   const { orderHint } = {
     orderHint: 0,
@@ -55,7 +55,7 @@ class ComposeNotice extends SimpleElementView {
     try {
       const composeTable = querySelector(
         this._gmailComposeView.getElement(),
-        '.iN'
+        '.iN',
       );
       insertElementInOrder(composeTable, this.el, ['data-order-hint'], true);
     } catch (err) {

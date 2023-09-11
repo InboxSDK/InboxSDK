@@ -31,7 +31,7 @@ function byId(id: string): string {
 
 export default function sizeFixer(
   driver: Record<string, any>,
-  gmailComposeView: GmailComposeView
+  gmailComposeView: GmailComposeView,
 ) {
   if (
     gmailComposeView.isInlineReplyForm() ||
@@ -63,7 +63,7 @@ export default function sizeFixer(
       SELECTOR_ESCAPE_HATCH_PREFIX + byId(composeId) + ' ' + selector;
     const ix = findIndex(
       sheet.cssRules,
-      (cssRule) => (cssRule as any).selectorText === fullSelector
+      (cssRule) => (cssRule as any).selectorText === fullSelector,
     );
 
     if (ix !== -1) {
@@ -84,7 +84,7 @@ export default function sizeFixer(
           bubbles: false,
           cancelable: false,
           detail: null,
-        })
+        }),
       );
     });
   resizeEvents
@@ -93,17 +93,17 @@ export default function sizeFixer(
     .merge(
       makeMutationObserverChunkedStream(scrollBody, {
         attributes: true,
-      })
+      }),
     )
     .takeUntilBy(stopper)
     .onValue(() => {
       const statusUnexpectedHeight = Math.max(
         statusAreaParent.offsetHeight - MATERIAL_UI_GMAIL_STATUS_HEIGHT,
-        0
+        0,
       );
       const topFormUnexpectedHeight = Math.max(
         topForm.offsetHeight - MATERIAL_UI_TOP_FORM_HEIGHT,
-        0
+        0,
       );
       const unexpectedHeight = statusUnexpectedHeight + topFormUnexpectedHeight;
       const maybeBody = gmailComposeView.getMaybeBodyElement();
@@ -118,7 +118,7 @@ export default function sizeFixer(
       const height = scrollBodyInner?.offsetHeight || scrollBody.offsetHeight;
       const maxHeight = parseInt(
         scrollBody.style.getPropertyValue('max-height'),
-        10
+        10,
       );
       const isFullScreen = gmailComposeView.isFullscreen();
       const newMaxHeight = maxHeight - unexpectedHeight;
@@ -158,7 +158,7 @@ export default function sizeFixer(
       if (
         startsWith(
           (sheet.cssRules as any)[ix].selectorText,
-          SELECTOR_ESCAPE_HATCH_PREFIX + byId(composeId) + ' '
+          SELECTOR_ESCAPE_HATCH_PREFIX + byId(composeId) + ' ',
         )
       ) {
         sheet.deleteRule(ix);

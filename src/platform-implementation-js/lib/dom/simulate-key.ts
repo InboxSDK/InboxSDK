@@ -3,7 +3,7 @@ import triggerRelayEvent from './trigger-relay-event';
 export default function simulateKey(
   element: HTMLElement,
   keyCode: number,
-  charCode: number
+  charCode: number,
 ) {
   const ctrlKey = false;
   const metaKey = false;

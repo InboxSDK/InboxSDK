@@ -17,17 +17,17 @@ var impStream = udKefir(module, imp);
 export default function setupComposeViewDriverStream(
   gmailDriver: GmailDriver,
   messageViewDriverStream: Kefir.Observable<GmailMessageView, unknown>,
-  xhrInterceptorStream: Kefir.Observable<any, unknown>
+  xhrInterceptorStream: Kefir.Observable<any, unknown>,
 ): Kefir.Observable<GmailComposeView, unknown> {
   return impStream.flatMapLatest((imp) =>
-    imp(gmailDriver, messageViewDriverStream, xhrInterceptorStream)
+    imp(gmailDriver, messageViewDriverStream, xhrInterceptorStream),
   );
 }
 
 function imp(
   gmailDriver: GmailDriver,
   messageViewDriverStream: Kefir.Observable<GmailMessageView, unknown>,
-  xhrInterceptorStream: Kefir.Observable<any, unknown>
+  xhrInterceptorStream: Kefir.Observable<any, unknown>,
 ): Kefir.Observable<GmailComposeView, unknown> {
   return Kefir.fromPromise(GmailElementGetter.waitForGmailModeToSettle())
     .flatMap(() => {
@@ -49,8 +49,8 @@ function imp(
             new GmailComposeView(el, xhrInterceptorStream, gmailDriver, {
               isStandalone,
               isInlineReplyForm: false,
-            })
-        )
+            }),
+        ),
       );
     })
     .merge(
@@ -61,17 +61,17 @@ function imp(
               new GmailComposeView(el, xhrInterceptorStream, gmailDriver, {
                 isStandalone: false,
                 isInlineReplyForm: true,
-              })
-          )
-        )
-      )
+              }),
+          ),
+        ),
+      ),
     )
     .flatMap((composeViewDriver: any) => composeViewDriver.ready());
 }
 
 function _setupStandardComposeElementStream() {
   return _waitForContainerAndMonitorChildrenStream(() =>
-    GmailElementGetter.getComposeWindowContainer()
+    GmailElementGetter.getComposeWindowContainer(),
   )
     .flatMap((composeGrandParent) => {
       var composeParentEl =
@@ -87,7 +87,7 @@ function _setupStandardComposeElementStream() {
     .merge(
       GmailElementGetter.getFullscreenComposeWindowContainerStream()
         .flatMap(({ el, removalStream }) =>
-          makeElementChildStream(el).takeUntilBy(removalStream)
+          makeElementChildStream(el).takeUntilBy(removalStream),
         )
         .map(_informElement('composeFullscreenStateChanged'))
         .map(({ el, removalStream }) => {
@@ -106,7 +106,7 @@ function _setupStandardComposeElementStream() {
             removalStream: removalStream.merge(hiddenStream).take(1),
           };
         })
-        .filter(Boolean)
+        .filter(Boolean),
     )
     .flatMap((event) => {
       if (!event) throw new Error('Should not happen');
@@ -124,12 +124,12 @@ function _setupStandardComposeElementStream() {
 
 function _setupStandaloneComposeElementStream() {
   return _waitForContainerAndMonitorChildrenStream(() =>
-    GmailElementGetter.StandaloneCompose.getComposeWindowContainer()
+    GmailElementGetter.StandaloneCompose.getComposeWindowContainer(),
   );
 }
 
 function _waitForContainerAndMonitorChildrenStream(
-  containerFn: () => HTMLElement | undefined | null
+  containerFn: () => HTMLElement | undefined | null,
 ) {
   return Kefir.interval(2000, undefined) // TODO replace this with page-parser-tree
     .map(containerFn)
@@ -151,7 +151,7 @@ function _informElement(eventName: string) {
           bubbles: false,
           cancelable: false,
           detail: null,
-        })
+        }),
       );
     }
     return event;

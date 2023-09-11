@@ -14,7 +14,7 @@ InboxSDK.load(2, 'sidebar-contact-example').then(function (sdk) {
       'threadView id',
       threadView.getThreadID(),
       threadView.getMessageViewsAll().length,
-      threadView.getMessageViews().length
+      threadView.getMessageViews().length,
     );
 
     var messages = threadView.getMessageViewsAll();

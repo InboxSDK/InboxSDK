@@ -16,6 +16,6 @@ it('works', () => {
   const divB = document.getElementById('b');
   if (!divB) throw new Error();
   expect(censorHTMLtree(divB)).toBe(
-    '<html>[1]<body><div id="canvas" role="foo&amp;" data-blah="...">[1]<div id="b">...<b class="blah" data-foo="...">...</b>...</div></div>[2]</body></html>'
+    '<html>[1]<body><div id="canvas" role="foo&amp;" data-blah="...">[1]<div id="b">...<b class="blah" data-foo="...">...</b>...</div></div>[2]</body></html>',
   );
 });

@@ -12,7 +12,7 @@ export default function showNativeRouteView(_gmailDriver: GmailDriver) {
     contentSectionElement.children,
     (child: HTMLElement) => {
       child.style.display = '';
-    }
+    },
   );
 
   if (document.body.classList.contains('inboxsdk__custom_view_active')) {

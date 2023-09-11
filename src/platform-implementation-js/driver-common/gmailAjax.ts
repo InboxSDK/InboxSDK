@@ -11,7 +11,7 @@ const IMAGE_REQUEST_TIMEOUT = 1000 * 60; // one minute
 const limitedAjax = rateLimitQueuer(
   rateLimitQueuer(ajax, 1000, 7),
   10 * 1000,
-  50
+  50,
 );
 
 // Tool for making ajax requests to Gmail endpoints. When used in Inbox, this
@@ -39,7 +39,7 @@ async function gmailAjax(opts: AjaxOpts): Promise<AjaxResponse> {
       // cookies get set, and then retrying the original ajax request.
       try {
         await Kefir.fromPromise(
-          imageRequest('https://mail.google.com/mail/u/0/')
+          imageRequest('https://mail.google.com/mail/u/0/'),
         )
           .merge(Kefir.later(IMAGE_REQUEST_TIMEOUT, undefined))
           .take(1)

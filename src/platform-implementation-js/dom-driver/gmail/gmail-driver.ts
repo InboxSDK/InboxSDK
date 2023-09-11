@@ -150,7 +150,7 @@ class GmailDriver implements Driver {
     IMPL_VERSION: string,
     logger: Logger,
     opts: PiOpts,
-    envData: EnvData
+    envData: EnvData,
   ) {
     this._appId = appId;
     this._logger = logger;
@@ -181,7 +181,7 @@ class GmailDriver implements Driver {
         key: 'inboxsdk__cached_sync_thread_id_old_gmail_thread_id',
         getAfromB: (oldGmailThreadId: string) => {
           return getSyncThreadForOldGmailThreadId(this, oldGmailThreadId).then(
-            ({ syncThreadID }) => syncThreadID
+            ({ syncThreadID }) => syncThreadID,
           );
         },
         getBfromA: (syncThreadID: string) => {
@@ -189,7 +189,7 @@ class GmailDriver implements Driver {
             (syncThread) => {
               if (syncThread) return syncThread.oldGmailThreadID;
               else throw new Error('syncThread not found');
-            }
+            },
           );
         },
       });
@@ -209,7 +209,7 @@ class GmailDriver implements Driver {
         // TODO remove sometime after March 24 2019 to give time for this to
         // run for most users.
         localStorage.removeItem(
-          'inboxsdk__cached_gmail_and_inbox_message_ids_2'
+          'inboxsdk__cached_gmail_and_inbox_message_ids_2',
         );
       } catch (err) {
         console.error(err);
@@ -240,7 +240,7 @@ class GmailDriver implements Driver {
 
     Kefir.later(45 * 1000, undefined)
       .takeUntilBy(
-        toItemWithLifetimeStream(this._page.tree.getAllByTag('supportMenu'))
+        toItemWithLifetimeStream(this._page.tree.getAllByTag('supportMenu')),
       )
       .onValue(() => {
         this._logger.errorSite(new Error('Failed to find gmail supportMenu'));
@@ -325,7 +325,7 @@ class GmailDriver implements Driver {
   }
   getThreadViewDriverStream() {
     return toItemWithLifetimeStream(this._threadViewDriverLiveSet).map(
-      ({ el }) => el
+      ({ el }) => el,
     );
   }
   getAttachmentCardViewDriverStream() {
@@ -337,7 +337,7 @@ class GmailDriver implements Driver {
               .getEventStream()
               .filter((event: any) => event.eventName === 'messageLoad')
               .map(() => messageViewDriver)
-              .take(1)
+              .take(1),
       )
       .map((messageView) => messageView.getAttachmentCardViewDrivers())
       .flatten<GmailAttachmentCardView>();
@@ -394,7 +394,7 @@ class GmailDriver implements Driver {
     };
 
     const toolbarViewSub = toValueObservable(
-      this._toolbarViewDriverLiveSet
+      this._toolbarViewDriverLiveSet,
     ).subscribe(({ value: gmailToolbarView }: { value: GmailToolbarView }) => {
       if (gmailToolbarView.isForThread()) {
         if (!options.positions || includes(options.positions, 'THREAD')) {
@@ -412,7 +412,7 @@ class GmailDriver implements Driver {
                   selectedThreadRowViewDrivers: [],
                 });
               },
-            })
+            }),
           );
         }
       } else if (gmailToolbarView.isForRowList()) {
@@ -423,7 +423,7 @@ class GmailDriver implements Driver {
               section: options.listSection || 'METADATA_STATE',
               onClick: (event: any) => {
                 const selectedThreadRowViewDrivers = Array.from(
-                  gmailToolbarView.getThreadRowViewDrivers()
+                  gmailToolbarView.getThreadRowViewDrivers(),
                 ).filter((gmailThreadRow) => gmailThreadRow.isSelected());
 
                 options.onClick({
@@ -433,7 +433,7 @@ class GmailDriver implements Driver {
                   selectedThreadRowViewDrivers,
                 });
               },
-            })
+            }),
           );
         }
       }
@@ -460,7 +460,7 @@ class GmailDriver implements Driver {
                 selectedThreadRowViewDrivers: [gmailThreadRow],
               });
             },
-          }).merge(unregister)
+          }).merge(unregister),
         );
       };
 
@@ -500,7 +500,7 @@ class GmailDriver implements Driver {
   addCustomRouteID(routeID: string): () => void {
     this._customRouteIDs.add(routeID);
     this._pageCommunicator.registerAllowedHashLinkStartTerm(
-      routeID.split('/')[0]
+      routeID.split('/')[0],
     );
     return () => {
       this._customRouteIDs.delete(routeID);
@@ -510,7 +510,7 @@ class GmailDriver implements Driver {
   addCustomListRouteID(routeID: string, handler: Function): () => void {
     this._customListRouteIDs.set(routeID, handler);
     this._pageCommunicator.registerAllowedHashLinkStartTerm(
-      routeID.split('/')[0]
+      routeID.split('/')[0],
     );
     return () => {
       this._customListRouteIDs.delete(routeID);
@@ -539,7 +539,7 @@ class GmailDriver implements Driver {
   showCustomThreadList(
     customRouteID: string,
     onActivate: Function,
-    params: Array<string>
+    params: Array<string>,
   ) {
     showCustomThreadList(this, customRouteID, onActivate, params);
   }
@@ -558,14 +558,14 @@ class GmailDriver implements Driver {
 
   goto(
     routeID: string,
-    params: RouteParams | string | null | undefined
+    params: RouteParams | string | null | undefined,
   ): Promise<void> {
     return gotoView(this, routeID, params);
   }
 
   resolveUrlRedirects(url: string): Promise<string> {
     return this._pageCommunicatorPromise.then((pageCommunicator) =>
-      pageCommunicator.resolveUrlRedirects(url)
+      pageCommunicator.resolveUrlRedirects(url),
     );
   }
 
@@ -578,7 +578,7 @@ class GmailDriver implements Driver {
   }
 
   addToolbarButtonForApp(
-    buttonDescriptor: any
+    buttonDescriptor: any,
   ): Promise<GmailAppToolbarButtonView> {
     return addToolbarButtonForApp(this, buttonDescriptor);
   }
@@ -596,22 +596,22 @@ class GmailDriver implements Driver {
   }
 
   getNextComposeViewDriver(
-    timeout: number = 10 * 1000
+    timeout: number = 10 * 1000,
   ): Promise<GmailComposeView> {
     return this._composeViewDriverStream
       .merge(
         Kefir.later(
           timeout,
           new Error(
-            'Reached timeout while waiting for getNextComposeViewDriver'
-          )
-        )
+            'Reached timeout while waiting for getNextComposeViewDriver',
+          ),
+        ),
       )
       .beforeEnd(
-        () => new Error('Driver was shut down before a new compose was found')
+        () => new Error('Driver was shut down before a new compose was found'),
       )
       .flatMap((x) =>
-        x instanceof Error ? Kefir.constantError(x) : Kefir.constant(x)
+        x instanceof Error ? Kefir.constantError(x) : Kefir.constant(x),
       )
       .take(1)
       .takeErrors(1)
@@ -644,13 +644,13 @@ class GmailDriver implements Driver {
       NavItemDescriptor,
       unknown
     >,
-    navMenuInjectionContainer?: HTMLElement
+    navMenuInjectionContainer?: HTMLElement,
   ): Promise<GmailNavItemView> {
     return addNavItem(
       this,
       appId,
       navItemDescriptorPropertyStream,
-      navMenuInjectionContainer
+      navMenuInjectionContainer,
     );
   }
 
@@ -659,7 +659,7 @@ class GmailDriver implements Driver {
   }
 
   addSupportItem(
-    supportItemDescriptor: SupportItemDescriptor
+    supportItemDescriptor: SupportItemDescriptor,
   ): GmailSupportItemView {
     return addSupportItem(this, supportItemDescriptor);
   }
@@ -677,13 +677,13 @@ class GmailDriver implements Driver {
     if (leftNavContainerElement) {
       if (isNative) {
         leftNavContainerElement.classList.remove(
-          'inboxsdk__hide_native_marker'
+          'inboxsdk__hide_native_marker',
         );
       } else {
         leftNavContainerElement.classList.add('inboxsdk__hide_native_marker');
         this._stopper.takeUntilBy(this._navMarkerHiddenChanged).onValue(() => {
           leftNavContainerElement.classList.remove(
-            'inboxsdk__hide_native_marker'
+            'inboxsdk__hide_native_marker',
           );
         });
       }
@@ -744,13 +744,13 @@ class GmailDriver implements Driver {
   activateShortcut(
     keyboardShortcutHandle: KeyboardShortcutHandle,
     appName: string | null | undefined,
-    appIconUrl: string | null | undefined
+    appIconUrl: string | null | undefined,
   ) {
     this.getKeyboardShortcutHelpModifier().set(
       keyboardShortcutHandle,
       this._appId,
       appName,
-      appIconUrl
+      appIconUrl,
     );
     keyboardShortcutHandle.once('destroy', () => {
       this.getKeyboardShortcutHelpModifier().delete(keyboardShortcutHandle);
@@ -761,7 +761,7 @@ class GmailDriver implements Driver {
     var result = makeXhrInterceptor();
 
     this._xhrInterceptorStream = result.xhrInterceptStream.takeUntilBy(
-      this._stopper
+      this._stopper,
     );
 
     this._pageCommunicatorPromise = result.pageCommunicatorPromise;
@@ -777,7 +777,7 @@ class GmailDriver implements Driver {
 
       this._routeViewDriverStream = setupRouteViewDriverStream(
         this._gmailRouteProcessor,
-        this
+        this,
       )
         .takeUntilBy(this._stopper)
         .toProperty();
@@ -787,7 +787,7 @@ class GmailDriver implements Driver {
       });
 
       this._rowListViewDriverStream = this._setupRouteSubViewDriver(
-        'newGmailRowListView'
+        'newGmailRowListView',
       ).takeUntilBy(this._stopper);
 
       this._setupThreadRowViewDriverKefirStream();
@@ -795,12 +795,12 @@ class GmailDriver implements Driver {
         this._setupRouteSubViewDriver('newGmailThreadView')
           .takeUntilBy(this._stopper)
           .flatMap((gmailThreadView) =>
-            gmailThreadView.getReadyStream().map(() => gmailThreadView)
+            gmailThreadView.getReadyStream().map(() => gmailThreadView),
           )
           .map((gmailThreadView: any) => ({
             el: gmailThreadView,
             removalStream: gmailThreadView.getStopper(),
-          }))
+          })),
       );
 
       this._setupToolbarViewDriverStream();
@@ -817,7 +817,7 @@ class GmailDriver implements Driver {
     this._composeViewDriverStream = setupComposeViewDriverStream(
       this,
       this._messageViewDriverStream,
-      this._xhrInterceptorStream
+      this._xhrInterceptorStream,
     ).takeUntilBy(this._stopper);
   }
 
@@ -833,7 +833,7 @@ class GmailDriver implements Driver {
   _setupThreadRowViewDriverKefirStream() {
     this._threadRowViewDriverKefirStream = this._rowListViewDriverStream
       .flatMap((rowListViewDriver: GmailRowListView) =>
-        rowListViewDriver.getRowViewDriverStream()
+        rowListViewDriver.getRowViewDriverStream(),
       )
       .takeUntilBy(this._stopper);
   }
@@ -843,10 +843,10 @@ class GmailDriver implements Driver {
       Kefir.merge([
         this._rowListViewDriverStream.map(
           (gmailRowListView: GmailRowListView) =>
-            gmailRowListView.getToolbarView()
+            gmailRowListView.getToolbarView(),
         ),
         this.getThreadViewDriverStream().map((gmailThreadView) =>
-          gmailThreadView.getToolbarView()
+          gmailThreadView.getToolbarView(),
         ),
       ])
         .filter(Boolean)
@@ -855,7 +855,7 @@ class GmailDriver implements Driver {
           el: gmailToolbarView,
           removalStream: gmailToolbarView.getStopper(),
         }))
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this._stopper),
     );
     this._toolbarViewDriverLiveSet.subscribe({});
   }
@@ -863,19 +863,19 @@ class GmailDriver implements Driver {
   _setupMessageViewDriverStream() {
     this._messageViewDriverStream = this.getThreadViewDriverStream()
       .flatMap((gmailThreadView) =>
-        gmailThreadView.getMessageViewDriverStream()
+        gmailThreadView.getMessageViewDriverStream(),
       )
       .takeUntilBy(this._stopper);
   }
 
   async addGlobalSidebarContentPanel(
-    descriptor: Kefir.Observable<Object, unknown>
+    descriptor: Kefir.Observable<Object, unknown>,
   ): Promise<ContentPanelViewDriver | null | undefined> {
     await this.waitForGlobalSidebarReady()
       .merge(
         this._stopper.flatMap(() =>
-          Kefir.constantError(new Error('Driver instance was destroyed early'))
-        )
+          Kefir.constantError(new Error('Driver instance was destroyed early')),
+        ),
       )
       .take(1)
       .takeErrors(1)
@@ -904,7 +904,7 @@ class GmailDriver implements Driver {
         throw new Error('did not find companionSidebarContentContainerEl');
       appSidebarView = this._appSidebarView = new GmailAppSidebarView(
         this,
-        companionSidebarContentContainerEl
+        companionSidebarContentContainerEl,
       );
     }
 
@@ -924,7 +924,7 @@ class GmailDriver implements Driver {
   }
 
   createTopMessageBarDriver(
-    optionStream: Kefir.Observable<any, unknown>
+    optionStream: Kefir.Observable<any, unknown>,
   ): GmailTopMessageBarDriver {
     return new GmailTopMessageBarDriver(optionStream);
   }
@@ -939,7 +939,7 @@ class GmailDriver implements Driver {
 
   getDraftIDForMessageID(
     messageID: string,
-    skipCache: boolean = false
+    skipCache: boolean = false,
   ): Promise<GetDraftIdResult> {
     return getDraftIDForMessageID(this, messageID, skipCache);
   }
@@ -965,7 +965,7 @@ class GmailDriver implements Driver {
             new Error('_recentSyncDraftIds count had unexpected value'),
             {
               count,
-            }
+            },
           );
         } else {
           newCount = count - 1;
@@ -982,7 +982,7 @@ class GmailDriver implements Driver {
   }
 
   _selectedThreadRows = t.mapcat((gmailRowListView: GmailRowListView) =>
-    gmailRowListView.getSelectedThreadRowViewDrivers()
+    gmailRowListView.getSelectedThreadRowViewDrivers(),
   );
   getSelectedThreadRowViewDrivers(): ReadonlyArray<GmailThreadRowView> {
     if (!this._currentRouteViewDriver) {
@@ -990,7 +990,7 @@ class GmailDriver implements Driver {
     }
     return t.toArray(
       this._currentRouteViewDriver.getRowListViews(),
-      this._selectedThreadRows
+      this._selectedThreadRows,
     );
   }
 

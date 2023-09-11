@@ -133,7 +133,7 @@ InboxSDK.load(1, 'toolbar-example', {
       onClick() {
         console.log(
           'message more button click on message from',
-          messageView.getSender().name
+          messageView.getSender().name,
         );
       },
     });
@@ -144,7 +144,7 @@ InboxSDK.load(1, 'toolbar-example', {
       onClick() {
         console.log(
           '2 message more button click on message from',
-          messageView.getSender().name
+          messageView.getSender().name,
         );
       },
     });

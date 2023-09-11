@@ -12,19 +12,19 @@ import Kefir from 'kefir';
 export default class GmailPageCommunicator extends CommonPageCommunicator {
   async getMessageDate(
     threadId: string,
-    message: HTMLElement
+    message: HTMLElement,
   ): Promise<number | null> {
     return this._getMessageData(
       threadId,
       message,
       'data-inboxsdk-sortdate',
-      'inboxSDKtellMeThisMessageDate'
+      'inboxSDKtellMeThisMessageDate',
     );
   }
 
   async getMessageRecipients(
     threadId: string,
-    message: HTMLElement
+    message: HTMLElement,
   ): Promise<Array<{
     emailAddress: string;
     name: string | null | undefined;
@@ -33,7 +33,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
       threadId,
       message,
       'data-inboxsdk-recipients',
-      'inboxSDKtellMeThisMessageRecipients'
+      'inboxSDKtellMeThisMessageRecipients',
     );
   }
 
@@ -41,7 +41,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     threadId: string,
     message: HTMLElement,
     attribute: string,
-    eventName: string
+    eventName: string,
   ): Promise<T | null> {
     let data = message.getAttribute(attribute);
     if (!data) {
@@ -58,7 +58,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
             btaiHeader,
             xsrfToken,
           },
-        })
+        }),
       );
 
       data = message.getAttribute(attribute);
@@ -85,7 +85,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
           bubbles: true,
           cancelable: false,
           detail: null,
-        })
+        }),
       );
       threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     }
@@ -100,7 +100,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
           bubbles: true,
           cancelable: false,
           detail: null,
-        })
+        }),
       );
       threadid = threadRow.getAttribute('data-inboxsdk-threadid');
     }
@@ -109,18 +109,18 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
 
   getCurrentThreadID(
     threadContainerElement: HTMLElement,
-    isPreviewedThread: boolean = false
+    isPreviewedThread: boolean = false,
   ): string {
     threadContainerElement.dispatchEvent(
       new CustomEvent('inboxSDKtellMeCurrentThreadId', {
         bubbles: true,
         cancelable: false,
         detail: { isPreviewedThread },
-      })
+      }),
     );
 
     const s = threadContainerElement.getAttribute(
-      'data-inboxsdk-currentthreadid'
+      'data-inboxsdk-currentthreadid',
     );
     if (s == null) throw new Error('Failed to read value');
     return s;
@@ -155,7 +155,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
           bubbles: false,
           cancelable: false,
           detail: null,
-        })
+        }),
       );
     });
   }
@@ -166,14 +166,14 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
         bubbles: false,
         cancelable: false,
         detail: { providerID },
-      })
+      }),
     );
   }
 
   provideAutocompleteSuggestions(
     providerID: string,
     query: string,
-    suggestions: AutocompleteSearchResultWithId[]
+    suggestions: AutocompleteSearchResultWithId[],
   ) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKprovideSuggestions', {
@@ -185,7 +185,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
           // Filter out non-JSONifiable things
           suggestions: JSON.parse(JSON.stringify(suggestions)),
         },
-      })
+      }),
     );
   }
 
@@ -195,7 +195,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
         bubbles: false,
         cancelable: false,
         detail: { query },
-      })
+      }),
     );
   }
 
@@ -210,7 +210,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
         bubbles: false,
         cancelable: false,
         detail,
-      })
+      }),
     );
   }
 
@@ -220,7 +220,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
         bubbles: false,
         cancelable: false,
         detail: { query, newResults },
-      })
+      }),
     );
   }
 
@@ -230,7 +230,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
         bubbles: false,
         cancelable: false,
         detail: { term },
-      })
+      }),
     );
   }
 
@@ -240,7 +240,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
         bubbles: false,
         cancelable: false,
         detail: { query, newQuery },
-      })
+      }),
     );
   }
 
@@ -259,7 +259,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
         detail,
         bubbles: false,
         cancelable: false,
-      })
+      }),
     );
 
     return modifierId;
@@ -271,7 +271,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
         detail: { keyId, modifierId },
         bubbles: false,
         cancelable: false,
-      })
+      }),
     );
   }
 
@@ -285,7 +285,7 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
         detail,
         bubbles: false,
         cancelable: false,
-      })
+      }),
     );
   }
 }

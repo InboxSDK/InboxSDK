@@ -107,7 +107,7 @@ export type ComposeViewDriver = {
   insertBodyHTMLAtCursor(html: string): HTMLElement | null | undefined;
   insertLinkIntoBody(
     text: string,
-    href: string
+    href: string,
   ): HTMLElement | null | undefined;
   insertLinkChipIntoBody(options: {
     iconUrl?: string;
@@ -146,10 +146,10 @@ export type ComposeViewDriver = {
       unknown
     >,
     groupOrderHint: string,
-    extraOnClickOptions: Record<string, any>
+    extraOnClickOptions: Record<string, any>,
   ): Promise<any | null | undefined>;
   addRecipientRow(
-    options: Kefir.Observable<Record<string, any> | null | undefined, unknown>
+    options: Kefir.Observable<Record<string, any> | null | undefined, unknown>,
   ): () => void;
   forceRecipientRowsOpen(): () => void;
   hideNativeRecipientRows(): () => void;
@@ -188,7 +188,7 @@ export type ComposeViewDriver = {
   addTooltipToButton(
     buttonViewController: Record<string, any>,
     buttonDescriptor: Record<string, any>,
-    tooltipDescriptor: TooltipDescriptor
+    tooltipDescriptor: TooltipDescriptor,
   ): void;
   closeButtonTooltip(buttonViewController: Record<string, any>): void;
   setupLinkPopOvers(): void;

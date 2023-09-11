@@ -3,7 +3,7 @@ import cproc from 'child_process';
 // Spawns a process and passes stdout and stderr through.
 export default function spawn(
   command: string,
-  args: string[] = []
+  args: string[] = [],
 ): Promise<void> {
   return new Promise(function (resolve, reject) {
     const proc = cproc.spawn(command, args, { stdio: 'inherit' });

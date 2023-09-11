@@ -7,7 +7,7 @@ it('should work with just an email address', () => {
 });
 it('should work with a name', () => {
   expect(
-    extractContactFromEmailContactString('George Monkey <monkeys@monkeys.com>')
+    extractContactFromEmailContactString('George Monkey <monkeys@monkeys.com>'),
   ).toEqual({
     name: 'George Monkey',
     emailAddress: 'monkeys@monkeys.com',
@@ -15,7 +15,7 @@ it('should work with a name', () => {
 });
 it('should work spaces around an email address', () => {
   expect(
-    extractContactFromEmailContactString('  monkeys@monkeys.com  ')
+    extractContactFromEmailContactString('  monkeys@monkeys.com  '),
   ).toEqual({
     name: null,
     emailAddress: 'monkeys@monkeys.com',
@@ -24,8 +24,8 @@ it('should work spaces around an email address', () => {
 it('should work with spaces around a name', () => {
   expect(
     extractContactFromEmailContactString(
-      '  George Monkey <monkeys@monkeys.com>'
-    )
+      '  George Monkey <monkeys@monkeys.com>',
+    ),
   ).toEqual({
     name: 'George Monkey',
     emailAddress: 'monkeys@monkeys.com',
@@ -38,7 +38,7 @@ it('throws on missing email address', () => {
 });
 it('filters out U+202C', () => {
   expect(
-    extractContactFromEmailContactString('Foo Bar <s@gmail.com\u202c>')
+    extractContactFromEmailContactString('Foo Bar <s@gmail.com\u202c>'),
   ).toEqual({
     name: 'Foo Bar',
     emailAddress: 's@gmail.com',

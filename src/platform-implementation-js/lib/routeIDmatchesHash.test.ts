@@ -10,9 +10,9 @@ test('array works', () => {
 });
 test('parameter works', () => {
   expect(routeIDmatchesHash('foo/:bar/def/:blah', 'foo/123/def/x1')).toBe(
-    'foo/:bar/def/:blah'
+    'foo/:bar/def/:blah',
   );
   expect(routeIDmatchesHash('foo/:bar/def/:blah', 'foo/123/xef/x1')).toBe(
-    undefined
+    undefined,
   );
 });

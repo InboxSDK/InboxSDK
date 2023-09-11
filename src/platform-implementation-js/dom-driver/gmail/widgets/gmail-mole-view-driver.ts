@@ -33,7 +33,7 @@ class GmailMoleViewDriver {
     } else {
       querySelector(
         this._element,
-        '.inboxsdk__mole_view_titlebar'
+        '.inboxsdk__mole_view_titlebar',
       ).addEventListener('click', (e: MouseEvent) => {
         this.setMinimized(!this.getMinimized());
         e.preventDefault();
@@ -73,7 +73,7 @@ class GmailMoleViewDriver {
       if (titleButtons) {
         const titleButtonContainer = querySelector(
           this._element,
-          '.inboxsdk__mole_title_buttons'
+          '.inboxsdk__mole_title_buttons',
         );
         const lastChild: HTMLElement =
           titleButtonContainer.lastElementChild as any;
@@ -97,7 +97,7 @@ class GmailMoleViewDriver {
     }
 
     querySelector(this._element, '.inboxsdk__mole_view_content').appendChild(
-      options.el
+      options.el,
     );
   }
 
@@ -106,7 +106,7 @@ class GmailMoleViewDriver {
       moleParent.insertBefore(this._element, last(moleParent.children)!);
       const dw = findParent(
         moleParent,
-        (el) => el.nodeName === 'DIV' && el.classList.contains('dw')
+        (el) => el.nodeName === 'DIV' && el.classList.contains('dw'),
       );
 
       if (dw) {
@@ -120,7 +120,7 @@ class GmailMoleViewDriver {
       doShow(moleParent);
     } else {
       const moleParentReadyEvent = streamWaitFor(() =>
-        GmailElementGetter.getMoleParent()
+        GmailElementGetter.getMoleParent(),
       )
         .takeUntilBy(this._stopper)
         .onValue(doShow);
@@ -176,7 +176,7 @@ class GmailMoleViewDriver {
 
   setTitle(text: string) {
     const titleElement = this._element.querySelector(
-      '.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_default'
+      '.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_default',
     );
 
     if (titleElement) {
@@ -186,7 +186,7 @@ class GmailMoleViewDriver {
 
   _setTitleEl(el: HTMLElement) {
     const container = this._element.querySelector(
-      '.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_default'
+      '.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_default',
     );
 
     if (container) {
@@ -197,7 +197,7 @@ class GmailMoleViewDriver {
 
   _setMinimizedTitleEl(el: HTMLElement) {
     const container = this._element.querySelector(
-      '.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_minimized'
+      '.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_minimized',
     );
 
     if (container) {

@@ -103,7 +103,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
 
   constructor(
     driver: GmailDriver,
-    panelDescriptor: AppMenuItemPanelDescriptor
+    panelDescriptor: AppMenuItemPanelDescriptor,
   ) {
     super();
     this.#driver = driver;
@@ -138,34 +138,34 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   addNavItem(
     navItemDescriptor:
       | NavItemDescriptor
-      | Kefir.Observable<NavItemDescriptor, any>
+      | Kefir.Observable<NavItemDescriptor, any>,
   ) {
     this.setLoading(false);
     const { element } = this;
 
     const navMenuContainerElement = querySelector(
       element,
-      NAV_MENU_CONTAINER_ELEMENT_SELECTOR
+      NAV_MENU_CONTAINER_ELEMENT_SELECTOR,
     );
 
     const appId = `collapsible-panel-${this.#id}`;
 
     const navItemDescriptorPropertyStream = kefirCast(
       Kefir,
-      navItemDescriptor
+      navItemDescriptor,
     ).toProperty();
 
     const gmailNavItemView = this.#driver.addNavItem(
       appId,
       navItemDescriptorPropertyStream,
-      navMenuContainerElement
+      navMenuContainerElement,
     );
 
     const navItemView = new NavItemView(
       appId,
       this.#driver,
       navItemDescriptorPropertyStream,
-      gmailNavItemView
+      gmailNavItemView,
     );
 
     return navItemView;
@@ -224,8 +224,8 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
         </div>
         <div class="${scrollablePanelClass}">
           <div class="${loadingElClass}">${
-      loadingIcon ? { __html: loadingIcon } : ''
-    }</div>
+            loadingIcon ? { __html: loadingIcon } : ''
+          }</div>
           <div class="Ls77Lb aZ6">
             <div class="pp" style="user-select: none;">
               <div>
@@ -257,15 +257,15 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     `.trim();
     const primaryBtnEl = querySelector(
       element,
-      PRIMARY_BUTTON_ELEMENT_SELECTOR
+      PRIMARY_BUTTON_ELEMENT_SELECTOR,
     );
     primaryBtnEl.style.setProperty(
       '--background-image',
-      defaultIconUrl ? `url(${defaultIconUrl})` : 'unset'
+      defaultIconUrl ? `url(${defaultIconUrl})` : 'unset',
     );
     primaryBtnEl.style.setProperty(
       '--background-image--hover',
-      hoverPanelIconUrl ? `url(${hoverPanelIconUrl})` : 'unset'
+      hoverPanelIconUrl ? `url(${hoverPanelIconUrl})` : 'unset',
     );
 
     primaryBtnEl.addEventListener('click', this.#onPrimaryButtonClick);
@@ -282,12 +282,12 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     if (!element) return;
 
     const existingClassNames = Object.values(
-      CollapsiblePanelView.elementCss
+      CollapsiblePanelView.elementCss,
     ).filter((className) => element.classList.contains(className));
     element.className = cx(
       ELEMENT_CLASS,
       this.panelDescriptor.className,
-      ...existingClassNames
+      ...existingClassNames,
     );
 
     this.#updateName(element);
@@ -300,7 +300,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   #updateIcon(element: HTMLElement) {
     const iconContainerEl = querySelector(
       element,
-      PRIMARY_BUTTON_ELEMENT_SELECTOR
+      PRIMARY_BUTTON_ELEMENT_SELECTOR,
     );
 
     const { panelDefault, panelHovered } =
@@ -348,7 +348,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
 
   #updateScrollablePanelLoading(element: Element) {
     const scrollablePanelLoadingEl = element.querySelector(
-      loadingElementSelector
+      loadingElementSelector,
     );
 
     if (!scrollablePanelLoadingEl) {

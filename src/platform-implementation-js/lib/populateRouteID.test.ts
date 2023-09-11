@@ -7,21 +7,21 @@ test('works with params', () => {
     populateRouteID('a/:id/b/:foo', {
       id: 'aaa',
       foo: '456',
-    })
+    }),
   ).toBe('a/aaa/b/456');
 });
 test('works with params that are not preceded by a slash', () => {
   expect(
     populateRouteID('a/foo:id/b', {
       id: 'aaa',
-    })
+    }),
   ).toBe('a/fooaaa/b');
 });
 test('url encodes', () => {
   expect(
     populateRouteID('a/:id', {
       id: '%/$\'"',
-    })
+    }),
   ).toBe("a/%25%2F%24'%22");
 });
 test('throws if missing params', () => {
@@ -32,6 +32,6 @@ test('throws if extra params', () => {
     populateRouteID('a/:id', {
       id: '456',
       foo: '789',
-    })
+    }),
   ).toThrowError();
 });

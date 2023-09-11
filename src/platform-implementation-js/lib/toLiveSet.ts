@@ -3,7 +3,7 @@ import * as Kefir from 'kefir';
 import type { ItemWithLifetime } from './dom/make-element-child-stream';
 
 export default function toLiveSet<T>(
-  itemWithLifetimeStream: Kefir.Observable<ItemWithLifetime<T>, unknown>
+  itemWithLifetimeStream: Kefir.Observable<ItemWithLifetime<T>, unknown>,
 ): LiveSet<T> {
   return new LiveSet({
     read() {

@@ -27,7 +27,7 @@ export default function xhrHelper() {
             text: await response.text(),
             responseURL: response.url,
           },
-        })
+        }),
       );
     })().catch((err) => {
       document.dispatchEvent(
@@ -41,7 +41,7 @@ export default function xhrHelper() {
             stack: err && err.stack,
             status: err && err.xhr && err.xhr.status,
           },
-        })
+        }),
       );
     });
   });

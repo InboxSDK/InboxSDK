@@ -32,7 +32,7 @@ export default class KeyboardShortcutHelpModifier {
     keyboardShortcutHandle: KeyboardShortcutHandle,
     appId: string,
     appName: string | null | undefined,
-    appIconUrl: string | null | undefined
+    appIconUrl: string | null | undefined,
   ) {
     this._initializeAppValues(appId, appName!, appIconUrl!);
 
@@ -46,7 +46,7 @@ export default class KeyboardShortcutHelpModifier {
   _initializeAppValues(
     appId: string,
     appName: string | null | undefined,
-    appIconUrl: string | null | undefined
+    appIconUrl: string | null | undefined,
   ) {
     if (!this._appId) {
       this._appId = appId;
@@ -72,7 +72,7 @@ export default class KeyboardShortcutHelpModifier {
         })
           .filter(() => !node.classList.contains('aou'))
           .toProperty(() => null)
-          .map(() => node)
+          .map(() => node),
       )
       .takeUntilBy(this._stopper)
       .onValue((node) => this._renderHelp(node));
@@ -159,7 +159,7 @@ export default class KeyboardShortcutHelpModifier {
 
   _renderShortcut(
     tableBody: HTMLElement,
-    keyboardShortcutHandle: KeyboardShortcutHandle
+    keyboardShortcutHandle: KeyboardShortcutHandle,
   ) {
     var shortcutRow = document.createElement('tr');
     shortcutRow.innerHTML = [
@@ -183,7 +183,7 @@ function _getShortcutHTML(chord: string): string {
 
   for (var ii = 0; ii < parts.length; ii++) {
     retArray.push(
-      '<span class="wh">' + escape(_getAngledBracket(parts[ii])) + '</span>'
+      '<span class="wh">' + escape(_getAngledBracket(parts[ii])) + '</span>',
     );
     if (separators && separators[ii]) {
       retArray.push(_getSeparatorHTML(separators[ii]));

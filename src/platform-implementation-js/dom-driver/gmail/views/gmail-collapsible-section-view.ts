@@ -35,7 +35,7 @@ class GmailCollapsibleSectionView {
     driver: GmailDriver,
     groupOrderHint: number,
     isSearch: boolean,
-    isCollapsible: boolean
+    isCollapsible: boolean,
   ) {
     this._driver = driver;
     this._isSearch = isSearch;
@@ -74,10 +74,10 @@ class GmailCollapsibleSectionView {
     collapsibleSectionDescriptorProperty: Kefir.Observable<
       Record<string, any> | null | undefined,
       unknown
-    >
+    >,
   ) {
     const stoppedProperty = collapsibleSectionDescriptorProperty.takeUntilBy(
-      this._eventStream.filter(() => false).beforeEnd(() => null)
+      this._eventStream.filter(() => false).beforeEnd(() => null),
     );
     stoppedProperty.onValue((x) => this._updateValues(x));
     stoppedProperty.take(1).onValue(() => this._isReadyDeferred.resolve(this));
@@ -95,7 +95,7 @@ class GmailCollapsibleSectionView {
   }
 
   _updateValues(
-    collapsibleSectionDescriptor: Record<string, any> | null | undefined
+    collapsibleSectionDescriptor: Record<string, any> | null | undefined,
   ) {
     const element = this._element;
 
@@ -147,8 +147,8 @@ class GmailCollapsibleSectionView {
       String(
         typeof collapsibleSectionDescriptor.orderHint === 'number'
           ? collapsibleSectionDescriptor.orderHint
-          : 0
-      )
+          : 0,
+      ),
     );
     if (!this._isCollapsible)
       element.classList.add('inboxsdk__resultsSection_nonCollapsible');
@@ -174,15 +174,15 @@ class GmailCollapsibleSectionView {
 
     if (this._isCollapsible && this._titleElement) {
       Kefir.fromEvents(this._titleElement, 'click').onValue(() =>
-        this._toggleCollapseState()
+        this._toggleCollapseState(),
       );
     }
 
     Kefir.fromEvents(element, 'removeCollapsedContainer').onValue(() =>
-      this._destroyCollapsedContainer()
+      this._destroyCollapsedContainer(),
     );
     Kefir.fromEvents(element, 'readdToCollapsedContainer').onValue(() =>
-      this._addToCollapsedContainer()
+      this._addToCollapsedContainer(),
     );
 
     this._eventStream.emit({
@@ -203,7 +203,7 @@ class GmailCollapsibleSectionView {
 
   _setupGmailv2Header(
     headerElement: HTMLElement,
-    collapsibleSectionDescriptor: Record<string, any>
+    collapsibleSectionDescriptor: Record<string, any>,
   ) {
     const titleElement = (this._titleElement = document.createElement('div'));
     titleElement.setAttribute('class', 'inboxsdk__resultsSection_title');
@@ -240,7 +240,7 @@ class GmailCollapsibleSectionView {
           '' +
             (typeof collapsibleSectionDescriptor.orderHint === 'number'
               ? collapsibleSectionDescriptor.orderHint
-              : 0)
+              : 0),
         );
 
       this._eventStream.emit({
@@ -282,7 +282,7 @@ class GmailCollapsibleSectionView {
     const titleElement = this._titleElement;
     if (!titleElement) return;
     let subtitleElement = titleElement.querySelector(
-      '.inboxsdk__resultsSection_title_subtitle'
+      '.inboxsdk__resultsSection_title_subtitle',
     );
 
     if (!collapsibleSectionDescriptor.subtitle) {
@@ -298,7 +298,7 @@ class GmailCollapsibleSectionView {
 
         if (subtitleElement && titleElement) {
           subtitleElement.classList.add(
-            'inboxsdk__resultsSection_title_subtitle'
+            'inboxsdk__resultsSection_title_subtitle',
           );
           const insertionPoint = titleElement.querySelector('.Wn');
 
@@ -318,7 +318,7 @@ class GmailCollapsibleSectionView {
     const headerElement = this._headerElement;
     if (!headerElement) return;
     let summaryTextElement = headerElement.querySelector(
-      '.inboxsdk__resultsSection_header_summaryText'
+      '.inboxsdk__resultsSection_header_summaryText',
     );
 
     if (!collapsibleSectionDescriptor.titleLinkText) {
@@ -333,7 +333,7 @@ class GmailCollapsibleSectionView {
         summaryTextElement = document.createElement('div');
         summaryTextElement.setAttribute(
           'class',
-          'inboxsdk__resultsSection_header_summaryText Wm'
+          'inboxsdk__resultsSection_header_summaryText Wm',
         );
         summaryTextElement.innerHTML = [
           '<span class="Di">&nbsp;',
@@ -350,7 +350,7 @@ class GmailCollapsibleSectionView {
           Kefir.fromEvents(summaryTextElement, 'click').map(() => ({
             eventName: 'titleLinkClicked',
             sectionDescriptor: this._collapsibleSectionDescriptor,
-          }))
+          })),
         );
 
         const _summaryTextElement = summaryTextElement;
@@ -364,7 +364,7 @@ class GmailCollapsibleSectionView {
         if (insertionPoint)
           (insertionPoint as any).insertAdjacentElement(
             'afterbegin',
-            summaryTextElement
+            summaryTextElement,
           );
       }
 
@@ -406,7 +406,7 @@ class GmailCollapsibleSectionView {
       ) {
         if (this._dropdownViewController)
           this._dropdownViewController.setDropdownShowFunction(
-            collapsibleSectionDescriptor.onDropdownClick
+            collapsibleSectionDescriptor.onDropdownClick,
           );
       }
     }
@@ -452,7 +452,7 @@ class GmailCollapsibleSectionView {
       const rowElement = document.createElement('tr');
       rowElement.setAttribute(
         'class',
-        'inboxsdk__resultsSection_tableRow zA ' + (result.isRead ? 'yO' : 'zE')
+        'inboxsdk__resultsSection_tableRow zA ' + (result.isRead ? 'yO' : 'zE'),
       );
       rowElement.innerHTML = _getRowHTML(result);
       if (!tbody) throw new Error('should not happen');
@@ -461,7 +461,7 @@ class GmailCollapsibleSectionView {
         Kefir.fromEvents(rowElement, 'click').map(() => ({
           eventName: 'rowClicked',
           rowDescriptor: result,
-        }))
+        })),
       );
     });
   }
@@ -493,7 +493,7 @@ class GmailCollapsibleSectionView {
     if (messageElement) {
       messageElement.setAttribute(
         'class',
-        'TB TC inboxsdk__resultsSection_loading'
+        'TB TC inboxsdk__resultsSection_loading',
       );
       messageElement.innerHTML = 'loading...'; //TODO: localize
 
@@ -536,7 +536,7 @@ class GmailCollapsibleSectionView {
             eventName: 'footerClicked',
             sectionDescriptor: this._collapsibleSectionDescriptor,
           };
-        })
+        }),
       );
 
       footerElement.appendChild(footerLinkElement);
@@ -635,11 +635,11 @@ class GmailCollapsibleSectionView {
       //now we need to "merge" the two collapse containers. This can be done by taking all the result sections out of the collapsed container
       //and calling our "recollapse" helper function on them
       const elementsToRecollapse = Array.from(
-        otherCollapseContainer.children[0].children
+        otherCollapseContainer.children[0].children,
       ).concat(Array.from(otherCollapseContainer.children[1].children));
       if (otherCollapseContainer)
         this._pulloutSectionsFromCollapsedContainer(
-          otherCollapseContainer as any
+          otherCollapseContainer as any,
         );
 
       this._recollapse(elementsToRecollapse);
@@ -664,7 +664,7 @@ class GmailCollapsibleSectionView {
     }
 
     const elementsToRecollapse = Array.from(
-      container.children[0].children
+      container.children[0].children,
     ).concat(Array.from(container.children[1].children));
 
     this._pulloutSectionsFromCollapsedContainer(container as any);
@@ -677,13 +677,13 @@ class GmailCollapsibleSectionView {
   _pulloutSectionsFromCollapsedContainer(container: HTMLElement) {
     const prependedChildren = Array.from(container.children[0].children);
     prependedChildren.forEach((child) =>
-      (container as any).insertAdjacentElement('beforebegin', child)
+      (container as any).insertAdjacentElement('beforebegin', child),
     );
     const appendedChildren = Array.from(
-      container.children[1].children
+      container.children[1].children,
     ).reverse();
     appendedChildren.forEach((child) =>
-      (container as any).insertAdjacentElement('afterend', child)
+      (container as any).insertAdjacentElement('afterend', child),
     );
   }
 
@@ -694,7 +694,7 @@ class GmailCollapsibleSectionView {
     if (this._collapsedContainer) {
       this._collapsedContainer.children[0].insertBefore(
         element,
-        this._collapsedContainer.children[1].firstElementChild
+        this._collapsedContainer.children[1].firstElementChild,
       );
 
       return;
@@ -720,7 +720,7 @@ class GmailCollapsibleSectionView {
     if (isPrepend && collapsedContainer) {
       collapsedContainer.children[0].insertBefore(
         element,
-        collapsedContainer.children[0].firstElementChild
+        collapsedContainer.children[0].firstElementChild,
       );
     } else if (collapsedContainer) {
       collapsedContainer.children[0].appendChild(element);
@@ -741,7 +741,7 @@ class GmailCollapsibleSectionView {
         'removeCollapsedContainer',
         false,
         false,
-        null
+        null,
       );
       child.dispatchEvent(removeEvent);
       const readdEvent = document.createEvent('CustomEvent');
@@ -749,7 +749,7 @@ class GmailCollapsibleSectionView {
         'readdToCollapsedContainer',
         false,
         false,
-        null
+        null,
       );
       child.dispatchEvent(readdEvent);
     });
@@ -760,7 +760,7 @@ class GmailCollapsibleSectionView {
       document.createElement('div'));
     collapsedContainer.setAttribute(
       'class',
-      'inboxsdk__results_collapsedContainer Wg'
+      'inboxsdk__results_collapsedContainer Wg',
     );
     collapsedContainer.innerHTML =
       '<div class="inboxsdk__results_collapsedContainer_prepend"></div><div class="inboxsdk__results_collapsedContainer_append"></div>';

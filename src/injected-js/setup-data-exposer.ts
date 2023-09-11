@@ -62,22 +62,22 @@ export default function setupDataExposer() {
       document.head.setAttribute('data-inboxsdk-user-language', userLanguage);
       document.head.setAttribute(
         'data-inboxsdk-using-sync-api',
-        context.GM_SPT_ENABLED
+        context.GM_SPT_ENABLED,
       );
 
       if (context.GLOBALS) {
         // Gmail
         document.head.setAttribute(
           'data-inboxsdk-ik-value',
-          context.GLOBALS[9]
+          context.GLOBALS[9],
         );
         document.head.setAttribute(
           'data-inboxsdk-action-token-value',
-          context.GM_ACTION_TOKEN
+          context.GM_ACTION_TOKEN,
         );
         var globalSettingsHolder = find(
           context.GLOBALS[17],
-          (item) => item[0] === 'p'
+          (item) => item[0] === 'p',
         );
 
         if (!globalSettingsHolder) {
@@ -88,7 +88,7 @@ export default function setupDataExposer() {
           {
             var previewPaneLabEnabled = getSettingValue(
               globalSettings,
-              'bx_lab_1252'
+              'bx_lab_1252',
             );
             var previewPaneEnabled = getSettingValue(globalSettings, 'bx_spa');
             var previewPaneVertical = getSettingValue(globalSettings, 'bx_spo');
@@ -100,7 +100,7 @@ export default function setupDataExposer() {
                 : 'none';
             document.head.setAttribute(
               'data-inboxsdk-user-preview-pane-mode',
-              previewPaneMode
+              previewPaneMode,
             );
           }
         }
@@ -111,12 +111,12 @@ export default function setupDataExposer() {
           document.querySelectorAll<HTMLScriptElement>('script:not([src])'),
           (script) =>
             script.text &&
-            script.text.slice(0, 500).indexOf(preloadDataSearchString) > -1
+            script.text.slice(0, 500).indexOf(preloadDataSearchString) > -1,
         ) as HTMLScriptElement | undefined;
 
         if (!preloadScript) {
           logger.error(
-            new Error('Could not read preloaded BT_EmbeddedAppData')
+            new Error('Could not read preloaded BT_EmbeddedAppData'),
           );
         } else {
           const { text } = preloadScript;
@@ -133,8 +133,8 @@ export default function setupDataExposer() {
           const preloadData = JSON.parse(
             text.slice(
               firstBracket + preloadDataSearchString.length - 1,
-              lastBracket + 1
-            )
+              lastBracket + 1,
+            ),
           );
           const ikValue = preloadData[11];
 

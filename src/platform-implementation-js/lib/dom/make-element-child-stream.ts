@@ -11,7 +11,7 @@ export type ElementWithLifetime = ItemWithLifetime<HTMLElement>;
 // Emits events whenever the given element has any children added or removed.
 // Also when first listened to, it emits events for existing children.
 export default function makeElementChildStream(
-  element: HTMLElement
+  element: HTMLElement,
 ): Kefir.Observable<ElementWithLifetime, never> {
   if (!element || !element.nodeType) {
     throw new Error('Expected element, got ' + String(element));
@@ -27,8 +27,8 @@ export default function makeElementChildStream(
       if (removalStreams.has(el)) {
         throwLater(
           new Error(
-            'Already had removalStream for element with class ' + el.className
-          )
+            'Already had removalStream for element with class ' + el.className,
+          ),
         );
       }
 
@@ -56,8 +56,8 @@ export default function makeElementChildStream(
         throwLater(
           new Error(
             'Could not find removalStream for element with class ' +
-              el.className
-          )
+              el.className,
+          ),
         );
       }
     }

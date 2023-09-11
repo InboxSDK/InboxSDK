@@ -4,7 +4,7 @@ it('handles first draft save', () => {
   const request = fs.readFileSync(
     __dirname +
       '/../../../__tests__/sync-compose-request-processor/first-draft-save-request-2018-01-25.json',
-    'utf8'
+    'utf8',
   );
   const composeRequest = SCRP.getDetailsOfComposeRequest(JSON.parse(request));
   expect(composeRequest).toMatchObject({
@@ -21,7 +21,7 @@ it('handles regular draft save', () => {
   const request = fs.readFileSync(
     __dirname +
       '/../../../__tests__/sync-compose-request-processor/draft-save-request-2018-01-25.json',
-    'utf8'
+    'utf8',
   );
   const composeRequest = SCRP.getDetailsOfComposeRequest(JSON.parse(request));
   expect(composeRequest).toMatchObject({
@@ -38,7 +38,7 @@ it('handles regular draft save with recipients', () => {
   const request = fs.readFileSync(
     __dirname +
       '/../../../__tests__/sync-compose-request-processor/draft-save-request-2018-01-25-with-recipients.json',
-    'utf8'
+    'utf8',
   );
   const composeRequest = SCRP.getDetailsOfComposeRequest(JSON.parse(request));
   expect(composeRequest).toMatchObject({
@@ -82,7 +82,7 @@ it('handles sending', () => {
   const request = fs.readFileSync(
     __dirname +
       '/../../../__tests__/sync-compose-request-processor/send-request-2018-01-25.json',
-    'utf8'
+    'utf8',
   );
   const composeRequest = SCRP.getDetailsOfComposeRequest(JSON.parse(request));
   expect(composeRequest).toMatchObject({

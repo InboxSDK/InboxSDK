@@ -5,7 +5,7 @@ import type GmailDriver from '../gmail-driver';
 import type { SyncThread } from '../gmail-sync-response-processor';
 export default async function getThreadFromSyncThreadId(
   driver: GmailDriver,
-  syncThreadId: string
+  syncThreadId: string,
 ): Promise<SyncThread | null | undefined> {
   const [btaiHeader, xsrfToken] = await Promise.all([
     driver.getPageCommunicator().getBtaiHeader(),
@@ -14,13 +14,13 @@ export default async function getThreadFromSyncThreadId(
   return getThreadFromSyncThreadIdUsingHeaders(
     syncThreadId,
     btaiHeader,
-    xsrfToken
+    xsrfToken,
   );
 }
 export async function getThreadFromSyncThreadIdUsingHeaders(
   syncThreadId: string,
   btaiHeader: string,
-  xsrfToken: string
+  xsrfToken: string,
 ): Promise<SyncThread | null | undefined> {
   let responseText = null;
 

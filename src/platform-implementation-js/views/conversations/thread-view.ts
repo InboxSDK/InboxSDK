@@ -44,7 +44,7 @@ class ThreadView
     threadViewImplementation: ThreadViewDriver,
     appId: string,
     driver: Driver,
-    membrane: Membrane
+    membrane: Membrane,
   ) {
     super();
     const members = {
@@ -66,7 +66,7 @@ class ThreadView
       .eventSdkPassive('threadView.addSidebarContentPanel');
     const contentPanelImplementation =
       members.threadViewImplementation.addSidebarContentPanel(
-        descriptorPropertyStream
+        descriptorPropertyStream,
       );
 
     if (contentPanelImplementation) {
@@ -85,24 +85,24 @@ class ThreadView
     provider: (
       numberCustomMessagesHidden: number,
       numberNativeMessagesHidden: number | null | undefined,
-      unmountPromise: Promise<void>
-    ) => HTMLElement
+      unmountPromise: Promise<void>,
+    ) => HTMLElement,
   ) {
     const members = get(memberMap, this);
     return members.threadViewImplementation.registerHiddenCustomMessageNoticeProvider(
-      provider
+      provider,
     );
   }
 
   addCustomMessage(descriptor: Record<string, any>): CustomMessageView {
     const descriptorPropertyStream = kefirCast(
       Kefir as any,
-      descriptor
+      descriptor,
     ).toProperty();
     const members = get(memberMap, this);
     members.driver.getLogger().eventSdkPassive('threadView.addCustomMessage');
     return members.threadViewImplementation.addCustomMessage(
-      descriptorPropertyStream
+      descriptorPropertyStream,
     );
   }
 
@@ -130,7 +130,7 @@ class ThreadView
       .driver.getLogger()
       .deprecationWarning(
         'threadView.getThreadID',
-        'threadView.getThreadIDAsync'
+        'threadView.getThreadIDAsync',
       );
     return get(memberMap, this).threadViewImplementation.getThreadID();
   }
@@ -148,7 +148,7 @@ export default ThreadView;
 
 function _bindToStreamEvents(
   threadView: ThreadView,
-  threadViewImplementation: ThreadViewDriver
+  threadViewImplementation: ThreadViewDriver,
 ) {
   threadViewImplementation.getEventStream().onEnd(function () {
     threadView.destroyed = true;

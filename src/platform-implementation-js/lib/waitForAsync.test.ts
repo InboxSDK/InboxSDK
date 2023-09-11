@@ -20,7 +20,7 @@ test('multiple calls', async () => {
 test('timeout', async () => {
   const fn = jest.fn(async () => false);
   await expect(waitForAsync(fn, 50, 10)).rejects.toThrowError(
-    'waitForAsync timeout'
+    'waitForAsync timeout',
   );
   expect(fn.mock.calls.length).toBeGreaterThanOrEqual(1);
   expect(fn.mock.calls.length).toBeLessThanOrEqual(6);

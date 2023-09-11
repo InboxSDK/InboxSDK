@@ -10,7 +10,7 @@ export default once(function detectClassicRecipientsArea() {
             rule instanceof CSSStyleRule &&
             rule.selectorText === '.aoI' &&
             rule.style.fontSize &&
-            rule.style.color
+            rule.style.color,
         );
       }
     } catch (e) {
@@ -28,7 +28,7 @@ export default once(function detectClassicRecipientsArea() {
       (rule) =>
         rule instanceof CSSStyleRule &&
         rule.selectorText === '.aoI' &&
-        rule.style.overflowY === 'visible'
+        rule.style.overflowY === 'visible',
     );
     if (hasOverflowYVisibleRule) {
       return;
@@ -37,7 +37,7 @@ export default once(function detectClassicRecipientsArea() {
       (rule) =>
         rule instanceof CSSStyleRule &&
         rule.selectorText === '.aaZ > .M9 > .aoI' &&
-        rule.style.overflowY === 'auto'
+        rule.style.overflowY === 'auto',
     );
     if (hasOverflowYAutoRule) {
       return;

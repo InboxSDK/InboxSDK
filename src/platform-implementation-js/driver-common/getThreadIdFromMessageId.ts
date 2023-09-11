@@ -5,7 +5,7 @@ import type { Driver } from '../driver-interfaces/driver';
 
 async function getThreadIdFromMessageId(
   driver: Driver,
-  messageId: string
+  messageId: string,
 ): Promise<string> {
   const ikValue = driver.getPageCommunicator().getIkValue();
   const text = await requestGmailThread(ikValue, messageId);

@@ -39,7 +39,7 @@ export default class StopperPool<V, E> {
     const arrStreams = Array.isArray(newStreams) ? newStreams : [newStreams];
     this._streamCount += arrStreams.length;
     this._pool.plug(
-      Kefir.merge(arrStreams.map((newStream) => newStream.take(1)))
+      Kefir.merge(arrStreams.map((newStream) => newStream.take(1))),
     );
   }
 

@@ -14,7 +14,7 @@ class GmailAppSidebarView {
 
   constructor(
     driver: GmailDriver,
-    companionSidebarContentContainerElement: HTMLElement
+    companionSidebarContentContainerElement: HTMLElement,
   ) {
     this._driver = driver;
     // We need to be able to cooperate with other apps/extensions that are
@@ -25,7 +25,7 @@ class GmailAppSidebarView {
     // attribute to see whether a previous extension's GmailAppSidebarView has
     // already set up the sidebar or not.
     const instanceId = companionSidebarContentContainerElement.getAttribute(
-      'data-sdk-sidebar-instance-id'
+      'data-sdk-sidebar-instance-id',
     );
 
     if (instanceId != null) {
@@ -33,7 +33,7 @@ class GmailAppSidebarView {
     } else {
       let primary = new GmailAppSidebarPrimary(
         driver,
-        companionSidebarContentContainerElement
+        companionSidebarContentContainerElement,
       );
       this._instanceId = primary.getInstanceId();
       // hot reloading support. Not perfect; this will break any existing panels.
@@ -41,7 +41,7 @@ class GmailAppSidebarView {
         primary.destroy();
         primary = new GmailAppSidebarPrimary(
           driver,
-          companionSidebarContentContainerElement
+          companionSidebarContentContainerElement,
         );
         this._instanceId = primary.getInstanceId();
       });
@@ -59,7 +59,7 @@ class GmailAppSidebarView {
   _getShouldThreadAppSidebarOpen(): boolean {
     return (
       global.localStorage.getItem(
-        'inboxsdk__thread_app_sidebar_should_open'
+        'inboxsdk__thread_app_sidebar_should_open',
       ) !== 'false'
     );
   }
@@ -68,7 +68,7 @@ class GmailAppSidebarView {
     try {
       global.localStorage.setItem(
         'inboxsdk__thread_app_sidebar_should_open',
-        String(open)
+        String(open),
       );
     } catch (err) {
       console.error('error saving', err);
@@ -81,7 +81,7 @@ class GmailAppSidebarView {
   _getShouldGlobalAppSidebarOpen(): boolean {
     return (
       global.localStorage.getItem(
-        'inboxsdk__global_app_sidebar_should_open'
+        'inboxsdk__global_app_sidebar_should_open',
       ) === 'true'
     );
   }
@@ -90,7 +90,7 @@ class GmailAppSidebarView {
     try {
       global.localStorage.setItem(
         'inboxsdk__global_app_sidebar_should_open',
-        String(open)
+        String(open),
       );
     } catch (err) {
       console.error('error saving', err);
@@ -99,12 +99,12 @@ class GmailAppSidebarView {
 
   addThreadSidebarContentPanel(
     descriptor: Kefir.Observable<Record<string, any>, unknown>,
-    threadView: GmailThreadView
+    threadView: GmailThreadView,
   ) {
     const panel = new ContentPanelViewDriver(
       this._driver,
       descriptor,
-      this._instanceId
+      this._instanceId,
     );
     Kefir.merge([threadView.getStopper(), this._stopper])
       .take(1)
@@ -114,13 +114,13 @@ class GmailAppSidebarView {
   }
 
   addGlobalSidebarContentPanel(
-    descriptor: Kefir.Observable<Record<string, any>, unknown>
+    descriptor: Kefir.Observable<Record<string, any>, unknown>,
   ) {
     const panel = new ContentPanelViewDriver(
       this._driver,
       descriptor,
       this._instanceId,
-      true
+      true,
     );
 
     this._stopper.takeUntilBy(panel.getStopper()).onValue(() => panel.remove());

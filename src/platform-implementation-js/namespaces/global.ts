@@ -27,14 +27,14 @@ export default class Global {
   }
 
   async addSidebarContentPanel(
-    descriptor: Record<string, any>
+    descriptor: Record<string, any>,
   ): Promise<ContentPanelView | null | undefined> {
     const descriptorPropertyStream = kefirCast(Kefir, descriptor).toProperty();
     const members = get(memberMap, this);
     members.driver.getLogger().eventSdkPassive('global.addSidebarContentPanel');
     const contentPanelImplementation =
       await members.driver.addGlobalSidebarContentPanel(
-        descriptorPropertyStream
+        descriptorPropertyStream,
       );
 
     if (contentPanelImplementation) {
@@ -45,7 +45,7 @@ export default class Global {
   }
 
   addSupportItem(
-    supportItemDescriptor: SupportItemDescriptor
+    supportItemDescriptor: SupportItemDescriptor,
   ): GmailSupportItemView {
     const members = get(memberMap, this);
     members.driver.getLogger().eventSdkPassive('global.addSupportItem');

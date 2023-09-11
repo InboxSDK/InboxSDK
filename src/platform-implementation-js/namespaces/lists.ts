@@ -40,7 +40,7 @@ export default class Lists {
     const threadRowViewDrivers =
       members.driver.getSelectedThreadRowViewDrivers();
     const threadRowViews = threadRowViewDrivers.map((d) =>
-      members.membrane.get(d)
+      members.membrane.get(d),
     );
     return threadRowViews;
   }

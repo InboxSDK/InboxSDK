@@ -42,7 +42,7 @@ if (args.remote && args.production && !args.minify) {
 // want those visible in production.
 if (args.production && (args.watch || args.integratedPageWorld)) {
   throw new Error(
-    '--production can not be used with --watch, or --integratedPageWorld'
+    '--production can not be used with --watch, or --integratedPageWorld',
   );
 }
 
@@ -112,8 +112,8 @@ async function getVersion(): Promise<string> {
   const packageJson = JSON.parse(
     await fs.promises.readFile(
       path.join(__dirname, 'packages/core/package.json'),
-      'utf8'
-    )
+      'utf8',
+    ),
   );
 
   let version = `${packageJson.version}-${Date.now()}-${commit}`;
@@ -197,7 +197,7 @@ async function webpackTask({
                     'data-inboxsdk-version',
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- this is injected by webpack
                     ///@ts-ignore
-                    SDK_VERSION
+                    SDK_VERSION,
                   );
                   document.head.append(htmlElement);
                 },
@@ -318,7 +318,7 @@ gulp.task('clean', async () => {
   const folders = ['./dist', './packages/core/src', './packages/core/test'];
   await Promise.all([
     ...folders.map((folder) =>
-      fs.promises.rm(folder, { force: true, recursive: true })
+      fs.promises.rm(folder, { force: true, recursive: true }),
     ),
     fs.promises.rm('./packages/core/inboxsdk.min.js', { force: true }),
   ]);
@@ -334,8 +334,8 @@ gulp.task('clean', async () => {
     fs.promises.rm(filename + '.LICENSE.txt', { force: true }),
     fg(filename + '*.map', { onlyFiles: true }).then((mapFiles) =>
       Promise.all(
-        mapFiles.map((mapFile) => fs.promises.rm(mapFile, { force: true }))
-      )
+        mapFiles.map((mapFile) => fs.promises.rm(mapFile, { force: true })),
+      ),
     ),
   ]);
 });
@@ -375,7 +375,7 @@ if (args.remote) {
         destName: 'platform-implementation.js',
         afterBuild: setupExamples,
       });
-    })
+    }),
   );
   gulp.task('default', gulp.series('sdk', 'remote'));
 } else if (args.integratedPageWorld) {
@@ -391,7 +391,7 @@ if (args.remote) {
         afterBuild: setupExamples,
         outputLibraryType: OutputLibraryType.Var,
       });
-    })
+    }),
   );
   gulp.task('remote', () => {
     throw new Error('No separate remote bundle in non-remote bundle mode');
@@ -421,5 +421,5 @@ gulp.task(
   gulp.series(!args.remote ? 'sdk' : 'remote', async function serverRun() {
     const app = await import('./live/app');
     app.run();
-  })
+  }),
 );

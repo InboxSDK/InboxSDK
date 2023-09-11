@@ -7,7 +7,7 @@ function isGmailRuleForTitlebarWideIcons(): boolean {
           (rule) =>
             rule instanceof CSSStyleRule &&
             rule.selectorText === '.Hl' &&
-            rule.style.width === '24px'
+            rule.style.width === '24px',
         );
       }
     } catch (e) {
