@@ -449,6 +449,7 @@ class GmailDriver implements Driver {
             hasDropdown: options.hasDropdown,
             iconClass: options.iconClass,
             iconUrl: options.iconUrl,
+            title: options.title,
             orderHint: options.orderHint,
             onClick: (event: any) => {
               if (!options.onClick) return;
