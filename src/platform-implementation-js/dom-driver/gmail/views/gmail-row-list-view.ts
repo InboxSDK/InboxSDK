@@ -1,6 +1,5 @@
 import find from 'lodash/find';
 import zip from 'lodash/zip';
-import assert from 'assert';
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
@@ -11,6 +10,7 @@ import GmailThreadRowView from './gmail-thread-row-view';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import type GmailDriver from '../gmail-driver';
 import type GmailRouteView from './gmail-route-view/gmail-route-view';
+import { assert } from '../../../../common/assert';
 const THREAD_ROW_SELECTED_CLASSNAME = 'x7';
 const THREAD_ROW_SELECTED_CLASSNAME_REGEX = /\bx7\b/;
 
@@ -184,7 +184,7 @@ class GmailRowListView {
       const newCols = newTableParent.querySelectorAll<HTMLElement>(
         'table.cf > colgroup > col'
       );
-      assert.strictEqual(firstCols.length, newCols.length);
+      assert(Object.is(firstCols.length, newCols.length));
       zip(firstCols, newCols).forEach(([firstCol, newCol]) => {
         newCol!.style.width = firstCol!.style.width;
       });

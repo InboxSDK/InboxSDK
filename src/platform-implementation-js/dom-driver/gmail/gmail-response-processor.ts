@@ -2,8 +2,8 @@ import flatten from 'lodash/flatten';
 import last from 'lodash/last';
 import t from 'transducers.js';
 import mapIndexed from 'map-indexed-xf';
-import assert from 'assert';
 import htmlToText from '../../../common/html-to-text';
+import { assert } from '../../../common/assert';
 
 export function interpretSentEmailResponse(responseString: string): {
   threadID: string;

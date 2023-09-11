@@ -271,8 +271,6 @@ async function webpackTask({
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       fallback: {
-        // 'assert' used in the SDK directly
-        assert: require.resolve('assert/'),
         // 'querystring' used in the SDK directly
         querystring: require.resolve('querystring-es3/'),
       },
