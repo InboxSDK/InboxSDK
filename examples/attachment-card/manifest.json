@@ -1,6 +1,6 @@
 {
   "name": "Attachment Card Example Extension",
-  "version": "0.1",
+  "version": "2.0",
   "content_scripts": [
     {
       "matches": ["https://mail.google.com/*"],
@@ -15,22 +15,16 @@
       "run_at": "document_end"
     }
   ],
-  "permissions": [
-    "https://mail.google.com/",
-    "https://mail-attachment.googleusercontent.com/"
-  ],
+  "permissions": ["scripting"],
   "web_accessible_resources": [
-    "inboxsdk.js.map",
-    "pageWorld.js",
-    "pageWorld.js.map",
-    "partycat.jpg",
-    "zipicon.png"
+    {
+      "matches": ["https://mail.google.com/*"],
+      "resources": ["pageWorld.js", "partycat.jpg", "zipicon.png"]
+    }
   ],
-
   "background": {
-    "scripts": ["background.js"],
-    "persistent": false
+    "service_worker": "background.js"
   },
-
-  "manifest_version": 2
+  "manifest_version": 3,
+  "host_permissions": ["https://mail.google.com/"]
 }
