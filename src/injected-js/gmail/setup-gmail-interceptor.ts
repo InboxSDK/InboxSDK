@@ -1166,8 +1166,12 @@ export function setupGmailInterceptorOnFrames(
 
     main_wrappers.push({
       isRelevantTo(connection) {
-        const url = new URL(connection.url);
-        return url.hostname.endsWith('.google.com');
+        // check for absolute URLs going to a google domain
+        if (connection.url.startsWith('https://')) {
+          const url = new URL(connection.url);
+          return url.hostname.endsWith('.google.com');
+        }
+        return false;
       },
 
       originalSendBodyLogger(connection) {
