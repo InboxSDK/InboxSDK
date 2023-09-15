@@ -19,23 +19,25 @@ export default class User {
     this.#piOpts = piOpts;
   }
 
-  getEmailAddress() {
+  getEmailAddress(): string {
     return this.#driver.getUserEmailAddress();
   }
 
-  isConversationViewDisabled() {
+  isConversationViewDisabled(): Promise<boolean> {
     return this.#driver.isConversationViewDisabled();
   }
 
-  isUsingGmailMaterialUI() {
+  /** @deprecated */
+  isUsingGmailMaterialUI(): boolean {
     this.#driver.getLogger().deprecationWarning('User.isUsingGmailMaterialUI');
     return true;
   }
 
-  getLanguage() {
+  getLanguage(): string {
     return this.#driver.getUserLanguage();
   }
 
+  /** @deprecated use {@link User.getEmailAddress} instead */
   getUserContact() {
     this.#driver
       .getLogger()
@@ -48,6 +50,7 @@ export default class User {
     return this.#driver.getUserContact();
   }
 
+  /** @deprecated use {@link User.getEmailAddress} instead */
   getAccountSwitcherContactList() {
     this.#driver
       .getLogger()

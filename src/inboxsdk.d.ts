@@ -21,6 +21,9 @@ import type AttachmentCardView from './platform-implementation-js/views/conversa
 import type TopMessageBarView from './platform-implementation-js/widgets/top-message-bar-view';
 import type { IMoleView as MoleView } from './platform-implementation-js/widgets/mole-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
+import type User from './platform-implementation-js/namespaces/user';
+
+export type { User };
 
 export const LOADER_VERSION: string;
 
@@ -250,14 +253,6 @@ export interface Lists {
   ): () => void;
   getSelectedThreadRowViews(): ThreadRowView[];
   registerThreadRowViewSelectionHandler(handler: () => void): () => void;
-}
-
-export interface User {
-  /** @deprecated */
-  getAccountSwitcherContactList(): Contact[];
-  getEmailAddress(): string;
-  getLanguage(): string;
-  isConversationViewDisabled(): Promise<boolean>;
 }
 
 export {
