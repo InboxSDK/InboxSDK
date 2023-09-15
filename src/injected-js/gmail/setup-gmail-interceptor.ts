@@ -22,7 +22,7 @@ import {
   replaceBodyContentInComposeSendRequestBody,
 } from './sync-compose-processor';
 
-import type { XHRProxyConnectionDetails } from '../xhr-proxy-factory';
+import type { Wrapper, XHRProxyConnectionDetails } from '../xhr-proxy-factory';
 
 function logErrorExceptEventListeners(err: unknown, details: string) {
   // Don't log Gmail's errors
@@ -54,9 +54,8 @@ export function setupGmailInterceptorOnFrames(
   mainFrame: WindowProxy,
   jsFrame: WindowProxy | null | undefined,
 ) {
-  type Wrappers = Parameters<typeof XHRProxyFactory>[1];
-  const main_wrappers: Wrappers = [],
-    js_frame_wrappers: Wrappers = [];
+  const main_wrappers: Wrapper[] = [],
+    js_frame_wrappers: Wrapper[] = [];
 
   {
     const main_originalXHR = (mainFrame as any).XMLHttpRequest;
@@ -1140,6 +1139,40 @@ export function setupGmailInterceptorOnFrames(
       originalSendBodyLogger(connection) {
         if (connection.headers['X-Framework-Xsrf-Token']) {
           saveXsrfTokenHeader(connection.headers['X-Framework-Xsrf-Token']);
+        }
+      },
+    });
+  }
+
+  // Google API request header values
+  {
+    // harcoding a value observed across multiple accounts to start with.
+    // Will be updated when we see a request, in case Gmail has changed it.
+    let googleApiKey = 'AIzaSyBm7aDMG9actsWSlx-MvrYsepwdnLgz69I';
+
+    document.addEventListener('inboxSDKgetGoogleRequestHeaders', () => {
+      const authorizationHeader = (
+        window as any
+      ).gapi.auth.getAuthHeaderValueForFirstParty([]);
+      const headers = {
+        authorization: authorizationHeader,
+        'x-goog-api-key': googleApiKey,
+      };
+      document.head.setAttribute(
+        'data-inboxsdk-google-headers',
+        JSON.stringify(headers),
+      );
+    });
+
+    main_wrappers.push({
+      isRelevantTo(connection) {
+        const url = new URL(connection.url);
+        return url.hostname.endsWith('.google.com');
+      },
+
+      originalSendBodyLogger(connection) {
+        if (connection.headers['X-Goog-Api-Key']) {
+          googleApiKey = connection.headers['X-Goog-Api-Key'];
         }
       },
     });

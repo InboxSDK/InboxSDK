@@ -93,6 +93,8 @@ import GmailNavItemView, {
 import { MoleOptions } from '../../driver-interfaces/mole-view-driver';
 import { Contact } from '../../../inboxsdk';
 import GmailAttachmentCardView from './views/gmail-attachment-card-view';
+import type { PersonDetails } from '../../namespaces/user';
+import getPersonDetails from './gmail-driver/getPersonDetails';
 
 class GmailDriver implements Driver {
   _appId: string;
@@ -1005,6 +1007,10 @@ class GmailDriver implements Driver {
     return () => {
       this._threadRowViewSelectionChanges.offValue(handler);
     };
+  }
+
+  getPersonDetails(emailAddress: string): Promise<PersonDetails | undefined> {
+    return getPersonDetails(this, emailAddress);
   }
 }
 

@@ -160,6 +160,22 @@ export default class GmailPageCommunicator extends CommonPageCommunicator {
     });
   }
 
+  getGoogleRequestHeaders(): { [key: string]: string } {
+    document.dispatchEvent(
+      new CustomEvent('inboxSDKgetGoogleRequestHeaders', {
+        bubbles: false,
+        cancelable: false,
+        detail: null,
+      }),
+    );
+    const json = document.head.getAttribute('data-inboxsdk-google-headers');
+    document.head.removeAttribute('data-inboxsdk-google-headers');
+    if (!json) {
+      throw new Error('Failed to get Google request auth headers');
+    }
+    return JSON.parse(json);
+  }
+
   registerSuggestionsModifier(providerID: string) {
     document.dispatchEvent(
       new CustomEvent('inboxSDKregisterSuggestionsModifier', {
