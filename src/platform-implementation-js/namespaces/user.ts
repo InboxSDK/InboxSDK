@@ -1,59 +1,53 @@
 import find from 'lodash/find';
-import * as ud from 'ud';
-import get from '../../common/get-or-fail';
 import type { Driver } from '../driver-interfaces/driver';
 import type { PiOpts } from '../platform-implementation';
-const memberMap = ud.defonce(module, () => new WeakMap()); // documented in src/docs/
 
-class User {
+export default class User {
+  #driver: Driver;
+  #piOpts: PiOpts;
+
   constructor(driver: Driver, piOpts: PiOpts) {
-    memberMap.set(this, {
-      driver,
-      piOpts,
-    });
+    this.#driver = driver;
+    this.#piOpts = piOpts;
   }
 
   getEmailAddress() {
-    return get(memberMap, this).driver.getUserEmailAddress();
+    return this.#driver.getUserEmailAddress();
   }
 
   isConversationViewDisabled() {
-    return get(memberMap, this).driver.isConversationViewDisabled();
+    return this.#driver.isConversationViewDisabled();
   }
 
   isUsingGmailMaterialUI() {
-    get(memberMap, this)
-      .driver.getLogger()
-      .deprecationWarning('User.isUsingGmailMaterialUI');
+    this.#driver.getLogger().deprecationWarning('User.isUsingGmailMaterialUI');
     return true;
   }
 
   getLanguage() {
-    return get(memberMap, this).driver.getUserLanguage();
+    return this.#driver.getUserLanguage();
   }
 
   getUserContact() {
-    const { driver, piOpts } = get(memberMap, this);
-    driver
+    this.#driver
       .getLogger()
       .deprecationWarning('User.getUserContact', 'User.getEmailAddress');
 
-    if (piOpts.REQUESTED_API_VERSION !== 1) {
+    if (this.#piOpts.REQUESTED_API_VERSION !== 1) {
       throw new Error('This method was discontinued after API version 1');
     }
 
-    return driver.getUserContact();
+    return this.#driver.getUserContact();
   }
 
   getAccountSwitcherContactList() {
-    const { driver } = get(memberMap, this);
-    driver
+    this.#driver
       .getLogger()
       .deprecationWarning(
         'User.getAccountSwitcherContactList',
         'User.getEmailAddress',
       );
-    let list = driver.getAccountSwitcherContactList();
+    let list = this.#driver.getAccountSwitcherContactList();
     const userEmail = this.getEmailAddress();
     const listHasUser = !!find(list, (item) => item.emailAddress === userEmail);
 
@@ -70,5 +64,3 @@ class User {
     return list;
   }
 }
-
-export default User;
