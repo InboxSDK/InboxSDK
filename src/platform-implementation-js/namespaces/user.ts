@@ -2,6 +2,14 @@ import find from 'lodash/find';
 import type { Driver } from '../driver-interfaces/driver';
 import type { PiOpts } from '../platform-implementation';
 
+export interface PersonDetails {
+  fullName?: string;
+  fullNameSortOrder?: string;
+  firstName?: string;
+  lastName?: string;
+  imageUrl?: string;
+}
+
 export default class User {
   #driver: Driver;
   #piOpts: PiOpts;
@@ -62,5 +70,9 @@ export default class User {
     }
 
     return list;
+  }
+
+  getPersonDetails(emailAddress: string): Promise<PersonDetails | undefined> {
+    return this.#driver.getPersonDetails(emailAddress);
   }
 }
