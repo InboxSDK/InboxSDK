@@ -20,6 +20,7 @@ import delay from 'pdelay';
 import GmailAppSidebarView from './index';
 import MockWebStorage from 'mock-webstorage';
 import GmailThreadView from '../gmail-thread-view';
+import { type ContentPanelDescriptor } from '../../../../driver-common/sidebar/ContentPanelViewDriver';
 
 jest.mock('../../../../lib/dom/make-element-child-stream', () => {
   return () => require('kefir-bus')();
@@ -53,7 +54,7 @@ describe('GmailAppSidebarView Primary', function () {
       title: 'foo',
       iconUrl: '/bar.png',
       el: document.createElement('div'),
-    });
+    } as unknown as ContentPanelDescriptor);
     const fakeThreadView = {
       getStopper: _.constant(kefirStopper()),
     } as GmailThreadView;
@@ -82,12 +83,12 @@ describe('GmailAppSidebarView Primary', function () {
       title: 'foo1',
       iconUrl: '/bar.png',
       el: document.createElement('div'),
-    });
+    } as unknown as ContentPanelDescriptor);
     const descriptor2 = Kefir.constant({
       title: 'foo2',
       iconUrl: '/bar.png',
       el: document.createElement('div'),
-    });
+    } as unknown as ContentPanelDescriptor);
     const fakeThreadView = {
       getStopper: _.constant(kefirStopper()),
     } as GmailThreadView;

@@ -5,6 +5,20 @@ import type { Driver } from '../../driver-interfaces/driver';
 import querySelector from '../../lib/dom/querySelectorOrFail';
 import { sidebarWaitingPlatformSelector } from './constants';
 
+export interface ContentPanelDescriptor {
+  appIconUrl?: string;
+  appName?: string;
+  el: HTMLElement;
+  id: string;
+  hideTitleBar?: boolean;
+  iconClass?: string;
+  iconUrl?: string;
+  orderHint?: number;
+  primaryColor?: string;
+  secondaryColor?: string;
+  title: string;
+}
+
 class ContentPanelViewDriver {
   _driver: Driver;
   _stopper: Kefir.Observable<null, unknown>;
@@ -18,7 +32,7 @@ class ContentPanelViewDriver {
 
   constructor(
     driver: Driver,
-    descriptor: Kefir.Observable<Record<string, any>, unknown>,
+    descriptor: Kefir.Observable<ContentPanelDescriptor, unknown>,
     sidebarId: string,
     isGlobal?: boolean,
   ) {

@@ -95,6 +95,7 @@ import { Contact } from '../../../inboxsdk';
 import GmailAttachmentCardView from './views/gmail-attachment-card-view';
 import type { PersonDetails } from '../../namespaces/user';
 import getPersonDetails from './gmail-driver/getPersonDetails';
+import { type ContentPanelDescriptor } from '../../driver-common/sidebar/ContentPanelViewDriver';
 
 class GmailDriver implements Driver {
   _appId: string;
@@ -871,7 +872,7 @@ class GmailDriver implements Driver {
   }
 
   async addGlobalSidebarContentPanel(
-    descriptor: Kefir.Observable<Object, unknown>,
+    descriptor: Kefir.Observable<ContentPanelDescriptor, unknown>,
   ): Promise<ContentPanelViewDriver | null | undefined> {
     await this.waitForGlobalSidebarReady()
       .merge(

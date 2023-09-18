@@ -15,6 +15,7 @@ import GmailMessageView from './gmail-message-view';
 import GmailToolbarView from './gmail-toolbar-view';
 import WidthManager from './gmail-thread-view/width-manager';
 import type { CustomMessageDescriptor } from '../../../views/conversations/custom-message-view';
+import { type ContentPanelDescriptor } from '../../../driver-common/sidebar/ContentPanelViewDriver';
 
 let hasLoggedAddonInfo = false;
 
@@ -185,7 +186,7 @@ class GmailThreadView {
   }
 
   addSidebarContentPanel(
-    descriptor: Kefir.Observable<Record<string, any>, unknown>,
+    descriptor: Kefir.Observable<ContentPanelDescriptor, unknown>,
   ) {
     const sidebar = this._driver.getGlobalSidebar();
 
