@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import type * as Kefir from 'kefir';
 import type TypedEmitter from 'typed-emitter';
 import AppMenu from './platform-implementation-js/namespaces/app-menu';
+import type Global from './platform-implementation-js/namespaces/global';
 import type {
   NavItemTypes,
   NavItemDescriptor,
@@ -52,14 +53,7 @@ export interface InboxSDK {
   Global: Global;
 }
 
-export interface Global {
-  addSidebarContentPanel(
-    contentPanelDescriptor: ContentPanelDescriptor,
-  ): Promise<ContentPanelView | null>;
-  addSupportItem(
-    supportItemDescriptor: SupportItemDescriptor,
-  ): GmailSupportItemView;
-}
+export { type Global };
 
 export interface GmailSupportItemView {
   destroy(): void;
