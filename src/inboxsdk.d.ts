@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import type * as Kefir from 'kefir';
 import type TypedEmitter from 'typed-emitter';
 import AppMenu from './platform-implementation-js/namespaces/app-menu';
+import type Global from './platform-implementation-js/namespaces/global';
 import type {
   NavItemTypes,
   NavItemDescriptor,
@@ -22,6 +23,7 @@ import type TopMessageBarView from './platform-implementation-js/widgets/top-mes
 import type { IMoleView as MoleView } from './platform-implementation-js/widgets/mole-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 import type User from './platform-implementation-js/namespaces/user';
+import { ContentPanelDescriptor } from './platform-implementation-js/driver-common/sidebar/ContentPanelViewDriver';
 
 export type { User };
 
@@ -52,14 +54,8 @@ export interface InboxSDK {
   Global: Global;
 }
 
-export interface Global {
-  addSidebarContentPanel(
-    contentPanelDescriptor: ContentPanelDescriptor,
-  ): Promise<ContentPanelView | null>;
-  addSupportItem(
-    supportItemDescriptor: SupportItemDescriptor,
-  ): GmailSupportItemView;
-}
+export { type ContentPanelDescriptor };
+export { type Global };
 
 export interface GmailSupportItemView {
   destroy(): void;
@@ -467,16 +463,6 @@ export interface ContentPanelView extends EventEmitter {
   isActive(): boolean;
   open(): void;
   remove(): void;
-}
-
-export interface ContentPanelDescriptor {
-  appName?: string;
-  el: HTMLElement;
-  id: string;
-  title: string;
-  iconUrl?: string;
-  iconClass?: string;
-  orderHint?: number;
 }
 
 export interface MessageAttachmentIconDescriptor {
