@@ -17,9 +17,15 @@ export default class Global {
   }
 
   async addSidebarContentPanel(
-    descriptor: Observable<ContentPanelDescriptor, unknown>,
+    descriptor:
+      | ContentPanelDescriptor
+      | Observable<ContentPanelDescriptor, unknown>,
   ): Promise<ContentPanelView | null | undefined> {
-    const descriptorPropertyStream = kefirCast(Kefir, descriptor).toProperty();
+    // kefirCast casts to Observable<any, any> which is not what we want
+    const descriptorPropertyStream: Observable<
+      ContentPanelDescriptor,
+      unknown
+    > = kefirCast(Kefir, descriptor).toProperty();
     this.#driver.getLogger().eventSdkPassive('global.addSidebarContentPanel');
     const contentPanelImplementation =
       await this.#driver.addGlobalSidebarContentPanel(descriptorPropertyStream);
