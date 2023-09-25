@@ -20,7 +20,7 @@ export default class Global {
     descriptor:
       | ContentPanelDescriptor
       | Observable<ContentPanelDescriptor, unknown>,
-  ): Promise<ContentPanelView | null | undefined> {
+  ): Promise<ContentPanelView | null> {
     // kefirCast casts to Observable<any, any> which is not what we want
     const descriptorPropertyStream: Observable<
       ContentPanelDescriptor,
