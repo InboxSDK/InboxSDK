@@ -3,7 +3,7 @@ import EventEmitter from '../../lib/safe-event-emitter';
 import type Membrane from '../../lib/Membrane';
 import type SimpleElementView from '../../views/SimpleElementView';
 import kefirCast from 'kefir-cast';
-import Kefir from 'kefir';
+import Kefir, { type Observable } from 'kefir';
 import ContentPanelView from '../content-panel-view';
 import get from '../../../common/get-or-fail';
 import type MessageView from './message-view';
@@ -55,8 +55,15 @@ class ThreadView
     _bindToStreamEvents(this, threadViewImplementation);
   }
 
-  addSidebarContentPanel(descriptor: ContentPanelDescriptor): ContentPanelView {
-    const descriptorPropertyStream = kefirCast(Kefir, descriptor).toProperty();
+  addSidebarContentPanel(
+    descriptor:
+      | ContentPanelDescriptor
+      | Observable<ContentPanelDescriptor, unknown>,
+  ): ContentPanelView {
+    const descriptorPropertyStream: Observable<
+      ContentPanelDescriptor,
+      unknown
+    > = kefirCast(Kefir, descriptor).toProperty();
     const members = get(memberMap, this);
     members.driver
       .getLogger()

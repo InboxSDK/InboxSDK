@@ -406,7 +406,9 @@ export interface SimpleElementView extends EventEmitter {
 export interface ThreadView extends TypedEventEmitter<ThreadViewEvents> {
   addLabel(): SimpleElementView;
   addSidebarContentPanel(
-    contentPanelDescriptor: ContentPanelDescriptor,
+    contentPanelDescriptor:
+      | ContentPanelDescriptor
+      | Kefir.Observable<ContentPanelDescriptor, unknown>,
   ): ContentPanelView;
   /**
    * @returns {MessageView[]} of all the loaded MessageView objects currently in the thread. @see MessageView for more information on what "loaded" means. Note that more messages may load into the thread later! If it's important to get future messages, use {@link Conversations#registerMessageViewHandler} instead.
