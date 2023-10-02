@@ -104,7 +104,25 @@ class GmailMoleViewDriver {
 
   show() {
     const doShow = (moleParent: HTMLElement) => {
-      moleParent.insertBefore(this.#element, last(moleParent.children)!);
+      const lastChild = last(moleParent.children)!;
+
+      if (lastChild instanceof HTMLElement) {
+        /**
+         * 2023-10-02 When Google Chat is enabled, we need to keep track of the `order` style property for moles added.
+         * If we don't, we end up with moles added on top of the sidebar because of a chat element in the same parent element as moleParent.
+         *
+         * This fix ratches the order of the element padding in order to present moles before the sidebar. Whether or not this fix works with Gmail's CSS in a RTL language is unknown.
+         */
+        const oldOrder = lastChild.style.order;
+        const oldOrderNum = parseInt(oldOrder, 10);
+
+        if (oldOrder && !isNaN(oldOrderNum)) {
+          this.#element.style.order = oldOrder;
+          lastChild.style.order = `${oldOrderNum - 1}`;
+        }
+      }
+
+      moleParent.insertBefore(this.#element, lastChild);
       const dw = findParent(
         moleParent,
         (el) => el.nodeName === 'DIV' && el.classList.contains('dw'),
