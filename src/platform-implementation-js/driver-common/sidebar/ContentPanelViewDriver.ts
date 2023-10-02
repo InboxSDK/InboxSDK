@@ -9,7 +9,7 @@ export interface ContentPanelDescriptor {
   appIconUrl?: string;
   appName?: string;
   el: HTMLElement;
-  id: string;
+  id?: string;
   hideTitleBar?: boolean;
   iconClass?: string;
   iconUrl?: string;
