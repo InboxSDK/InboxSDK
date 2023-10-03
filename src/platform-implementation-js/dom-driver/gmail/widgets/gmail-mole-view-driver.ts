@@ -12,47 +12,47 @@ import isComposeTitleBarLightColor from '../is-compose-titlebar-light-color';
 import * as styles from './mole-view.module.css';
 
 class GmailMoleViewDriver {
-  _driver: GmailDriver;
-  _eventStream = kefirBus<
+  #driver: GmailDriver;
+  #eventStream = kefirBus<
     {
       eventName: 'minimize' | 'restore';
     },
     unknown
   >();
-  _stopper = kefirStopper();
-  _element: HTMLElement;
+  #stopper = kefirStopper();
+  #element: HTMLElement;
 
   constructor(driver: GmailDriver, options: MoleOptions) {
-    this._driver = driver;
-    this._element = Object.assign(document.createElement('div'), {
+    this.#driver = driver;
+    this.#element = Object.assign(document.createElement('div'), {
       className: 'inboxsdk__mole_view ' + (options.className || ''),
       innerHTML: getHTMLString(options),
     });
 
     if (options.chrome === false) {
-      this._element.classList.add('inboxsdk__mole_view_chromeless');
+      this.#element.classList.add('inboxsdk__mole_view_chromeless');
     } else {
       querySelector(
-        this._element,
+        this.#element,
         '.inboxsdk__mole_view_titlebar',
       ).addEventListener('click', (e: MouseEvent) => {
         this.setMinimized(!this.getMinimized());
         e.preventDefault();
         e.stopPropagation();
       });
-      const minimizeBtn = querySelector(this._element, '.Hl');
+      const minimizeBtn = querySelector(this.#element, '.Hl');
       minimizeBtn.addEventListener('click', (e: MouseEvent) => {
         this.setMinimized(true);
         e.preventDefault();
         e.stopPropagation();
       });
-      const maximizeBtn = querySelector(this._element, '.Hk');
+      const maximizeBtn = querySelector(this.#element, '.Hk');
       maximizeBtn.addEventListener('click', (e: MouseEvent) => {
         this.setMinimized(false);
         e.preventDefault();
         e.stopPropagation();
       });
-      const closeBtn = querySelector(this._element, '.Ha');
+      const closeBtn = querySelector(this.#element, '.Ha');
       closeBtn.addEventListener('click', (e: MouseEvent) => {
         this.destroy();
         e.preventDefault();
@@ -60,20 +60,20 @@ class GmailMoleViewDriver {
       });
 
       if (options.titleEl) {
-        this._setTitleEl(options.titleEl);
+        this.#setTitleEl(options.titleEl);
       } else {
         this.setTitle(options.title || '');
       }
 
       if (options.minimizedTitleEl) {
-        this._setMinimizedTitleEl(options.minimizedTitleEl);
+        this.#setMinimizedTitleEl(options.minimizedTitleEl);
       }
 
       const titleButtons = options.titleButtons;
 
       if (titleButtons) {
         const titleButtonContainer = querySelector(
-          this._element,
+          this.#element,
           '.inboxsdk__mole_title_buttons',
         );
         const lastChild: HTMLElement =
@@ -97,14 +97,14 @@ class GmailMoleViewDriver {
       }
     }
 
-    querySelector(this._element, '.inboxsdk__mole_view_content').appendChild(
+    querySelector(this.#element, '.inboxsdk__mole_view_content').appendChild(
       options.el,
     );
   }
 
   show() {
     const doShow = (moleParent: HTMLElement) => {
-      moleParent.insertBefore(this._element, last(moleParent.children)!);
+      moleParent.insertBefore(this.#element, last(moleParent.children)!);
       const dw = findParent(
         moleParent,
         (el) => el.nodeName === 'DIV' && el.classList.contains('dw'),
@@ -123,7 +123,7 @@ class GmailMoleViewDriver {
       const moleParentReadyEvent = streamWaitFor(() =>
         GmailElementGetter.getMoleParent(),
       )
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue(doShow);
       // For some users, the mole parent element seems to be lazily loaded by
       // Gmail only once the user has used a compose view or a thread view.
@@ -133,14 +133,14 @@ class GmailMoleViewDriver {
       Kefir.fromPromise(GmailElementGetter.waitForGmailModeToSettle())
         .flatMap(() => {
           // delay until we've passed TimestampOnReady + 10 seconds
-          return this._driver.delayToTimeAfterReady(10 * 1000);
+          return this.#driver.delayToTimeAfterReady(10 * 1000);
         })
         .takeUntilBy(moleParentReadyEvent)
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue(() => {
-          this._driver.getLogger().eventSdkActive('mole parent force load');
+          this.#driver.getLogger().eventSdkActive('mole parent force load');
 
-          this._driver.openNewComposeViewDriver().then((gmailComposeView) => {
+          this.#driver.openNewComposeViewDriver().then((gmailComposeView) => {
             gmailComposeView.close();
           });
         });
@@ -149,34 +149,34 @@ class GmailMoleViewDriver {
 
   setMinimized(minimized: boolean) {
     if (minimized) {
-      this._element.classList.add('inboxsdk__minimized');
+      this.#element.classList.add('inboxsdk__minimized');
 
-      this._eventStream.emit({
+      this.#eventStream.emit({
         eventName: 'minimize',
       });
     } else {
-      this._element.classList.remove('inboxsdk__minimized');
+      this.#element.classList.remove('inboxsdk__minimized');
 
       // If the mole is off the left edge of the screen, then move it to the
       // right.
-      const moleParent = this._element.parentElement;
+      const moleParent = this.#element.parentElement;
 
-      if (moleParent && this._element.getBoundingClientRect().left < 0) {
-        moleParent.insertBefore(this._element, last(moleParent.children)!);
+      if (moleParent && this.#element.getBoundingClientRect().left < 0) {
+        moleParent.insertBefore(this.#element, last(moleParent.children)!);
       }
 
-      this._eventStream.emit({
+      this.#eventStream.emit({
         eventName: 'restore',
       });
     }
   }
 
   getMinimized(): boolean {
-    return this._element.classList.contains('inboxsdk__minimized');
+    return this.#element.classList.contains('inboxsdk__minimized');
   }
 
   setTitle(text: string) {
-    const titleElement = this._element.querySelector(
+    const titleElement = this.#element.querySelector(
       '.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_default',
     );
 
@@ -185,8 +185,8 @@ class GmailMoleViewDriver {
     }
   }
 
-  _setTitleEl(el: HTMLElement) {
-    const container = this._element.querySelector(
+  #setTitleEl(el: HTMLElement) {
+    const container = this.#element.querySelector(
       '.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_default',
     );
 
@@ -196,13 +196,13 @@ class GmailMoleViewDriver {
     }
   }
 
-  _setMinimizedTitleEl(el: HTMLElement) {
-    const container = this._element.querySelector(
+  #setMinimizedTitleEl(el: HTMLElement) {
+    const container = this.#element.querySelector(
       '.inboxsdk__mole_view_titlebar h2.inboxsdk__mole_minimized',
     );
 
     if (container) {
-      this._element.classList.add('inboxsdk__mole_use_minimize_title');
+      this.#element.classList.add('inboxsdk__mole_use_minimize_title');
 
       container.textContent = '';
       container.appendChild(el);
@@ -210,15 +210,15 @@ class GmailMoleViewDriver {
   }
 
   getEventStream() {
-    return this._eventStream;
+    return this.#eventStream;
   }
 
   destroy() {
-    this._element.remove();
+    this.#element.remove();
 
-    this._eventStream.end();
+    this.#eventStream.end();
 
-    this._stopper.destroy();
+    this.#stopper.destroy();
   }
 }
 
