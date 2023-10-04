@@ -45,7 +45,6 @@ class ContentPanelViewDriver {
       .ignoreValues()
       .beforeEnd(() => null)
       .toProperty();
-    const document = global.document; //fix for unit test
 
     this.#eventStream.plug(
       Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelActivated')
