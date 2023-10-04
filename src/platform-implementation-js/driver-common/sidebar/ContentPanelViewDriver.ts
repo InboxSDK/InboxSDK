@@ -20,15 +20,17 @@ export interface ContentPanelDescriptor {
 }
 
 class ContentPanelViewDriver {
-  _driver: Driver;
-  _stopper: Kefir.Observable<null, unknown>;
-  _eventStream = kefirBus<{ eventName: string }, unknown>();
-  _isActive: boolean = false;
-  // This is not the `id` property passed by the application, but a random
-  // unique identifier used to manage a specific instance.
-  _instanceId: string = `${Date.now()}-${Math.random()}`;
-  _sidebarId: string;
-  _isGlobal: boolean;
+  #driver: Driver;
+  #stopper: Kefir.Observable<null, unknown>;
+  #eventStream = kefirBus<{ eventName: 'activate' | 'deactivate' }, unknown>();
+  #isActive: boolean = false;
+  /**
+   * This is not the `id` property passed by the application, but a random
+   * unique identifier used to manage a specific instance.
+   * */
+  #instanceId: string = `${Date.now()}-${Math.random()}`;
+  #sidebarId: string;
+  #isGlobal: boolean;
 
   constructor(
     driver: Driver,
@@ -36,31 +38,31 @@ class ContentPanelViewDriver {
     sidebarId: string,
     isGlobal?: boolean,
   ) {
-    this._driver = driver;
-    this._sidebarId = sidebarId;
-    this._isGlobal = Boolean(isGlobal);
-    this._stopper = this._eventStream
+    this.#driver = driver;
+    this.#sidebarId = sidebarId;
+    this.#isGlobal = Boolean(isGlobal);
+    this.#stopper = this.#eventStream
       .ignoreValues()
       .beforeEnd(() => null)
       .toProperty();
     const document = global.document; //fix for unit test
 
-    this._eventStream.plug(
+    this.#eventStream.plug(
       Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelActivated')
-        .filter((e: any) => e.detail.instanceId === this._instanceId)
+        .filter((e: any) => e.detail.instanceId === this.#instanceId)
         .map(() => {
-          this._isActive = true;
+          this.#isActive = true;
           return {
             eventName: 'activate',
           };
         }),
     );
 
-    this._eventStream.plug(
+    this.#eventStream.plug(
       Kefir.fromEvents(document.body, 'inboxsdkSidebarPanelDeactivated')
-        .filter((e: any) => e.detail.instanceId === this._instanceId)
+        .filter((e: any) => e.detail.instanceId === this.#instanceId)
         .map(() => {
-          this._isActive = false;
+          this.#isActive = false;
           return {
             eventName: 'deactivate',
           };
@@ -82,7 +84,7 @@ class ContentPanelViewDriver {
     );
     descriptor
       .flatMap((x) => afterAsap.map(() => x))
-      .takeUntilBy(this._stopper)
+      .takeUntilBy(this.#stopper)
       .onValue((descriptor) => {
         const {
           el,
@@ -113,27 +115,27 @@ class ContentPanelViewDriver {
             cancelable: false,
             detail: {
               appIconUrl:
-                appIconUrl || this._driver.getOpts().appIconUrl || iconUrl,
-              appId: this._driver.getAppId(),
+                appIconUrl || this.#driver.getOpts().appIconUrl || iconUrl,
+              appId: this.#driver.getAppId(),
               appName,
               hideTitleBar: Boolean(hideTitleBar),
               iconClass,
               iconUrl,
               id: String(id || title),
-              instanceId: this._instanceId,
+              instanceId: this.#instanceId,
               isGlobal,
               orderHint: typeof orderHint === 'number' ? orderHint : 0,
-              primaryColor: primaryColor || this._driver.getOpts().primaryColor,
+              primaryColor: primaryColor || this.#driver.getOpts().primaryColor,
               secondaryColor:
-                secondaryColor || this._driver.getOpts().secondaryColor,
-              sidebarId: this._sidebarId,
+                secondaryColor || this.#driver.getOpts().secondaryColor,
+              sidebarId: this.#sidebarId,
               title,
             },
           }),
         );
       });
 
-    this._stopper.onValue(() => {
+    this.#stopper.onValue(() => {
       if (!hasPlacedAlready) return;
       document.body.dispatchEvent(
         new CustomEvent('inboxsdkRemoveSidebarPanel', {
@@ -141,8 +143,8 @@ class ContentPanelViewDriver {
           cancelable: false,
           detail: {
             appName,
-            sidebarId: this._sidebarId,
-            instanceId: this._instanceId,
+            sidebarId: this.#sidebarId,
+            instanceId: this.#instanceId,
           },
         }),
       );
@@ -150,21 +152,22 @@ class ContentPanelViewDriver {
   }
 
   getStopper() {
-    return this._stopper;
+    return this.#stopper;
   }
 
   getEventStream() {
-    return this._eventStream;
+    return this.#eventStream;
   }
 
+  // TODO: is this used?
   scrollIntoView() {
     document.body.dispatchEvent(
       new CustomEvent('inboxsdkSidebarPanelScrollIntoView', {
         bubbles: true,
         cancelable: false,
         detail: {
-          instanceId: this._instanceId,
-          sidebarId: this._sidebarId,
+          instanceId: this.#instanceId,
+          sidebarId: this.#sidebarId,
         },
       }),
     );
@@ -176,9 +179,9 @@ class ContentPanelViewDriver {
         bubbles: true,
         cancelable: false,
         detail: {
-          instanceId: this._instanceId,
-          isGlobal: this._isGlobal,
-          sidebarId: this._sidebarId,
+          instanceId: this.#instanceId,
+          isGlobal: this.#isGlobal,
+          sidebarId: this.#sidebarId,
         },
       }),
     );
@@ -190,20 +193,20 @@ class ContentPanelViewDriver {
         bubbles: true,
         cancelable: false,
         detail: {
-          instanceId: this._instanceId,
-          isGlobal: this._isGlobal,
-          sidebarId: this._sidebarId,
+          instanceId: this.#instanceId,
+          isGlobal: this.#isGlobal,
+          sidebarId: this.#sidebarId,
         },
       }),
     );
   }
 
   isActive(): boolean {
-    return this._isActive;
+    return this.#isActive;
   }
 
   remove() {
-    this._eventStream.end();
+    this.#eventStream.end();
   }
 }
 
