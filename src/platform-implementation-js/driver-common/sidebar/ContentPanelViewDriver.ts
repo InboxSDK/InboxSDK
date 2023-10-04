@@ -16,7 +16,7 @@ export interface ContentPanelDescriptor {
   orderHint?: number;
   primaryColor?: string;
   secondaryColor?: string;
-  title: string;
+  title?: string;
 }
 
 class ContentPanelViewDriver {
