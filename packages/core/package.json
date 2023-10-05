@@ -27,7 +27,7 @@
     "src"
   ],
   "dependencies": {
-    "@babel/runtime": "^7.0.0",
+    "@babel/runtime": "^7.23.1",
     "@types/kefir": "^3.8.6",
     "@types/node": "*",
     "@types/transducers.js": "^0.3.0",
