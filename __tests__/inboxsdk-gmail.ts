@@ -45,8 +45,8 @@ test('loads in gmail mock', () => {
       ).map((x) => `window.${x}`);
       expect(newGlobals).toEqual([]);
 
-      expect((inboxsdk as any).LOADER_VERSION).toBe('beep');
-      expect((inboxsdk as any).IMPL_VERSION).toBe('beep');
+      expect(inboxsdk.LOADER_VERSION).toBe('beep');
+      expect(inboxsdk.IMPL_VERSION).toBe('beep');
       expect(inboxsdk.User.getAccountSwitcherContactList()).toEqual([
         { name: 'Chris Cowan', emailAddress: 'cowan@streak.com' },
         { name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com' },

@@ -24,6 +24,7 @@ import type { IMoleView as MoleView } from './platform-implementation-js/widgets
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 import type User from './platform-implementation-js/namespaces/user';
 import { ContentPanelDescriptor } from './platform-implementation-js/driver-common/sidebar/ContentPanelViewDriver';
+import type ContentPanelView from './platform-implementation-js/views/content-panel-view';
 
 export type { User };
 
@@ -460,12 +461,7 @@ export interface CustomMessageView extends EventEmitter {
   getSortDate(): Date | null;
 }
 
-export interface ContentPanelView extends EventEmitter {
-  close(): void;
-  isActive(): boolean;
-  open(): void;
-  remove(): void;
-}
+export { ContentPanelView };
 
 export interface MessageAttachmentIconDescriptor {
   iconUrl?: string;
