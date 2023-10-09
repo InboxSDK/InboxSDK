@@ -130,7 +130,7 @@ class GmailMoleViewDriver {
         !leftMoleSpacer.style.order
       ) {
         this.#driver.logger.error(
-          'leftMoleSpacer has no style.order property set',
+          new Error('leftMoleSpacer has no style.order property set'),
         );
       } else if (leftMoleSpacer instanceof HTMLElement) {
         /**
@@ -160,7 +160,9 @@ class GmailMoleViewDriver {
         moleParent.insertBefore(this.#element, lastMole);
       } else {
         this.#driver.logger.error(
-          'Mole show invariant violated. `lastMole` is not an HTMLElement',
+          new Error(
+            'Mole show invariant violated. `lastMole` is not an HTMLElement',
+          ),
         );
         return;
       }
