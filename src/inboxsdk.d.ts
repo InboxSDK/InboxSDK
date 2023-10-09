@@ -25,6 +25,7 @@ export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-ite
 import type User from './platform-implementation-js/namespaces/user';
 import { ContentPanelDescriptor } from './platform-implementation-js/driver-common/sidebar/ContentPanelViewDriver';
 import type ContentPanelView from './platform-implementation-js/views/content-panel-view';
+import type { MoleOptions } from './platform-implementation-js/dom-driver/gmail/widgets/gmail-mole-view-driver';
 
 export type { User };
 
@@ -190,7 +191,7 @@ export interface Widgets {
   /** check whether mole view has light title bar as part of gmail new view / original view  */
   isMoleViewTitleBarLightColor(): boolean;
   showModalView(descriptor: ModalDescriptor): ModalView;
-  showMoleView(descriptor: MoleDescriptor): MoleView;
+  showMoleView(descriptor: MoleOptions): MoleView;
   showDrawerView(descriptor: DrawerDescriptor): DrawerView;
   showTopMessageBarView(opts: { el: Element }): TopMessageBarView;
 }
@@ -372,16 +373,8 @@ export interface DrawerDescriptor {
   matchSidebarContentPanelWidth?: boolean;
 }
 
-export interface MoleDescriptor {
-  el: HTMLElement;
-  title?: string;
-  titleEl?: HTMLElement;
-  minimizedTitleEl?: HTMLElement;
-  className?: string;
-  titleButtons?: Array<ButtonDescriptor>;
-  chrome?: boolean;
-}
-
+/** @deprecated use MoleOptions interface directly instead */
+export { type MoleOptions as MoleDescriptor };
 export interface ButtonDescriptor {
   title?: string;
   iconUrl?: string;

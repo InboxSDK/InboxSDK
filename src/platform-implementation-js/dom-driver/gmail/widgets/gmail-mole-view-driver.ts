@@ -4,12 +4,28 @@ import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import streamWaitFor from '../../../lib/stream-wait-for';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
-import type { MoleOptions } from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
 import isComposeTitleBarLightColor from '../is-compose-titlebar-light-color';
 import * as styles from './mole-view.module.css';
 import cx from 'classnames';
+
+export type MoleButtonDescriptor = {
+  title: string;
+  iconUrl: string;
+  iconClass?: string;
+  onClick: (...args: Array<any>) => any;
+};
+
+export type MoleOptions = {
+  el: HTMLElement;
+  className?: string;
+  title?: string;
+  titleEl?: HTMLElement;
+  minimizedTitleEl?: HTMLElement;
+  titleButtons?: MoleButtonDescriptor[];
+  chrome?: boolean;
+};
 
 const INBOXSDK_CLASS = 'inboxsdk__mole_view' as const;
 
