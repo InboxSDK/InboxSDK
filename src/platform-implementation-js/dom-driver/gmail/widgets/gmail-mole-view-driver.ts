@@ -123,7 +123,7 @@ class GmailMoleViewDriver {
   show() {
     const doShow = (moleParent: HTMLElement) => {
       const leftMoleSpacer = moleParent.firstChild;
-      const lastMole = moleParent.lastChild;
+      const rightMoleSpacer = moleParent.lastChild;
 
       if (
         leftMoleSpacer instanceof HTMLElement &&
@@ -156,8 +156,8 @@ class GmailMoleViewDriver {
         }
       }
 
-      if (lastMole instanceof HTMLElement) {
-        moleParent.insertBefore(this.#element, lastMole);
+      if (rightMoleSpacer instanceof HTMLElement) {
+        moleParent.insertBefore(this.#element, rightMoleSpacer);
       } else {
         this.#driver.logger.error(
           new Error(
