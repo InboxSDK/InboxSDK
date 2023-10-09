@@ -290,6 +290,11 @@ class GmailDriver {
   getPageCommunicatorPromise(): Promise<PageCommunicator> {
     return this.#pageCommunicatorPromise;
   }
+
+  get logger() {
+    return this.#logger;
+  }
+
   getLogger(): Logger {
     return this.#logger;
   }
