@@ -478,11 +478,7 @@ The :has portion of this selector hopefully binds the sidebar and mole together 
 
 TODO: The second selector ending with `[style*=width: 310px;]` should be removed when we drop Safari 15.3 and Chrome 100 support.
 */
-body:has(.companion_app_sidebar_wrapper_visible)
-  .dw
-  .nH
-  > .no
-  .nH.nn:last-child,
+body:has(.companion_app_sidebar_visible) .dw .nH > .no .nH.nn:last-child,
 .dw .nH > .no .nH.nn:last-child[style*='width: 310px;'] {
   width: 366px !important;
 }
