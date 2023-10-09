@@ -473,7 +473,16 @@ steps to repro:
 1. open compose mole
 2. open non-native sidebar
 3. mole overlaps sidebar
+
+The :has portion of this selector hopefully binds the sidebar and mole together for future readers. This selector should survive Gmail changing the width of the left sidebar a little more gracefully too.
+
+TODO: The second selector ending with `[style*=width: 310px;]` should be removed when we drop Safari 15.3 and Chrome 100 support.
 */
+body:has(.companion_app_sidebar_wrapper_visible)
+  .dw
+  .nH
+  > .no
+  .nH.nn:last-child,
 .dw .nH > .no .nH.nn:last-child[style*='width: 310px;'] {
   width: 366px !important;
 }
