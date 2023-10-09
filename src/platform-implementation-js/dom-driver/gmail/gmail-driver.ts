@@ -385,14 +385,14 @@ class GmailDriver {
     return Kefir.later(timeToWait, undefined);
   }
 
-  getTimings(): { [ix: string]: number | null | undefined } {
+  getTimings() {
     return {
       piMainStarted: this.#envData.piMainStarted,
       piLoadStarted: this.#envData.piLoadStarted,
       globalsFound: this.#timestampGlobalsFound,
       accountSwitcherReady: this.#timestampAccountSwitcherReady,
       onready: this.#timestampOnready,
-    };
+    } as const;
   }
 
   registerThreadButton(options: any) {

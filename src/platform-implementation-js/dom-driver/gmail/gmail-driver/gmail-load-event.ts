@@ -1,6 +1,7 @@
 import type GmailDriver from '../gmail-driver';
 import isIntegratedViewGmail, {
   isCollapsiblePanelHidden,
+  isGoogleChatEnabled,
 } from './isIntegratedViewGmail';
 import { waitForMenuReady } from './add-nav-item';
 import { checkForDarkThemeSafe } from './track-gmail-styles';
@@ -13,9 +14,15 @@ export default async function gmailLoadEvent(driver: GmailDriver) {
   await waitForMenuReady();
   const isUsingDarkTheme = await checkForDarkThemeSafe();
 
+  const timing = performance?.timing;
+
   driver.getLogger().eventSite('gmailSettings', {
     isGmailIntegratedView: isIntegratedViewGmail(),
+    /**
+     * This is the panel on the left side of the screen. If the top left burger of Gmail is collapsed, then this is true.
+     */
     isCollapsiblePanelHidden: isCollapsiblePanelHidden(),
+    isGoogleChatEnabled: isGoogleChatEnabled(),
     isDarkTheme: isUsingDarkTheme,
     screenWidth: window.screen?.width,
     screenHeight: window.screen?.height,
@@ -28,22 +35,20 @@ export default async function gmailLoadEvent(driver: GmailDriver) {
     wasAccountSwitcherReadyAtStart:
       driver.getEnvData().wasAccountSwitcherReadyAtStart,
     timings: {
-      responseStart: global.performance?.timing.responseStart,
-      responseEnd: global.performance?.timing.responseEnd,
-      domLoading: global.performance?.timing.domLoading,
-      domInteractive: global.performance?.timing.domInteractive,
-      domComplete: global.performance?.timing.domComplete,
-      domContentLoadedEventStart:
-        global.performance?.timing.domContentLoadedEventStart,
-      domContentLoadedEventEnd:
-        global.performance?.timing.domContentLoadedEventEnd,
-      domainLookupEnd: global.performance?.timing.domainLookupEnd,
-      domainLookupStart: global.performance?.timing.domainLookupStart,
-      fetchStart: global.performance?.timing.fetchStart,
-      loadEventStart: global.performance?.timing.loadEventStart,
-      loadEventEnd: global.performance?.timing.loadEventEnd,
-      navigationStart: global.performance?.timing.navigationStart,
-      requestStart: global.performance?.timing.requestStart,
+      responseStart: timing?.responseStart,
+      responseEnd: timing?.responseEnd,
+      domLoading: timing?.domLoading,
+      domInteractive: timing?.domInteractive,
+      domComplete: timing?.domComplete,
+      domContentLoadedEventStart: timing?.domContentLoadedEventStart,
+      domContentLoadedEventEnd: timing?.domContentLoadedEventEnd,
+      domainLookupEnd: timing?.domainLookupEnd,
+      domainLookupStart: timing?.domainLookupStart,
+      fetchStart: timing?.fetchStart,
+      loadEventStart: timing?.loadEventStart,
+      loadEventEnd: timing?.loadEventEnd,
+      navigationStart: timing?.navigationStart,
+      requestStart: timing?.requestStart,
       ...driver.getTimings(),
     },
   });
