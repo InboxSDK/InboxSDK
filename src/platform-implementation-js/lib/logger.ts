@@ -58,8 +58,8 @@ export interface AppLogger {
 }
 
 export default class Logger {
-  private _appId: string;
-  private _isMaster: boolean;
+  #appId: string;
+  #isMaster: boolean;
 
   constructor(
     appId: string,
@@ -68,8 +68,8 @@ export default class Logger {
     implVersion: string,
   ) {
     _extensionLoggerSetup(appId, opts, loaderVersion, implVersion);
-    this._appId = appId;
-    this._isMaster = (() => {
+    this.#appId = appId;
+    this.#isMaster = (() => {
       if (
         !_extensionUseEventTracking ||
         (typeof document !== 'undefined' &&
@@ -87,7 +87,7 @@ export default class Logger {
       }
     })();
 
-    if (this._isMaster && typeof document !== 'undefined') {
+    if (this.#isMaster && typeof document !== 'undefined') {
       document.addEventListener('inboxSDKinjectedError', (event: unknown) => {
         if (!(event instanceof CustomEvent && event?.detail)) {
           this.error(new Error('Invalid inboxSDKinjectedError event'), event);
@@ -149,54 +149,56 @@ export default class Logger {
   }
 
   error(err: Error | unknown, details?: any) {
-    _logError(err, details, this._appId, false);
+    _logError(err, details, this.#appId, false);
   }
 
   errorApp(err: Error | unknown, details?: any) {
-    _logError(err, details, this._appId, true);
+    _logError(err, details, this.#appId, true);
   }
 
+  /** Only the first logger instance reports Site errors. */
   errorSite(err: Error | unknown, details?: any) {
-    // Only the first logger instance reports Site errors.
-    if (!this._isMaster) {
+    if (!this.#isMaster) {
       return;
     }
     this.error(err, details);
   }
 
-  // Should only be used by the InboxSDK users for their own app events.
+  /** Should only be used by the InboxSDK users for their own app events. */
   eventApp(name: string, details?: any) {
-    _trackEvent(this._appId, 'app', name, details);
+    _trackEvent(this.#appId, 'app', name, details);
   }
 
-  // For tracking app events that are possibly triggered by the user. Extensions
-  // can opt out of this with a flag passed to InboxSDK.load().
+  /**
+   * For tracking app events that are possibly triggered by the user. Extensions
+   * can opt out of this with a flag passed to InboxSDK.load().
+   */
   eventSdkActive(name: string, details?: any) {
     if (!_extensionUseEventTracking) {
       return;
     }
-    _trackEvent(this._appId, 'sdkActive', name, details);
+    _trackEvent(this.#appId, 'sdkActive', name, details);
   }
 
   // Track events unrelated to user activity about how the app uses the SDK.
   // Examples include the app being initialized, and calls to any of the
   // register___ViewHandler functions.
   eventSdkPassive(name: string, details?: any, sensitive?: boolean) {
-    if (sensitive && !isStreakAppId(this._appId)) {
+    if (sensitive && !isStreakAppId(this.#appId)) {
       // do not log events if they were marked as sensitive
       return;
     }
 
-    _trackEvent(this._appId, 'sdkPassive', name, details);
+    _trackEvent(this.#appId, 'sdkPassive', name, details);
   }
 
   // Track Site events.
   eventSite(name: string, details?: any) {
     // Only the first logger instance reports Site events.
-    if (!this._isMaster) {
+    if (!this.#isMaster) {
       return;
     }
-    _trackEvent(this._appId, 'gmail', name, details);
+    _trackEvent(this.#appId, 'gmail', name, details);
   }
 
   deprecationWarning(name: string, suggestion?: string) {
@@ -227,7 +229,7 @@ export default class Logger {
     if (
       Math.random() < sampleRate &&
       document.visibilityState === 'visible' &&
-      this._isMaster
+      this.#isMaster
     ) {
       const start = Date.now();
       fn();
