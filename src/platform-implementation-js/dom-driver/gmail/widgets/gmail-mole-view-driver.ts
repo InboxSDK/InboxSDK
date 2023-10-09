@@ -4,12 +4,14 @@ import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import streamWaitFor from '../../../lib/stream-wait-for';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
-import findParent from '../../../../common/find-parent';
 import type { MoleOptions } from '../../../driver-interfaces/mole-view-driver';
 import GmailElementGetter from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
 import isComposeTitleBarLightColor from '../is-compose-titlebar-light-color';
 import * as styles from './mole-view.module.css';
+import cx from 'classnames';
+
+const INBOXSDK_CLASS = 'inboxsdk__mole_view' as const;
 
 class GmailMoleViewDriver {
   #driver: GmailDriver;
@@ -25,7 +27,7 @@ class GmailMoleViewDriver {
   constructor(driver: GmailDriver, options: MoleOptions) {
     this.#driver = driver;
     this.#element = Object.assign(document.createElement('div'), {
-      className: 'inboxsdk__mole_view ' + (options.className || ''),
+      className: cx(INBOXSDK_CLASS, options.className),
       innerHTML: getHTMLString(options),
     });
 
@@ -104,11 +106,50 @@ class GmailMoleViewDriver {
 
   show() {
     const doShow = (moleParent: HTMLElement) => {
-      moleParent.insertBefore(this.#element, last(moleParent.children)!);
-      const dw = findParent(
-        moleParent,
-        (el) => el.nodeName === 'DIV' && el.classList.contains('dw'),
-      );
+      const leftMoleSpacer = moleParent.firstChild;
+      const lastMole = moleParent.lastChild;
+
+      if (
+        leftMoleSpacer instanceof HTMLElement &&
+        !leftMoleSpacer.style.order
+      ) {
+        this.#driver.logger.error(
+          'leftMoleSpacer has no style.order property set',
+        );
+      } else if (leftMoleSpacer instanceof HTMLElement) {
+        /**
+         * 2023-10-02 When Google Chat is enabled, we need to keep track of the `order` style property for moles added.
+         * If we don't, we end up with moles added on top of the sidebar because the moleParent is using `order` for layout, and any child without `order` set will be forced to the right edge of the page.
+         */
+        const order = leftMoleSpacer.style.order;
+        const orderNumber = parseInt(order, 10);
+
+        if (isFinite(orderNumber)) {
+          this.#element.style.order = `${orderNumber - 1}`;
+        }
+
+        for (const existingMole of document.querySelectorAll<HTMLElement>(
+          INBOXSDK_CLASS,
+        )) {
+          const existingOrder = existingMole.style.order;
+          const existingOrderNumber = parseInt(existingOrder, 10);
+
+          if (isFinite(existingOrderNumber)) {
+            existingMole.style.order = `${existingOrderNumber - 1}`;
+          }
+        }
+      }
+
+      if (lastMole instanceof HTMLElement) {
+        moleParent.insertBefore(this.#element, lastMole);
+      } else {
+        this.#driver.logger.error(
+          'Mole show invariant violated. `lastMole` is not an HTMLElement',
+        );
+        return;
+      }
+
+      const dw = moleParent.closest('div.dw');
 
       if (dw) {
         dw.classList.add('inboxsdk__moles_in_use', styles.inboxsdkMolesInUse);

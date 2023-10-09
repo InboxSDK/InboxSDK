@@ -466,16 +466,16 @@ div.T-I.inboxsdk__button {
 
 /* compose buttons */
 
-/* fix compose mole position when sidebar is open */
-
 /*
+fix compose mole position when sidebar is open
+
 steps to repro:
 1. open compose mole
 2. open non-native sidebar
 3. mole overlaps sidebar
 */
-.dw .nH > .no .nH.nn:last-child[style='width: 320px;'] {
-  width: 376px !important;
+.dw .nH > .no .nH.nn:last-child[style*='width: 310px;'] {
+  width: 366px !important;
 }
 
 /* mimic button styling */
