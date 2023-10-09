@@ -156,21 +156,23 @@ export default class Logger {
     _logError(err, details, this._appId, true);
   }
 
+  /** Only the first logger instance reports Site errors. */
   errorSite(err: Error | unknown, details?: any) {
-    // Only the first logger instance reports Site errors.
     if (!this._isMaster) {
       return;
     }
     this.error(err, details);
   }
 
-  // Should only be used by the InboxSDK users for their own app events.
+  /** Should only be used by the InboxSDK users for their own app events. */
   eventApp(name: string, details?: any) {
     _trackEvent(this._appId, 'app', name, details);
   }
 
-  // For tracking app events that are possibly triggered by the user. Extensions
-  // can opt out of this with a flag passed to InboxSDK.load().
+  /**
+   * For tracking app events that are possibly triggered by the user. Extensions
+   * can opt out of this with a flag passed to InboxSDK.load().
+   */
   eventSdkActive(name: string, details?: any) {
     if (!_extensionUseEventTracking) {
       return;
