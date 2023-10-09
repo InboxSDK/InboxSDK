@@ -1,4 +1,3 @@
-import last from 'lodash/last';
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
@@ -122,8 +121,8 @@ class GmailMoleViewDriver {
 
   show() {
     const doShow = (moleParent: HTMLElement) => {
-      const leftMoleSpacer = moleParent.firstChild;
-      const rightMoleSpacer = moleParent.lastChild;
+      const leftMoleSpacer = moleParent.firstElementChild;
+      const rightMoleSpacer = moleParent.lastElementChild;
 
       if (
         leftMoleSpacer instanceof HTMLElement &&
@@ -221,7 +220,7 @@ class GmailMoleViewDriver {
       const moleParent = this.#element.parentElement;
 
       if (moleParent && this.#element.getBoundingClientRect().left < 0) {
-        moleParent.insertBefore(this.#element, last(moleParent.children)!);
+        moleParent.insertBefore(this.#element, moleParent.lastElementChild!);
       }
 
       this.#eventStream.emit({
