@@ -143,9 +143,13 @@ class GmailMoleViewDriver {
           this.#element.style.order = `${orderNumber - 1}`;
         }
 
-        for (const existingMole of document.querySelectorAll<HTMLElement>(
+        for (const existingMole of document.getElementsByClassName(
           INBOXSDK_CLASS,
         )) {
+          if (!(existingMole instanceof HTMLElement)) {
+            continue;
+          }
+
           const existingOrder = existingMole.style.order;
           const existingOrderNumber = parseInt(existingOrder, 10);
 
