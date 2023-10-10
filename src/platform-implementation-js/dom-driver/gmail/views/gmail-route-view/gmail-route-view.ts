@@ -20,6 +20,9 @@ import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import type GmailDriver from '../../gmail-driver';
 import type GmailRouteProcessor from '../gmail-route-view/gmail-route-processor';
+import PageParserTree from 'page-parser-tree';
+import { makePageParser } from './page-parser';
+import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
 
 class GmailRouteView {
   _type: string;
@@ -37,6 +40,7 @@ class GmailRouteView {
   _sectionsContainer: HTMLElement | null | undefined;
   _hasAddedCollapsibleSection: boolean;
   _cachedRouteData: Record<string, any>;
+  #page: PageParserTree;
 
   constructor(
     { urlObject, type, routeID, cachedRouteData }: Record<string, any>,
@@ -57,6 +61,7 @@ class GmailRouteView {
     this._driver = driver;
     this._eventStream = kefirBus();
     this._hasAddedCollapsibleSection = false;
+    this.#page = makePageParser(document.body, driver.getLogger());
 
     if (this._type === 'CUSTOM') {
       this._setupCustomViewElement();
@@ -93,6 +98,7 @@ class GmailRouteView {
     this._stopper.destroy();
 
     this._eventStream.end();
+    this.#page.dump();
 
     if (this._customViewElement) {
       this._customViewElement.remove();
@@ -290,25 +296,18 @@ class GmailRouteView {
     asap(() => {
       if (!this._eventStream) return;
 
-      this._setupRowListViews();
-
+      this.#monitorRowListElements();
       this._setupContentAndSidebarView();
-
       this._setupScrollStream();
     });
   }
 
-  _setupRowListViews() {
-    const rowListElements = GmailElementGetter.getRowListElements();
-    if (!rowListElements) {
-      // rowListElements CAN be async loaded for some users when searching
-      // initial list view seems immediately available so far
-      // wait for it to be available
-      throw new Error('could not find rowListElements to setupRowListViews');
-    }
-    Array.prototype.forEach.call(rowListElements, (rowListElement) => {
-      this._processRowListElement(rowListElement);
-    });
+  #monitorRowListElements() {
+    toItemWithLifetimeStream(this.#page.tree.getAllByTag('rowListElement'))
+      .takeUntilBy(this._stopper)
+      .onValue(({ el }) => {
+        this._processRowListElement(el.getValue());
+      });
   }
 
   _processRowListElement(rowListElement: HTMLElement) {
@@ -533,16 +532,9 @@ class GmailRouteView {
   }
 
   _isListRoute(): boolean {
-    const rowListElements = GmailElementGetter.getRowListElements();
-    if (!rowListElements)
-      throw new Error(
-        'could not find rowListElements to check if _isListRoute',
-      );
     return (
-      (this._type === 'CUSTOM_LIST' ||
-        this._gmailRouteProcessor.isListRouteName(this._name)) &&
-      rowListElements &&
-      rowListElements.length > 0
+      this._type === 'CUSTOM_LIST' ||
+      this._gmailRouteProcessor.isListRouteName(this._name)
     );
   }
 

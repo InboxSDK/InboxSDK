@@ -241,6 +241,12 @@ const GmailElementGetter = {
     }
   },
 
+  getRowListElementsContainer(): HTMLElement | null {
+    // This selector can find multiple elements but they should all be siblings
+    // so it's fine because we get the common parent.
+    return document.querySelector('.bGI.nH')?.parentElement ?? null;
+  },
+
   getRowListElements(): HTMLElement[] | null {
     const rowListElements = document.querySelectorAll<HTMLElement>('[gh=tl]');
     if (rowListElements.length === 0) {
