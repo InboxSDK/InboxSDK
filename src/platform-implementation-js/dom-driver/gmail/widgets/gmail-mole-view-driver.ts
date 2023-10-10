@@ -136,7 +136,7 @@ class GmailMoleViewDriver {
          * 2023-10-02 When Google Chat is enabled, we need to keep track of the `order` style property for moles added.
          * If we don't, we end up with moles added on top of the sidebar because the moleParent is using `order` for layout, and any child without `order` set will be forced to the right edge of the page.
          */
-        const order = leftMoleSpacer.style.order;
+        const order = isNaN(leftMoleSpacer.style.order) ? (1 << 32): leftMoleSpacer.style.order;
         const orderNumber = parseInt(order, 10);
 
         if (isFinite(orderNumber)) {
