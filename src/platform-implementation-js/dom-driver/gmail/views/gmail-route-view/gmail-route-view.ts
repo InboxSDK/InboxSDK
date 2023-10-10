@@ -37,7 +37,6 @@ class GmailRouteView {
   _eventStream: Bus<any, unknown>;
   _customViewElement: HTMLElement | null | undefined;
   _threadView: GmailThreadView | null | undefined;
-  _sectionsContainer: HTMLElement | null | undefined;
   _hasAddedCollapsibleSection: boolean;
   _cachedRouteData: Record<string, any>;
   #page: PageParserTree;
@@ -185,7 +184,7 @@ class GmailRouteView {
     >,
     groupOrderHint: any,
   ): GmailCollapsibleSectionView {
-    return this._addCollapsibleSection(
+    return this.#addCollapsibleSection(
       sectionDescriptorProperty,
       groupOrderHint,
       true,
@@ -199,14 +198,14 @@ class GmailRouteView {
     >,
     groupOrderHint: any,
   ): GmailCollapsibleSectionView {
-    return this._addCollapsibleSection(
+    return this.#addCollapsibleSection(
       sectionDescriptorProperty,
       groupOrderHint,
       false,
     );
   }
 
-  _addCollapsibleSection(
+  #addCollapsibleSection(
     collapsibleSectionDescriptorProperty: any,
     groupOrderHint: any,
     isCollapsible: boolean,
@@ -219,30 +218,28 @@ class GmailRouteView {
       isCollapsible,
     );
 
-    var sectionsContainer = this._getSectionsContainer();
-
-    gmailResultsSectionView
-      .getEventStream()
-      .filter(function (event) {
+    Kefir.combine([
+      this.#getSectionsContainer(),
+      gmailResultsSectionView.getEventStream().filter((event) => {
         return event.type === 'update' && event.property === 'orderHint';
-      })
-      .onValue(function () {
-        var children = sectionsContainer.children;
-        var insertBeforeElement = getInsertBeforeElement(
-          gmailResultsSectionView.getElement(),
-          children,
-          ['data-group-order-hint', 'data-order-hint'],
-        );
+      }),
+    ]).onValue(([sectionsContainer]) => {
+      const children = sectionsContainer.children;
+      const insertBeforeElement = getInsertBeforeElement(
+        gmailResultsSectionView.getElement(),
+        children,
+        ['data-group-order-hint', 'data-order-hint'],
+      );
 
-        if (insertBeforeElement) {
-          sectionsContainer.insertBefore(
-            gmailResultsSectionView.getElement(),
-            insertBeforeElement,
-          );
-        } else {
-          sectionsContainer.appendChild(gmailResultsSectionView.getElement());
-        }
-      });
+      if (insertBeforeElement) {
+        sectionsContainer.insertBefore(
+          gmailResultsSectionView.getElement(),
+          insertBeforeElement,
+        );
+      } else {
+        sectionsContainer.appendChild(gmailResultsSectionView.getElement());
+      }
+    });
     gmailResultsSectionView.setCollapsibleSectionDescriptorProperty(
       collapsibleSectionDescriptorProperty,
     );
@@ -408,26 +405,31 @@ class GmailRouteView {
     );
   }
 
-  _getSectionsContainer(): HTMLElement {
-    const main = document.querySelector("div[role='main']");
-    if (!main) throw new Error('should not happen');
-    let sectionsContainer = main.querySelector<HTMLElement>(
-      '.inboxsdk__custom_sections',
-    );
+  #getSectionsContainer(): Kefir.Observable<HTMLElement, never> {
+    return toItemWithLifetimeStream(
+      this.#page.tree.getAllByTag('rowListElementContainer'),
+    )
+      .takeUntilBy(this._stopper)
+      .take(1)
+      .map(({ el }) => {
+        const main = el.getValue();
+        let sectionsContainer = main.querySelector<HTMLElement>(
+          '.inboxsdk__custom_sections',
+        );
 
-    if (!sectionsContainer) {
-      sectionsContainer = this._sectionsContainer =
-        document.createElement('div');
-      sectionsContainer.classList.add('inboxsdk__custom_sections');
-      main.insertBefore(sectionsContainer, main.firstChild);
-    } else if (
-      sectionsContainer.classList.contains('Wc') &&
-      !this._isSearchRoute()
-    ) {
-      sectionsContainer.classList.remove('Wc');
-    }
-
-    return sectionsContainer;
+        if (!sectionsContainer) {
+          sectionsContainer = document.createElement('div');
+          sectionsContainer.classList.add('inboxsdk__custom_sections');
+          main.insertBefore(sectionsContainer, main.firstChild);
+        } else if (
+          sectionsContainer.classList.contains('Wc') &&
+          !this._isSearchRoute()
+        ) {
+          sectionsContainer.classList.remove('Wc');
+        }
+        return sectionsContainer;
+      })
+      .toProperty();
   }
 
   _getCustomParams(): Record<string, any> {
