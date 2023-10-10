@@ -299,7 +299,13 @@ class GmailRouteView {
   }
 
   _setupRowListViews() {
-    var rowListElements = GmailElementGetter.getRowListElements();
+    const rowListElements = GmailElementGetter.getRowListElements();
+    if (!rowListElements) {
+      // rowListElements CAN be async loaded for some users when searching
+      // initial list view seems immediately available so far
+      // wait for it to be available
+      throw new Error('could not find rowListElements to setupRowListViews');
+    }
     Array.prototype.forEach.call(rowListElements, (rowListElement) => {
       this._processRowListElement(rowListElement);
     });
@@ -527,7 +533,11 @@ class GmailRouteView {
   }
 
   _isListRoute(): boolean {
-    var rowListElements = GmailElementGetter.getRowListElements();
+    const rowListElements = GmailElementGetter.getRowListElements();
+    if (!rowListElements)
+      throw new Error(
+        'could not find rowListElements to check if _isListRoute',
+      );
     return (
       (this._type === 'CUSTOM_LIST' ||
         this._gmailRouteProcessor.isListRouteName(this._name)) &&

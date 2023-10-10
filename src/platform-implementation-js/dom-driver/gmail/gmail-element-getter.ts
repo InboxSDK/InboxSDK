@@ -241,8 +241,12 @@ const GmailElementGetter = {
     }
   },
 
-  getRowListElements(): HTMLElement[] {
-    return Array.from(document.querySelectorAll('[gh=tl]'));
+  getRowListElements(): HTMLElement[] | null {
+    const rowListElements = document.querySelectorAll<HTMLElement>('[gh=tl]');
+    if (rowListElements.length === 0) {
+      return null;
+    }
+    return Array.from(rowListElements);
   },
 
   getScrollContainer(): HTMLElement | null {
