@@ -23,7 +23,9 @@ import { removeAllThreadRowUnclaimedModifications } from './views/gmail-thread-r
 
 import GmailTopMessageBarDriver from './widgets/gmail-top-message-bar-driver';
 import GmailModalViewDriver from './widgets/gmail-modal-view-driver';
-import GmailMoleViewDriver from './widgets/gmail-mole-view-driver';
+import GmailMoleViewDriver, {
+  type MoleOptions,
+} from './widgets/gmail-mole-view-driver';
 import InboxDrawerView from '../inbox/views/inbox-drawer-view';
 import GmailRouteProcessor from './views/gmail-route-view/gmail-route-processor';
 import KeyboardShortcutHelpModifier from './gmail-driver/keyboard-shortcut-help-modifier';
@@ -90,7 +92,6 @@ import type ContentPanelViewDriver from '../../driver-common/sidebar/ContentPane
 import GmailNavItemView, {
   type NavItemDescriptor,
 } from './views/gmail-nav-item-view';
-import { MoleOptions } from '../../driver-interfaces/mole-view-driver';
 import { Contact } from '../../../inboxsdk';
 import GmailAttachmentCardView from './views/gmail-attachment-card-view';
 import type { PersonDetails } from '../../namespaces/user';
