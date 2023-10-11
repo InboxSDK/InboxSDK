@@ -8,6 +8,9 @@ import type GmailDriver from '../gmail-driver';
 import isComposeTitleBarLightColor from '../is-compose-titlebar-light-color';
 import * as styles from './mole-view.module.css';
 import cx from 'classnames';
+import PageParserTree from 'page-parser-tree';
+import censorHTMLtree from '../../../../common/censorHTMLtree';
+import isNotNil from '../../../lib/isNotNil';
 
 export type MoleButtonDescriptor = {
   title: string;
@@ -29,6 +32,79 @@ export type MoleOptions = {
 const INBOXSDK_CLASS = 'inboxsdk__mole_view' as const;
 
 class GmailMoleViewDriver {
+  static #moleParent: PageParserTree;
+  static #moleOrder = new Set<HTMLElement>();
+
+  static {
+    const moleParentSelector = '.dw .nH > .nH > .no';
+    /**
+     * Compose and SDK mole selector.
+     *
+     * 2023-10-11 note on :not selectors:
+     * style*="order: 2147483647;" is the left mole spacer.
+     * style*="order: 0" is the right mole spacer.
+     * .aJl is the chat placeholder.
+     */
+    const moleSelector = `${moleParentSelector} > *:not([style*="order: 0;"], [style*="order: 2147483647;"], .aJl)`;
+
+    this.#moleParent = new PageParserTree(document, {
+      logError(err, el) {
+        const details = {
+          el,
+          html: el ? censorHTMLtree(el) : null,
+        };
+        console.log(err, details);
+      },
+      tags: {
+        mole: {
+          ownedBy: ['moleParent'],
+        },
+      },
+      watchers: [
+        {
+          tag: 'mole',
+          selectors: [moleSelector],
+          sources: ['moleParent'],
+        },
+        {
+          tag: 'moleParent',
+          selectors: [moleParentSelector],
+          sources: [null],
+        },
+      ],
+      finders: {
+        moleParent: {
+          fn: (root) =>
+            [root.querySelector<HTMLElement>(moleParentSelector)].filter(
+              isNotNil,
+            ),
+        },
+        mole: {
+          fn: (root) => root.querySelectorAll(moleSelector),
+        },
+      },
+    });
+
+    const moles = this.#moleParent.tree.getAllByTag('mole');
+    moles.subscribe((changes) => {
+      for (const change of changes) {
+        if (change.type === 'add') {
+          const el = change.value.getValue();
+
+          this.#moleOrder.add(el);
+          console.log(change.type, change.value.getValue());
+        } else if (change.type === 'remove') {
+          const el = change.value.getValue();
+
+          this.#moleOrder.delete(el);
+          console.log(change.type, change.value.getValue());
+        }
+
+        console.log(this.#moleOrder);
+      }
+    });
+  }
+
   #driver: GmailDriver;
   #eventStream = kefirBus<
     {
