@@ -16,9 +16,6 @@ export function isCollapsiblePanelHidden(): boolean | null {
   return document.querySelector('div[role=navigation].aBA') != null;
 }
 
-/**
- * @note only able to @return true when @see {isIntegratedViewGmail} returns true
- */
 export function isGoogleChatEnabled() {
   return document.querySelector('div[role=navigation] > .ao4') != null;
 }
