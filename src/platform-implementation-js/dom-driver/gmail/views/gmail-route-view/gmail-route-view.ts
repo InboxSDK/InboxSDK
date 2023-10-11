@@ -534,9 +534,14 @@ class GmailRouteView {
   }
 
   _isListRoute(): boolean {
+    const rowListElements = GmailElementGetter.getRowListElements();
+
     return (
-      this._type === 'CUSTOM_LIST' ||
-      this._gmailRouteProcessor.isListRouteName(this._name)
+      (this._type === 'CUSTOM_LIST' ||
+        this._gmailRouteProcessor.isListRouteName(this._name)) &&
+      // this case is for when you're on a THREAD route, but the thread renders a list like our thread breaker does
+      rowListElements != null &&
+      rowListElements.length > 0
     );
   }
 
