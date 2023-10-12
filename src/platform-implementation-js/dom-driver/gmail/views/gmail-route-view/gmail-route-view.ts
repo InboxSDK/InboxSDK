@@ -413,8 +413,6 @@ class GmailRouteView {
       .take(1)
       .map(({ el }) => {
         const main = el.getValue();
-        console.log('==== main', main);
-
         let sectionsContainer = main.querySelector<HTMLElement>(
           '.inboxsdk__custom_sections',
         );
