@@ -4,11 +4,6 @@ import rateLimitQueuer from './rate-limit-queuer';
 
 jest.useFakeTimers();
 
-// Babel replaces calls to Date.now which makes mocking it awkward, so undo that.
-jest.mock('core-js/library/fn/date/now', () => {
-  return () => global.Date.now();
-});
-
 const _originalDateNow = global.Date.now;
 
 beforeEach(() => {
