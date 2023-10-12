@@ -135,24 +135,17 @@ class GmailMoleViewDriver {
   }
 
   static #reorderMoles() {
-    let insertionPoint: Element | null | undefined;
-    const chatEnabled = isGoogleChatEnabled();
+    if (this.#moleInsertOrder.size <= 1) {
+      return;
+    }
 
-    const reinsert = (mole: HTMLElement) => {
-      const moleParent = mole.parentElement;
-      if (chatEnabled) {
-        insertionPoint ??= moleParent?.lastElementChild;
-        insertionPoint?.insertAdjacentElement('beforebegin', mole);
-      } else {
-        insertionPoint ??= moleParent?.querySelector(
-          Selector.ChatMolePlaceholder,
-        );
-        insertionPoint?.insertAdjacentElement('afterend', mole);
-      }
-    };
+    let moleParent;
+    let insertionPoint: Element | null | undefined;
 
     for (const mole of this.#moleInsertOrder) {
-      reinsert(mole);
+      moleParent ??= mole.parentElement;
+      insertionPoint ??= moleParent?.lastElementChild;
+      insertionPoint?.insertAdjacentElement('beforebegin', mole);
     }
   }
 
