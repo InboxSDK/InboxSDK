@@ -11,7 +11,6 @@ import cx from 'classnames';
 import PageParserTree from 'page-parser-tree';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
 import isNotNil from '../../../lib/isNotNil';
-import { isGoogleChatEnabled } from '../gmail-driver/isIntegratedViewGmail';
 
 export type MoleButtonDescriptor = {
   title: string;
@@ -57,11 +56,6 @@ const enum Tag {
 
 class GmailMoleViewDriver {
   static #page: PageParserTree;
-  /**
-   * Should only include Compose and SDK moles.
-   * As of writing, Chat moles always are on the far left of the mole parent when Google Chat is enabled.
-   */
-  static #moleInsertOrder = new Set<HTMLElement>();
 
   static {
     this.#page = new PageParserTree(document, {
@@ -104,29 +98,16 @@ class GmailMoleViewDriver {
 
     const moles = this.#page.tree.getAllByTag(Tag.Mole);
 
-    for (const mole of moles.values()) {
-      const value = mole.getValue();
-      this.#moleInsertOrder.add(value);
-    }
-
     moles.subscribe((changes) => {
       for (const change of changes) {
         switch (change.type) {
           case 'add': {
             const el = change.value.getValue();
 
-            this.#moleInsertOrder.add(el);
-
             if (el.matches(Selector.ComposeMole)) {
-              this.#reorderMoles();
+              this.#maybeMoveMole(el);
             }
 
-            break;
-          }
-          case 'remove': {
-            const el = change.value.getValue();
-
-            this.#moleInsertOrder.delete(el);
             break;
           }
         }
@@ -134,19 +115,14 @@ class GmailMoleViewDriver {
     });
   }
 
-  static #reorderMoles() {
-    if (this.#moleInsertOrder.size <= 1) {
+  static #maybeMoveMole(mole: HTMLElement) {
+    const rightSpacer = mole.parentElement?.lastElementChild;
+
+    if (!(rightSpacer instanceof HTMLElement)) {
       return;
     }
 
-    let moleParent;
-    let insertionPoint: Element | null | undefined;
-
-    for (const mole of this.#moleInsertOrder) {
-      moleParent ??= mole.parentElement;
-      insertionPoint ??= moleParent?.lastElementChild;
-      insertionPoint?.insertAdjacentElement('beforebegin', mole);
-    }
+    rightSpacer.insertAdjacentElement('beforebegin', mole);
   }
 
   #driver: GmailDriver;
@@ -302,22 +278,13 @@ class GmailMoleViewDriver {
       return;
     }
 
-    GmailMoleViewDriver.#moleInsertOrder.delete(this.#element);
+    const rightSpacer = this.#element.parentElement?.lastElementChild;
 
-    // Compose moles are ordered differently if Chat is enabled v. not.
-    // With Chat enabled, compose moles stack from the right.
-    // Without Chat enabled, compose moles queue to right.
-    if (isGoogleChatEnabled()) {
-      GmailMoleViewDriver.#moleInsertOrder = new Set([
-        this.#element,
-        ...GmailMoleViewDriver.#moleInsertOrder,
-        this.#element,
-      ]);
-    } else {
-      GmailMoleViewDriver.#moleInsertOrder.add(this.#element);
+    if (!(rightSpacer instanceof HTMLElement)) {
+      return;
     }
 
-    GmailMoleViewDriver.#reorderMoles();
+    rightSpacer.insertAdjacentElement('beforebegin', this.#element);
   }
 
   setMinimized(minimized: boolean) {
@@ -381,7 +348,6 @@ class GmailMoleViewDriver {
   }
 
   destroy() {
-    GmailMoleViewDriver.#moleInsertOrder.delete(this.#element);
     this.#element.remove();
 
     this.#eventStream.end();
