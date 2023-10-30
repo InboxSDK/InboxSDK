@@ -196,10 +196,9 @@ class GmailMoleViewDriver {
           this.#element,
           '.inboxsdk__mole_title_buttons',
         );
-        const lastChild: HTMLElement =
-          titleButtonContainer.lastElementChild as any;
+        const lastChild = titleButtonContainer.lastElementChild;
         titleButtons.forEach((titleButton) => {
-          const img: HTMLImageElement = document.createElement('img') as any;
+          const img = document.createElement('img');
 
           if (titleButton.iconClass) {
             img.className = titleButton.iconClass;
