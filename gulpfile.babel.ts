@@ -385,6 +385,7 @@ if (args.remote) {
 } else {
   // standard npm non-remote bundle
   config = {
+    devtool: args.production ? false : 'inline-source-map',
     entry: {
       ...pageWorld,
       [sdkFilename]: {
