@@ -109,6 +109,16 @@ class GmailMoleViewDriver {
       for (const change of changes) {
         switch (change.type) {
           case 'add': {
+            /**
+             * @todo this approach doesn't seem to work in the edge case when
+             *
+             * - chat enabled
+             * - open a gmail compose
+             * - reload the page
+             * - open an SDK mole before the previous compose loads in
+             *
+             * We end up with a the SDK mole starting on the left, but then it is very noticably moved to the right of the Gmail compose.
+             */
             const el = change.value.getValue();
 
             if (el.matches(Selector.ComposeMole)) {
@@ -122,6 +132,11 @@ class GmailMoleViewDriver {
     });
   }
 
+  /**
+   * This method, among other things, DOES NOT
+   * - preseve initial load order with moles.
+   * - preserve mole order after a mole has been maximized.
+   */
   static #maybeMoveMole(mole: HTMLElement) {
     const rightSpacer = mole.parentElement?.lastElementChild;
 
