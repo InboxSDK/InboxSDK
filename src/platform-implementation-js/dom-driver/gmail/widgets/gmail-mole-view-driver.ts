@@ -97,7 +97,7 @@ class GmailMoleViewDriver {
               isNotNil,
             ),
           interval(elementCount, timeRunning) {
-            return timeRunning <= 5_000 ? 100 : 5000;
+            return timeRunning <= 5_000 && elementCount === 0 ? 100 : 5_000;
           },
         },
         [Tag.Mole]: {
@@ -108,7 +108,7 @@ class GmailMoleViewDriver {
             // - Google Chat is enabled
             // - a compose mole is open from a previous Gmail load
             // - a SDK mole is added immediately after page load.
-            return timeRunning <= 5_000 ? 100 : 5000;
+            return timeRunning <= 5_000 && elementCount === 0 ? 100 : 5_000;
           },
         },
       },
