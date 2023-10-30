@@ -96,9 +96,20 @@ class GmailMoleViewDriver {
             [root.querySelector<HTMLElement>(Selector.MoleParent)].filter(
               isNotNil,
             ),
+          interval(elementCount, timeRunning) {
+            return timeRunning <= 5_000 ? 100 : 5000;
+          },
         },
         [Tag.Mole]: {
           fn: (root) => root.querySelectorAll(Selector.Mole),
+          interval(elementCount, timeRunning) {
+            // For initial Gmail load, we want to prevent an issue where compose moles are reordered to the left SDK moles after 5 seconds when
+            //
+            // - Google Chat is enabled
+            // - a compose mole is open from a previous Gmail load
+            // - a SDK mole is added immediately after page load.
+            return timeRunning <= 5_000 ? 100 : 5000;
+          },
         },
       },
     });
@@ -109,16 +120,6 @@ class GmailMoleViewDriver {
       for (const change of changes) {
         switch (change.type) {
           case 'add': {
-            /**
-             * @todo this approach doesn't seem to work in the edge case when
-             *
-             * - chat enabled
-             * - open a gmail compose
-             * - reload the page
-             * - open an SDK mole before the previous compose loads in
-             *
-             * We end up with a the SDK mole starting on the left, but then it is very noticably moved to the right of the Gmail compose.
-             */
             const el = change.value.getValue();
 
             if (el.matches(Selector.ComposeMole)) {
