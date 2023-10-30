@@ -64,6 +64,13 @@ class GmailMoleViewDriver {
           el,
           html: el ? censorHTMLtree(el) : null,
         };
+        // ignore 'errors' that seem to be warnings instead...
+        if (
+          err.message.includes('found element missed by watcher') ||
+          err.message.includes('watcher found element already found by finder')
+        ) {
+          return;
+        }
         console.log(err, details);
       },
       tags: {
