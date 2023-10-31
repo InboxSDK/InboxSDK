@@ -14,7 +14,7 @@ import isNotNil from '../../../lib/isNotNil';
 
 export type MoleButtonDescriptor = {
   title: string;
-  iconUrl: string;
+  iconUrl?: string;
   iconClass?: string;
   onClick: (...args: Array<any>) => any;
 };
@@ -226,7 +226,9 @@ class GmailMoleViewDriver {
             event.stopPropagation();
             titleButton.onClick.call(null);
           });
-          img.src = titleButton.iconUrl;
+          if (titleButton.iconUrl) {
+            img.src = titleButton.iconUrl;
+          }
           titleButtonContainer.insertBefore(img, lastChild);
         });
       }
