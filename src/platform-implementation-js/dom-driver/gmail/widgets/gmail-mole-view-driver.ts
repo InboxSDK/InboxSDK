@@ -298,7 +298,7 @@ class GmailMoleViewDriver {
           document.body.classList.add(styles.hideComposes);
           const gmailComposeView =
             await this.#driver.openNewComposeViewDriver();
-          gmailComposeView.close();
+          gmailComposeView.discard();
         } finally {
           document.body.classList.remove(styles.hideComposes);
         }
