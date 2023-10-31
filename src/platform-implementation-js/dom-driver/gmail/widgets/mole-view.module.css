@@ -8,3 +8,14 @@
 .inboxsdkMolesInUse :global(.aDj.ahe) {
   position: static !important;
 }
+
+.hideComposes
+  :global(
+    .dw
+      .nH
+      > .nH
+      > .no
+      > *:not([style*='order: 0;'], [style*='order: 2147483647;'], .aJl).nn.nH
+  ) {
+  display: none !important;
+}

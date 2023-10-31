@@ -149,10 +149,6 @@ const GmailElementGetter = {
     return getMainContentElementChangedStream(this);
   }),
 
-  getMoleParent(): HTMLElement | null {
-    return document.body.querySelector('.dw .nH > .nH > .no');
-  },
-
   /**
    * This method checks whether we should use the old InboxSDK style of adding nav items
    * inline among Gmail's nav items (as opposed to the newer style where we put our nav items
