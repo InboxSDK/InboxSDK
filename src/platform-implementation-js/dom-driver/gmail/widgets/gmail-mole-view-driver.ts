@@ -1,7 +1,6 @@
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
-import streamWaitFor from '../../../lib/stream-wait-for';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import GmailElementGetter from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
@@ -56,6 +55,8 @@ const enum Tag {
 
 class GmailMoleViewDriver {
   static #page: PageParserTree;
+  static #moleParentReadyEvent = kefirBus<HTMLElement, unknown>();
+  static #moleParent?: HTMLElement;
 
   static {
     this.#page = new PageParserTree(document, {
@@ -97,7 +98,7 @@ class GmailMoleViewDriver {
               isNotNil,
             ),
           interval(elementCount, timeRunning) {
-            return timeRunning <= 5_000 && elementCount === 0 ? 100 : 5_000;
+            return timeRunning <= 15_000 && elementCount === 0 ? 100 : 5_000;
           },
         },
         [Tag.Mole]: {
@@ -112,6 +113,23 @@ class GmailMoleViewDriver {
           },
         },
       },
+    });
+
+    const moleParent = this.#page.tree.getAllByTag(Tag.MoleParent);
+
+    const moleParentLiveSet = moleParent.subscribe((changes) => {
+      for (const change of changes) {
+        switch (change.type) {
+          case 'add': {
+            const el = change.value.getValue();
+
+            this.#moleParent = el;
+            this.#moleParentReadyEvent.emit(el);
+
+            moleParentLiveSet.unsubscribe();
+          }
+        }
+      }
     });
 
     const moles = this.#page.tree.getAllByTag(Tag.Mole);
@@ -237,58 +255,63 @@ class GmailMoleViewDriver {
     );
   }
 
+  #doShow = (moleParent: HTMLElement) => {
+    const insertBefore = moleParent.lastElementChild;
+
+    if (insertBefore instanceof HTMLElement) {
+      moleParent.insertBefore(this.#element, insertBefore);
+    } else {
+      this.#driver.logger.error(
+        new Error(
+          'Mole show invariant violated. `lastMole` is not an HTMLElement',
+        ),
+      );
+      return;
+    }
+
+    const dw = moleParent.closest('div.dw');
+
+    if (dw) {
+      dw.classList.add('inboxsdk__moles_in_use', styles.inboxsdkMolesInUse);
+    }
+  };
+
   show() {
-    const doShow = (moleParent: HTMLElement) => {
-      const insertBefore = moleParent.lastElementChild;
-
-      if (insertBefore instanceof HTMLElement) {
-        moleParent.insertBefore(this.#element, insertBefore);
-      } else {
-        this.#driver.logger.error(
-          new Error(
-            'Mole show invariant violated. `lastMole` is not an HTMLElement',
-          ),
-        );
-        return;
-      }
-
-      const dw = moleParent.closest('div.dw');
-
-      if (dw) {
-        dw.classList.add('inboxsdk__moles_in_use', styles.inboxsdkMolesInUse);
-      }
-    };
-
-    const moleParent = GmailElementGetter.getMoleParent();
+    const moleParent = GmailMoleViewDriver.#moleParent;
 
     if (moleParent) {
-      doShow(moleParent);
-    } else {
-      const moleParentReadyEvent = streamWaitFor(() =>
-        GmailElementGetter.getMoleParent(),
-      )
-        .takeUntilBy(this.#stopper)
-        .onValue(doShow);
-      // For some users, the mole parent element seems to be lazily loaded by
-      // Gmail only once the user has used a compose view or a thread view.
-      // If the gmail mode has settled, we've been loaded for 10 seconds, and
-      // we don't have the mole parent yet, then force the mole parent to load
-      // by opening a compose view and then closing it.
-      Kefir.fromPromise(GmailElementGetter.waitForGmailModeToSettle())
-        .flatMap(() => {
-          // delay until we've passed TimestampOnReady + 10 seconds
-          return this.#driver.delayToTimeAfterReady(10 * 1000);
-        })
-        .takeUntilBy(moleParentReadyEvent)
-        .takeUntilBy(this.#stopper)
-        .onValue(() => {
-          this.#driver.getLogger().eventSdkActive('mole parent force load');
-
-          this.#driver.openNewComposeViewDriver().then((gmailComposeView) => {
-            gmailComposeView.close();
-          });
-        });
+      this.#doShow(moleParent);
+      return;
     }
+
+    const moleParentReadyEvent = GmailMoleViewDriver.#moleParentReadyEvent
+      .takeUntilBy(this.#stopper)
+      .onValue(this.#doShow);
+
+    // The mole parent element is lazily loaded by
+    // Gmail only once the user has used a compose view or a thread view.
+    // If the gmail mode has settled, we've been loaded for 10 seconds, and
+    // we don't have the mole parent yet, then force the mole parent to load
+    // by opening a compose view and then closing it.
+    Kefir.fromPromise(GmailElementGetter.waitForGmailModeToSettle())
+      .flatMap(() => {
+        // delay until we've passed TimestampOnReady + 5 seconds
+        return this.#driver.delayToTimeAfterReady(5_000);
+      })
+      .takeUntilBy(moleParentReadyEvent)
+      .takeUntilBy(this.#stopper)
+      .onValue(async () => {
+        this.#driver.getLogger().eventSdkActive('mole parent force load');
+
+        try {
+          document.body.classList.add(styles.hideComposes);
+          const gmailComposeView =
+            await this.#driver.openNewComposeViewDriver();
+          gmailComposeView.discard();
+        } finally {
+          document.body.classList.remove(styles.hideComposes);
+        }
+      });
   }
 
   /**
