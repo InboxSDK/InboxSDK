@@ -56,6 +56,7 @@ const enum Tag {
 class GmailMoleViewDriver {
   static #page: PageParserTree;
   static #moleParentReadyEvent = kefirBus<HTMLElement, unknown>();
+  static #moleParent?: HTMLElement;
 
   static {
     this.#page = new PageParserTree(document, {
@@ -122,6 +123,7 @@ class GmailMoleViewDriver {
           case 'add': {
             const el = change.value.getValue();
 
+            this.#moleParent = el;
             this.#moleParentReadyEvent.emit(el);
 
             moleParentLiveSet.unsubscribe();
@@ -275,19 +277,26 @@ class GmailMoleViewDriver {
   };
 
   show() {
+    const moleParent = GmailMoleViewDriver.#moleParent;
+
+    if (moleParent) {
+      this.#doShow(moleParent);
+      return;
+    }
+
     const moleParentReadyEvent = GmailMoleViewDriver.#moleParentReadyEvent
       .takeUntilBy(this.#stopper)
       .onValue(this.#doShow);
 
-    // For some users, the mole parent element seems to be lazily loaded by
+    // The mole parent element is lazily loaded by
     // Gmail only once the user has used a compose view or a thread view.
     // If the gmail mode has settled, we've been loaded for 10 seconds, and
     // we don't have the mole parent yet, then force the mole parent to load
     // by opening a compose view and then closing it.
     Kefir.fromPromise(GmailElementGetter.waitForGmailModeToSettle())
       .flatMap(() => {
-        // delay until we've passed TimestampOnReady + 10 seconds
-        return this.#driver.delayToTimeAfterReady(10 * 1000);
+        // delay until we've passed TimestampOnReady + 5 seconds
+        return this.#driver.delayToTimeAfterReady(5_000);
       })
       .takeUntilBy(moleParentReadyEvent)
       .takeUntilBy(this.#stopper)
