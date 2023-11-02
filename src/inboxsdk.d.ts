@@ -27,6 +27,7 @@ import { ContentPanelDescriptor } from './platform-implementation-js/driver-comm
 import type ContentPanelView from './platform-implementation-js/views/content-panel-view';
 import type { MoleOptions } from './platform-implementation-js/dom-driver/gmail/widgets/gmail-mole-view-driver';
 import type { ComposeButtonDescriptor } from './platform-implementation-js/driver-interfaces/compose-view-driver';
+import type ComposeView from './platform-implementation-js/views/compose-view';
 
 export type { User };
 
@@ -589,69 +590,7 @@ export {
   LinkPopOverSection,
 } from './platform-implementation-js/views/compose-view';
 
-export interface ComposeView extends TypedEmitter<ComposeViewEvent> {
-  destroyed: boolean;
-  addButton(
-    buttonOptions:
-      | ComposeButtonDescriptor
-      | Kefir.Observable<ComposeButtonDescriptor, any>,
-  ): void;
-  addComposeNotice(): ComposeNoticeView;
-  addRecipientRow(
-    RecipientRowOptions:
-      | RecipientRowOptions
-      | Kefir.Observable<RecipientRowOptions, any>,
-  ): { destroy(): void };
-  addStatusBar(statusBarDescriptor: StatusBarDescriptor): StatusBarView;
-  close(): void;
-  ensureAppButtonToolbarsAreClosed(): void;
-  ensureFormattingToolbarIsHidden(): void;
-  forceRecipientRowsOpen(): () => void;
-  getBccRecipients(): Array<Contact>;
-  getBodyElement(): HTMLElement;
-  getCcRecipients(): Array<Contact>;
-  getCurrentDraftID(): Promise<string | null | undefined>;
-  getElement(): HTMLElement;
-  getDraftID(): Promise<string | null | undefined>;
-  getSubject(): string;
-  getSubjectInput(): HTMLInputElement | null;
-  getThreadID(): string;
-  getToRecipients(): Array<Contact>;
-  getHTMLContent(): string;
-  getTextContent(): string;
-  hideDiscardButton(): () => void;
-  hideNativeRecipientRows(): () => void;
-  isMinimized(): boolean;
-  setMinimized(minimized: boolean): void;
-  isFullscreen(): boolean;
-  insertHTMLIntoBodyAtCursor(html: string): HTMLElement | null | undefined;
-  isForward(): boolean;
-  isInlineReplyForm(): boolean;
-  isReply(): boolean;
-  overrideEditSubject(): void;
-  registerRequestModifier(
-    cb: (composeParams: { isPlainText?: boolean; body: string }) =>
-      | {
-          body: string;
-        }
-      | Promise<{
-          body: string;
-        }>,
-  ): void;
-  replaceSendButton({ el }: { el: HTMLElement }): () => void;
-  setBccRecipients(emails: string[]): void;
-  setBodyHTML(html: string): void;
-  setBodyText(to: string): void;
-  setCcRecipients(emails: string[]): void;
-  setFullscreen(isFullscreen: boolean): void;
-  setSubject(subject: string): void;
-  setTitleBarColor(color: string): () => void;
-  setTitleBarText(to: string): () => void;
-  setToRecipients(recipients: string[]): void;
-  send(options?: SendOptions): void;
-  getFromContact(): Contact;
-  getFromContactChoices(): Contact[];
-}
+export { ComposeView };
 
 export interface SendOptions {
   sendAndArchive?: boolean;

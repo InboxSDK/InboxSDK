@@ -13,7 +13,7 @@ import type {
   StatusBar,
   ComposeButtonDescriptor,
 } from '../driver-interfaces/compose-view-driver';
-import type { Contact, ComposeView as IComposeView } from '../../inboxsdk';
+import type { Contact } from '../../inboxsdk';
 import type TypedEventEmitter from 'typed-emitter';
 import type {
   AddressChangeEventName,
@@ -81,10 +81,7 @@ export type ComposeViewEvent = {
   messageIDChange(data: string | null | undefined): void;
 } & AddressChangeEventsMapped;
 
-export default class ComposeView
-  extends (EventEmitter as new () => TypedEventEmitter<ComposeViewEvent>)
-  implements IComposeView
-{
+export default class ComposeView extends (EventEmitter as new () => TypedEventEmitter<ComposeViewEvent>) {
   destroyed: boolean = false;
 
   constructor(
