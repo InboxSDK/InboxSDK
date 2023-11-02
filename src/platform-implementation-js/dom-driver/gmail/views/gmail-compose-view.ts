@@ -4,7 +4,6 @@ import autoHtml from 'auto-html';
 import t from 'transducers.js';
 import once from 'lodash/once';
 import escape from 'lodash/escape';
-import includes from 'lodash/includes';
 import constant from 'lodash/constant';
 import find from 'lodash/find';
 import asap from 'asap';
@@ -26,12 +25,10 @@ import {
   simulateDrop,
   simulateDragEnd,
 } from '../../../lib/dom/simulate-drag-and-drop';
-import * as GmailResponseProcessor from '../gmail-response-processor';
 import GmailElementGetter from '../gmail-element-getter';
 import setCss from '../../../lib/dom/set-css';
 import waitFor from '../../../lib/wait-for';
 import streamWaitFor from '../../../lib/stream-wait-for';
-import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import handleComposeLinkChips from '../../../lib/handle-compose-link-chips';
 import insertLinkChipIntoBody from '../../../lib/insert-link-chip-into-body';
 import addComposeNotice from './gmail-compose-view/add-compose-notice';
@@ -92,7 +89,6 @@ class GmailComposeView implements ComposeViewDriver {
   #isInlineReplyForm: boolean;
   #isFullscreen: boolean;
   #isStandalone: boolean;
-  #emailWasSent: boolean;
   #driver: GmailDriver;
   #managedViewControllers: Array<{
     destroy(): void;
@@ -106,11 +102,9 @@ class GmailComposeView implements ComposeViewDriver {
   #composeID!: string;
   #messageIDElement!: HTMLInputElement;
   #messageId: string | null | undefined;
-  #finalMessageId: string | null | undefined; // Set only after the message is sent.
 
   #initialMessageId: string | null | undefined;
   #targetMessageID: string | null | undefined;
-  #draftSaving: boolean;
   #draftIDpromise: Promise<string | null | undefined> | null | undefined;
   #threadID: string | null | undefined;
   #stopper: Stopper;
@@ -156,10 +150,7 @@ class GmailComposeView implements ComposeViewDriver {
     this.#isInlineReplyForm = options.isInlineReplyForm;
     this.#isStandalone = options.isStandalone;
     this.#isFullscreen = false;
-    this.#emailWasSent = false;
     this.#messageId = null;
-    this.#finalMessageId = null;
-    this.#draftSaving = false;
     this.#draftIDpromise = null;
     this.#driver = driver;
     this.#stopper = kefirStopper();
@@ -171,245 +162,79 @@ class GmailComposeView implements ComposeViewDriver {
     this.#isTriggeringADraftSavePending = false;
     this.#page = makePageParser(element, driver.getLogger());
     this.tagTree = this.#page.tree;
-    let saveAndSendStream;
-
-    if (this.#driver.isUsingSyncAPI()) {
-      saveAndSendStream = xhrInterceptorStream // we know _getDraftIDfromForm will work because by the time we're
-        // getting an ajax event Gmail's JS has generated an ID and added it to the DOM.
-        .filter((event) => event.draftID === this.#getDraftIDfromForm())
-        .map((event) => {
-          switch (event.type) {
-            case 'emailSending': {
-              return {
-                eventName: 'sending',
-              };
-            }
-
-            case 'emailSent': {
-              const syncThreadID = event.threadID;
-              const syncMessageID = event.messageID;
-              if (event.oldMessageID) this.#messageId = event.oldMessageID;
-              if (event.oldThreadID) this.#threadID = event.oldThreadID;
-              driver.removeCachedGmailMessageIdForSyncMessageId(syncMessageID);
-              driver.removeCachedOldGmailThreadIdFromSyncThreadId(syncThreadID);
-              return {
-                eventName: 'sent',
-                data: {
-                  getThreadID: once(async (): Promise<string> => {
-                    if (event.oldThreadID) {
-                      return event.oldThreadID;
-                    }
-
-                    return await driver.getOldGmailThreadIdFromSyncThreadId(
-                      syncThreadID,
-                    );
-                  }),
-                  getMessageID: once(async (): Promise<string> => {
-                    if (event.oldMessageID) {
-                      return event.oldMessageID;
-                    }
-
-                    return await driver.getGmailMessageIdForSyncMessageId(
-                      syncMessageID,
-                    );
-                  }),
-                },
-              };
-            }
-
-            case 'emailSendFailed': {
-              return {
-                eventName: 'sendCanceled',
-              };
-            }
-
-            case 'emailDraftReceived': {
-              this.#messageId = event.oldMessageID;
-              this.#threadID = event.oldThreadID;
-              return {
-                eventName: 'draftSaved',
-                data: {
-                  getThreadID() {
-                    return Promise.resolve(event.oldThreadID);
-                  },
-
-                  getMessageID() {
-                    return Promise.resolve(event.oldMessageID);
-                  },
-                },
-              };
-            }
-
-            default: {
-              return null;
-            }
+    const saveAndSendStream = xhrInterceptorStream
+      // we know _getDraftIDfromForm will work because by the time we're
+      // getting an ajax event Gmail's JS has generated an ID and added it to the DOM.
+      .filter((event) => event.draftID === this.#getDraftIDfromForm())
+      .map((event) => {
+        switch (event.type) {
+          case 'emailSending': {
+            return {
+              eventName: 'sending',
+            };
           }
-        })
-        .filter(Boolean);
-    } else {
-      saveAndSendStream = xhrInterceptorStream
-        .filter((event) => event.composeId === this.getComposeID())
-        .map((event) => {
-          switch (event.type) {
-            case 'emailSending': {
-              return [
-                {
-                  eventName: 'sending',
-                },
-              ];
-            }
 
-            case 'emailSent': {
-              const response =
-                GmailResponseProcessor.interpretSentEmailResponse(
-                  event.response,
-                );
+          case 'emailSent': {
+            const syncThreadID = event.threadID;
+            const syncMessageID = event.messageID;
+            if (event.oldMessageID) this.#messageId = event.oldMessageID;
+            if (event.oldThreadID) this.#threadID = event.oldThreadID;
+            driver.removeCachedGmailMessageIdForSyncMessageId(syncMessageID);
+            driver.removeCachedOldGmailThreadIdFromSyncThreadId(syncThreadID);
+            return {
+              eventName: 'sent',
+              data: {
+                getThreadID: once(async (): Promise<string> => {
+                  if (event.oldThreadID) {
+                    return event.oldThreadID;
+                  }
 
-              if (includes(['tr', 'eu'], response.messageID)) {
-                return [
-                  {
-                    eventName: 'sendCanceled',
-                  },
-                ];
-              }
-
-              this.#emailWasSent = true;
-
-              if (response.messageID) {
-                this.#finalMessageId = response.messageID;
-              }
-
-              this.#messageId = null;
-              const data = {
-                getThreadID: (): Promise<string> =>
-                  Promise.resolve(response.threadID),
-                getMessageID: (): Promise<string> =>
-                  Promise.resolve(response.messageID),
-              };
-              ['threadID', 'gmailThreadId'].forEach((prop) => {
-                // These properties are nonenumerable.
-                Object.defineProperty(data as any, prop, {
-                  get: () => {
-                    this.#driver
-                      .getLogger()
-                      .deprecationWarning(
-                        `composeView sent event.${prop}`,
-                        'composeView sent event.getThreadID()',
-                      );
-
-                    return response.threadID;
-                  },
-                });
-              });
-              ['messageID', 'gmailMessageId'].forEach((prop) => {
-                Object.defineProperty(data as any, prop, {
-                  get: () => {
-                    this.#driver
-                      .getLogger()
-                      .deprecationWarning(
-                        `composeView sent event.${prop}`,
-                        'composeView sent event.getMessageID()',
-                      );
-
-                    return response.messageID;
-                  },
-                });
-              });
-              return [
-                {
-                  eventName: 'sent',
-                  data,
-                },
-              ];
-            }
-
-            case 'emailDraftSaveSending': {
-              this.#draftSaving = true;
-              return [
-                {
-                  eventName: 'draftSaving',
-                },
-              ];
-            }
-
-            case 'emailDraftReceived': {
-              this.#draftSaving = false;
-              let response;
-
-              try {
-                response = GmailResponseProcessor.interpretSentEmailResponse(
-                  event.response,
-                );
-              } catch (err) {
-                if (this.#driver.getAppId() === 'sdk_streak_21e9788951') {
-                  this.#driver.getLogger().error(err, {
-                    connectionDetails: event.connectionDetails,
-                    response: event.response,
-                  });
-
-                  throw err;
-                } else {
-                  throw err;
-                }
-              }
-
-              if (response.messageID === 'eu') {
-                return []; // save was canceled
-              }
-
-              const events = [
-                {
-                  eventName: 'draftSaved',
-                  data: response,
-                },
-              ];
-
-              if (!response.messageID) {
-                this.#driver
-                  .getLogger()
-                  .error(
-                    new Error('Missing message id from emailDraftReceived'),
+                  return await driver.getOldGmailThreadIdFromSyncThreadId(
+                    syncThreadID,
                   );
-              } else if (
-                response.messageID &&
-                this.#messageId !== response.messageID
-              ) {
-                if (/^[0-9a-f]+$/i.test(response.messageID)) {
-                  this.#messageId = response.messageID;
-                  events.push({
-                    eventName: 'messageIDChange',
-                    data: this.#messageId as any,
-                  });
-                } else {
-                  this.#driver
-                    .getLogger()
-                    .error(
-                      new Error('Invalid message id from emailDraftReceived'),
-                      {
-                        value: response.messageID,
-                      },
-                    );
-                }
-              }
+                }),
+                getMessageID: once(async (): Promise<string> => {
+                  if (event.oldMessageID) {
+                    return event.oldMessageID;
+                  }
 
-              return events;
-            }
-
-            default:
-              return [];
-          }
-        })
-        .flatten()
-        .map((event) => {
-          if (this.#driver.getLogger().shouldTrackEverything()) {
-            driver.getLogger().eventSite('compose.debug.xhr', {
-              eventName: (event as any).eventName,
-            });
+                  return await driver.getGmailMessageIdForSyncMessageId(
+                    syncMessageID,
+                  );
+                }),
+              },
+            };
           }
 
-          return event;
-        });
-    }
+          case 'emailSendFailed': {
+            return {
+              eventName: 'sendCanceled',
+            };
+          }
+
+          case 'emailDraftReceived': {
+            this.#messageId = event.oldMessageID;
+            this.#threadID = event.oldThreadID;
+            return {
+              eventName: 'draftSaved',
+              data: {
+                getThreadID() {
+                  return Promise.resolve(event.oldThreadID);
+                },
+
+                getMessageID() {
+                  return Promise.resolve(event.oldMessageID);
+                },
+              },
+            };
+          }
+
+          default: {
+            return null;
+          }
+        }
+      })
+      .filter(Boolean);
 
     this.#eventStream.plug(
       Kefir.merge<any, any>([
@@ -523,34 +348,27 @@ class GmailComposeView implements ComposeViewDriver {
       });
     });
 
-    // v2 Data behaves differently whereby the compose element is removed
-    // from the page while the send is in flight instead of waiting for the
-    // send to come back, so we have to handle that difference
-    if (this.#driver.isUsingSyncAPI()) {
-      Kefir.merge([
-        // if we get a presending then we let the other stream wait for
-        // sent. But if we get a sendCanceled, then a regular destroy can
-        // pass through
-        this.#removedFromDOMStopper.filterBy(
-          this.#eventStream
-            .filter(
-              ({ eventName }) =>
-                eventName === 'presending' || eventName === 'sendCanceled',
-            )
-            .map(({ eventName }) => eventName === 'sendCanceled')
-            .toProperty(() => true),
-        ),
-        Kefir.combine([
-          this.#removedFromDOMStopper,
-          this.#eventStream.filter(({ eventName }) => eventName === 'sent'),
-        ]),
-      ])
-        .take(1) // we delay asap here so that the event stream is not destroyed before listeners here the sent event
-        .flatMap(() => delayAsap(null))
-        .onValue(() => this.#destroy());
-    } else {
-      this.#removedFromDOMStopper.onValue(() => this.#destroy());
-    }
+    Kefir.merge([
+      // if we get a presending then we let the other stream wait for
+      // sent. But if we get a sendCanceled, then a regular destroy can
+      // pass through
+      this.#removedFromDOMStopper.filterBy(
+        this.#eventStream
+          .filter(
+            ({ eventName }) =>
+              eventName === 'presending' || eventName === 'sendCanceled',
+          )
+          .map(({ eventName }) => eventName === 'sendCanceled')
+          .toProperty(() => true),
+      ),
+      Kefir.combine([
+        this.#removedFromDOMStopper,
+        this.#eventStream.filter(({ eventName }) => eventName === 'sent'),
+      ]),
+    ])
+      .take(1) // we delay asap here so that the event stream is not destroyed before listeners here the sent event
+      .flatMap(() => delayAsap(null))
+      .onValue(() => this.#destroy());
 
     detectClassicRecipientsArea();
   }
@@ -671,31 +489,6 @@ class GmailComposeView implements ComposeViewDriver {
           eventName: minimized ? 'minimized' : 'restored',
         })),
     );
-
-    if (!this.#driver.isUsingSyncAPI()) {
-      makeMutationObserverChunkedStream(this.#messageIDElement, {
-        attributes: true,
-        attributeFilter: ['value'],
-      })
-        .takeUntilBy(
-          this.#eventStream.filter(() => false).beforeEnd(() => null),
-        )
-        .map(() => this.#getMessageIDfromForm())
-        .filter(
-          (messageID) =>
-            (messageID as unknown as boolean) &&
-            !this.#emailWasSent &&
-            this.#messageId !== messageID,
-        )
-        .onValue((messageID) => {
-          this.#messageId = messageID;
-
-          this.#eventStream.emit({
-            eventName: 'messageIDChange',
-            data: this.#messageId,
-          });
-        });
-    }
   }
 
   #setupConsistencyCheckers() {
@@ -710,51 +503,45 @@ class GmailComposeView implements ComposeViewDriver {
   }
 
   #setupIDs() {
-    if (this.#driver.isUsingSyncAPI()) {
-      const syncTargetMessageID = this.#getTargetMessageID();
+    const syncTargetMessageID = this.#getTargetMessageID();
 
-      if (syncTargetMessageID) {
-        this.#driver
-          .getGmailMessageIdForSyncMessageId(syncTargetMessageID)
-          .then((gmailMessageId) => (this.#targetMessageID = gmailMessageId));
-      }
-
-      const syncMessageId = this.#getMessageIDfromForm();
-
-      if (syncMessageId) {
-        this.#driver
-          .getGmailMessageIdForSyncDraftId(syncMessageId)
-          .then((gmailMessageId) => {
-            this.#initialMessageId = gmailMessageId;
-            this.#messageId = gmailMessageId;
-          })
-          .catch(() => {
-            //do nothing because this means the message hasn't been saved yet
-          });
-
-        this.#driver.reportRecentSyncDraftId(syncMessageId);
-
-        this.#stopper.onValue(() => {
-          this.#driver.reportDraftClosed(syncMessageId);
-        });
-      } else {
-        this.#driver
-          .getLogger()
-          .error(new Error('Draft is missing sync draft id'));
-      }
-
-      const legacyThreadIdElement: HTMLInputElement | null | undefined =
-        this.#element.querySelector('input[name="lts"]') as any;
-      if (
-        legacyThreadIdElement &&
-        typeof legacyThreadIdElement.value === 'string'
-      )
-        this.#threadID = legacyThreadIdElement.value;
-    } else {
-      this.#targetMessageID = this.#getTargetMessageID();
-      this.#messageId = this.#initialMessageId = this.#getMessageIDfromForm();
-      this.#threadID = this.#getThreadID();
+    if (syncTargetMessageID) {
+      this.#driver
+        .getGmailMessageIdForSyncMessageId(syncTargetMessageID)
+        .then((gmailMessageId) => (this.#targetMessageID = gmailMessageId));
     }
+
+    const syncMessageId = this.#getMessageIDfromForm();
+
+    if (syncMessageId) {
+      this.#driver
+        .getGmailMessageIdForSyncDraftId(syncMessageId)
+        .then((gmailMessageId) => {
+          this.#initialMessageId = gmailMessageId;
+          this.#messageId = gmailMessageId;
+        })
+        .catch(() => {
+          //do nothing because this means the message hasn't been saved yet
+        });
+
+      this.#driver.reportRecentSyncDraftId(syncMessageId);
+
+      this.#stopper.onValue(() => {
+        this.#driver.reportDraftClosed(syncMessageId);
+      });
+    } else {
+      this.#driver
+        .getLogger()
+        .error(new Error('Draft is missing sync draft id'));
+    }
+
+    const legacyThreadIdElement: HTMLInputElement | null | undefined =
+      this.#element.querySelector('input[name="lts"]') as any;
+    if (
+      legacyThreadIdElement &&
+      typeof legacyThreadIdElement.value === 'string'
+    )
+      this.#threadID = legacyThreadIdElement.value;
   }
 
   #updateComposeFullscreenState() {
@@ -1519,9 +1306,11 @@ class GmailComposeView implements ComposeViewDriver {
     return this.#initialMessageId;
   }
 
-  // For use only when isUsingSyncAPI() is true — gets the draft ID
-  // from the input that used to hold the hex message ID. Still does not
-  // populate until first save.
+  /**
+   * gets the draft ID
+   * from the input that used to hold the hex message ID. Still does not
+   * populate until first save.
+   */
   #getDraftIDfromForm(): string | null | undefined {
     const value =
       (this.#messageIDElement && this.#messageIDElement.value) || null;
@@ -1531,15 +1320,7 @@ class GmailComposeView implements ComposeViewDriver {
       value !== 'undefined' &&
       value !== 'null'
     ) {
-      if (this.#driver.isUsingSyncAPI()) {
-        return value.replace('#', '').replace('msg-a:', '');
-      } else {
-        this.#driver
-          .getLogger()
-          .error(new Error('Invalid draft id in element'), {
-            value,
-          });
-      }
+      return value.replace('#', '').replace('msg-a:', '');
     }
 
     return null;
@@ -1554,19 +1335,7 @@ class GmailComposeView implements ComposeViewDriver {
       value !== 'undefined' &&
       value !== 'null'
     ) {
-      if (this.#driver.isUsingSyncAPI()) {
-        return value.replace('#', ''); //annoyingly the hash is included
-      } else {
-        if (/^[0-9a-f]+$/i.test(value)) {
-          return value;
-        } else {
-          this.#driver
-            .getLogger()
-            .error(new Error('Invalid message id in element'), {
-              value,
-            });
-        }
-      }
+      return value.replace('#', ''); //annoyingly the hash is included
     }
 
     return null;
@@ -1585,34 +1354,26 @@ class GmailComposeView implements ComposeViewDriver {
   }
 
   async getCurrentDraftID(): Promise<string | null | undefined> {
-    if (this.#driver.isUsingSyncAPI()) {
-      // This function is mostly a mirror of _getDraftIDimplementation, but
-      // instead of waiting when finding out it's not saved, just returns null.
-      const draftID = this.#getDraftIDfromForm();
+    // This function is mostly a mirror of _getDraftIDimplementation, but
+    // instead of waiting when finding out it's not saved, just returns null.
+    const draftID = this.#getDraftIDfromForm();
 
-      if (this.#messageId) {
-        return draftID;
-      } else {
-        const syncMessageId = this.#getMessageIDfromForm();
-
-        if (syncMessageId) {
-          try {
-            // If this succeeds, then the draft must exist on the server and we
-            // can safely return the draft id we know.
-            await this.#driver.getGmailMessageIdForSyncDraftId(syncMessageId);
-          } catch (e) {
-            // ignore error, it's probably that the draft isn't saved yet.
-            return null;
-          }
-
-          return draftID;
-        }
-      }
+    if (this.#messageId) {
+      return draftID;
     } else {
-      if (!this.getMessageID()) {
-        return null;
-      } else {
-        return this.getDraftID();
+      const syncMessageId = this.#getMessageIDfromForm();
+
+      if (syncMessageId) {
+        try {
+          // If this succeeds, then the draft must exist on the server and we
+          // can safely return the draft id we know.
+          await this.#driver.getGmailMessageIdForSyncDraftId(syncMessageId);
+        } catch (e) {
+          // ignore error, it's probably that the draft isn't saved yet.
+          return null;
+        }
+
+        return draftID;
       }
     }
   }
@@ -1628,132 +1389,35 @@ class GmailComposeView implements ComposeViewDriver {
   }
 
   async #getDraftIDimplementation(): Promise<string | null | undefined> {
-    if (this.#driver.isUsingSyncAPI()) {
-      const draftID = this.#getDraftIDfromForm();
+    const draftID = this.#getDraftIDfromForm();
 
-      // we want to keep the semantics that getDraftID doesn't return until
-      // the draft is actually saved on Gmail's servers
-      if (this.#messageId) {
-        // if we have a messageId that means there is a draft on the server
-        return draftID;
-      } else {
-        // there may be a draft on the server, so let's find out
-        const syncMessageId = this.#getMessageIDfromForm();
-
-        if (syncMessageId) {
-          try {
-            // If this succeeds, then the draft must exist on the server and we
-            // can safely return the draft id we know.
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const gmailMessageId =
-              await this.#driver.getGmailMessageIdForSyncDraftId(syncMessageId);
-          } catch (e) {
-            // draft doesn't exist so we wait until it does
-            await this.#eventStream
-              .filter(({ eventName }) => eventName === 'draftSaved')
-              .beforeEnd(() => null)
-              .map(() => this.#getDraftIDfromForm())
-              .take(1)
-              .toPromise();
-          }
-
-          return draftID;
-        }
-      }
+    // we want to keep the semantics that getDraftID doesn't return until
+    // the draft is actually saved on Gmail's servers
+    if (this.#messageId) {
+      // if we have a messageId that means there is a draft on the server
+      return draftID;
     } else {
-      let i = -1;
-      let lastDebugData = null;
+      // there may be a draft on the server, so let's find out
+      const syncMessageId = this.#getMessageIDfromForm();
 
-      try {
-        // If this compose view doesn't have a message id yet, wait until it gets
-        // one or it's closed.
-        if (!this.#messageId) {
+      if (syncMessageId) {
+        try {
+          // If this succeeds, then the draft must exist on the server and we
+          // can safely return the draft id we know.
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const gmailMessageId =
+            await this.#driver.getGmailMessageIdForSyncDraftId(syncMessageId);
+        } catch (e) {
+          // draft doesn't exist so we wait until it does
           await this.#eventStream
-            .filter((event) => event.eventName === 'messageIDChange')
+            .filter(({ eventName }) => eventName === 'draftSaved')
             .beforeEnd(() => null)
+            .map(() => this.#getDraftIDfromForm())
             .take(1)
             .toPromise();
-
-          if (!this.#messageId) {
-            // The compose was closed before it got an id.
-            return null;
-          }
         }
 
-        // We make an AJAX request against gmail to find the draft ID for our
-        // current message ID. However, our message ID can change before that
-        // request finishes. If we fail to get our draft ID and we see that our
-        // message ID has changed since we made the request, then we try again.
-        let lastMessageId = null;
-
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          i++;
-          const messageId = this.#messageId;
-
-          if (!messageId) {
-            throw new Error('Should not happen');
-          }
-
-          if (lastMessageId === messageId) {
-            // It's possible that the server received a draft save request from us
-            // already, causing the draft id lookup to fail, but we haven't gotten
-            // the draft save response yet. Wait for that response to finish and
-            // keep trying if it looks like that might be the case.
-            if (this.#draftSaving) {
-              await this.#eventStream
-                .filter((event) => event.eventName === 'messageIDChange')
-                .beforeEnd(() => null)
-                .take(1)
-                .toPromise();
-              continue;
-            }
-
-            // maaaaybe the draft is saving, but we failed to detect that.
-            // Let's log whether things would've worked out a little in the future.
-            setTimeout(async () => {
-              const newMessageId = this.#messageId;
-
-              if (!newMessageId) {
-                throw new Error('Should not happen');
-              }
-
-              const { draftID, debugData } =
-                await this.#driver.getDraftIDForMessageID(newMessageId, true);
-              const err = new Error('Failed to read draft ID -- after check');
-
-              this.#driver.getLogger().error(err, {
-                message: 'getDraftID error -- after check',
-                messageIdChanged: messageId !== newMessageId,
-                gotDraftID: draftID != null,
-                debugData: draftID ? null : debugData,
-              });
-            }, 10 * 1000);
-            throw new Error('Failed to read draft ID');
-          }
-
-          lastMessageId = messageId;
-          const { draftID, debugData } =
-            await this.#driver.getDraftIDForMessageID(messageId);
-          lastDebugData = debugData;
-
-          if (draftID) {
-            return draftID;
-          }
-        }
-      } catch (err) {
-        this.#driver.getLogger().error(err, {
-          message: 'getDraftID error',
-          removedFromDOM: !document.contains(this.#element),
-          destroyed: this.#destroyed,
-          isFullscreen: this.#isFullscreen,
-          isStandalone: this.#isStandalone,
-          emailWasSent: this.#emailWasSent,
-          i,
-          lastDebugData,
-        });
-
-        throw err;
+        return draftID;
       }
     }
   }
@@ -1933,18 +1597,6 @@ class GmailComposeView implements ComposeViewDriver {
       : null;
   }
 
-  #getThreadID(): string | null | undefined {
-    const targetID = this.getTargetMessageID();
-
-    try {
-      return targetID ? this.#driver.getThreadIDForMessageID(targetID) : null;
-    } catch (err) {
-      this.#driver.getLogger().error(err);
-
-      return null;
-    }
-  }
-
   getElement(): HTMLElement {
     return this.#element;
   }
@@ -1981,9 +1633,7 @@ class GmailComposeView implements ComposeViewDriver {
           body: string;
         }>,
   ) {
-    const keyId = this.#driver.isUsingSyncAPI()
-      ? this.#getDraftIDfromForm()
-      : this.getComposeID();
+    const keyId = this.#getDraftIDfromForm();
     if (!keyId) throw new Error('keyId should be set here');
 
     const modifierId = this.#driver
@@ -2006,9 +1656,7 @@ class GmailComposeView implements ComposeViewDriver {
       return;
     }
 
-    const keyId = this.#driver.isUsingSyncAPI()
-      ? this.#getDraftIDfromForm()
-      : this.getComposeID();
+    const keyId = this.#getDraftIDfromForm();
     if (!keyId) throw new Error('keyId should be set here');
 
     this.#driver
