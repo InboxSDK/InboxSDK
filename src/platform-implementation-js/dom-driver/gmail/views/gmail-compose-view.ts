@@ -138,7 +138,6 @@ class GmailComposeView implements ComposeViewDriver {
       isStandalone: boolean;
     },
   ) {
-    this as ComposeViewDriver;
     this.#element = element;
 
     this.#element.classList.add('inboxsdk__compose');
@@ -280,14 +279,12 @@ class GmailComposeView implements ComposeViewDriver {
         .takeUntilBy(this.#stopper)
         .map((bodyElement) => {
           this.#seenBodyElement = bodyElement;
-          this.#composeID = (
-            this.#element.querySelector(
-              'input[name="composeid"]',
-            ) as any as HTMLInputElement
-          ).value;
+          this.#composeID = this.#element.querySelector<HTMLInputElement>(
+            'input[name="composeid"]',
+          )!.value;
           this.#messageIDElement = this.#element.querySelector(
             'input[name="draft"]',
-          ) as any;
+          )!;
 
           if (!this.#messageIDElement) {
             driver
@@ -535,8 +532,8 @@ class GmailComposeView implements ComposeViewDriver {
         .error(new Error('Draft is missing sync draft id'));
     }
 
-    const legacyThreadIdElement: HTMLInputElement | null | undefined =
-      this.#element.querySelector('input[name="lts"]') as any;
+    const legacyThreadIdElement =
+      this.#element.querySelector<HTMLInputElement>('input[name="lts"]');
     if (
       legacyThreadIdElement &&
       typeof legacyThreadIdElement.value === 'string'
@@ -610,7 +607,9 @@ class GmailComposeView implements ComposeViewDriver {
   }
 
   setSubject(text: string) {
-    (this.#element.querySelector('input[name=subjectbox]') as any).value = text;
+    this.#element.querySelector<HTMLInputElement>(
+      'input[name=subjectbox]',
+    )!.value = text;
 
     this.#triggerDraftSave();
   }
@@ -1107,7 +1106,9 @@ class GmailComposeView implements ComposeViewDriver {
   }
 
   getSubjectInput(): HTMLInputElement {
-    return (this.#element as any).querySelector('input[name=subjectbox]');
+    return this.#element.querySelector<HTMLInputElement>(
+      'input[name=subjectbox]',
+    )!;
   }
 
   getMetadataFormElement(): HTMLElement {
@@ -1221,7 +1222,7 @@ class GmailComposeView implements ComposeViewDriver {
     );
 
     if (scheduleSend) {
-      return (scheduleSend as any).parentElement;
+      return scheduleSend.parentElement!;
     }
 
     return this.getSendButton();
@@ -1261,7 +1262,7 @@ class GmailComposeView implements ComposeViewDriver {
         : parent.children[1];
     const result = !firstNotSendElement
       ? null
-      : firstNotSendElement.querySelector('[role=button]');
+      : firstNotSendElement.querySelector<HTMLElement>('[role=button]');
 
     if (result) {
       this.#driver
@@ -1275,7 +1276,7 @@ class GmailComposeView implements ComposeViewDriver {
         );
     }
 
-    return result as HTMLElement | null;
+    return result;
   }
 
   getCloseButton(): HTMLElement {
@@ -1588,8 +1589,8 @@ class GmailComposeView implements ComposeViewDriver {
   // If this compose is a reply, then this gets the message ID of the message
   // we're replying to.
   #getTargetMessageID(): string | null | undefined {
-    const input: HTMLInputElement | null | undefined =
-      this.#element.querySelector('input[name="rm"]') as any;
+    const input =
+      this.#element.querySelector<HTMLInputElement>('input[name="rm"]');
     return input &&
       typeof input.value === 'string' &&
       input.value != 'undefined'
