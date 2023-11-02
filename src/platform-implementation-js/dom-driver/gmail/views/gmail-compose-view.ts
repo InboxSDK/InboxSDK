@@ -73,17 +73,17 @@ import * as fromManager from './gmail-compose-view/from-manager';
 import type {
   ComposeButtonDescriptor,
   ComposeNotice,
-  ComposeViewDriver,
   ComposeViewDriverEvent,
   StatusBar,
 } from '../../../driver-interfaces/compose-view-driver';
 import type GmailDriver from '../gmail-driver';
 import { Contact } from '../../../../inboxsdk';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
+import { type PublicOnly } from '../../../../../types';
 
 let hasReportedMissingBody = false;
 
-class GmailComposeView implements ComposeViewDriver {
+class GmailComposeView {
   #element: HTMLElement;
   #seenBodyElement!: HTMLElement;
   #isInlineReplyForm: boolean;
@@ -697,7 +697,7 @@ class GmailComposeView implements ComposeViewDriver {
     >,
     groupOrderHint: string,
     extraOnClickOptions: Record<string, any>,
-  ): Promise<Record<string, any> | null | undefined> {
+  ) {
     return addButton(
       this,
       buttonDescriptor,
@@ -1717,3 +1717,4 @@ class GmailComposeView implements ComposeViewDriver {
 }
 
 export default GmailComposeView;
+export type ComposeViewDriver = PublicOnly<GmailComposeView>;

@@ -26,6 +26,7 @@ import type User from './platform-implementation-js/namespaces/user';
 import { ContentPanelDescriptor } from './platform-implementation-js/driver-common/sidebar/ContentPanelViewDriver';
 import type ContentPanelView from './platform-implementation-js/views/content-panel-view';
 import type { MoleOptions } from './platform-implementation-js/dom-driver/gmail/widgets/gmail-mole-view-driver';
+import type { ComposeButtonDescriptor } from './platform-implementation-js/driver-interfaces/compose-view-driver';
 
 export type { User };
 
@@ -629,7 +630,13 @@ export interface ComposeView extends TypedEmitter<ComposeViewEvent> {
   isReply(): boolean;
   overrideEditSubject(): void;
   registerRequestModifier(
-    cb: (composeParams: { isPlainText?: boolean; body: string }) => void,
+    cb: (composeParams: { isPlainText?: boolean; body: string }) =>
+      | {
+          body: string;
+        }
+      | Promise<{
+          body: string;
+        }>,
   ): void;
   replaceSendButton({ el }: { el: HTMLElement }): () => void;
   setBccRecipients(emails: string[]): void;
@@ -654,18 +661,7 @@ export type ComposeViewDestroyEvent = Parameters<
   ComposeViewEvent['destroy']
 >[0];
 
-export interface ComposeButtonDescriptor {
-  title: string;
-  iconUrl?: string;
-  iconClass?: string;
-  onClick(event: ComposeViewButtonOnClickEvent): void;
-  hasDropdown?: boolean;
-  type?: 'SEND_ACTION' | 'MODIFIER';
-  orderHint?: number;
-  enabled?: boolean;
-  noOverflow?: boolean;
-  tooltip?: string | null;
-}
+export { ComposeButtonDescriptor };
 
 export interface ComposeViewButtonOnClickEvent {
   composeView: ComposeView;
