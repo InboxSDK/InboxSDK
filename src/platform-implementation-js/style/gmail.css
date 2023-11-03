@@ -1466,7 +1466,6 @@ isn't visible behind it. */
   width: 24px;
   position: relative;
   top: 2px;
-  opacity: 0.6;
 }
 
 .inboxsdk__mole_title_buttons:not(.inboxsdk__original_view) > img {
