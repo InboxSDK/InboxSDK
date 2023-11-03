@@ -123,7 +123,7 @@
   "workspaces": [
     "packages/*"
   ],
-  "packageManager": "yarn@3.5.0",
+  "packageManager": "yarn@4.0.1",
   "devDependencies": {
     "babel-loader": "^9.1.2",
     "css-loader": "^6.7.3",
