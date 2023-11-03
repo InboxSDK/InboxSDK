@@ -575,7 +575,7 @@ class GmailComposeView {
       this.getLastSelectionRange(),
     );
 
-    this.#triggerDraftSave();
+    this.triggerDraftSave();
 
     // sometimes the html inserted can be quite large, so we need ot make sure that GMail resizes the compose window
     // triggering an enter press forces Gmail to resize compose
@@ -589,7 +589,7 @@ class GmailComposeView {
   ): HTMLElement | null | undefined {
     var retVal = insertLinkIntoBody(this, text, href);
 
-    this.#triggerDraftSave();
+    this.triggerDraftSave();
 
     return retVal;
   }
@@ -601,7 +601,7 @@ class GmailComposeView {
   }): HTMLElement {
     var retVal = insertLinkChipIntoBody(this, options);
 
-    this.#triggerDraftSave();
+    this.triggerDraftSave();
 
     return retVal;
   }
@@ -611,37 +611,37 @@ class GmailComposeView {
       'input[name=subjectbox]',
     )!.value = text;
 
-    this.#triggerDraftSave();
+    this.triggerDraftSave();
   }
 
   setBodyHTML(html: string) {
     this.getBodyElement().innerHTML = html;
 
-    this.#triggerDraftSave();
+    this.triggerDraftSave();
   }
 
   setBodyText(text: string) {
     this.getBodyElement().textContent = text;
 
-    this.#triggerDraftSave();
+    this.triggerDraftSave();
   }
 
   setToRecipients(emails: string[]) {
     setRecipients(this, 'to', emails);
 
-    this.#triggerDraftSave();
+    this.triggerDraftSave();
   }
 
   setCcRecipients(emails: string[]) {
     setRecipients(this, 'cc', emails);
 
-    this.#triggerDraftSave();
+    this.triggerDraftSave();
   }
 
   setBccRecipients(emails: string[]) {
     setRecipients(this, 'bcc', emails);
 
-    this.#triggerDraftSave();
+    this.triggerDraftSave();
   }
 
   addRecipientRow(
@@ -1557,7 +1557,7 @@ class GmailComposeView {
     };
   }
 
-  #triggerDraftSave() {
+  triggerDraftSave() {
     if (this.#isTriggeringADraftSavePending) {
       return;
     } else {

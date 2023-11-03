@@ -548,4 +548,11 @@ export default class ComposeView extends (EventEmitter as new () => TypedEventEm
       composeViewImplementation.overrideEditSubject();
     }
   }
+
+  /**
+   * Simulate a keypress to trick Gmail into saving a draft. This is useful if you want to save a draft in response to a user action, but you don't want to actually modify the contents of the draft.
+   */
+  triggerDraftSave() {
+    get(memberMap, this).composeViewImplementation.triggerDraftSave();
+  }
 }
