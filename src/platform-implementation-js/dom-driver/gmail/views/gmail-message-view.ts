@@ -114,54 +114,50 @@ class GmailMessageView {
 
     let partialReadyStream;
 
-    if (driver.isUsingSyncAPI()) {
-      // handle the case that the data-message-id is available, but the data-legacy-message-id is not
-      // this happens when you're looking at a thread, and then you reply to a message, the message id is generated
-      // client side, so the new message added (from your reply) shows up in the UI right away and has a data-message-id but
-      // because it hasn't been synced to the server it does not have a data-legacy-messag-id
-      // so we wait until the message has been synced to the server before saying this is ready
-      const messageIdElement = this._element.querySelector('[data-message-id]');
+    // handle the case that the data-message-id is available, but the data-legacy-message-id is not
+    // this happens when you're looking at a thread, and then you reply to a message, the message id is generated
+    // client side, so the new message added (from your reply) shows up in the UI right away and has a data-message-id but
+    // because it hasn't been synced to the server it does not have a data-legacy-messag-id
+    // so we wait until the message has been synced to the server before saying this is ready
+    const messageIdElement = this._element.querySelector('[data-message-id]');
 
-      if (messageIdElement) {
-        const syncMessageId = messageIdElement.getAttribute('data-message-id');
-        if (!syncMessageId)
-          throw new Error('data-message-id attribute has no value');
+    if (messageIdElement) {
+      const syncMessageId = messageIdElement.getAttribute('data-message-id');
+      if (!syncMessageId)
+        throw new Error('data-message-id attribute has no value');
 
-        // Only respect data-legacy-message-id if data-message-id is not the id
-        // of a draft we've seen recently, in order to work around a Gmail bug.
-        // https://github.com/StreakYC/GmailSDK/issues/515#issuecomment-457420619
-        if (
-          messageIdElement.hasAttribute('data-legacy-message-id') &&
-          !this._driver.isRecentSyncDraftId(syncMessageId.replace('#', ''))
-        ) {
-          partialReadyStream = Kefir.constant(null);
-        } else {
-          // we have a data message id, but not the legacy message id. So now we have to poll for the gmail message id
-          partialReadyStream = Kefir.fromPromise(
-            (async () => {
-              for (let ii = 0; ii < 10; ii++) {
-                try {
-                  const gmailMessageId =
-                    await this._driver.getGmailMessageIdForSyncMessageId(
-                      syncMessageId.replace('#', ''),
-                    );
-                  // set the legacy message id attribute so subsequent calls to getMessageId find the legacy message id in the dom
-                  messageIdElement.setAttribute(
-                    'data-legacy-message-id',
-                    gmailMessageId,
-                  );
-                  return null;
-                } catch (e) {
-                  await new Promise((resolve) => setTimeout(resolve, ii * 200));
-                }
-              }
-
-              throw new Error('gmail message id never became available');
-            })(),
-          );
-        }
-      } else {
+      // Only respect data-legacy-message-id if data-message-id is not the id
+      // of a draft we've seen recently, in order to work around a Gmail bug.
+      // https://github.com/StreakYC/GmailSDK/issues/515#issuecomment-457420619
+      if (
+        messageIdElement.hasAttribute('data-legacy-message-id') &&
+        !this._driver.isRecentSyncDraftId(syncMessageId.replace('#', ''))
+      ) {
         partialReadyStream = Kefir.constant(null);
+      } else {
+        // we have a data message id, but not the legacy message id. So now we have to poll for the gmail message id
+        partialReadyStream = Kefir.fromPromise(
+          (async () => {
+            for (let ii = 0; ii < 10; ii++) {
+              try {
+                const gmailMessageId =
+                  await this._driver.getGmailMessageIdForSyncMessageId(
+                    syncMessageId.replace('#', ''),
+                  );
+                // set the legacy message id attribute so subsequent calls to getMessageId find the legacy message id in the dom
+                messageIdElement.setAttribute(
+                  'data-legacy-message-id',
+                  gmailMessageId,
+                );
+                return null;
+              } catch (e) {
+                await new Promise((resolve) => setTimeout(resolve, ii * 200));
+              }
+            }
+
+            throw new Error('gmail message id never became available');
+          })(),
+        );
       }
     } else {
       partialReadyStream = Kefir.constant(null);
@@ -267,32 +263,20 @@ class GmailMessageView {
     let recipients = this._recipientsFull;
     if (recipients) return recipients;
 
-    if (this._driver.isUsingSyncAPI()) {
-      const threadID = this._threadViewDriver.getInternalID();
+    const threadID = this._threadViewDriver.getInternalID();
 
-      recipients = this._recipientsFull = (await this._driver
-        .getPageCommunicator()
-        .getMessageRecipients(threadID, this._element)) as any;
+    recipients = this._recipientsFull = (await this._driver
+      .getPageCommunicator()
+      .getMessageRecipients(threadID, this._element)) as any;
 
-      if (!recipients) {
-        this._driver
-          .getLogger()
-          .error(new Error('Failed to find message recipients from response'), {
-            threadID,
-          });
-
-        recipients = this._recipientsFull = this.getRecipients();
-      }
-    } else {
-      const receipientSpans = Array.from(
-        this._element.querySelectorAll('.hb span[email]'),
-      );
-      recipients = this._recipientsFull = receipientSpans.map((span) => {
-        return this._getUpdatedContact({
-          name: span.getAttribute('name')!,
-          emailAddress: span.getAttribute('email') || '',
+    if (!recipients) {
+      this._driver
+        .getLogger()
+        .error(new Error('Failed to find message recipients from response'), {
+          threadID,
         });
-      });
+
+      recipients = this._recipientsFull = this.getRecipients();
     }
 
     return recipients;
