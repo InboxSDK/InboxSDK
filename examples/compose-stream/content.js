@@ -217,6 +217,9 @@ InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
     composeView.on('subjectChanged', () => {
       console.log('subject changed', composeView.getSubject());
     });
+    composeView.on('bodyChanged', () => {
+      console.log('body changed', composeView.getTextContent());
+    });
     composeView.on(
       'toContactAdded',
       console.log.bind(console, 'toContactAdded'),
