@@ -1,6 +1,5 @@
 import find from 'lodash/find';
 import GmailElementGetter from '../gmail-element-getter';
-import * as GRP from '../gmail-response-processor';
 import * as SyncGRP from '../gmail-sync-response-processor';
 import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
@@ -309,109 +308,93 @@ const setupSearchReplacing = (
         // order that user passed in
         let newResponse: any;
         try {
-          if (driver.isUsingSyncAPI()) {
-            const extractedThreads =
-              SyncGRP.extractThreadsFromSearchResponse(response);
+          const extractedThreads =
+            SyncGRP.extractThreadsFromSearchResponse(response);
 
-            const extractedThreadsInCompletedIDPairsOrder = completedIDPairs
-              .map(({ gtid }) =>
-                find(extractedThreads, (t) => t.oldGmailThreadID === gtid),
-              )
-              .filter(Boolean);
+          const extractedThreadsInCompletedIDPairsOrder = completedIDPairs
+            .map(({ gtid }) =>
+              find(extractedThreads, (t) => t.oldGmailThreadID === gtid),
+            )
+            .filter(Boolean);
 
-            const doesNeedReorder =
-              extractedThreads.length !==
-                extractedThreadsInCompletedIDPairsOrder.length ||
-              extractedThreads.some(
-                (extractedThread, index) =>
-                  extractedThread !==
-                  extractedThreadsInCompletedIDPairsOrder[index],
-              );
+          const doesNeedReorder =
+            extractedThreads.length !==
+              extractedThreadsInCompletedIDPairsOrder.length ||
+            extractedThreads.some(
+              (extractedThread, index) =>
+                extractedThread !==
+                extractedThreadsInCompletedIDPairsOrder[index],
+            );
 
-            let reorderedThreads: typeof extractedThreads;
-            if (doesNeedReorder) {
-              const now = Date.now();
-              reorderedThreads = extractedThreadsInCompletedIDPairsOrder.map(
-                (extractedThread, index) => {
-                  const newFormat = Array.isArray(extractedThread!.rawResponse);
+          let reorderedThreads: typeof extractedThreads;
+          if (doesNeedReorder) {
+            const now = Date.now();
+            reorderedThreads = extractedThreadsInCompletedIDPairsOrder.map(
+              (extractedThread, index) => {
+                const newFormat = Array.isArray(extractedThread!.rawResponse);
 
-                  const newTime = String(now - index);
-                  let newThread = update(extractedThread, {
+                const newTime = String(now - index);
+                let newThread = update(extractedThread, {
+                  rawResponse: newFormat
+                    ? {
+                        '0': {
+                          '2': { $set: newTime },
+                          '7': { $set: newTime },
+                        },
+                      }
+                    : {
+                        '1': {
+                          '3': { $set: newTime },
+                          '8': { $set: newTime },
+                        },
+                      },
+                });
+
+                if (
+                  newFormat
+                    ? extractedThread!.rawResponse[0][4]
+                    : extractedThread!.rawResponse[1][5]
+                ) {
+                  newThread = update(newThread, {
                     rawResponse: newFormat
                       ? {
                           '0': {
-                            '2': { $set: newTime },
-                            '7': { $set: newTime },
+                            '4': (oldVal: any[]) =>
+                              oldVal.map((md) =>
+                                update(md, {
+                                  '6': { $set: newTime },
+                                  '17': { $set: newTime },
+                                  '30': { $set: newTime },
+                                }),
+                              ),
                           },
                         }
                       : {
                           '1': {
-                            '3': { $set: newTime },
-                            '8': { $set: newTime },
+                            '5': (oldVal: any[]) =>
+                              oldVal.map((md) =>
+                                update(md, {
+                                  '7': { $set: newTime },
+                                  '18': { $set: newTime },
+                                  '31': { $set: newTime },
+                                }),
+                              ),
                           },
                         },
                   });
-
-                  if (
-                    newFormat
-                      ? extractedThread!.rawResponse[0][4]
-                      : extractedThread!.rawResponse[1][5]
-                  ) {
-                    newThread = update(newThread, {
-                      rawResponse: newFormat
-                        ? {
-                            '0': {
-                              '4': (oldVal: any[]) =>
-                                oldVal.map((md) =>
-                                  update(md, {
-                                    '6': { $set: newTime },
-                                    '17': { $set: newTime },
-                                    '30': { $set: newTime },
-                                  }),
-                                ),
-                            },
-                          }
-                        : {
-                            '1': {
-                              '5': (oldVal: any[]) =>
-                                oldVal.map((md) =>
-                                  update(md, {
-                                    '7': { $set: newTime },
-                                    '18': { $set: newTime },
-                                    '31': { $set: newTime },
-                                  }),
-                                ),
-                            },
-                          },
-                    });
-                  }
-                  return newThread!;
-                },
-              );
-            } else {
-              reorderedThreads = extractedThreads;
-            }
-
-            newResponse = SyncGRP.replaceThreadsInSearchResponse(
-              response,
-              reorderedThreads,
-              { start, total },
+                }
+                return newThread!;
+              },
             );
           } else {
-            const extractedThreads = GRP.extractThreads(response);
-
-            const reorderedThreads: typeof extractedThreads = completedIDPairs
-              .map(({ gtid }) =>
-                find(extractedThreads, (t) => t.gmailThreadId === gtid),
-              )
-              .filter(Boolean) as typeof extractedThreads;
-
-            newResponse = GRP.replaceThreadsInResponse(
-              response,
-              reorderedThreads,
-              { start, total },
-            );
+            reorderedThreads = extractedThreads;
           }
+
+          newResponse = SyncGRP.replaceThreadsInSearchResponse(
+            response,
+            reorderedThreads,
+            { start, total },
+          );
 
           driver
             .getPageCommunicator()
@@ -429,22 +412,13 @@ const setupSearchReplacing = (
             });
           }
           try {
-            if (driver.isUsingSyncAPI()) {
-              driver.getPageCommunicator().setCustomListResults(
-                newQuery,
-                SyncGRP.replaceThreadsInSearchResponse(response, [], {
-                  start,
-                  total,
-                }),
-              );
-            } else {
-              driver
-                .getPageCommunicator()
-                .setCustomListResults(
-                  newQuery,
-                  GRP.replaceThreadsInResponse(response, [], { start, total }),
-                );
-            }
+            driver.getPageCommunicator().setCustomListResults(
+              newQuery,
+              SyncGRP.replaceThreadsInSearchResponse(response, [], {
+                start,
+                total,
+              }),
+            );
           } catch (e2) {
             driver.getLogger().error(e2);
             // The original response will be used.

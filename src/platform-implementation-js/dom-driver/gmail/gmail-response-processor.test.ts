@@ -598,32 +598,6 @@ describe('replaceThreadsInResponse', () => {
   });
 });
 
-describe('interpretSentEmailResponse', () => {
-  it('can read new thread', async () => {
-    const rawResponse = await readFile(
-      __dirname +
-        '/../../../../__tests__/gmail-response-processor/sent-response.txt',
-      'utf8',
-    );
-    const response =
-      GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
-    expect(response.messageID).toBe('14a08f7810935cb3');
-    expect(response.threadID).toBe('14a08f7810935cb3');
-  });
-
-  it('can read reply', async () => {
-    const rawResponse = await readFile(
-      __dirname +
-        '/../../../../__tests__/gmail-response-processor/sent-response2.txt',
-      'utf8',
-    );
-    const response =
-      GmailResponseProcessor.interpretSentEmailResponse(rawResponse);
-    expect(response.messageID).toBe('14a090139a3835a4');
-    expect(response.threadID).toBe('14a08f7810935cb3');
-  });
-});
-
 describe('extractMessage', () => {
   it('can handle response where only messages from one thread are found', async () => {
     const rawResponse = await readFile(

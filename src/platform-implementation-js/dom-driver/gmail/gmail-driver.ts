@@ -773,7 +773,6 @@ class GmailDriver {
       this.#timestampGlobalsFound = Date.now();
       this.#pageCommunicator = pageCommunicator;
       this.#logger.setUserEmailAddress(this.getUserEmailAddress());
-      this.#logger.setIsUsingSyncAPI(pageCommunicator.isUsingSyncAPI());
       this.#userInfo = new UserInfo(this);
 
       this.#timestampAccountSwitcherReady = Date.now();
@@ -916,10 +915,6 @@ class GmailDriver {
 
   isRunningInPageContext(): boolean {
     return !!((global as any).GLOBALS && (global as any)._GM_main);
-  }
-
-  isUsingSyncAPI(): boolean {
-    return this.#pageCommunicator.isUsingSyncAPI();
   }
 
   showAppIdWarning() {

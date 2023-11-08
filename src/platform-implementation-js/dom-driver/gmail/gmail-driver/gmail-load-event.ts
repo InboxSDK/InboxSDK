@@ -58,7 +58,6 @@ export default async function gmailLoadEvent(driver: GmailDriver) {
     windowWidth: window.innerWidth,
     windowHeight: window.innerHeight,
     language: pageCommunicator.getUserLanguage(),
-    isUsingSyncAPI: pageCommunicator.isUsingSyncAPI(),
     previewPane: pageCommunicator.getUserOriginalPreviewPaneMode(),
     isConversationViewDisabled,
     wasAccountSwitcherReadyAtStart:

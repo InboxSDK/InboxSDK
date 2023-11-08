@@ -10,39 +10,34 @@ export default async function openDraftByMessageID(
   driver: GmailDriver,
   messageID: string,
 ) {
-  let newHash;
-  if (driver.isUsingSyncAPI()) {
-    const rfcMessageID = await getRfcMessageIdForGmailMessageId(
-      driver,
-      messageID,
-    );
-    const { threads } = await getSyncThreadsForSearch(
-      driver,
-      'rfc822msgid:' + rfcMessageID,
-    );
+  const rfcMessageID = await getRfcMessageIdForGmailMessageId(
+    driver,
+    messageID,
+  );
+  const { threads } = await getSyncThreadsForSearch(
+    driver,
+    'rfc822msgid:' + rfcMessageID,
+  );
 
-    if (threads.length === 0) {
-      throw new Error('Failed to get sync message id');
-    }
-
-    const thread = threads[0];
-    const syncMessageData = thread.extraMetaData.syncMessageData.find(
-      (m) => m.oldMessageID === messageID,
-    );
-    if (!syncMessageData) {
-      throw new Error('Failed to find syncMessageData');
-    }
-
-    const { syncMessageID } = syncMessageData;
-
-    newHash = makeNewSyncHash(
-      window.location.hash,
-      thread.syncThreadID,
-      syncMessageID,
-    );
-  } else {
-    newHash = makeNewHash(window.location.hash, messageID);
+  if (threads.length === 0) {
+    throw new Error('Failed to get sync message id');
   }
+
+  const thread = threads[0];
+  const syncMessageData = thread.extraMetaData.syncMessageData.find(
+    (m) => m.oldMessageID === messageID,
+  );
+  if (!syncMessageData) {
+    throw new Error('Failed to find syncMessageData');
+  }
+
+  const { syncMessageID } = syncMessageData;
+
+  const newHash = makeNewSyncHash(
+    window.location.hash,
+    thread.syncThreadID,
+    syncMessageID,
+  );
   window.location.hash = newHash;
 }
 
