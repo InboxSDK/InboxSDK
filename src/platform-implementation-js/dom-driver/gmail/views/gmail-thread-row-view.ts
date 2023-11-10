@@ -323,44 +323,18 @@ class GmailThreadRowView {
     if (!counts) {
       const recipientsElement = querySelector(this._elements[0], 'td div.yW');
 
-      if (this._driver.isUsingSyncAPI()) {
-        const draftCount = recipientsElement.querySelectorAll('.boq').length;
-        const messageCountMatch = recipientsElement.querySelector('.bx0');
-        const messageCount =
-          messageCountMatch && messageCountMatch.innerHTML
-            ? +messageCountMatch.innerHTML
-            : draftCount
-            ? 0
-            : 1;
-        counts = this._counts = {
-          messageCount,
-          draftCount,
-        };
-      } else {
-        const [preDrafts, drafts] = recipientsElement.innerHTML.split(
-          /<font color=[^>]+>[^>]+<\/font>/,
-        );
-        const preDraftsWithoutNames = preDrafts.replace(
-          /<span\b[^>]*>.*?<\/span>/g,
-          '',
-        );
-        const messageCountMatch = preDraftsWithoutNames.match(/\((\d+)\)/);
-        const messageCount = messageCountMatch
-          ? +messageCountMatch[1]
-          : preDrafts
-          ? 1
-          : 0;
-        const draftCountMatch = drafts && drafts.match(/\((\d+)\)/);
-        const draftCount = draftCountMatch
-          ? +draftCountMatch[1]
-          : drafts != null
-          ? 1
-          : 0;
-        counts = this._counts = {
-          messageCount,
-          draftCount,
-        };
-      }
+      const draftCount = recipientsElement.querySelectorAll('.boq').length;
+      const messageCountMatch = recipientsElement.querySelector('.bx0');
+      const messageCount =
+        messageCountMatch && messageCountMatch.innerHTML
+          ? +messageCountMatch.innerHTML
+          : draftCount
+          ? 0
+          : 1;
+      counts = this._counts = {
+        messageCount,
+        draftCount,
+      };
     }
 
     return counts;
@@ -1152,42 +1126,36 @@ class GmailThreadRowView {
       return this._cachedThreadID;
     }
 
-    if (this._driver.isUsingSyncAPI()) {
-      const elementWithId = flatten(
-        this._elements.map((el) =>
-          Array.from(
-            el.querySelectorAll('[data-thread-id][data-legacy-thread-id]'),
-          ),
+    const elementWithId = flatten(
+      this._elements.map((el) =>
+        Array.from(
+          el.querySelectorAll('[data-thread-id][data-legacy-thread-id]'),
         ),
-      ).filter(Boolean)[0];
+      ),
+    ).filter(Boolean)[0];
 
-      if (elementWithId) {
-        this._cachedSyncThreadID = elementWithId
-          .getAttribute('data-thread-id')!
-          .replace('#', '');
-        this._cachedThreadID = elementWithId
-          .getAttribute('data-legacy-thread-id')!
-          .replace('#', '');
-        return this._cachedThreadID;
-      } else {
-        const threadID = this._driver
-          .getThreadRowIdentifier()
-          .getThreadIdForThreadRow(this, this._elements);
-
-        this._cachedSyncThreadID = threadID;
-
-        if (threadID) {
-          this._driver
-            .getOldGmailThreadIdFromSyncThreadId(threadID)
-            .then((oldGmailThreadID) => {
-              this._cachedThreadID = oldGmailThreadID;
-            });
-        }
-      }
+    if (elementWithId) {
+      this._cachedSyncThreadID = elementWithId
+        .getAttribute('data-thread-id')!
+        .replace('#', '');
+      this._cachedThreadID = elementWithId
+        .getAttribute('data-legacy-thread-id')!
+        .replace('#', '');
+      return this._cachedThreadID;
     } else {
-      this._cachedThreadID = this._driver
+      const threadID = this._driver
         .getThreadRowIdentifier()
         .getThreadIdForThreadRow(this, this._elements);
+
+      this._cachedSyncThreadID = threadID;
+
+      if (threadID) {
+        this._driver
+          .getOldGmailThreadIdFromSyncThreadId(threadID)
+          .then((oldGmailThreadID) => {
+            this._cachedThreadID = oldGmailThreadID;
+          });
+      }
     }
 
     return this._cachedThreadID;
@@ -1218,24 +1186,18 @@ class GmailThreadRowView {
   getDraftID(): Promise<string | null | undefined> {
     if (this._cachedSyncDraftIDPromise) return this._cachedSyncDraftIDPromise;
 
-    if (this._driver.isUsingSyncAPI()) {
-      const elementWithId = flatten(
-        this._elements.map((el) =>
-          Array.from(el.querySelectorAll('[data-standalone-draft-id]')),
-        ),
-      ).filter(Boolean)[0];
-      this._cachedSyncDraftIDPromise = Promise.resolve(
-        elementWithId
-          ? elementWithId
-              .getAttribute('data-standalone-draft-id')!
-              .replace('#msg-a:', '')
-          : null,
-      );
-    } else {
-      this._cachedSyncDraftIDPromise = this._driver
-        .getThreadRowIdentifier()
-        .getDraftIdForThreadRow(this);
-    }
+    const elementWithId = flatten(
+      this._elements.map((el) =>
+        Array.from(el.querySelectorAll('[data-standalone-draft-id]')),
+      ),
+    ).filter(Boolean)[0];
+    this._cachedSyncDraftIDPromise = Promise.resolve(
+      elementWithId
+        ? elementWithId
+            .getAttribute('data-standalone-draft-id')!
+            .replace('#msg-a:', '')
+        : null,
+    );
 
     return this._cachedSyncDraftIDPromise;
   }

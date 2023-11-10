@@ -18,7 +18,6 @@ let _extensionLoaderVersion: string | undefined;
 let _extensionImplVersion: string | undefined;
 let _extensionUserEmailHash: string | undefined;
 let _extensionUseEventTracking = false;
-let _isUsingSyncAPI: boolean | undefined = undefined;
 
 const _sessionId = getSessionId();
 const _loggedDeprecatedMessages = new Set();
@@ -120,10 +119,6 @@ export default class Logger {
       _extensionUserEmailHash ===
       'ca05afe92819df590a4196c31814fdb24050e8f49d8a41613f3d6cfb5729c785'
     );
-  }
-
-  setIsUsingSyncAPI(isUsing: boolean) {
-    _isUsingSyncAPI = isUsing;
   }
 
   static run<T>(cb: () => T, details?: any): T {
@@ -412,7 +407,6 @@ function _logError(
     loaderVersion: _extensionLoaderVersion,
     implVersion: _extensionImplVersion,
     userEmailHash: _extensionUserEmailHash,
-    isUsingSyncAPI: _isUsingSyncAPI,
   });
 }
 
@@ -457,7 +451,6 @@ function _trackEvent(
     emailHash: _extensionUserEmailHash,
     loaderVersion: _extensionLoaderVersion,
     implementationVersion: _extensionImplVersion,
-    isUsingSyncAPI: _isUsingSyncAPI,
     properties: properties,
   };
 

@@ -5,67 +5,6 @@ import mapIndexed from 'map-indexed-xf';
 import htmlToText from '../../../common/html-to-text';
 import { assert } from '../../../common/assert';
 
-export function interpretSentEmailResponse(responseString: string): {
-  threadID: string;
-  messageID: string;
-} {
-  const emailSentArray = deserialize(responseString).value;
-
-  const gmailMessageId = extractGmailMessageIdFromSentEmail(emailSentArray);
-  const gmailThreadId =
-    extractGmailThreadIdFromSentEmail(emailSentArray) || gmailMessageId;
-  if (!gmailMessageId || !gmailThreadId) {
-    throw new Error('Failed to read email response');
-  }
-  return {
-    threadID: gmailThreadId,
-    messageID: gmailMessageId,
-  };
-}
-
-export function extractGmailMessageIdFromSentEmail(
-  emailSentArray: any,
-): string | null {
-  const messageIdArrayMarker = 'a';
-  const messageIdArray = _searchArray(
-    emailSentArray,
-    messageIdArrayMarker,
-    (markerArray) =>
-      markerArray.length > 3 &&
-      Array.isArray(markerArray[3]) &&
-      markerArray[3].length > 0,
-  );
-
-  if (!messageIdArray) {
-    return null;
-  }
-
-  return messageIdArray[3][0];
-}
-
-export function extractGmailThreadIdFromSentEmail(
-  emailSentArray: any,
-): string | null {
-  const threadIdArrayMarker = 'csd';
-  const threadIdArray = _searchArray(
-    emailSentArray,
-    threadIdArrayMarker,
-    function (markerArray) {
-      return (
-        markerArray.length == 3 &&
-        Array.isArray(markerArray[2]) &&
-        markerArray[2].length > 5
-      );
-    },
-  );
-
-  if (!threadIdArray) {
-    return null;
-  }
-
-  return threadIdArray[1];
-}
-
 export function extractGmailThreadIdFromMessageIdSearch(
   responseString: string,
 ): string | null {

@@ -24,7 +24,6 @@ class ShowCustomThreadListTester {
   _customListResultsBus = kefirBus();
   _allowGmailThreadIdLookup = kefirBus();
   _driver: any = {
-    isUsingSyncAPI: () => true,
     getLogger: once(() => ({
       error(e: any) {
         console.error(e);

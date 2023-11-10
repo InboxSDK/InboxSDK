@@ -85,10 +85,7 @@ class GmailThreadView {
 
     let combinedReadyStream;
 
-    if (
-      driver.getOpts().REQUESTED_API_VERSION === 1 &&
-      driver.isUsingSyncAPI()
-    ) {
+    if (driver.getOpts().REQUESTED_API_VERSION === 1) {
       combinedReadyStream = Kefir.combine([
         waitForSidebarReady,
         Kefir.fromPromise(this.getThreadIDAsync()),
@@ -509,27 +506,24 @@ class GmailThreadView {
     if (this._threadID) return this._threadID;
     let threadID;
 
-    if (this._driver.isUsingSyncAPI()) {
-      const idElement = this._element.querySelector('[data-thread-perm-id]');
+    const idElement = this._element.querySelector('[data-thread-perm-id]');
 
-      if (!idElement) throw new Error('threadID element not found');
-      const syncThreadID = (this._syncThreadID = idElement.getAttribute(
-        'data-thread-perm-id',
-      ));
-      if (!syncThreadID)
-        throw new Error('syncThreadID attribute with no value');
-      threadID = idElement.getAttribute('data-legacy-thread-id');
+    if (!idElement) throw new Error('threadID element not found');
+    const syncThreadID = (this._syncThreadID = idElement.getAttribute(
+      'data-thread-perm-id',
+    ));
+    if (!syncThreadID) throw new Error('syncThreadID attribute with no value');
+    threadID = idElement.getAttribute('data-legacy-thread-id');
 
-      if (!threadID) {
-        const err = new Error(
-          'Failed to get id for thread: data-legacy-thread-id attribute missing',
-        );
+    if (!threadID) {
+      const err = new Error(
+        'Failed to get id for thread: data-legacy-thread-id attribute missing',
+      );
 
-        this._driver.getLogger().error(err); // throw err;
-        // Fall back to old behavior instead of throwing. Probably not super sensible, but
-        // this is a deprecated method and preserving the current behavior is
-        // probably an okay choice.
-      }
+      this._driver.getLogger().error(err); // throw err;
+      // Fall back to old behavior instead of throwing. Probably not super sensible, but
+      // this is a deprecated method and preserving the current behavior is
+      // probably an okay choice.
     }
 
     if (!threadID) {
@@ -561,45 +555,18 @@ class GmailThreadView {
   async getThreadIDAsync(): Promise<string> {
     let threadID;
 
-    if (this._driver.isUsingSyncAPI()) {
-      const idElement = this._element.querySelector('[data-thread-perm-id]');
+    const idElement = this._element.querySelector('[data-thread-perm-id]');
 
-      if (!idElement) throw new Error('threadID element not found');
-      const syncThreadID = (this._syncThreadID = idElement.getAttribute(
-        'data-thread-perm-id',
-      ));
-      if (!syncThreadID)
-        throw new Error('syncThreadID attribute with no value');
-      this._threadID = threadID = idElement.getAttribute(
-        'data-legacy-thread-id',
-      );
+    if (!idElement) throw new Error('threadID element not found');
+    const syncThreadID = (this._syncThreadID = idElement.getAttribute(
+      'data-thread-perm-id',
+    ));
+    if (!syncThreadID) throw new Error('syncThreadID attribute with no value');
+    this._threadID = threadID = idElement.getAttribute('data-legacy-thread-id');
 
-      if (!threadID) {
-        this._threadID = threadID =
-          await this._driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
-      }
-    } else {
-      if (this._isPreviewedThread) {
-        threadID = this._driver
-          .getPageCommunicator()
-          .getCurrentThreadID(this._element, true);
-      } else {
-        const params = this._routeViewDriver
-          ? this._routeViewDriver.getParams()
-          : null;
-
-        if (params && params.threadID) {
-          threadID = params.threadID;
-        } else {
-          const err = new Error('Failed to get id for thread');
-
-          this._driver.getLogger().error(err);
-
-          throw err;
-        }
-      }
-
-      this._threadID = threadID;
+    if (!threadID) {
+      this._threadID = threadID =
+        await this._driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
     }
 
     if (this._threadID) return this._threadID;
