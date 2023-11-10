@@ -53,7 +53,7 @@ Please feel free to open issues or pull requests for bug fixes. For feature requ
 # Development Cycle Essentials
 
 Run `yarn` to install the necessary dependencies, and run `yarn start` to
-start the automatic builder. Then load `examples/hello-world/` as an unpacked
+start the automatic builder. _Note: if you want `yarn start` to work, for now: `nvm install 18.10`._ Then load `examples/hello-world/` as an unpacked
 extension into Google Chrome.
 
 The [Chrome Extensions
