@@ -7,6 +7,7 @@ import GmailDropdownView from '../../widgets/gmail-dropdown-view';
 import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 import type GmailComposeView from '../gmail-compose-view';
 import { ComposeButtonDescriptor } from '../../../../driver-interfaces/compose-view-driver';
+import { Options } from '../../../../views/compose-button-view';
 
 export default function addButton(
   gmailComposeView: GmailComposeView,
@@ -16,8 +17,8 @@ export default function addButton(
   >,
   groupOrderHint: string,
   extraOnClickOptions: Record<string, any>,
-): Promise<Record<string, any> | null | undefined> {
-  return new Promise((resolve) => {
+) {
+  return new Promise<Options | null>((resolve) => {
     let buttonViewController:
       | BasicButtonViewController
       | DropdownButtonViewController
@@ -35,7 +36,7 @@ export default function addButton(
           if (buttonOptions) {
             buttonViewController = _addButton(
               gmailComposeView,
-              buttonOptions as any,
+              buttonOptions,
               groupOrderHint,
             );
             resolve({
@@ -44,6 +45,7 @@ export default function addButton(
             });
           }
         } else {
+          // This
           buttonViewController.update(buttonOptions as any);
         }
       })
@@ -166,15 +168,19 @@ function _processButtonDescriptor(
   buttonDescriptor: ComposeButtonDescriptor | null | undefined,
   extraOnClickOptions: Record<string, any>,
   driver: GmailDriver,
-): Record<string, any> | null | undefined {
+) {
   // clone the descriptor and set defaults.
   if (!buttonDescriptor) {
     return null;
   }
 
-  const buttonOptions = {
+  const buttonOptions: ComposeButtonDescriptor & {
+    dropdownShowFunction?: ComposeButtonDescriptor['onClick'];
+    activateFunction?: ComposeButtonDescriptor['onClick'];
+    noArrow?: true;
+  } = {
     type: 'MODIFIER',
-    ...(buttonDescriptor as any),
+    ...buttonDescriptor,
   };
   const oldOnClick = buttonOptions.onClick;
 

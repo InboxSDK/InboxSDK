@@ -66,7 +66,7 @@ function imp(
         ),
       ),
     )
-    .flatMap((composeViewDriver: any) => composeViewDriver.ready());
+    .flatMap((composeViewDriver) => composeViewDriver.ready());
 }
 
 function _setupStandardComposeElementStream() {

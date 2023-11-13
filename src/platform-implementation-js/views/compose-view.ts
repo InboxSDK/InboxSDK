@@ -1,5 +1,5 @@
 import EventEmitter from '../lib/safe-event-emitter';
-import Kefir from 'kefir';
+import Kefir, { Observable } from 'kefir';
 import kefirCast from 'kefir-cast';
 import * as ud from 'ud';
 import get from '../../common/get-or-fail';
@@ -11,8 +11,9 @@ import type {
   ComposeViewDriver,
   ComposeNotice,
   StatusBar,
+  ComposeButtonDescriptor,
 } from '../driver-interfaces/compose-view-driver';
-import type { Contact, ComposeView as IComposeView } from '../../inboxsdk';
+import type { Contact } from '../../inboxsdk';
 import type TypedEventEmitter from 'typed-emitter';
 import type {
   AddressChangeEventName,
@@ -80,10 +81,7 @@ export type ComposeViewEvent = {
   messageIDChange(data: string | null | undefined): void;
 } & AddressChangeEventsMapped;
 
-export default class ComposeView
-  extends (EventEmitter as new () => TypedEventEmitter<ComposeViewEvent>)
-  implements IComposeView
-{
+export default class ComposeView extends (EventEmitter as new () => TypedEventEmitter<ComposeViewEvent>) {
   destroyed: boolean = false;
 
   constructor(
@@ -145,9 +143,16 @@ export default class ComposeView
     });
   }
 
-  addButton(buttonDescriptor: any) {
+  addButton(
+    buttonDescriptor:
+      | ComposeButtonDescriptor
+      | Observable<ComposeButtonDescriptor, any>,
+  ) {
     const members = get(memberMap, this);
-    const buttonDescriptorStream = kefirCast(Kefir, buttonDescriptor);
+    const buttonDescriptorStream = kefirCast(
+      Kefir,
+      buttonDescriptor,
+    ) as Observable<ComposeButtonDescriptor, any>;
 
     const optionsPromise = members.composeViewImplementation.addButton(
       buttonDescriptorStream,
@@ -160,18 +165,6 @@ export default class ComposeView
       members.driver,
     );
   }
-
-  /*
-	// Incomplete
-	addInnerSidebar(options){
-		get(memberMap, this).composeViewImplementation.addInnerSidebar(options);
-	}
-
-	// Incomplete
-	addOuterSidebar(options){
-		get(memberMap, this).composeViewImplementation.addOuterSidebar(options);
-	}
-	*/
 
   addComposeNotice(composeNoticeDescriptor?: {
     height?: number;
@@ -509,7 +502,13 @@ export default class ComposeView
   }
 
   registerRequestModifier(
-    modifier: (composeParams: { isPlainText?: boolean; body: string }) => void,
+    modifier: (composeParams: { body: string }) =>
+      | {
+          body: string;
+        }
+      | Promise<{
+          body: string;
+        }>,
   ) {
     get(memberMap, this).composeViewImplementation.registerRequestModifier(
       modifier,

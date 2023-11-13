@@ -1,6 +1,9 @@
 import EventEmitter from '../lib/safe-event-emitter';
 import get from '../../common/get-or-fail';
-import { ComposeViewDriver } from '../driver-interfaces/compose-view-driver';
+import {
+  ComposeButtonDescriptor,
+  ComposeViewDriver,
+} from '../driver-interfaces/compose-view-driver';
 import { Driver } from '../driver-interfaces/driver';
 
 export interface TooltipDescriptor {
@@ -11,8 +14,8 @@ export interface TooltipDescriptor {
   button?: null | { onClick?: Function; title: string };
 }
 
-interface Options {
-  buttonDescriptor: any;
+export interface Options {
+  buttonDescriptor: ComposeButtonDescriptor | null | undefined;
   buttonViewController: any;
 }
 const memberMap = new WeakMap<
@@ -59,7 +62,7 @@ export default class ComposeButtonView extends EventEmitter {
       if (!options) return;
       members.composeViewDriver.addTooltipToButton(
         options.buttonViewController,
-        options.buttonDescriptor,
+        options.buttonDescriptor!,
         tooltipDescriptor,
       );
     });

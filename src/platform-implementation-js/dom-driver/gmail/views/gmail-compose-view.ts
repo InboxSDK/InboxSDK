@@ -73,46 +73,43 @@ import * as fromManager from './gmail-compose-view/from-manager';
 import type {
   ComposeButtonDescriptor,
   ComposeNotice,
-  ComposeViewDriver,
   ComposeViewDriverEvent,
   StatusBar,
 } from '../../../driver-interfaces/compose-view-driver';
 import type GmailDriver from '../gmail-driver';
 import { Contact } from '../../../../inboxsdk';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
+import { type PublicOnly } from '../../../../../types';
 
 let hasReportedMissingBody = false;
 
-class GmailComposeView implements ComposeViewDriver {
-  _element: HTMLElement;
-  _seenBodyElement!: HTMLElement;
-  _isInlineReplyForm: boolean;
-  _isFullscreen: boolean;
-  _isStandalone: boolean;
-  _emailWasSent: boolean;
-  _driver: GmailDriver;
-  _managedViewControllers: Array<{
+class GmailComposeView {
+  #element: HTMLElement;
+  #seenBodyElement!: HTMLElement;
+  #isInlineReplyForm: boolean;
+  #isFullscreen: boolean;
+  #isStandalone: boolean;
+  #driver: GmailDriver;
+  #managedViewControllers: Array<{
     destroy(): void;
   }>;
-  _eventStream: Bus<ComposeViewDriverEvent, unknown>;
-  _isTriggeringADraftSavePending: boolean;
-  _buttonViewControllerTooltipMap: WeakMap<
+  #eventStream: Bus<ComposeViewDriverEvent, unknown>;
+  #isTriggeringADraftSavePending: boolean;
+  #buttonViewControllerTooltipMap: WeakMap<
     Record<string, any>,
     Record<string, any>
   >;
-  _composeID!: string;
-  _messageIDElement!: HTMLInputElement;
-  _messageId: string | null | undefined;
-  _finalMessageId: string | null | undefined; // Set only after the message is sent.
+  #composeID!: string;
+  #messageIDElement!: HTMLInputElement;
+  #messageId: string | null | undefined;
 
-  _initialMessageId: string | null | undefined;
-  _targetMessageID: string | null | undefined;
-  _draftSaving: boolean;
-  _draftIDpromise: Promise<string | null | undefined> | null | undefined;
-  _threadID: string | null | undefined;
-  _stopper: Stopper;
-  _lastSelectionRange: Range | null | undefined;
-  _requestModifiers: Record<
+  #initialMessageId: string | null | undefined;
+  #targetMessageID: string | null | undefined;
+  #draftIDpromise: Promise<string | null | undefined> | null | undefined;
+  #threadID: string | null | undefined;
+  #stopper: Stopper;
+  #lastSelectionRange: Range | null | undefined;
+  #requestModifiers: Record<
     string,
     (composeParams: { body: string }) =>
       | {
@@ -122,13 +119,13 @@ class GmailComposeView implements ComposeViewDriver {
           body: string;
         }>
   >;
-  _isListeningToAjaxInterceptStream: boolean;
-  _formattingArea: HTMLElement | null | undefined;
-  _closedProgrammatically: boolean = false;
-  _destroyed: boolean = false;
-  _removedFromDOMStopper: Stopper;
-  _hasSetupLinkPopOvers: boolean = false;
-  _page: PageParserTree;
+  #isListeningToAjaxInterceptStream: boolean;
+  #formattingArea: HTMLElement | null | undefined;
+  #closedProgrammatically = false;
+  #destroyed = false;
+  #removedFromDOMStopper: Stopper;
+  #hasSetupLinkPopOvers = false;
+  #page: PageParserTree;
   tagTree: TagTree<HTMLElement>;
   ready: () => Kefir.Observable<GmailComposeView, unknown>;
 
@@ -141,36 +138,33 @@ class GmailComposeView implements ComposeViewDriver {
       isStandalone: boolean;
     },
   ) {
-    this as ComposeViewDriver;
-    this._element = element;
+    this.#element = element;
 
-    this._element.classList.add('inboxsdk__compose');
+    this.#element.classList.add('inboxsdk__compose');
 
     if (options.isInlineReplyForm) {
-      this._element.classList.add('inboxsdk__compose_inlineReply');
+      this.#element.classList.add('inboxsdk__compose_inlineReply');
     }
 
-    this._isInlineReplyForm = options.isInlineReplyForm;
-    this._isStandalone = options.isStandalone;
-    this._isFullscreen = false;
-    this._emailWasSent = false;
-    this._messageId = null;
-    this._finalMessageId = null;
-    this._draftSaving = false;
-    this._draftIDpromise = null;
-    this._driver = driver;
-    this._stopper = kefirStopper();
-    this._managedViewControllers = [];
-    this._requestModifiers = {};
-    this._isListeningToAjaxInterceptStream = false;
-    this._eventStream = kefirBus();
-    this._removedFromDOMStopper = kefirStopper();
-    this._isTriggeringADraftSavePending = false;
-    this._page = makePageParser(element, driver.getLogger());
-    this.tagTree = this._page.tree;
-    const saveAndSendStream = xhrInterceptorStream // we know _getDraftIDfromForm will work because by the time we're
+    this.#isInlineReplyForm = options.isInlineReplyForm;
+    this.#isStandalone = options.isStandalone;
+    this.#isFullscreen = false;
+    this.#messageId = null;
+    this.#draftIDpromise = null;
+    this.#driver = driver;
+    this.#stopper = kefirStopper();
+    this.#managedViewControllers = [];
+    this.#requestModifiers = {};
+    this.#isListeningToAjaxInterceptStream = false;
+    this.#eventStream = kefirBus();
+    this.#removedFromDOMStopper = kefirStopper();
+    this.#isTriggeringADraftSavePending = false;
+    this.#page = makePageParser(element, driver.getLogger());
+    this.tagTree = this.#page.tree;
+    const saveAndSendStream = xhrInterceptorStream
+      // we know _getDraftIDfromForm will work because by the time we're
       // getting an ajax event Gmail's JS has generated an ID and added it to the DOM.
-      .filter((event) => event.draftID === this._getDraftIDfromForm())
+      .filter((event) => event.draftID === this.#getDraftIDfromForm())
       .map((event) => {
         switch (event.type) {
           case 'emailSending': {
@@ -182,8 +176,8 @@ class GmailComposeView implements ComposeViewDriver {
           case 'emailSent': {
             const syncThreadID = event.threadID;
             const syncMessageID = event.messageID;
-            if (event.oldMessageID) this._messageId = event.oldMessageID;
-            if (event.oldThreadID) this._threadID = event.oldThreadID;
+            if (event.oldMessageID) this.#messageId = event.oldMessageID;
+            if (event.oldThreadID) this.#threadID = event.oldThreadID;
             driver.removeCachedGmailMessageIdForSyncMessageId(syncMessageID);
             driver.removeCachedOldGmailThreadIdFromSyncThreadId(syncThreadID);
             return {
@@ -218,8 +212,8 @@ class GmailComposeView implements ComposeViewDriver {
           }
 
           case 'emailDraftReceived': {
-            this._messageId = event.oldMessageID;
-            this._threadID = event.oldThreadID;
+            this.#messageId = event.oldMessageID;
+            this.#threadID = event.oldThreadID;
             return {
               eventName: 'draftSaved',
               data: {
@@ -241,25 +235,25 @@ class GmailComposeView implements ComposeViewDriver {
       })
       .filter(Boolean);
 
-    this._eventStream.plug(
+    this.#eventStream.plug(
       Kefir.merge<any, any>([
         saveAndSendStream,
-        Kefir.fromEvents(this._element, 'buttonAdded').map(() => {
+        Kefir.fromEvents(this.#element, 'buttonAdded').map(() => {
           return {
             eventName: 'buttonAdded',
           };
         }),
-        Kefir.fromEvents(this._element, 'resize').map(() => ({
+        Kefir.fromEvents(this.#element, 'resize').map(() => ({
           eventName: 'resize',
         })),
-        Kefir.fromEvents(this._element, 'composeFullscreenStateChanged').map(
+        Kefir.fromEvents(this.#element, 'composeFullscreenStateChanged').map(
           () => {
-            this._updateComposeFullscreenState();
+            this.#updateComposeFullscreenState();
 
             return {
               eventName: 'fullscreenChanged',
               data: {
-                fullscreen: this._isFullscreen,
+                fullscreen: this.#isFullscreen,
               },
             };
           },
@@ -267,12 +261,12 @@ class GmailComposeView implements ComposeViewDriver {
       ]),
     );
 
-    Kefir.fromEvents(this._element, 'closedProgrammatically')
-      .takeUntilBy(this._stopper)
+    Kefir.fromEvents(this.#element, 'closedProgrammatically')
+      .takeUntilBy(this.#stopper)
       .onValue(() => {
-        this._closedProgrammatically = true;
+        this.#closedProgrammatically = true;
       });
-    this._buttonViewControllerTooltipMap = new WeakMap();
+    this.#buttonViewControllerTooltipMap = new WeakMap();
     const initialBodyElement = this.getMaybeBodyElement();
     this.ready = constant(
       (initialBodyElement
@@ -282,33 +276,31 @@ class GmailComposeView implements ComposeViewDriver {
             3 * 60 * 1000, //timeout
           )
       )
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .map((bodyElement) => {
-          this._seenBodyElement = bodyElement;
-          this._composeID = (
-            this._element.querySelector(
-              'input[name="composeid"]',
-            ) as any as HTMLInputElement
-          ).value;
-          this._messageIDElement = this._element.querySelector(
+          this.#seenBodyElement = bodyElement;
+          this.#composeID = this.#element.querySelector<HTMLInputElement>(
+            'input[name="composeid"]',
+          )!.value;
+          this.#messageIDElement = this.#element.querySelector(
             'input[name="draft"]',
-          ) as any;
+          )!;
 
-          if (!this._messageIDElement) {
+          if (!this.#messageIDElement) {
             driver
               .getLogger()
               .error(new Error('Could not find compose message id field'));
             // stub so other things don't fail
-            this._messageIDElement = document.createElement('input');
+            this.#messageIDElement = document.createElement('input');
           }
 
-          this._setupIDs();
+          this.#setupIDs();
 
-          this._setupStreams();
+          this.#setupStreams();
 
-          this._setupConsistencyCheckers();
+          this.#setupConsistencyCheckers();
 
-          this._updateComposeFullscreenState();
+          this.#updateComposeFullscreenState();
 
           {
             // try and handle the case where the user types in a bad email address
@@ -316,7 +308,7 @@ class GmailComposeView implements ComposeViewDriver {
             // a modal comes up informing the user of the bad email address
             this.getEventStream()
               .filter(({ eventName }) => eventName === 'presending')
-              .takeUntilBy(this._stopper)
+              .takeUntilBy(this.#stopper)
               .onValue(() => {
                 makeElementChildStream(document.body)
                   .map((event) => event.el)
@@ -336,7 +328,7 @@ class GmailComposeView implements ComposeViewDriver {
                     ]),
                   )
                   .onValue(() => {
-                    this._eventStream.emit({
+                    this.#eventStream.emit({
                       eventName: 'sendCanceled',
                     });
                   });
@@ -357,8 +349,8 @@ class GmailComposeView implements ComposeViewDriver {
       // if we get a presending then we let the other stream wait for
       // sent. But if we get a sendCanceled, then a regular destroy can
       // pass through
-      this._removedFromDOMStopper.filterBy(
-        this._eventStream
+      this.#removedFromDOMStopper.filterBy(
+        this.#eventStream
           .filter(
             ({ eventName }) =>
               eventName === 'presending' || eventName === 'sendCanceled',
@@ -367,13 +359,13 @@ class GmailComposeView implements ComposeViewDriver {
           .toProperty(() => true),
       ),
       Kefir.combine([
-        this._removedFromDOMStopper,
-        this._eventStream.filter(({ eventName }) => eventName === 'sent'),
+        this.#removedFromDOMStopper,
+        this.#eventStream.filter(({ eventName }) => eventName === 'sent'),
       ]),
     ])
       .take(1) // we delay asap here so that the event stream is not destroyed before listeners here the sent event
       .flatMap(() => delayAsap(null))
-      .onValue(() => this._destroy());
+      .onValue(() => this.#destroy());
 
     detectClassicRecipientsArea();
   }
@@ -381,48 +373,48 @@ class GmailComposeView implements ComposeViewDriver {
   destroy() {
     // this gets called when the element gets removed from the DOM
     // however we don't want to pass through that destroy event right away
-    this._removedFromDOMStopper.destroy();
+    this.#removedFromDOMStopper.destroy();
 
-    this._page.dump();
+    this.#page.dump();
   }
 
-  _destroy() {
-    this._eventStream.emit({
+  #destroy() {
+    this.#eventStream.emit({
       eventName: 'destroy',
       data: {
         messageID: this.getMessageID(),
-        closedByInboxSDK: this._closedProgrammatically,
+        closedByInboxSDK: this.#closedProgrammatically,
       },
     });
 
-    this._eventStream.end();
+    this.#eventStream.end();
 
-    this._managedViewControllers.forEach((vc) => {
+    this.#managedViewControllers.forEach((vc) => {
       vc.destroy();
     });
 
-    this._requestModifiers = {};
-    this._managedViewControllers.length = 0;
+    this.#requestModifiers = {};
+    this.#managedViewControllers.length = 0;
 
-    this._stopper.destroy();
+    this.#stopper.destroy();
 
-    this._destroyed = true;
+    this.#destroyed = true;
   }
 
   getStopper() {
-    return this._stopper;
+    return this.#stopper;
   }
 
   getEventStream() {
-    return this._eventStream;
+    return this.#eventStream;
   }
 
   getGmailDriver(): GmailDriver {
-    return this._driver;
+    return this.#driver;
   }
 
   isDestroyed(): boolean {
-    return this._destroyed;
+    return this.#destroyed;
   }
 
   #getSubjectChangesStream() {
@@ -434,15 +426,15 @@ class GmailComposeView implements ComposeViewDriver {
     });
   }
 
-  _setupStreams() {
-    this._eventStream.plug(getAddressChangesStream(this));
+  #setupStreams() {
+    this.#eventStream.plug(getAddressChangesStream(this));
 
-    this._eventStream.plug(this.#getSubjectChangesStream());
-    this._eventStream.plug(getBodyChangesStream(this));
+    this.#eventStream.plug(this.#getSubjectChangesStream());
+    this.#eventStream.plug(getBodyChangesStream(this));
 
-    this._eventStream.plug(getResponseTypeChangesStream(this));
+    this.#eventStream.plug(getResponseTypeChangesStream(this));
 
-    this._eventStream.plug(
+    this.#eventStream.plug(
       getPresendingStream({
         element: this.getElement(),
         sendButton: this.getSendButton(),
@@ -456,15 +448,15 @@ class GmailComposeView implements ComposeViewDriver {
       discardButton = this.getDiscardButton();
     } catch (err) {
       // handle failures of this.getDiscardButton()
-      this._driver
+      this.#driver
         .getLogger()
         .errorSite(new Error('Failed to find discard button'), {
-          html: censorHTMLstring(this._element.outerHTML),
+          html: censorHTMLstring(this.#element.outerHTML),
         });
     }
 
     if (discardButton) {
-      this._eventStream.plug(
+      this.#eventStream.plug(
         getDiscardStream({
           element: this.getElement(),
           discardButton,
@@ -472,13 +464,13 @@ class GmailComposeView implements ComposeViewDriver {
       );
     }
 
-    this._eventStream.plug(
+    this.#eventStream.plug(
       Kefir.fromEvents(this.getElement(), 'inboxSDKsendCanceled').map(() => ({
         eventName: 'sendCanceled',
       })),
     );
 
-    this._eventStream.plug(
+    this.#eventStream.plug(
       Kefir.fromEvents(this.getElement(), 'inboxSDKdiscardCanceled').map(
         () => ({
           eventName: 'discardCanceled',
@@ -486,7 +478,7 @@ class GmailComposeView implements ComposeViewDriver {
       ),
     );
 
-    this._eventStream.plug(
+    this.#eventStream.plug(
       Kefir.later(10, undefined)
         .flatMap(() => getMinimizedStream(this))
         .changes()
@@ -496,73 +488,73 @@ class GmailComposeView implements ComposeViewDriver {
     );
   }
 
-  _setupConsistencyCheckers() {
+  #setupConsistencyCheckers() {
     try {
       handleComposeLinkChips(this);
       monitorSelectionRange(this);
       manageButtonGrouping(this);
-      sizeFixer(this._driver, this);
+      sizeFixer(this.#driver, this);
     } catch (err) {
-      this._driver.getLogger().error(err);
+      this.#driver.getLogger().error(err);
     }
   }
 
-  _setupIDs() {
-    const syncTargetMessageID = this._getTargetMessageID();
+  #setupIDs() {
+    const syncTargetMessageID = this.#getTargetMessageID();
 
     if (syncTargetMessageID) {
-      this._driver
+      this.#driver
         .getGmailMessageIdForSyncMessageId(syncTargetMessageID)
-        .then((gmailMessageId) => (this._targetMessageID = gmailMessageId));
+        .then((gmailMessageId) => (this.#targetMessageID = gmailMessageId));
     }
 
-    const syncMessageId = this._getMessageIDfromForm();
+    const syncMessageId = this.#getMessageIDfromForm();
 
     if (syncMessageId) {
-      this._driver
+      this.#driver
         .getGmailMessageIdForSyncDraftId(syncMessageId)
         .then((gmailMessageId) => {
-          this._initialMessageId = gmailMessageId;
-          this._messageId = gmailMessageId;
+          this.#initialMessageId = gmailMessageId;
+          this.#messageId = gmailMessageId;
         })
         .catch(() => {
           //do nothing because this means the message hasn't been saved yet
         });
 
-      this._driver.reportRecentSyncDraftId(syncMessageId);
+      this.#driver.reportRecentSyncDraftId(syncMessageId);
 
-      this._stopper.onValue(() => {
-        this._driver.reportDraftClosed(syncMessageId);
+      this.#stopper.onValue(() => {
+        this.#driver.reportDraftClosed(syncMessageId);
       });
     } else {
-      this._driver
+      this.#driver
         .getLogger()
         .error(new Error('Draft is missing sync draft id'));
     }
 
-    const legacyThreadIdElement: HTMLInputElement | null | undefined =
-      this._element.querySelector('input[name="lts"]') as any;
+    const legacyThreadIdElement =
+      this.#element.querySelector<HTMLInputElement>('input[name="lts"]');
     if (
       legacyThreadIdElement &&
       typeof legacyThreadIdElement.value === 'string'
     )
-      this._threadID = legacyThreadIdElement.value;
+      this.#threadID = legacyThreadIdElement.value;
   }
 
-  _updateComposeFullscreenState() {
-    if (this._isInlineReplyForm) {
-      this._isFullscreen = false;
+  #updateComposeFullscreenState() {
+    if (this.#isInlineReplyForm) {
+      this.#isFullscreen = false;
     } else {
-      if (this._isStandalone) {
-        this._isFullscreen = true;
+      if (this.#isStandalone) {
+        this.#isFullscreen = true;
       } else {
         const fullScreenContainer =
           GmailElementGetter.getFullscreenComposeWindowContainer();
 
         if (!fullScreenContainer) {
-          this._isFullscreen = false;
+          this.#isFullscreen = false;
         } else {
-          this._isFullscreen = fullScreenContainer.contains(this._element);
+          this.#isFullscreen = fullScreenContainer.contains(this.#element);
         }
       }
     }
@@ -583,7 +575,7 @@ class GmailComposeView implements ComposeViewDriver {
       this.getLastSelectionRange(),
     );
 
-    this._triggerDraftSave();
+    this.#triggerDraftSave();
 
     // sometimes the html inserted can be quite large, so we need ot make sure that GMail resizes the compose window
     // triggering an enter press forces Gmail to resize compose
@@ -597,7 +589,7 @@ class GmailComposeView implements ComposeViewDriver {
   ): HTMLElement | null | undefined {
     var retVal = insertLinkIntoBody(this, text, href);
 
-    this._triggerDraftSave();
+    this.#triggerDraftSave();
 
     return retVal;
   }
@@ -609,45 +601,47 @@ class GmailComposeView implements ComposeViewDriver {
   }): HTMLElement {
     var retVal = insertLinkChipIntoBody(this, options);
 
-    this._triggerDraftSave();
+    this.#triggerDraftSave();
 
     return retVal;
   }
 
   setSubject(text: string) {
-    (this._element.querySelector('input[name=subjectbox]') as any).value = text;
+    this.#element.querySelector<HTMLInputElement>(
+      'input[name=subjectbox]',
+    )!.value = text;
 
-    this._triggerDraftSave();
+    this.#triggerDraftSave();
   }
 
   setBodyHTML(html: string) {
     this.getBodyElement().innerHTML = html;
 
-    this._triggerDraftSave();
+    this.#triggerDraftSave();
   }
 
   setBodyText(text: string) {
     this.getBodyElement().textContent = text;
 
-    this._triggerDraftSave();
+    this.#triggerDraftSave();
   }
 
   setToRecipients(emails: string[]) {
     setRecipients(this, 'to', emails);
 
-    this._triggerDraftSave();
+    this.#triggerDraftSave();
   }
 
   setCcRecipients(emails: string[]) {
     setRecipients(this, 'cc', emails);
 
-    this._triggerDraftSave();
+    this.#triggerDraftSave();
   }
 
   setBccRecipients(emails: string[]) {
     setRecipients(this, 'bcc', emails);
 
-    this._triggerDraftSave();
+    this.#triggerDraftSave();
   }
 
   addRecipientRow(
@@ -657,15 +651,15 @@ class GmailComposeView implements ComposeViewDriver {
   }
 
   forceRecipientRowsOpen(): () => void {
-    this._element.classList.add('inboxsdk__compose_forceRecipientsOpen');
+    this.#element.classList.add('inboxsdk__compose_forceRecipientsOpen');
 
     return () => {
-      this._element.classList.remove('inboxsdk__compose_forceRecipientsOpen');
+      this.#element.classList.remove('inboxsdk__compose_forceRecipientsOpen');
     };
   }
 
   hideNativeRecipientRows(): () => void {
-    const nativeRecipientRows = getRecipientRowElements(this._element);
+    const nativeRecipientRows = getRecipientRowElements(this.#element);
     nativeRecipientRows.forEach((row) => {
       row.classList.add('inboxsdk__compose_forceRecipientRowHidden');
     });
@@ -677,23 +671,23 @@ class GmailComposeView implements ComposeViewDriver {
   }
 
   hideRecipientArea(): () => void {
-    this._element.classList.add('inboxsdk__compose_hideRecipientArea');
+    this.#element.classList.add('inboxsdk__compose_hideRecipientArea');
 
     return () => {
-      this._element.classList.remove('inboxsdk__compose_hideRecipientArea');
+      this.#element.classList.remove('inboxsdk__compose_hideRecipientArea');
     };
   }
 
   getFromContact() {
-    return fromManager.getFromContact(this._driver, this);
+    return fromManager.getFromContact(this.#driver, this);
   }
 
   getFromContactChoices() {
-    return fromManager.getFromContactChoices(this._driver, this);
+    return fromManager.getFromContactChoices(this.#driver, this);
   }
 
   setFromEmail(email: string) {
-    fromManager.setFromEmail(this._driver, this, email);
+    fromManager.setFromEmail(this.#driver, this, email);
   }
 
   addButton(
@@ -703,7 +697,7 @@ class GmailComposeView implements ComposeViewDriver {
     >,
     groupOrderHint: string,
     extraOnClickOptions: Record<string, any>,
-  ): Promise<Record<string, any> | null | undefined> {
+  ) {
     return addButton(
       this,
       buttonDescriptor,
@@ -724,21 +718,21 @@ class GmailComposeView implements ComposeViewDriver {
       tooltipDescriptor,
     );
 
-    this._buttonViewControllerTooltipMap.set(buttonViewController, tooltip);
+    this.#buttonViewControllerTooltipMap.set(buttonViewController, tooltip);
   }
 
   closeButtonTooltip(buttonViewController: Record<string, any>) {
-    if (!this._buttonViewControllerTooltipMap) {
+    if (!this.#buttonViewControllerTooltipMap) {
       return;
     }
 
     var tooltip =
-      this._buttonViewControllerTooltipMap.get(buttonViewController);
+      this.#buttonViewControllerTooltipMap.get(buttonViewController);
 
     if (tooltip) {
       tooltip.destroy();
 
-      this._buttonViewControllerTooltipMap.delete(buttonViewController);
+      this.#buttonViewControllerTooltipMap.delete(buttonViewController);
     }
   }
 
@@ -749,7 +743,7 @@ class GmailComposeView implements ComposeViewDriver {
   ): ComposeNotice {
     const composeNotice = addComposeNotice(this, options);
 
-    this._element.dispatchEvent(
+    this.#element.dispatchEvent(
       new CustomEvent('resize', {
         bubbles: false,
         cancelable: false,
@@ -759,9 +753,9 @@ class GmailComposeView implements ComposeViewDriver {
 
     Kefir.fromEvents(composeNotice, 'destroy')
       .flatMap(delayAsap)
-      .takeUntilBy(this._stopper)
+      .takeUntilBy(this.#stopper)
       .onValue(() => {
-        this._element.dispatchEvent(
+        this.#element.dispatchEvent(
           new CustomEvent('resize', {
             bubbles: false,
             cancelable: false,
@@ -781,7 +775,7 @@ class GmailComposeView implements ComposeViewDriver {
   ): StatusBar {
     const statusBar = addStatusBar(this, options);
 
-    this._element.dispatchEvent(
+    this.#element.dispatchEvent(
       new CustomEvent('resize', {
         bubbles: false,
         cancelable: false,
@@ -791,9 +785,9 @@ class GmailComposeView implements ComposeViewDriver {
 
     Kefir.fromEvents(statusBar, 'destroy')
       .flatMap(delayAsap)
-      .takeUntilBy(this._stopper)
+      .takeUntilBy(this.#stopper)
       .onValue(() => {
-        this._element.dispatchEvent(
+        this.#element.dispatchEvent(
           new CustomEvent('resize', {
             bubbles: false,
             cancelable: false,
@@ -840,11 +834,11 @@ class GmailComposeView implements ComposeViewDriver {
     container.appendChild(el);
     sendButton.insertAdjacentElement('afterend', container);
 
-    this._element.setAttribute('data-inboxsdk-send-replaced', '');
+    this.#element.setAttribute('data-inboxsdk-send-replaced', '');
 
     const removalStopper = kefirStopper();
     Kefir.fromEvents<KeyboardEvent, unknown>(this.getBodyElement(), 'keydown')
-      .takeUntilBy(this._stopper)
+      .takeUntilBy(this.#stopper)
       .takeUntilBy(removalStopper)
       .filter(
         (domEvent) =>
@@ -874,7 +868,7 @@ class GmailComposeView implements ComposeViewDriver {
       removalStopper.destroy();
       container.remove();
 
-      this._element.removeAttribute('data-inboxsdk-send-replaced');
+      this.#element.removeAttribute('data-inboxsdk-send-replaced');
 
       sendButton.style.display = '';
 
@@ -911,7 +905,7 @@ class GmailComposeView implements ComposeViewDriver {
       return;
     }
 
-    this._element.dispatchEvent(
+    this.#element.dispatchEvent(
       new CustomEvent('closedProgrammatically', {
         bubbles: false,
         cancelable: false,
@@ -919,8 +913,8 @@ class GmailComposeView implements ComposeViewDriver {
       }),
     );
 
-    if (this._isFullscreen) {
-      this._eventStream
+    if (this.#isFullscreen) {
+      this.#eventStream
         .filter(({ eventName }) => eventName === 'fullscreenChanged')
         .onValue(() => simulateClick(this.getCloseButton()));
 
@@ -954,25 +948,25 @@ class GmailComposeView implements ComposeViewDriver {
     }
 
     const popOutBtn = querySelector(
-      this._element,
+      this.#element,
       '.M9 > [role=menu]:first-child > .SK > [role=menuitem]:last-child',
     );
     simulateClick(popOutBtn);
   }
 
   overrideEditSubject() {
-    overrideEditSubject(this._driver, this);
+    overrideEditSubject(this.#driver, this);
   }
 
-  _hideDropzones() {
+  #hideDropzones() {
     setCss('compose dropzone hider', 'body > .aC7 .aC9 {visibility: hidden;}');
   }
 
-  _reenableDropzones() {
+  #reenableDropzones() {
     setCss('compose dropzone hider', null);
   }
 
-  _dropzonesVisible(): boolean {
+  #dropzonesVisible(): boolean {
     return (
       find(
         document.querySelectorAll('body > .aC7:not(.aWP)'),
@@ -981,10 +975,10 @@ class GmailComposeView implements ComposeViewDriver {
     );
   }
 
-  _findDropzoneForThisCompose(inline: boolean): HTMLElement {
+  #findDropzoneForThisCompose(inline: boolean): HTMLElement {
     // Iterate through all the dropzones and find the one visually contained by
     // this compose.
-    const rect = this._element.getBoundingClientRect();
+    const rect = this.#element.getBoundingClientRect();
 
     const dropzoneSelector = inline
       ? 'body > .aC7:not(.aWP)'
@@ -1018,10 +1012,10 @@ class GmailComposeView implements ComposeViewDriver {
     return el;
   }
 
-  async _attachFiles(files: Blob[], inline: boolean): Promise<void> {
-    this._hideDropzones();
+  async #attachFiles(files: Blob[], inline: boolean): Promise<void> {
+    this.#hideDropzones();
 
-    const endDrag = once(() => simulateDragEnd(this._element, files));
+    const endDrag = once(() => simulateDragEnd(this.#element, files));
 
     try {
       let firstLoop = true;
@@ -1033,42 +1027,42 @@ class GmailComposeView implements ComposeViewDriver {
           await delay(500);
         }
 
-        simulateDragOver(this._element, partitionedFiles);
-        await waitFor(() => this._dropzonesVisible(), 20 * 1000);
+        simulateDragOver(this.#element, partitionedFiles);
+        await waitFor(() => this.#dropzonesVisible(), 20 * 1000);
 
-        const dropzone = this._findDropzoneForThisCompose(inline);
+        const dropzone = this.#findDropzoneForThisCompose(inline);
 
         simulateDrop(dropzone, partitionedFiles);
         endDrag();
-        await waitFor(() => !this._dropzonesVisible(), 20 * 1000);
+        await waitFor(() => !this.#dropzonesVisible(), 20 * 1000);
       }
     } catch (err) {
-      this._driver.getLogger().error(err);
+      this.#driver.getLogger().error(err);
     } finally {
       endDrag();
 
-      this._reenableDropzones();
+      this.#reenableDropzones();
     }
   }
 
   attachFiles(files: Blob[]): Promise<void> {
-    return this._attachFiles(files, false);
+    return this.#attachFiles(files, false);
   }
 
   attachInlineFiles(files: Blob[]): Promise<void> {
-    return this._attachFiles(files, true);
+    return this.#attachFiles(files, true);
   }
 
   isForward(): boolean {
-    return Boolean(this._element.querySelector('.Un.J-JN-M-I .mI'));
+    return Boolean(this.#element.querySelector('.Un.J-JN-M-I .mI'));
   }
 
   isReply(): boolean {
-    return this._isInlineReplyForm || !!this._element.querySelector('.HQ');
+    return this.#isInlineReplyForm || !!this.#element.querySelector('.HQ');
   }
 
   isInlineReplyForm(): boolean {
-    return this._isInlineReplyForm;
+    return this.#isInlineReplyForm;
   }
 
   getBodyElement(): HTMLElement {
@@ -1078,11 +1072,11 @@ class GmailComposeView implements ComposeViewDriver {
   }
 
   getMaybeBodyElement(): HTMLElement | null | undefined {
-    return this._element.querySelector<HTMLElement>('.Ap [g_editable=true]');
+    return this.#element.querySelector<HTMLElement>('.Ap [g_editable=true]');
   }
 
   getTopFormElement(): HTMLElement {
-    return querySelector(this._element, 'td > form');
+    return querySelector(this.#element, 'td > form');
   }
 
   getHTMLContent(): string {
@@ -1112,7 +1106,9 @@ class GmailComposeView implements ComposeViewDriver {
   }
 
   getSubjectInput(): HTMLInputElement {
-    return (this._element as any).querySelector('input[name=subjectbox]');
+    return this.#element.querySelector<HTMLInputElement>(
+      'input[name=subjectbox]',
+    )!;
   }
 
   getMetadataFormElement(): HTMLElement {
@@ -1147,23 +1143,24 @@ class GmailComposeView implements ComposeViewDriver {
     updateInsertMoreAreaLeft(this, oldFormattingAreaOffsetLeft);
   }
 
+  /** @internal non-public method used outside this class */
   _getFormattingAreaOffsetLeft(): number {
     return getFormattingAreaOffsetLeft(this);
   }
 
   getFormattingArea(): HTMLElement | null | undefined {
-    let formattingArea = this._formattingArea;
+    let formattingArea = this.#formattingArea;
 
     if (!formattingArea) {
-      formattingArea = this._formattingArea =
-        this._element.querySelector<HTMLElement>('.oc');
+      formattingArea = this.#formattingArea =
+        this.#element.querySelector<HTMLElement>('.oc');
     }
 
     return formattingArea;
   }
 
   getFormattingToolbar(): HTMLElement | null | undefined {
-    return this._element.querySelector<HTMLElement>('.aX');
+    return this.#element.querySelector<HTMLElement>('.aX');
   }
 
   getFormattingToolbarArrow(): HTMLElement {
@@ -1173,20 +1170,20 @@ class GmailComposeView implements ComposeViewDriver {
   }
 
   getFormattingToolbarToggleButton(): HTMLElement {
-    const innerElement = querySelector(this._element, '[role=button] .dv');
+    const innerElement = querySelector(this.#element, '[role=button] .dv');
     const btn = closest(innerElement, '[role=button]');
     if (!btn) throw new Error('failed to find button');
     return btn;
   }
 
   getStatusBarPrependContainer(): HTMLElement | null | undefined {
-    return this._element.querySelector<HTMLElement>(
+    return this.#element.querySelector<HTMLElement>(
       '.inboxsdk__compose_statusBarPrependContainer',
     );
   }
 
   getScrollBody(): HTMLElement {
-    var scrollBody = this._element.querySelector<HTMLElement>('table .GP');
+    var scrollBody = this.#element.querySelector<HTMLElement>('table .GP');
 
     if (!scrollBody) {
       throw new Error('Failed to find scroll body');
@@ -1197,35 +1194,35 @@ class GmailComposeView implements ComposeViewDriver {
 
   getStatusArea(): HTMLElement {
     const statusArea =
-      this._element.querySelector<HTMLElement>('.aDg .aDj > .aDh');
+      this.#element.querySelector<HTMLElement>('.aDg .aDj > .aDh');
 
     if (!statusArea) throw new Error('Failed to find status area');
     return statusArea;
   }
 
   getInsertMoreArea(): HTMLElement {
-    return querySelector(this._element, '.eq');
+    return querySelector(this.#element, '.eq');
   }
 
   getInsertLinkButton(): HTMLElement {
-    return querySelector(this._element, '.e5.aaA.aMZ');
+    return querySelector(this.#element, '.e5.aaA.aMZ');
   }
 
   getSendButton(): HTMLElement {
     return querySelector(
-      this._element,
+      this.#element,
       '.IZ .Up div > div[role=button]:not(.Uo):not([aria-haspopup=true]):not([class^=inboxsdk_])',
     );
   }
 
   // When schedule send is available, this returns the element that contains both buttons.
   getSendButtonGroup(): HTMLElement {
-    const scheduleSend = this._element.querySelector(
+    const scheduleSend = this.#element.querySelector(
       '.IZ .Up div > [role=button][aria-haspopup=true]:not([class^=inboxsdk_])',
     );
 
     if (scheduleSend) {
-      return (scheduleSend as any).parentElement;
+      return scheduleSend.parentElement!;
     }
 
     return this.getSendButton();
@@ -1236,7 +1233,7 @@ class GmailComposeView implements ComposeViewDriver {
       return null;
     }
 
-    const sendAndArchiveButton = this._element.querySelector<HTMLElement>(
+    const sendAndArchiveButton = this.#element.querySelector<HTMLElement>(
       '.IZ .Up div > div[role=button].Uo:not([aria-haspopup=true]):not([class^=inboxsdk_])',
     );
 
@@ -1250,7 +1247,7 @@ class GmailComposeView implements ComposeViewDriver {
     if (!(parent instanceof HTMLElement)) throw new Error('should not happen');
 
     if (parent.childElementCount <= 1) {
-      this._driver
+      this.#driver
         .getLogger()
         .eventSdkPassive(
           'getSendAndArchiveButton - old method - failed to find, childElementCount <= 1',
@@ -1265,49 +1262,49 @@ class GmailComposeView implements ComposeViewDriver {
         : parent.children[1];
     const result = !firstNotSendElement
       ? null
-      : firstNotSendElement.querySelector('[role=button]');
+      : firstNotSendElement.querySelector<HTMLElement>('[role=button]');
 
     if (result) {
-      this._driver
+      this.#driver
         .getLogger()
         .eventSdkPassive('getSendAndArchiveButton - old method - found');
     } else {
-      this._driver
+      this.#driver
         .getLogger()
         .eventSdkPassive(
           'getSendAndArchiveButton - old method - failed to find',
         );
     }
 
-    return result as HTMLElement | null;
+    return result;
   }
 
   getCloseButton(): HTMLElement {
-    return this._element.querySelectorAll<HTMLElement>('.Hm > img')[2];
+    return this.#element.querySelectorAll<HTMLElement>('.Hm > img')[2];
   }
 
   getMoleSwitchButton(): HTMLElement {
-    return this._element.querySelectorAll<HTMLElement>('.Hm > img')[1];
+    return this.#element.querySelectorAll<HTMLElement>('.Hm > img')[1];
   }
 
   getBottomBarTable(): HTMLElement {
-    return querySelector(this._element, '.aoP .aDh > table');
+    return querySelector(this.#element, '.aoP .aDh > table');
   }
 
   getBottomToolbarContainer(): HTMLElement {
-    return querySelector(this._element, '.aoP .aDj');
+    return querySelector(this.#element, '.aoP .aDj');
   }
 
   getDiscardButton(): HTMLElement {
-    return querySelector(this._element, '.gU .oh');
+    return querySelector(this.#element, '.gU .oh');
   }
 
   getComposeID(): string {
-    return this._composeID;
+    return this.#composeID;
   }
 
   getInitialMessageID(): string | null | undefined {
-    return this._initialMessageId;
+    return this.#initialMessageId;
   }
 
   /**
@@ -1315,9 +1312,9 @@ class GmailComposeView implements ComposeViewDriver {
    * from the input that used to hold the hex message ID. Still does not
    * populate until first save.
    */
-  _getDraftIDfromForm(): string | null | undefined {
+  #getDraftIDfromForm(): string | null | undefined {
     const value =
-      (this._messageIDElement && this._messageIDElement.value) || null;
+      (this.#messageIDElement && this.#messageIDElement.value) || null;
 
     if (
       typeof value === 'string' &&
@@ -1330,9 +1327,9 @@ class GmailComposeView implements ComposeViewDriver {
     return null;
   }
 
-  _getMessageIDfromForm(): string | null | undefined {
+  #getMessageIDfromForm(): string | null | undefined {
     const value =
-      (this._messageIDElement && this._messageIDElement.value) || null;
+      (this.#messageIDElement && this.#messageIDElement.value) || null;
 
     if (
       typeof value === 'string' &&
@@ -1346,32 +1343,32 @@ class GmailComposeView implements ComposeViewDriver {
   }
 
   getMessageID(): string | null | undefined {
-    return this._messageId;
+    return this.#messageId;
   }
 
   getTargetMessageID(): string | null | undefined {
-    return this._targetMessageID;
+    return this.#targetMessageID;
   }
 
   getThreadID(): string | null | undefined {
-    return this._threadID;
+    return this.#threadID;
   }
 
   async getCurrentDraftID(): Promise<string | null | undefined> {
     // This function is mostly a mirror of _getDraftIDimplementation, but
     // instead of waiting when finding out it's not saved, just returns null.
-    const draftID = this._getDraftIDfromForm();
+    const draftID = this.#getDraftIDfromForm();
 
-    if (this._messageId) {
+    if (this.#messageId) {
       return draftID;
     } else {
-      const syncMessageId = this._getMessageIDfromForm();
+      const syncMessageId = this.#getMessageIDfromForm();
 
       if (syncMessageId) {
         try {
           // If this succeeds, then the draft must exist on the server and we
           // can safely return the draft id we know.
-          await this._driver.getGmailMessageIdForSyncDraftId(syncMessageId);
+          await this.#driver.getGmailMessageIdForSyncDraftId(syncMessageId);
         } catch (e) {
           // ignore error, it's probably that the draft isn't saved yet.
           return null;
@@ -1383,26 +1380,26 @@ class GmailComposeView implements ComposeViewDriver {
   }
 
   getDraftID(): Promise<string | null | undefined> {
-    let draftIDpromise = this._draftIDpromise;
+    let draftIDpromise = this.#draftIDpromise;
 
     if (!draftIDpromise) {
-      draftIDpromise = this._draftIDpromise = this._getDraftIDimplementation();
+      draftIDpromise = this.#draftIDpromise = this.#getDraftIDimplementation();
     }
 
     return draftIDpromise;
   }
 
-  async _getDraftIDimplementation(): Promise<string | null | undefined> {
-    const draftID = this._getDraftIDfromForm();
+  async #getDraftIDimplementation(): Promise<string | null | undefined> {
+    const draftID = this.#getDraftIDfromForm();
 
     // we want to keep the semantics that getDraftID doesn't return until
     // the draft is actually saved on Gmail's servers
-    if (this._messageId) {
+    if (this.#messageId) {
       // if we have a messageId that means there is a draft on the server
       return draftID;
     } else {
       // there may be a draft on the server, so let's find out
-      const syncMessageId = this._getMessageIDfromForm();
+      const syncMessageId = this.#getMessageIDfromForm();
 
       if (syncMessageId) {
         try {
@@ -1410,13 +1407,13 @@ class GmailComposeView implements ComposeViewDriver {
           // can safely return the draft id we know.
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
           const gmailMessageId =
-            await this._driver.getGmailMessageIdForSyncDraftId(syncMessageId);
+            await this.#driver.getGmailMessageIdForSyncDraftId(syncMessageId);
         } catch (e) {
           // draft doesn't exist so we wait until it does
-          await this._eventStream
+          await this.#eventStream
             .filter(({ eventName }) => eventName === 'draftSaved')
             .beforeEnd(() => null)
-            .map(() => this._getDraftIDfromForm())
+            .map(() => this.#getDraftIDfromForm())
             .take(1)
             .toPromise();
         }
@@ -1427,15 +1424,15 @@ class GmailComposeView implements ComposeViewDriver {
   }
 
   addManagedViewController(viewController: { destroy(): void }) {
-    this._managedViewControllers.push(viewController);
+    this.#managedViewControllers.push(viewController);
   }
 
   ensureGroupingIsOpen(type: string) {
-    ensureGroupingIsOpen(this._element, type);
+    ensureGroupingIsOpen(this.#element, type);
   }
 
   ensureAppButtonToolbarsAreClosed(): void {
-    ensureAppButtonToolbarsAreClosed(this._element);
+    ensureAppButtonToolbarsAreClosed(this.#element);
   }
 
   isMinimized(): boolean {
@@ -1449,14 +1446,14 @@ class GmailComposeView implements ComposeViewDriver {
       if (!hasReportedMissingBody) {
         hasReportedMissingBody = true;
 
-        this._driver
+        this.#driver
           .getLogger()
           .error(new Error('isMinimized failed to find bodyContainer'), {
             bodyElement: !!bodyElement,
-            hasMessageIDElement: !!this._messageIDElement,
-            ended: (this._eventStream as any).ended,
-            bodyElStillInCompose: this._element.contains(this._seenBodyElement),
-            seenBodyElHtml: censorHTMLstring(this._seenBodyElement.outerHTML),
+            hasMessageIDElement: !!this.#messageIDElement,
+            ended: (this.#eventStream as any).ended,
+            bodyElStillInCompose: this.#element.contains(this.#seenBodyElement),
+            seenBodyElHtml: censorHTMLstring(this.#seenBodyElement.outerHTML),
             composeHtml: censorHTMLstring(element.outerHTML),
           });
       }
@@ -1469,19 +1466,19 @@ class GmailComposeView implements ComposeViewDriver {
 
   setMinimized(minimized: boolean) {
     if (minimized !== this.isMinimized()) {
-      if (this._isInlineReplyForm)
+      if (this.#isInlineReplyForm)
         throw new Error('Not implemented for inline compose views');
-      const minimizeButton = querySelector(this._element, '.Hm > img');
+      const minimizeButton = querySelector(this.#element, '.Hm > img');
       simulateClick(minimizeButton);
     }
   }
 
   setFullscreen(fullscreen: boolean) {
     if (fullscreen !== this.isFullscreen()) {
-      if (this._isInlineReplyForm)
+      if (this.#isInlineReplyForm)
         throw new Error('Not implemented for inline compose views');
       const fullscreenButton = querySelector(
-        this._element,
+        this.#element,
         '.Hm > img:nth-of-type(2)',
       );
       simulateClick(fullscreenButton);
@@ -1490,13 +1487,13 @@ class GmailComposeView implements ComposeViewDriver {
 
   setTitleBarColor(color: string): () => void {
     const buttonParent = querySelector(
-      this._element,
+      this.#element,
       '.nH.Hy.aXJ table.cf.Ht td.Hm',
     );
     const elementsToModify = [
-      querySelector(this._element, '.nH.Hy.aXJ .pi > .l.o'),
-      querySelector(this._element, '.nH.Hy.aXJ .l.m'),
-      querySelector(this._element, '.nH.Hy.aXJ .l.m > .l.n'),
+      querySelector(this.#element, '.nH.Hy.aXJ .pi > .l.o'),
+      querySelector(this.#element, '.nH.Hy.aXJ .l.m'),
+      querySelector(this.#element, '.nH.Hy.aXJ .l.m > .l.n'),
     ];
     buttonParent.classList.add('inboxsdk__compose_customTitleBarColor');
     elementsToModify.forEach((el) => {
@@ -1518,7 +1515,7 @@ class GmailComposeView implements ComposeViewDriver {
     }
 
     const titleBarTable = querySelector(
-      this._element,
+      this.#element,
       '.nH.Hy.aXJ table.cf.Ht',
     );
 
@@ -1560,22 +1557,22 @@ class GmailComposeView implements ComposeViewDriver {
     };
   }
 
-  _triggerDraftSave() {
-    if (this._isTriggeringADraftSavePending) {
+  #triggerDraftSave() {
+    if (this.#isTriggeringADraftSavePending) {
       return;
     } else {
-      this._isTriggeringADraftSavePending = true;
+      this.#isTriggeringADraftSavePending = true;
       // Done asynchronously with setTimeout because if it's done synchronously
       // or after an asap step after an inline compose view's creation, Gmail
       // interprets the fake keypress and decides to add a '¾' character.
       Kefir.later(0, undefined)
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue(() => {
-          this._isTriggeringADraftSavePending = false;
+          this.#isTriggeringADraftSavePending = false;
           const body = this.getMaybeBodyElement();
 
           if (body) {
-            const unsilence = this._driver
+            const unsilence = this.#driver
               .getPageCommunicator()
               .silenceGmailErrorsForAMoment();
 
@@ -1591,9 +1588,9 @@ class GmailComposeView implements ComposeViewDriver {
 
   // If this compose is a reply, then this gets the message ID of the message
   // we're replying to.
-  _getTargetMessageID(): string | null | undefined {
-    const input: HTMLInputElement | null | undefined =
-      this._element.querySelector('input[name="rm"]') as any;
+  #getTargetMessageID(): string | null | undefined {
+    const input =
+      this.#element.querySelector<HTMLInputElement>('input[name="rm"]');
     return input &&
       typeof input.value === 'string' &&
       input.value != 'undefined'
@@ -1601,43 +1598,31 @@ class GmailComposeView implements ComposeViewDriver {
       : null;
   }
 
-  _getThreadID(): string | null | undefined {
-    const targetID = this.getTargetMessageID();
-
-    try {
-      return targetID ? this._driver.getThreadIDForMessageID(targetID) : null;
-    } catch (err) {
-      this._driver.getLogger().error(err);
-
-      return null;
-    }
-  }
-
   getElement(): HTMLElement {
-    return this._element;
+    return this.#element;
   }
 
   isFullscreen(): boolean {
-    return this._isFullscreen;
+    return this.#isFullscreen;
   }
 
   getLastSelectionRange(): Range | null | undefined {
     // The selection range can become invalid if the compose view has become expanded or
     // minimized since the range was set.
-    const range = this._lastSelectionRange;
+    const range = this.#lastSelectionRange;
 
     if (
       range &&
       !this.getBodyElement().contains(range.commonAncestorContainer)
     ) {
-      this._lastSelectionRange = undefined;
+      this.#lastSelectionRange = undefined;
     }
 
-    return this._lastSelectionRange;
+    return this.#lastSelectionRange;
   }
 
   setLastSelectionRange(lastSelectionRange: Range | null | undefined) {
-    this._lastSelectionRange = lastSelectionRange;
+    this.#lastSelectionRange = lastSelectionRange;
   }
 
   registerRequestModifier(
@@ -1649,53 +1634,53 @@ class GmailComposeView implements ComposeViewDriver {
           body: string;
         }>,
   ) {
-    const keyId = this._getDraftIDfromForm();
+    const keyId = this.#getDraftIDfromForm();
     if (!keyId) throw new Error('keyId should be set here');
 
-    const modifierId = this._driver
+    const modifierId = this.#driver
       .getPageCommunicator()
-      .registerComposeRequestModifier(keyId, this._driver.getAppId());
+      .registerComposeRequestModifier(keyId, this.#driver.getAppId());
 
-    this._requestModifiers[modifierId] = modifier;
+    this.#requestModifiers[modifierId] = modifier;
 
-    this._startListeningForModificationRequests();
+    this.#startListeningForModificationRequests();
 
-    this._stopper.onValue(() => {
-      this._driver
+    this.#stopper.onValue(() => {
+      this.#driver
         .getPageCommunicator()
         .unregisterComposeRequestModifier(keyId, modifierId);
     });
   }
 
-  _startListeningForModificationRequests() {
-    if (this._isListeningToAjaxInterceptStream) {
+  #startListeningForModificationRequests() {
+    if (this.#isListeningToAjaxInterceptStream) {
       return;
     }
 
-    const keyId = this._getDraftIDfromForm();
+    const keyId = this.#getDraftIDfromForm();
     if (!keyId) throw new Error('keyId should be set here');
 
-    this._driver
+    this.#driver
       .getPageCommunicator()
       .ajaxInterceptStream.filter(
         ({ type, composeid, draftID, modifierId }) =>
           type === 'inboxSDKmodifyComposeRequest' &&
           (composeid === keyId || keyId === draftID) &&
-          Boolean(this._requestModifiers[modifierId]),
+          Boolean(this.#requestModifiers[modifierId]),
       )
-      .takeUntilBy(this._stopper)
+      .takeUntilBy(this.#stopper)
       .onValue(({ modifierId, composeParams }) => {
-        if (this._driver.getLogger().shouldTrackEverything()) {
-          this._driver.getLogger().eventSite('inboxSDKmodifyComposeRequest');
+        if (this.#driver.getLogger().shouldTrackEverything()) {
+          this.#driver.getLogger().eventSite('inboxSDKmodifyComposeRequest');
         }
 
-        const modifier = this._requestModifiers[modifierId];
+        const modifier = this.#requestModifiers[modifierId];
         const result = new Promise((resolve) =>
           resolve(modifier(composeParams)),
         );
         result
           .then((newComposeParams) =>
-            this._driver
+            this.#driver
               .getPageCommunicator()
               .modifyComposeRequest(
                 keyId,
@@ -1704,31 +1689,32 @@ class GmailComposeView implements ComposeViewDriver {
               ),
           )
           .then((x) => {
-            if (this._driver.getLogger().shouldTrackEverything()) {
-              this._driver.getLogger().eventSite('composeRequestModified');
+            if (this.#driver.getLogger().shouldTrackEverything()) {
+              this.#driver.getLogger().eventSite('composeRequestModified');
             }
 
             return x;
           })
           .catch((err) => {
-            this._driver
+            this.#driver
               .getPageCommunicator()
               .modifyComposeRequest(keyId, modifierId, composeParams);
 
-            this._driver.getLogger().error(err);
+            this.#driver.getLogger().error(err);
           });
       });
 
-    this._isListeningToAjaxInterceptStream = true;
+    this.#isListeningToAjaxInterceptStream = true;
   }
 
   setupLinkPopOvers(): void {
-    if (!this._hasSetupLinkPopOvers) {
-      this._hasSetupLinkPopOvers = true;
+    if (!this.#hasSetupLinkPopOvers) {
+      this.#hasSetupLinkPopOvers = true;
 
-      this._eventStream.plug(setupLinkPopOvers(this));
+      this.#eventStream.plug(setupLinkPopOvers(this));
     }
   }
 }
 
 export default GmailComposeView;
+export type ComposeViewDriver = PublicOnly<GmailComposeView>;
