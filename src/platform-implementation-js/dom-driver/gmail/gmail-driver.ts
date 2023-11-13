@@ -97,6 +97,10 @@ import GmailAttachmentCardView from './views/gmail-attachment-card-view';
 import type { PersonDetails } from '../../namespaces/user';
 import getPersonDetails from './gmail-driver/getPersonDetails';
 import { type ContentPanelDescriptor } from '../../driver-common/sidebar/ContentPanelViewDriver';
+import type {
+  SearchSuggestionsProvider,
+  SearchQueryRewriter,
+} from '../../namespaces/search';
 
 /**
  * @internal
@@ -572,11 +576,11 @@ class GmailDriver {
     );
   }
 
-  registerSearchSuggestionsProvider(handler: Function) {
+  registerSearchSuggestionsProvider(handler: SearchSuggestionsProvider) {
     registerSearchSuggestionsProvider(this, handler);
   }
 
-  registerSearchQueryRewriter(obj: Object) {
+  registerSearchQueryRewriter(obj: SearchQueryRewriter) {
     registerSearchQueryRewriter(this.#pageCommunicator, obj);
   }
 

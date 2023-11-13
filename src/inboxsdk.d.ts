@@ -28,6 +28,7 @@ import type ContentPanelView from './platform-implementation-js/views/content-pa
 import type { MoleOptions } from './platform-implementation-js/dom-driver/gmail/widgets/gmail-mole-view-driver';
 import type { ComposeButtonDescriptor } from './platform-implementation-js/driver-interfaces/compose-view-driver';
 import type ComposeView from './platform-implementation-js/views/compose-view';
+import type Search from './platform-implementation-js/namespaces/search';
 
 export type { User };
 
@@ -234,17 +235,6 @@ export interface Keyboard {
   createShortcutHandle(
     descriptor: KeyboardShortcutDescriptor,
   ): KeyboardShortcutHandle;
-}
-
-export interface Search {
-  registerSearchSuggestionsProvider(
-    handler: (
-      query: string,
-    ) =>
-      | Array<AutocompleteSearchResult>
-      | Promise<Array<AutocompleteSearchResult>>,
-  ): void;
-  registerSearchQueryRewriter(rewriter: SearchQueryRewriter): void;
 }
 
 export interface Lists {
@@ -614,21 +604,6 @@ export interface RecipientRowOptions {
   labelTextClass?: string;
 }
 
-export interface AutocompleteSearchResult {
-  name?: null | string;
-  nameHTML?: null | string;
-  description?: null | string;
-  descriptionHTML?: null | string;
-  routeName?: null | string;
-  routeParams?: null | { [ix: string]: string | number };
-  externalURL?: null | string;
-  searchTerm?: null | string;
-  iconUrl?: null | string;
-  iconClass?: null | string;
-  iconHTML?: null | string;
-  onClick?: null | (() => void);
-}
-
 export interface StatusBarDescriptor {
   addAboveNativeStatusBar?: boolean;
   height?: number;
@@ -685,7 +660,9 @@ export interface SavingMessageDescriptor {
   time?: number;
 }
 
-export interface SearchQueryRewriter {
-  term: string;
-  termReplacer(): string | Promise<string>;
-}
+export type {
+  AutocompleteSearchResult,
+  default as Search,
+  SearchQueryRewriter,
+  SearchSuggestionsProvider,
+} from './platform-implementation-js/namespaces/search';
