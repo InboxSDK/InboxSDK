@@ -1,8 +1,9 @@
+import { type SearchQueryRewriter } from '../../../namespaces/search';
 import type PageCommunicator from '../gmail-page-communicator';
 
 export default function registerSearchQueryRewriter(
   pageCommunicator: PageCommunicator,
-  obj: any,
+  obj: SearchQueryRewriter,
 ) {
   pageCommunicator.createCustomSearchTerm(obj.term);
 

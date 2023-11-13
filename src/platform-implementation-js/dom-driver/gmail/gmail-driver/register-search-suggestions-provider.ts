@@ -12,10 +12,11 @@ import type {
   AutocompleteSearchResult,
   AutocompleteSearchResultWithId,
 } from '../../../../injected-js/gmail/modify-suggestions';
+import type { SearchSuggestionsProvider } from '../../../namespaces/search';
 
 export default function registerSearchSuggestionsProvider(
   driver: GmailDriver,
-  handler: Function,
+  handler: SearchSuggestionsProvider,
 ) {
   // We inject the app-provided suggestions into Gmail's AJAX response. Then we
   // watch the DOM for our injected suggestions to show up and attach click and
