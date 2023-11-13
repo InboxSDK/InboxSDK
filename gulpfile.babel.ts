@@ -339,6 +339,15 @@ const remoteCompatConfig = {
   afterBuild: setupExamples,
 } as const;
 
+const sourceMapPlugin = new webpack.SourceMapDevToolPlugin({
+  fileContext: '../',
+  // Adds hash to the end of the sourcemap URL so that
+  // remote code source maps are not cached erroneously by Sentry
+  // if and when https://github.com/getsentry/sentry/issues/54819 is patched up.
+  filename: '[file].[contenthash].map',
+  publicPath: 'https://www.inboxsdk.com/build/',
+});
+
 if (args.remote) {
   config = {
     ...remoteCompatConfig,
@@ -355,16 +364,7 @@ if (args.remote) {
       'platform-implementation':
         './src/platform-implementation-js/main-INTEGRATED-PAGEWORLD',
     },
-    plugins: [
-      new webpack.SourceMapDevToolPlugin({
-        fileContext: '../',
-        // Adds hash to the end of the sourcemap URL so that
-        // remote code source maps are not cached erroneously by Sentry
-        // if and when https://github.com/getsentry/sentry/issues/54819 is patched up.
-        filename: '[file].[contenthash].map',
-        publicPath: 'https://www.inboxsdk.com/build/',
-      }),
-    ],
+    plugins: [sourceMapPlugin],
   };
 } else if (args.integratedPageWorld) {
   // non-remote bundle built for compatibility with remote bundle
@@ -410,6 +410,7 @@ gulp.task('sdk', async () => {
     await webpackTask({
       entry: pageWorld,
       devtool: args.remote ? false : 'inline-source-map',
+      plugins: [sourceMapPlugin],
     });
   }
 
