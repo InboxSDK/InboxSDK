@@ -41,7 +41,7 @@ class GmailThreadView {
     | ((
         numberCustomMessagesHidden: number,
         numberNativeMessagesHidden: number | null | undefined,
-        unmountPromise: Promise<void>
+        unmountPromise: Promise<void>,
       ) => HTMLElement | null | undefined)
     | null
     | undefined;
@@ -52,7 +52,7 @@ class GmailThreadView {
     element: HTMLElement,
     routeViewDriver: any,
     driver: GmailDriver,
-    isPreviewedThread: boolean = false
+    isPreviewedThread: boolean = false,
   ) {
     this._element = element;
     this._routeViewDriver = routeViewDriver;
@@ -62,7 +62,7 @@ class GmailThreadView {
     this._messageViewDrivers = [];
 
     this._logAddonElementInfo().catch((err) =>
-      this._driver.getLogger().error(err)
+      this._driver.getLogger().error(err),
     );
 
     const waitForSidebarReady = this._driver
@@ -72,9 +72,9 @@ class GmailThreadView {
           .delayToTimeAfterReady(15 * 1000)
           .flatMap(() =>
             Kefir.constantError(
-              new Error('15 second timeout while waiting for sidebar fired')
-            )
-          )
+              new Error('15 second timeout while waiting for sidebar fired'),
+            ),
+          ),
       )
       .take(1)
       .takeErrors(1)
@@ -124,9 +124,9 @@ class GmailThreadView {
         this._eventStream
           .filter(
             (event) =>
-              event.type === 'internal' && event.eventName === 'messageCreated'
+              event.type === 'internal' && event.eventName === 'messageCreated',
           )
-          .map((event) => event.view)
+          .map((event) => event.view),
       ) as any;
   }
 
@@ -185,7 +185,7 @@ class GmailThreadView {
   }
 
   addSidebarContentPanel(
-    descriptor: Kefir.Observable<ContentPanelDescriptor, unknown>
+    descriptor: Kefir.Observable<ContentPanelDescriptor, unknown>,
   ) {
     const sidebar = this._driver.getGlobalSidebar();
 
@@ -205,7 +205,7 @@ class GmailThreadView {
     let subjectContainer;
 
     for (const [currentVersion, selector] of Object.entries(
-      this._subjectContainerSelectors
+      this._subjectContainerSelectors,
     )) {
       // Flow should be able to infer selector to be a string,
       // Typescript can. Remove this when ported.
@@ -240,14 +240,14 @@ class GmailThreadView {
     provider: (
       numberCustomMessagesHidden: number,
       numberNativeMessagesHidden: number | null | undefined,
-      unmountPromise: Promise<void>
-    ) => HTMLElement
+      unmountPromise: Promise<void>,
+    ) => HTMLElement,
   ) {
     this._hiddenCustomMessageNoticeProvider = provider;
   }
 
   addCustomMessage(
-    descriptorStream: Kefir.Observable<CustomMessageDescriptor, unknown>
+    descriptorStream: Kefir.Observable<CustomMessageDescriptor, unknown>,
   ): CustomMessageView {
     const parentElement = this._element.parentElement;
     if (!parentElement) throw new Error('missing parent element');
@@ -265,12 +265,12 @@ class GmailThreadView {
               sortDatetime: (await messageView.getDate()) || 0,
               isHidden: messageView.getViewState() === 'HIDDEN',
               element: messageView.getElement(),
-            }))
+            })),
           )),
           ...Array.from(this._customMessageViews)
             .filter(
               (cmv) =>
-                cmv !== customMessageView && cmv.getElement().parentElement
+                cmv !== customMessageView && cmv.getElement().parentElement,
               /* it has been inserted into dom */
             )
             .map((cmv) => {
@@ -305,12 +305,12 @@ class GmailThreadView {
         if (insertBeforeMessage)
           insertBeforeMessage.insertAdjacentElement(
             'beforebegin',
-            customMessageView.getElement()
+            customMessageView.getElement(),
           );
         else
           messageContainer.insertAdjacentElement(
             'beforeend',
-            customMessageView.getElement()
+            customMessageView.getElement(),
           );
 
         if (isInHidden) {
@@ -330,7 +330,7 @@ class GmailThreadView {
         parentElement.classList.add('inboxsdk__thread_view_with_custom_view');
       else
         parentElement.classList.remove(
-          'inboxsdk__thread_view_with_custom_view'
+          'inboxsdk__thread_view_with_custom_view',
         );
     });
     return customMessageView;
@@ -353,7 +353,7 @@ class GmailThreadView {
     if (!hiddenNoticeMessageElement) {
       nativeHiddenNoticePresent = false;
       const superCollapsedMessageElements = Array.from(
-        this._element.querySelectorAll<HTMLElement>('.kQ')
+        this._element.querySelectorAll<HTMLElement>('.kQ'),
       );
       if (superCollapsedMessageElements.length < 2) return;
       hiddenNoticeMessageElement = superCollapsedMessageElements[1];
@@ -368,12 +368,12 @@ class GmailThreadView {
         Kefir.merge([
           this._stopper,
           Kefir.fromEvents(customMessageView, 'destroy'),
-        ])
+        ]),
       )
       .filter(
         () =>
           (hiddenNoticeMessageElement &&
-            !hiddenNoticeMessageElement.classList.contains('kQ')) as boolean
+            !hiddenNoticeMessageElement.classList.contains('kQ')) as boolean,
       ) //when kQ is gone, message is visible
       .onValue(() => {
         customMessageView
@@ -386,7 +386,7 @@ class GmailThreadView {
 
     this._updateHiddenNotice(
       hiddenNoticeMessageElement,
-      nativeHiddenNoticePresent
+      nativeHiddenNoticePresent,
     );
 
     Kefir.fromEvents(customMessageView, 'destroy')
@@ -398,14 +398,14 @@ class GmailThreadView {
         if (hiddenNoticeMessageElement)
           this._updateHiddenNotice(
             hiddenNoticeMessageElement,
-            nativeHiddenNoticePresent
+            nativeHiddenNoticePresent,
           );
       });
   }
 
   _updateHiddenNotice(
     hiddenNoticeMessageElement: HTMLElement,
-    nativeHiddenNoticePresent: boolean
+    nativeHiddenNoticePresent: boolean,
   ) {
     const existingAppNoticeElement = this._hiddenCustomMessageNoticeElement;
 
@@ -421,7 +421,7 @@ class GmailThreadView {
     const appNoticeContainerElement = (this._hiddenCustomMessageNoticeElement =
       document.createElement('span'));
     appNoticeContainerElement.classList.add(
-      'inboxsdk__custom_message_view_app_notice_content'
+      'inboxsdk__custom_message_view_app_notice_content',
     );
     const numberCustomHiddenMessages = this._hiddenCustomMessageViews.size;
     let numberNativeHiddenMessages = null;
@@ -429,15 +429,15 @@ class GmailThreadView {
     if (nativeHiddenNoticePresent) {
       const nativeHiddenNoticeCountSpan = querySelector(
         hiddenNoticeMessageElement,
-        '.adx span'
+        '.adx span',
       );
       numberNativeHiddenMessages = Number(
-        nativeHiddenNoticeCountSpan.innerHTML
+        nativeHiddenNoticeCountSpan.innerHTML,
       );
 
       if (isNaN(numberNativeHiddenMessages)) {
         throw new Error(
-          "Couldn't find number of native hidden messages in dom structure"
+          "Couldn't find number of native hidden messages in dom structure",
         );
       }
     }
@@ -447,7 +447,7 @@ class GmailThreadView {
       numberNativeHiddenMessages,
       new Promise((resolve) => {
         this._resolveUnmountHiddenNoticePromise = resolve;
-      })
+      }),
     );
 
     if (!appNoticeElement) {
@@ -465,10 +465,10 @@ class GmailThreadView {
 
     const hiddenNoticeElement = querySelector(
       hiddenNoticeMessageElement,
-      '.adx'
+      '.adx',
     );
     hiddenNoticeElement.classList.add(
-      'inboxsdk__custom_message_view_app_notice_container'
+      'inboxsdk__custom_message_view_app_notice_container',
     );
     hiddenNoticeElement.appendChild(appNoticeContainerElement);
   }
@@ -512,14 +512,14 @@ class GmailThreadView {
 
     if (!idElement) throw new Error('threadID element not found');
     const syncThreadID = (this._syncThreadID = idElement.getAttribute(
-      'data-thread-perm-id'
+      'data-thread-perm-id',
     ));
     if (!syncThreadID) throw new Error('syncThreadID attribute with no value');
     threadID = idElement.getAttribute('data-legacy-thread-id');
 
     if (!threadID) {
       const err = new Error(
-        'Failed to get id for thread: data-legacy-thread-id attribute missing'
+        'Failed to get id for thread: data-legacy-thread-id attribute missing',
       );
 
       this._driver.getLogger().error(err); // throw err;
@@ -561,7 +561,7 @@ class GmailThreadView {
 
     if (!idElement) throw new Error('threadID element not found');
     const syncThreadID = (this._syncThreadID = idElement.getAttribute(
-      'data-thread-perm-id'
+      'data-thread-perm-id',
     ));
     if (!syncThreadID) throw new Error('syncThreadID attribute with no value');
     this._threadID = threadID = idElement.getAttribute('data-legacy-thread-id');
@@ -592,7 +592,7 @@ class GmailThreadView {
             mutation.type === 'childList' &&
             mutation.removedNodes &&
             mutation.removedNodes.length &&
-            mutation.removedNodes.length > 0
+            mutation.removedNodes.length > 0,
         )
       ) {
         if (!labelContainer.contains(el)) {
@@ -659,7 +659,7 @@ class GmailThreadView {
       toolbarElement,
       this._driver,
       this._routeViewDriver,
-      this
+      this,
     );
   }
 
@@ -670,7 +670,7 @@ class GmailThreadView {
     for (var ii = 0; ii < toolbarContainerElements.length; ii++) {
       if (this._isToolbarContainerRelevant(toolbarContainerElements[ii])) {
         return toolbarContainerElements[ii].querySelector<HTMLElement>(
-          '[gh=mtb]'
+          '[gh=mtb]',
         );
       }
     }
@@ -698,10 +698,10 @@ class GmailThreadView {
       (toolbarContainerElement as any).parentElement.getAttribute('role') ===
         'main' &&
       (toolbarContainerElement as any).parentElement.querySelector(
-        '.if, .PeIF1d, .a98.iY'
+        '.if, .PeIF1d, .a98.iY',
       ) &&
       (toolbarContainerElement as any).parentElement.querySelector(
-        '.if, .PeIF1d, .a98.iY'
+        '.if, .PeIF1d, .a98.iY',
       ).parentElement === this._element
     ) {
       let version = '2018';
@@ -758,7 +758,7 @@ class GmailThreadView {
 
   _observeNewMessages(messageContainer: any) {
     this._newMessageMutationObserver = new MutationObserver(
-      this._handleNewMessageMutations.bind(this)
+      this._handleNewMessageMutations.bind(this),
     );
 
     this._newMessageMutationObserver.observe(messageContainer, {
@@ -805,11 +805,11 @@ class GmailThreadView {
       const contentContainer = mainContentBodyContainerElement.parentElement;
       if (!contentContainer)
         throw new Error(
-          'mainContentBodyContainerElement has no parent element'
+          'mainContentBodyContainerElement has no parent element',
         );
       this._widthManager = widthManager = new WidthManager(
         contentContainer as any,
-        addonSidebarElement
+        addonSidebarElement,
       );
     }
 
@@ -834,7 +834,7 @@ class GmailThreadView {
         children: Array.from(container.children).map((el) =>
           (el as HTMLElement).style
             ? (el as HTMLElement).style.display === 'none'
-            : null
+            : null,
         ),
       };
       const rect = container.getBoundingClientRect();
@@ -857,7 +857,7 @@ class GmailThreadView {
         await delay(time);
         if (this._stopper.stopped) return;
         eventData.time[time] = readInfo();
-      })
+      }),
     );
     if (this._stopper.stopped) return;
 
@@ -876,7 +876,7 @@ class GmailThreadView {
     if (expandAllElementImg) {
       const expandAllElement = findParent(
         expandAllElementImg,
-        (el) => el.getAttribute('role') === 'button'
+        (el) => el.getAttribute('role') === 'button',
       );
 
       if (expandAllElement) {
@@ -884,9 +884,9 @@ class GmailThreadView {
           Kefir.fromEvents(expandAllElement, 'click'),
           Kefir.fromEvents<KeyboardEvent, unknown>(
             expandAllElement,
-            'keydown'
+            'keydown',
           ).filter(
-            (e) => e.which === 13
+            (e) => e.which === 13,
             /* enter */
           ),
         ])
@@ -906,7 +906,7 @@ class GmailThreadView {
     if (collapseAllElementImg) {
       const collapseAllElement = findParent(
         collapseAllElementImg,
-        (el) => el.getAttribute('role') === 'button'
+        (el) => el.getAttribute('role') === 'button',
       );
 
       if (collapseAllElement) {
@@ -914,9 +914,9 @@ class GmailThreadView {
           Kefir.fromEvents(collapseAllElement, 'click'),
           Kefir.fromEvents<KeyboardEvent, unknown>(
             collapseAllElement,
-            'keydown'
+            'keydown',
           ).filter(
-            (e) => e.which === 13
+            (e) => e.which === 13,
             /* enter */
           ),
         ])
