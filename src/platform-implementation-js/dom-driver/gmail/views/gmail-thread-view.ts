@@ -16,6 +16,8 @@ import GmailToolbarView from './gmail-toolbar-view';
 import WidthManager from './gmail-thread-view/width-manager';
 import type { CustomMessageDescriptor } from '../../../views/conversations/custom-message-view';
 import { type ContentPanelDescriptor } from '../../../driver-common/sidebar/ContentPanelViewDriver';
+import isStreakAppId from '../../../lib/isStreakAppId';
+import censorHTMLstring from '../../../../common/censorHTMLstring';
 
 let hasLoggedAddonInfo = false;
 
@@ -617,7 +619,39 @@ class GmailThreadView {
   _setupToolbarView() {
     const toolbarElement = this._findToolbarElement();
 
-    if (!toolbarElement) throw new Error('No toolbar element found');
+    if (!toolbarElement) {
+      if (isStreakAppId(this._driver.getAppId())) {
+        const threadViewEl = document.querySelector('.nH.bkK');
+        if (threadViewEl instanceof HTMLElement) {
+          this._driver
+            .getLogger()
+            .error(new Error('Thread view toolbar cannot be found'), {
+              threadViewHtml: censorHTMLstring(threadViewEl.innerHTML),
+            });
+        } else {
+          const pageHtml = document.querySelector('.nH');
+
+          if (pageHtml instanceof HTMLElement) {
+            this._driver
+              .getLogger()
+              .error(new Error('Thread view toolbar cannot be found'), {
+                threadViewHtml: '.nH.bkK cannot be found',
+                pageHtml: censorHTMLstring(pageHtml.innerHTML),
+              });
+          } else {
+            this._driver
+              .getLogger()
+              .error(new Error('Thread view toolbar cannot be found'), {
+                threadViewHtml: '.nH.bkK cannot be found',
+                pageHtml: '.nH cannot be found',
+              });
+          }
+        }
+      }
+
+      throw new Error('No toolbar element found');
+    }
+
     const toolbarParent = toolbarElement.parentElement;
     if (toolbarParent)
       toolbarParent.classList.add('inboxsdk__thread_toolbar_parent');
