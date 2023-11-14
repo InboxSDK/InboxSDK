@@ -1,6 +1,6 @@
 export function querySelectorOrWarn<T extends Element>(
   el: Document | DocumentFragment | Element,
-  selector: string
+  selector: string,
 ): T | null {
   const result = el.querySelector<T>(selector);
 
