@@ -1,7 +1,7 @@
 import type { RouteParams } from '../namespaces/router';
 export default function populateRouteID(
   routeID: string,
-  params: RouteParams | null | undefined
+  params: RouteParams | null | undefined,
 ): string {
   const paramsObject = params || {};
   const usedParams = new Set();

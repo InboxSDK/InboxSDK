@@ -27,41 +27,46 @@ import {
   sidebarWaitingPlatformSelector,
 } from '../../../../../driver-common/sidebar/constants';
 const ACTIVE_ADD_ON_ICON_SELECTOR = '.aT5-aOt-I-KO';
-const COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS = 'brC-brG-btc'; // Only one instance of this Primary is ever created within a page, even if
-// there are multiple InboxSDK instances and/or extensions. All other InboxSDK
-// instances (including from other extensions) communicate with this Primary
-// through DOM events.
+const COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS = 'brC-brG-btc';
 
+/** Only one instance of this Primary is ever created within a page, even if
+ * there are multiple InboxSDK instances and/or extensions. All other InboxSDK
+ * instances (including from other extensions) communicate with this Primary
+ * through DOM events. */
 class GmailAppSidebarPrimary {
-  _stopper = kefirStopper();
-  // There could be multiple InboxSDK instances (and therefore GmailDrivers)
-  // talking to this Primary, so we shouldn't privilege the specific GmailDriver
-  // that happened to create the Primary. Only use this GmailDriver for
-  // logging-related functionality!
-  _driver: GmailDriver;
-  // This Primary has an identifier used by the DOM events to specify they're
-  // talking to this Primary. This leaves us some room for having multiple
-  // Primary instances (representing different visual locations in Gmail) or
-  // multiple classes that make use of the same DOM events, but we don't make
-  // use of that now. Mainly I didn't want to risk baking in the singleton
-  // nature too deeply; that always seems to bite me.
-  _instanceId: string = `${Date.now()}-${Math.random()}`;
-  _companionSidebarContentContainerEl: HTMLElement;
-  _instanceIdsToDescriptors: Map<string, Record<string, any>> = new Map();
-  _threadSidebarComponent: AppSidebar | null | undefined = null;
-  _threadIconArea: HTMLElement | null | undefined = null;
-  _globalIconArea: HTMLElement | null | undefined = null;
-  _globalButtonContainers: Map<string, HTMLElement> = new Map();
-  _threadButtonContainers: Map<string, HTMLElement> = new Map();
-  _contentContainers: Map<string, HTMLElement> = new Map();
-  _threadSidebarContainerEl: HTMLElement | null | undefined = null;
-  _companionSidebarOuterWrapper!: HTMLElement;
-  _currentIds: Set<string> = new Set();
-  _orderManager = new OrderManager<PanelDescriptor>({
+  #stopper = kefirStopper();
+  /**
+   * There could be multiple InboxSDK instances (and therefore GmailDrivers)
+   * talking to this Primary, so we shouldn't privilege the specific GmailDriver
+   * that happened to create the Primary. Only use this GmailDriver for
+   * logging-related functionality!
+   */
+  #driver: { getLogger: GmailDriver['getLogger'] };
+  /**
+   * This Primary has an identifier used by the DOM events to specify they're
+   * talking to this Primary. This leaves us some room for having multiple
+   * Primary instances (representing different visual locations in Gmail) or
+   * multiple classes that make use of the same DOM events, but we don't make
+   * use of that now. Mainly I didn't want to risk baking in the singleton
+   * nature too deeply; that always seems to bite me.
+   */
+  #instanceId: string = `${Date.now()}-${Math.random()}`;
+  #companionSidebarContentContainerEl: HTMLElement;
+  #instanceIdsToDescriptors: Map<string, Record<string, any>> = new Map();
+  #threadSidebarComponent: AppSidebar | null | undefined = null;
+  #threadIconArea: HTMLElement | null | undefined = null;
+  #globalIconArea: HTMLElement | null | undefined = null;
+  #globalButtonContainers: Map<string, HTMLElement> = new Map();
+  #threadButtonContainers: Map<string, HTMLElement> = new Map();
+  #contentContainers: Map<string, HTMLElement> = new Map();
+  #threadSidebarContainerEl: HTMLElement | null | undefined = null;
+  #companionSidebarOuterWrapper!: HTMLElement;
+  #currentIds: Set<string> = new Set();
+  #orderManager = new OrderManager<PanelDescriptor>({
     get() {
       try {
         return JSON.parse(
-          global.localStorage.getItem('inboxsdk__sidebar_ordering') || 'null'
+          global.localStorage.getItem('inboxsdk__sidebar_ordering') || 'null',
         );
       } catch (err) {
         console.error('failed to read sidebar order data', err);
@@ -72,100 +77,104 @@ class GmailAppSidebarPrimary {
       try {
         global.localStorage.setItem(
           'inboxsdk__sidebar_ordering',
-          JSON.stringify(data)
+          JSON.stringify(data),
         );
       } catch (err) {
         console.error('failed to set sidebar order data', err);
       }
     },
   });
-  _containerProp!: () => HTMLElement;
-  _updateHighlightedAppThreadIconBus: Bus<null, unknown> = kefirBus();
+  #containerProp!: () => HTMLElement;
+  #updateHighlightedAppThreadIconBus: Bus<null, unknown> = kefirBus();
 
   constructor(
     driver: GmailDriver,
-    companionSidebarContentContainerElement: HTMLElement
+    companionSidebarContentContainerElement: HTMLElement,
   ) {
-    this._driver = driver;
-    this._companionSidebarContentContainerEl =
+    this.#driver = driver;
+    this.#companionSidebarContentContainerEl =
       companionSidebarContentContainerElement;
 
-    this._setupElement();
+    this.#setupElement();
   }
 
   getInstanceId(): string {
-    return this._instanceId;
+    return this.#instanceId;
   }
 
-  // Only use this if a different Primary needs to take over this one's elements.
-  // Currently this is only done when hot-reloading in dev. Don't use this when
-  // a threadview exits, the sdk.destroy() is called, etc.
+  /**
+   * Only use this if a different Primary needs to take over this one's elements.
+   * Currently this is only done when hot-reloading in dev. Don't use this when
+   * a threadview exits, the sdk.destroy() is called, etc.
+   */
   destroy() {
-    this._stopper.destroy();
+    this.#stopper.destroy();
   }
 
-  // This value controls whether the app sidebar should automatically open
-  // itself when available when the chat sidebar isn't present. It's only set
-  // if the user interacts with the app sidebar button.
-  _getShouldGlobalAppSidebarOpen(): boolean {
+  /**
+   * This value controls whether the app sidebar should automatically open
+   * itself when available when the chat sidebar isn't present. It's only set
+   * if the user interacts with the app sidebar button.
+   */
+  #getShouldGlobalAppSidebarOpen(): boolean {
     return (
       global.localStorage.getItem(
-        'inboxsdk__global_app_sidebar_should_open'
+        'inboxsdk__global_app_sidebar_should_open',
       ) === 'true'
     );
   }
 
-  _setShouldGlobalAppSidebarOpen(open: boolean) {
+  #setShouldGlobalAppSidebarOpen(open: boolean) {
     try {
       global.localStorage.setItem(
         'inboxsdk__global_app_sidebar_should_open',
-        String(open)
+        String(open),
       );
     } catch (err) {
       console.error('error saving', err);
     }
   }
 
-  _getShouldThreadAppSidebarOpen(): boolean {
+  #getShouldThreadAppSidebarOpen(): boolean {
     return (
       global.localStorage.getItem(
-        'inboxsdk__thread_app_sidebar_should_open'
+        'inboxsdk__thread_app_sidebar_should_open',
       ) !== 'false'
     );
   }
 
-  _setShouldThreadAppSidebarOpen(open: boolean) {
+  #setShouldThreadAppSidebarOpen(open: boolean) {
     try {
       global.localStorage.setItem(
         'inboxsdk__thread_app_sidebar_should_open',
-        String(open)
+        String(open),
       );
     } catch (err) {
       console.error('error saving', err);
     }
   }
 
-  _createThreadSidebarIfNeeded(): HTMLElement {
-    if (this._threadSidebarContainerEl) return this._threadSidebarContainerEl;
-    const threadSidebarContainerEl = (this._threadSidebarContainerEl =
+  #createThreadSidebarIfNeeded(): HTMLElement {
+    if (this.#threadSidebarContainerEl) return this.#threadSidebarContainerEl;
+    const threadSidebarContainerEl = (this.#threadSidebarContainerEl =
       document.createElement('div'));
     threadSidebarContainerEl.classList.add(
       'thread_app_sidebar',
       idMap('app_sidebar_container'),
-      'addon_sidebar'
+      'addon_sidebar',
     );
 
-    this._companionSidebarContentContainerEl.insertBefore(
+    this.#companionSidebarContentContainerEl.insertBefore(
       threadSidebarContainerEl,
-      this._companionSidebarContentContainerEl.firstElementChild
+      this.#companionSidebarContentContainerEl.firstElementChild,
     );
 
-    this._containerProp = () => threadSidebarContainerEl;
+    this.#containerProp = () => threadSidebarContainerEl;
 
-    this._updateHighlightedAppThreadIconBus
+    this.#updateHighlightedAppThreadIconBus
       .bufferWithTimeOrCount(150, 100)
       .filter((events: any[]) => events.length > 0)
-      .takeUntilBy(this._stopper)
+      .takeUntilBy(this.#stopper)
       .onValue(() => {
         // Before touching this code, make sure you understand the meaning of the clientRect
         // values and of scrollTop. In particular, make sure you understand the distinction of
@@ -178,9 +187,9 @@ class GmailAppSidebarPrimary {
         const titleBars = Array.from(
           threadSidebarContainerEl.querySelectorAll(
             `.${idMap('app_sidebar_content_panel')}.${idMap(
-              'expanded'
-            )} .${idMap('app_sidebar_content_panel_top_line')}`
-          )
+              'expanded',
+            )} .${idMap('app_sidebar_content_panel_top_line')}`,
+          ),
         );
         const absoluteScrollOfViewportTop = threadSidebarContainerEl.scrollTop;
         const absoluteScrollOfViewportMidpoint =
@@ -225,17 +234,17 @@ class GmailAppSidebarPrimary {
           const appName = titleBar.getAttribute('data-app-name');
           if (!appName) return;
 
-          const appButton = this._threadButtonContainers.get(appName);
+          const appButton = this.#threadButtonContainers.get(appName);
 
-          if (!appButton || !this._threadIconArea) return;
+          if (!appButton || !this.#threadIconArea) return;
 
-          const activeButtonContainer = this._threadIconArea.querySelector(
-            '.sidebar_button_container_active'
+          const activeButtonContainer = this.#threadIconArea.querySelector(
+            '.sidebar_button_container_active',
           );
 
           if (activeButtonContainer) {
             activeButtonContainer.classList.remove(
-              'sidebar_button_container_active'
+              'sidebar_button_container_active',
             );
           }
 
@@ -244,94 +253,94 @@ class GmailAppSidebarPrimary {
       });
 
     //listen for scroll and update active icon if needed
-    this._updateHighlightedAppThreadIconBus.plug(
-      Kefir.fromEvents(threadSidebarContainerEl, 'scroll').map(() => null)
+    this.#updateHighlightedAppThreadIconBus.plug(
+      Kefir.fromEvents(threadSidebarContainerEl, 'scroll').map(() => null),
     );
 
     // handle rendering thread sidebar contents
-    this._renderThreadSidebar();
+    this.#renderThreadSidebar();
 
     return threadSidebarContainerEl;
   }
 
-  _renderThreadSidebarIfPresent() {
-    if (!this._threadSidebarContainerEl) {
+  #renderThreadSidebarIfPresent() {
+    if (!this.#threadSidebarContainerEl) {
       return;
     }
 
-    this._renderThreadSidebar();
+    this.#renderThreadSidebar();
   }
 
-  _appSidebarRefSetter: (el: AppSidebar | null | undefined) => void = (
-    threadSidebarComponent
+  #appSidebarRefSetter: (el: AppSidebar | null | undefined) => void = (
+    threadSidebarComponent,
   ) => {
     if (threadSidebarComponent) {
-      this._threadSidebarComponent = threadSidebarComponent;
+      this.#threadSidebarComponent = threadSidebarComponent;
     }
   };
 
-  _renderThreadSidebar(): Promise<AppSidebar> {
-    const threadSidebarContainerEl = this._threadSidebarContainerEl;
+  #renderThreadSidebar(): Promise<AppSidebar> {
+    const threadSidebarContainerEl = this.#threadSidebarContainerEl;
 
     if (!threadSidebarContainerEl) {
       throw new Error(
-        '_renderThreadSidebar should not be called when _threadSidebarContainerEl is unset'
+        '_renderThreadSidebar should not be called when _threadSidebarContainerEl is unset',
       );
     }
 
     return new Promise((resolve) => {
       ReactDOM.render(
         <AppSidebar
-          ref={this._appSidebarRefSetter}
-          panels={this._orderManager.getOrderedItems().map((x) => x.value)}
+          ref={this.#appSidebarRefSetter}
+          panels={this.#orderManager.getOrderedItems().map((x) => x.value)}
           onMoveEnd={(newList, movedItem, oldIndex, newIndex) => {
-            this._orderManager.moveItem(oldIndex, newIndex);
+            this.#orderManager.moveItem(oldIndex, newIndex);
 
-            this._renderThreadSidebar();
+            this.#renderThreadSidebar();
           }}
           onExpandedToggle={() => {
-            this._updateHighlightedAppThreadIconBus.emit(null);
+            this.#updateHighlightedAppThreadIconBus.emit(null);
           }}
-          container={this._containerProp}
+          container={this.#containerProp}
         />,
         threadSidebarContainerEl,
         () => {
-          if (!this._threadSidebarComponent) {
+          if (!this.#threadSidebarComponent) {
             throw new Error('Should not happen');
           }
 
-          resolve(this._threadSidebarComponent);
+          resolve(this.#threadSidebarComponent);
 
-          this._updateHighlightedAppThreadIconBus.emit(null);
-        }
+          this.#updateHighlightedAppThreadIconBus.emit(null);
+        },
       );
     });
   }
 
-  _getActiveButtonContainer(): HTMLElement | null | undefined {
+  #getActiveButtonContainer(): HTMLElement | null | undefined {
     let activeButtonContainer;
 
-    if (this._globalIconArea) {
-      activeButtonContainer = this._globalIconArea.querySelector<HTMLElement>(
-        '.sidebar_button_container_active'
+    if (this.#globalIconArea) {
+      activeButtonContainer = this.#globalIconArea.querySelector<HTMLElement>(
+        '.sidebar_button_container_active',
       );
     }
 
-    if (!activeButtonContainer && this._threadIconArea) {
-      activeButtonContainer = this._threadIconArea.querySelector<HTMLElement>(
-        '.sidebar_button_container_active'
+    if (!activeButtonContainer && this.#threadIconArea) {
+      activeButtonContainer = this.#threadIconArea.querySelector<HTMLElement>(
+        '.sidebar_button_container_active',
       );
     }
 
     return activeButtonContainer;
   }
 
-  _closeButton: ((userClick: boolean) => void) | null | undefined = null;
+  #closeButton: ((userClick: boolean) => void) | null | undefined = null;
 
-  _addButton(
+  #addButton(
     iconArea: HTMLElement,
     event: Record<string, any>,
-    isGlobal: boolean
+    isGlobal: boolean,
   ) {
     // we put adding the content panel icon in the iconArea in an asap so that we
     // get consistent ordering. The ordering of the icons is based on the position of the FIRST
@@ -349,8 +358,8 @@ class GmailAppSidebarPrimary {
       // If there's an existing button for the app, then just increment its
       // data-count attribute instead of adding a new button.
       const existingButtonContainer = isGlobal
-        ? this._globalButtonContainers.get(appName)
-        : this._threadButtonContainers.get(appName);
+        ? this.#globalButtonContainers.get(appName)
+        : this.#threadButtonContainers.get(appName);
       let buttonContainer: HTMLElement;
 
       if (existingButtonContainer) {
@@ -358,7 +367,7 @@ class GmailAppSidebarPrimary {
           Number(existingButtonContainer.getAttribute('data-count')) || 1;
         existingButtonContainer.setAttribute(
           'data-count',
-          String(currentCount + 1)
+          String(currentCount + 1),
         );
         buttonContainer = existingButtonContainer;
       } else {
@@ -375,42 +384,42 @@ class GmailAppSidebarPrimary {
         if (event.detail.primaryColor) {
           querySelector(
             buttonContainer,
-            '.inboxsdk__button_selectedIndicator'
+            '.inboxsdk__button_selectedIndicator',
           ).style.backgroundColor = event.detail.primaryColor;
         }
 
         if (isGlobal) {
-          this._globalButtonContainers.set(appName, buttonContainer);
+          this.#globalButtonContainers.set(appName, buttonContainer);
         } else {
-          this._threadButtonContainers.set(appName, buttonContainer);
+          this.#threadButtonContainers.set(appName, buttonContainer);
         }
 
         const activate = (dontScrollIntoView = false) => {
-          const activeButtonContainer = this._getActiveButtonContainer();
+          const activeButtonContainer = this.#getActiveButtonContainer();
 
           if (activeButtonContainer === buttonContainer) {
             // button was clicked while its panel was open, so close it.
-            if (!this._closeButton) throw new Error();
+            if (!this.#closeButton) throw new Error();
 
-            this._closeButton(true);
+            this.#closeButton(true);
           } else {
             // button was clicked while its own panel wasn't open, so open it.
-            if (this._closeButton) {
-              this._closeButton(true);
+            if (this.#closeButton) {
+              this.#closeButton(true);
             }
 
-            if (isGlobal) this._setShouldGlobalAppSidebarOpen(true);
-            else this._setShouldThreadAppSidebarOpen(true);
+            if (isGlobal) this.#setShouldGlobalAppSidebarOpen(true);
+            else this.#setShouldThreadAppSidebarOpen(true);
 
-            this._openSidebarAndActivateButton(buttonContainer, isGlobal);
+            this.#openSidebarAndActivateButton(buttonContainer, isGlobal);
 
             if (isGlobal) {
-              const contentEl = this._contentContainers.get(appName);
+              const contentEl = this.#contentContainers.get(appName);
 
               if (contentEl) contentEl.style.display = '';
 
-              this._companionSidebarContentContainerEl.classList.add(
-                'companion_global_app_sidebar_visible'
+              this.#companionSidebarContentContainerEl.classList.add(
+                'companion_global_app_sidebar_visible',
               );
 
               // let app listen for activate event
@@ -421,10 +430,10 @@ class GmailAppSidebarPrimary {
                   detail: {
                     instanceId,
                   },
-                })
+                }),
               );
             } else {
-              const threadSidebarComponent = this._threadSidebarComponent;
+              const threadSidebarComponent = this.#threadSidebarComponent;
 
               if (!threadSidebarComponent) {
                 throw new Error('sidebar not mounted');
@@ -436,26 +445,26 @@ class GmailAppSidebarPrimary {
               }
             }
 
-            this._closeButton = (userClick: boolean) => {
-              this._closeButton = null;
+            this.#closeButton = (userClick: boolean) => {
+              this.#closeButton = null;
 
-              const activeButtonContainer = this._getActiveButtonContainer();
+              const activeButtonContainer = this.#getActiveButtonContainer();
 
               if (!activeButtonContainer) {
                 throw new Error('Expected activeButtonContainer');
               }
 
-              this._closeSidebarAndDeactivateButton(activeButtonContainer);
+              this.#closeSidebarAndDeactivateButton(activeButtonContainer);
 
               if (isGlobal) {
-                if (userClick) this._setShouldGlobalAppSidebarOpen(false);
+                if (userClick) this.#setShouldGlobalAppSidebarOpen(false);
 
-                const contentEl = this._contentContainers.get(appName);
+                const contentEl = this.#contentContainers.get(appName);
 
                 if (contentEl) {
                   contentEl.style.display = 'none';
                 } else {
-                  this._driver
+                  this.#driver
                     .getLogger()
                     .error(new Error('Unexpected: contentEl not set'));
                 }
@@ -467,10 +476,10 @@ class GmailAppSidebarPrimary {
                     detail: {
                       instanceId,
                     },
-                  })
+                  }),
                 );
               } else {
-                if (userClick) this._setShouldThreadAppSidebarOpen(false);
+                if (userClick) this.#setShouldThreadAppSidebarOpen(false);
               }
 
               //fake a window resize after closing so gmail fixes any heights that are messed up
@@ -488,35 +497,35 @@ class GmailAppSidebarPrimary {
             event.stopPropagation();
             activate();
           },
-          true
+          true,
         );
 
         if (iconArea) {
-          addToIconArea(this._orderManager, appName, buttonContainer, iconArea);
+          addToIconArea(this.#orderManager, appName, buttonContainer, iconArea);
         }
 
         // if we last had an SDK sidebar open then bring up the SDK sidebar when the first
         // panel gets added
         {
-          const activeButtonContainer = this._getActiveButtonContainer();
+          const activeButtonContainer = this.#getActiveButtonContainer();
 
           if (isGlobal) {
-            if (this._getShouldGlobalAppSidebarOpen()) {
+            if (this.#getShouldGlobalAppSidebarOpen()) {
               const activeButtonContainerPresentAndIsForGlobal =
-                this._globalIconArea &&
+                this.#globalIconArea &&
                 activeButtonContainer &&
-                this._globalIconArea.contains(activeButtonContainer);
+                this.#globalIconArea.contains(activeButtonContainer);
 
               if (!activeButtonContainerPresentAndIsForGlobal) {
                 activate(true);
               }
             }
           } else {
-            if (this._getShouldThreadAppSidebarOpen()) {
+            if (this.#getShouldThreadAppSidebarOpen()) {
               const activeButtonContainerPresentAndIsForThread =
-                this._threadIconArea &&
+                this.#threadIconArea &&
                 activeButtonContainer &&
-                this._threadIconArea.contains(activeButtonContainer);
+                this.#threadIconArea.contains(activeButtonContainer);
 
               if (!activeButtonContainerPresentAndIsForThread) {
                 activate(true);
@@ -528,17 +537,17 @@ class GmailAppSidebarPrimary {
     });
   }
 
-  _removeButton(
+  #removeButton(
     event: Record<string, any>,
     buttonContainers: Map<string, HTMLElement>,
-    iconArea: HTMLElement | null | undefined
+    iconArea: HTMLElement | null | undefined,
   ) {
     const appName = event.detail.appName;
     const container = buttonContainers.get(appName);
 
     if (!iconArea || !container) {
       throw new Error(
-        'should not happen: tried to remove button without container or iconArea'
+        'should not happen: tried to remove button without container or iconArea',
       );
     }
 
@@ -546,27 +555,27 @@ class GmailAppSidebarPrimary {
 
     if (currentCount <= 1) {
       const activeButtonContainer = iconArea.querySelector(
-        '.sidebar_button_container_active'
+        '.sidebar_button_container_active',
       );
 
       if (container === activeButtonContainer) {
-        if (!this._closeButton) throw new Error();
+        if (!this.#closeButton) throw new Error();
 
-        this._closeButton(false);
+        this.#closeButton(false);
 
-        this._companionSidebarOuterWrapper.classList.remove(
-          'companion_app_sidebar_wrapper_visible'
+        this.#companionSidebarOuterWrapper.classList.remove(
+          'companion_app_sidebar_wrapper_visible',
         );
 
-        this._companionSidebarContentContainerEl.classList.remove(
-          'companion_app_sidebar_visible'
+        this.#companionSidebarContentContainerEl.classList.remove(
+          'companion_app_sidebar_visible',
         );
 
         const contentContainer =
-          this._companionSidebarOuterWrapper.previousElementSibling;
+          this.#companionSidebarOuterWrapper.previousElementSibling;
         if (contentContainer)
           contentContainer.classList.remove(
-            'companion_container_app_sidebar_visible'
+            'companion_container_app_sidebar_visible',
           );
       }
 
@@ -579,42 +588,42 @@ class GmailAppSidebarPrimary {
     }
   }
 
-  _closeSidebarAndDeactivateButton(activeButtonContainer: HTMLElement) {
+  #closeSidebarAndDeactivateButton(activeButtonContainer: HTMLElement) {
     activeButtonContainer.classList.remove('sidebar_button_container_active');
 
-    this._companionSidebarOuterWrapper.classList.remove(
-      'companion_app_sidebar_wrapper_visible'
+    this.#companionSidebarOuterWrapper.classList.remove(
+      'companion_app_sidebar_wrapper_visible',
     );
 
-    this._companionSidebarContentContainerEl.classList.add(
-      COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS
+    this.#companionSidebarContentContainerEl.classList.add(
+      COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS,
     );
 
-    this._companionSidebarContentContainerEl.classList.remove(
+    this.#companionSidebarContentContainerEl.classList.remove(
       'companion_app_sidebar_visible',
-      'companion_global_app_sidebar_visible'
+      'companion_global_app_sidebar_visible',
     );
 
     const contentContainer =
-      this._companionSidebarOuterWrapper.previousElementSibling;
+      this.#companionSidebarOuterWrapper.previousElementSibling;
     if (contentContainer)
       contentContainer.classList.remove(
-        'companion_container_app_sidebar_visible'
+        'companion_container_app_sidebar_visible',
       );
   }
 
-  _openSidebarAndActivateButton(
+  #openSidebarAndActivateButton(
     buttonContainer: HTMLElement,
-    isGlobal: boolean
+    isGlobal: boolean,
   ) {
     const companionSidebarIconContainerEl =
       GmailElementGetter.getCompanionSidebarIconContainerElement();
     if (!companionSidebarIconContainerEl)
       throw new Error(
-        'Could not find companion sidebar icon container element'
+        'Could not find companion sidebar icon container element',
       );
 
-    const activeButtonContainer = this._getActiveButtonContainer();
+    const activeButtonContainer = this.#getActiveButtonContainer();
 
     if (activeButtonContainer) {
       throw new Error('activeButtonContainer should not be true'); // this._closeSidebarAndDeactivateButton(activeButtonContainer);
@@ -624,7 +633,7 @@ class GmailAppSidebarPrimary {
       // If a gmail addon is active, close it.
       const nativeActiveAddOnIcon =
         companionSidebarIconContainerEl.querySelector<HTMLElement>(
-          ACTIVE_ADD_ON_ICON_SELECTOR
+          ACTIVE_ADD_ON_ICON_SELECTOR,
         );
 
       if (nativeActiveAddOnIcon) {
@@ -633,72 +642,72 @@ class GmailAppSidebarPrimary {
     }
     buttonContainer.classList.add('sidebar_button_container_active');
 
-    this._companionSidebarOuterWrapper.classList.add(
-      'companion_app_sidebar_wrapper_visible'
+    this.#companionSidebarOuterWrapper.classList.add(
+      'companion_app_sidebar_wrapper_visible',
     );
 
-    this._companionSidebarContentContainerEl.classList.add(
-      'companion_app_sidebar_visible'
+    this.#companionSidebarContentContainerEl.classList.add(
+      'companion_app_sidebar_visible',
     );
 
-    this._companionSidebarContentContainerEl.classList.remove(
-      COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS
+    this.#companionSidebarContentContainerEl.classList.remove(
+      COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS,
     );
 
     const contentContainer =
-      this._companionSidebarOuterWrapper.previousElementSibling;
+      this.#companionSidebarOuterWrapper.previousElementSibling;
     if (contentContainer)
       contentContainer.classList.add('companion_container_app_sidebar_visible');
     if (isGlobal)
-      this._companionSidebarContentContainerEl.classList.add(
-        'companion_global_app_sidebar_visible'
+      this.#companionSidebarContentContainerEl.classList.add(
+        'companion_global_app_sidebar_visible',
       );
   }
 
-  _setupElement() {
+  #setupElement() {
     const companionSidebarIconContainerEl =
       GmailElementGetter.getCompanionSidebarIconContainerElement();
     if (!companionSidebarIconContainerEl)
       throw new Error(
-        'Could not find companion sidebar icon container element'
+        'Could not find companion sidebar icon container element',
       );
 
-    this._companionSidebarContentContainerEl.setAttribute(
+    this.#companionSidebarContentContainerEl.setAttribute(
       'data-sdk-sidebar-instance-id',
-      this._instanceId
+      this.#instanceId,
     );
 
     // TODO: Once the changes to the GMail DOM have been entirely ramped, drop the ternary here and
     // always get the parentElement. (Jun 20, 2018)
-    this._companionSidebarOuterWrapper =
-      this._companionSidebarContentContainerEl.classList.contains('bq9')
-        ? this._companionSidebarContentContainerEl
-        : (this._companionSidebarContentContainerEl.parentElement as any);
+    this.#companionSidebarOuterWrapper =
+      this.#companionSidebarContentContainerEl.classList.contains('bq9')
+        ? this.#companionSidebarContentContainerEl
+        : (this.#companionSidebarContentContainerEl.parentElement as any);
 
-    if (!this._companionSidebarOuterWrapper) {
+    if (!this.#companionSidebarOuterWrapper) {
       throw new Error(
-        'should not happen: failed to find companionSidebarOuterWrapper'
+        'should not happen: failed to find companionSidebarOuterWrapper',
       );
     }
 
     const contentContainer =
-      this._companionSidebarOuterWrapper.previousElementSibling;
+      this.#companionSidebarOuterWrapper.previousElementSibling;
 
     if (contentContainer) {
       contentContainer.classList.add(
-        idMap('companion_container_app_sidebar_in_use')
+        idMap('companion_container_app_sidebar_in_use'),
       );
     }
 
-    this._companionSidebarContentContainerEl.classList.add(
-      idMap('app_sidebar_in_use')
+    this.#companionSidebarContentContainerEl.classList.add(
+      idMap('app_sidebar_in_use'),
     );
 
     if (!document.body.querySelector(sidebarWaitingPlatformSelector)) {
       const waitingPlatform = document.createElement('div');
       waitingPlatform.className = cx(
         sidebarWaitingPlatformClassName,
-        idMap('app_sidebar_waiting_platform')
+        idMap('app_sidebar_waiting_platform'),
       );
       document.body.appendChild(waitingPlatform);
     }
@@ -707,31 +716,31 @@ class GmailAppSidebarPrimary {
     {
       Kefir.fromEvents<StorageEvent, unknown>(window, 'storage')
         .filter((e) => e.key === 'inboxsdk__sidebar_ordering')
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue(() => {
-          this._orderManager.reload();
+          this.#orderManager.reload();
 
-          this._renderThreadSidebarIfPresent();
+          this.#renderThreadSidebarIfPresent();
         });
       Kefir.fromEvents<any, unknown>(document.body, 'inboxsdkNewSidebarPanel')
         .filter(
-          (e) => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal
+          (e) => e.detail.sidebarId === this.#instanceId && !e.detail.isGlobal,
         )
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue((event) => {
-          this._createThreadSidebarIfNeeded();
+          this.#createThreadSidebarIfNeeded();
 
           let id = event.detail.id;
 
-          while (this._currentIds.has(id)) {
+          while (this.#currentIds.has(id)) {
             id = incrementName(id);
           }
 
-          this._currentIds.add(id);
+          this.#currentIds.add(id);
 
           const appName = event.detail.appName;
 
-          this._orderManager.addItem({
+          this.#orderManager.addItem({
             groupId: event.detail.appId,
             id,
             orderHint: event.detail.orderHint,
@@ -748,46 +757,46 @@ class GmailAppSidebarPrimary {
             },
           });
 
-          this._renderThreadSidebar();
+          this.#renderThreadSidebar();
 
-          let threadIconArea = (this._threadIconArea =
+          let threadIconArea = (this.#threadIconArea =
             companionSidebarIconContainerEl.querySelector<HTMLElement>(
-              '.sidebar_thread_iconArea'
+              '.sidebar_thread_iconArea',
             ));
 
           if (!threadIconArea) {
-            threadIconArea = this._threadIconArea =
+            threadIconArea = this.#threadIconArea =
               document.createElement('div');
             threadIconArea.className = idMap('sidebar_iconArea');
             threadIconArea.classList.add('sidebar_thread_iconArea');
             addCompanionThreadIconArea(
-              this._driver.getLogger(),
+              this.#driver.getLogger(),
               threadIconArea,
-              companionSidebarIconContainerEl
+              companionSidebarIconContainerEl,
             );
           }
 
-          this._addButton(threadIconArea, event, false);
+          this.#addButton(threadIconArea, event, false);
         });
       Kefir.fromEvents<any, unknown>(
         document.body,
-        'inboxsdkUpdateSidebarPanel'
+        'inboxsdkUpdateSidebarPanel',
       )
         .filter(
-          (e) => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal
+          (e) => e.detail.sidebarId === this.#instanceId && !e.detail.isGlobal,
         )
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue((event) => {
-          const orderedItems = this._orderManager.getOrderedItems();
+          const orderedItems = this.#orderManager.getOrderedItems();
 
           const index = findIndex(
             orderedItems,
-            (x) => x.value.instanceId === event.detail.instanceId
+            (x) => x.value.instanceId === event.detail.instanceId,
           );
           if (index === -1)
             throw new Error('should not happen: failed to find orderItem');
 
-          this._orderManager.updateItemValueByIndex(index, {
+          this.#orderManager.updateItemValueByIndex(index, {
             id: orderedItems[index].value.id,
             appId: event.detail.appId,
             appName: event.detail.appName || event.detail.title,
@@ -799,84 +808,84 @@ class GmailAppSidebarPrimary {
             el: event.target,
           });
 
-          this._renderThreadSidebar();
+          this.#renderThreadSidebar();
         });
       Kefir.fromEvents<any, unknown>(
         document.body,
-        'inboxsdkRemoveSidebarPanel'
+        'inboxsdkRemoveSidebarPanel',
       )
         .filter(
-          (e) => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal
+          (e) => e.detail.sidebarId === this.#instanceId && !e.detail.isGlobal,
         )
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue((event) => {
-          const orderedItems = this._orderManager.getOrderedItems();
+          const orderedItems = this.#orderManager.getOrderedItems();
 
           const index = findIndex(
             orderedItems,
-            (x) => x.value.instanceId === event.detail.instanceId
+            (x) => x.value.instanceId === event.detail.instanceId,
           );
           if (index === -1)
             throw new Error('should not happen: failed to find orderItem');
 
-          this._currentIds.delete(orderedItems[index].id);
+          this.#currentIds.delete(orderedItems[index].id);
 
-          this._orderManager.removeItemByIndex(index);
+          this.#orderManager.removeItemByIndex(index);
 
-          this._renderThreadSidebar();
+          this.#renderThreadSidebar();
 
-          this._removeButton(
+          this.#removeButton(
             event,
-            this._threadButtonContainers,
-            this._threadIconArea
+            this.#threadButtonContainers,
+            this.#threadIconArea,
           );
         });
       Kefir.fromEvents<any, unknown>(
         document.body,
-        'inboxsdkSidebarPanelScrollIntoView'
+        'inboxsdkSidebarPanelScrollIntoView',
       )
         .filter(
-          (e) => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal
+          (e) => e.detail.sidebarId === this.#instanceId && !e.detail.isGlobal,
         )
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue((event) => {
-          if (this._threadSidebarComponent)
-            this._threadSidebarComponent.scrollPanelIntoView(
-              event.detail.instanceId
+          if (this.#threadSidebarComponent)
+            this.#threadSidebarComponent.scrollPanelIntoView(
+              event.detail.instanceId,
             );
         });
       Kefir.fromEvents<any, unknown>(document.body, 'inboxsdkSidebarPanelClose')
         .filter(
-          (e) => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal
+          (e) => e.detail.sidebarId === this.#instanceId && !e.detail.isGlobal,
         )
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue((event) => {
-          if (this._threadSidebarComponent)
-            this._threadSidebarComponent.closePanel(event.detail.instanceId);
+          if (this.#threadSidebarComponent)
+            this.#threadSidebarComponent.closePanel(event.detail.instanceId);
         });
       Kefir.fromEvents<any, unknown>(document.body, 'inboxsdkSidebarPanelOpen')
         .filter(
-          (e) => e.detail.sidebarId === this._instanceId && !e.detail.isGlobal
+          (e) => e.detail.sidebarId === this.#instanceId && !e.detail.isGlobal,
         )
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue((e) => {
           // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          this._renderThreadSidebar().then((threadSidebarComponent) => {
-            const descriptor = this._instanceIdsToDescriptors.get(
-              e.detail.instanceId
+          this.#renderThreadSidebar().then((threadSidebarComponent) => {
+            const descriptor = this.#instanceIdsToDescriptors.get(
+              e.detail.instanceId,
             );
 
             if (!descriptor) return;
 
-            const buttonContainer = this._threadButtonContainers.get(
-              descriptor.appName
+            const buttonContainer = this.#threadButtonContainers.get(
+              descriptor.appName,
             );
 
             if (!buttonContainer) {
               throw new Error('missing button container');
             }
 
-            const activeButtonContainer = this._getActiveButtonContainer();
+            const activeButtonContainer = this.#getActiveButtonContainer();
 
             if (activeButtonContainer !== buttonContainer) {
               querySelector(buttonContainer, 'button').click();
@@ -888,33 +897,33 @@ class GmailAppSidebarPrimary {
     {
       Kefir.fromEvents<any, unknown>(document.body, 'inboxsdkNewSidebarPanel')
         .filter(
-          (e) => e.detail.sidebarId === this._instanceId && e.detail.isGlobal
+          (e) => e.detail.sidebarId === this.#instanceId && e.detail.isGlobal,
         )
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue((event) => {
           let id = event.detail.id;
 
-          while (this._currentIds.has(id)) {
+          while (this.#currentIds.has(id)) {
             id = incrementName(id);
           }
 
-          this._currentIds.add(id);
+          this.#currentIds.add(id);
 
           const appName = event.detail.appName;
-          let globalIconArea = (this._globalIconArea =
+          let globalIconArea = (this.#globalIconArea =
             companionSidebarIconContainerEl.querySelector<HTMLElement>(
-              '.sidebar_global_iconArea'
+              '.sidebar_global_iconArea',
             ));
 
           if (!globalIconArea) {
-            globalIconArea = this._globalIconArea =
+            globalIconArea = this.#globalIconArea =
               document.createElement('div');
             globalIconArea.className = idMap('sidebar_iconArea');
             globalIconArea.classList.add('sidebar_global_iconArea');
             addCompanionGlobalIconArea(
-              this._driver.getLogger(),
+              this.#driver.getLogger(),
               globalIconArea,
-              companionSidebarIconContainerEl
+              companionSidebarIconContainerEl,
             );
           }
 
@@ -922,32 +931,32 @@ class GmailAppSidebarPrimary {
           sdkContentContainerEl.classList.add(
             'addon_sidebar',
             idMap('app_sidebar_container'),
-            'global_app_sidebar'
+            'global_app_sidebar',
           );
 
-          this._companionSidebarContentContainerEl.insertAdjacentElement(
+          this.#companionSidebarContentContainerEl.insertAdjacentElement(
             'afterbegin',
-            sdkContentContainerEl
+            sdkContentContainerEl,
           );
 
-          this._contentContainers.set(appName, sdkContentContainerEl);
+          this.#contentContainers.set(appName, sdkContentContainerEl);
 
           sdkContentContainerEl.appendChild(event.target);
           sdkContentContainerEl.style.display = 'none';
 
-          this._addButton(globalIconArea, event, true);
+          this.#addButton(globalIconArea, event, true);
         });
       Kefir.fromEvents<any, unknown>(
         document.body,
-        'inboxsdkUpdateSidebarPanel'
+        'inboxsdkUpdateSidebarPanel',
       )
         .filter(
-          (e) => e.detail.sidebarId === this._instanceId && e.detail.isGlobal
+          (e) => e.detail.sidebarId === this.#instanceId && e.detail.isGlobal,
         )
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue((event) => {
-          const buttonContainer = this._globalButtonContainers.get(
-            event.detail.appName
+          const buttonContainer = this.#globalButtonContainers.get(
+            event.detail.appName,
           );
 
           if (!buttonContainer) return;
@@ -960,68 +969,68 @@ class GmailAppSidebarPrimary {
         });
       Kefir.fromEvents<any, unknown>(
         document.body,
-        'inboxsdkRemoveSidebarPanel'
+        'inboxsdkRemoveSidebarPanel',
       )
         .filter(
-          (e) => e.detail.sidebarId === this._instanceId && e.detail.isGlobal
+          (e) => e.detail.sidebarId === this.#instanceId && e.detail.isGlobal,
         )
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue((event) => {
-          this._currentIds.delete(event.detail.id);
+          this.#currentIds.delete(event.detail.id);
 
-          this._removeButton(
+          this.#removeButton(
             event,
-            this._globalButtonContainers,
-            this._globalIconArea
+            this.#globalButtonContainers,
+            this.#globalIconArea,
           );
         });
       Kefir.fromEvents<any, unknown>(document.body, 'inboxsdkSidebarPanelClose')
         .filter(
-          (e) => e.detail.sidebarId === this._instanceId && e.detail.isGlobal
+          (e) => e.detail.sidebarId === this.#instanceId && e.detail.isGlobal,
         )
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue((event) => {
-          const descriptor = this._instanceIdsToDescriptors.get(
-            event.detail.instanceId
+          const descriptor = this.#instanceIdsToDescriptors.get(
+            event.detail.instanceId,
           );
 
           if (!descriptor) return;
 
-          const buttonContainer = this._globalButtonContainers.get(
-            descriptor.appName
+          const buttonContainer = this.#globalButtonContainers.get(
+            descriptor.appName,
           );
 
           if (!buttonContainer) return;
 
-          const activeButtonContainer = this._getActiveButtonContainer();
+          const activeButtonContainer = this.#getActiveButtonContainer();
 
           if (activeButtonContainer === buttonContainer) {
-            if (!this._closeButton) {
+            if (!this.#closeButton) {
               throw new Error('Expected this._closeButton');
             }
 
-            this._closeButton(true);
+            this.#closeButton(true);
           }
         });
       Kefir.fromEvents<any, unknown>(document.body, 'inboxsdkSidebarPanelOpen')
         .filter(
-          (e) => e.detail.sidebarId === this._instanceId && e.detail.isGlobal
+          (e) => e.detail.sidebarId === this.#instanceId && e.detail.isGlobal,
         )
-        .takeUntilBy(this._stopper)
+        .takeUntilBy(this.#stopper)
         .onValue((event) => {
-          const descriptor = this._instanceIdsToDescriptors.get(
-            event.detail.instanceId
+          const descriptor = this.#instanceIdsToDescriptors.get(
+            event.detail.instanceId,
           );
 
           if (!descriptor) return;
 
-          const buttonContainer = this._globalButtonContainers.get(
-            descriptor.appName
+          const buttonContainer = this.#globalButtonContainers.get(
+            descriptor.appName,
           );
 
           if (!buttonContainer) return;
 
-          const activeButtonContainer = this._getActiveButtonContainer();
+          const activeButtonContainer = this.#getActiveButtonContainer();
 
           if (activeButtonContainer !== buttonContainer) {
             querySelector(buttonContainer, 'button').click();
@@ -1031,33 +1040,33 @@ class GmailAppSidebarPrimary {
     // instance id to descriptor management
     {
       Kefir.fromEvents<any, unknown>(document.body, 'inboxsdkNewSidebarPanel')
-        .filter((e) => e.detail.sidebarId === this._instanceId)
-        .takeUntilBy(this._stopper)
+        .filter((e) => e.detail.sidebarId === this.#instanceId)
+        .takeUntilBy(this.#stopper)
         .onValue((event) => {
-          this._instanceIdsToDescriptors.set(
+          this.#instanceIdsToDescriptors.set(
             event.detail.instanceId,
-            event.detail
+            event.detail,
           );
         });
       Kefir.fromEvents<any, unknown>(
         document.body,
-        'inboxsdkRemoveSidebarPanel'
+        'inboxsdkRemoveSidebarPanel',
       )
-        .filter((e) => e.detail.sidebarId === this._instanceId)
-        .takeUntilBy(this._stopper)
+        .filter((e) => e.detail.sidebarId === this.#instanceId)
+        .takeUntilBy(this.#stopper)
         .onValue((event) => {
-          this._instanceIdsToDescriptors.delete(event.detail.instanceId);
+          this.#instanceIdsToDescriptors.delete(event.detail.instanceId);
         });
       Kefir.fromEvents<any, unknown>(
         document.body,
-        'inboxsdkUpdateSidebarPanel'
+        'inboxsdkUpdateSidebarPanel',
       )
-        .filter((e) => e.detail.sidebarId === this._instanceId)
-        .takeUntilBy(this._stopper)
+        .filter((e) => e.detail.sidebarId === this.#instanceId)
+        .takeUntilBy(this.#stopper)
         .onValue((event) => {
-          this._instanceIdsToDescriptors.set(
+          this.#instanceIdsToDescriptors.set(
             event.detail.instanceId,
-            event.detail
+            event.detail,
           );
         });
     }
@@ -1069,9 +1078,9 @@ class GmailAppSidebarPrimary {
     // or the thread add-on content element are visible
     // if they are both display: '' or display: none then the native sidebar
     // contents are not visible
-    const globalAddOnContentContainer = this._companionSidebarContentContainerEl
+    const globalAddOnContentContainer = this.#companionSidebarContentContainerEl
       .children[0] as HTMLElement;
-    const threadAddOnContentContainer = this._companionSidebarContentContainerEl
+    const threadAddOnContentContainer = this.#companionSidebarContentContainerEl
       .children[1] as HTMLElement;
     Kefir.merge(
       [globalAddOnContentContainer, threadAddOnContentContainer].map(
@@ -1079,19 +1088,19 @@ class GmailAppSidebarPrimary {
           makeMutationObserverChunkedStream(addonContentEl, {
             attributes: true,
             attributeFilter: ['style'],
-          })
-      )
+          }),
+      ),
     )
       .filter(
         () =>
           globalAddOnContentContainer.style.display !==
-          threadAddOnContentContainer.style.display
+          threadAddOnContentContainer.style.display,
       )
-      .takeUntilBy(this._stopper)
+      .takeUntilBy(this.#stopper)
       .onValue(() => {
         // TODO What is this block for? It closes the current section whenever
         // one of the Gmail addons bar elements changes?
-        const activeButtonContainer = this._getActiveButtonContainer();
+        const activeButtonContainer = this.#getActiveButtonContainer();
 
         if (activeButtonContainer) {
           querySelector(activeButtonContainer, 'button').click();

@@ -3,18 +3,15 @@ import EventEmitter from '../../lib/safe-event-emitter';
 import type Membrane from '../../lib/Membrane';
 import type SimpleElementView from '../../views/SimpleElementView';
 import kefirCast from 'kefir-cast';
-import Kefir from 'kefir';
+import Kefir, { type Observable } from 'kefir';
 import ContentPanelView from '../content-panel-view';
 import get from '../../../common/get-or-fail';
 import type MessageView from './message-view';
 import type { Driver, ThreadViewDriver } from '../../driver-interfaces/driver';
 import type CustomMessageView from '../../views/conversations/custom-message-view';
-import type {
-  Contact,
-  ContentPanelDescriptor,
-  ThreadView as IThreadView,
-} from '../../../inboxsdk';
+import type { Contact, ThreadView as IThreadView } from '../../../inboxsdk';
 import type TypedEventEmitter from 'typed-emitter';
+import { type ContentPanelDescriptor } from '../../driver-common/sidebar/ContentPanelViewDriver';
 
 interface Members {
   threadViewImplementation: ThreadViewDriver;
@@ -44,7 +41,7 @@ class ThreadView
     threadViewImplementation: ThreadViewDriver,
     appId: string,
     driver: Driver,
-    membrane: Membrane
+    membrane: Membrane,
   ) {
     super();
     const members = {
@@ -58,15 +55,22 @@ class ThreadView
     _bindToStreamEvents(this, threadViewImplementation);
   }
 
-  addSidebarContentPanel(descriptor: ContentPanelDescriptor): ContentPanelView {
-    const descriptorPropertyStream = kefirCast(Kefir, descriptor).toProperty();
+  addSidebarContentPanel(
+    descriptor:
+      | ContentPanelDescriptor
+      | Observable<ContentPanelDescriptor, unknown>,
+  ): ContentPanelView {
+    const descriptorPropertyStream: Observable<
+      ContentPanelDescriptor,
+      unknown
+    > = kefirCast(Kefir, descriptor).toProperty();
     const members = get(memberMap, this);
     members.driver
       .getLogger()
       .eventSdkPassive('threadView.addSidebarContentPanel');
     const contentPanelImplementation =
       members.threadViewImplementation.addSidebarContentPanel(
-        descriptorPropertyStream
+        descriptorPropertyStream,
       );
 
     if (contentPanelImplementation) {
@@ -85,24 +89,24 @@ class ThreadView
     provider: (
       numberCustomMessagesHidden: number,
       numberNativeMessagesHidden: number | null | undefined,
-      unmountPromise: Promise<void>
-    ) => HTMLElement
+      unmountPromise: Promise<void>,
+    ) => HTMLElement,
   ) {
     const members = get(memberMap, this);
     return members.threadViewImplementation.registerHiddenCustomMessageNoticeProvider(
-      provider
+      provider,
     );
   }
 
   addCustomMessage(descriptor: Record<string, any>): CustomMessageView {
     const descriptorPropertyStream = kefirCast(
       Kefir as any,
-      descriptor
+      descriptor,
     ).toProperty();
     const members = get(memberMap, this);
     members.driver.getLogger().eventSdkPassive('threadView.addCustomMessage');
     return members.threadViewImplementation.addCustomMessage(
-      descriptorPropertyStream
+      descriptorPropertyStream,
     );
   }
 
@@ -130,7 +134,7 @@ class ThreadView
       .driver.getLogger()
       .deprecationWarning(
         'threadView.getThreadID',
-        'threadView.getThreadIDAsync'
+        'threadView.getThreadIDAsync',
       );
     return get(memberMap, this).threadViewImplementation.getThreadID();
   }
@@ -148,7 +152,7 @@ export default ThreadView;
 
 function _bindToStreamEvents(
   threadView: ThreadView,
-  threadViewImplementation: ThreadViewDriver
+  threadViewImplementation: ThreadViewDriver,
 ) {
   threadViewImplementation.getEventStream().onEnd(function () {
     threadView.destroyed = true;

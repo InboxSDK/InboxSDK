@@ -22,29 +22,29 @@ class ListRouteView extends RouteView {
   }
 
   addCollapsibleSection(
-    collapsibleSectionDescriptor: Record<string, any> | null | undefined
+    collapsibleSectionDescriptor: Record<string, any> | null | undefined,
   ): CollapsibleSectionView {
     const members = get(membersMap, this);
     const collapsibleSectionViewDriver =
       members.routeViewDriver.addCollapsibleSection(
         kefirCast(Kefir as any, collapsibleSectionDescriptor).toProperty(),
-        members.appId
+        members.appId,
       );
     const collapsibleSectionView = new CollapsibleSectionView(
       collapsibleSectionViewDriver,
-      members.driver
+      members.driver,
     );
     members.sectionViews.push(collapsibleSectionView);
     return collapsibleSectionView;
   }
 
   addSection(
-    sectionDescriptor: Record<string, any> | null | undefined
+    sectionDescriptor: Record<string, any> | null | undefined,
   ): SectionView {
     const members = get(membersMap, this);
     const sectionViewDriver = members.routeViewDriver.addSection(
       kefirCast(Kefir as any, sectionDescriptor).toProperty(),
-      members.appId
+      members.appId,
     );
     const sectionView = new SectionView(sectionViewDriver, members.driver);
     members.sectionViews.push(sectionView);
@@ -60,7 +60,7 @@ const membersMap = new WeakMap();
 
 function _bindToEventStream(
   routeViewDriver: RouteViewDriver,
-  routeView: ListRouteView
+  routeView: ListRouteView,
 ) {
   routeViewDriver.getEventStream().onEnd(() => {
     const members = get(membersMap, routeView);

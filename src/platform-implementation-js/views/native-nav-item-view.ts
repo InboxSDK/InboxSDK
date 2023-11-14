@@ -5,6 +5,8 @@ import get from '../../common/get-or-fail';
 import NavItemView from './nav-item-view';
 import type { Driver } from '../driver-interfaces/driver';
 import type GmailNavItemView from '../dom-driver/gmail/views/gmail-nav-item-view';
+import type { NavItemDescriptor } from '../dom-driver/gmail/views/gmail-nav-item-view';
+
 interface Members {
   appId: string;
   driver: Driver;
@@ -14,12 +16,13 @@ interface Members {
   navItemViewDriverPromise: Promise<GmailNavItemView>;
 }
 const memberMap = new WeakMap<NativeNavItemView, Members>();
+
 export default class NativeNavItemView extends EventEmitter {
   constructor(
     appId: string,
     driver: Driver,
     labelName: string,
-    navItemViewDriverPromise: Promise<GmailNavItemView>
+    navItemViewDriverPromise: Promise<GmailNavItemView>,
   ) {
     super();
     const members = {
@@ -44,11 +47,11 @@ export default class NativeNavItemView extends EventEmitter {
     });
   }
 
-  addNavItem(navItemDescriptor: Record<string, any>): NavItemView {
+  addNavItem(navItemDescriptor: NavItemDescriptor): NavItemView {
     const members = get(memberMap, this);
     const navItemDescriptorPropertyStream = kefirCast(
-      Kefir as any,
-      navItemDescriptor
+      Kefir,
+      navItemDescriptor,
     ).toProperty();
     const childNavItemView = new NavItemView(
       members.appId,
@@ -57,10 +60,10 @@ export default class NativeNavItemView extends EventEmitter {
       members.navItemViewDriverPromise.then((navItemViewDriver) => {
         const childNavItemViewDriver = navItemViewDriver.addNavItem(
           members.appId,
-          navItemDescriptorPropertyStream
+          navItemDescriptorPropertyStream,
         );
         return childNavItemViewDriver;
-      })
+      }),
     );
     members.navItemViews.push(childNavItemView);
     return childNavItemView;
@@ -69,7 +72,7 @@ export default class NativeNavItemView extends EventEmitter {
   isCollapsed(): boolean {
     return (
       localStorage.getItem(
-        'inboxsdk__nativeNavItem__state_' + get(memberMap, this).labelName
+        'inboxsdk__nativeNavItem__state_' + get(memberMap, this).labelName,
       ) === 'collapsed'
     );
   }
@@ -82,7 +85,7 @@ export default class NativeNavItemView extends EventEmitter {
     } else {
       localStorage.setItem(
         'inboxsdk__nativeNavItem__state_' + members.labelName,
-        collapseValue ? 'collapsed' : 'expanded'
+        collapseValue ? 'collapsed' : 'expanded',
       );
     }
   }
@@ -90,7 +93,7 @@ export default class NativeNavItemView extends EventEmitter {
 
 function _handleStreamEvent(
   emitter: NativeNavItemView,
-  event: { eventName: string }
+  event: { eventName: string },
 ) {
   switch (event.eventName) {
     case 'expanded':

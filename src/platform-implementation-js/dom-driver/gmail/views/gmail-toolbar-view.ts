@@ -42,7 +42,7 @@ class GmailToolbarView {
     element: HTMLElement,
     driver: GmailDriver,
     routeViewDriver: RouteViewDriver,
-    parent: GmailThreadView | GmailRowListView
+    parent: GmailThreadView | GmailRowListView,
   ) {
     // Important: Multiple GmailToolbarViews will be created for the same
     // toolbar element in preview pane mode! When a GmailToolbarView is
@@ -127,7 +127,7 @@ class GmailToolbarView {
 
   addButton(
     buttonDescriptor: Record<string, any>,
-    id?: string
+    id?: string,
   ): {
     getStopper(): Kefir.Observable<null, unknown>;
     destroy(): void;
@@ -152,7 +152,7 @@ class GmailToolbarView {
 
         buttonStopper.onValue(() => {
           this._moreMenuItems = this._moreMenuItems.filter(
-            (_entry) => _entry !== entry
+            (_entry) => _entry !== entry,
           );
 
           this._addMoreItems();
@@ -160,7 +160,7 @@ class GmailToolbarView {
       } else {
         const sectionElement = this._getSectionElement(
           buttonDescriptor.section,
-          toolbarSections
+          toolbarSections,
         );
 
         if (sectionElement) {
@@ -188,23 +188,23 @@ class GmailToolbarView {
                 title: buttonDescriptor.title,
                 hasThreadViewDriver: this.isForThread(),
                 hasRowListViewDriver: this.isForRowList(),
-              })
+              }),
             );
           buttonViewController
             .getView()
             .getElement()
             .setAttribute(
               'data-order-hint',
-              String(buttonDescriptor.orderHint || 0)
+              String(buttonDescriptor.orderHint || 0),
             );
           insertElementInOrder(
             sectionElement,
-            buttonViewController.getView().getElement()
+            buttonViewController.getView().getElement(),
           );
           Kefir.merge([Kefir.constant(-1), Kefir.later(1000, 1000)])
             .map((delay) => {
               const duplicates: Record<string, any>[] = Array.from(
-                sectionElement.children
+                sectionElement.children,
               )
                 .filter(
                   (el) =>
@@ -217,7 +217,7 @@ class GmailToolbarView {
                       .getView()
                       .getElement()
                       .getAttribute('data-toolbar-expanded') ===
-                      el.getAttribute('data-toolbar-expanded')
+                      el.getAttribute('data-toolbar-expanded'),
                 )
                 .filter((el) => el.hasAttribute('data-add-button-debug'))
                 .map((el) =>
@@ -227,9 +227,9 @@ class GmailToolbarView {
                         .__addButton_ownedByExtension,
                     },
                     JSON.parse(
-                      el.getAttribute('data-add-button-debug') || 'null'
-                    )
-                  )
+                      el.getAttribute('data-add-button-debug') || 'null',
+                    ),
+                  ),
                 )
                 .filter(({ title }) => title === buttonDescriptor.title);
               return {
@@ -245,10 +245,10 @@ class GmailToolbarView {
                 delay,
                 duplicates,
                 dataThreadToolbar: this._element.getAttribute(
-                  'data-thread-toolbar'
+                  'data-thread-toolbar',
                 ),
                 dataRowlistToolbar: this._element.getAttribute(
-                  'data-rowlist-toolbar'
+                  'data-rowlist-toolbar',
                 ),
               });
             });
@@ -275,7 +275,7 @@ class GmailToolbarView {
   }
 
   _createButtonViewController(
-    buttonDescriptor: Record<string, any>
+    buttonDescriptor: Record<string, any>,
   ): DropdownButtonViewController | BasicButtonViewController {
     const buttonView = this._getButtonView(buttonDescriptor);
 
@@ -294,7 +294,7 @@ class GmailToolbarView {
       });
     } else {
       buttonViewController = new BasicButtonViewController(
-        buttonDescriptor as any
+        buttonDescriptor as any,
       );
     }
 
@@ -357,17 +357,17 @@ class GmailToolbarView {
     if (!moveSectionElement) throw new Error('No move section element');
     const isIconMode = Array.from(
       moveSectionElement.querySelectorAll(
-        '[role=button]:not(.inboxsdk__button)'
-      )
+        '[role=button]:not(.inboxsdk__button)',
+      ),
     ).some(
       (buttonElement) =>
         buttonElement.hasAttribute('title') ||
-        buttonElement.hasAttribute('data-tooltip')
+        buttonElement.hasAttribute('data-tooltip'),
     );
 
     this._element.setAttribute(
       'data-toolbar-icononly',
-      isIconMode ? 'true' : 'false'
+      isIconMode ? 'true' : 'false',
     );
   }
 
@@ -398,7 +398,7 @@ class GmailToolbarView {
 
   _getSectionElement(
     sectionName: string,
-    toolbarSections: Record<string, any>
+    toolbarSections: Record<string, any>,
   ): HTMLElement | null | undefined {
     switch (sectionName) {
       case toolbarSections.INBOX_STATE:
@@ -414,7 +414,7 @@ class GmailToolbarView {
 
   _getArchiveSectionElement(): HTMLElement | null | undefined {
     return this._getSectionElementForButtonSelector(
-      '.ar9, .aFh, .aFj, .lR, .nN, .nX, .aFk'
+      '.ar9, .aFh, .aFj, .lR, .nN, .nX, .aFk',
     );
   }
 
@@ -427,7 +427,7 @@ class GmailToolbarView {
   }
 
   _getSectionElementForButtonSelector(
-    buttonSelector: string
+    buttonSelector: string,
   ): HTMLElement | null | undefined {
     const sectionElements =
       this._element.querySelectorAll<HTMLElement>('.G-Ni');
@@ -459,7 +459,7 @@ class GmailToolbarView {
           if (current.previousElementSibling) {
             if (
               current.previousElementSibling.classList.contains(
-                'inboxsdk__button'
+                'inboxsdk__button',
               )
             ) {
               if (isElementVisible(current.previousElementSibling)) {
@@ -566,7 +566,7 @@ class GmailToolbarView {
     itemElement.setAttribute('role', 'menuitem');
     itemElement.setAttribute(
       'data-order-hint',
-      String(buttonDescriptor.orderHint || 0)
+      String(buttonDescriptor.orderHint || 0),
     );
     itemElement.innerHTML = [
       '<div class="J-N-Jz" style="-webkit-user-select: none;">',
@@ -584,10 +584,10 @@ class GmailToolbarView {
       '</div>',
     ].join('');
     itemElement.addEventListener('mouseenter', () =>
-      itemElement.classList.add('J-N-JT')
+      itemElement.classList.add('J-N-JT'),
     );
     itemElement.addEventListener('mouseleave', () =>
-      itemElement.classList.remove('J-N-JT')
+      itemElement.classList.remove('J-N-JT'),
     );
     itemElement.addEventListener('click', () => {
       if (buttonDescriptor.onClick) {

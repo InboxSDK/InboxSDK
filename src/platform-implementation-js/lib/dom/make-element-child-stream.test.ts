@@ -24,7 +24,7 @@ it('should work', (done) => {
       child1,
       child2,
       child3,
-    }).map(([name, el]) => [el, name])
+    }).map(([name, el]) => [el, name]),
   );
 
   const target = new MockElementParent([child1, child2]);
@@ -64,7 +64,7 @@ it('triggers removals when no longer listened on', (done) => {
     _.toPairs({
       child1,
       child2,
-    }).map(([name, el]) => [el, name])
+    }).map(([name, el]) => [el, name]),
   );
 
   const stopper = kefirBus();
@@ -73,7 +73,7 @@ it('triggers removals when no longer listened on', (done) => {
 
   const calls: any[][] = [];
   const stream = kefirMakeElementChildStream(target as any).takeUntilBy(
-    stopper
+    stopper,
   );
   stream.onValue((event) => {
     const name = childrenToNames.get(event.el);
@@ -174,9 +174,9 @@ it(
               }
             },
             delay,
-            ...args
+            ...args,
           );
-        }
+        },
       );
     }
 
@@ -188,7 +188,7 @@ it(
         child1,
         child2,
         child3,
-      }).map(([name, el]) => [el, name])
+      }).map(([name, el]) => [el, name]),
     );
 
     const target = new MockElementParent([child1, child2, child3]);
@@ -228,5 +228,5 @@ it(
       ['remove', 'child1'],
       ['remove', 'child3'],
     ]);
-  })
+  }),
 );

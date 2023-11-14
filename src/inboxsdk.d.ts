@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import type * as Kefir from 'kefir';
 import type TypedEmitter from 'typed-emitter';
 import AppMenu from './platform-implementation-js/namespaces/app-menu';
+import type Global from './platform-implementation-js/namespaces/global';
 import type {
   NavItemTypes,
   NavItemDescriptor,
@@ -18,25 +19,25 @@ import { MessageViewEvent } from './platform-implementation-js/views/conversatio
 import type { ThreadViewEvents } from './platform-implementation-js/views/conversations/thread-view';
 import type { ComposeViewEvent } from './platform-implementation-js/views/compose-view';
 import type AttachmentCardView from './platform-implementation-js/views/conversations/attachment-card-view';
+import type TopMessageBarView from './platform-implementation-js/widgets/top-message-bar-view';
+import type { IMoleView as MoleView } from './platform-implementation-js/widgets/mole-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
+import type User from './platform-implementation-js/namespaces/user';
+import { ContentPanelDescriptor } from './platform-implementation-js/driver-common/sidebar/ContentPanelViewDriver';
+import type ContentPanelView from './platform-implementation-js/views/content-panel-view';
+import type { MoleOptions } from './platform-implementation-js/dom-driver/gmail/widgets/gmail-mole-view-driver';
+import type { ComposeButtonDescriptor } from './platform-implementation-js/driver-interfaces/compose-view-driver';
+import type ComposeView from './platform-implementation-js/views/compose-view';
+import type Search from './platform-implementation-js/namespaces/search';
+
+export type { User };
 
 export const LOADER_VERSION: string;
-export interface LoadScriptOptions {
-  // By default, the script is executed within a function, so that top-level
-  // variables defined in it don't become global variables. Setting nowrap to
-  // true disables this behavior.
-  nowrap?: boolean;
-  disableSourceMappingURL?: boolean;
-  XMLHttpRequest?: typeof XMLHttpRequest;
-}
-export function loadScript(
-  url: string,
-  opts?: LoadScriptOptions
-): Promise<void>;
+
 export function load(
   version: number,
   appId: string,
-  opts: any
+  opts: any,
 ): Promise<InboxSDK>;
 
 // types
@@ -58,14 +59,8 @@ export interface InboxSDK {
   Global: Global;
 }
 
-export interface Global {
-  addSidebarContentPanel(
-    contentPanelDescriptor: ContentPanelDescriptor
-  ): Promise<ContentPanelView | null>;
-  addSupportItem(
-    supportItemDescriptor: SupportItemDescriptor
-  ): GmailSupportItemView;
-}
+export { type ContentPanelDescriptor };
+export { type Global };
 
 export interface GmailSupportItemView {
   destroy(): void;
@@ -77,10 +72,10 @@ export interface SupportItemDescriptor {
 }
 export interface Conversations {
   registerThreadViewHandler(
-    callback: (threadView: ThreadView) => void
+    callback: (threadView: ThreadView) => void,
   ): () => void;
   registerMessageViewHandler(
-    callback: (messageView: MessageView) => void
+    callback: (messageView: MessageView) => void,
   ): () => void;
 }
 
@@ -125,7 +120,7 @@ export interface NavMenu {
   SENT_MAIL: NativeNavItemView;
   NavItemTypes: NavItemTypes;
   addNavItem(
-    descriptor: NavItemDescriptor | Kefir.Observable<NavItemDescriptor, any>
+    descriptor: NavItemDescriptor | Kefir.Observable<NavItemDescriptor, any>,
   ): NavItemView;
 }
 
@@ -136,15 +131,15 @@ export interface Router {
   handleAllRoutes(handler: (routeView: RouteView) => void): () => void;
   handleCustomRoute(
     routeID: string,
-    handler: (customRouteView: CustomRouteView) => void
+    handler: (customRouteView: CustomRouteView) => void,
   ): () => void;
   handleCustomListRoute(
     routeID: string,
-    handler: (offset: number, max: number) => void
+    handler: (offset: number, max: number) => void,
   ): void;
   handleListRoute(
     routeID: string,
-    handler: (listRouteView: ListRouteView) => void
+    handler: (listRouteView: ListRouteView) => void,
   ): () => void;
   NativeRouteIDs: Record<NativeRouteIdTypes, string>;
   NativeListRouteIDs: Record<
@@ -199,20 +194,20 @@ export interface Widgets {
   /** check whether mole view has light title bar as part of gmail new view / original view  */
   isMoleViewTitleBarLightColor(): boolean;
   showModalView(descriptor: ModalDescriptor): ModalView;
-  showMoleView(descriptor: MoleDescriptor): MoleView;
+  showMoleView(descriptor: MoleOptions): MoleView;
   showDrawerView(descriptor: DrawerDescriptor): DrawerView;
-  showTopMessageBarView(opts: { el: Element }): Element;
+  showTopMessageBarView(opts: { el: Element }): TopMessageBarView;
 }
 
 export interface Toolbars {
   addToolbarButtonForApp(
     descriptor:
       | AppToolbarButtonDescriptor
-      | Kefir.Stream<AppToolbarButtonDescriptor, any>
+      | Kefir.Stream<AppToolbarButtonDescriptor, any>,
   ): AppToolbarButtonView;
   registerThreadButton(descriptor: ToolbarButtonDescriptor): () => void;
   registerToolbarButtonForThreadView(
-    descriptor: LegacyToolbarButtonDescriptor
+    descriptor: LegacyToolbarButtonDescriptor,
   ): () => void;
   SectionNames: {
     INBOX_STATE: 'INBOX_STATE';
@@ -238,35 +233,16 @@ export type AppToolbarButtonView = {
 
 export interface Keyboard {
   createShortcutHandle(
-    descriptor: KeyboardShortcutDescriptor
+    descriptor: KeyboardShortcutDescriptor,
   ): KeyboardShortcutHandle;
-}
-
-export interface Search {
-  registerSearchSuggestionsProvider(
-    handler: (
-      query: string
-    ) =>
-      | Array<AutocompleteSearchResult>
-      | Promise<Array<AutocompleteSearchResult>>
-  ): void;
-  registerSearchQueryRewriter(rewriter: SearchQueryRewriter): void;
 }
 
 export interface Lists {
   registerThreadRowViewHandler(
-    handler: (threadRowView: ThreadRowView) => void
+    handler: (threadRowView: ThreadRowView) => void,
   ): () => void;
   getSelectedThreadRowViews(): ThreadRowView[];
   registerThreadRowViewSelectionHandler(handler: () => void): () => void;
-}
-
-export interface User {
-  /** @deprecated */
-  getAccountSwitcherContactList(): Contact[];
-  getEmailAddress(): string;
-  getLanguage(): string;
-  isConversationViewDisabled(): Promise<boolean>;
 }
 
 export {
@@ -316,7 +292,7 @@ export class RouteView extends EventEmitter {
   constructor(
     options: any,
     gmailRouteProcessor: GmailRouteProcessor,
-    driver: GmailDriver
+    driver: GmailDriver,
   );
   destroy(): void;
   getEventStream(): Kefir.Observable<any, any>;
@@ -375,7 +351,7 @@ export interface DrawerView extends EventEmitter {
   close(): void;
   associateComposeView(
     composeView: ComposeView,
-    closeWithCompose?: boolean
+    closeWithCompose?: boolean,
   ): void;
   disassociateComposeView(): void;
 }
@@ -389,16 +365,8 @@ export interface DrawerDescriptor {
   matchSidebarContentPanelWidth?: boolean;
 }
 
-export interface MoleDescriptor {
-  el: HTMLElement;
-  title?: string;
-  titleEl?: HTMLElement;
-  minimizedTitleEl?: HTMLElement;
-  className?: string;
-  titleButtons?: Array<ButtonDescriptor>;
-  chrome?: boolean;
-}
-
+/** @deprecated use MoleOptions interface directly instead */
+export { type MoleOptions as MoleDescriptor };
 export interface ButtonDescriptor {
   title?: string;
   iconUrl?: string;
@@ -413,12 +381,7 @@ export interface ButtonDescriptor {
   type?: string;
 }
 
-export interface MoleView extends EventEmitter {
-  close(): void;
-  getMinimized(): boolean;
-  setMinimized(value: boolean): void;
-  setTitle(title: string): void;
-}
+export { MoleView };
 
 export interface SimpleElementView extends EventEmitter {
   el: HTMLElement;
@@ -429,9 +392,17 @@ export interface SimpleElementView extends EventEmitter {
 export interface ThreadView extends TypedEventEmitter<ThreadViewEvents> {
   addLabel(): SimpleElementView;
   addSidebarContentPanel(
-    contentPanelDescriptor: ContentPanelDescriptor
+    contentPanelDescriptor:
+      | ContentPanelDescriptor
+      | Kefir.Observable<ContentPanelDescriptor, unknown>,
   ): ContentPanelView;
+  /**
+   * @returns {MessageView[]} of all the loaded MessageView objects currently in the thread. @see MessageView for more information on what "loaded" means. Note that more messages may load into the thread later! If it's important to get future messages, use {@link Conversations#registerMessageViewHandler} instead.
+   */
   getMessageViews(): Array<MessageView>;
+  /**
+   * @returns {MessageView[]} of all the MessageView objects in the thread regardless of their load state. @see MessageView for more information on what "loaded" means.
+   */
   getMessageViewsAll(): Array<MessageView>;
   getSubject(): string;
   /**
@@ -461,8 +432,8 @@ export interface UNSTABLE_ThreadView extends ThreadView {
     provider: (
       numCustomHidden: number,
       numberNativeHidden: number,
-      unmountPromise: Promise<void>
-    ) => HTMLElement | null
+      unmountPromise: Promise<void>,
+    ) => HTMLElement | null,
   ) => void;
   //#endregion
 }
@@ -475,22 +446,7 @@ export interface CustomMessageView extends EventEmitter {
   getSortDate(): Date | null;
 }
 
-export interface ContentPanelView extends EventEmitter {
-  close(): void;
-  isActive(): boolean;
-  open(): void;
-  remove(): void;
-}
-
-export interface ContentPanelDescriptor {
-  appName?: string;
-  el: HTMLElement;
-  id: string;
-  title: string;
-  iconUrl?: string;
-  iconClass?: string;
-  orderHint?: number;
-}
+export { ContentPanelView };
 
 export interface MessageAttachmentIconDescriptor {
   iconUrl?: string;
@@ -516,17 +472,38 @@ export interface MessageViewToolbarButtonDescriptor {
   orderHint?: number;
 }
 
+export type { MessageViewViewStates } from './platform-implementation-js/namespaces/conversations';
+
+/**
+ * Represents a visible message in the UI. There are properties to access data about the message itself as well as change the state of the UI. MessageViews have a view state as well as a loaded state. These 2 properties are orthogonal to each other.
+
+ * A messages' view state can be one of {@link MessageViewViewStates.EXPANDED}, {@link MessageViewViewStates.COLLAPSED} or {@link MessageViewViewStates.HIDDEN}. Gmail visually display messages in a thread in different ways depending on what they are trying to show a user. These values are described in the enum MessageViewViewStates. The load state of a message determines whether all of the data pertaining to a message has been loaded in the UI. In some case, not all the information (such as recipients or the body) may be loaded, typically when the the view state is COLLAPSED or HIDDEN.
+
+ * @note You should not depend on any relationship between the view state
+ * and load state. Instead, use the provided {MessageView#getViewState} and {MessageView#isLoaded} methods.
+ */
 export interface MessageView extends TypedEventEmitter<MessageViewEvent> {
   addAttachmentIcon(
     opts:
       | MessageAttachmentIconDescriptor
-      | Kefir.Stream<MessageAttachmentIconDescriptor, never>
+      | Kefir.Stream<MessageAttachmentIconDescriptor, never>,
   ): AttachmentIcon;
   addToolbarButton(opts?: MessageViewToolbarButtonDescriptor): void;
   getBodyElement(): HTMLElement;
   isElementInQuotedArea(element: HTMLElement): boolean;
+  /**
+   * Returns whether this message has been loaded yet. If the message has not been loaded, some of the data related methods on this object may return empty results. The message may be loaded once the user clicks on the message stub.
+   */
   isLoaded(): boolean;
   getFileAttachmentCardViews(): AttachmentCardView[];
+  /**
+   * Get the contact of the sender of this message.
+
+    * @returns {Contact} The contact of the sender of this message.
+    * @throws {Error} If the message has not been loaded yet.
+    *
+    * @note If you're using this method on an array of {MessageView}s returned by {@link ThreadRowView#getMessageViewsAll}, make sure to check {@link MessageView#isLoaded} before calling this method.
+   */
   getSender(): Contact;
   getRecipients(): Array<Contact>;
   getRecipientsFull(): Promise<Array<Contact>>;
@@ -603,63 +580,7 @@ export {
   LinkPopOverSection,
 } from './platform-implementation-js/views/compose-view';
 
-export interface ComposeView extends TypedEmitter<ComposeViewEvent> {
-  destroyed: boolean;
-  addButton(
-    buttonOptions:
-      | ComposeButtonDescriptor
-      | Kefir.Observable<ComposeButtonDescriptor, any>
-  ): void;
-  addComposeNotice(): ComposeNoticeView;
-  addRecipientRow(
-    RecipientRowOptions:
-      | RecipientRowOptions
-      | Kefir.Observable<RecipientRowOptions, any>
-  ): { destroy(): void };
-  addStatusBar(statusBarDescriptor: StatusBarDescriptor): StatusBarView;
-  close(): void;
-  ensureAppButtonToolbarsAreClosed(): void;
-  ensureFormattingToolbarIsHidden(): void;
-  forceRecipientRowsOpen(): () => void;
-  getBccRecipients(): Array<Contact>;
-  getBodyElement(): HTMLElement;
-  getCcRecipients(): Array<Contact>;
-  getCurrentDraftID(): Promise<string | null | undefined>;
-  getElement(): HTMLElement;
-  getDraftID(): Promise<string | null | undefined>;
-  getSubject(): string;
-  getSubjectInput(): HTMLInputElement | null;
-  getThreadID(): string;
-  getToRecipients(): Array<Contact>;
-  getHTMLContent(): string;
-  getTextContent(): string;
-  hideDiscardButton(): () => void;
-  hideNativeRecipientRows(): () => void;
-  isMinimized(): boolean;
-  setMinimized(minimized: boolean): void;
-  isFullscreen(): boolean;
-  insertHTMLIntoBodyAtCursor(html: string): HTMLElement | null | undefined;
-  isForward(): boolean;
-  isInlineReplyForm(): boolean;
-  isReply(): boolean;
-  overrideEditSubject(): void;
-  registerRequestModifier(
-    cb: (composeParams: { isPlainText?: boolean; body: string }) => void
-  ): void;
-  replaceSendButton({ el }: { el: HTMLElement }): () => void;
-  setBccRecipients(emails: string[]): void;
-  setBodyHTML(html: string): void;
-  setBodyText(to: string): void;
-  setCcRecipients(emails: string[]): void;
-  setFullscreen(isFullscreen: boolean): void;
-  setSubject(subject: string): void;
-  setTitleBarColor(color: string): () => void;
-  setTitleBarText(to: string): () => void;
-  setToRecipients(recipients: string[]): void;
-  send(options?: SendOptions): void;
-  getFromContact(): Contact;
-  getFromContactChoices(): Contact[];
-}
+export { ComposeView };
 
 export interface SendOptions {
   sendAndArchive?: boolean;
@@ -669,18 +590,7 @@ export type ComposeViewDestroyEvent = Parameters<
   ComposeViewEvent['destroy']
 >[0];
 
-export interface ComposeButtonDescriptor {
-  title: string;
-  iconUrl?: string;
-  iconClass?: string;
-  onClick(event: ComposeViewButtonOnClickEvent): void;
-  hasDropdown?: boolean;
-  type?: 'SEND_ACTION' | 'MODIFIER';
-  orderHint?: number;
-  enabled?: boolean;
-  noOverflow?: boolean;
-  tooltip?: string | null;
-}
+export { ComposeButtonDescriptor };
 
 export interface ComposeViewButtonOnClickEvent {
   composeView: ComposeView;
@@ -692,21 +602,6 @@ export interface RecipientRowOptions {
   labelClass?: string;
   labelText?: string;
   labelTextClass?: string;
-}
-
-export interface AutocompleteSearchResult {
-  name?: null | string;
-  nameHTML?: null | string;
-  description?: null | string;
-  descriptionHTML?: null | string;
-  routeName?: null | string;
-  routeParams?: null | { [ix: string]: string | number };
-  externalURL?: null | string;
-  searchTerm?: null | string;
-  iconUrl?: null | string;
-  iconClass?: null | string;
-  iconHTML?: null | string;
-  onClick?: null | (() => void);
 }
 
 export interface StatusBarDescriptor {
@@ -765,7 +660,9 @@ export interface SavingMessageDescriptor {
   time?: number;
 }
 
-export interface SearchQueryRewriter {
-  term: string;
-  termReplacer(): string | Promise<string>;
-}
+export type {
+  AutocompleteSearchResult,
+  default as Search,
+  SearchQueryRewriter,
+  SearchSuggestionsProvider,
+} from './platform-implementation-js/namespaces/search';

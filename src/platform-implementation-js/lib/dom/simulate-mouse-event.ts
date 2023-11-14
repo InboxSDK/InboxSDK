@@ -1,6 +1,6 @@
 export default function simulateMouseEvent(
   element: HTMLElement,
-  mouseEventName: string
+  mouseEventName: string,
 ) {
   const event = document.createEvent('MouseEvents');
   event.initMouseEvent(
@@ -18,7 +18,7 @@ export default function simulateMouseEvent(
     false,
     false,
     0,
-    null
+    null,
   );
   element.dispatchEvent(event);
 }

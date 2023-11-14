@@ -90,6 +90,6 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function (inboxSDK) {
           tableRows: [],
         });
       }, 5000);
-    }
+    },
   );
 });

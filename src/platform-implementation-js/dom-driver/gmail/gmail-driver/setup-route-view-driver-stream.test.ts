@@ -1,6 +1,6 @@
 jest.mock('../views/gmail-route-view/gmail-route-view', () =>
   // eslint-disable-next-line @typescript-eslint/no-empty-function
-  jest.fn(() => ({ destroy() {} }))
+  jest.fn(() => ({ destroy() {} })),
 );
 
 import _ from 'lodash';

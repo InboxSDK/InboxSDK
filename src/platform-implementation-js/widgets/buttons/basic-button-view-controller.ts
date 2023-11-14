@@ -50,7 +50,7 @@ export default class BasicButtonViewController {
   update(options: Options) {
     this.getView().update(options);
     this.setActivateFunction(
-      options && (options.activateFunction || options.onClick)
+      options && (options.activateFunction || options.onClick),
     );
   }
 

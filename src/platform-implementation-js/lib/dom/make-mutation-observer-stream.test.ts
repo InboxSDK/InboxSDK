@@ -34,7 +34,7 @@ it('works with MockElementParent', (done) => {
         default:
           throw new Error('should not happen');
       }
-    }
+    },
   );
 
   target.removeChild(child1);
@@ -73,7 +73,7 @@ it("doesn't emit events while current events are processed", (done) => {
           throw new Error('should not happen');
       }
       criticalSection = false;
-    }
+    },
   );
 
   target.removeChild(child1);

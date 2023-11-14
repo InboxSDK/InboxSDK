@@ -7,7 +7,7 @@ export interface IconSettings {
 function createIconElement(
   containerElement: HTMLElement,
   append: boolean,
-  insertBeforeEl: HTMLElement | null | undefined
+  insertBeforeEl: HTMLElement | null | undefined,
 ) {
   const iconElement = document.createElement('div');
   iconElement.classList.add('inboxsdk__button_icon');
@@ -18,7 +18,7 @@ function createIconElement(
   } else {
     containerElement.insertBefore(
       iconElement,
-      insertBeforeEl || (containerElement as any).firstElementChild
+      insertBeforeEl || (containerElement as any).firstElementChild,
     );
   }
 
@@ -29,12 +29,12 @@ function createIconImgElement(
   iconUrl: string,
   containerElement: HTMLElement,
   append: boolean,
-  insertBeforeEl: HTMLElement | null | undefined
+  insertBeforeEl: HTMLElement | null | undefined,
 ) {
   const iconElement = createIconElement(
     containerElement,
     append,
-    insertBeforeEl
+    insertBeforeEl,
   );
   iconElement.innerHTML = '';
   const iconImgElement = document.createElement('img');
@@ -54,7 +54,7 @@ export default function updateIcon(
   newIconClass: string | null | undefined,
   newIconUrl: string | null | undefined,
   insertBeforeEl?: HTMLElement | null | undefined, // Should not be used with append: true — the append flag will override
-  newIconHtml?: string
+  newIconHtml?: string,
 ) {
   if (append && insertBeforeEl)
     throw new Error('append and insertBeforeEl should not be used together');
@@ -62,7 +62,7 @@ export default function updateIcon(
   // if iconHtml exists, class or url presents just throw error
   if (newIconHtml && (newIconClass || newIconUrl)) {
     throw new Error(
-      'iconHtml can not be used together with iconClass or iconUrl'
+      'iconHtml can not be used together with iconClass or iconUrl',
     );
   }
 
@@ -71,7 +71,7 @@ export default function updateIcon(
       iconSettings.iconHtmlElement = createIconElement(
         containerElement,
         append,
-        insertBeforeEl
+        insertBeforeEl,
       );
     }
 
@@ -92,7 +92,7 @@ export default function updateIcon(
         newIconUrl,
         containerElement,
         append,
-        insertBeforeEl
+        insertBeforeEl,
       );
     } else {
       (
@@ -102,7 +102,7 @@ export default function updateIcon(
 
     iconSettings.iconImgElement.setAttribute(
       'class',
-      `inboxsdk__button_icon ${newIconClass || ''}`
+      `inboxsdk__button_icon ${newIconClass || ''}`,
     );
 
     if (iconSettings.iconHtmlElement) {
@@ -119,13 +119,13 @@ export default function updateIcon(
       iconSettings.iconElement = createIconElement(
         containerElement,
         append,
-        insertBeforeEl
+        insertBeforeEl,
       );
     }
 
     iconSettings.iconElement.setAttribute(
       'class',
-      'inboxsdk__button_icon ' + newIconClass
+      'inboxsdk__button_icon ' + newIconClass,
     );
 
     if (iconSettings.iconHtmlElement) {

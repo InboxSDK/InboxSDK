@@ -11,7 +11,7 @@ const gotoView = ud.defn(
   async function gotoView(
     gmailDriver: GmailDriver,
     viewName: string,
-    params: (RouteParams | string) | null | undefined
+    params: (RouteParams | string) | null | undefined,
   ): Promise<void> {
     if (viewName[0] === '#') {
       if (params) {
@@ -21,21 +21,19 @@ const gotoView = ud.defn(
     }
 
     if (includes(NATIVE_ROUTE_IDS, viewName)) {
-      if (gmailDriver.isUsingSyncAPI()) {
-        // need to go to the new url
-        if (params && typeof params !== 'string') {
-          const threadID = params.threadID;
-          if (threadID && typeof threadID === 'string') {
-            const int = parseInt(threadID, 16);
-            if (!isNaN(int)) {
-              //we got an old id
-              const syncThreadId =
-                await gmailDriver.getSyncThreadIdForOldGmailThreadId(threadID);
-              params = {
-                ...params,
-                threadID: '#' + syncThreadId,
-              };
-            }
+      // need to go to the new url
+      if (params && typeof params !== 'string') {
+        const threadID = params.threadID;
+        if (threadID && typeof threadID === 'string') {
+          const int = parseInt(threadID, 16);
+          if (!isNaN(int)) {
+            //we got an old id
+            const syncThreadId =
+              await gmailDriver.getSyncThreadIdForOldGmailThreadId(threadID);
+            params = {
+              ...params,
+              threadID: '#' + syncThreadId,
+            };
           }
         }
       }
@@ -63,7 +61,7 @@ const gotoView = ud.defn(
       // worry about the above issue.
       window.location.hash = newHash;
     }
-  }
+  },
 );
 
 export default gotoView;

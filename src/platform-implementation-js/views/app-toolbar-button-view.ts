@@ -14,7 +14,7 @@ export default class AppToolbarButtonView
 
   constructor(
     driver: Driver,
-    appToolbarButtonViewDriverPromise: Promise<AppToolbarButtonViewDriver>
+    appToolbarButtonViewDriverPromise: Promise<AppToolbarButtonViewDriver>,
   ) {
     super();
     const members = {
@@ -33,7 +33,7 @@ export default class AppToolbarButtonView
           this.destroyed = true;
           this.emit('destroy');
         });
-      }
+      },
     );
     driver.getStopper().onValue(() => {
       this.remove();
@@ -43,7 +43,7 @@ export default class AppToolbarButtonView
   open() {
     const members = get(memberMap, this);
     members.appToolbarButtonViewDriverPromise.then(function (
-      appToolbarButtonViewDriver: AppToolbarButtonViewDriver
+      appToolbarButtonViewDriver: AppToolbarButtonViewDriver,
     ) {
       appToolbarButtonViewDriver.open();
     });
@@ -52,7 +52,7 @@ export default class AppToolbarButtonView
   close() {
     const members = get(memberMap, this);
     members.appToolbarButtonViewDriverPromise.then(function (
-      appToolbarButtonViewDriver: AppToolbarButtonViewDriver
+      appToolbarButtonViewDriver: AppToolbarButtonViewDriver,
     ) {
       appToolbarButtonViewDriver.close();
     });
@@ -61,7 +61,7 @@ export default class AppToolbarButtonView
   remove() {
     const members = get(memberMap, this);
     members.appToolbarButtonViewDriverPromise.then(function (
-      appToolbarButtonViewDriver: AppToolbarButtonViewDriver
+      appToolbarButtonViewDriver: AppToolbarButtonViewDriver,
     ) {
       appToolbarButtonViewDriver.destroy();
     });

@@ -10,7 +10,7 @@ export function setup() {
     'inboxSDKtellMeThisMessageDate',
     function (event: Record<string, any>) {
       exposeMetadata(event, 'data-inboxsdk-sortdate', (m: any) => m.date);
-    }
+    },
   );
   document.addEventListener(
     'inboxSDKtellMeThisMessageRecipients',
@@ -19,7 +19,7 @@ export function setup() {
         if (m.recipients) return m.recipients;
         else return null;
       });
-    }
+    },
   );
 }
 
@@ -33,8 +33,8 @@ function exposeMetadata(event: any, attribute: string, processor: any) {
       .filter(
         (el) =>
           !(el as HTMLElement).classList.contains(
-            'inboxsdk__custom_message_view'
-          )
+            'inboxsdk__custom_message_view',
+          ),
       )
       .indexOf(target);
 
@@ -55,7 +55,7 @@ function exposeMetadata(event: any, attribute: string, processor: any) {
 
       if (message == null) {
         throw new Error(
-          'Failed to find message date after re-requesting thread'
+          'Failed to find message date after re-requesting thread',
         );
       }
     }
@@ -69,7 +69,7 @@ function exposeMetadata(event: any, attribute: string, processor: any) {
 
 function getMessage(
   threadId: string,
-  messageIndex: number
+  messageIndex: number,
 ): Message | null | undefined {
   const messages = threadIdToMessages.get(threadId);
 
@@ -86,7 +86,7 @@ export function add(
   groupedMessages: Array<{
     threadID: string;
     messages: Message[];
-  }>
+  }>,
 ) {
   groupedMessages.forEach((group) => {
     threadIdToMessages.set(group.threadID, group.messages);
@@ -98,7 +98,7 @@ function addDataForThread(
   threadId: string,
   ikValue: string,
   btaiHeader: string | null | undefined,
-  xsrfToken: string | null | undefined
+  xsrfToken: string | null | undefined,
 ): Promise<void> {
   const existingRequestPromise = activeThreadRequestPromises.get(threadId);
 
@@ -112,14 +112,14 @@ function addDataForThread(
         // new data layer
         if (!btaiHeader || !xsrfToken) {
           throw new Error(
-            'Need btaiHeader and xsrfToken when in new data layer'
+            'Need btaiHeader and xsrfToken when in new data layer',
           );
         }
 
         const syncThread = await getThreadFromSyncThreadIdUsingHeaders(
           threadId,
           btaiHeader,
-          xsrfToken
+          xsrfToken,
         );
 
         if (syncThread) {
@@ -130,7 +130,7 @@ function addDataForThread(
                 (syncMessage) => ({
                   date: syncMessage.date,
                   recipients: syncMessage.recipients as any,
-                })
+                }),
               ),
             },
           ]);

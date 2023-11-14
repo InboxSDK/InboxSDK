@@ -7,7 +7,7 @@ import type GmailDriver from '../gmail-driver';
 
 export default function getNativeNavItem(
   driver: GmailDriver,
-  label: string
+  label: string,
 ): Promise<NativeGmailNavItemView> {
   return waitFor(() => {
     const navContainer = GmailElementGetter.getLeftNavContainerElement();
@@ -16,7 +16,7 @@ export default function getNativeNavItem(
   }, 300 * 1000)
     .then((labelLinkElement) => {
       const labelElement = findParent(labelLinkElement, (el) =>
-        el.classList.contains('aim')
+        el.classList.contains('aim'),
       );
 
       if (!labelElement) {

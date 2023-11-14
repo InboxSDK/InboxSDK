@@ -24,7 +24,6 @@ class ShowCustomThreadListTester {
   _customListResultsBus = kefirBus();
   _allowGmailThreadIdLookup = kefirBus();
   _driver: any = {
-    isUsingSyncAPI: () => true,
     getLogger: once(() => ({
       error(e: any) {
         console.error(e);
@@ -81,7 +80,7 @@ class ShowCustomThreadListTester {
 
     this._threadIdsToRfcIds = new Map(options.threadAndRfcIds);
     this._rfcIdsToThreadIds = new Map(
-      options.threadAndRfcIds.map(([threadId, rfcId]) => [rfcId, threadId])
+      options.threadAndRfcIds.map(([threadId, rfcId]) => [rfcId, threadId]),
     );
 
     this._expectedSearchQuery = options.expectedSearchQuery;
@@ -95,12 +94,12 @@ class ShowCustomThreadListTester {
       this._customRouteID,
       this._onActivate,
       this._routeParams,
-      () => null
+      () => null,
     );
 
     expect(
       this._driver.getPageCommunicator().setupCustomListResultsQuery.mock.calls
-        .length
+        .length,
     ).toBe(1);
     this._newQuery =
       this._driver.getPageCommunicator().setupCustomListResultsQuery.mock.calls[0][0];
@@ -108,12 +107,12 @@ class ShowCustomThreadListTester {
 
     expect(this._driver.getCustomListSearchStringsToRouteIds().size).toBe(1);
     expect(
-      this._driver.getCustomListSearchStringsToRouteIds().get(this._newQuery)
+      this._driver.getCustomListSearchStringsToRouteIds().get(this._newQuery),
     ).toBe('tlbeep');
 
     expect(this._driver.signalCustomThreadListActivity.mock.calls).toEqual([]);
     expect(
-      this._driver.getPageCommunicator().setCustomListNewQuery.mock.calls
+      this._driver.getPageCommunicator().setCustomListNewQuery.mock.calls,
     ).toEqual([]);
     this._ajaxInterceptStream.value({
       type: 'searchForReplacement',
@@ -125,7 +124,7 @@ class ShowCustomThreadListTester {
     ]);
     await this._customListNewQueryBus.take(1).toPromise();
     expect(
-      this._driver.getPageCommunicator().setCustomListNewQuery.mock.calls
+      this._driver.getPageCommunicator().setCustomListNewQuery.mock.calls,
     ).toEqual([
       [
         {
@@ -147,16 +146,16 @@ class ShowCustomThreadListTester {
     });
 
     expect(
-      this._driver.getPageCommunicator().setCustomListResults.mock.calls.length
+      this._driver.getPageCommunicator().setCustomListResults.mock.calls.length,
     ).toBe(0);
     (this._allowGmailThreadIdLookup as any).value();
     await this._customListResultsBus.take(1).toPromise();
     expect(
-      this._driver.getPageCommunicator().setCustomListResults.mock.calls.length
+      this._driver.getPageCommunicator().setCustomListResults.mock.calls.length,
     ).toBe(1);
 
     expect(
-      this._driver.getPageCommunicator().setCustomListResults.mock.calls[0][0]
+      this._driver.getPageCommunicator().setCustomListResults.mock.calls[0][0],
     ).toBe(this._newQuery);
 
     return this._driver.getPageCommunicator().setCustomListResults.mock
@@ -168,8 +167,8 @@ test('works', async () => {
   const getOriginalSearchResponse = once(() =>
     readFile(
       __dirname + '/../../../../../test/data/2019-02-01 search results.json',
-      'utf8'
-    )
+      'utf8',
+    ),
   );
 
   const tester = new ShowCustomThreadListTester({
@@ -208,12 +207,12 @@ test('works', async () => {
 
   expect(
     ignoreRawResponses(
-      GSRP.extractThreadsFromSearchResponse(setCustomListResults)
-    )
+      GSRP.extractThreadsFromSearchResponse(setCustomListResults),
+    ),
   ).toEqual(
     ignoreRawResponses(
-      GSRP.extractThreadsFromSearchResponse(await getOriginalSearchResponse())
-    )
+      GSRP.extractThreadsFromSearchResponse(await getOriginalSearchResponse()),
+    ),
   );
 });
 
@@ -221,8 +220,8 @@ test('can reorder list', async () => {
   const getOriginalSearchResponse = once(() =>
     readFile(
       __dirname + '/../../../../../test/data/2019-02-01 search results.json',
-      'utf8'
-    )
+      'utf8',
+    ),
   );
 
   const tester = new ShowCustomThreadListTester({
@@ -268,12 +267,12 @@ test('can reorder list', async () => {
 
   expect(
     ignoreSomeFields(
-      GSRP.extractThreadsFromSearchResponse(setCustomListResults)
-    )
+      GSRP.extractThreadsFromSearchResponse(setCustomListResults),
+    ),
   ).toEqual(
     ignoreSomeFields(
-      GSRP.extractThreadsFromSearchResponse(await getOriginalSearchResponse())
-    ).reverse()
+      GSRP.extractThreadsFromSearchResponse(await getOriginalSearchResponse()),
+    ).reverse(),
   );
 });
 
@@ -281,8 +280,8 @@ test('missing thread id', async () => {
   const getOriginalSearchResponse = once(() =>
     readFile(
       __dirname + '/../../../../../test/data/2019-02-01 search results.json',
-      'utf8'
-    )
+      'utf8',
+    ),
   );
 
   const tester = new ShowCustomThreadListTester({
@@ -331,12 +330,12 @@ test('missing thread id', async () => {
 
   expect(
     ignoreSomeFields(
-      GSRP.extractThreadsFromSearchResponse(setCustomListResults)
-    )
+      GSRP.extractThreadsFromSearchResponse(setCustomListResults),
+    ),
   ).toEqual(
     ignoreSomeFields(
-      GSRP.extractThreadsFromSearchResponse(await getOriginalSearchResponse())
-    ).reverse()
+      GSRP.extractThreadsFromSearchResponse(await getOriginalSearchResponse()),
+    ).reverse(),
   );
 });
 
@@ -344,8 +343,8 @@ test('missing threads in response', async () => {
   const getOriginalSearchResponse = once(() =>
     readFile(
       __dirname + '/../../../../../test/data/2019-02-01 search results.json',
-      'utf8'
-    )
+      'utf8',
+    ),
   );
 
   const tester = new ShowCustomThreadListTester({
@@ -390,11 +389,11 @@ test('missing threads in response', async () => {
 
   expect(
     ignoreRawResponses(
-      GSRP.extractThreadsFromSearchResponse(setCustomListResults)
-    )
+      GSRP.extractThreadsFromSearchResponse(setCustomListResults),
+    ),
   ).toEqual(
     ignoreRawResponses(
-      GSRP.extractThreadsFromSearchResponse(await getOriginalSearchResponse())
-    )
+      GSRP.extractThreadsFromSearchResponse(await getOriginalSearchResponse()),
+    ),
   );
 });

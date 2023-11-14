@@ -35,7 +35,7 @@ export default class GenericButtonView {
   private _setupEventStream() {
     const clickEventStream = Kefir.fromEvents<MouseEvent, never>(
       this._element,
-      'click'
+      'click',
     );
 
     clickEventStream.onValue((event) => {
@@ -49,7 +49,7 @@ export default class GenericButtonView {
           eventName: 'click',
           domEvent: event,
         };
-      })
+      }),
     );
   }
 }

@@ -1,7 +1,7 @@
 function log() {
   console.log.apply(
     console,
-    ['nav-menu'].concat(Array.prototype.slice.call(arguments))
+    ['nav-menu'].concat(Array.prototype.slice.call(arguments)),
   );
 }
 
@@ -29,7 +29,7 @@ InboxSDK.load(1, 'nav-menu').then(function (sdk) {
       const el = document.createElement('span');
       el.innerHTML = 'This is a parent custom route!';
       customRouteView.getElement().appendChild(el);
-    }
+    },
   );
 
   sdk.Router.handleCustomRoute(
@@ -38,7 +38,7 @@ InboxSDK.load(1, 'nav-menu').then(function (sdk) {
       const el = document.createElement('span');
       el.innerHTML = 'This is a child custom route!';
       customRouteView.getElement().appendChild(el);
-    }
+    },
   );
 
   const initNavItemAdd = () => {

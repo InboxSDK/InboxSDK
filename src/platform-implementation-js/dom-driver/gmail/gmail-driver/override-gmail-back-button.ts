@@ -7,7 +7,7 @@ import type GmailRouteProcessor from '../views/gmail-route-view/gmail-route-proc
 
 export default function overrideGmailBackButton(
   gmailDriver: GmailDriver,
-  gmailRouteProcessor: GmailRouteProcessor
+  gmailRouteProcessor: GmailRouteProcessor,
 ) {
   GmailElementGetter.waitForGmailModeToSettle().then(function () {
     if (GmailElementGetter.isStandalone()) {
@@ -19,14 +19,14 @@ export default function overrideGmailBackButton(
 
 function _setupManagement(
   gmailDriver: GmailDriver,
-  gmailRouteProcessor: GmailRouteProcessor
+  gmailRouteProcessor: GmailRouteProcessor,
 ) {
   gmailDriver
     .getRouteViewDriverStream()
     .scan(
       (
         prev: { gmailRouteView: GmailRouteView } | null | undefined,
-        gmailRouteView: GmailRouteView
+        gmailRouteView: GmailRouteView,
       ) => {
         let lastCustomRouteID, lastCustomRouteParams;
         if (
@@ -39,7 +39,7 @@ function _setupManagement(
         }
         return { gmailRouteView, lastCustomRouteID, lastCustomRouteParams };
       },
-      undefined
+      undefined,
     )
     .changes()
     .onValue(
@@ -49,9 +49,9 @@ function _setupManagement(
           lastCustomRouteID,
           lastCustomRouteParams,
           gmailDriver,
-          gmailRouteProcessor
+          gmailRouteProcessor,
         );
-      }
+      },
     );
 }
 
@@ -62,7 +62,7 @@ const handleGmailRouteView = defn(
     lastCustomRouteID: string | null | undefined,
     lastCustomRouteParams: any,
     gmailDriver: GmailDriver,
-    gmailRouteProcessor: GmailRouteProcessor
+    gmailRouteProcessor: GmailRouteProcessor,
   ) {
     if (
       lastCustomRouteID &&
@@ -70,12 +70,12 @@ const handleGmailRouteView = defn(
     ) {
       _bindToBackButton(gmailDriver, gmailRouteView);
     }
-  }
+  },
 );
 
 function _bindToBackButton(
   gmailDriver: GmailDriver,
-  gmailRouteView: GmailRouteView
+  gmailRouteView: GmailRouteView,
 ) {
   const backButton = GmailElementGetter.getThreadBackButton();
 

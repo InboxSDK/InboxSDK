@@ -3,7 +3,7 @@ import * as Kefir from 'kefir';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
 
 const dispatchCancel = (
-  element: Element // asap necessary so we don't emit this event during the click/keydown event dispatch
+  element: Element, // asap necessary so we don't emit this event during the click/keydown event dispatch
 ) =>
   asap(() =>
     element.dispatchEvent(
@@ -11,8 +11,8 @@ const dispatchCancel = (
         bubbles: false,
         cancelable: false,
         detail: null,
-      })
-    )
+      }),
+    ),
   );
 
 export default function ({
@@ -32,19 +32,19 @@ export default function ({
       .filter(
         (domEvent) =>
           [13, 32].indexOf(domEvent.which) > -1 ||
-          [13, 32].indexOf(domEvent.keyCode) > -1
+          [13, 32].indexOf(domEvent.keyCode) > -1,
       )
       .filter(
         (domEvent) =>
           (sendButton && sendButton.contains(domEvent.target)) ||
           ((sendAndArchive &&
-            sendAndArchive.contains(domEvent.target)) as boolean)
+            sendAndArchive.contains(domEvent.target)) as boolean),
       ),
     fromEventTargetCapture(element, 'click').filter(
       (domEvent) =>
         (sendButton && sendButton.contains(domEvent.target)) ||
         ((sendAndArchive &&
-          sendAndArchive.contains(domEvent.target)) as boolean)
+          sendAndArchive.contains(domEvent.target)) as boolean),
     ),
   ]);
   return domEventStream

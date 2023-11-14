@@ -53,7 +53,7 @@ InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
 
             const element =
               event.composeView.insertHTMLIntoBodyAtCursor(
-                '<b>monkey face</b>'
+                '<b>monkey face</b>',
               );
             element.textContent = 'monkey time';
           },
@@ -63,7 +63,7 @@ InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
         sinkFunction(buttonOptions);
 
         return function () {};
-      })
+      }),
     );
 
     composeView.addButton(
@@ -81,7 +81,7 @@ InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
         };
         sink(buttonOptions);
         return function () {};
-      })
+      }),
     );
 
     composeView.addButton({
@@ -91,7 +91,7 @@ InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
       onClick: function (event) {
         event.composeView.insertLinkIntoBodyAtCursor(
           'monkeys',
-          'http://www.google.com'
+          'http://www.google.com',
         );
       },
     });
@@ -101,7 +101,7 @@ InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
       iconUrl: chrome.runtime.getURL('lion.png'),
       onClick: function (event) {
         event.composeView.insertTextIntoBodyAtCursor(
-          '<b>the xss guy\nfoo bar\nbar foo'
+          '<b>the xss guy\nfoo bar\nbar foo',
         );
       },
     });
@@ -113,7 +113,7 @@ InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
         event.composeView.insertLinkChipIntoBodyAtCursor(
           'name',
           'https://rpominov.github.io/kefir/',
-          'https://cf.dropboxstatic.com/static/images/gmail_attachment_logo.png'
+          'https://cf.dropboxstatic.com/static/images/gmail_attachment_logo.png',
         );
       },
     });
@@ -217,47 +217,50 @@ InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
     composeView.on('subjectChanged', () => {
       console.log('subject changed', composeView.getSubject());
     });
+    composeView.on('bodyChanged', () => {
+      console.log('body changed', composeView.getTextContent());
+    });
     composeView.on(
       'toContactAdded',
-      console.log.bind(console, 'toContactAdded')
+      console.log.bind(console, 'toContactAdded'),
     );
     composeView.on(
       'toContactRemoved',
-      console.log.bind(console, 'toContactRemoved')
+      console.log.bind(console, 'toContactRemoved'),
     );
     composeView.on(
       'ccContactAdded',
-      console.log.bind(console, 'ccContactAdded')
+      console.log.bind(console, 'ccContactAdded'),
     );
     composeView.on(
       'ccContactRemoved',
-      console.log.bind(console, 'ccContactRemoved')
+      console.log.bind(console, 'ccContactRemoved'),
     );
     composeView.on(
       'bccContactAdded',
-      console.log.bind(console, 'bccContactAdded')
+      console.log.bind(console, 'bccContactAdded'),
     );
     composeView.on(
       'bccContactRemoved',
-      console.log.bind(console, 'bccContactRemoved')
+      console.log.bind(console, 'bccContactRemoved'),
     );
     composeView.on(
       'recipientsChanged',
-      console.log.bind(console, 'recipientsChanged')
+      console.log.bind(console, 'recipientsChanged'),
     );
     composeView.on(
       'fromContactChanged',
-      console.log.bind(console, 'fromContactChanged')
+      console.log.bind(console, 'fromContactChanged'),
     );
 
     composeView.on(
       'responseTypeChanged',
-      console.log.bind(console, 'responseTypeChanged')
+      console.log.bind(console, 'responseTypeChanged'),
     );
 
     composeView.on(
       'fullscreenChanged',
-      console.log.bind(console, 'fullscreenChanged')
+      console.log.bind(console, 'fullscreenChanged'),
     );
     composeView.on('minimized', console.log.bind(console, 'minimized'));
     composeView.on('restored', console.log.bind(console, 'restored'));

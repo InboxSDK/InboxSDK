@@ -1,6 +1,9 @@
+/**
+ * @deprecated Use @see Element.closest instead.
+ */
 export default function findParent(
   el: HTMLElement,
-  cb: (el: Element) => boolean
+  cb: (el: Element) => boolean,
 ): HTMLElement | null {
   let candidate = el.parentElement;
   while (candidate) {

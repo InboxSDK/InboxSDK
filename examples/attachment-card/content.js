@@ -147,7 +147,7 @@ InboxSDK.load(2, 'attachment-card-exmaple').then(function (sdk) {
             (url) => {
               console.log('card url', url);
             },
-            (err) => console.error(err)
+            (err) => console.error(err),
           );
         }
       },
@@ -201,8 +201,8 @@ InboxSDK.load(2, 'attachment-card-exmaple').then(function (sdk) {
               event.target.innerHTML = 'clicked me';
             },
           },
-          'click me'
-        )
+          'click me',
+        ),
       );
     }
 
@@ -245,7 +245,7 @@ InboxSDK.load(2, 'attachment-card-exmaple').then(function (sdk) {
         iconClass: 'test-remove-icon',
         tooltip: 'custom icon html',
         onClick: alert.bind(window, 'bar'),
-      }).merge(stopper.map(() => null))
+      }).merge(stopper.map(() => null)),
     );
 
     setTimeout(() => {
@@ -276,7 +276,7 @@ InboxSDK.load(2, 'attachment-card-exmaple').then(function (sdk) {
             onClick: alert.bind(window, 'bar'),
           },
         ]);
-      })
+      }),
     );
   });
 });

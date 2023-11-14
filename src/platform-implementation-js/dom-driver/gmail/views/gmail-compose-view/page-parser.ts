@@ -90,7 +90,7 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
                 {
                   $map: (el) =>
                     el.querySelector<HTMLElement>(
-                      'textarea.vO[name=to], input[name=to]'
+                      'textarea.vO[name=to], input[name=to]',
                     ),
                 },
                 { $map: (el) => el.closest('tr') },
@@ -133,7 +133,7 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
                 {
                   $map: (el) =>
                     el.querySelector<HTMLElement>(
-                      'textarea.vO[name=cc], input[name=cc]'
+                      'textarea.vO[name=cc], input[name=cc]',
                     ),
                 },
                 { $map: (el) => el.closest('tr') },
@@ -176,7 +176,7 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
                 {
                   $map: (el) =>
                     el.querySelector<HTMLElement>(
-                      'textarea.vO[name=bcc], input[name=bcc]'
+                      'textarea.vO[name=bcc], input[name=bcc]',
                     ),
                 },
                 { $map: (el) => el.closest('tr') },
@@ -208,16 +208,16 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
 
 export function getRecipientChips(
   element: HTMLElement,
-  addressType: 'to' | 'cc' | 'bcc'
+  addressType: 'to' | 'cc' | 'bcc',
 ): Array<HTMLElement> | NodeListOf<HTMLElement> {
   const oldRow = getOldRecipientRowForType(element, addressType);
   if (oldRow) {
     return Array.from(oldRow.querySelectorAll('.vR > input[type=hidden]')).map(
-      (el) => el.parentElement!
+      (el) => el.parentElement!,
     );
   } else {
     return element.querySelectorAll<HTMLElement>(
-      `.GS .anm[name="${addressType}"] [role=listbox] [role=option][data-name]`
+      `.GS .anm[name="${addressType}"] [role=listbox] [role=option][data-name]`,
     );
   }
 }
@@ -226,29 +226,29 @@ export function getRecipientChips(
 export function getRecipientRowElements(element: HTMLElement): HTMLElement[] {
   return Array.prototype.filter.call(
     element.querySelectorAll<HTMLElement>(
-      '.GS tr, .GS .anm[name] [role=listbox]'
+      '.GS tr, .GS .anm[name] [role=listbox]',
     ),
-    (tr) => !tr.classList.contains('inboxsdk__recipient_row')
+    (tr) => !tr.classList.contains('inboxsdk__recipient_row'),
   );
 }
 
 export function getRecipientRowForType(
   element: HTMLElement,
-  addressType: 'to' | 'cc' | 'bcc'
+  addressType: 'to' | 'cc' | 'bcc',
 ): HTMLElement | null {
   // handling new recipients
   // https://workspaceupdates.googleblog.com/2021/10/visual-updates-for-composing-email-in-gmail.html
   return element.querySelector<HTMLElement>(
-    `.GS .anm[name="${addressType}"] [role=listbox]`
+    `.GS .anm[name="${addressType}"] [role=listbox]`,
   );
 }
 
 export function getOldRecipientRowForType(
   element: HTMLElement,
-  addressType: 'to' | 'cc' | 'bcc'
+  addressType: 'to' | 'cc' | 'bcc',
 ): HTMLElement | null {
   const input = element.querySelector<HTMLElement>(
-    `.GS tr textarea.vO[name="${addressType}"], .GS tr input[name="${addressType}"]`
+    `.GS tr textarea.vO[name="${addressType}"], .GS tr input[name="${addressType}"]`,
   );
   if (input) {
     return closest(input, 'tr');

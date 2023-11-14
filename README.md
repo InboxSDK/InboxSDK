@@ -130,14 +130,14 @@ it.)
 
 By default, `yarn start` runs the following command:
 
-    yarn gulp default --watch --reloader
+    yarn gulp default -w --reloader
 
-which builds the SDK, watches all of its source files for changes to trigger rebuilds of the bundle automatically (`--watch`), and tells Chrome to reload its extensions after SDK rebuilds (`--reload`).
+which builds the SDK, watches all of its source files for changes to trigger rebuilds of the bundle automatically (`-w`), and tells Chrome to reload its extensions after SDK rebuilds (`--reload`).
 
 Separate SDK and implementation bundles can be built and a local test server
 which hosts the remote implementation bundle can be started by running:
 
-    yarn gulp default server --watch --reloader
+    yarn gulp default server -w --reloader
 
 Building separate SDK and implementation bundles represents how the production
 builds will work. When using the local test server to host the

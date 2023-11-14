@@ -8,11 +8,11 @@ import { Contact } from '../../../../../inboxsdk';
 
 export default function getRecipients(
   gmailComposeView: GmailComposeView,
-  addressType: ReceiverType
+  addressType: ReceiverType,
 ): Contact[] {
   const contactNodes = getRecipientChips(
     gmailComposeView.getElement(),
-    addressType
+    addressType,
   );
   return Array.from(contactNodes)
     .map((contactNode) => {
@@ -27,7 +27,7 @@ export default function getRecipients(
         // old
         return getAddressInformationExtractor(
           addressType,
-          gmailComposeView
+          gmailComposeView,
         )(contactNode);
       }
     })

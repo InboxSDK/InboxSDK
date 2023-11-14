@@ -7,7 +7,7 @@ import type GmailRouteProcessor from '../views/gmail-route-view/gmail-route-proc
 export default function createLink(
   GmailRouteProcessor: GmailRouteProcessor,
   routeID: string,
-  params: RouteParams | string | null | undefined
+  params: RouteParams | string | null | undefined,
 ): string {
   params =
     typeof params === 'string'

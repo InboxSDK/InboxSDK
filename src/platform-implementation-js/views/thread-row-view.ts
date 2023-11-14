@@ -28,11 +28,11 @@ export type IThreadRowView = EmitterType & {
     labelDescriptor:
       | LabelDescriptor
       | Observable<LabelDescriptor | null, unknown>
-      | null
+      | null,
   ): void;
   addAttachmentIcon(threadRowAttachmentIconDescriptor: any): void;
   addImage(
-    imageDescriptor: ImageDescriptor | Observable<ImageDescriptor | null, any>
+    imageDescriptor: ImageDescriptor | Observable<ImageDescriptor | null, any>,
   ): void;
   getElement(): HTMLElement;
   /**
@@ -63,7 +63,7 @@ export type IThreadRowView = EmitterType & {
     threadDateDescriptor:
       | ThreadDateDescriptor
       | null
-      | Observable<ThreadDateDescriptor | null, any>
+      | Observable<ThreadDateDescriptor | null, any>,
   ): void;
   /**
    * @returns the {number} of visible messages in the thread based on the visible numeric marker.
@@ -76,7 +76,7 @@ export type IThreadRowView = EmitterType & {
     descriptor:
       | DraftLabelDescriptor
       | null
-      | Observable<DraftLabelDescriptor | null, any>
+      | Observable<DraftLabelDescriptor | null, any>,
   ): void;
 };
 
@@ -109,13 +109,13 @@ export default class ThreadRowView
     labelDescriptor:
       | LabelDescriptor
       | null
-      | Observable<LabelDescriptor | null, unknown>
+      | Observable<LabelDescriptor | null, unknown>,
   ) {
     get(membersMap, this).threadRowViewDriver.addLabel(labelDescriptor);
   }
 
   addImage(
-    imageDescriptor: ImageDescriptor | Observable<ImageDescriptor | null, any>
+    imageDescriptor: ImageDescriptor | Observable<ImageDescriptor | null, any>,
   ) {
     get(membersMap, this).threadRowViewDriver.addImage(imageDescriptor);
   }
@@ -126,13 +126,13 @@ export default class ThreadRowView
 
   addActionButton(actionButtonDescriptor: Record<string, any>) {
     get(membersMap, this).threadRowViewDriver.addActionButton(
-      actionButtonDescriptor
+      actionButtonDescriptor,
     );
   }
 
   addAttachmentIcon(threadRowAttachmentIconDescriptor: Record<string, any>) {
     get(membersMap, this).threadRowViewDriver.addAttachmentIcon(
-      threadRowAttachmentIconDescriptor
+      threadRowAttachmentIconDescriptor,
     );
   }
 
@@ -140,10 +140,10 @@ export default class ThreadRowView
     threadRowDateDescriptor:
       | ThreadDateDescriptor
       | null
-      | Observable<ThreadDateDescriptor | null, any>
+      | Observable<ThreadDateDescriptor | null, any>,
   ) {
     get(membersMap, this).threadRowViewDriver.replaceDate(
-      threadRowDateDescriptor
+      threadRowDateDescriptor,
     );
   }
 
@@ -151,10 +151,10 @@ export default class ThreadRowView
     draftLabelDescriptor:
       | DraftLabelDescriptor
       | null
-      | Observable<DraftLabelDescriptor | null, any>
+      | Observable<DraftLabelDescriptor | null, any>,
   ) {
     get(membersMap, this).threadRowViewDriver.replaceDraftLabel(
-      draftLabelDescriptor
+      draftLabelDescriptor,
     );
   }
 

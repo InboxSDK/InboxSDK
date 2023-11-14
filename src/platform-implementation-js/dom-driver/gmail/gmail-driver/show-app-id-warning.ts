@@ -16,11 +16,11 @@ export default function showAppIdWarning(driver: GmailDriver) {
 `;
 
   const topMessageBarDriver = driver.createTopMessageBarDriver(
-    kefirCast(Kefir, { el: topDiv })
+    kefirCast(Kefir, { el: topDiv }),
   );
 
   const closeBtn = topDiv.querySelector<HTMLElement>(
-    '.inboxsdk__x_close_button'
+    '.inboxsdk__x_close_button',
   );
   if (!closeBtn) throw new Error('Should not happen');
   closeBtn.addEventListener('click', function (_e) {

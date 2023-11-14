@@ -1,5 +1,5 @@
 import EventEmitter from '../lib/safe-event-emitter';
-import Kefir from 'kefir';
+import Kefir, { Observable } from 'kefir';
 import kefirCast from 'kefir-cast';
 import * as ud from 'ud';
 import get from '../../common/get-or-fail';
@@ -11,9 +11,14 @@ import type {
   ComposeViewDriver,
   ComposeNotice,
   StatusBar,
+  ComposeButtonDescriptor,
 } from '../driver-interfaces/compose-view-driver';
-import type { Contact, ComposeView as IComposeView } from '../../inboxsdk';
+import type { Contact } from '../../inboxsdk';
 import type TypedEventEmitter from 'typed-emitter';
+import type {
+  AddressChangeEventName,
+  RecipientsChangedEvent,
+} from '../dom-driver/gmail/views/gmail-compose-view/get-address-changes-stream';
 
 interface Members {
   driver: Driver;
@@ -33,6 +38,10 @@ export interface LinkPopOverSection {
   remove(): void;
 }
 
+type AddressChangeEventsMapped = {
+  [P in AddressChangeEventName]: (data: { contact: Contact }) => void;
+};
+
 export type ComposeViewEvent = {
   newListener: (eventName: string) => void;
   close(): void;
@@ -46,7 +55,7 @@ export type ComposeViewEvent = {
   fullscreenChanged(data: { fullscreen: boolean }): void;
   linkPopOver(data: LinkPopOver): void;
   minimized(): void;
-  recipientsChanged(data: unknown): void;
+  recipientsChanged(data: RecipientsChangedEvent): void;
   resize(): void;
   restored(): void;
   sendCanceled(): void;
@@ -70,18 +79,15 @@ export type ComposeViewEvent = {
   responseTypeChanged(data: { isForward: boolean }): void;
   presending(data: { cancel(): void }): void;
   messageIDChange(data: string | null | undefined): void;
-};
+} & AddressChangeEventsMapped;
 
-export default class ComposeView
-  extends (EventEmitter as new () => TypedEventEmitter<ComposeViewEvent>)
-  implements IComposeView
-{
+export default class ComposeView extends (EventEmitter as new () => TypedEventEmitter<ComposeViewEvent>) {
   destroyed: boolean = false;
 
   constructor(
     driver: Driver,
     composeViewImplementation: ComposeViewDriver,
-    membrane: Membrane
+    membrane: Membrane,
   ) {
     super();
 
@@ -98,11 +104,11 @@ export default class ComposeView
           .getLogger()
           .deprecationWarning(
             'composeView close event',
-            'composeView destroy event'
+            'composeView destroy event',
           );
         if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
           console.error(
-            'The composeView close event was removed after API version 1'
+            'The composeView close event was removed after API version 1',
           );
         }
       } else if (eventName === 'messageIDChange') {
@@ -110,11 +116,11 @@ export default class ComposeView
           .getLogger()
           .deprecationWarning(
             'composeView messageIDChange event',
-            'composeView.getDraftID'
+            'composeView.getDraftID',
           );
         if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
           console.error(
-            'The composeView messageIDChange event was removed after API version 1'
+            'The composeView messageIDChange event was removed after API version 1',
           );
         }
       } else if (eventName === 'linkPopOver') {
@@ -137,40 +143,35 @@ export default class ComposeView
     });
   }
 
-  addButton(buttonDescriptor: any) {
+  addButton(
+    buttonDescriptor:
+      | ComposeButtonDescriptor
+      | Observable<ComposeButtonDescriptor, any>,
+  ) {
     const members = get(memberMap, this);
-    const buttonDescriptorStream = kefirCast(Kefir, buttonDescriptor);
+    const buttonDescriptorStream = kefirCast(
+      Kefir,
+      buttonDescriptor,
+    ) as Observable<ComposeButtonDescriptor, any>;
 
     const optionsPromise = members.composeViewImplementation.addButton(
       buttonDescriptorStream,
       members.driver.getAppId(),
-      { composeView: this }
+      { composeView: this },
     );
     return new ComposeButtonView(
       optionsPromise,
       members.composeViewImplementation,
-      members.driver
+      members.driver,
     );
   }
-
-  /*
-	// Incomplete
-	addInnerSidebar(options){
-		get(memberMap, this).composeViewImplementation.addInnerSidebar(options);
-	}
-
-	// Incomplete
-	addOuterSidebar(options){
-		get(memberMap, this).composeViewImplementation.addOuterSidebar(options);
-	}
-	*/
 
   addComposeNotice(composeNoticeDescriptor?: {
     height?: number;
     orderHint?: number;
   }): ComposeNotice {
     return get(memberMap, this).composeViewImplementation.addComposeNotice(
-      composeNoticeDescriptor
+      composeNoticeDescriptor,
     );
   }
 
@@ -180,7 +181,7 @@ export default class ComposeView
     addAboveNativeStatusBar?: boolean;
   }): StatusBar {
     return get(memberMap, this).composeViewImplementation.addStatusBar(
-      statusBarDescriptor
+      statusBarDescriptor,
     );
   }
 
@@ -191,7 +192,7 @@ export default class ComposeView
   addRecipientRow(options: any): { destroy(): void } {
     return {
       destroy: get(memberMap, this).composeViewImplementation.addRecipientRow(
-        kefirCast(Kefir, options)
+        kefirCast(Kefir, options),
       ),
     };
   }
@@ -199,14 +200,14 @@ export default class ComposeView
   forceRecipientRowsOpen(): () => void {
     return get(
       memberMap,
-      this
+      this,
     ).composeViewImplementation.forceRecipientRowsOpen();
   }
 
   hideNativeRecipientRows(): () => void {
     return get(
       memberMap,
-      this
+      this,
     ).composeViewImplementation.hideNativeRecipientRows();
   }
 
@@ -219,7 +220,7 @@ export default class ComposeView
   }
 
   send(
-    { sendAndArchive }: { sendAndArchive: boolean } = { sendAndArchive: false }
+    { sendAndArchive }: { sendAndArchive: boolean } = { sendAndArchive: false },
   ) {
     get(memberMap, this).composeViewImplementation.send({ sendAndArchive });
   }
@@ -231,7 +232,7 @@ export default class ComposeView
   getMetadataForm(): HTMLElement {
     return get(
       memberMap,
-      this
+      this,
     ).composeViewImplementation.getMetadataFormElement();
   }
 
@@ -257,7 +258,7 @@ export default class ComposeView
   getInitialMessageID(): string {
     return get(
       memberMap,
-      this
+      this,
     ).composeViewImplementation.getInitialMessageID()!;
   }
 
@@ -324,21 +325,21 @@ export default class ComposeView
   insertTextIntoBodyAtCursor(text: string): HTMLElement | null | void {
     return get(
       memberMap,
-      this
+      this,
     ).composeViewImplementation.insertBodyTextAtCursor(text);
   }
 
   insertHTMLIntoBodyAtCursor(html: string): HTMLElement | null | undefined {
     return get(
       memberMap,
-      this
+      this,
     ).composeViewImplementation.insertBodyHTMLAtCursor(html);
   }
 
   insertLinkChipIntoBodyAtCursor(
     text: string,
     url: string,
-    iconUrl: string
+    iconUrl: string,
   ): HTMLElement | void {
     if (
       !iconUrl ||
@@ -351,7 +352,7 @@ export default class ComposeView
 
     return get(
       memberMap,
-      this
+      this,
     ).composeViewImplementation.insertLinkChipIntoBody({
       text: text,
       url: url,
@@ -361,11 +362,11 @@ export default class ComposeView
 
   insertLinkIntoBodyAtCursor(
     text: string,
-    url: string
+    url: string,
   ): HTMLElement | null | void {
     return get(memberMap, this).composeViewImplementation.insertLinkIntoBody(
       text,
-      url
+      url,
     );
   }
 
@@ -395,7 +396,7 @@ export default class ComposeView
 
   setTitleBarColor(color: string): () => void {
     return get(memberMap, this).composeViewImplementation.setTitleBarColor(
-      color
+      color,
     );
   }
 
@@ -406,7 +407,7 @@ export default class ComposeView
   async popOut(): Promise<ComposeView> {
     const nextComposeViewDriverPromise = get(
       memberMap,
-      this
+      this,
     ).driver.getNextComposeViewDriver();
     get(memberMap, this).composeViewImplementation.popOut();
     const nextComposeViewDriver = await nextComposeViewDriverPromise;
@@ -436,7 +437,7 @@ export default class ComposeView
   getFromContactChoices(): Contact[] {
     return get(
       memberMap,
-      this
+      this,
     ).composeViewImplementation.getFromContactChoices();
   }
 
@@ -464,7 +465,7 @@ export default class ComposeView
       throw new Error('parameter must be an array of Blob objects');
     }
     return get(memberMap, this).composeViewImplementation.attachFiles(
-      Array.from(files)
+      Array.from(files),
     );
   }
 
@@ -476,7 +477,7 @@ export default class ComposeView
       throw new Error('parameter must be an array of Blob objects');
     }
     return get(memberMap, this).composeViewImplementation.attachInlineFiles(
-      Array.from(files)
+      Array.from(files),
     );
   }
 
@@ -487,7 +488,7 @@ export default class ComposeView
       .getLogger()
       .deprecationWarning(
         'ComposeView.dragFilesIntoCompose',
-        'ComposeView.attachInlineFiles'
+        'ComposeView.attachInlineFiles',
       );
     if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
       throw new Error('This method was discontinued after API version 1');
@@ -501,10 +502,16 @@ export default class ComposeView
   }
 
   registerRequestModifier(
-    modifier: (composeParams: { isPlainText?: boolean; body: string }) => void
+    modifier: (composeParams: { body: string }) =>
+      | {
+          body: string;
+        }
+      | Promise<{
+          body: string;
+        }>,
   ) {
     get(memberMap, this).composeViewImplementation.registerRequestModifier(
-      modifier
+      modifier,
     );
   }
 
@@ -519,14 +526,14 @@ export default class ComposeView
   ensureFormattingToolbarIsHidden() {
     get(
       memberMap,
-      this
+      this,
     ).composeViewImplementation.ensureFormattingToolbarIsHidden();
   }
 
   ensureAppButtonToolbarsAreClosed() {
     get(
       memberMap,
-      this
+      this,
     ).composeViewImplementation.ensureAppButtonToolbarsAreClosed();
   }
 

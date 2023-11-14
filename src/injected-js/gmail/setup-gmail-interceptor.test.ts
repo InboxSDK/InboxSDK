@@ -17,7 +17,7 @@ import type { AjaxOpts, AjaxResponse } from '../../common/ajax';
 
 function ajax(
   frame: { XMLHttpRequest: typeof XMLHttpRequest },
-  opts: AjaxOpts
+  opts: AjaxOpts,
 ): Promise<AjaxResponse> {
   const orig_XMLHttpRequest = window.XMLHttpRequest;
   try {
@@ -40,14 +40,14 @@ const jsFrame = { XMLHttpRequest: jsServer.XMLHttpRequest };
 beforeAll(() => {
   setupGmailInterceptorOnFrames(
     mainFrame as Partial<Window> as Window,
-    jsFrame as Partial<Window> as Window
+    jsFrame as Partial<Window> as Window,
   );
 });
 
 const ajaxInterceptEvents: Array<Object> = [];
 Kefir.fromEvents<{ detail: any }, unknown>(
   document,
-  'inboxSDKajaxIntercept'
+  'inboxSDKajaxIntercept',
 ).onValue((event) => {
   ajaxInterceptEvents.push(event.detail);
 });
@@ -62,9 +62,9 @@ describe('sync api', () => {
     {
       status: 200,
       response: JSON.stringify(
-        require('../../../test/data/2019-01-18-cvOnSend.json')
+        require('../../../test/data/2019-01-18-cvOnSend.json'),
       ),
-    }
+    },
   );
 
   test('cv:on send', async () => {
@@ -77,7 +77,7 @@ describe('sync api', () => {
       data: raw`{"1":{"3":2},"2":{"1":[{"1":"6","2":{"1":"thread-a:r8235801758805685576","2":{"14":{"1":{"1":"msg-a:r-3147389712012403088","2":{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"},"3":[{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"}],"7":"1547859067835","8":"","9":{"2":[{"1":0,"2":"<div dir=\"ltr\"><br></div>"}],"7":1},"11":["^all","^pfg","^f_bt","^f_btns","^f_cl","^i","^u","^io_im"],"18":"1547859067835","42":0,"43":{"1":0,"2":0,"3":0,"4":0},"52":"s:512627d3fa03dd2f|#msg-a:r-3147389712012403088|0"},"3":1}}}}]},"4":{"2":1,"3":"1547859067853","4":1,"5":83},"5":2}`,
     });
     expect(JSON.parse(response.text)).toEqual(
-      require('../../../test/data/2019-01-18-cvOnSend.json')
+      require('../../../test/data/2019-01-18-cvOnSend.json'),
     );
     expect(ajaxInterceptEvents).toEqual([
       { type: 'emailSending', draftID: 'r-3147389712012403088' },
@@ -95,9 +95,9 @@ describe('sync api', () => {
     {
       status: 200,
       response: JSON.stringify(
-        require('../../../test/data/2019-01-18-cvOnReplyDraftSave.json')
+        require('../../../test/data/2019-01-18-cvOnReplyDraftSave.json'),
       ),
-    }
+    },
   );
 
   test('cv:on reply draft save', async () => {
@@ -110,7 +110,7 @@ describe('sync api', () => {
       data: raw`{"2":{"1":[{"1":"13","2":{"1":"thread-a:r8235801758805685576","2":{"2":{"1":{"1":"msg-a:r-4742963983885267953","2":{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"},"3":[{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"}],"7":"1547862932860","8":"Re: ","9":{"2":[{"1":0,"2":"<div dir=\"ltr\">x</div>"},{"1":2,"2":"<br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Fri, Jan 18, 2019 at 4:51 PM Chris Cowan &lt;cowan@streak.com&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin: 0px 0px 0px 0.8ex; border-left: 1px solid rgb(204, 204, 204); padding-left: 1ex;\"><div dir=\"ltr\"><br></div>\n</blockquote></div>"}],"7":1},"11":["^all","^r","^r_bt","^io_im"],"16":"<CAL_Ays_f9YieNaOcMrYQG6XNLygC-bNexCHpYWfCjVdtts7=5Q@mail.gmail.com>","18":"1547862932860","42":0,"43":{"1":0,"2":0,"3":1,"4":0},"52":"s:512627d3fa03dd2f|#msg-a:r-4742963983885267953|0"},"2":"msg-a:r-3147389712012403088","3":1,"5":{"1":"1547862932865"}}}}}]},"3":{"1":1,"2":"21847650","5":{"2":0},"7":1},"4":{"2":1,"3":"1547862932867","4":0,"5":81},"5":2}`,
     });
     expect(JSON.parse(response.text)).toEqual(
-      require('../../../test/data/2019-01-18-cvOnReplyDraftSave.json')
+      require('../../../test/data/2019-01-18-cvOnReplyDraftSave.json'),
     );
     expect(ajaxInterceptEvents).toEqual([
       {
@@ -131,9 +131,9 @@ describe('sync api', () => {
     {
       status: 200,
       response: JSON.stringify(
-        require('../../../test/data/2019-05-29-cvOnDraftSave.json')
+        require('../../../test/data/2019-05-29-cvOnDraftSave.json'),
       ),
-    }
+    },
   );
 
   test('cv:on draft save', async () => {
@@ -146,7 +146,7 @@ describe('sync api', () => {
       data: raw`{"2":{"1":[{"1":"23","2":{"1":"thread-a:r-5923235777735080743","2":{"3":{"1":{"1":"","3":"1559183445219","4":"thread-a:r-5923235777735080743","5":[{"1":"msg-a:r4410172531046441555","2":{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"},"7":"1559183445219","8":"","9":{"2":[{"1":0,"2":"<div dir=\"ltr\">a</div>"}],"7":1},"11":["^all","^r","^r_bt"],"18":"1559183445219","42":0,"43":{"1":0,"2":0,"3":1,"4":0},"52":"s:116405b570aeb88e|#msg-a:r4410172531046441555|0"}]}}}}}]},"3":{"1":1,"2":"24043806","5":{"2":0},"7":1},"4":{"2":1,"3":"1559183445223","4":0,"5":83},"5":2}`,
     });
     expect(JSON.parse(response.text)).toEqual(
-      require('../../../test/data/2019-05-29-cvOnDraftSave.json')
+      require('../../../test/data/2019-05-29-cvOnDraftSave.json'),
     );
     expect(ajaxInterceptEvents).toEqual([
       {
@@ -167,9 +167,9 @@ describe('sync api', () => {
     {
       status: 200,
       response: JSON.stringify(
-        require('../../../test/data/2019-01-18-cvOnReplySend.json')
+        require('../../../test/data/2019-01-18-cvOnReplySend.json'),
       ),
-    }
+    },
   );
 
   test('cv:on send reply', async () => {
@@ -182,7 +182,7 @@ describe('sync api', () => {
       data: raw`{"1":{"3":2},"2":{"1":[{"1":"15","2":{"1":"thread-a:r8235801758805685576","2":{"14":{"1":{"1":"msg-a:r-4742963983885267953","2":{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"},"3":[{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"}],"7":"1547863370143","8":"Re: ","9":{"2":[{"1":0,"2":"<div dir=\"ltr\">x</div>"},{"1":2,"2":"<br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Fri, Jan 18, 2019 at 4:51 PM Chris Cowan &lt;cowan@streak.com&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin: 0px 0px 0px 0.8ex; border-left: 1px solid rgb(204, 204, 204); padding-left: 1ex;\"><div dir=\"ltr\"><br></div>\n</blockquote></div>"}],"7":1},"11":["^all","^pfg","^f_bt","^f_btns","^f_cl","^i","^u","^io_im"],"16":"<CAL_Ays_f9YieNaOcMrYQG6XNLygC-bNexCHpYWfCjVdtts7=5Q@mail.gmail.com>","18":"1547863370143","42":0,"43":{"1":0,"2":0,"3":1,"4":0},"52":"s:512627d3fa03dd2f|#msg-a:r-4742963983885267953|0"},"2":"msg-a:r-3147389712012403088","3":1,"5":{"1":"1547863370156"}}}}},{"1":"16","2":{"1":"thread-a:r8235801758805685576","2":{"7":{"1":["^io_re"],"2":["^io_fwd"],"3":["msg-a:r-3147389712012403088"]}}}}]},"4":{"2":2,"3":"1547863370157","4":1,"5":81},"5":2}`,
     });
     expect(JSON.parse(response.text)).toEqual(
-      require('../../../test/data/2019-01-18-cvOnReplySend.json')
+      require('../../../test/data/2019-01-18-cvOnReplySend.json'),
     );
     expect(ajaxInterceptEvents).toEqual([
       { type: 'emailSending', draftID: 'r-4742963983885267953' },
@@ -200,9 +200,9 @@ describe('sync api', () => {
     {
       status: 200,
       response: JSON.stringify(
-        require('../../../test/data/2019-01-18-cvOffDraftSave.json')
+        require('../../../test/data/2019-01-18-cvOffDraftSave.json'),
       ),
-    }
+    },
   );
 
   test('cv:off draft save', async () => {
@@ -215,7 +215,7 @@ describe('sync api', () => {
       data: raw`{"2":{"1":[{"1":"6","2":{"1":"thread-a:r-6484824435222735158|msg-a:r1172851975112249697","2":{"3":{"1":{"1":"x","3":"1547864344081","4":"thread-a:r-6484824435222735158|msg-a:r1172851975112249697","5":[{"1":"msg-a:r1172851975112249697","2":{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"},"3":[{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"}],"7":"1547864344081","8":"x","9":{"2":[{"1":0,"2":"<div dir=\"ltr\">x</div>"}],"7":1},"11":["^all","^r","^r_bt","^io_im"],"18":"1547864344081","42":0,"43":{"1":0,"2":0,"3":1,"4":0},"52":"s:7443fe0f19af83b2|#msg-a:r1172851975112249697|0"}]}}}}}]},"3":{"1":1,"2":"21848112","5":{"2":4},"6":"1622958358028407256","7":1},"4":{"2":1,"3":"1547864344092","4":0,"5":82},"5":2}`,
     });
     expect(JSON.parse(response.text)).toEqual(
-      require('../../../test/data/2019-01-18-cvOffDraftSave.json')
+      require('../../../test/data/2019-01-18-cvOffDraftSave.json'),
     );
     expect(ajaxInterceptEvents).toEqual([
       {
@@ -235,9 +235,9 @@ describe('sync api', () => {
     {
       status: 200,
       response: JSON.stringify(
-        require('../../../test/data/2019-01-18-cvOffSend.json')
+        require('../../../test/data/2019-01-18-cvOffSend.json'),
       ),
-    }
+    },
   );
 
   test('cv:off send', async () => {
@@ -250,7 +250,7 @@ describe('sync api', () => {
       data: raw`{"1":{"3":2},"2":{"1":[{"1":"7","2":{"1":"thread-a:r-6484824435222735158|msg-a:r1172851975112249697","2":{"14":{"1":{"1":"msg-a:r1172851975112249697","2":{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"},"3":[{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"}],"7":"1547864572618","8":"x","9":{"2":[{"1":0,"2":"<div dir=\"ltr\">x</div>"}],"7":1},"11":["^all","^pfg","^f_bt","^f_btns","^f_cl","^i","^u","^io_im"],"18":"1547864572618","42":0,"43":{"1":0,"2":0,"3":1,"4":0},"52":"s:7443fe0f19af83b2|#msg-a:r1172851975112249697|0"},"3":1}}}}]},"4":{"2":1,"3":"1547864572634","4":1,"5":82},"5":2}`,
     });
     expect(JSON.parse(response.text)).toEqual(
-      require('../../../test/data/2019-01-18-cvOffSend.json')
+      require('../../../test/data/2019-01-18-cvOffSend.json'),
     );
     expect(ajaxInterceptEvents).toEqual([
       {
@@ -275,9 +275,9 @@ describe('sync api', () => {
     {
       status: 200,
       response: JSON.stringify(
-        require('../../../test/data/2019-01-18-cvOffReplyDraftSave.json')
+        require('../../../test/data/2019-01-18-cvOffReplyDraftSave.json'),
       ),
-    }
+    },
   );
 
   test('cv:off reply draft save', async () => {
@@ -290,7 +290,7 @@ describe('sync api', () => {
       data: raw`{"2":{"1":[{"1":"11","2":{"1":"thread-a:r-6484824435222735158|msg-a:r1172851975112249697","2":{"2":{"1":{"1":"msg-a:r5342060334926697893","2":{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"},"3":[{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"}],"7":"1547865092605","8":"Re: x","9":{"2":[{"1":0,"2":"<div dir=\"ltr\">y</div>"},{"1":2,"2":"<br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Fri, Jan 18, 2019 at 6:22 PM Chris Cowan &lt;cowan@streak.com&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin: 0px 0px 0px 0.8ex; border-left: 1px solid rgb(204, 204, 204); padding-left: 1ex;\"><div dir=\"ltr\">x</div>\n</blockquote></div>"}],"7":1},"11":["^all","^r","^r_bt","^io_im"],"16":"<CAL_Ays_bOq9jhw5e3e1x7cBS9uYpqnGLYf8YnjrVZhM2e3q2xQ@mail.gmail.com>","18":"1547865092605","42":0,"43":{"1":0,"2":0,"3":1,"4":0},"52":"s:7443fe0f19af83b2|#msg-a:r5342060334926697893|0"},"2":"msg-a:r1172851975112249697","3":1,"5":{"1":"1547865092610"}}}}}]},"3":{"1":1,"2":"21848255","5":{"2":0},"7":1},"4":{"2":1,"3":"1547865092610","4":0,"5":82},"5":2}`,
     });
     expect(JSON.parse(response.text)).toEqual(
-      require('../../../test/data/2019-01-18-cvOffReplyDraftSave.json')
+      require('../../../test/data/2019-01-18-cvOffReplyDraftSave.json'),
     );
     expect(ajaxInterceptEvents).toEqual([
       {
@@ -311,9 +311,9 @@ describe('sync api', () => {
     {
       status: 200,
       response: JSON.stringify(
-        require('../../../test/data/2019-01-18-cvOffReplySend.json')
+        require('../../../test/data/2019-01-18-cvOffReplySend.json'),
       ),
-    }
+    },
   );
 
   test('cv:off reply send', async () => {
@@ -326,7 +326,7 @@ describe('sync api', () => {
       data: raw`{"1":{"3":2},"2":{"1":[{"1":"12","2":{"1":"thread-a:r-6484824435222735158|msg-a:r1172851975112249697","2":{"14":{"1":{"1":"msg-a:r5342060334926697893","2":{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"},"3":[{"1":1,"2":"cowan@streak.com","3":"Chris Cowan"}],"7":"1547865280656","8":"Re: x","9":{"2":[{"1":0,"2":"<div dir=\"ltr\">y</div>"},{"1":2,"2":"<br><div class=\"gmail_quote\"><div dir=\"ltr\" class=\"gmail_attr\">On Fri, Jan 18, 2019 at 6:22 PM Chris Cowan &lt;cowan@streak.com&gt; wrote:<br></div><blockquote class=\"gmail_quote\" style=\"margin: 0px 0px 0px 0.8ex; border-left: 1px solid rgb(204, 204, 204); padding-left: 1ex;\"><div dir=\"ltr\">x</div>\n</blockquote></div>"}],"7":1},"11":["^all","^pfg","^f_bt","^f_btns","^f_cl","^i","^u","^io_im"],"16":"<CAL_Ays_bOq9jhw5e3e1x7cBS9uYpqnGLYf8YnjrVZhM2e3q2xQ@mail.gmail.com>","18":"1547865280656","42":0,"43":{"1":0,"2":0,"3":1,"4":0},"52":"s:7443fe0f19af83b2|#msg-a:r5342060334926697893|0"},"2":"msg-a:r1172851975112249697","3":1,"5":{"1":"1547865280676"}}}}},{"1":"13","2":{"1":"thread-a:r-6484824435222735158|msg-a:r1172851975112249697","2":{"7":{"1":["^io_re"],"2":["^io_fwd"],"3":["msg-a:r1172851975112249697"]}}}}]},"4":{"2":2,"3":"1547865280679","4":1,"5":81},"5":2}`,
     });
     expect(JSON.parse(response.text)).toEqual(
-      require('../../../test/data/2019-01-18-cvOffReplySend.json')
+      require('../../../test/data/2019-01-18-cvOffReplySend.json'),
     );
     expect(ajaxInterceptEvents).toEqual([
       {
@@ -354,9 +354,9 @@ describe('sync api', () => {
     {
       status: 200,
       response: JSON.stringify(
-        require('../../../test/data/2022-09-09-cvOnDraftSave_response.json')
+        require('../../../test/data/2022-09-09-cvOnDraftSave_response.json'),
       ),
-    }
+    },
   );
 
   test('cv:2022-09-09 draft saved', async () => {
@@ -367,11 +367,11 @@ describe('sync api', () => {
         'Content-Type': 'application/json',
       },
       data: JSON.stringify(
-        require('../../../test/data/2022-09-09-cvOnDraftSave_request.json')
+        require('../../../test/data/2022-09-09-cvOnDraftSave_request.json'),
       ),
     });
     expect(JSON.parse(response.text)).toEqual(
-      require('../../../test/data/2022-09-09-cvOnDraftSave_response.json')
+      require('../../../test/data/2022-09-09-cvOnDraftSave_response.json'),
     );
     expect(ajaxInterceptEvents).toEqual([
       {
@@ -395,9 +395,9 @@ describe('sync api', () => {
     {
       status: 200,
       response: JSON.stringify(
-        require('../../../test/data/2022-09-09-cvOnDraftUpdate_response.json')
+        require('../../../test/data/2022-09-09-cvOnDraftUpdate_response.json'),
       ),
-    }
+    },
   );
 
   test('cv:2022-09-09 draft updated', async () => {
@@ -408,11 +408,11 @@ describe('sync api', () => {
         'Content-Type': 'application/json',
       },
       data: JSON.stringify(
-        require('../../../test/data/2022-09-09-cvOnDraftUpdate_request.json')
+        require('../../../test/data/2022-09-09-cvOnDraftUpdate_request.json'),
       ),
     });
     expect(JSON.parse(response.text)).toEqual(
-      require('../../../test/data/2022-09-09-cvOnDraftUpdate_response.json')
+      require('../../../test/data/2022-09-09-cvOnDraftUpdate_response.json'),
     );
     expect(ajaxInterceptEvents).toEqual([
       {
@@ -436,9 +436,9 @@ describe('sync api', () => {
     {
       status: 200,
       response: JSON.stringify(
-        require('../../../test/data/2022-09-09-cvOnSend_response.json')
+        require('../../../test/data/2022-09-09-cvOnSend_response.json'),
       ),
-    }
+    },
   );
 
   test('cv:2022-09-09 draft sent', async () => {
@@ -449,11 +449,11 @@ describe('sync api', () => {
         'Content-Type': 'application/json',
       },
       data: JSON.stringify(
-        require('../../../test/data/2022-09-09-cvOnSend_request.json')
+        require('../../../test/data/2022-09-09-cvOnSend_request.json'),
       ),
     });
     expect(JSON.parse(response.text)).toEqual(
-      require('../../../test/data/2022-09-09-cvOnSend_response.json')
+      require('../../../test/data/2022-09-09-cvOnSend_response.json'),
     );
     expect(ajaxInterceptEvents).toEqual([
       { type: 'emailSending', draftID: 'r8190137112111191537' },
@@ -478,9 +478,9 @@ describe('sync api', () => {
     {
       status: 200,
       response: JSON.stringify(
-        require('../../../test/data/2022-09-09-cvOnSend_2_response_customThreadId.json')
+        require('../../../test/data/2022-09-09-cvOnSend_2_response_customThreadId.json'),
       ),
-    }
+    },
   );
 
   test('cv:2022-09-09 draft sent', async () => {
@@ -491,11 +491,11 @@ describe('sync api', () => {
         'Content-Type': 'application/json',
       },
       data: JSON.stringify(
-        require('../../../test/data/2022-09-09-cvOnSend_2_request_customThreadId.json')
+        require('../../../test/data/2022-09-09-cvOnSend_2_request_customThreadId.json'),
       ),
     });
     expect(JSON.parse(response.text)).toEqual(
-      require('../../../test/data/2022-09-09-cvOnSend_2_response_customThreadId.json')
+      require('../../../test/data/2022-09-09-cvOnSend_2_response_customThreadId.json'),
     );
     expect(ajaxInterceptEvents).toEqual([
       { type: 'emailSending', draftID: 'r8190137112111191537' },
@@ -520,9 +520,9 @@ describe('sync api', () => {
     {
       status: 200,
       response: JSON.stringify(
-        require('../../../test/data/2022-09-09-cvOnReplySend_response.json')
+        require('../../../test/data/2022-09-09-cvOnReplySend_response.json'),
       ),
-    }
+    },
   );
 
   test('cv:2022-09-09 reply draft sent', async () => {
@@ -533,11 +533,11 @@ describe('sync api', () => {
         'Content-Type': 'application/json',
       },
       data: JSON.stringify(
-        require('../../../test/data/2022-09-09-cvOnReplySend_request.json')
+        require('../../../test/data/2022-09-09-cvOnReplySend_request.json'),
       ),
     });
     expect(JSON.parse(response.text)).toEqual(
-      require('../../../test/data/2022-09-09-cvOnReplySend_response.json')
+      require('../../../test/data/2022-09-09-cvOnReplySend_response.json'),
     );
     expect(ajaxInterceptEvents).toEqual([
       { type: 'emailSending', draftID: 'r-414184523264894368' },
@@ -563,9 +563,9 @@ mainServer.respondWith(
   {
     status: 200,
     response: JSON.stringify(
-      require('../../../test/data/2022-09-09-cvOnReplySend_2_response.json')
+      require('../../../test/data/2022-09-09-cvOnReplySend_2_response.json'),
     ),
-  }
+  },
 );
 
 test('cv:2022-09-09 reply draft 2 sent', async () => {
@@ -576,11 +576,11 @@ test('cv:2022-09-09 reply draft 2 sent', async () => {
       'Content-Type': 'application/json',
     },
     data: JSON.stringify(
-      require('../../../test/data/2022-09-09-cvOnReplySend_2_request.json')
+      require('../../../test/data/2022-09-09-cvOnReplySend_2_request.json'),
     ),
   });
   expect(JSON.parse(response.text)).toEqual(
-    require('../../../test/data/2022-09-09-cvOnReplySend_2_response.json')
+    require('../../../test/data/2022-09-09-cvOnReplySend_2_response.json'),
   );
   expect(ajaxInterceptEvents).toEqual([
     { type: 'emailSending', draftID: 'r2026878197680476540' },
@@ -780,7 +780,7 @@ test('cv:2022-09-09 reply draft 2 sent', async () => {
 
     const responseData = require(pathPrefix + filePrefix + 'response.json');
     const requestData = JSON.stringify(
-      require(pathPrefix + filePrefix + 'request.json')
+      require(pathPrefix + filePrefix + 'request.json'),
     );
 
     mainServer.respondWith(
@@ -791,7 +791,7 @@ test('cv:2022-09-09 reply draft 2 sent', async () => {
       {
         status: 200,
         response: JSON.stringify(responseData),
-      }
+      },
     );
 
     test(`${filePrefix} sent`, async () => {

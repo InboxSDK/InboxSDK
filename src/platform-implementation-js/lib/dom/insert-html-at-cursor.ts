@@ -5,7 +5,7 @@ var insertHTMLatCursor = ud.defn(
   function insertHTMLatCursor(
     element: HTMLElement,
     html: any,
-    oldRange: Record<string, any> | null | undefined
+    oldRange: Record<string, any> | null | undefined,
   ): HTMLElement | null | undefined {
     element.focus();
 
@@ -84,7 +84,7 @@ var insertHTMLatCursor = ud.defn(
             false,
             false,
             0,
-            null
+            null,
           );
           event.preventDefault();
           element.dispatchEvent(event);
@@ -109,6 +109,6 @@ var insertHTMLatCursor = ud.defn(
         }
       }
     }
-  }
+  },
 );
 export default insertHTMLatCursor;

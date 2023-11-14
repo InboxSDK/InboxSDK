@@ -20,6 +20,9 @@ import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import type GmailDriver from '../../gmail-driver';
 import type GmailRouteProcessor from '../gmail-route-view/gmail-route-processor';
+import PageParserTree from 'page-parser-tree';
+import { makePageParser } from './page-parser';
+import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
 
 class GmailRouteView {
   _type: string;
@@ -34,14 +37,14 @@ class GmailRouteView {
   _eventStream: Bus<any, unknown>;
   _customViewElement: HTMLElement | null | undefined;
   _threadView: GmailThreadView | null | undefined;
-  _sectionsContainer: HTMLElement | null | undefined;
   _hasAddedCollapsibleSection: boolean;
   _cachedRouteData: Record<string, any>;
+  #page: PageParserTree;
 
   constructor(
     { urlObject, type, routeID, cachedRouteData }: Record<string, any>,
     gmailRouteProcessor: GmailRouteProcessor,
-    driver: GmailDriver
+    driver: GmailDriver,
   ) {
     // Check we implement interface
     this as RouteViewDriver;
@@ -57,6 +60,7 @@ class GmailRouteView {
     this._driver = driver;
     this._eventStream = kefirBus();
     this._hasAddedCollapsibleSection = false;
+    this.#page = makePageParser(document.body, driver.getLogger());
 
     if (this._type === 'CUSTOM') {
       this._setupCustomViewElement();
@@ -93,6 +97,7 @@ class GmailRouteView {
     this._stopper.destroy();
 
     this._eventStream.end();
+    this.#page.dump();
 
     if (this._customViewElement) {
       this._customViewElement.remove();
@@ -177,12 +182,12 @@ class GmailRouteView {
       Record<string, any> | null | undefined,
       unknown
     >,
-    groupOrderHint: any
+    groupOrderHint: any,
   ): GmailCollapsibleSectionView {
-    return this._addCollapsibleSection(
+    return this.#addCollapsibleSection(
       sectionDescriptorProperty,
       groupOrderHint,
-      true
+      true,
     );
   }
 
@@ -191,54 +196,52 @@ class GmailRouteView {
       Record<string, any> | null | undefined,
       unknown
     >,
-    groupOrderHint: any
+    groupOrderHint: any,
   ): GmailCollapsibleSectionView {
-    return this._addCollapsibleSection(
+    return this.#addCollapsibleSection(
       sectionDescriptorProperty,
       groupOrderHint,
-      false
+      false,
     );
   }
 
-  _addCollapsibleSection(
+  #addCollapsibleSection(
     collapsibleSectionDescriptorProperty: any,
     groupOrderHint: any,
-    isCollapsible: boolean
+    isCollapsible: boolean,
   ): GmailCollapsibleSectionView {
     this._hasAddedCollapsibleSection = true;
     var gmailResultsSectionView = new GmailCollapsibleSectionView(
       this._driver,
       groupOrderHint,
       this.getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH,
-      isCollapsible
+      isCollapsible,
     );
 
-    var sectionsContainer = this._getSectionsContainer();
-
-    gmailResultsSectionView
-      .getEventStream()
-      .filter(function (event) {
+    Kefir.combine([
+      this.#getSectionsContainer(),
+      gmailResultsSectionView.getEventStream().filter((event) => {
         return event.type === 'update' && event.property === 'orderHint';
-      })
-      .onValue(function () {
-        var children = sectionsContainer.children;
-        var insertBeforeElement = getInsertBeforeElement(
-          gmailResultsSectionView.getElement(),
-          children,
-          ['data-group-order-hint', 'data-order-hint']
-        );
+      }),
+    ]).onValue(([sectionsContainer]) => {
+      const children = sectionsContainer.children;
+      const insertBeforeElement = getInsertBeforeElement(
+        gmailResultsSectionView.getElement(),
+        children,
+        ['data-group-order-hint', 'data-order-hint'],
+      );
 
-        if (insertBeforeElement) {
-          sectionsContainer.insertBefore(
-            gmailResultsSectionView.getElement(),
-            insertBeforeElement
-          );
-        } else {
-          sectionsContainer.appendChild(gmailResultsSectionView.getElement());
-        }
-      });
+      if (insertBeforeElement) {
+        sectionsContainer.insertBefore(
+          gmailResultsSectionView.getElement(),
+          insertBeforeElement,
+        );
+      } else {
+        sectionsContainer.appendChild(gmailResultsSectionView.getElement());
+      }
+    });
     gmailResultsSectionView.setCollapsibleSectionDescriptorProperty(
-      collapsibleSectionDescriptorProperty
+      collapsibleSectionDescriptorProperty,
     );
     return gmailResultsSectionView;
   }
@@ -290,19 +293,18 @@ class GmailRouteView {
     asap(() => {
       if (!this._eventStream) return;
 
-      this._setupRowListViews();
-
+      this.#monitorRowListElements();
       this._setupContentAndSidebarView();
-
       this._setupScrollStream();
     });
   }
 
-  _setupRowListViews() {
-    var rowListElements = GmailElementGetter.getRowListElements();
-    Array.prototype.forEach.call(rowListElements, (rowListElement) => {
-      this._processRowListElement(rowListElement);
-    });
+  #monitorRowListElements() {
+    toItemWithLifetimeStream(this.#page.tree.getAllByTag('rowListElement'))
+      .takeUntilBy(this._stopper)
+      .onValue(({ el }) => {
+        this._processRowListElement(el.getValue());
+      });
   }
 
   _processRowListElement(rowListElement: HTMLElement) {
@@ -311,7 +313,7 @@ class GmailRouteView {
     var gmailRowListView = new GmailRowListView(
       rootElement as any,
       this,
-      this._driver
+      this._driver,
     );
 
     this._rowListViews.push(gmailRowListView);
@@ -329,7 +331,7 @@ class GmailRouteView {
       var gmailThreadView = new GmailThreadView(
         threadContainerElement,
         this,
-        this._driver
+        this._driver,
       );
       this._threadView = gmailThreadView;
 
@@ -342,7 +344,7 @@ class GmailRouteView {
       // when in preview pane mode. We want to monitor it in either case
       // because the user could switch into preview pane mode.
       const previewPaneContainer = document.querySelector<HTMLElement>(
-        'div[role=main] .aia'
+        'div[role=main] .aia',
       );
 
       if (previewPaneContainer) {
@@ -374,15 +376,15 @@ class GmailRouteView {
   _startMonitoringPreviewPaneForThread(previewPaneContainer: HTMLElement) {
     const threadContainerTableElement = querySelector(
       previewPaneContainer,
-      'table.Bs > tr'
+      'table.Bs > tr',
     );
     const elementStream = makeElementChildStream(
-      threadContainerTableElement
+      threadContainerTableElement,
     ).filter(
       (event) =>
         !!event.el.querySelector('.if') ||
         !!event.el.querySelector('.PeIF1d') ||
-        !!event.el.querySelector('.a98.iY')
+        !!event.el.querySelector('.a98.iY'),
     );
 
     this._eventStream.plug(
@@ -390,8 +392,8 @@ class GmailRouteView {
         .flatMap(
           makeElementViewStream(
             (element) =>
-              new (GmailThreadView as any)(element, this, this._driver, true)
-          )
+              new (GmailThreadView as any)(element, this, this._driver, true),
+          ),
         )
         .map((view) => {
           this._threadView = view;
@@ -399,37 +401,42 @@ class GmailRouteView {
             eventName: 'newGmailThreadView',
             view: view,
           };
-        })
+        }),
     );
   }
 
-  _getSectionsContainer(): HTMLElement {
-    const main = document.querySelector("div[role='main']");
-    if (!main) throw new Error('should not happen');
-    let sectionsContainer = main.querySelector<HTMLElement>(
-      '.inboxsdk__custom_sections'
-    );
+  #getSectionsContainer(): Kefir.Observable<HTMLElement, never> {
+    return toItemWithLifetimeStream(
+      this.#page.tree.getAllByTag('rowListElementContainer'),
+    )
+      .takeUntilBy(this._stopper)
+      .take(1)
+      .map(({ el }) => {
+        const main = el.getValue();
+        let sectionsContainer = main.querySelector<HTMLElement>(
+          '.inboxsdk__custom_sections',
+        );
 
-    if (!sectionsContainer) {
-      sectionsContainer = this._sectionsContainer =
-        document.createElement('div');
-      sectionsContainer.classList.add('inboxsdk__custom_sections');
-      main.insertBefore(sectionsContainer, main.firstChild);
-    } else if (
-      sectionsContainer.classList.contains('Wc') &&
-      !this._isSearchRoute()
-    ) {
-      sectionsContainer.classList.remove('Wc');
-    }
-
-    return sectionsContainer;
+        if (!sectionsContainer) {
+          sectionsContainer = document.createElement('div');
+          sectionsContainer.classList.add('inboxsdk__custom_sections');
+          main.insertBefore(sectionsContainer, main.firstChild);
+        } else if (
+          sectionsContainer.classList.contains('Wc') &&
+          !this._isSearchRoute()
+        ) {
+          sectionsContainer.classList.remove('Wc');
+        }
+        return sectionsContainer;
+      })
+      .toProperty();
   }
 
   _getCustomParams(): Record<string, any> {
     var params: Record<string, any> = Object.create(null);
     if (!this._customRouteID)
       throw new Error(
-        "Should not happen, can't get custom params for non-custom view"
+        "Should not happen, can't get custom params for non-custom view",
       );
 
     this._customRouteID
@@ -527,12 +534,11 @@ class GmailRouteView {
   }
 
   _isListRoute(): boolean {
-    var rowListElements = GmailElementGetter.getRowListElements();
     return (
       (this._type === 'CUSTOM_LIST' ||
         this._gmailRouteProcessor.isListRouteName(this._name)) &&
-      rowListElements &&
-      rowListElements.length > 0
+      // this case is for when you're on a THREAD route, but the thread renders a list like our thread breaker does
+      !this._isThreadRoute()
     );
   }
 
@@ -640,7 +646,7 @@ class GmailRouteView {
   refresh() {
     var el =
       GmailElementGetter.getToolbarElement().querySelector<HTMLElement>(
-        'div.T-I.nu'
+        'div.T-I.nu',
       );
 
     if (el) {
@@ -672,7 +678,7 @@ class GmailRouteView {
   _getThreadContainerElement: () => HTMLElement | null | undefined = once(
     () => {
       return GmailElementGetter.getThreadContainerElement();
-    }
+    },
   );
 }
 

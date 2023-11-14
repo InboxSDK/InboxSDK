@@ -8,5 +8,5 @@ process.stdin.pipe(
     const { value, options } = JSON.parse(buffer.toString());
     const serialized = serialize(value, options);
     process.stdout.write(serialized);
-  })
+  }),
 );

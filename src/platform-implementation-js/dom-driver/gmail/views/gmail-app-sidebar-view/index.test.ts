@@ -20,6 +20,7 @@ import delay from 'pdelay';
 import GmailAppSidebarView from './index';
 import MockWebStorage from 'mock-webstorage';
 import GmailThreadView from '../gmail-thread-view';
+import { type ContentPanelDescriptor } from '../../../../driver-common/sidebar/ContentPanelViewDriver';
 
 jest.mock('../../../../lib/dom/make-element-child-stream', () => {
   return () => require('kefir-bus')();
@@ -47,62 +48,62 @@ describe('GmailAppSidebarView Primary', function () {
     const container = makeContentContainerElement();
     const gmailAppSidebarView = new GmailAppSidebarView(
       makeDriver(),
-      container
+      container,
     );
     const descriptor = Kefir.constant({
       title: 'foo',
       iconUrl: '/bar.png',
       el: document.createElement('div'),
-    });
+    } as unknown as ContentPanelDescriptor);
     const fakeThreadView = {
       getStopper: _.constant(kefirStopper()),
     } as GmailThreadView;
     const panel = gmailAppSidebarView.addThreadSidebarContentPanel(
       descriptor,
-      fakeThreadView
+      fakeThreadView,
     );
     await delay(0);
     expect(
       container.querySelectorAll('.' + idMap('app_sidebar_content_panel'))
-        .length
+        .length,
     ).toBe(1);
     panel.remove();
     expect(
       container.querySelectorAll('.' + idMap('app_sidebar_content_panel'))
-        .length
+        .length,
     ).toBe(0);
   });
   it('multiple sidebars can be added', async () => {
     const container = makeContentContainerElement();
     const gmailAppSidebarView = new GmailAppSidebarView(
       makeDriver(),
-      container
+      container,
     );
     const descriptor1 = Kefir.constant({
       title: 'foo1',
       iconUrl: '/bar.png',
       el: document.createElement('div'),
-    });
+    } as unknown as ContentPanelDescriptor);
     const descriptor2 = Kefir.constant({
       title: 'foo2',
       iconUrl: '/bar.png',
       el: document.createElement('div'),
-    });
+    } as unknown as ContentPanelDescriptor);
     const fakeThreadView = {
       getStopper: _.constant(kefirStopper()),
     } as GmailThreadView;
     gmailAppSidebarView.addThreadSidebarContentPanel(
       descriptor1,
-      fakeThreadView
+      fakeThreadView,
     );
     gmailAppSidebarView.addThreadSidebarContentPanel(
       descriptor2,
-      fakeThreadView
+      fakeThreadView,
     );
     await delay(0);
     expect(
       container.querySelectorAll('.' + idMap('app_sidebar_content_panel'))
-        .length
+        .length,
     ).toBe(2);
   });
 });

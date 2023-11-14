@@ -3,7 +3,7 @@ import { ComposeRequest, ComposeRequestType, SEND_ACTIONS } from './constants';
 import { Contact } from '../../inboxsdk';
 
 export function getDetailsOfComposeRequest(
-  parsed: Record<any, any>
+  parsed: Record<any, any>,
 ): ComposeRequest | null {
   const updateList = parsed[2] && parsed[2][1];
   if (!updateList) return null;
@@ -63,7 +63,7 @@ export function getDetailsOfComposeRequest(
           update[2][2][3] &&
           update[2][2][3][1] &&
           update[2][2][3][1][5] &&
-          update[2][2][3][1][5][0]
+          update[2][2][3][1][5][0],
       )
       .filter(Boolean);
 
@@ -76,7 +76,7 @@ export function getDetailsOfComposeRequest(
 
 function getComposeRequestFromUpdate(
   update: any,
-  type: ComposeRequestType
+  type: ComposeRequestType,
 ): ComposeRequest | null {
   const body =
     update[9] && update[9][2] && update[9][2][0] && update[9][2][0][2];
@@ -101,13 +101,13 @@ function parseContacts(contacts: any[]): Contact[] | null {
   }
 
   return contacts.map(
-    (c): Contact => ({ emailAddress: c[2], name: c[3] || null })
+    (c): Contact => ({ emailAddress: c[2], name: c[3] || null }),
   );
 }
 
 export function replaceEmailBodyForSendRequest(
   request: string,
-  newBody?: string
+  newBody?: string,
 ): string {
   if (!newBody) return request;
 

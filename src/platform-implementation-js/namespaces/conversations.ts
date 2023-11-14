@@ -6,9 +6,18 @@ import AttachmentCardView from '../views/conversations/attachment-card-view';
 import HandlerRegistry from '../lib/handler-registry';
 import type Membrane from '../lib/Membrane';
 import type { Driver } from '../driver-interfaces/driver';
+
 const memberMap = new WeakMap();
+
 export const MessageViewViewStates = Object.freeze({
+  /**
+   * One case where a {@link MessageView} is 'HIDDEN' is when there are too many messages in a thread,
+   * and the message doesn't show at all.
+   */
   HIDDEN: 'HIDDEN',
+  /**
+   * {@link MessageView}s are collapsed when they are partially shown. The {@link MessageView}'s subject line and timestamp is visible, but the body of the message may be truncated.
+   */
   COLLAPSED: 'COLLAPSED',
   EXPANDED: 'EXPANDED',
 });
@@ -52,7 +61,7 @@ class Conversations {
       ThreadView,
       members.threadViewHandlerRegistry,
       this,
-      membrane
+      membrane,
     );
 
     _setupViewDriverWatcher(
@@ -61,7 +70,7 @@ class Conversations {
       MessageView,
       members.messageViewHandlerRegistries.all,
       this,
-      membrane
+      membrane,
     );
 
     _setupViewDriverWatcher(
@@ -73,41 +82,41 @@ class Conversations {
               .getEventStream()
               .filter((event) => event.eventName === 'messageLoad')
               .map(() => messageViewDriver)
-              .take(1)
+              .take(1),
       ),
       MessageView,
       members.messageViewHandlerRegistries.loaded,
       this,
-      membrane
+      membrane,
     );
   }
 
   registerThreadViewHandler(handler: (v: ThreadView) => void): () => void {
     return get(memberMap, this).threadViewHandlerRegistry.registerHandler(
-      handler
+      handler,
     );
   }
 
   registerMessageViewHandler(handler: (v: MessageView) => void): () => void {
     return get(
       memberMap,
-      this
+      this,
     ).messageViewHandlerRegistries.loaded.registerHandler(handler);
   }
 
   registerMessageViewHandlerAll(handler: (v: MessageView) => void): () => void {
     return get(
       memberMap,
-      this
+      this,
     ).messageViewHandlerRegistries.all.registerHandler(handler);
   }
 
   registerFileAttachmentCardViewHandler(
-    handler: (v: AttachmentCardView) => void
+    handler: (v: AttachmentCardView) => void,
   ): () => void {
     return get(
       memberMap,
-      this
+      this,
     ).attachmentCardViewHandlerRegistry.registerHandler(handler);
   }
 }
@@ -118,7 +127,7 @@ function _setupViewDriverWatcher(
   ViewClass: typeof MessageView | typeof ThreadView,
   handlerRegistry: any,
   ConversationsInstance: any,
-  membrane: Membrane
+  membrane: Membrane,
 ) {
   var combinedStream = stream.map(function (viewDriver) {
     const view = membrane.get(viewDriver);
@@ -133,7 +142,7 @@ function _setupViewDriverWatcher(
       event.viewDriver
         .getReadyStream()
         .map(() => event)
-        .takeUntilBy(Kefir.fromEvents(event.view, 'destroy'))
+        .takeUntilBy(Kefir.fromEvents(event.view, 'destroy')),
     )
     .onValue(function (event: any) {
       handlerRegistry.addTarget(event.view);

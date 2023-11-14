@@ -1,6 +1,8 @@
 import * as Kefir from 'kefir';
 import GmailElementGetter from '../gmail-element-getter';
-import GmailNavItemView from '../views/gmail-nav-item-view';
+import GmailNavItemView, {
+  type NavItemDescriptor,
+} from '../views/gmail-nav-item-view';
 import Logger from '../../../lib/logger';
 import waitFor from '../../../lib/wait-for';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
@@ -13,8 +15,8 @@ import once from 'lodash/once';
 export default async function addNavItem(
   driver: GmailDriver,
   orderGroup: string,
-  navItemDescriptor: Kefir.Observable<any, any>,
-  navMenuInjectionContainer?: HTMLElement
+  navItemDescriptor: Kefir.Observable<NavItemDescriptor, unknown>,
+  navMenuInjectionContainer?: HTMLElement,
 ): Promise<GmailNavItemView> {
   await waitForMenuReady();
 
@@ -25,7 +27,7 @@ export default async function addNavItem(
     try {
       const attacher = _attachNavItemView(
         gmailNavItemView,
-        navMenuInjectionContainer
+        navMenuInjectionContainer,
       );
 
       attacher();
@@ -53,7 +55,7 @@ const waitForNavMenuReady = once(async (): Promise<void> => {
   if (!GmailElementGetter.isStandalone()) {
     await GmailElementGetter.waitForGmailModeToSettle();
     await waitFor(() =>
-      document.querySelector('.aeN[role=navigation], .aeN [role=navigation]')
+      document.querySelector('.aeN[role=navigation], .aeN [role=navigation]'),
     );
     // Wait for contents of navmenu to load (needed to figure out if it's integrated gmail mode)
     await waitFor(() => document.querySelector('.Ls77Lb.aZ6 > .pp'));
@@ -62,13 +64,13 @@ const waitForNavMenuReady = once(async (): Promise<void> => {
 
 function _attachNavItemView(
   gmailNavItemView: GmailNavItemView,
-  navMenuInjectionContainer?: HTMLElement
+  navMenuInjectionContainer?: HTMLElement,
 ) {
   if (navMenuInjectionContainer) {
     return () => {
       insertElementInOrder(
         navMenuInjectionContainer,
-        gmailNavItemView.getElement()
+        gmailNavItemView.getElement(),
       );
     };
   }
@@ -86,8 +88,8 @@ function _attachNavItemView(
 
       const nonMailLeftNavSections = Array.from(
         document.querySelectorAll<HTMLElement>(
-          '.Xa.wT:not([data-group-order-hint])'
-        )
+          '.Xa.wT:not([data-group-order-hint])',
+        ),
       ).slice(1);
       nonMailLeftNavSections.forEach((div) => {
         div.dataset.groupOrderHint = 'zz_gmail';
@@ -95,7 +97,7 @@ function _attachNavItemView(
 
       insertElementInOrder(
         navMenuInjectionContainer,
-        gmailNavItemView.getElement()
+        gmailNavItemView.getElement(),
       );
     };
   } else {
@@ -126,7 +128,7 @@ function _createNavItemsHolder(): HTMLElement {
   if (!navMenuInjectionContainer) throw new Error('should not happen');
   navMenuInjectionContainer.insertBefore(
     holder,
-    navMenuInjectionContainer.children[2]
+    navMenuInjectionContainer.children[2],
   );
 
   makeMutationObserverStream(holder, {

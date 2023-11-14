@@ -5,7 +5,7 @@ import type GmailComposeView from '../../views/gmail-compose-view';
 import { Contact } from '../../../../../inboxsdk';
 export function getFromContact(
   driver: GmailDriver,
-  gmailComposeView: GmailComposeView
+  gmailComposeView: GmailComposeView,
 ): Contact {
   const nameInput: HTMLInputElement | null | undefined = gmailComposeView
     .getElement()
@@ -19,7 +19,7 @@ export function getFromContact(
   const fromContactChoices = getFromContactChoices(driver, gmailComposeView);
   const matchingContact: Contact | null | undefined = find(
     fromContactChoices,
-    (contact) => contact.emailAddress === emailAddress
+    (contact) => contact.emailAddress === emailAddress,
   );
   let name;
 
@@ -39,12 +39,12 @@ export function getFromContact(
 }
 export function getFromContactChoices(
   driver: GmailDriver,
-  gmailComposeView: GmailComposeView
+  gmailComposeView: GmailComposeView,
 ): Contact[] {
   const choiceEls = gmailComposeView
     .getElement()
     .querySelectorAll(
-      'div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX > div[value][role=menuitem]'
+      'div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX > div[value][role=menuitem]',
     );
 
   if (choiceEls.length == 0) {
@@ -60,7 +60,7 @@ export function getFromContactChoices(
 export function setFromEmail(
   driver: GmailDriver,
   gmailComposeView: GmailComposeView,
-  email: string
+  email: string,
 ) {
   const currentFromAddress = gmailComposeView.getFromContact().emailAddress;
   if (currentFromAddress === email) {
@@ -81,7 +81,7 @@ export function setFromEmail(
 
   const chosenChoice = find(
     choiceParent.children,
-    (item) => item.getAttribute('value') == email
+    (item) => item.getAttribute('value') == email,
   ) as HTMLElement;
 
   if (!chosenChoice) {

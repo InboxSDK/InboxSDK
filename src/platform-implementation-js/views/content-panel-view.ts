@@ -1,12 +1,18 @@
 import EventEmitter from '../lib/safe-event-emitter';
 import get from '../../common/get-or-fail';
 import type ContentPanelViewDriver from '../driver-common/sidebar/ContentPanelViewDriver';
+import type TypedEventEmitter from 'typed-emitter';
+
 interface Members {
   contentPanelViewImplementation: ContentPanelViewDriver;
 }
-const membersMap = new WeakMap<ContentPanelView, Members>(); // documented in src/docs/
+const membersMap = new WeakMap<ContentPanelView, Members>();
 
-export default class ContentPanelView extends EventEmitter {
+export default class ContentPanelView extends (EventEmitter as new () => TypedEventEmitter<{
+  activate(): void;
+  deactivate(): void;
+  destroy(): void;
+}>) {
   destroyed: boolean = false;
 
   constructor(contentPanelViewImplementation: ContentPanelViewDriver) {
@@ -16,7 +22,7 @@ export default class ContentPanelView extends EventEmitter {
     };
     membersMap.set(this, members);
 
-    this._bindToStreamEvents();
+    this.#bindToStreamEvents();
   }
 
   remove() {
@@ -35,10 +41,10 @@ export default class ContentPanelView extends EventEmitter {
     return get(membersMap, this).contentPanelViewImplementation.isActive();
   }
 
-  _bindToStreamEvents() {
+  #bindToStreamEvents() {
     const stream = get(
       membersMap,
-      this
+      this,
     ).contentPanelViewImplementation.getEventStream();
     stream.onValue(({ eventName }) => {
       this.emit(eventName);

@@ -88,7 +88,7 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
       loadingIcon: `<div>
         Slow loading...20s&nbsp;
         <img src="${chrome.runtime.getURL(
-          'monkey.png'
+          'monkey.png',
         )}" width="20" height="20" />
       </div>`,
       primaryButton: {

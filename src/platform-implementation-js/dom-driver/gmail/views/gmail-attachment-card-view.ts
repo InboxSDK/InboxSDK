@@ -37,7 +37,7 @@ class GmailAttachmentCardView {
   constructor(
     options: Record<string, any>,
     driver: GmailDriver,
-    messageViewDriver?: GmailMessageView | null
+    messageViewDriver?: GmailMessageView | null,
   ) {
     this._driver = driver;
     this._messageViewDriver = messageViewDriver;
@@ -157,7 +157,7 @@ class GmailAttachmentCardView {
       if (firstChildHref) {
         return firstChildHref.replace(
           /([?&])disp=inline(?=&|$)/,
-          '$1disp=safe'
+          '$1disp=safe',
         );
       }
 
@@ -171,13 +171,12 @@ class GmailAttachmentCardView {
       if (this._isStandardAttachment()) {
         const downloadUrl = await waitFor(() => this._getDownloadLink());
         if (!downloadUrl) return null;
-        const finalUrl: string = await this._driver.resolveUrlRedirects(
-          downloadUrl
-        );
+        const finalUrl: string =
+          await this._driver.resolveUrlRedirects(downloadUrl);
 
         if (
           !/^https:\/\/mail-attachment\.googleusercontent\.com\/attachment\//.test(
-            finalUrl
+            finalUrl,
           )
         ) {
           console.error('getDownloadURL returned unexpected url', finalUrl);
@@ -198,7 +197,7 @@ class GmailAttachmentCardView {
         return finalUrl;
       } else {
         const downloadButton = this._element.querySelector(
-          '[data-inboxsdk-download-url]'
+          '[data-inboxsdk-download-url]',
         );
 
         return downloadButton
@@ -308,14 +307,14 @@ class GmailAttachmentCardView {
       Kefir.fromEvents<MouseEvent, unknown>(this._element, 'click').map(
         (event) => ({
           preventDefault: () => event.preventDefault(),
-        })
-      ) as any
+        }),
+      ) as any,
     );
 
     if (options.previewThumbnailUrl && options.failoverPreviewIconUrl) {
       const previewThumbnailUrlImage = querySelector(
         this._element,
-        '.inboxsdk__attachmentCard_previewThumbnailUrl'
+        '.inboxsdk__attachmentCard_previewThumbnailUrl',
       );
 
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -328,7 +327,7 @@ class GmailAttachmentCardView {
         if (!parent) throw new Error('Could not find parent element');
         parent.insertBefore(
           iconDiv,
-          previewThumbnailUrlImage.nextElementSibling
+          previewThumbnailUrlImage.nextElementSibling,
         );
         previewThumbnailUrlImage.remove();
       };
@@ -394,7 +393,7 @@ class GmailAttachmentCardView {
           function (e: MouseEvent) {
             e.stopPropagation();
           },
-          true
+          true,
         );
 
         if (options.openInNewTab) {

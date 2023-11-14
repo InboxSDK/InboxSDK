@@ -2,79 +2,18 @@ import flatten from 'lodash/flatten';
 import last from 'lodash/last';
 import t from 'transducers.js';
 import mapIndexed from 'map-indexed-xf';
-import assert from 'assert';
 import htmlToText from '../../../common/html-to-text';
-
-export function interpretSentEmailResponse(responseString: string): {
-  threadID: string;
-  messageID: string;
-} {
-  const emailSentArray = deserialize(responseString).value;
-
-  const gmailMessageId = extractGmailMessageIdFromSentEmail(emailSentArray);
-  const gmailThreadId =
-    extractGmailThreadIdFromSentEmail(emailSentArray) || gmailMessageId;
-  if (!gmailMessageId || !gmailThreadId) {
-    throw new Error('Failed to read email response');
-  }
-  return {
-    threadID: gmailThreadId,
-    messageID: gmailMessageId,
-  };
-}
-
-export function extractGmailMessageIdFromSentEmail(
-  emailSentArray: any
-): string | null {
-  const messageIdArrayMarker = 'a';
-  const messageIdArray = _searchArray(
-    emailSentArray,
-    messageIdArrayMarker,
-    (markerArray) =>
-      markerArray.length > 3 &&
-      Array.isArray(markerArray[3]) &&
-      markerArray[3].length > 0
-  );
-
-  if (!messageIdArray) {
-    return null;
-  }
-
-  return messageIdArray[3][0];
-}
-
-export function extractGmailThreadIdFromSentEmail(
-  emailSentArray: any
-): string | null {
-  const threadIdArrayMarker = 'csd';
-  const threadIdArray = _searchArray(
-    emailSentArray,
-    threadIdArrayMarker,
-    function (markerArray) {
-      return (
-        markerArray.length == 3 &&
-        Array.isArray(markerArray[2]) &&
-        markerArray[2].length > 5
-      );
-    }
-  );
-
-  if (!threadIdArray) {
-    return null;
-  }
-
-  return threadIdArray[1];
-}
+import { assert } from '../../../common/assert';
 
 export function extractGmailThreadIdFromMessageIdSearch(
-  responseString: string
+  responseString: string,
 ): string | null {
   const threadResponseArray = deserialize(responseString).value;
   const threadIdArrayMarker = 'cs';
   const threadIdArray = _searchArray(
     threadResponseArray,
     threadIdArrayMarker,
-    (markerArray) => markerArray[0] === 'cs' && markerArray.length > 20
+    (markerArray) => markerArray[0] === 'cs' && markerArray.length > 20,
   );
 
   if (!threadIdArray) {
@@ -153,7 +92,7 @@ function findNextQuote(s: string, start: number): number {
 function findNextUnescapedCharacter(
   s: string,
   start: number,
-  char: string
+  char: string,
 ): number {
   for (let i = start, len = s.length; i < len; i++) {
     if (s[i] === '\\') {
@@ -230,7 +169,7 @@ export function deserialize(threadResponseString: string): {
 
 function transformUnquotedSections(
   str: string,
-  cb: (str: string) => string
+  cb: (str: string) => string,
 ): string {
   const parts = [];
   let nextQuote;
@@ -267,7 +206,7 @@ export function deserializeArray(value: string): any[] {
     (match) =>
       match
         .replace(/,\s*(?=,|\])/g, ',null') // fix implied nulls
-        .replace(/\[\s*(?=,)/g, '[null') // "
+        .replace(/\[\s*(?=,)/g, '[null'), // "
   );
 
   try {
@@ -287,7 +226,7 @@ export function serialize(value: any[], options: MessageOptions): string {
 
 function threadListSerialize(
   threadResponseArray: any[],
-  options: MessageOptions
+  options: MessageOptions,
 ): string {
   const { includeLengths, noArrayNewLines, includeExplicitNulls } = options;
 
@@ -297,7 +236,7 @@ function threadListSerialize(
     const arraySectionString = serializeArray(
       arraySection,
       noArrayNewLines,
-      includeExplicitNulls
+      includeExplicitNulls,
     );
 
     if (!includeLengths) {
@@ -328,7 +267,7 @@ function threadListSerialize(
 
 function suggestionSerialize(
   suggestionsArray: any[],
-  includeExplicitNulls: boolean
+  includeExplicitNulls: boolean,
 ): string {
   let response = "5\n)]}'\n";
   for (let ii = 0; ii < suggestionsArray.length; ii++) {
@@ -336,7 +275,7 @@ function suggestionSerialize(
     const arraySectionString = serializeArray(
       arraySection,
       false,
-      includeExplicitNulls
+      includeExplicitNulls,
     );
 
     const length = arraySectionString.length;
@@ -349,7 +288,7 @@ function suggestionSerialize(
 function serializeArray(
   array: any[],
   noArrayNewLines: boolean,
-  includeExplicitNulls: boolean
+  includeExplicitNulls: boolean,
 ): string {
   let response = '[';
   for (let ii = 0; ii < array.length; ii++) {
@@ -394,7 +333,7 @@ export interface Thread {
 
 export function readDraftId(
   response: string,
-  messageID: string
+  messageID: string,
 ): string | null {
   const decoded = deserialize(response).value;
 
@@ -406,8 +345,8 @@ export function readDraftId(
       t.cat,
       t.filter((x: any) => x[0] === 'ms' && x[1] === messageID),
       t.take(1),
-      t.map((x: any) => x[60])
-    )
+      t.map((x: any) => x[60]),
+    ),
   )[0] as string | null | undefined;
   if (msgA) {
     const match = msgA.match(/^msg-[^:]:(\S+)$/i);
@@ -419,7 +358,7 @@ export function readDraftId(
 export function replaceThreadsInResponse(
   response: string,
   replacementThreads: Thread[],
-  { start, total }: { start: number; total?: number | 'MANY' }
+  { start, total }: { start: number; total?: number | 'MANY' },
 ): string {
   const { value, options } = deserialize(response);
 
@@ -575,9 +514,9 @@ export function extractThreadsFromDeserialized(value: any[]): Thread[] {
           gmailThreadId: thread[0],
         },
         '_originalGmailFormat',
-        { value: thread }
-      )
-    )
+        { value: thread },
+      ),
+    ),
   );
 }
 
@@ -585,7 +524,7 @@ const _extractMessageIdsFromThreadBatchRequestXf = t.compose(
   t.cat,
   t.cat,
   t.filter((item: any) => item[0] === 'cs'),
-  t.map((item: any) => [item[1], item[2]])
+  t.map((item: any) => [item[1], item[2]]),
 );
 export function extractMessageIdsFromThreadBatchRequest(response: string): {
   [threadId: string]: string;
@@ -606,14 +545,14 @@ const _extractThreadArraysFromResponseArrayXf = t.compose(
   t.cat,
   t.filter((item: any) => item[0] === 'tb'),
   t.map((item: any) => item[2]),
-  t.cat
+  t.cat,
 );
 function _extractThreadArraysFromResponseArray(
-  threadResponseArray: any[]
+  threadResponseArray: any[],
 ): any[] {
   return t.toArray(
     threadResponseArray,
-    _extractThreadArraysFromResponseArrayXf
+    _extractThreadArraysFromResponseArrayXf,
   );
 }
 
@@ -632,7 +571,7 @@ const _extractThreadsFromConversationViewResponseArrayXf = t.compose(
   t.map((item: any) => ({
     threadID: item[1],
     messageIDs: item[8],
-  }))
+  })),
 );
 
 const _extractMessagesFromResponseArrayXf = t.compose(
@@ -641,11 +580,11 @@ const _extractMessagesFromResponseArrayXf = t.compose(
   t.map((item: any) => ({
     messageID: item[1],
     date: item[7],
-  }))
+  })),
 );
 
 export function extractMessages(
-  response: string
+  response: string,
 ): Array<{ threadID: string; messages: Message[] }> {
   // regular view=cv requests have a top level array length of 1
   // whereas view=cv requests when you refresh Gmail while looking at a thread
@@ -655,7 +594,7 @@ export function extractMessages(
 
   const threads: Array<{ threadID: string; messageIDs: string[] }> = t.toArray(
     value,
-    _extractThreadsFromConversationViewResponseArrayXf
+    _extractThreadsFromConversationViewResponseArrayXf,
   );
   const messages = t.toArray(value, _extractMessagesFromResponseArrayXf);
 
@@ -674,7 +613,7 @@ function _threadsToTbGroups(threads: any[], start: number): Array<Array<any>> {
   const _threadsToTbGroupsXf = t.compose(
     t.map((thread: any) => thread._originalGmailFormat),
     t.partition(10),
-    mapIndexed((threadsChunk, i) => [['tb', start + i * 10, threadsChunk]])
+    mapIndexed((threadsChunk, i) => [['tb', start + i * 10, threadsChunk]]),
   );
   return t.toArray(threads, _threadsToTbGroupsXf);
 }
@@ -682,7 +621,7 @@ function _threadsToTbGroups(threads: any[], start: number): Array<Array<any>> {
 function _searchArray(
   responseArray: any,
   marker: string,
-  markerArrayValidator: (markerArray: any[]) => boolean
+  markerArrayValidator: (markerArray: any[]) => boolean,
 ): any {
   const pathArray = _searchObject(responseArray, marker, 100);
 
@@ -690,7 +629,7 @@ function _searchArray(
     const pathToMarkerArray = pathArray[ii].path.slice(0, -1);
     const markerArray = _getArrayValueFromPath(
       responseArray,
-      pathToMarkerArray
+      pathToMarkerArray,
     );
 
     if (markerArrayValidator(markerArray)) {

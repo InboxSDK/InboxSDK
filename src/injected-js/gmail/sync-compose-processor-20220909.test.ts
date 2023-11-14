@@ -321,7 +321,7 @@ const expectedOutputByFile = {
 };
 
 for (const [file, { parseWith, expected }] of Object.entries(
-  expectedOutputByFile
+  expectedOutputByFile,
 )) {
   it(`handles on ${file}`, () => {
     const testData = JSON.stringify(require(`../../../test/data/${file}`));
@@ -334,11 +334,11 @@ for (const [file, { parseWith, expected }] of Object.entries(
 
 it('handles onDraftSave request', () => {
   const request = JSON.stringify(
-    require('../../../test/data/2022-09-09-cvOnDraftSave_request.json')
+    require('../../../test/data/2022-09-09-cvOnDraftSave_request.json'),
   );
 
   const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
-    JSON.parse(request)
+    JSON.parse(request),
   );
   expect(composeRequest).toMatchObject({
     threadId: 'thread-a:r263523620390330024',
@@ -352,11 +352,11 @@ it('handles onDraftSave request', () => {
 
 it('handles onDraftSave request', () => {
   const request = JSON.stringify(
-    require('../../../test/data/2022-09-09-cvOnDraftUpdate_request.json')
+    require('../../../test/data/2022-09-09-cvOnDraftUpdate_request.json'),
   );
 
   const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
-    JSON.parse(request)
+    JSON.parse(request),
   );
   expect(composeRequest).toMatchObject({
     threadId: 'thread-a:r263523620390330024',
@@ -370,11 +370,11 @@ it('handles onDraftSave request', () => {
 
 it('handles onDraftSend request', () => {
   const request = JSON.stringify(
-    require('../../../test/data/2022-09-09-cvOnSend_request.json')
+    require('../../../test/data/2022-09-09-cvOnSend_request.json'),
   );
 
   const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
-    JSON.parse(request)
+    JSON.parse(request),
   );
   expect(composeRequest).toMatchObject({
     threadId: 'thread-a:r263523620390330024',
@@ -390,11 +390,11 @@ it('handles onDraftSend_2 request', () => {
   // cvOnSend_2_request_customThreadId was created
   // based on 2019-01-18-cvOffSend.json that has weird thread id field
   const request = JSON.stringify(
-    require('../../../test/data/2022-09-09-cvOnSend_2_request_customThreadId.json')
+    require('../../../test/data/2022-09-09-cvOnSend_2_request_customThreadId.json'),
   );
 
   const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
-    JSON.parse(request)
+    JSON.parse(request),
   );
   expect(composeRequest).toMatchObject({
     threadId: 'thread-a:r263523620390330024',
@@ -408,11 +408,11 @@ it('handles onDraftSend_2 request', () => {
 
 it('handles onReplySend request', () => {
   const request = JSON.stringify(
-    require('../../../test/data/2022-09-09-cvOnReplySend_request.json')
+    require('../../../test/data/2022-09-09-cvOnReplySend_request.json'),
   );
 
   const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
-    JSON.parse(request)
+    JSON.parse(request),
   );
   expect(composeRequest).toMatchObject({
     threadId: 'thread-a:r-474834441621213468',
@@ -436,17 +436,17 @@ it('handles onReplySend request', () => {
 
 it('replaces onReplySend request body', () => {
   const request = JSON.stringify(
-    require('../../../test/data/2022-09-09-cvOnReplySend_request.json')
+    require('../../../test/data/2022-09-09-cvOnReplySend_request.json'),
   );
 
   const replacedRequest =
     SCRP.replaceBodyContentInComposeSendRequestBody_2022_09_09(
       JSON.parse(request),
-      'replaced_content'
+      'replaced_content',
     );
 
   const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
-    replacedRequest!
+    replacedRequest!,
   );
 
   expect(parsedRequest).toMatchObject({
@@ -471,11 +471,11 @@ it('replaces onReplySend request body', () => {
 
 it('handles onReplySend_2 request', () => {
   const request = JSON.stringify(
-    require('../../../test/data/2022-09-09-cvOnReplySend_2_request.json')
+    require('../../../test/data/2022-09-09-cvOnReplySend_2_request.json'),
   );
 
   const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
-    JSON.parse(request)
+    JSON.parse(request),
   );
   expect(composeRequest).toMatchObject({
     threadId: 'thread-f:1743802434391390786',
@@ -489,17 +489,17 @@ it('handles onReplySend_2 request', () => {
 
 it('replaces onReplySend_2 request body', () => {
   const request = JSON.stringify(
-    require('../../../test/data/2022-09-09-cvOnReplySend_2_request.json')
+    require('../../../test/data/2022-09-09-cvOnReplySend_2_request.json'),
   );
 
   const replacedRequest =
     SCRP.replaceBodyContentInComposeSendRequestBody_2022_09_09(
       JSON.parse(request),
-      'replaced_content'
+      'replaced_content',
     );
 
   const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
-    replacedRequest!
+    replacedRequest!,
   );
 
   expect(parsedRequest).toMatchObject({
@@ -514,17 +514,17 @@ it('replaces onReplySend_2 request body', () => {
 
 it('replaces onReplySend_3 request body', () => {
   const request = JSON.stringify(
-    require('../../../test/data/2022-09-09-cvOnReplySend_3_request.json')
+    require('../../../test/data/2022-09-09-cvOnReplySend_3_request.json'),
   );
 
   const replacedRequest =
     SCRP.replaceBodyContentInComposeSendRequestBody_2022_09_09(
       JSON.parse(request),
-      'replaced_content'
+      'replaced_content',
     );
 
   const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
-    replacedRequest!
+    replacedRequest!,
   );
 
   expect(parsedRequest).toMatchObject({
@@ -539,17 +539,17 @@ it('replaces onReplySend_3 request body', () => {
 
 it('replaces onReplySend_4 request body', () => {
   const request = JSON.stringify(
-    require('../../../test/data/2022-09-09-cvOnReplySend_4_request.json')
+    require('../../../test/data/2022-09-09-cvOnReplySend_4_request.json'),
   );
 
   const replacedRequest =
     SCRP.replaceBodyContentInComposeSendRequestBody_2022_09_09(
       JSON.parse(request),
-      'replaced_content'
+      'replaced_content',
     );
 
   const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
-    replacedRequest!
+    replacedRequest!,
   );
 
   expect(parsedRequest).toMatchObject({
@@ -564,17 +564,17 @@ it('replaces onReplySend_4 request body', () => {
 
 it('replaces onReplySend_5 request body', () => {
   const request = JSON.stringify(
-    require('../../../test/data/2022-09-09-cvOnReplySend_5_request.json')
+    require('../../../test/data/2022-09-09-cvOnReplySend_5_request.json'),
   );
 
   const replacedRequest =
     SCRP.replaceBodyContentInComposeSendRequestBody_2022_09_09(
       JSON.parse(request),
-      'replaced_content'
+      'replaced_content',
     );
 
   const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
-    replacedRequest!
+    replacedRequest!,
   );
 
   expect(parsedRequest).toMatchObject({

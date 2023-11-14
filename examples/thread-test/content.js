@@ -1,3 +1,5 @@
+/// <reference path="../types.d.ts" />
+
 function addCustomMessage(sortDate) {
   const collapsedEl = document.createElement('div');
   const headerEl = document.createElement('div');
@@ -21,18 +23,35 @@ InboxSDK.load(2, 'thread-example').then((sdk) => {
 
   window._sdk = sdk;
 
+  sdk.Toolbars.registerThreadButton({
+    title: 'Start',
+    positions: ['THREAD'],
+    // iconUrl: StartImage,
+    hasDropdown: true,
+    onClick(event) {
+      console.log('clicked');
+      const selectedThreadViews = event.selectedThreadViews;
+      const messages = selectedThreadViews.flatMap((view) =>
+        view.getMessageViewsAll(),
+      );
+      const senders = messages.map(
+        (message) => message.getSender().emailAddress,
+      );
+    },
+  });
+
   sdk.Conversations.registerThreadViewHandler((threadView) => {
     (async () => {
       window._lastThreadView = threadView;
       console.log(
         'threadView',
         await threadView.getThreadIDAsync(),
-        threadView.getSubject()
+        threadView.getSubject(),
       );
       console.log(
         '%s loaded message views, %s all message views',
         threadView.getMessageViews().length,
-        threadView.getMessageViewsAll().length
+        threadView.getMessageViewsAll().length,
       );
       threadView.on('destroy', () => {
         console.log('threadView destroy');
@@ -46,7 +65,7 @@ InboxSDK.load(2, 'thread-example').then((sdk) => {
           }${customHiddenCount} custom hides`;
           console.log('args', customHiddenCount, nativeHiddenCount);
           return span;
-        }
+        },
       );
 
       const newLabel = document.createElement('span');
@@ -66,7 +85,7 @@ InboxSDK.load(2, 'thread-example').then((sdk) => {
       console.log(
         'messageView',
         await messageView.getMessageIDAsync(),
-        messageView.getBodyElement().textContent.slice(0, 20)
+        messageView.getBodyElement().textContent.slice(0, 20),
       );
       console.log('messageView.getViewState()', messageView.getViewState());
       ['viewStateChange', 'destroy'].forEach((name) => {
@@ -75,7 +94,7 @@ InboxSDK.load(2, 'thread-example').then((sdk) => {
             'messageView',
             name,
             messageView.getBodyElement().textContent.slice(0, 20),
-            event
+            event,
           );
         });
       });

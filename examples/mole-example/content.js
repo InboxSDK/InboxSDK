@@ -1,7 +1,19 @@
+/// <reference path="../types.d.ts" />
+
 'use strict';
 
 InboxSDK.load(2, 'simple-example').then(function (inboxSDK) {
   let i = 0;
+
+  inboxSDK.Compose.registerComposeViewHandler((composeView) => {
+    composeView.addButton({
+      title: 'My Button',
+      iconUrl: 'https://mailfoogae.appspot.com/build/images/snoozeIcon.png',
+      onClick: (event) => {
+        console.log('button clicked');
+      },
+    });
+  });
 
   window.makeMoleWidget = function () {
     const div = document.createElement('div');
@@ -22,21 +34,13 @@ InboxSDK.load(2, 'simple-example').then(function (inboxSDK) {
       //titleEl: titleEl,
       minimizedTitleEl: minimizedTitleEl,
       titleButtons: [
-        {
-          title: 'a1',
-          iconUrl: 'https://mailfoogae.appspot.com/build/images/snoozeIcon.png',
-          onClick: function () {
-            console.log('click a1');
-          },
-        },
-        {
-          title: 'a2',
-          iconUrl:
-            'https://mailfoogae.appspot.com/build/images/boxIconOnNewCompose.png',
-          onClick: function () {
-            console.log('click a2');
-          },
-        },
+        // {
+        //   title: 'a1',
+        //   iconUrl: 'https://mailfoogae.appspot.com/build/images/snoozeIcon.png',
+        //   onClick: function () {
+        //     console.log('click a1');
+        //   },
+        // },
       ],
     });
 

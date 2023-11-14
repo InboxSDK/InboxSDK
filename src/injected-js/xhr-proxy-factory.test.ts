@@ -1,4 +1,4 @@
-import assert from 'assert';
+import assert from 'node:assert';
 import _ from 'lodash';
 import noop from 'lodash/noop';
 import sinon from 'sinon';
@@ -44,7 +44,7 @@ server.respondWith(
   {
     status: 200,
     response: 'header value received',
-  }
+  },
 );
 server.respondWith(
   {
@@ -55,7 +55,7 @@ server.respondWith(
   {
     status: 200,
     response: 'testing here!',
-  }
+  },
 );
 server.respondWith(
   {
@@ -69,7 +69,7 @@ server.respondWith(
     headers: {
       'X-Test': 'Header Value',
     },
-  } as Responder
+  } as Responder,
 );
 server.respondWith(
   {
@@ -80,7 +80,7 @@ server.respondWith(
   {
     status: 200,
     response: 'body received',
-  }
+  },
 );
 server.respondWith(
   {
@@ -91,7 +91,7 @@ server.respondWith(
   {
     status: 200,
     response: 'testab received',
-  }
+  },
 );
 server.respondWith(
   {
@@ -101,7 +101,7 @@ server.respondWith(
   {
     status: 200,
     response: 'POST request',
-  }
+  },
 );
 server.respondWith(
   {
@@ -112,7 +112,7 @@ server.respondWith(
     status: 200,
     response: 'foo2 response!',
     partialResponse: 'foo2 response',
-  } as Responder
+  } as Responder,
 );
 server.respondWith(
   {
@@ -125,7 +125,7 @@ server.respondWith(
     responseXML: {
       fakeXml: true,
     },
-  } as Responder
+  } as Responder,
 );
 server.respondWith(
   {
@@ -135,7 +135,7 @@ server.respondWith(
   {
     status: 200,
     response: 'fooAB requested, data12 received',
-  }
+  },
 );
 const XMLHttpRequest = server.XMLHttpRequest;
 const constructors: Record<string, typeof XMLHttpRequest> = {
@@ -164,7 +164,7 @@ constructors['XHRProxy with changers'] = XHRProxyFactory(
   ],
   {
     logError: logError,
-  }
+  },
 );
 beforeEach(() => {
   logErrorTestCalls = 0;
@@ -195,7 +195,7 @@ beforeEach(() => {
               assert.strictEqual(
                 event.target,
                 this,
-                'check for correct event target'
+                'check for correct event target',
               );
               (calledForState as any)[this.readyState]++;
 
@@ -207,7 +207,7 @@ beforeEach(() => {
                 assert.equal(
                   this.responseText,
                   this.response,
-                  'check responseText'
+                  'check responseText',
                 );
               } else {
                 let responseText;
@@ -241,7 +241,7 @@ beforeEach(() => {
                     '3': runCount,
                     '4': runCount,
                   },
-                  'check that listener was called for each state'
+                  'check that listener was called for each state',
                 );
 
                 if (runCount === 1) {
@@ -285,7 +285,7 @@ beforeEach(() => {
             if (this.readyState == 4) {
               assert(
                 simpleFired && addedFired,
-                'check that both listeners fired'
+                'check that both listeners fired',
               );
               done();
             }
@@ -321,7 +321,7 @@ beforeEach(() => {
                 assert.equal(
                   this.responseText,
                   'Response here',
-                  'response check'
+                  'response check',
                 );
                 xhr.open('GET', '/foo2');
                 xhr.send();
@@ -329,7 +329,7 @@ beforeEach(() => {
                 assert.equal(
                   this.responseText,
                   'foo2 response!',
-                  'response check'
+                  'response check',
                 );
                 done();
               }
@@ -349,7 +349,7 @@ beforeEach(() => {
           assert.strictEqual(xhr.readyState, 1);
           assert((xhr.onreadystatechange as any).calledOnce);
           xhr.onreadystatechange = thrower(
-            'readyStateChange should not happen here'
+            'readyStateChange should not happen here',
           );
           xhr.send();
           xhr.open('GET', '/foo2');
@@ -617,7 +617,7 @@ beforeEach(() => {
             } else {
               assert.equal(
                 this.getAllResponseHeaders().trim().toLowerCase(),
-                'x-test: header value'
+                'x-test: header value',
               );
             }
 
@@ -670,7 +670,7 @@ beforeEach(() => {
         });
       });
     });
-  }
+  },
 );
 describe('XHRProxyFactory', () => {
   describe('wrappers', () => {
@@ -687,12 +687,12 @@ describe('XHRProxyFactory', () => {
       function checkConnectionParam(
         connection: Connection,
         expectStatus: any,
-        expectOriginalSendBody: any
+        expectOriginalSendBody: any,
       ) {
         assert.equal(
           (connection as any)._flag,
           true,
-          'connection object check'
+          'connection object check',
         );
 
         if (expectStatus) {
@@ -700,14 +700,14 @@ describe('XHRProxyFactory', () => {
           assert.equal(
             (connection as any).responseType,
             'text',
-            'responseType check'
+            'responseType check',
           );
         }
 
         assert.equal(
           connection.originalSendBody,
           expectOriginalSendBody ? 'body test' : undefined,
-          'body check'
+          'body check',
         );
         assert.equal(connection.method, 'GET', 'method check');
         assert.equal(connection.url, '/foo', 'url check');
@@ -720,7 +720,7 @@ describe('XHRProxyFactory', () => {
             assert.strictEqual(this, wrappers[0], 'this check');
             assert(
               !(connection as any)._flag,
-              'check that connection object is fresh'
+              'check that connection object is fresh',
             );
             (connection as any)._flag = true;
             checkConnectionParam(connection, false, false);
@@ -783,12 +783,12 @@ describe('XHRProxyFactory', () => {
             assert.equal(
               firstAfterListenersRan,
               1 * runCount,
-              'check that afterListeners ran correct number of times'
+              'check that afterListeners ran correct number of times',
             );
             assert.equal(
               rsc4Ran,
               1 * runCount,
-              'check that readystatechange listener ran correct number of times'
+              'check that readystatechange listener ran correct number of times',
             );
 
             if (runCount === 1) {
@@ -834,7 +834,7 @@ describe('XHRProxyFactory', () => {
           assert.equal(
             this.response,
             '',
-            'check response is empty until end when responseTextChanger is used'
+            'check response is empty until end when responseTextChanger is used',
           );
           assert.equal(this.responseText, this.response, 'check responseText');
         }
@@ -844,32 +844,32 @@ describe('XHRProxyFactory', () => {
           assert.equal(
             originalSendBodyLoggerRan,
             2 * runCount,
-            'check that originalSendBodyLogger ran correct number of times'
+            'check that originalSendBodyLogger ran correct number of times',
           );
           assert.equal(
             originalResponseTextLoggerRan,
             2 * runCount,
-            'check that originalResponseTextLogger ran correct number of times'
+            'check that originalResponseTextLogger ran correct number of times',
           );
           assert.equal(
             responseTextChangerRan,
             1 * runCount,
-            'check that responseTextChanger ran correct number of times'
+            'check that responseTextChanger ran correct number of times',
           );
           assert.equal(
             finalResponseTextLoggerRan,
             2 * runCount,
-            'check that finalResponseTextLogger ran correct number of times'
+            'check that finalResponseTextLogger ran correct number of times',
           );
           assert.equal(
             firstAfterListenersRan,
             1 * (runCount - 1),
-            'check that afterListeners ran correct number of times'
+            'check that afterListeners ran correct number of times',
           );
           assert.equal(
             this.response,
             origResponse + '-modified' + (runCount - 1),
-            'check that response was modified'
+            'check that response was modified',
           );
           assert.equal(this.responseText, this.response, 'check responseText');
           rsc4Ran++; // done is in afterListener wrapper
@@ -932,12 +932,12 @@ describe('XHRProxyFactory', () => {
           assert.equal(
             originalResponseTextLoggerRan,
             1,
-            'check that originalResponseTextLogger ran correct number of times'
+            'check that originalResponseTextLogger ran correct number of times',
           );
           assert.equal(
             finalResponseTextLoggerRan,
             1,
-            'check that finalResponseTextLogger ran correct number of times'
+            'check that finalResponseTextLogger ran correct number of times',
           );
           done();
         }
@@ -1012,12 +1012,12 @@ describe('XHRProxyFactory', () => {
           assert.equal(
             logErrorTestCalls,
             9,
-            'check that logError was called correct number of times'
+            'check that logError was called correct number of times',
           );
           assert.equal(
             loggerRan,
             1,
-            'check that originalResponseTextLogger was attempted'
+            'check that originalResponseTextLogger was attempted',
           );
           assert.equal(this.response, 'Response here!', 'check response');
           done();
@@ -1060,7 +1060,7 @@ describe('XHRProxyFactory', () => {
           assert.equal(
             loggerRan,
             1,
-            'check that originalResponseTextLogger has run'
+            'check that originalResponseTextLogger has run',
           );
           done();
         }
@@ -1078,7 +1078,7 @@ describe('XHRProxyFactory', () => {
         assert.equal(
           (connection as any)._flag,
           true,
-          'connection object check'
+          'connection object check',
         );
       }
 
@@ -1106,7 +1106,7 @@ describe('XHRProxyFactory', () => {
             assert.equal(
               xhr.readyState,
               3,
-              'check that readyState is still LOADING'
+              'check that readyState is still LOADING',
             );
             return response + '-modified';
           },
@@ -1159,12 +1159,12 @@ describe('XHRProxyFactory', () => {
         assert.equal(
           responseTextChangerRan,
           1,
-          'check that responseTextChanger ran correct number of times'
+          'check that responseTextChanger ran correct number of times',
         );
         assert.equal(
           finalResponseTextLoggerRan,
           2,
-          'check that finalResponseTextLogger ran correct number of times'
+          'check that finalResponseTextLogger ran correct number of times',
         );
         done();
       });
@@ -1176,7 +1176,7 @@ describe('XHRProxyFactory', () => {
           assert.equal(
             this.response,
             origResponse + '-modified',
-            'check that response was modified'
+            'check that response was modified',
           );
           methodCalled = true;
           finishRsc();
@@ -1188,7 +1188,7 @@ describe('XHRProxyFactory', () => {
           assert.equal(
             this.response,
             origResponse + '-modified',
-            'check that response was modified'
+            'check that response was modified',
           );
           addedListenerCalled = true;
           finishRsc();
@@ -1239,11 +1239,11 @@ describe('XHRProxyFactory', () => {
           responseTextChanger(connection, response) {
             assert.strictEqual(
               connection.originalResponseText,
-              'foo2 response!'
+              'foo2 response!',
             );
             assert.strictEqual(
               connection.modifiedResponseText,
-              'foo2 response!'
+              'foo2 response!',
             );
             assert.strictEqual(connection.modifiedResponseText, response);
             return response + 'a';
@@ -1255,11 +1255,11 @@ describe('XHRProxyFactory', () => {
           responseTextChanger(connection, response) {
             assert.strictEqual(
               connection.originalResponseText,
-              'foo2 response!'
+              'foo2 response!',
             );
             assert.strictEqual(
               connection.modifiedResponseText,
-              'foo2 response!a'
+              'foo2 response!a',
             );
             assert.strictEqual(connection.modifiedResponseText, response);
             return response + 'b';
@@ -1337,7 +1337,7 @@ describe('XHRProxyFactory', () => {
       xhr.onload = function () {
         assert.strictEqual(
           this.responseText,
-          'fooAB requested, data12 received'
+          'fooAB requested, data12 received',
         );
         done();
       };

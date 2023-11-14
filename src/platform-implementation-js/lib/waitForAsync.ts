@@ -3,7 +3,7 @@ import delay from 'pdelay';
 export default async function waitForAsync<T>(
   condition: () => Promise<T | null | undefined>,
   timeout: number = 120 * 1000,
-  steptime: number = 250
+  steptime: number = 250,
 ): Promise<T> {
   // make this error here so we have a sensible stack.
   const timeoutError = new Error('waitForAsync timeout');

@@ -5,7 +5,7 @@ import GmailDriver from '../gmail-driver';
 
 export default function addSupportItem(
   driver: GmailDriver,
-  supportItemDescriptor: SupportItemDescriptor
+  supportItemDescriptor: SupportItemDescriptor,
 ): GmailSupportItemView {
   return new GmailSupportItemView(driver, supportItemDescriptor);
 }

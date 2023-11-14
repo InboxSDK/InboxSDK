@@ -65,7 +65,7 @@ export default class CreateAccessoryButtonView implements ButtonViewI {
   private _setupEventStream() {
     const clickEventStream = Kefir.fromEvents<any, never>(
       this._element,
-      'click'
+      'click',
     );
 
     clickEventStream.onValue((event) => {
@@ -74,7 +74,10 @@ export default class CreateAccessoryButtonView implements ButtonViewI {
     });
 
     this._eventStream.plug(
-      clickEventStream.map((event) => ({ eventName: 'click', domEvent: event }))
+      clickEventStream.map((event) => ({
+        eventName: 'click',
+        domEvent: event,
+      })),
     );
   }
 }

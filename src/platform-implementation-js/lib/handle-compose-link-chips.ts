@@ -42,7 +42,7 @@ const handleComposeLinkChips = defn(
             doPresendFixing(composeView);
           });
       });
-  }
+  },
 );
 export default handleComposeLinkChips;
 const doFixing = defn(
@@ -54,7 +54,7 @@ const doFixing = defn(
 
     chips.filter(_isNotEnhanced).forEach(_addEnhancements);
   },
-  'doFixing'
+  'doFixing',
 );
 const doPresendFixing = defn(
   module,
@@ -77,7 +77,7 @@ const doPresendFixing = defn(
       }
     });
   },
-  'doPresendFixing'
+  'doPresendFixing',
 );
 
 function _getChipElements(bodyElement: HTMLElement): HTMLElement[] {
@@ -94,7 +94,7 @@ function _waitToClaim(el: HTMLElement): Kefir.Observable<boolean, unknown> {
       makeMutationObserverChunkedStream(el, {
         attributes: true,
         attributeFilter: ['class'],
-      })
+      }),
     )
     .map(() => !el.classList.contains('inboxsdk__ensure_link_active'))
     .filter(Boolean)
@@ -125,14 +125,14 @@ function _addEnhancements(chipElement: HTMLElement) {
       function (e: MouseEvent) {
         e.stopImmediatePropagation();
       },
-      true
+      true,
     );
     anchor.addEventListener(
       'click',
       function (e: MouseEvent) {
         e.stopImmediatePropagation();
       },
-      true
+      true,
     );
   }
 
@@ -140,14 +140,14 @@ function _addEnhancements(chipElement: HTMLElement) {
   xElement.src = X_URL;
   xElement.setAttribute(
     'style',
-    'opacity: 0.55; cursor: pointer; float: right; position: relative; top: -1px;'
+    'opacity: 0.55; cursor: pointer; float: right; position: relative; top: -1px;',
   );
   xElement.addEventListener(
     'mousedown',
     function () {
       chipElement.remove();
     },
-    true
+    true,
   );
   xElement.addEventListener(
     'click',
@@ -155,7 +155,7 @@ function _addEnhancements(chipElement: HTMLElement) {
       e.stopImmediatePropagation();
       e.preventDefault();
     },
-    true
+    true,
   );
   chipElement.addEventListener('mouseenter', function () {
     chipElement.appendChild(xElement);

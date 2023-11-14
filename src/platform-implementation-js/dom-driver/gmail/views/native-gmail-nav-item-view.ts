@@ -24,7 +24,7 @@ export default class NativeGmailNavItemView {
   constructor(
     driver: GmailDriver,
     nativeElement: HTMLElement,
-    navItemName: string
+    navItemName: string,
   ) {
     this._driver = driver;
     this._element = nativeElement;
@@ -43,8 +43,8 @@ export default class NativeGmailNavItemView {
       })
         .map(() =>
           parentElement.querySelector<HTMLElement>(
-            `.aim a[href*="#${this._navItemName}"]`
-          )
+            `.aim a[href*="#${this._navItemName}"]`,
+          ),
         )
         .filter(Boolean)
         .map((link) => findParent(link!, (el) => el.classList.contains('aim')))
@@ -96,7 +96,7 @@ export default class NativeGmailNavItemView {
 
   addNavItem(
     orderGroup: number,
-    navItemDescriptor: Kefir.Observable<any, any>
+    navItemDescriptor: Kefir.Observable<any, any>,
   ): GmailNavItemView {
     const gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, 2);
     Kefir.merge([
@@ -175,11 +175,11 @@ export default class NativeGmailNavItemView {
     const insertBeforeElement = getInsertBeforeElement(
       gmailNavItemView.getElement(),
       itemContainerElement.children,
-      ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint']
+      ['data-group-order-hint', 'data-order-hint', 'data-insertion-order-hint'],
     );
     itemContainerElement.insertBefore(
       gmailNavItemView.getElement(),
-      insertBeforeElement
+      insertBeforeElement,
     );
     const element = gmailNavItemView.getElement();
     querySelector(element, '.TN').style.marginLeft =
@@ -194,7 +194,7 @@ export default class NativeGmailNavItemView {
     if (!itemContainerElement) {
       itemContainerElement = this._itemContainerElement =
         this._element.querySelector<HTMLElement>(
-          '.inboxsdk__navItem_container'
+          '.inboxsdk__navItem_container',
         );
 
       if (!itemContainerElement) {
@@ -235,7 +235,7 @@ export default class NativeGmailNavItemView {
         e.preventDefault();
         e.stopImmediatePropagation();
       },
-      true
+      true,
     );
 
     const insertionPoint = this._element.querySelector('.TN');
@@ -243,7 +243,7 @@ export default class NativeGmailNavItemView {
     if (insertionPoint) {
       (insertionPoint as any).insertAdjacentElement(
         'afterbegin',
-        expandoElement
+        expandoElement,
       );
     }
 
@@ -291,7 +291,7 @@ export default class NativeGmailNavItemView {
       this._itemContainerElement.style.display = 'none';
     localStorage.setItem(
       'inboxsdk__nativeNavItem__state_' + this._navItemName,
-      'collapsed'
+      'collapsed',
     );
 
     this._eventStream.emit({
@@ -309,7 +309,7 @@ export default class NativeGmailNavItemView {
       this._itemContainerElement.style.display = '';
     localStorage.setItem(
       'inboxsdk__nativeNavItem__state_' + this._navItemName,
-      'expanded'
+      'expanded',
     );
 
     this._eventStream.emit({
@@ -351,7 +351,7 @@ export default class NativeGmailNavItemView {
 
     this._element.insertBefore(
       activeMarkerElement,
-      this._element.firstElementChild
+      this._element.firstElementChild,
     );
   }
 

@@ -12,7 +12,7 @@ export default class ScrollableContainByScreen {
   constructor(
     element: HTMLElement,
     anchorPoint: HTMLElement,
-    options: Options
+    options: Options,
   ) {
     Kefir.merge([
       this._manualRepositions,

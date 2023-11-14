@@ -9,7 +9,7 @@ class Keyboard {
     appId: string,
     appName: string | null | undefined,
     appIconUrl: string | null | undefined,
-    driver: Driver
+    driver: Driver,
   ) {
     const members = {
       appId,
@@ -36,12 +36,12 @@ class Keyboard {
 
     const keyboardShortcutHandle = new KeyboardShortcutHandle(
       chord,
-      description
+      description,
     );
     members.driver.activateShortcut(
       keyboardShortcutHandle,
       members.appName,
-      members.appIconUrl
+      members.appIconUrl,
     );
     return keyboardShortcutHandle;
   }

@@ -5,7 +5,6 @@ import intersection from 'lodash/intersection';
 import uniqBy from 'lodash/uniqBy';
 import flatMap from 'lodash/flatMap';
 import { defonce } from 'ud';
-import assert from 'assert';
 import * as Kefir from 'kefir';
 import asap from 'asap';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
@@ -28,6 +27,7 @@ import type {
   ThreadDateDescriptor,
 } from '../../../../inboxsdk';
 import { querySelectorOrWarn } from '../../../lib/dom/querySelectorOrWarn';
+import { assert } from '../../../../common/assert';
 
 type LabelMod = {
   gmailLabelView: Record<string, any>;
@@ -80,7 +80,7 @@ type Mods = {
 };
 const cachedModificationsByRow: WeakMap<HTMLElement, Mods> = defonce(
   module,
-  () => new WeakMap()
+  () => new WeakMap(),
 );
 
 function focusAndNoPropagation(this: any, event: Event) {
@@ -112,7 +112,7 @@ function starGroupEventInterceptor(this: any, event: MouseEvent) {
         event.shiftKey,
         event.metaKey,
         event.button,
-        event.relatedTarget
+        event.relatedTarget,
       );
       this.parentElement.dispatchEvent(newEvent);
     }
@@ -148,7 +148,7 @@ class GmailThreadRowView {
   constructor(
     element: HTMLElement,
     rowListViewDriver: GmailRowListView,
-    gmailDriver: GmailDriver
+    gmailDriver: GmailDriver,
   ) {
     assert(element.hasAttribute('id'), 'check element is main thread row');
     this._isVertical =
@@ -227,36 +227,36 @@ class GmailThreadRowView {
     this._isDestroyed = true;
     this._modifications.label.unclaimed =
       this._modifications.label.claimed.concat(
-        this._modifications.label.unclaimed
+        this._modifications.label.unclaimed,
       );
     this._modifications.label.claimed.length = 0;
     this._modifications.action.unclaimed =
       this._modifications.action.claimed.concat(
-        this._modifications.action.unclaimed
+        this._modifications.action.unclaimed,
       );
     this._modifications.action.claimed.length = 0;
     this._modifications.button.unclaimed =
       this._modifications.button.claimed.concat(
-        this._modifications.button.unclaimed
+        this._modifications.button.unclaimed,
       );
     this._modifications.button.claimed.length = 0;
     this._modifications.image.unclaimed =
       this._modifications.image.claimed.concat(
-        this._modifications.image.unclaimed
+        this._modifications.image.unclaimed,
       );
     this._modifications.image.claimed.length = 0;
     this._modifications.replacedDate.unclaimed =
       this._modifications.replacedDate.claimed.concat(
-        this._modifications.replacedDate.unclaimed
+        this._modifications.replacedDate.unclaimed,
       );
     this._modifications.replacedDate.claimed.length = 0;
     this._modifications.replacedDraftLabel.unclaimed =
       this._modifications.replacedDraftLabel.claimed.concat(
-        this._modifications.replacedDraftLabel.unclaimed
+        this._modifications.replacedDraftLabel.unclaimed,
       );
     this._modifications.replacedDraftLabel.claimed.length = 0;
     flatMap(this._elements, (el) =>
-      Array.from(el.getElementsByClassName('inboxsdk__thread_row_addition'))
+      Array.from(el.getElementsByClassName('inboxsdk__thread_row_addition')),
     ).forEach((el) => {
       el.remove();
     });
@@ -301,7 +301,7 @@ class GmailThreadRowView {
         if (stepTime == undefined) {
           console.log(
             'Should not happen: ThreadRowViewDriver never became ready',
-            this
+            this,
           );
           return Kefir.never();
         } else {
@@ -327,7 +327,7 @@ class GmailThreadRowView {
      */
     const recipientsElement = querySelectorOrWarn<HTMLElement>(
       this._elements[0],
-      'td div.yW'
+      'td div.yW',
     );
 
     if (!recipientsElement) {
@@ -360,7 +360,7 @@ class GmailThreadRowView {
     label:
       | LabelDescriptor
       | null
-      | Kefir.Observable<LabelDescriptor | null, unknown>
+      | Kefir.Observable<LabelDescriptor | null, unknown>,
   ) {
     if (!this._elements.length) {
       console.warn('addLabel called on destroyed thread row');
@@ -382,7 +382,7 @@ class GmailThreadRowView {
 
             this._modifications.label.claimed.splice(
               this._modifications.label.claimed.indexOf(labelMod),
-              1
+              1,
             );
 
             labelMod = null;
@@ -415,7 +415,7 @@ class GmailThreadRowView {
           ) {
             labelParentDiv.insertAdjacentElement(
               'afterbegin',
-              labelMod.gmailLabelView.getElement()
+              labelMod.gmailLabelView.getElement(),
             );
           }
         }
@@ -425,7 +425,7 @@ class GmailThreadRowView {
   addImage(
     inIconDescriptor:
       | ImageDescriptor
-      | Kefir.Observable<ImageDescriptor | null, any>
+      | Kefir.Observable<ImageDescriptor | null, any>,
   ) {
     if (!this._elements.length) {
       console.warn('addImage called on destroyed thread row');
@@ -439,7 +439,7 @@ class GmailThreadRowView {
           this._getRefresher(),
           this._getSubjectRefresher(),
           this._getImageContainerRefresher(),
-        ])
+        ]),
       )
       .takeUntilBy(this._stopper);
     let imageMod: ImageMod | null | undefined = null;
@@ -450,7 +450,7 @@ class GmailThreadRowView {
 
           this._modifications.image.claimed.splice(
             this._modifications.image.claimed.indexOf(imageMod),
-            1
+            1,
           );
 
           imageMod = null;
@@ -481,7 +481,7 @@ class GmailThreadRowView {
           iconWrapper,
           false,
           iconDescriptor.imageClass,
-          iconDescriptor.imageUrl
+          iconDescriptor.imageUrl,
         );
         const containerRow =
           this._elements.length === 3 ? this._elements[2] : this._elements[0];
@@ -498,7 +498,7 @@ class GmailThreadRowView {
         if (!labelParent.contains(iconWrapper)) {
           querySelector(labelParent, '.y6').insertAdjacentElement(
             'beforebegin',
-            iconWrapper
+            iconWrapper,
           );
         }
       }
@@ -545,7 +545,7 @@ class GmailThreadRowView {
 
           this._modifications.button.claimed.splice(
             this._modifications.button.claimed.indexOf(buttonMod),
-            1
+            1,
           );
 
           buttonMod = null;
@@ -579,6 +579,7 @@ class GmailThreadRowView {
 
             if (buttonDescriptor.title) {
               buttonSpan.setAttribute('title', buttonDescriptor.title);
+              buttonSpan.setAttribute('data-tooltip', buttonDescriptor.title);
             } else {
               buttonSpan.removeAttribute('title');
             }
@@ -586,7 +587,7 @@ class GmailThreadRowView {
             buttonSpan.setAttribute('tabindex', '-1');
             buttonSpan.setAttribute(
               'data-order-hint',
-              String(buttonDescriptor.orderHint || 0)
+              String(buttonDescriptor.orderHint || 0),
             );
             buttonSpan.addEventListener('onmousedown', focusAndNoPropagation);
             iconSettings = {};
@@ -632,7 +633,7 @@ class GmailThreadRowView {
                 appEvent.dropdown = activeDropdown = new DropdownView(
                   new GmailDropdownView(),
                   buttonSpan,
-                  null
+                  null,
                 );
                 activeDropdown.setPlacementOptions({
                   position: 'bottom',
@@ -662,7 +663,7 @@ class GmailThreadRowView {
           buttonSpan,
           false,
           buttonDescriptor.iconClass,
-          buttonDescriptor.iconUrl
+          buttonDescriptor.iconUrl,
         );
 
         if (buttonToolbar && buttonSpan.parentElement !== buttonToolbar) {
@@ -717,7 +718,7 @@ class GmailThreadRowView {
 
           this._modifications.action.claimed.splice(
             this._modifications.action.claimed.indexOf(actionMod),
-            1
+            1,
           );
 
           actionMod = null;
@@ -739,7 +740,7 @@ class GmailThreadRowView {
         }
 
         actionMod.gmailActionButtonView.updateDescriptor(
-          actionButtonDescriptor
+          actionButtonDescriptor,
         );
         const { url, onClick } = actionButtonDescriptor;
         actionMod.gmailActionButtonView.setOnClick((event: Event) => {
@@ -760,12 +761,12 @@ class GmailThreadRowView {
         if (
           !includes(
             actionParentDiv.children,
-            actionMod.gmailActionButtonView.getElement()
+            actionMod.gmailActionButtonView.getElement(),
           )
         ) {
           actionParentDiv.insertBefore(
             actionMod.gmailActionButtonView.getElement(),
-            actionParentDiv.firstChild
+            actionParentDiv.firstChild,
           );
         }
       }
@@ -807,11 +808,11 @@ class GmailThreadRowView {
 
             if (
               !attachmentDiv.querySelector(
-                '.inboxsdk__thread_row_attachment_icon'
+                '.inboxsdk__thread_row_attachment_icon',
               )
             ) {
               attachmentDiv.classList.remove(
-                'inboxsdk__thread_row_attachment_icons_present'
+                'inboxsdk__thread_row_attachment_icons_present',
               );
             }
           }
@@ -861,7 +862,7 @@ class GmailThreadRowView {
           }
 
           attachmentDiv.classList.add(
-            'inboxsdk__thread_row_attachment_icons_present'
+            'inboxsdk__thread_row_attachment_icons_present',
           );
         }
       });
@@ -872,7 +873,7 @@ class GmailThreadRowView {
       if (!this._elements.length) return;
 
       const dateContainer = this._elements[0].querySelector(
-        'td.xW, td.yf > div.apm'
+        'td.xW, td.yf > div.apm',
       );
 
       if (!dateContainer) return;
@@ -891,7 +892,7 @@ class GmailThreadRowView {
           8 +
           2 +
           20 +
-          dateColumnAttachmentIconCount * 16
+          dateColumnAttachmentIconCount * 16,
       );
     });
   }
@@ -900,7 +901,7 @@ class GmailThreadRowView {
     opts:
       | ThreadDateDescriptor
       | null
-      | Kefir.Observable<ThreadDateDescriptor | null, any>
+      | Kefir.Observable<ThreadDateDescriptor | null, any>,
   ) {
     if (!this._elements.length) {
       console.warn('replaceDraftLabel called on destroyed thread row');
@@ -927,7 +928,7 @@ class GmailThreadRowView {
 
             this._modifications.replacedDraftLabel.claimed.splice(
               this._modifications.replacedDraftLabel.claimed.indexOf(labelMod),
-              1
+              1,
             );
 
             labelMod = null;
@@ -937,7 +938,7 @@ class GmailThreadRowView {
             {
               count: 1,
             },
-            opts
+            opts,
           );
 
           if (!labelMod) {
@@ -960,13 +961,13 @@ class GmailThreadRowView {
 
           const needToAdd = !includes(
             recipientsContainer.children,
-            labelMod.el
+            labelMod.el,
           );
 
           if (needToAdd || !draftElement) {
             labelMod.el.innerHTML = originalLabel.innerHTML;
             const materiaUIlDraftElements = Array.from(
-              labelMod.el.querySelectorAll('.boq')
+              labelMod.el.querySelectorAll('.boq'),
             );
 
             if (materiaUIlDraftElements.length > 0) {
@@ -990,7 +991,7 @@ class GmailThreadRowView {
             }
 
             draftElement.classList.add(
-              'inboxsdk__thread_row_custom_draft_part'
+              'inboxsdk__thread_row_custom_draft_part',
             );
             countElement = Object.assign(document.createElement('span'), {
               className: 'inboxsdk__thread_row_custom_draft_count',
@@ -1012,7 +1013,7 @@ class GmailThreadRowView {
     opts:
       | ThreadDateDescriptor
       | null
-      | Kefir.Observable<ThreadDateDescriptor | null, any>
+      | Kefir.Observable<ThreadDateDescriptor | null, any>,
   ) {
     if (!this._elements.length) {
       console.warn('replaceDate called on destroyed thread row');
@@ -1030,7 +1031,7 @@ class GmailThreadRowView {
       .onValue(([opts]: any) => {
         const dateContainer = querySelector(
           this._elements[0],
-          'td.xW, td.yf > div.apm'
+          'td.xW, td.yf > div.apm',
         );
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const originalDateSpan = dateContainer.firstElementChild;
@@ -1041,7 +1042,7 @@ class GmailThreadRowView {
 
             this._modifications.replacedDate.claimed.splice(
               this._modifications.replacedDate.claimed.indexOf(dateMod),
-              1
+              1,
             );
 
             dateMod = null;
@@ -1059,7 +1060,7 @@ class GmailThreadRowView {
                 remove() {
                   this.el.remove();
                   dateContainer.classList.remove(
-                    'inboxsdk__thread_row_custom_date_container'
+                    'inboxsdk__thread_row_custom_date_container',
                   );
                 },
               };
@@ -1083,7 +1084,7 @@ class GmailThreadRowView {
           if (!includes(dateContainer.children, dateMod.el)) {
             dateContainer.insertBefore(dateMod.el, dateContainer.firstChild);
             dateContainer.classList.add(
-              'inboxsdk__thread_row_custom_date_container'
+              'inboxsdk__thread_row_custom_date_container',
             );
           }
 
@@ -1109,7 +1110,7 @@ class GmailThreadRowView {
       ? querySelector(this._elements[1], 'div.xS div.xT div.y6 > span[id]')
       : querySelector(
           this._elements[0],
-          'td.a4W div.xS div.xT div.y6 > span[id]'
+          'td.a4W div.xS div.xT div.y6 > span[id]',
         );
   }
 
@@ -1124,7 +1125,7 @@ class GmailThreadRowView {
   getDateString(): string {
     return querySelector(
       this._elements[0],
-      'td.xW > span[title]:not(.inboxsdk__thread_row_custom_date), td.yf.apt > div.apm > span[title]:not(.inboxsdk__thread_row_custom_date)'
+      'td.xW > span[title]:not(.inboxsdk__thread_row_custom_date), td.yf.apt > div.apm > span[title]:not(.inboxsdk__thread_row_custom_date)',
     ).title;
   }
 
@@ -1137,42 +1138,36 @@ class GmailThreadRowView {
       return this._cachedThreadID;
     }
 
-    if (this._driver.isUsingSyncAPI()) {
-      const elementWithId = flatten(
-        this._elements.map((el) =>
-          Array.from(
-            el.querySelectorAll('[data-thread-id][data-legacy-thread-id]')
-          )
-        )
-      ).filter(Boolean)[0];
+    const elementWithId = flatten(
+      this._elements.map((el) =>
+        Array.from(
+          el.querySelectorAll('[data-thread-id][data-legacy-thread-id]'),
+        ),
+      ),
+    ).filter(Boolean)[0];
 
-      if (elementWithId) {
-        this._cachedSyncThreadID = elementWithId
-          .getAttribute('data-thread-id')!
-          .replace('#', '');
-        this._cachedThreadID = elementWithId
-          .getAttribute('data-legacy-thread-id')!
-          .replace('#', '');
-        return this._cachedThreadID;
-      } else {
-        const threadID = this._driver
-          .getThreadRowIdentifier()
-          .getThreadIdForThreadRow(this, this._elements);
-
-        this._cachedSyncThreadID = threadID;
-
-        if (threadID) {
-          this._driver
-            .getOldGmailThreadIdFromSyncThreadId(threadID)
-            .then((oldGmailThreadID) => {
-              this._cachedThreadID = oldGmailThreadID;
-            });
-        }
-      }
+    if (elementWithId) {
+      this._cachedSyncThreadID = elementWithId
+        .getAttribute('data-thread-id')!
+        .replace('#', '');
+      this._cachedThreadID = elementWithId
+        .getAttribute('data-legacy-thread-id')!
+        .replace('#', '');
+      return this._cachedThreadID;
     } else {
-      this._cachedThreadID = this._driver
+      const threadID = this._driver
         .getThreadRowIdentifier()
         .getThreadIdForThreadRow(this, this._elements);
+
+      this._cachedSyncThreadID = threadID;
+
+      if (threadID) {
+        this._driver
+          .getOldGmailThreadIdFromSyncThreadId(threadID)
+          .then((oldGmailThreadID) => {
+            this._cachedThreadID = oldGmailThreadID;
+          });
+      }
     }
 
     return this._cachedThreadID;
@@ -1203,24 +1198,18 @@ class GmailThreadRowView {
   getDraftID(): Promise<string | null | undefined> {
     if (this._cachedSyncDraftIDPromise) return this._cachedSyncDraftIDPromise;
 
-    if (this._driver.isUsingSyncAPI()) {
-      const elementWithId = flatten(
-        this._elements.map((el) =>
-          Array.from(el.querySelectorAll('[data-standalone-draft-id]'))
-        )
-      ).filter(Boolean)[0];
-      this._cachedSyncDraftIDPromise = Promise.resolve(
-        elementWithId
-          ? elementWithId
-              .getAttribute('data-standalone-draft-id')!
-              .replace('#msg-a:', '')
-          : null
-      );
-    } else {
-      this._cachedSyncDraftIDPromise = this._driver
-        .getThreadRowIdentifier()
-        .getDraftIdForThreadRow(this);
-    }
+    const elementWithId = flatten(
+      this._elements.map((el) =>
+        Array.from(el.querySelectorAll('[data-standalone-draft-id]')),
+      ),
+    ).filter(Boolean)[0];
+    this._cachedSyncDraftIDPromise = Promise.resolve(
+      elementWithId
+        ? elementWithId
+            .getAttribute('data-standalone-draft-id')!
+            .replace('#msg-a:', '')
+        : null,
+    );
 
     return this._cachedSyncDraftIDPromise;
   }
@@ -1245,7 +1234,7 @@ class GmailThreadRowView {
 
   isSelected(): boolean {
     return !!this._elements[0].querySelector(
-      'div[role=checkbox][aria-checked=true]'
+      'div[role=checkbox][aria-checked=true]',
     );
   }
 
@@ -1253,7 +1242,7 @@ class GmailThreadRowView {
     return this._elements.length > 1
       ? querySelector(
           this._elements[this._elements.length === 2 ? 0 : 2],
-          'div.apu'
+          'div.apu',
         )
       : querySelector(this._elements[0], 'td.a4W div.xS div.xT');
   }
@@ -1280,7 +1269,7 @@ class GmailThreadRowView {
         this._getWatchElement(),
         {
           childList: true,
-        }
+        },
       )
         .map(() => null)
         .takeUntilBy(this._stopper)
@@ -1326,18 +1315,18 @@ class GmailThreadRowView {
           {
             attributes: true,
             attributeFilter: ['class'],
-          }
+          },
         );
         imageRefresher = this._imageRefresher = classChangeStream
           .bufferBy(classChangeStream.flatMapLatest(() => delayAsap()))
           .filter(
             () =>
               containerRow.querySelectorAll(
-                '.inboxsdk__thread_row_icon_wrapper'
+                '.inboxsdk__thread_row_icon_wrapper',
               ).length > 0 &&
               !containerRow.classList.contains(
-                'inboxsdk__thread_row_image_added'
-              )
+                'inboxsdk__thread_row_image_added',
+              ),
           )
           .map(() => null)
           .takeUntilBy(this._stopper)
@@ -1357,7 +1346,7 @@ export function removeAllThreadRowUnclaimedModifications() {
   // and populate the unclaimed modifications
   setTimeout(() => {
     const modifiedRows = document.querySelectorAll(
-      'tr[data-inboxsdk-thread-row]'
+      'tr[data-inboxsdk-thread-row]',
     );
     Array.prototype.forEach.call(modifiedRows, (row) => {
       const modifications = cachedModificationsByRow.get(row);

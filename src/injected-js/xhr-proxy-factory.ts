@@ -5,7 +5,7 @@ import each from 'lodash/each';
 import filter from 'lodash/filter';
 import includes from 'lodash/includes';
 import once from 'lodash/once';
-import assert from 'assert';
+import { assert } from '../common/assert';
 import EventEmitter from 'events';
 import { parse as deparam } from 'querystring';
 export type Opts = {
@@ -93,26 +93,26 @@ export type Wrapper = {
   isRelevantTo: (connection: XHRProxyConnectionDetails) => boolean;
   originalSendBodyLogger?: (
     connection: XHRProxyConnectionDetails,
-    body: string
+    body: string,
   ) => void;
   requestChanger?: (
     connection: XHRProxyConnectionDetails,
-    request: Record<string, any>
+    request: Record<string, any>,
   ) => Request | Promise<Request>;
   originalResponseTextLogger?: (
     connection: XHRProxyConnectionDetailsWithResponse,
-    originalResponseText: string
+    originalResponseText: string,
   ) => void;
   responseTextChanger?: (
     connection: XHRProxyConnectionDetailsWithResponse,
-    originalResponseText: string
+    originalResponseText: string,
   ) => string | Promise<string>;
   finalResponseTextLogger?: (
     connection: XHRProxyConnectionDetailsWithResponse,
-    finalResponseText: string
+    finalResponseText: string,
   ) => void;
   afterListeners?: (
-    connection: XHRProxyConnectionDetailsAfterListeners
+    connection: XHRProxyConnectionDetailsAfterListeners,
   ) => void;
 };
 /**
@@ -129,7 +129,7 @@ export type Wrapper = {
 export default function XHRProxyFactory(
   XHR: typeof XMLHttpRequest,
   wrappers: Wrapper[],
-  opts: Opts
+  opts: Opts,
 ): typeof XMLHttpRequest {
   const logError =
     (opts && opts.logError) ||
@@ -143,7 +143,7 @@ export default function XHRProxyFactory(
   function transformEvent(
     oldTarget: unknown,
     newTarget: Record<string, any>,
-    event: any
+    event: any,
   ) {
     const newEvent: any = {};
     Object.keys(event)
@@ -187,14 +187,14 @@ export default function XHRProxyFactory(
     return function (event: any) {
       return listener.call(
         newTarget,
-        transformEvent(oldTarget, newTarget, event)
+        transformEvent(oldTarget, newTarget, event),
       );
     };
   }
 
   function findApplicableWrappers(
     wrappers: Wrapper[],
-    connection: XHRProxyConnectionDetails
+    connection: XHRProxyConnectionDetails,
   ) {
     return filter(wrappers, function (wrapper) {
       try {
@@ -238,7 +238,7 @@ export default function XHRProxyFactory(
       // call constructor with variable number of arguments
       this._realxhr = new ((XHR as any).bind.apply(
         XHR,
-        [null].concat(arguments as any)
+        [null].concat(arguments as any),
       ))();
     } else {
       // Safari's XMLHttpRequest lacks a bind method, but its constructor
@@ -255,7 +255,7 @@ export default function XHRProxyFactory(
           wrapEventListener(
             this._realxhr,
             this,
-            (this as any)['on' + name]
+            (this as any)['on' + name],
           ).call(this, event);
         } catch (e) {
           logError(e, 'XMLHttpRequest event listener error');
@@ -294,7 +294,7 @@ export default function XHRProxyFactory(
           AT_TARGET: 2,
           BUBBLING_PHASE: 3,
           eventPhase: 0,
-        })
+        }),
       );
     };
 
@@ -310,7 +310,7 @@ export default function XHRProxyFactory(
           lengthComputable: false,
           loaded: 0,
           total: 0,
-        }
+        },
       );
       var supportsResponseText =
         !this._realxhr.responseType || this._realxhr.responseType == 'text';
@@ -321,7 +321,7 @@ export default function XHRProxyFactory(
             try {
               wrapper.finalResponseTextLogger(
                 this._connection,
-                this.responseText
+                this.responseText,
               );
             } catch (e) {
               logError(e);
@@ -378,7 +378,7 @@ export default function XHRProxyFactory(
                 try {
                   wrapper.originalResponseTextLogger(
                     this._connection,
-                    this._connection.originalResponseText
+                    this._connection.originalResponseText,
                   );
                 } catch (e) {
                   logError(e);
@@ -403,14 +403,14 @@ export default function XHRProxyFactory(
                     console.warn(
                       'responseTextChanger is taking too long',
                       responseTextChanger,
-                      startConnection
+                      startConnection,
                     );
                   }, WARNING_TIMEOUT);
 
                   try {
                     modifiedResponseText = await responseTextChanger(
                       startConnection,
-                      modifiedResponseText
+                      modifiedResponseText,
                     );
                   } finally {
                     clearTimeout(longRunWarningTimer);
@@ -419,7 +419,7 @@ export default function XHRProxyFactory(
                   if (typeof modifiedResponseText !== 'string') {
                     throw new Error(
                       'responseTextChanger returned non-string value ' +
-                        modifiedResponseText
+                        modifiedResponseText,
                     );
                   }
 
@@ -443,7 +443,7 @@ export default function XHRProxyFactory(
                       this.responseText = this._realxhr.responseText;
                       finish();
                     }
-                  }
+                  },
                 )
                 .catch(logError);
               return;
@@ -479,7 +479,7 @@ export default function XHRProxyFactory(
           runRscListeners(event);
         }
       },
-      false
+      false,
     );
 
     [
@@ -560,13 +560,13 @@ export default function XHRProxyFactory(
 
   XHRProxy.prototype.setRequestHeader = function (
     name: string,
-    value: unknown
+    value: unknown,
   ) {
     var self = this;
 
     if (this.readyState != 1) {
       console.warn(
-        'setRequestHeader improperly called at readyState ' + this.readyState
+        'setRequestHeader improperly called at readyState ' + this.readyState,
       );
     }
 
@@ -587,7 +587,7 @@ export default function XHRProxyFactory(
 
   XHRProxy.prototype.addEventListener = function (
     name: string,
-    listener: unknown
+    listener: unknown,
   ) {
     if (!this._listeners[name]) {
       this._listeners[name] = [];
@@ -611,7 +611,7 @@ export default function XHRProxyFactory(
 
   XHRProxy.prototype.removeEventListener = function (
     name: string,
-    listener: unknown
+    listener: unknown,
   ) {
     if (!this._listeners[name]) {
       return;
@@ -636,7 +636,7 @@ export default function XHRProxyFactory(
     this: XHRProxyThis,
     method: string,
     url: string,
-    async: boolean
+    async: boolean,
   ) {
     // Work around MailTrack issue
     if (!(this instanceof XHRProxy)) {
@@ -655,7 +655,7 @@ export default function XHRProxyFactory(
     this._realStartedSend = false;
     this._activeWrappers = findApplicableWrappers(
       this._wrappers,
-      this._connection
+      this._connection,
     );
     this._responseTextChangers = this._activeWrappers
       .map(function (wrapper) {
@@ -738,14 +738,14 @@ export default function XHRProxyFactory(
             console.warn(
               'requestChanger is taking too long',
               requestChanger,
-              startConnection
+              startConnection,
             );
           }, WARNING_TIMEOUT);
 
           try {
             modifiedRequest = await requestChanger(
               this._connection,
-              Object.freeze(modifiedRequest)
+              Object.freeze(modifiedRequest),
             );
           } finally {
             clearTimeout(longRunWarningTimer);

@@ -1,7 +1,7 @@
 function log() {
   console.log.apply(
     console,
-    ['custom-thread-list'].concat(Array.prototype.slice.call(arguments))
+    ['custom-thread-list'].concat(Array.prototype.slice.call(arguments)),
   );
 }
 
@@ -26,7 +26,7 @@ InboxSDK.load(1, 'custom-thread-list').then(function (sdk) {
       'type',
       routeView.getRouteType(),
       'params',
-      routeView.getParams()
+      routeView.getParams(),
     );
   });
 
@@ -34,7 +34,7 @@ InboxSDK.load(1, 'custom-thread-list').then(function (sdk) {
     sdk.Router.NativeListRouteIDs.ANY_LIST,
     function (listRouteView) {
       window.lastListRouteView = listRouteView;
-    }
+    },
   );
 
   sdk.Router.handleCustomRoute('text', function (customRouteView) {
@@ -109,7 +109,7 @@ InboxSDK.load(1, 'custom-thread-list').then(function (sdk) {
         '<br>foo<br>bar' +
         '<br>foo<br>bar' +
         '<br>foo<br>bar<br>END';
-    }
+    },
   );
 
   const customListThreads = [

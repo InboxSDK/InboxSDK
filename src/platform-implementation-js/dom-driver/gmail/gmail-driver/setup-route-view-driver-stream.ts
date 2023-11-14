@@ -11,7 +11,7 @@ import routeIDmatchesHash from '../../../lib/routeIDmatchesHash';
 
 export default function setupRouteViewDriverStream(
   gmailRouteProcessor: GmailRouteProcessor,
-  driver: GmailDriver
+  driver: GmailDriver,
 ): Observable<GmailRouteView, unknown> {
   const customRouteIDs = driver.getCustomRouteIDs();
   const customListRouteIDs = driver.getCustomListRouteIDs();
@@ -33,7 +33,7 @@ export default function setupRouteViewDriverStream(
 
   const eligibleHashChanges = Kefir.fromEvents<HashChangeEvent, unknown>(
     window,
-    'hashchange'
+    'hashchange',
   )
     .filter((event) => !event.oldURL.match(/#inboxsdk-fake-no-vc$/))
     .map((event) => ({
@@ -63,7 +63,7 @@ export default function setupRouteViewDriverStream(
     });
 
   const customAndCustomListRouteHashChanges = eligibleHashChanges.filter(
-    ({ type }) => type !== 'NATIVE'
+    ({ type }) => type !== 'NATIVE',
   );
 
   // If a user goes from a native route to a custom route, and then back to the
@@ -95,14 +95,14 @@ export default function setupRouteViewDriverStream(
         type: 'NATIVE',
       }))
       .filter((options) =>
-        gmailRouteProcessor.isNativeRoute(options.urlObject.name)
+        gmailRouteProcessor.isNativeRoute(options.urlObject.name),
       ),
   ])
     .map((options) => {
       const { type, urlObject } = options;
       if (type === 'NATIVE' && urlObject.name === 'search') {
         const customListRouteId = customListSearchStringsToRouteIds.get(
-          urlObject.params[0]
+          urlObject.params[0],
         );
         if (customListRouteId) {
           const searchInput = GmailElementGetter.getSearchInput();
@@ -123,7 +123,7 @@ export default function setupRouteViewDriverStream(
             driver.hashChangeNoViewChange(
               '#' +
                 customListRouteId +
-                (urlObject.params[1] ? '/' + urlObject.params[1] : '')
+                (urlObject.params[1] ? '/' + urlObject.params[1] : ''),
             );
             return {
               type: 'CUSTOM_LIST',
@@ -151,7 +151,7 @@ export default function setupRouteViewDriverStream(
           .sort(
             (a, b) =>
               sameRouteData[b].lastUsedTimestamp -
-              sameRouteData[a].lastUsedTimestamp
+              sameRouteData[a].lastUsedTimestamp,
           )
           .slice(0, MAX_KEY_CACHE / 2)
           .reduce((acc, hash) => ({ ...acc, [hash]: sameRouteData[hash] }), {});
@@ -169,7 +169,7 @@ export default function setupRouteViewDriverStream(
         driver.showCustomThreadList(
           (options as any).routeID,
           get(customListRouteIDs, (options as any).routeID),
-          options.urlObject.params
+          options.urlObject.params,
         );
         return;
       }

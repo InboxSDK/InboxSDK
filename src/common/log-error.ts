@@ -13,7 +13,6 @@ export interface LogErrorContext {
   loaderVersion?: string;
   implVersion?: string;
   userEmailHash?: string;
-  isUsingSyncAPI?: boolean;
 }
 
 const sessionId = getSessionId();
@@ -23,7 +22,7 @@ const sessionId = getSessionId();
 export default function logError(
   err: Error | unknown,
   details: any,
-  context: LogErrorContext
+  context: LogErrorContext,
 ) {
   if (typeof document === 'undefined') {
     // In tests, just throw the error.
@@ -43,12 +42,12 @@ export default function logError(
     if (!(err instanceof Error)) {
       console.warn(
         'First parameter to Logger.error was not an error object:',
-        err
+        err,
       );
       err = new Error('Logger.error called with non-error: ' + err);
       markErrorAsSeen(err);
     }
-    const { appIds, implVersion, isUsingSyncAPI, userEmailHash } = context;
+    const { appIds, implVersion, userEmailHash } = context;
     const loaderVersion = context.loaderVersion || BUILD_VERSION;
     const sentByApp = !!context.sentByApp;
 
@@ -86,7 +85,6 @@ export default function logError(
     stuffToLog.push('\nExtension Id:', getExtensionId());
     stuffToLog.push('\nInboxSDK Loader Version:', loaderVersion);
     stuffToLog.push('\nInboxSDK Implementation Version:', implVersion);
-    stuffToLog.push('\nIs Using Sync API:', isUsingSyncAPI);
 
     console.error(...stuffToLog);
 
@@ -102,7 +100,6 @@ export default function logError(
       extensionId: getExtensionId(),
       loaderVersion: loaderVersion,
       implementationVersion: implVersion,
-      isUsingSyncAPI,
       origin: document.location.origin,
       timestamp: Date.now() * 1000,
     };
@@ -124,7 +121,7 @@ export default function logError(
             details,
             sentByApp,
           },
-        })
+        }),
       );
     }
   } catch (err2) {
@@ -215,7 +212,7 @@ const sendError = rateLimit(
     }
   },
   60 * 1000,
-  10
+  10,
 );
 
 function tooManyErrors(err2: unknown, originalArgs: any) {

@@ -1,9 +1,5 @@
-import fs from 'fs';
-import path from 'path';
-const packageJson = JSON.parse(
-  fs.readFileSync(__dirname + '/package.json', 'utf8')
-);
-
+import fs from 'node:fs';
+import path from 'node:path';
 import gulp from 'gulp';
 import destAtomic from 'gulp-dest-atomic';
 import webpack from 'webpack';
@@ -12,7 +8,7 @@ import extReloader from './live/extReloader';
 import fg from 'fast-glob';
 import exec from './src/build/exec';
 
-const sdkFilename = 'inboxsdk.js';
+const sdkFilename = 'inboxsdk';
 
 const args = stdio.getopt({
   // --watch is a node flag that doesn't seem to work after Node 18.12 with gulp.
@@ -38,15 +34,15 @@ const args = stdio.getopt({
 // Don't let production be built without minification.
 // Could just make the production flag imply the minify flag, but that seems
 // like it would harm discoverability.
-if (args.production && !args.minify) {
-  throw new Error('--production requires --minify');
+if (args.remote && args.production && !args.minify) {
+  throw new Error('--remote --production requires --minify');
 }
 
 // --watch causes Browserify to use full paths in module references. We don't
 // want those visible in production.
 if (args.production && (args.watch || args.integratedPageWorld)) {
   throw new Error(
-    '--production can not be used with --watch, or --integratedPageWorld'
+    '--production can not be used with --watch, or --integratedPageWorld',
   );
 }
 
@@ -113,6 +109,13 @@ async function getVersion(): Promise<string> {
   const commit = results[0].toString().trim().slice(0, 16);
   const isModified = /^\s*M/m.test(results[1].toString());
 
+  const packageJson = JSON.parse(
+    await fs.promises.readFile(
+      path.join(__dirname, 'packages/core/package.json'),
+      'utf8',
+    ),
+  );
+
   let version = `${packageJson.version}-${Date.now()}-${commit}`;
   if (isModified) {
     version += '-MODIFIED';
@@ -124,41 +127,32 @@ async function getVersion(): Promise<string> {
 }
 
 const enum OutputLibraryType {
-  /** Used for the integrated page world build */
-  Var = 'var',
   /** Remote and npm output format for compatibility's sake */
   UMD = 'umd',
   /** Future output format */
   ESM = 'module',
 }
 
-interface BrowserifyTaskOptions {
-  entry: string;
-  destName: string;
-  devtool?: 'source-map' | 'inline-source-map' | 'remote';
-  standalone?: string;
+interface WebpackTaskOptions {
+  entry: webpack.Configuration['entry'];
+  devtool?: webpack.Configuration['devtool'];
   disableMinification?: boolean;
   afterBuild?: () => Promise<void>;
-  outputLibraryType?: OutputLibraryType;
+  plugins?: webpack.Configuration['plugins'];
 }
 
 async function webpackTask({
   entry,
-  destName,
   disableMinification,
   ...options
-}: BrowserifyTaskOptions): Promise<void> {
-  const willMinify = args.minify && !disableMinification;
+}: WebpackTaskOptions): Promise<void> {
+  const willMinify = (args.minify && !disableMinification) ?? false;
 
   const VERSION = await getVersion();
 
   const bundler = webpack({
-    devtool:
-      options.devtool === 'remote' ? false : options.devtool ?? 'source-map',
-    entry: [
-      willMinify || args.production ? './src/inboxsdk-js/header' : null,
-      entry,
-    ].flatMap((x) => (x != null ? [x] : [])),
+    devtool: options.devtool ?? 'source-map',
+    entry,
     mode: args.production ? 'production' : 'development',
     module: {
       rules: [
@@ -194,7 +188,7 @@ async function webpackTask({
                     'data-inboxsdk-version',
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment -- this is injected by webpack
                     ///@ts-ignore
-                    SDK_VERSION
+                    SDK_VERSION,
                   );
                   document.head.append(htmlElement);
                 },
@@ -225,43 +219,42 @@ async function webpackTask({
     },
     output: {
       path: path.join(__dirname, 'packages/core'),
-      filename: destName,
-      ...(options.standalone
-        ? {
-            library: {
-              export: 'default',
-              name: options.standalone,
-              type: options.outputLibraryType ?? OutputLibraryType.UMD,
-            },
-          }
-        : {}),
       uniqueName: 'inboxsdk_' + VERSION,
     },
     plugins: [
       new webpack.DefinePlugin({
         SDK_VERSION: JSON.stringify(VERSION),
+        /**
+         * This flag would allow us to build an npm build with MV2 support.
+         * We keep this off so npm builds don't trigger false-positives
+         * in Chrome Web Store reviews checking for dynamically loaded code in MV3 extensions.
+         * This flag has no effect for remote/non-npm builds.
+         */
+        NPM_MV2_SUPPORT: JSON.stringify(false),
       }),
+      ...(willMinify || args.production
+        ? [
+            new webpack.BannerPlugin({
+              banner: fs.readFileSync('./src/inboxsdk-js/header.ts', 'utf8'),
+              raw: true,
+              entryOnly: true,
+            }),
+          ]
+        : []),
       // Work around for Buffer is undefined:
       // https://github.com/webpack/changelog-v5/issues/10
       new webpack.ProvidePlugin({
         Buffer: ['buffer', 'Buffer'],
-        // https://github.com/algolia/places/issues/847#issuecomment-748202652 For Algolia
+        // transitively from react-draggable-list -> react-motion -> performance-now uses 'process/browser'
         process: 'process/browser',
       }),
-      ...(options.devtool === 'remote'
-        ? [
-            new webpack.SourceMapDevToolPlugin({
-              fileContext: '../',
-              filename: '[file].[contenthash].map',
-              publicPath: 'https://www.inboxsdk.com/build/',
-            }),
-          ]
-        : []),
+      ...(options.plugins ?? []),
     ],
     resolve: {
       extensions: ['.js', '.jsx', '.ts', '.tsx'],
       fallback: {
-        buffer: require.resolve('buffer'),
+        // 'querystring' used in the SDK directly
+        querystring: require.resolve('querystring-es3/'),
       },
     },
     stats: {
@@ -295,35 +288,38 @@ async function webpackTask({
   }
 }
 
-gulp.task('pageWorld', () => {
-  return webpackTask({
-    devtool: args.remote ? 'remote' : undefined,
-    entry: './src/injected-js/main',
-    destName: 'pageWorld.js',
-  });
-});
+const pageWorld: webpack.EntryObject = {
+  pageWorld: './src/injected-js/main',
+};
 
 gulp.task('clean', async () => {
-  await fs.promises.rm('./dist', { force: true, recursive: true });
-  await fs.promises.rm('./packages/core/src', {
-    force: true,
-    recursive: true,
-  });
-  await fs.promises.rm('./packages/core/test', {
-    force: true,
-    recursive: true,
-  });
-  for (const filename of [
+  const folders = ['./dist', './packages/core/src', './packages/core/test'];
+  await Promise.all([
+    ...folders.map((folder) =>
+      fs.promises.rm(folder, { force: true, recursive: true }),
+    ),
+    fs.promises.rm('./packages/core/inboxsdk.min.js', { force: true }),
+  ]);
+
+  const outputFiles = [
     './packages/core/inboxsdk.js',
+    './packages/core/platform-implementation.js',
     './packages/core/pageWorld.js',
-  ]) {
-    await fs.promises.rm(filename, { force: true });
-    await fs.promises.rm(filename + '.map', { force: true });
-  }
+  ];
+
+  outputFiles.flatMap((filename) => [
+    fs.promises.rm(filename, { force: true }),
+    fs.promises.rm(filename + '.LICENSE.txt', { force: true }),
+    fg(filename + '*.map', { onlyFiles: true }).then((mapFiles) =>
+      Promise.all(
+        mapFiles.map((mapFile) => fs.promises.rm(mapFile, { force: true })),
+      ),
+    ),
+  ]);
 });
 
 /**
- * Copy handwritten type definitions and plain js to a appease tsc in our TS setup.
+ * Copy handwritten type definitions (inboxsdk.d.ts) and those generated from source.
  */
 gulp.task('types', async () => {
   const files = await fg(['./src/**/*.d.ts'], {
@@ -338,85 +334,95 @@ gulp.task('types', async () => {
   await exec('yarn typedefs');
 });
 
+let config: WebpackTaskOptions;
+const remoteCompatConfig = {
+  afterBuild: setupExamples,
+} as const;
+
+const sourceMapPlugin = new webpack.SourceMapDevToolPlugin({
+  fileContext: '../',
+  // Adds hash to the end of the sourcemap URL so that
+  // remote code source maps are not cached erroneously by Sentry
+  // if and when https://github.com/getsentry/sentry/issues/54819 is patched up.
+  filename: '[file].[contenthash].map',
+  publicPath: 'https://www.inboxsdk.com/build/',
+});
+
 if (args.remote) {
-  gulp.task('sdk', () => {
-    return webpackTask({
-      devtool: 'remote',
-      disableMinification: true,
-      entry: './src/inboxsdk-js/inboxsdk-REMOTE',
-      destName: sdkFilename,
-      standalone: 'InboxSDK',
-    });
-  });
-  gulp.task(
-    'remote',
-    gulp.series('pageWorld', function impBundle() {
-      return webpackTask({
-        devtool: 'remote',
-        entry: './src/platform-implementation-js/main-INTEGRATED-PAGEWORLD',
-        destName: 'platform-implementation.js',
-        afterBuild: setupExamples,
-      });
-    })
-  );
-  gulp.task('default', gulp.series('sdk', 'remote'));
+  config = {
+    ...remoteCompatConfig,
+    devtool: false,
+    entry: {
+      [sdkFilename]: {
+        library: {
+          export: 'default',
+          name: 'InboxSDK',
+          type: OutputLibraryType.UMD,
+        },
+        import: './src/inboxsdk-js/inboxsdk-REMOTE',
+      },
+      'platform-implementation':
+        './src/platform-implementation-js/main-INTEGRATED-PAGEWORLD',
+    },
+    plugins: [sourceMapPlugin],
+  };
 } else if (args.integratedPageWorld) {
   // non-remote bundle built for compatibility with remote bundle
-  gulp.task(
-    'sdk',
-    gulp.series('pageWorld', function sdkBundle() {
-      return webpackTask({
-        devtool: 'inline-source-map',
-        entry: './src/inboxsdk-js/inboxsdk-NONREMOTE-INTEGRATED-PAGEWORLD',
-        destName: sdkFilename,
-        standalone: 'InboxSDK',
-        afterBuild: setupExamples,
-        outputLibraryType: OutputLibraryType.Var,
-      });
-    })
-  );
-  gulp.task('remote', () => {
-    throw new Error('No separate remote bundle in non-remote bundle mode');
-  });
-  gulp.task('default', gulp.parallel('sdk', 'types'));
+  config = {
+    ...remoteCompatConfig,
+    devtool: 'inline-source-map',
+    entry: {
+      [sdkFilename]: {
+        library: {
+          export: 'default',
+          name: 'InboxSDK',
+          type: OutputLibraryType.UMD,
+        },
+        import: './src/inboxsdk-js/inboxsdk-NONREMOTE-INTEGRATED-PAGEWORLD',
+      },
+    },
+  };
 } else {
   // standard npm non-remote bundle
-  gulp.task('sdk', async () => {
-    return webpackTask({
-      entry: './src/inboxsdk-js/inboxsdk-NONREMOTE',
-      destName: sdkFilename,
-      disableMinification: true,
-      standalone: 'InboxSDK',
-      afterBuild: async () => {
-        setupExamples();
-        const { minify } = await import('terser');
-
-        const sourceOutput = await fs.promises.readFile(
-          'packages/core/inboxsdk.js',
-          'utf8'
-        );
-
-        const minified = await minify(sourceOutput);
-        await fs.promises.writeFile(
-          'packages/core/inboxsdk.min.js',
-          minified.code!,
-          {
-            encoding: 'utf8',
-          }
-        );
+  config = {
+    devtool: args.production ? false : 'inline-source-map',
+    entry: {
+      ...pageWorld,
+      [sdkFilename]: {
+        library: {
+          export: 'default',
+          name: 'InboxSDK',
+          type: OutputLibraryType.UMD,
+        },
+        import: './src/inboxsdk-js/inboxsdk-NONREMOTE',
       },
-    });
-  });
-  gulp.task('remote', () => {
-    throw new Error('No separate remote bundle in non-remote bundle mode');
-  });
-  gulp.task('default', gulp.parallel('sdk', 'pageWorld', 'types'));
+    },
+    disableMinification: true,
+    afterBuild: async () => {
+      setupExamples();
+    },
+  };
 }
+
+gulp.task('sdk', async () => {
+  // Only the npm build contains pageWorld as of writing.
+  if (config.entry instanceof Object && !('pageWorld' in config.entry)) {
+    await webpackTask({
+      entry: pageWorld,
+      devtool: args.remote ? false : 'inline-source-map',
+      plugins: [sourceMapPlugin],
+    });
+  }
+
+  return webpackTask(config);
+});
+
+gulp.task('default', gulp.parallel('sdk', 'types'));
 
 gulp.task(
   'server',
-  gulp.series(!args.remote ? 'sdk' : 'remote', async function serverRun() {
+  gulp.series('sdk', async function serverRun() {
     const app = await import('./live/app');
     app.run();
-  })
+  }),
 );

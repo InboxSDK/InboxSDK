@@ -10,7 +10,7 @@ export default function (gmailComposeView: GmailComposeView) {
   try {
     responseTypeEl = querySelector(
       gmailComposeView.getElement(),
-      '.J-J5-Ji .J-JN-M-I-Jm > img'
+      '.J-J5-Ji .J-JN-M-I-Jm > img',
     );
     return makeMutationObserverChunkedStream(responseTypeEl, {
       attributeFilter: ['class'],

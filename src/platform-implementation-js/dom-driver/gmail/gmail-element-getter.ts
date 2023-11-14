@@ -24,7 +24,7 @@ const NAV_MENU = '.aeN.WR.nH.oy8Mbf[role=navigation]';
 const GmailElementGetter = {
   getActiveMoreMenu(): HTMLElement | null {
     const elements = document.querySelectorAll<HTMLElement>(
-      '.J-M.aX0.aYO.jQjAxd'
+      '.J-M.aX0.aYO.jQjAxd',
     );
 
     for (let ii = 0; ii < elements.length; ii++) {
@@ -79,12 +79,12 @@ const GmailElementGetter = {
       if (el !== oldMethodEl) {
         Logger.error(
           new Error(
-            'getContentSectionElement old and new method inconsistency'
+            'getContentSectionElement old and new method inconsistency',
           ),
           {
             elClassName: el?.className,
             oldMethodClassName: oldMethodEl?.className,
-          }
+          },
         );
       }
       return oldMethodEl;
@@ -104,7 +104,7 @@ const GmailElementGetter = {
       makeElementChildStream(document.body)
         .filter(({ el }) => el.classList.contains('aSs'))
         .flatMap(({ el, removalStream }) =>
-          makeElementChildStream(el).takeUntilBy(removalStream)
+          makeElementChildStream(el).takeUntilBy(removalStream),
         )
         .filter(({ el }) => el.classList.contains('aSt'))
         // Assume that only one element will come through and will never be removed from the page.
@@ -144,30 +144,23 @@ const GmailElementGetter = {
   },
 
   getMainContentElementChangedStream: once(function (
-    this: any
+    this: any,
   ): Kefir.Observable<HTMLElement, never> {
     return getMainContentElementChangedStream(this);
   }),
 
-  getMoleParent(): HTMLElement | null {
-    return document.body.querySelector('.dw .nH > .nH > .no');
-  },
-
-  // This function checks whether we should use the old InboxSDK style of adding nav items
-  // inline among Gmail's nav items (as opposed to the newer style where we put our nav items
-  // in their own sections at the bottom of the leftnav).
+  /**
+   * This method checks whether we should use the old InboxSDK style of adding nav items
+   * inline among Gmail's nav items (as opposed to the newer style where we put our nav items
+   * in their own sections at the bottom of the leftnav).
+   */
   shouldAddNavItemsInline(): boolean {
-    // There's three cases this function should return true:
-    // - The user is in a pre-Google-Chat Hangouts-only version of Gmail (the Gmail Settings ->
-    //   Chat and Meet -> Chat menu only has the options "Hangouts On" and "Hangouts Off").
-    // - The user has "Classic Hangouts" picked in Gmail Settings -> Chat and Meet -> Chat.
-    // - Integrated view gmail.
     if (isIntegratedViewGmail()) {
       return true;
     }
 
     const leftNavElement = document.querySelector(
-      '.aeN[role=navigation], .aeN [role=navigation]'
+      '.aeN[role=navigation], .aeN [role=navigation]',
     );
     if (!leftNavElement) {
       throw new Error('shouldAddNavItemsInline failed to find leftNavElement');
@@ -175,14 +168,6 @@ const GmailElementGetter = {
 
     // leftNavElement classnames depending on gmail chat & meet settings:
 
-    // Old Hangouts-only Gmail
-    //  div.aeN.WR.nH.oy8Mbf.nn
-    //  (looks identical to current Gmail's chat-off-meet-off setup, but there are important
-    //  CSS differences inside the element!)
-    // ===================
-    // No classname difference between open/collapsed
-    //  div.ajl.aib.aZ6 (classic hangouts on left or right, google meet on/off)
-    // ===================
     // Collapsed gets .bhZ class added
     //  div.aeN.WR.nH.oy8Mbf.nn (chat off, google meet off)
     //  div.aeN.WR.BaIAZe.anZ.nH.oy8Mbf.nn (chat off, google meet on)
@@ -202,7 +187,7 @@ const GmailElementGetter = {
 
       try {
         const element = await waitFor(() =>
-          document.querySelector<HTMLElement>(`${APP_MENU}, ${NAV_MENU}`)
+          document.querySelector<HTMLElement>(`${APP_MENU}, ${NAV_MENU}`),
         );
 
         if (!document.querySelector(APP_MENU)) {
@@ -218,7 +203,7 @@ const GmailElementGetter = {
 
   getAppBurgerMenu() {
     return document.querySelector<HTMLElement>(
-      'header[role="banner"] > div > div > div[aria-expanded]'
+      'header[role="banner"] > div > div > div[aria-expanded]',
     );
   },
 
@@ -252,8 +237,18 @@ const GmailElementGetter = {
     }
   },
 
-  getRowListElements(): HTMLElement[] {
-    return Array.from(document.querySelectorAll('[gh=tl]'));
+  getRowListElementsContainer(): HTMLElement | null {
+    // This selector can find multiple elements but they should all be siblings
+    // so it's fine because we get the common parent.
+    return document.querySelector('.bGI.nH')?.parentElement ?? null;
+  },
+
+  getRowListElements(): HTMLElement[] | null {
+    const rowListElements = document.querySelectorAll<HTMLElement>('[gh=tl]');
+    if (rowListElements.length === 0) {
+      return null;
+    }
+    return Array.from(rowListElements);
   },
 
   getScrollContainer(): HTMLElement | null {
@@ -262,7 +257,7 @@ const GmailElementGetter = {
 
   getSearchInput(): HTMLInputElement | null {
     return document.querySelector(
-      'form[role=search] input'
+      'form[role=search] input',
     ) as HTMLInputElement | null;
   },
 
@@ -295,7 +290,7 @@ const GmailElementGetter = {
 
   getTopAccountContainer(): HTMLElement | null {
     return document.querySelector(
-      'header[role="banner"] > div:nth-child(2) > div:nth-child(2)'
+      'header[role="banner"] > div:nth-child(2) > div:nth-child(2)',
     );
   },
 
@@ -307,7 +302,7 @@ const GmailElementGetter = {
 
     return (
       topAccountContainer.querySelectorAll(
-        'a[href*="https://plus"][href*="upgrade"]'
+        'a[href*="https://plus"][href*="upgrade"]',
       ).length === 0
     );
   },

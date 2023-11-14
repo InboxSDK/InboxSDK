@@ -99,7 +99,7 @@ export class PlatformImplementation extends SafeEventEmitter {
             appId,
             membrane,
             this.Conversations,
-            driver
+            driver,
           ),
       ],
       [
@@ -158,7 +158,7 @@ export type EnvData = {
 export function makePlatformImplementation(
   appId: string,
   _opts: Partial<PiOpts>,
-  envData: EnvData
+  envData: EnvData,
 ): Promise<PlatformImplementation> {
   if (typeof appId !== 'string') {
     throw new Error('appId must be a string');
@@ -183,7 +183,7 @@ export function makePlatformImplementation(
 
     default:
       throw new Error(
-        'InboxSDK: Unsupported API version ' + opts.REQUESTED_API_VERSION
+        'InboxSDK: Unsupported API version ' + opts.REQUESTED_API_VERSION,
       );
   }
 
@@ -205,7 +205,7 @@ export function makePlatformImplementation(
     IMPL_VERSION,
     logger,
     opts,
-    envData
+    envData,
   );
   return driver.onready.then(() => {
     if (!isValidAppId(appId)) {
@@ -222,7 +222,7 @@ https://www.inboxsdk.com/docs/#RequiredSetup
 
     if (driver.isRunningInPageContext()) {
       console.warn(
-        'Running the InboxSDK outside of an extension content script is not recommended!'
+        'Running the InboxSDK outside of an extension content script is not recommended!',
       );
     }
 

@@ -7,6 +7,7 @@ import GmailDropdownView from '../../widgets/gmail-dropdown-view';
 import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 import type GmailComposeView from '../gmail-compose-view';
 import { ComposeButtonDescriptor } from '../../../../driver-interfaces/compose-view-driver';
+import { Options } from '../../../../views/compose-button-view';
 
 export default function addButton(
   gmailComposeView: GmailComposeView,
@@ -15,9 +16,9 @@ export default function addButton(
     unknown
   >,
   groupOrderHint: string,
-  extraOnClickOptions: Record<string, any>
-): Promise<Record<string, any> | null | undefined> {
-  return new Promise((resolve) => {
+  extraOnClickOptions: Record<string, any>,
+) {
+  return new Promise<Options | null>((resolve) => {
     let buttonViewController:
       | BasicButtonViewController
       | DropdownButtonViewController
@@ -28,15 +29,15 @@ export default function addButton(
         const buttonOptions = _processButtonDescriptor(
           buttonDescriptor!,
           extraOnClickOptions,
-          gmailComposeView.getGmailDriver()
+          gmailComposeView.getGmailDriver(),
         );
 
         if (!buttonViewController) {
           if (buttonOptions) {
             buttonViewController = _addButton(
               gmailComposeView,
-              buttonOptions as any,
-              groupOrderHint
+              buttonOptions,
+              groupOrderHint,
             );
             resolve({
               buttonViewController: buttonViewController,
@@ -44,6 +45,7 @@ export default function addButton(
             });
           }
         } else {
+          // This
           buttonViewController.update(buttonOptions as any);
         }
       })
@@ -57,7 +59,7 @@ export default function addButton(
 function _addButton(
   gmailComposeView: GmailComposeView,
   buttonOptions: ComposeButtonDescriptor,
-  groupOrderHint: string
+  groupOrderHint: string,
 ) {
   if (
     !gmailComposeView.getElement() ||
@@ -72,12 +74,12 @@ function _addButton(
     buttonViewController = _addButtonToModifierArea(
       gmailComposeView,
       buttonOptions,
-      groupOrderHint
+      groupOrderHint,
     );
   } else if (buttonOptions.type === 'SEND_ACTION') {
     buttonViewController = _addButtonToSendActionArea(
       gmailComposeView,
-      buttonOptions
+      buttonOptions,
     );
   }
 
@@ -86,7 +88,7 @@ function _addButton(
       bubbles: false,
       cancelable: false,
       detail: null,
-    })
+    }),
   );
   return buttonViewController;
 }
@@ -94,7 +96,7 @@ function _addButton(
 function _addButtonToModifierArea(
   gmailComposeView: GmailComposeView,
   buttonDescriptor: Record<string, any>,
-  groupOrderHint: string
+  groupOrderHint: string,
 ) {
   var buttonViewController = _getButtonViewController(buttonDescriptor);
 
@@ -122,7 +124,7 @@ function _addButtonToModifierArea(
 
 function _addButtonToSendActionArea(
   gmailComposeView: GmailComposeView,
-  buttonDescriptor: ComposeButtonDescriptor
+  buttonDescriptor: ComposeButtonDescriptor,
 ) {
   const buttonViewController = _getButtonViewController(buttonDescriptor);
 
@@ -165,16 +167,20 @@ function _getButtonViewController(buttonDescriptor: Record<string, any>) {
 function _processButtonDescriptor(
   buttonDescriptor: ComposeButtonDescriptor | null | undefined,
   extraOnClickOptions: Record<string, any>,
-  driver: GmailDriver
-): Record<string, any> | null | undefined {
+  driver: GmailDriver,
+) {
   // clone the descriptor and set defaults.
   if (!buttonDescriptor) {
     return null;
   }
 
-  const buttonOptions = {
+  const buttonOptions: ComposeButtonDescriptor & {
+    dropdownShowFunction?: ComposeButtonDescriptor['onClick'];
+    activateFunction?: ComposeButtonDescriptor['onClick'];
+    noArrow?: true;
+  } = {
     type: 'MODIFIER',
-    ...(buttonDescriptor as any),
+    ...buttonDescriptor,
   };
   const oldOnClick = buttonOptions.onClick;
 

@@ -1,8 +1,9 @@
+import { type SearchQueryRewriter } from '../../../namespaces/search';
 import type PageCommunicator from '../gmail-page-communicator';
 
 export default function registerSearchQueryRewriter(
   pageCommunicator: PageCommunicator,
-  obj: any
+  obj: SearchQueryRewriter,
 ) {
   pageCommunicator.createCustomSearchTerm(obj.term);
 
@@ -20,7 +21,7 @@ export default function registerSearchQueryRewriter(
         const newTerm = '(' + result + ')';
         const newQuery = event.query.replace(
           obj.term,
-          () => newTerm // Callback used so $ escapes aren't interpreted
+          () => newTerm, // Callback used so $ escapes aren't interpreted
         );
         pageCommunicator.setSearchQueryReplacement(event.query, newQuery);
       });

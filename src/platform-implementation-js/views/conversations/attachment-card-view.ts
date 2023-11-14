@@ -19,7 +19,7 @@ class AttachmentCardView extends (EventEmitter as new () => TypedEventEmitter<{
   constructor(
     attachmentCardImplementation: AttachmentCardViewDriver,
     driver: Driver,
-    membrane: Membrane
+    membrane: Membrane,
   ) {
     super();
     this.destroyed = false;
@@ -53,7 +53,7 @@ class AttachmentCardView extends (EventEmitter as new () => TypedEventEmitter<{
       .getLogger()
       .deprecationWarning(
         'AttachmentCardView.getDownloadURL',
-        'AttachmentCardView.addButton -> onClick -> AttachmentCardClickEvent'
+        'AttachmentCardView.addButton -> onClick -> AttachmentCardClickEvent',
       );
 
     if (this._driver.getOpts().REQUESTED_API_VERSION !== 1) {

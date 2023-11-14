@@ -1,7 +1,7 @@
 import type GmailComposeView from '../gmail-compose-view';
 const composeViewActionToolbars = new WeakMap();
 export default function getAdditionalActionToolbar(
-  gmailComposeView: GmailComposeView
+  gmailComposeView: GmailComposeView,
 ) {
   var groupedActionToolbar = gmailComposeView
     .getElement()

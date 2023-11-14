@@ -7,7 +7,7 @@ import getRfcMessageIdForGmailMessageId from './get-rfc-message-id-for-gmail-mes
 
 export default async function getRfcMessageIdForGmailThreadId(
   driver: GmailDriver,
-  gmailThreadId: string
+  gmailThreadId: string,
 ): Promise<string> {
   const messageIdQuery = {
     ui: 2,
@@ -32,14 +32,14 @@ export default async function getRfcMessageIdForGmailThreadId(
 
   const extractedIds =
     GmailResponseProcessor.extractMessageIdsFromThreadBatchRequest(
-      gmailMessageIdResponse.text
+      gmailMessageIdResponse.text,
     );
 
   if (Object.keys(extractedIds).length !== 1) {
     throw new Error(
       `Expected to find 1 thread/message ID pair, but got ${
         Object.keys(extractedIds).length
-      }`
+      }`,
     );
   }
 

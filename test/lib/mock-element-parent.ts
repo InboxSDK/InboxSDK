@@ -1,4 +1,4 @@
-import assert from 'assert';
+import assert from 'node:assert';
 import EventEmitter from 'events';
 
 // Mock element suitable for use with MockMutationObserver

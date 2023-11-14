@@ -85,7 +85,7 @@ export default function ajax(opts: AjaxOpts): Promise<AjaxResponse> {
         }
       }
 
-      const err = Object.assign(new Error(`Failed to load ${url}`) as any, {
+      const err = Object.assign(new Error(`Failed to load ${url}`), {
         event,
         xhr,
         status: xhr.status,
@@ -127,6 +127,6 @@ function _retry(opts: AjaxOpts): Promise<AjaxResponse> {
   const retryTimeout = Math.min(Math.pow(2, retryNum) * 1000, MAX_TIMEOUT);
 
   return delay(retryTimeout).then(() =>
-    ajax(Object.assign({}, opts, { retryNum }))
+    ajax(Object.assign({}, opts, { retryNum })),
   );
 }

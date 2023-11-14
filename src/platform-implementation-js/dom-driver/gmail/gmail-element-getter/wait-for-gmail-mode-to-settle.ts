@@ -10,7 +10,7 @@ const waitForGmailModeToSettle = once(() =>
     .filter(() => document.body.classList.length > 0)
     .map(() => undefined)
     .take(1)
-    .toProperty()
+    .toProperty(),
 );
 
 export default waitForGmailModeToSettle;

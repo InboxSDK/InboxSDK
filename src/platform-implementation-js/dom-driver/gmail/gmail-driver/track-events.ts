@@ -20,7 +20,7 @@ function _setupComposeMonitoring(gmailDriver: GmailDriver) {
 
 function _getLogFunction(
   gmailDriver: GmailDriver,
-  composeViewDriver: GmailComposeView
+  composeViewDriver: GmailComposeView,
 ) {
   var logger = gmailDriver.getLogger();
   var composeStats = {
@@ -37,7 +37,7 @@ type LogFunction = (eventName: string, extraOptions?: any) => void;
 
 function _monitorComposeSpecificEvents(
   composeViewDriver: GmailComposeView,
-  logFunction: LogFunction
+  logFunction: LogFunction,
 ) {
   _monitorAttachmentButton(composeViewDriver, logFunction);
   _monitorDriveButton(composeViewDriver, logFunction);
@@ -45,7 +45,7 @@ function _monitorComposeSpecificEvents(
 
 function _monitorAttachmentButton(
   composeViewDriver: GmailComposeView,
-  logFunction: LogFunction
+  logFunction: LogFunction,
 ) {
   var attachmentButton = composeViewDriver.getElement().querySelector('.a1');
   if (attachmentButton) {
@@ -60,7 +60,7 @@ function _monitorAttachmentButton(
 
 function _monitorAttachmentAdded(
   composeViewDriver: GmailComposeView,
-  logFunction: LogFunction
+  logFunction: LogFunction,
 ) {
   makeElementChildStream(document.body)
     .map((event) => event.el)
@@ -72,7 +72,7 @@ function _monitorAttachmentAdded(
         .merge(
           Kefir.fromEvents(composeViewDriver.getBodyElement(), 'focus')
             .map(() => false)
-            .delay(1000)
+            .delay(1000),
         );
     })
     .take(1)
@@ -83,7 +83,7 @@ function _monitorAttachmentAdded(
 
 function _monitorDriveButton(
   composeViewDriver: GmailComposeView,
-  logFunction: LogFunction
+  logFunction: LogFunction,
 ) {
   var driveButton = composeViewDriver.getElement().querySelector('.aA7');
   if (driveButton) {
@@ -98,7 +98,7 @@ function _monitorDriveButton(
 
 function _monitorDriveFileAdded(
   composeViewDriver: GmailComposeView,
-  logFunction: LogFunction
+  logFunction: LogFunction,
 ) {
   var numberCurrentDriveChips = composeViewDriver
     .getBodyElement()
@@ -133,7 +133,8 @@ function _setupAttachmentModalMonitoring(gmailDriver: GmailDriver) {
   makeElementChildStream(document.body)
     .map((event) => event.el)
     .filter(
-      (node) => node.getAttribute && node.getAttribute('role') === 'alertdialog'
+      (node) =>
+        node.getAttribute && node.getAttribute('role') === 'alertdialog',
     )
     .takeUntilBy(gmailDriver.getStopper())
     .onValue((node) => {
@@ -166,7 +167,7 @@ function _setupDragDropMonitoring(gmailDriver: GmailDriver) {
         .filter(
           (event) =>
             event.toElement.classList.contains('aC7') ||
-            event.toElement.classList.contains('aC9')
+            event.toElement.classList.contains('aC9'),
         )
         .take(1);
     })
@@ -181,7 +182,7 @@ function _setupDragDropMonitoring(gmailDriver: GmailDriver) {
         .filter(
           (event) =>
             event.toElement.classList.contains('aC7') ||
-            event.toElement.classList.contains('aC9')
+            event.toElement.classList.contains('aC9'),
         )
         .take(1);
     })

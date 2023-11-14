@@ -105,7 +105,7 @@ function _handleModalStackOnModalDestroy(modalView: ModalView) {
 
 function _replaceCurrentlyShowingModal(
   modalView: ModalView,
-  modalViewDriver: ModalViewDriver
+  modalViewDriver: ModalViewDriver,
 ) {
   if (currentlyShowingModal) {
     hideStream.emit(currentlyShowingModal.modalView);

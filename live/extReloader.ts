@@ -29,7 +29,7 @@ const getchromeSuffixWithReloaderExtension = once(
       return firstResult.match(/Chrome([^/]*)\//)![1];
     }
     return undefined;
-  }
+  },
 );
 
 const getChromeLocation = memoize(
@@ -40,7 +40,7 @@ const getChromeLocation = memoize(
       '.app/Contents/MacOS/Google Chrome*';
     const results = await fg([path]);
     return results[0];
-  }
+  },
 );
 
 export default async function extensionReload(): Promise<void> {

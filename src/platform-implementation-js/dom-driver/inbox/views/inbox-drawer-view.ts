@@ -30,7 +30,7 @@ class InboxDrawerView {
     if (composeView) {
       const ret = this._setupComposeInsertionTarget(
         composeView,
-        closeWithCompose
+        closeWithCompose,
       );
 
       insertionTarget = ret.insertionTarget;
@@ -47,7 +47,7 @@ class InboxDrawerView {
       composeNeedToMoveLeft = this._setupComposeAnimation(
         composeView,
         composeRect,
-        true
+        true,
       );
     }
 
@@ -103,7 +103,7 @@ class InboxDrawerView {
 
   _setupComposeInsertionTarget(
     composeView: ComposeView,
-    closeWithCompose: boolean | null | undefined
+    closeWithCompose: boolean | null | undefined,
   ): {
     composeRect: ClientRect;
     insertionTarget: HTMLElement;
@@ -123,14 +123,14 @@ class InboxDrawerView {
     const closeEvents = [
       Kefir.fromEvents(composeView, 'restored'),
       Kefir.later(10, undefined).flatMap(() =>
-        Kefir.fromEvents(composeView, 'fullscreenChanged')
+        Kefir.fromEvents(composeView, 'fullscreenChanged'),
       ),
     ];
 
     if (closeWithCompose) {
       closeEvents.push(
         Kefir.fromEvents(composeView, 'destroy'),
-        Kefir.fromEvents(composeView, 'minimized')
+        Kefir.fromEvents(composeView, 'minimized'),
       );
     }
 
@@ -160,28 +160,28 @@ class InboxDrawerView {
         composeOffsetParent,
         (el) =>
           window.getComputedStyle(el).getPropertyValue('z-index') !== 'auto' &&
-          el.getBoundingClientRect().left === 0
+          el.getBoundingClientRect().left === 0,
       ) || document.body;
     composeEl.dispatchEvent(
       new CustomEvent(TAKE_OVER_EVENT, {
         bubbles: false,
         cancelable: false,
         detail: null,
-      })
+      }),
     );
     composeOffsetParent.dispatchEvent(
       new CustomEvent(TAKE_OVER_EVENT, {
         bubbles: false,
         cancelable: false,
         detail: null,
-      })
+      }),
     );
     insertionTarget.dispatchEvent(
       new CustomEvent(TAKE_OVER_EVENT, {
         bubbles: false,
         cancelable: false,
         detail: null,
-      })
+      }),
     );
     // Needed to stop composeviews from coming apart visually in Gmail.
     insertionTarget.classList.add('inboxsdk__drawers_in_use');
@@ -191,7 +191,7 @@ class InboxDrawerView {
     if (!composeOffsetParent.hasAttribute('data-drawer-old-zindex')) {
       composeOffsetParent.setAttribute(
         'data-drawer-old-zindex',
-        composeOffsetParent.style.zIndex
+        composeOffsetParent.style.zIndex,
       );
     }
 
@@ -221,7 +221,7 @@ class InboxDrawerView {
   _setupElement(options: DrawerViewOptions, insertionTarget: HTMLElement) {
     const backdrop = (this._backdrop = new InboxBackdrop(
       zIndex,
-      insertionTarget
+      insertionTarget,
     ));
 
     this._preAutoCloseStream.plug(backdrop.getPreAutoCloseStream());
@@ -291,7 +291,7 @@ class InboxDrawerView {
   _setupComposeAnimation(
     composeView: ComposeView,
     composeRect: ClientRect,
-    forceLayout: boolean
+    forceLayout: boolean,
   ): number {
     const composeEl = composeView.getElement();
     const parentEl: HTMLElement = composeEl.parentElement as any;
@@ -339,8 +339,8 @@ class InboxDrawerView {
         .flatMap(
           () =>
             Kefir.fromEvents(parentEl, 'transitionend').merge(
-              Kefir.later(200, undefined)
-            ) // transition might not finish if element is hidden
+              Kefir.later(200, undefined),
+            ), // transition might not finish if element is hidden
         )
         .merge(this._composeChanges)
         .take(1)
@@ -358,7 +358,7 @@ class InboxDrawerView {
 
     const { insertionTarget, composeRect } = this._setupComposeInsertionTarget(
       composeView,
-      closeWithCompose
+      closeWithCompose,
     );
 
     if (this._backdrop)
@@ -369,7 +369,7 @@ class InboxDrawerView {
     const composeNeedToMoveLeft = this._setupComposeAnimation(
       composeView,
       composeRect,
-      false
+      false,
     );
 
     this._positionCompose(composeView, composeNeedToMoveLeft);

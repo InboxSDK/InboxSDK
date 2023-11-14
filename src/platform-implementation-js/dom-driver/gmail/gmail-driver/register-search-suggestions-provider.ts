@@ -12,10 +12,11 @@ import type {
   AutocompleteSearchResult,
   AutocompleteSearchResultWithId,
 } from '../../../../injected-js/gmail/modify-suggestions';
+import type { SearchSuggestionsProvider } from '../../../namespaces/search';
 
 export default function registerSearchSuggestionsProvider(
   driver: GmailDriver,
-  handler: Function
+  handler: SearchSuggestionsProvider,
 ) {
   // We inject the app-provided suggestions into Gmail's AJAX response. Then we
   // watch the DOM for our injected suggestions to show up and attach click and
@@ -38,7 +39,7 @@ export default function registerSearchSuggestionsProvider(
           try {
             const validatedResults = copyAndValidateAutocompleteResults(
               driver,
-              results
+              results,
             );
 
             const validatedResultsWithIds = validatedResults.map((result) => ({
@@ -58,13 +59,13 @@ export default function registerSearchSuggestionsProvider(
         })
         .map((suggestions) => {
           return { query, suggestions };
-        })
+        }),
     )
     .onValue((event) => {
       pageCommunicator.provideAutocompleteSuggestions(
         providerId,
         event.query,
-        event.suggestions
+        event.suggestions,
       );
     })
     .map((event) => event.suggestions);
@@ -94,7 +95,7 @@ export default function registerSearchSuggestionsProvider(
     .flatMap((suggestionsBoxTbody) =>
       makeMutationObserverChunkedStream(suggestionsBoxTbody, {
         childList: true,
-      }).toProperty(() => null)
+      }).toProperty(() => null),
     )
     .map(() => null);
 
@@ -102,8 +103,8 @@ export default function registerSearchSuggestionsProvider(
   // canceled before Gmail receives it.
   const suggestionsBoxEnterPresses = searchBoxStream.flatMap((searchBox) =>
     fromEventTargetCapture(document, 'keydown').filter(
-      (event) => event.keyCode == 13 && event.target === searchBox
-    )
+      (event) => event.keyCode == 13 && event.target === searchBox,
+    ),
   );
 
   // Stream of arrays of row elements belonging to this provider.
@@ -113,8 +114,8 @@ export default function registerSearchSuggestionsProvider(
       .map(
         (suggestionsBoxTbody) =>
           Array.from(suggestionsBoxTbody.children).filter(
-            (row) => row.getElementsByClassName(providerId).length > 0
-          ) as HTMLElement[]
+            (row) => row.getElementsByClassName(providerId).length > 0,
+          ) as HTMLElement[],
       );
 
   providedRows.onValue((rows) => {
@@ -142,11 +143,11 @@ export default function registerSearchSuggestionsProvider(
         Kefir.merge([
           fromEventTargetCapture(row, 'click'),
           suggestionsBoxEnterPresses.filter(() =>
-            row.classList.contains('gssb_i')
+            row.classList.contains('gssb_i'),
           ),
-        ]).map((event) => ({ event, row }))
-      )
-    )
+        ]).map((event) => ({ event, row })),
+      ),
+    ),
   );
 
   const activeSuggestionsStream: Kefir.Observable<
@@ -165,13 +166,13 @@ export default function registerSearchSuggestionsProvider(
     const [{ event, row }, searchBox, suggestions] = tuple as [
       { event: any; row: HTMLElement },
       HTMLInputElement,
-      Array<AutocompleteSearchResultWithId>
+      Array<AutocompleteSearchResultWithId>,
     ];
 
     const itemDataSpan = row.querySelector('span[data-inboxsdk-suggestion]');
     const itemData = itemDataSpan
       ? JSON.parse(
-          itemDataSpan.getAttribute('data-inboxsdk-suggestion') || 'null'
+          itemDataSpan.getAttribute('data-inboxsdk-suggestion') || 'null',
         )
       : null;
 

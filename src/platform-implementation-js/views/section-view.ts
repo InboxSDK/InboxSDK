@@ -32,7 +32,7 @@ class SectionView extends EventEmitter {
 function _bindToEventStream(
   sectionView: SectionView,
   sectionViewDriver: GmailCollapsibleSectionView,
-  driver: Driver
+  driver: Driver,
 ) {
   sectionViewDriver.getEventStream().onValue((e) => {
     sectionView.emit(e.eventName);
@@ -40,7 +40,7 @@ function _bindToEventStream(
   sectionViewDriver
     .getEventStream()
     .filter(
-      ({ eventName }: { eventName: unknown }) => eventName === 'rowClicked'
+      ({ eventName }: { eventName: unknown }) => eventName === 'rowClicked',
     )
     .onValue(
       ({
@@ -55,7 +55,7 @@ function _bindToEventStream(
         if (typeof rowDescriptor.onClick === 'function') {
           rowDescriptor.onClick();
         }
-      }
+      },
     );
   sectionViewDriver
     .getEventStream()

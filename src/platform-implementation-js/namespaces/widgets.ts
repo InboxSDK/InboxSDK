@@ -7,10 +7,11 @@ import TopMessageBarView from '../widgets/top-message-bar-view';
 import ComposeView from '../views/compose-view';
 import type { Driver, DrawerViewOptions } from '../driver-interfaces/driver';
 import get from '../../common/get-or-fail';
-import isComposeTitleBarLightColor from '../dom-driver/gmail/is-compose-titlebar-light-color'; // documented in src/docs/
-import { MoleOptions } from '../driver-interfaces/mole-view-driver';
+import isComposeTitleBarLightColor from '../dom-driver/gmail/is-compose-titlebar-light-color';
+import { type MoleOptions } from '../dom-driver/gmail/widgets/gmail-mole-view-driver';
+import type { Widgets as IWidgets, ModalDescriptor } from '../../inboxsdk';
 
-class Widgets {
+class Widgets implements IWidgets {
   constructor(appId: string, driver: Driver) {
     const members = {
       driver,
@@ -18,7 +19,7 @@ class Widgets {
     memberMap.set(this, members);
   }
 
-  showModalView(options: Record<string, any>): ModalView {
+  showModalView(options: ModalDescriptor): ModalView {
     if (options.buttons) {
       options.buttons = options.buttons.map((button: any) => {
         if (button.onClick) {
@@ -50,7 +51,7 @@ class Widgets {
 
   showMoleView(options: MoleOptions): MoleView {
     const moleViewDriver = get(memberMap, this).driver.createMoleViewDriver(
-      options
+      options,
     );
     const moleView = new MoleView({
       moleViewDriver,
@@ -59,11 +60,11 @@ class Widgets {
     return moleView;
   }
 
-  showTopMessageBarView(options: Record<string, any>): TopMessageBarView {
+  showTopMessageBarView(options: { el: Element }): TopMessageBarView {
     const topMessageBarViewDriver = get(
       memberMap,
-      this
-    ).driver.createTopMessageBarDriver(kefirCast(Kefir as any, options));
+      this,
+    ).driver.createTopMessageBarDriver(kefirCast(Kefir, options));
     return new TopMessageBarView({
       topMessageBarViewDriver,
     });
@@ -78,7 +79,7 @@ class Widgets {
     if (options.composeView && !(options.composeView instanceof ComposeView))
       throw new Error('composeView option was not a ComposeView');
     const drawerViewDriver = get(memberMap, this).driver.createDrawerViewDriver(
-      options
+      options,
     );
     return new DrawerView(drawerViewDriver);
   }

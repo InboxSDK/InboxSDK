@@ -3,7 +3,7 @@
 function log() {
   console.log.apply(
     console,
-    ['thread-rows'].concat(Array.prototype.slice.call(arguments))
+    ['thread-rows'].concat(Array.prototype.slice.call(arguments)),
   );
 }
 
@@ -30,7 +30,7 @@ InboxSDK.load(2, 'thread-rows').then(function (inboxSDK) {
       threadRowView.addLabel(
         Kefir.fromPromise(threadRowView.getDraftID()).map((id) => ({
           title: '' + id,
-        }))
+        })),
       );
     }
 
@@ -39,7 +39,7 @@ InboxSDK.load(2, 'thread-rows').then(function (inboxSDK) {
         imageUrl:
           'https://lh6.googleusercontent.com/-dSK6wJEXzP8/AAAAAAAAAAI/AAAAAAAAAAA/Som6EQiIJa8/s64-c/photo.jpg',
         tooltip: 'Monkeys',
-      })
+      }),
     );
 
     threadRowView.addLabel(
@@ -58,7 +58,7 @@ InboxSDK.load(2, 'thread-rows').then(function (inboxSDK) {
           iconClass: 'test_icon_thing',
           maxWidth: '200px',
         },
-      ]).toProperty({ title: '0' })
+      ]).toProperty({ title: '0' }),
     );
     threadRowView.addLabel({
       title: 'a' + i++,
@@ -101,7 +101,7 @@ InboxSDK.load(2, 'thread-rows').then(function (inboxSDK) {
           iconClass: 'icon-html-class',
           title: 'icon html',
         },
-      ])
+      ]),
     );
     threadRowView.replaceDraftLabel(
       Kefir.repeatedly(1000, [
@@ -113,7 +113,7 @@ InboxSDK.load(2, 'thread-rows').then(function (inboxSDK) {
           text: 'foo',
         },
         null,
-      ])
+      ]),
     );
     var r = Math.random();
     threadRowView.replaceDate(
@@ -123,7 +123,7 @@ InboxSDK.load(2, 'thread-rows').then(function (inboxSDK) {
             tooltip: 'foo of bar',
             textColor: 'green',
           }
-        : null
+        : null,
     );
     threadRowView.replaceDate(null);
 
@@ -173,7 +173,7 @@ InboxSDK.load(2, 'thread-rows').then(function (inboxSDK) {
                 }, 10000);
               },
             },
-          ])
+          ]),
         );
       },
     });
@@ -198,7 +198,7 @@ InboxSDK.load(2, 'thread-rows').then(function (inboxSDK) {
             console.log('modified onClick fired: ', event);
           },
         },
-      ])
+      ]),
     );
   });
 });

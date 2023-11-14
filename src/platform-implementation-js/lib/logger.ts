@@ -18,7 +18,6 @@ let _extensionLoaderVersion: string | undefined;
 let _extensionImplVersion: string | undefined;
 let _extensionUserEmailHash: string | undefined;
 let _extensionUseEventTracking = false;
-let _isUsingSyncAPI: boolean | undefined = undefined;
 
 const _sessionId = getSessionId();
 const _loggedDeprecatedMessages = new Set();
@@ -35,7 +34,7 @@ const _extensionIsLoggerMaster = (function () {
   } else {
     document.documentElement.setAttribute(
       'data-inboxsdk-master-claimed',
-      'true'
+      'true',
     );
     return true;
   }
@@ -58,36 +57,36 @@ export interface AppLogger {
 }
 
 export default class Logger {
-  private _appId: string;
-  private _isMaster: boolean;
+  #appId: string;
+  #isMaster: boolean;
 
   constructor(
     appId: string,
     opts: any,
     loaderVersion: string,
-    implVersion: string
+    implVersion: string,
   ) {
     _extensionLoggerSetup(appId, opts, loaderVersion, implVersion);
-    this._appId = appId;
-    this._isMaster = (() => {
+    this.#appId = appId;
+    this.#isMaster = (() => {
       if (
         !_extensionUseEventTracking ||
         (typeof document !== 'undefined' &&
           document.documentElement.hasAttribute(
-            'data-inboxsdk-app-logger-master-chosen'
+            'data-inboxsdk-app-logger-master-chosen',
           ))
       ) {
         return false;
       } else {
         document.documentElement.setAttribute(
           'data-inboxsdk-app-logger-master-chosen',
-          'true'
+          'true',
         );
         return true;
       }
     })();
 
-    if (this._isMaster && typeof document !== 'undefined') {
+    if (this.#isMaster && typeof document !== 'undefined') {
       document.addEventListener('inboxSDKinjectedError', (event: unknown) => {
         if (!(event instanceof CustomEvent && event?.detail)) {
           this.error(new Error('Invalid inboxSDKinjectedError event'), event);
@@ -97,7 +96,7 @@ export default class Logger {
         const detail = event.detail;
         this.error(
           Object.assign(new Error(detail.message), { stack: detail.stack }),
-          detail.details
+          detail.details,
         );
       });
 
@@ -106,7 +105,7 @@ export default class Logger {
         (event: any) => {
           const detail = event.detail;
           this.eventSdkPassive(detail.name, detail.details, detail.sensitive);
-        }
+        },
       );
     }
   }
@@ -120,10 +119,6 @@ export default class Logger {
       _extensionUserEmailHash ===
       'ca05afe92819df590a4196c31814fdb24050e8f49d8a41613f3d6cfb5729c785'
     );
-  }
-
-  setIsUsingSyncAPI(isUsing: boolean) {
-    _isUsingSyncAPI = isUsing;
   }
 
   static run<T>(cb: () => T, details?: any): T {
@@ -149,60 +144,62 @@ export default class Logger {
   }
 
   error(err: Error | unknown, details?: any) {
-    _logError(err, details, this._appId, false);
+    _logError(err, details, this.#appId, false);
   }
 
   errorApp(err: Error | unknown, details?: any) {
-    _logError(err, details, this._appId, true);
+    _logError(err, details, this.#appId, true);
   }
 
+  /** Only the first logger instance reports Site errors. */
   errorSite(err: Error | unknown, details?: any) {
-    // Only the first logger instance reports Site errors.
-    if (!this._isMaster) {
+    if (!this.#isMaster) {
       return;
     }
     this.error(err, details);
   }
 
-  // Should only be used by the InboxSDK users for their own app events.
+  /** Should only be used by the InboxSDK users for their own app events. */
   eventApp(name: string, details?: any) {
-    _trackEvent(this._appId, 'app', name, details);
+    _trackEvent(this.#appId, 'app', name, details);
   }
 
-  // For tracking app events that are possibly triggered by the user. Extensions
-  // can opt out of this with a flag passed to InboxSDK.load().
+  /**
+   * For tracking app events that are possibly triggered by the user. Extensions
+   * can opt out of this with a flag passed to InboxSDK.load().
+   */
   eventSdkActive(name: string, details?: any) {
     if (!_extensionUseEventTracking) {
       return;
     }
-    _trackEvent(this._appId, 'sdkActive', name, details);
+    _trackEvent(this.#appId, 'sdkActive', name, details);
   }
 
   // Track events unrelated to user activity about how the app uses the SDK.
   // Examples include the app being initialized, and calls to any of the
   // register___ViewHandler functions.
   eventSdkPassive(name: string, details?: any, sensitive?: boolean) {
-    if (sensitive && !isStreakAppId(this._appId)) {
+    if (sensitive && !isStreakAppId(this.#appId)) {
       // do not log events if they were marked as sensitive
       return;
     }
 
-    _trackEvent(this._appId, 'sdkPassive', name, details);
+    _trackEvent(this.#appId, 'sdkPassive', name, details);
   }
 
   // Track Site events.
   eventSite(name: string, details?: any) {
     // Only the first logger instance reports Site events.
-    if (!this._isMaster) {
+    if (!this.#isMaster) {
       return;
     }
-    _trackEvent(this._appId, 'gmail', name, details);
+    _trackEvent(this.#appId, 'gmail', name, details);
   }
 
   deprecationWarning(name: string, suggestion?: string) {
     console.warn(
       `InboxSDK: ${name} is deprecated.` +
-        (suggestion ? ` Please use ${suggestion} instead.` : '')
+        (suggestion ? ` Please use ${suggestion} instead.` : ''),
     );
 
     const key = name + (suggestion ? ':' + suggestion : '');
@@ -222,12 +219,12 @@ export default class Logger {
   trackFunctionPerformance(
     fn: Function,
     sampleRate: number,
-    details: { type: string; [key: string]: any }
+    details: { type: string; [key: string]: any },
   ) {
     if (
       Math.random() < sampleRate &&
       document.visibilityState === 'visible' &&
-      this._isMaster
+      this.#isMaster
     ) {
       const start = Date.now();
       fn();
@@ -249,13 +246,13 @@ function _extensionLoggerSetup(
   appId: string,
   opts: any,
   loaderVersion: string,
-  implVersion: string
+  implVersion: string,
 ) {
   _extensionAppIds.push(
     Object.freeze({
       appId: appId,
       version: opts.appVersion || undefined,
-    })
+    }),
   );
   document.documentElement.setAttribute(
     'data-inboxsdk-active-app-ids',
@@ -265,8 +262,8 @@ function _extensionLoggerSetup(
           appId: appId,
           version: opts.appVersion || undefined,
         },
-      ])
-    )
+      ]),
+    ),
   );
 
   if (_extensionLoaderVersion) {
@@ -357,7 +354,7 @@ function _extensionLoggerSetup(
           // call constructor with variable number of arguments
           return new ((Original.bind as any).apply(
             Original,
-            [null].concat(args)
+            [null].concat(args),
           ))();
         } else {
           // Safari's MutationObserver lacks a bind method, but its constructor
@@ -377,7 +374,7 @@ function _extensionLoggerSetup(
 
 function getAppIdsProperty(
   causedByAppId: string | null | undefined,
-  onlyExtensionApps: boolean = true
+  onlyExtensionApps: boolean = true,
 ): any[] {
   const appIds = onlyExtensionApps ? _extensionAppIds : getAllAppIds();
   if (!causedByAppId) {
@@ -401,7 +398,7 @@ function _logError(
   err: Error | unknown,
   details: any,
   appId: string | undefined,
-  sentByApp: boolean
+  sentByApp: boolean,
 ) {
   logError(err, details, {
     appId,
@@ -410,7 +407,6 @@ function _logError(
     loaderVersion: _extensionLoaderVersion,
     implVersion: _extensionImplVersion,
     userEmailHash: _extensionUserEmailHash,
-    isUsingSyncAPI: _isUsingSyncAPI,
   });
 }
 
@@ -424,7 +420,7 @@ function makeLoggedFunction<F extends Function>(func: F, name?: string): F {
 function replaceFunction(
   parent: any,
   name: string,
-  newFnMaker: (original: Function) => Function
+  newFnMaker: (original: Function) => Function,
 ) {
   const newFn = newFnMaker(parent[name]);
   (newFn as any).__original = parent[name];
@@ -441,7 +437,7 @@ function _trackEvent(
   appId: string | null | undefined,
   type: string,
   eventName: string,
-  properties: any
+  properties: any,
 ) {
   if (properties && typeof properties != 'object') {
     throw new Error('properties must be object or null: ' + properties);
@@ -455,7 +451,6 @@ function _trackEvent(
     emailHash: _extensionUserEmailHash,
     loaderVersion: _extensionLoaderVersion,
     implementationVersion: _extensionImplVersion,
-    isUsingSyncAPI: _isUsingSyncAPI,
     properties: properties,
   };
 
@@ -479,7 +474,7 @@ function _trackEvent(
   // Signal to the logger master that a new event is ready to be sent.
   document.documentElement.setAttribute(
     'data-inboxsdk-last-event',
-    '' + Date.now()
+    '' + Date.now(),
   );
 }
 
@@ -505,7 +500,7 @@ async function retrieveNewEventsAccessToken(): Promise<{
   const accessToken: any = JSON.parse(text);
   if (isTimestampExpired(accessToken.expirationDate)) {
     console.warn(
-      'Got an apparently already expired token. Assuming our clock is busted...'
+      'Got an apparently already expired token. Assuming our clock is busted...',
     );
     // Let's assume the token expires in 30 minutes. The server refreshes the
     // token 30 minutes before it expires so it's probably a safe bet.
@@ -551,7 +546,7 @@ if (
         // TODO change to use CommonPageCommunicator.pageAjax()
         await ajax({
           url: `https://pubsub.googleapis.com/v1/projects/mailfoogae/topics/events:publish?key=${encodeURIComponent(
-            apiKey
+            apiKey,
           )}`,
           method: 'POST',
           headers: {
@@ -565,7 +560,7 @@ if (
                   JSON.stringify({
                     data: events,
                     timestamp: Date.now() * 1000,
-                  })
+                  }),
                 ).toString('base64'),
               },
             ],

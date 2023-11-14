@@ -6,7 +6,7 @@ export default function setupInboxCustomViewLinkFixer() {
     function (event: Event) {
       const term = (event as any).detail.term;
       allowedStartTerms.add(term);
-    }
+    },
   );
   document.addEventListener(
     'click',
@@ -23,6 +23,6 @@ export default function setupInboxCustomViewLinkFixer() {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       (event as any).preventDefault = () => {};
     },
-    true
+    true,
   );
 }

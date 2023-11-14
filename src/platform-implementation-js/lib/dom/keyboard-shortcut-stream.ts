@@ -5,7 +5,7 @@ const combokeys =
   typeof document !== 'undefined' && new Combokeys(document.body, true);
 
 export default function keyboardShortcutStream(
-  chord: string
+  chord: string,
 ): Kefir.Observable<any, never> {
   return Kefir.stream((emitter) => {
     return (
@@ -16,7 +16,7 @@ export default function keyboardShortcutStream(
           emitter.emit(domEvent);
           return false;
         },
-        'keydown'
+        'keydown',
       )
     );
   });

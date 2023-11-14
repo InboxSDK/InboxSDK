@@ -3,7 +3,7 @@ import type GmailComposeView from '../gmail-compose-view';
 const leftMap = new WeakMap();
 export default function getFormattingAreaOffsetLeft(
   gmailComposeView: GmailComposeView,
-  forceGet?: boolean
+  forceGet?: boolean,
 ): number {
   if (!forceGet) {
     const existingValue = leftMap.get(gmailComposeView);

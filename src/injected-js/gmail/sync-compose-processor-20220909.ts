@@ -24,7 +24,7 @@ export function parseComposeResponseBody_2022_09_09(response: Array<any>) {
 
 export function replaceBodyContentInComposeSendRequestBody_2022_09_09(
   request: Array<any>,
-  newBodyHtmlContent: string
+  newBodyHtmlContent: string,
 ): Array<any> | null {
   return replaceBodyContentInSendRequestBody(request, newBodyHtmlContent);
 }
@@ -46,7 +46,7 @@ function parseCreateUpdateSendDraftRequestBody(request: any[]) {
   const parsedMessages = updateList.map(parseRequestThread).filter(isNotNil);
 
   const sorted = sortBy(parsedMessages, (m) =>
-    ACTION_TYPE_PRIORITY_RANK.indexOf(m.type)
+    ACTION_TYPE_PRIORITY_RANK.indexOf(m.type),
   );
 
   return sorted[0] || null;
@@ -103,7 +103,7 @@ function parseCreateUpdateSendDraftResponseBody(response: any[]) {
 
 function replaceBodyContentInSendRequestBody(
   request: Array<any>,
-  newBodyHtmlContent: string
+  newBodyHtmlContent: string,
 ) {
   // since draftID is not passed from outside,
   // use parse function to find a message which body needs to be replaced
@@ -139,7 +139,7 @@ function replaceBodyContentInSendRequestBody(
 
     if (parseResult?.parsedMsg.messageId === replaceBodyInThisMessageId) {
       const actionType = actionsToComposeRequestType(
-        parseResult.parsedMsg.actions
+        parseResult.parsedMsg.actions,
       );
 
       if (actionType === 'SEND') {
@@ -374,7 +374,7 @@ function parseResponseMsg(msg: any[]) {
 }
 
 export function actionsToComposeRequestType(
-  actions: string[]
+  actions: string[],
 ): ComposeRequestType | null {
   if (
     intersection(actions, DRAFT_SAVING_ACTIONS).length ===
