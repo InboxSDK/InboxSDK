@@ -17,7 +17,7 @@ import WidthManager from './gmail-thread-view/width-manager';
 import type { CustomMessageDescriptor } from '../../../views/conversations/custom-message-view';
 import { type ContentPanelDescriptor } from '../../../driver-common/sidebar/ContentPanelViewDriver';
 import isStreakAppId from '../../../lib/isStreakAppId';
-import censorHTMLtree from '../../../../common/censorHTMLtree';
+import censorHTMLstring from '../../../../common/censorHTMLstring';
 
 let hasLoggedAddonInfo = false;
 
@@ -626,7 +626,7 @@ class GmailThreadView {
           this._driver
             .getLogger()
             .error(new Error('Thread view toolbar cannot be found'), {
-              threadViewHtml: censorHTMLtree(threadViewEl),
+              threadViewHtml: censorHTMLstring(threadViewEl.innerHTML),
             });
         } else {
           const pageHtml = document.querySelector('.nH');
@@ -636,7 +636,7 @@ class GmailThreadView {
               .getLogger()
               .error(new Error('Thread view toolbar cannot be found'), {
                 threadViewHtml: '.nH.bkK cannot be found',
-                pageHtml: censorHTMLtree(pageHtml),
+                pageHtml: censorHTMLstring(pageHtml.innerHTML),
               });
           } else {
             this._driver
