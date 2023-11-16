@@ -688,43 +688,40 @@ class GmailThreadView {
 
   _isToolbarContainerRelevant(toolbarContainerElement: HTMLElement): boolean {
     if (
-      (toolbarContainerElement as any).parentElement.parentElement ===
+      toolbarContainerElement.parentElement!.parentElement ===
       (this._element as any).parentElement.parentElement
     ) {
       return true;
     }
 
     if (
-      (toolbarContainerElement as any).parentElement.getAttribute('role') !==
-        'main' &&
-      (this._element as any).parentElement.getAttribute('role') !== 'main'
+      toolbarContainerElement.parentElement!.getAttribute('role') !== 'main' &&
+      this._element.parentElement!.getAttribute('role') !== 'main'
     ) {
       return true;
     }
 
     if (
-      (toolbarContainerElement as any).parentElement.getAttribute('role') ===
-        'main' &&
-      (toolbarContainerElement as any).parentElement.querySelector(
+      toolbarContainerElement.parentElement!.getAttribute('role') === 'main' &&
+      toolbarContainerElement.parentElement!.querySelector(
         '.if, .PeIF1d, .a98.iY',
       ) &&
-      ((toolbarContainerElement as any).parentElement.querySelector(
+      (toolbarContainerElement.parentElement!.querySelector(
         '.if, .PeIF1d, .a98.iY',
-      ).parentElement === this._element ||
-        (toolbarContainerElement as any).parentElement.querySelector(
-          '.a98.iY',
-        ) === this._element)
+      )!.parentElement === this._element ||
+        toolbarContainerElement.parentElement!.querySelector('.a98.iY') ===
+          this._element)
     ) {
       let version = '2018';
 
       if (this._element.matches('.a98.iY')) {
         version = '2023-11-16';
       } else if (
-        (toolbarContainerElement as any).parentElement.querySelector('.a98.iY')
+        toolbarContainerElement.parentElement!.querySelector('.a98.iY')
       ) {
         version = '2022-10-20';
       } else if (
-        (toolbarContainerElement as any).parentElement.querySelector('.PeIF1d')
+        toolbarContainerElement.parentElement!.querySelector('.PeIF1d')
       ) {
         version = '2022-10-12';
       }
