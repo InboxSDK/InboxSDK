@@ -281,7 +281,10 @@ const GmailElementGetter = {
   },
 
   getThreadContainerElement(): HTMLElement | null {
-    return document.querySelector('[role=main] .g.id table.Bs > tr');
+    // [role=main] .g.id .a98.iY is the new selector after Nov 16, 2023 gmail change
+    return document.querySelector(
+      '[role=main] .g.id table.Bs > tr, [role=main] .g.id .a98.iY',
+    );
   },
 
   getToolbarElement(): HTMLElement {

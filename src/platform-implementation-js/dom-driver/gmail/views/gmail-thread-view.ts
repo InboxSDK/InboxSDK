@@ -198,18 +198,26 @@ class GmailThreadView {
     [2018]: '.if > .nH',
   };
 
+  _subjectContainerSelectorsAfterNov162023 = {
+    '2023_11_16': '> .nH',
+  };
+
   addNoticeBar(): SimpleElementView {
     const el = document.createElement('div');
     el.className = idMap('thread_noticeBar');
     let version;
     let subjectContainer;
 
-    for (const [currentVersion, selector] of Object.entries(
-      this._subjectContainerSelectors,
-    )) {
-      // Flow should be able to infer selector to be a string,
-      // Typescript can. Remove this when ported.
-      const el = this._element.querySelector(selector as any);
+    let selectorsToTry: Record<string, string> =
+      this._subjectContainerSelectors;
+
+    if (this._element.matches('.a98.iY')) {
+      // thread view gmail update Nov 16, 2023
+      selectorsToTry = this._subjectContainerSelectorsAfterNov162023;
+    }
+
+    for (const [currentVersion, selector] of Object.entries(selectorsToTry)) {
+      const el = this._element.querySelector(selector);
 
       if (!el) {
         continue;
@@ -700,13 +708,18 @@ class GmailThreadView {
       (toolbarContainerElement as any).parentElement.querySelector(
         '.if, .PeIF1d, .a98.iY',
       ) &&
-      (toolbarContainerElement as any).parentElement.querySelector(
+      ((toolbarContainerElement as any).parentElement.querySelector(
         '.if, .PeIF1d, .a98.iY',
-      ).parentElement === this._element
+      ).parentElement === this._element ||
+        (toolbarContainerElement as any).parentElement.querySelector(
+          '.a98.iY',
+        ) === this._element)
     ) {
       let version = '2018';
 
-      if (
+      if (this._element.matches('.a98.iY')) {
+        version = '2023-11-16';
+      } else if (
         (toolbarContainerElement as any).parentElement.querySelector('.a98.iY')
       ) {
         version = '2022-10-20';
