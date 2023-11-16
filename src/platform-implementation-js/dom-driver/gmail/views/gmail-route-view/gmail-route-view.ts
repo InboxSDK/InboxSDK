@@ -17,12 +17,12 @@ import GmailThreadView from '../gmail-thread-view';
 import GmailCollapsibleSectionView from '../gmail-collapsible-section-view';
 import GmailElementGetter from '../../gmail-element-getter';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
-import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import type GmailDriver from '../../gmail-driver';
 import type GmailRouteProcessor from '../gmail-route-view/gmail-route-processor';
 import PageParserTree from 'page-parser-tree';
 import { makePageParser } from './page-parser';
 import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
+import waitFor from '../../../../lib/wait-for';
 
 class GmailRouteView {
   _type: string;
@@ -373,14 +373,27 @@ class GmailRouteView {
     }
   }
 
-  _startMonitoringPreviewPaneForThread(previewPaneContainer: HTMLElement) {
-    let threadContainerElement =
-      previewPaneContainer.querySelector<HTMLElement>('table.Bs > tr');
+  async _startMonitoringPreviewPaneForThread(
+    previewPaneContainer: HTMLElement,
+  ) {
+    const threadContainerElement = await waitFor(() => {
+      let threadContainerElement =
+        previewPaneContainer.querySelector<HTMLElement>('table.Bs > tr');
+
+      if (!threadContainerElement) {
+        threadContainerElement =
+          previewPaneContainer.querySelector<HTMLElement>(
+            '.nH.g.id:has(.a98.iY)',
+          );
+      }
+
+      return threadContainerElement;
+    });
 
     if (!threadContainerElement) {
-      threadContainerElement = querySelector(
-        previewPaneContainer,
-        '.nH.g.id:has(.a98.iY)',
+      throw new Error(
+        `Failed to find element with selector: .nH.g.id:has(.a98.iY)`,
+        { cause: new Error("Thread container for preview pane wasn't found") },
       );
     }
 
