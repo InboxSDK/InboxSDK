@@ -24,6 +24,8 @@ import { makePageParser } from './page-parser';
 import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
 import waitFor from '../../../../lib/wait-for';
 import { SelectorError } from '../../../../lib/dom/querySelectorOrFail';
+import censorHTMLstring from '../../../../../common/censorHTMLstring';
+import isStreakAppId from '../../../../lib/isStreakAppId';
 
 class GmailRouteView {
   _type: string;
@@ -378,7 +380,7 @@ class GmailRouteView {
     previewPaneContainer: HTMLElement,
   ) {
     let threadContainerElement;
-    const selector_2023_11_16 = 'table.Bs > tr, .nH.g.id:has(.a98.iY)';
+    const selector_2023_11_16 = 'table.Bs > tr, .ao8:has(.a98.iY)';
 
     try {
       threadContainerElement = await waitFor(() => {
@@ -387,9 +389,16 @@ class GmailRouteView {
         );
       }, 15_000);
     } catch {
-      throw new SelectorError(selector_2023_11_16, {
+      const selectorError = new SelectorError(selector_2023_11_16, {
         cause: new Error("Thread container for preview pane wasn't found"),
       });
+      if (isStreakAppId(this._driver.getAppId())) {
+        this._driver.getLogger().error(selectorError, {
+          html: censorHTMLstring(previewPaneContainer.innerHTML),
+        });
+      }
+
+      throw selectorError;
     }
 
     const elementStream = makeElementChildStream(threadContainerElement).filter(
