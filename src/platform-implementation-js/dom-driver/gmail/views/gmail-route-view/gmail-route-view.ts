@@ -25,6 +25,7 @@ import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
 import waitFor from '../../../../lib/wait-for';
 import { SelectorError } from '../../../../lib/dom/querySelectorOrFail';
 import censorHTMLstring from '../../../../../common/censorHTMLstring';
+import isStreakAppId from '../../../../lib/isStreakAppId';
 
 class GmailRouteView {
   _type: string;
@@ -388,14 +389,16 @@ class GmailRouteView {
         );
       }, 15_000);
     } catch {
-      this._driver
-        .getLogger()
-        .errorSite(
-          new Error("Thread container for preview pane wasn't found"),
-          {
-            html: censorHTMLstring(previewPaneContainer.innerHTML),
-          },
-        );
+      if (isStreakAppId(this._driver.getAppId())) {
+        this._driver
+          .getLogger()
+          .errorSite(
+            new Error("Thread container for preview pane wasn't found"),
+            {
+              html: censorHTMLstring(previewPaneContainer.innerHTML),
+            },
+          );
+      }
 
       throw new SelectorError(selector_2023_11_16, {
         cause: new Error("Thread container for preview pane wasn't found"),
