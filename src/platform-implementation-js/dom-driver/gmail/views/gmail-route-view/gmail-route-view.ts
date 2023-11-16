@@ -374,13 +374,17 @@ class GmailRouteView {
   }
 
   _startMonitoringPreviewPaneForThread(previewPaneContainer: HTMLElement) {
-    const threadContainerTableElement = querySelector(
-      previewPaneContainer,
-      'table.Bs > tr',
-    );
-    const elementStream = makeElementChildStream(
-      threadContainerTableElement,
-    ).filter(
+    let threadContainerElement =
+      previewPaneContainer.querySelector<HTMLElement>('table.Bs > tr');
+
+    if (!threadContainerElement) {
+      threadContainerElement = querySelector(
+        previewPaneContainer,
+        '.nH.g.id:has(.a98.iY)',
+      );
+    }
+
+    const elementStream = makeElementChildStream(threadContainerElement).filter(
       (event) =>
         !!event.el.querySelector('.if') ||
         !!event.el.querySelector('.PeIF1d') ||
