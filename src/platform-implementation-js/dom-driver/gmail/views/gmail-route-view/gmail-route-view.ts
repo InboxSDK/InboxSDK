@@ -23,6 +23,7 @@ import PageParserTree from 'page-parser-tree';
 import { makePageParser } from './page-parser';
 import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
 import waitFor from '../../../../lib/wait-for';
+import { SelectorError } from '../../../../lib/dom/querySelectorOrFail';
 
 class GmailRouteView {
   _type: string;
@@ -376,25 +377,19 @@ class GmailRouteView {
   async _startMonitoringPreviewPaneForThread(
     previewPaneContainer: HTMLElement,
   ) {
-    const threadContainerElement = await waitFor(() => {
-      let threadContainerElement =
-        previewPaneContainer.querySelector<HTMLElement>('table.Bs > tr');
+    let threadContainerElement;
+    const selector_2023_11_16 = 'table.Bs > tr, .nH.g.id:has(.a98.iY)';
 
-      if (!threadContainerElement) {
-        threadContainerElement =
-          previewPaneContainer.querySelector<HTMLElement>(
-            '.nH.g.id:has(.a98.iY)',
-          );
-      }
-
-      return threadContainerElement;
-    });
-
-    if (!threadContainerElement) {
-      throw new Error(
-        `Failed to find element with selector: .nH.g.id:has(.a98.iY)`,
-        { cause: new Error("Thread container for preview pane wasn't found") },
-      );
+    try {
+      threadContainerElement = await waitFor(() => {
+        return previewPaneContainer.querySelector<HTMLElement>(
+          selector_2023_11_16,
+        );
+      }, 15_000);
+    } catch {
+      throw new SelectorError(selector_2023_11_16, {
+        cause: new Error("Thread container for preview pane wasn't found"),
+      });
     }
 
     const elementStream = makeElementChildStream(threadContainerElement).filter(
