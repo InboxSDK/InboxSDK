@@ -393,11 +393,9 @@ class GmailRouteView {
         cause: new Error("Thread container for preview pane wasn't found"),
       });
       if (isStreakAppId(this._driver.getAppId())) {
-        this._driver
-          .getLogger()
-          .error(selectorError, {
-            html: censorHTMLstring(previewPaneContainer.innerHTML),
-          });
+        this._driver.getLogger().error(selectorError, {
+          html: censorHTMLstring(previewPaneContainer.innerHTML),
+        });
       }
 
       throw selectorError;
