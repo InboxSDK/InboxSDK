@@ -366,7 +366,7 @@ class GmailMessageView {
 
   #getOpenMoreMenu(): HTMLElement | null | undefined {
     const selector_2022_11_23 =
-      'td > div.nH.a98.iY > div.nH.aHU .b7.J-M[aria-haspopup=true]';
+      'td > div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]';
     const maybeMoreMenu =
       document.body.querySelector<HTMLElement>(selector_2022_11_23);
     // This will find any message's open more menu! The caller needs to make
