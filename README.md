@@ -11,6 +11,11 @@ extensions.
 - **Constant updates**: new versions released as Gmail updates (often before
   their changes are fully rolled out)
 
+The InboxSDK is developed by [Streak](https://www.streak.com/). We use the
+InboxSDK ourselves to build our own product. We're sharing the InboxSDK so we
+can collaborate with others on integrating with Gmail and with each other's
+extensions.
+
 # Documentation
 
 The [full docs site](https://inboxsdk.github.io/inboxsdk-docs/) and
@@ -117,13 +122,13 @@ of Gmail may visually appear the same but contain internal differences (HTML
 structure, ajax request/response formats, etc.) that cause compatibility issues
 for the InboxSDK.
 
-In general, we should try to add error logging that makes it obvious whenever
-Gmail's HTML structure or ajax formats aren't what we expect. For example, if we
-have code that calls `.querySelector(...)` on an element and then requires an
-element to be returned, we should either import and use 'querySelectorOrFail.ts'
-(which throws an error with a useful message if no element is found), or we
-should handle null being returned from `.querySelector(...)` with code like the
-following:
+In general, we should try to add remote error logging that makes it obvious
+whenever Gmail's HTML structure or ajax formats aren't what we expect. For
+example, if we have code that calls `.querySelector(...)` on an element and then
+requires an element to be returned, we should either import and use
+'querySelectorOrFail.ts' (which throws an error with a useful message if no
+element is found), or we should handle null being returned from
+`.querySelector(...)` with code like the following:
 
 ```js
 const insertionPointEl = el.querySelector('.foo .bar');
@@ -144,9 +149,6 @@ the element's parents is useful too), or restrict the logging to only happen for
 Streak users (by checking the extension's appId with the `isStreakAppId.ts`
 function). Same rule of thumb applies for logging ajax request/responses too
 (see `censorJSONTree`).
-
-See the _Querying for Error Logs_ section below for instructions on reading the
-logged errors and their details.
 
 Whenever we update our code for a new Gmail version that isn't completely rolled
 out, we need to make sure our code continues to support previous versions of
