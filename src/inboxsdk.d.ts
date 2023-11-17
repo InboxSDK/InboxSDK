@@ -29,6 +29,10 @@ import type { MoleOptions } from './platform-implementation-js/dom-driver/gmail/
 import type { ComposeButtonDescriptor } from './platform-implementation-js/driver-interfaces/compose-view-driver';
 import type ComposeView from './platform-implementation-js/views/compose-view';
 import type Search from './platform-implementation-js/namespaces/search';
+import type {
+  default as Toolbars,
+  LegacyToolbarButtonDescriptor,
+} from './platform-implementation-js/namespaces/toolbars';
 
 export type { User };
 
@@ -199,22 +203,11 @@ export interface Widgets {
   showTopMessageBarView(opts: { el: Element }): TopMessageBarView;
 }
 
-export interface Toolbars {
-  addToolbarButtonForApp(
-    descriptor:
-      | AppToolbarButtonDescriptor
-      | Kefir.Stream<AppToolbarButtonDescriptor, any>,
-  ): AppToolbarButtonView;
-  registerThreadButton(descriptor: ToolbarButtonDescriptor): () => void;
-  registerToolbarButtonForThreadView(
-    descriptor: LegacyToolbarButtonDescriptor,
-  ): () => void;
-  SectionNames: {
-    INBOX_STATE: 'INBOX_STATE';
-    METADATA_STATE: 'METADATA_STATE';
-    OTHER: 'OTHER';
-  };
-}
+export { Toolbars, LegacyToolbarButtonDescriptor };
+export {
+  ToolbarButtonDescriptor,
+  ToolbarButtonOnClickEvent,
+} from './platform-implementation-js/namespaces/toolbars';
 
 export interface AppToolbarButtonDescriptor {
   title: string;
@@ -523,39 +516,6 @@ export interface MessageViewLinkDescriptor {
   element: HTMLElement;
   href: string;
   isInQuotedArea: boolean;
-}
-
-export interface ToolbarButtonDescriptor {
-  title: string;
-  iconUrl?: string;
-  iconClass?: string;
-  positions?: Array<'THREAD' | 'ROW' | 'LIST'> | null;
-  threadSection?: string;
-  listSection?: string;
-  onClick(event: ToolbarButtonOnClickEvent): void;
-  hasDropdown: boolean;
-  hideFor?: (routeView: RouteView) => boolean;
-  keyboardShortcutHandle?: KeyboardShortcutHandle;
-  orderHint?: number;
-}
-
-export interface LegacyToolbarButtonDescriptor {
-  title: string;
-  iconUrl?: string;
-  iconClass?: string;
-  section: 'INBOX_STATE' | 'METADATA_STATE' | 'OTHER';
-  onClick(event: ToolbarButtonOnClickEvent): void;
-  hasDropdown?: boolean;
-  hideFor?: (routeView: RouteView) => boolean;
-  keyboardShortcutHandle?: KeyboardShortcutHandle;
-  orderHint?: number;
-}
-
-export interface ToolbarButtonOnClickEvent {
-  selectedThreadViews: Array<ThreadView>;
-  selectedThreadRowViews: Array<ThreadRowView>;
-  dropdown?: DropdownView;
-  threadView?: ThreadView;
 }
 
 export interface KeyboardShortcutDescriptor {

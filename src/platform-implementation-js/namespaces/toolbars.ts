@@ -1,27 +1,59 @@
-import Kefir from 'kefir';
+import Kefir, { type Stream } from 'kefir';
 import kefirCast from 'kefir-cast';
 import kefirStopper from 'kefir-stopper';
 import EventEmitter from '../lib/safe-event-emitter';
 import type { Driver } from '../driver-interfaces/driver';
 import type { PiOpts } from '../platform-implementation';
 import type Membrane from '../lib/Membrane';
-import get from '../../common/get-or-fail';
 import AppToolbarButtonView from '../views/app-toolbar-button-view';
 import { SECTION_NAMES } from '../constants/toolbars';
 import type {
-  Toolbars as IToolbars,
-  ToolbarButtonDescriptor,
+  AppToolbarButtonDescriptor,
+  DropdownView,
+  KeyboardShortcutHandle,
+  RouteView,
+  ThreadRowView,
+  ThreadView,
 } from '../../inboxsdk';
 
-type Members = {
-  appId: string;
-  driver: Driver;
-  membrane: Membrane;
-  piOpts: PiOpts;
-};
-const memberMap: WeakMap<Toolbars, Members> = new WeakMap();
+export interface ToolbarButtonOnClickEvent {
+  selectedThreadViews: Array<ThreadView>;
+  selectedThreadRowViews: Array<ThreadRowView>;
+  dropdown?: DropdownView;
+  threadView?: ThreadView;
+}
 
-export default class Toolbars extends EventEmitter implements IToolbars {
+export interface LegacyToolbarButtonDescriptor {
+  title: string;
+  iconUrl?: string;
+  iconClass?: string;
+  section: 'INBOX_STATE' | 'METADATA_STATE' | 'OTHER';
+  onClick(event: ToolbarButtonOnClickEvent): void;
+  hasDropdown?: boolean;
+  hideFor?: (routeView: RouteView) => boolean;
+  keyboardShortcutHandle?: KeyboardShortcutHandle;
+  orderHint?: number;
+}
+
+export interface ToolbarButtonDescriptor {
+  title: string;
+  iconUrl?: string;
+  iconClass?: string;
+  positions?: Array<'THREAD' | 'ROW' | 'LIST'> | null;
+  threadSection?: string;
+  listSection?: string;
+  onClick(event: ToolbarButtonOnClickEvent): void;
+  hasDropdown: boolean;
+  hideFor?: (routeView: RouteView) => boolean;
+  keyboardShortcutHandle?: KeyboardShortcutHandle;
+  orderHint?: number;
+}
+
+export default class Toolbars extends EventEmitter {
+  #driver;
+  #membrane;
+  #piOpts;
+
   SectionNames = SECTION_NAMES;
 
   constructor(
@@ -31,24 +63,23 @@ export default class Toolbars extends EventEmitter implements IToolbars {
     piOpts: PiOpts,
   ) {
     super();
-    const members = {
-      appId,
-      driver,
-      membrane,
-      piOpts,
-    };
-    memberMap.set(this, members);
+    this.#driver = driver;
+    this.#membrane = membrane;
+    this.#piOpts = piOpts;
   }
 
+  /**
+   * Registers a toolbar button to appear on thread rows, above the thread list when some rows are checked, and above threads.
+   *
+   * @returns a function which removes the button registration.
+   */
   registerThreadButton(buttonDescriptor: ToolbarButtonDescriptor) {
-    const members = get(memberMap, this);
-
     if (
       (buttonDescriptor.listSection === 'OTHER' ||
         buttonDescriptor.threadSection === 'OTHER') &&
       buttonDescriptor.hasDropdown
     ) {
-      members.driver
+      this.#driver
         .getLogger()
         .errorApp(
           new Error(
@@ -61,7 +92,7 @@ export default class Toolbars extends EventEmitter implements IToolbars {
     const { hideFor, ..._buttonDescriptor } = buttonDescriptor;
 
     const registerThreadButton = () => {
-      return members.driver.registerThreadButton({
+      return this.#driver.registerThreadButton({
         ..._buttonDescriptor,
         onClick: (event: any) => {
           if (!_buttonDescriptor.onClick) return;
@@ -71,10 +102,10 @@ export default class Toolbars extends EventEmitter implements IToolbars {
             position: event.position,
             dropdown: event.dropdown,
             selectedThreadViews: event.selectedThreadViewDrivers.map((x: any) =>
-              members.membrane.get(x),
+              this.#membrane.get(x),
             ),
             selectedThreadRowViews: event.selectedThreadRowViewDrivers.map(
-              (x: any) => members.membrane.get(x),
+              (x: any) => this.#membrane.get(x),
             ),
           } as any);
         },
@@ -86,11 +117,11 @@ export default class Toolbars extends EventEmitter implements IToolbars {
     } else {
       const stopper = kefirStopper();
       let currentRemover: null | (() => void) = null;
-      members.driver
+      this.#driver
         .getRouteViewDriverStream()
         .takeUntilBy(stopper)
         .onValue((routeViewDriver) => {
-          const routeView = members.membrane.get(routeViewDriver);
+          const routeView = this.#membrane.get(routeViewDriver);
 
           if (hideFor(routeView)) {
             if (currentRemover) {
@@ -114,8 +145,12 @@ export default class Toolbars extends EventEmitter implements IToolbars {
     }
   }
 
+  /**
+   * @deprecated This method is deprecated in favor of {@link Toolbars.registerThreadButton}.
+   *
+   * Registers a toolbar button to appear above any list page such as the Inbox or Sent Mail.
+   */
   registerToolbarButtonForList(buttonDescriptor: Record<string, any>) {
-    const members = get(memberMap, this);
     return this.registerThreadButton({
       positions: ['LIST'],
       listSection: buttonDescriptor.section,
@@ -129,7 +164,7 @@ export default class Toolbars extends EventEmitter implements IToolbars {
           selectedThreadRowViews: event.selectedThreadRowViews,
 
           get threadRowViews() {
-            members.driver
+            this.#driver
               .getLogger()
               .deprecationWarning(
                 'Toolbars.registerToolbarButtonForList onClick event.threadRowViews',
@@ -145,7 +180,14 @@ export default class Toolbars extends EventEmitter implements IToolbars {
     });
   }
 
-  registerToolbarButtonForThreadView(buttonDescriptor: Record<string, any>) {
+  /**
+   * @deprecated This function is deprecated in favor of {@link Toolbars#registerThreadButton}.
+   *
+   * Registers a toolbar button to appear when viewing a thread.
+   */
+  registerToolbarButtonForThreadView(
+    buttonDescriptor: LegacyToolbarButtonDescriptor,
+  ) {
     return this.registerThreadButton({
       positions: ['THREAD'],
       threadSection: buttonDescriptor.section,
@@ -159,39 +201,49 @@ export default class Toolbars extends EventEmitter implements IToolbars {
         buttonDescriptor.onClick({
           dropdown: event.dropdown,
           threadView: event.selectedThreadViews[0],
-        });
+        } as any);
       },
-      hasDropdown: buttonDescriptor.hasDropdown,
+      hasDropdown: buttonDescriptor.hasDropdown!,
       orderHint: buttonDescriptor.orderHint,
       hideFor: buttonDescriptor.hideFor,
       keyboardShortcutHandle: buttonDescriptor.keyboardShortcutHandle,
     });
   }
 
-  setAppToolbarButton(appToolbarButtonDescriptor: Record<string, any>) {
-    const { driver, piOpts } = get(memberMap, this);
-    driver
+  /** @deprecated */
+  setAppToolbarButton(
+    appToolbarButtonDescriptor:
+      | AppToolbarButtonDescriptor
+      | Stream<AppToolbarButtonDescriptor, any>,
+  ) {
+    this.#driver
       .getLogger()
       .deprecationWarning(
         'Toolbars.setAppToolbarButton',
         'Toolbars.addToolbarButtonForApp',
       );
 
-    if (piOpts.REQUESTED_API_VERSION !== 1) {
+    if (this.#piOpts.REQUESTED_API_VERSION !== 1) {
       throw new Error('This method was discontinued after API version 1');
     }
 
     return this.addToolbarButtonForApp(appToolbarButtonDescriptor);
   }
 
-  addToolbarButtonForApp(buttonDescriptor: Record<string, any>) {
-    const buttonDescriptorStream = kefirCast(Kefir, buttonDescriptor);
-    const appToolbarButtonViewDriverPromise = get(
-      memberMap,
-      this,
-    ).driver.addToolbarButtonForApp(buttonDescriptorStream);
+  /**
+   * Adds a button and dropdown to the "Global Toolbar". This is typically used to show a dropdown with general information about your application. In Gmail, this refers to the navigation area at the top right of the window.
+   */
+  addToolbarButtonForApp(
+    buttonDescriptor:
+      | AppToolbarButtonDescriptor
+      | Stream<AppToolbarButtonDescriptor, any>,
+  ) {
+    const buttonDescriptorStream: Stream<AppToolbarButtonDescriptor, any> =
+      kefirCast(Kefir, buttonDescriptor);
+    const appToolbarButtonViewDriverPromise =
+      this.#driver.addToolbarButtonForApp(buttonDescriptorStream);
     const appToolbarButtonView = new AppToolbarButtonView(
-      get(memberMap, this).driver,
+      this.#driver,
       appToolbarButtonViewDriverPromise,
     );
     return appToolbarButtonView;

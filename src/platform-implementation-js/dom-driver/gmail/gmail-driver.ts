@@ -92,7 +92,7 @@ import type ContentPanelViewDriver from '../../driver-common/sidebar/ContentPane
 import GmailNavItemView, {
   type NavItemDescriptor,
 } from './views/gmail-nav-item-view';
-import { Contact } from '../../../inboxsdk';
+import { AppToolbarButtonDescriptor, Contact } from '../../../inboxsdk';
 import GmailAttachmentCardView from './views/gmail-attachment-card-view';
 import type { PersonDetails } from '../../namespaces/user';
 import getPersonDetails from './gmail-driver/getPersonDetails';
@@ -585,7 +585,7 @@ class GmailDriver {
   }
 
   addToolbarButtonForApp(
-    buttonDescriptor: any,
+    buttonDescriptor: Kefir.Stream<AppToolbarButtonDescriptor, any>,
   ): Promise<GmailAppToolbarButtonView> {
     return addToolbarButtonForApp(this, buttonDescriptor);
   }
