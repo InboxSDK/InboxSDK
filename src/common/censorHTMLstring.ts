@@ -33,12 +33,12 @@ export const ATTRIBUTE_WHITELIST: Set<string> = new Set([
 // then log the censored HTML so we know we aren't logging user data.
 export default function censorHTMLstring(html: string): string {
   return html
+    .replace(/\s([^\s=]+)\s*=\s*"[^"]+"/g, (match: string, attr: string) =>
+      ATTRIBUTE_WHITELIST.has(attr) ? match : ` ${attr}="..."`,
+    )
     .replace(
       /(^|>)([^<]+)/g,
       (match: string, start: string, text: string) =>
         start + (text.trim().length ? '...' : ''),
-    )
-    .replace(/\s([^\s=]+)\s*=\s*"[^"]+"/g, (match: string, attr: string) =>
-      ATTRIBUTE_WHITELIST.has(attr) ? match : ` ${attr}="..."`,
     );
 }

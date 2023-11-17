@@ -24,8 +24,8 @@ import { makePageParser } from './page-parser';
 import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
 import waitFor from '../../../../lib/wait-for';
 import { SelectorError } from '../../../../lib/dom/querySelectorOrFail';
-import censorHTMLstring from '../../../../../common/censorHTMLstring';
 import isStreakAppId from '../../../../lib/isStreakAppId';
+import { extractDocumentHtmlAndCss } from '../../../../../common/extractDocumentHtmlAndCss';
 
 class GmailRouteView {
   _type: string;
@@ -394,7 +394,7 @@ class GmailRouteView {
       });
       if (isStreakAppId(this._driver.getAppId())) {
         this._driver.getLogger().error(selectorError, {
-          html: censorHTMLstring(previewPaneContainer.innerHTML),
+          html: extractDocumentHtmlAndCss(),
         });
       }
 
