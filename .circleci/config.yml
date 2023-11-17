@@ -35,7 +35,9 @@ jobs:
           command: yarn gulp --remote
       - run:
           name: Check output files exist
-          command: ls dist/inboxsdk.js dist/platform-implementation.js dist/pageWorld.js
+          command:
+            ls dist/inboxsdk.js dist/platform-implementation.js
+            dist/pageWorld.js
       - run:
           name: Clean
           command: yarn gulp clean
@@ -51,7 +53,8 @@ jobs:
           command: yarn gulp --integratedPageWorld
       - run:
           name: Check output files exist
-          command: ls dist/inboxsdk.js dist/pageWorld.js packages/core/pageWorld.js
+          command:
+            ls dist/inboxsdk.js dist/pageWorld.js packages/core/pageWorld.js
       - run:
           name: Clean
           command: yarn gulp clean
