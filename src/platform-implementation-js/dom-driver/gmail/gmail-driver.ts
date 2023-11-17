@@ -142,7 +142,7 @@ class GmailDriver {
     | { customRouteID: string; timestamp: Date }
     | null
     | undefined;
-  #currentRouteViewDriver!: GmailRouteView;
+  #currentRouteViewDriver?: GmailRouteView;
   #appSidebarView: GmailAppSidebarView | null | undefined = null;
 
   getGmailThreadIdForRfcMessageId: (rfcId: string) => Promise<string>;
@@ -402,7 +402,7 @@ class GmailDriver {
 
     const toolbarViewSub = toValueObservable(
       this.#toolbarViewDriverLiveSet,
-    ).subscribe(({ value: gmailToolbarView }: { value: GmailToolbarView }) => {
+    ).subscribe(({ value: gmailToolbarView }) => {
       if (gmailToolbarView.isForThread()) {
         if (!options.positions || includes(options.positions, 'THREAD')) {
           removeButtonOnUnregister(
