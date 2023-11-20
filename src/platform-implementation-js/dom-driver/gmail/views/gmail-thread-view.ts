@@ -199,7 +199,7 @@ class GmailThreadView {
   };
 
   _subjectContainerSelectorsAfterNov162023 = {
-    '2023_11_16': '> .nH',
+    '2023_11_16': '* > .nH',
   };
 
   addNoticeBar(): SimpleElementView {
