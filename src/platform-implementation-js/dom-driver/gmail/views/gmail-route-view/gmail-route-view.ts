@@ -380,18 +380,30 @@ class GmailRouteView {
     previewPaneContainer: HTMLElement,
   ) {
     let threadContainerElement;
-    const selector_2023_11_16 = 'table.Bs > tr, .ao8:has(.a98.iY)';
+
+    const selector = 'table.Bs > tr';
+    const selector_2023_11_16 = '.ao8:has(.a98.iY)';
 
     try {
       threadContainerElement = await waitFor(() => {
+        const threadContainerElement =
+          previewPaneContainer.querySelector<HTMLElement>(selector);
+
+        if (threadContainerElement) {
+          return threadContainerElement;
+        }
+
         return previewPaneContainer.querySelector<HTMLElement>(
           selector_2023_11_16,
         );
       }, 15_000);
     } catch {
-      const selectorError = new SelectorError(selector_2023_11_16, {
-        cause: new Error("Thread container for preview pane wasn't found"),
-      });
+      const selectorError = new SelectorError(
+        `${selector}, ${selector_2023_11_16}`,
+        {
+          cause: new Error("Thread container for preview pane wasn't found"),
+        },
+      );
       if (isStreakAppId(this._driver.getAppId())) {
         this._driver.getLogger().error(selectorError, {
           html: extractDocumentHtmlAndCss(),

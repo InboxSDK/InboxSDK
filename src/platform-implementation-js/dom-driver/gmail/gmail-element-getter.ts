@@ -281,10 +281,17 @@ const GmailElementGetter = {
   },
 
   getThreadContainerElement(): HTMLElement | null {
-    // [role=main] .g.id .a98.iY is the new selector after Nov 16, 2023 gmail change
-    return document.querySelector(
-      '[role=main] .g.id table.Bs > tr, [role=main] .g.id .a98.iY',
-    );
+    const selector = '[role=main] .g.id table.Bs > tr';
+    const selector_2023_11_16 = '[role=main] .g.id .a98.iY';
+
+    const threadContainerElement =
+      document.querySelector<HTMLElement>(selector);
+
+    if (threadContainerElement) {
+      return threadContainerElement;
+    }
+
+    return document.querySelector(selector_2023_11_16);
   },
 
   getToolbarElement(): HTMLElement {
