@@ -9,3 +9,13 @@ it('works', () => {
     '...<b href="..." bar src="..." a="..." class="whitelisted">...</b><i src="..."></i>...',
   );
 });
+
+it('can handle attributes with special symbol', () => {
+  expect(
+    censorHTMLstring(
+      `<div class="ar as" data-tooltip="Name <email@example.com>"><div class="at"><div class="au"><div class="av">Name</div></div></div></div>`,
+    ),
+  ).toBe(
+    `<div class="ar as" data-tooltip="..."><div class="at"><div class="au"><div class="av">...</div></div></div></div>`,
+  );
+});
