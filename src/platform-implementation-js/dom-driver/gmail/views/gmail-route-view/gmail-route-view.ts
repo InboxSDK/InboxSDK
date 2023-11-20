@@ -398,9 +398,12 @@ class GmailRouteView {
         );
       }, 15_000);
     } catch {
-      const selectorError = new SelectorError(selector_2023_11_16, {
-        cause: new Error("Thread container for preview pane wasn't found"),
-      });
+      const selectorError = new SelectorError(
+        `${selector}, ${selector_2023_11_16}`,
+        {
+          cause: new Error("Thread container for preview pane wasn't found"),
+        },
+      );
       if (isStreakAppId(this._driver.getAppId())) {
         this._driver.getLogger().error(selectorError, {
           html: extractDocumentHtmlAndCss(),
