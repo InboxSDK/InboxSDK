@@ -82,7 +82,9 @@ class GmailRouteView {
     if (this._type === 'CUSTOM_LIST') {
       Kefir.later(500, undefined)
         .takeUntilBy(this._stopper)
-        .onValue(() => {
+        .onValue(async () => {
+          await this.#waitForMainElementSafe();
+
           var last = driver.getLastCustomThreadListActivity();
 
           if (
@@ -293,13 +295,28 @@ class GmailRouteView {
   }
 
   _setupSubViews() {
-    asap(() => {
+    asap(async () => {
       if (!this._eventStream) return;
+
+      await this.#waitForMainElementSafe();
 
       this.#monitorRowListElements();
       this._setupContentAndSidebarView();
       this._setupScrollStream();
     });
+  }
+
+  async #waitForMainElementSafe() {
+    try {
+      // role=main attribute is not set while page in a loading state
+      await waitFor(() => document.querySelector('[role=main]'), 15_000);
+    } catch {
+      this._driver
+        .getLogger()
+        .error(new Error('[role=main] element not found'), {
+          html: extractDocumentHtmlAndCss(),
+        });
+    }
   }
 
   #monitorRowListElements() {
