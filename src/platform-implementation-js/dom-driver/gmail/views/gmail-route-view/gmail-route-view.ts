@@ -342,12 +342,45 @@ class GmailRouteView {
     });
   }
 
-  _setupContentAndSidebarView() {
-    const threadContainerElement = this._getThreadContainerElement();
+  async _setupContentAndSidebarView() {
+    let contentElement: {
+      threadContainerElement?: HTMLElement;
+      previewPanelThreadContainerElement?: HTMLElement;
+    } | null = null;
 
-    if (threadContainerElement) {
+    try {
+      // additionally to page loading state, gmail can render content asynchronously
+      // wait until any of the content container elements appear in the DOM
+      contentElement = await waitFor(() => {
+        const threadContainerElement = this._getThreadContainerElement();
+
+        if (threadContainerElement) {
+          return { threadContainerElement };
+        }
+
+        const previewPanelThreadContainerElement =
+          this._getPreviewPaneThreadContainerElement();
+
+        if (previewPanelThreadContainerElement) {
+          return { previewPanelThreadContainerElement };
+        }
+
+        return null;
+      }, 15_000);
+    } catch {
+      const error = new Error("Thread container element wasn't found");
+      if (isStreakAppId(this._driver.getAppId())) {
+        this._driver.getLogger().error(error, {
+          html: extractDocumentHtmlAndCss(),
+        });
+      }
+
+      throw error;
+    }
+
+    if (contentElement?.threadContainerElement) {
       var gmailThreadView = new GmailThreadView(
-        threadContainerElement,
+        contentElement.threadContainerElement,
         this,
         this._driver,
       );
@@ -357,17 +390,12 @@ class GmailRouteView {
         eventName: 'newGmailThreadView',
         view: gmailThreadView,
       });
-    } else {
-      // This element is always present in thread lists, but it only has contents
-      // when in preview pane mode. We want to monitor it in either case
-      // because the user could switch into preview pane mode.
-      const previewPaneContainer = document.querySelector<HTMLElement>(
-        'div[role=main] .aia',
+    } else if (contentElement?.previewPanelThreadContainerElement) {
+      this._startMonitoringPreviewPaneForThread(
+        contentElement.previewPanelThreadContainerElement,
       );
-
-      if (previewPaneContainer) {
-        this._startMonitoringPreviewPaneForThread(previewPaneContainer);
-      }
+    } else {
+      throw new Error(`Thread content element wasn't found`);
     }
   }
 
@@ -392,42 +420,8 @@ class GmailRouteView {
   }
 
   async _startMonitoringPreviewPaneForThread(
-    previewPaneContainer: HTMLElement,
+    threadContainerElement: HTMLElement,
   ) {
-    let threadContainerElement;
-
-    const selector = 'table.Bs > tr';
-    const selector_2023_11_16 = '.ao8:has(.a98.iY)';
-
-    try {
-      threadContainerElement = await waitFor(() => {
-        const threadContainerElement =
-          previewPaneContainer.querySelector<HTMLElement>(selector);
-
-        if (threadContainerElement) {
-          return threadContainerElement;
-        }
-
-        return previewPaneContainer.querySelector<HTMLElement>(
-          selector_2023_11_16,
-        );
-      }, 15_000);
-    } catch {
-      const selectorError = new SelectorError(
-        `${selector}, ${selector_2023_11_16}`,
-        {
-          cause: new Error("Thread container for preview pane wasn't found"),
-        },
-      );
-      if (isStreakAppId(this._driver.getAppId())) {
-        this._driver.getLogger().error(selectorError, {
-          html: extractDocumentHtmlAndCss(),
-        });
-      }
-
-      throw selectorError;
-    }
-
     const elementStream = makeElementChildStream(threadContainerElement).filter(
       (event) =>
         !!event.el.querySelector('.if') ||
@@ -723,11 +717,13 @@ class GmailRouteView {
       .map((part) => part.substring(1));
   }
 
-  _getThreadContainerElement: () => HTMLElement | null | undefined = once(
-    () => {
-      return GmailElementGetter.getThreadContainerElement();
-    },
-  );
+  _getThreadContainerElement(): HTMLElement | null | undefined {
+    return GmailElementGetter.getThreadContainerElement();
+  }
+
+  _getPreviewPaneThreadContainerElement(): HTMLElement | null | undefined {
+    return GmailElementGetter.getPreviewPaneThreadContainerElement();
+  }
 }
 
 export default GmailRouteView;
