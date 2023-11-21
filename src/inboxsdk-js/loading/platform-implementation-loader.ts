@@ -18,13 +18,13 @@ export class PlatformImplementationLoader {
     appId: string,
     opts: PiOpts,
   ): Promise<PlatformImplementation> {
-    if (!global.__InboxSDKImpLoader) {
+    if (!globalThis.__InboxSDKImpLoader) {
       await this.loadScript();
-      if (!global.__InboxSDKImpLoader) {
+      if (!globalThis.__InboxSDKImpLoader) {
         throw new Error('Implementation file did not load correctly');
       }
     }
-    return global.__InboxSDKImpLoader.load('0.1', appId, opts);
+    return globalThis.__InboxSDKImpLoader.load('0.1', appId, opts);
   }
 
   static async preload() {
