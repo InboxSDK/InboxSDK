@@ -11,7 +11,6 @@ import makeElementChildStream from '../../../../lib/dom/make-element-child-strea
 import makeElementViewStream from '../../../../lib/dom/make-element-view-stream';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import getInsertBeforeElement from '../../../../lib/dom/get-insert-before-element';
-import type { RouteViewDriver } from '../../../../driver-interfaces/route-view-driver';
 import GmailRowListView from '../gmail-row-list-view';
 import GmailThreadView from '../gmail-thread-view';
 import GmailCollapsibleSectionView from '../gmail-collapsible-section-view';
@@ -37,7 +36,14 @@ class GmailRouteView {
   _rowListViews: GmailRowListView[];
   _gmailRouteProcessor: GmailRouteProcessor;
   _driver: GmailDriver;
-  _eventStream: Bus<any, unknown>;
+  _eventStream: Bus<
+    | { eventName: 'newGmailRowListView'; view: GmailRowListView }
+    | {
+        eventName: 'newGmailThreadView';
+        view: GmailThreadView;
+      },
+    unknown
+  >;
   _customViewElement: HTMLElement | null | undefined;
   _threadView: GmailThreadView | null | undefined;
   _hasAddedCollapsibleSection: boolean;
@@ -49,8 +55,6 @@ class GmailRouteView {
     gmailRouteProcessor: GmailRouteProcessor,
     driver: GmailDriver,
   ) {
-    // Check we implement interface
-    this as RouteViewDriver;
     this._type = type;
     this._hash = urlObject.hash;
     this._name = urlObject.name;
@@ -314,7 +318,7 @@ class GmailRouteView {
     var rootElement = rowListElement.parentElement;
     if (!rootElement) throw new Error('no rootElement');
     var gmailRowListView = new GmailRowListView(
-      rootElement as any,
+      rootElement,
       this,
       this._driver,
     );

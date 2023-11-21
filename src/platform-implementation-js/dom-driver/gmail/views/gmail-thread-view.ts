@@ -18,6 +18,7 @@ import type { CustomMessageDescriptor } from '../../../views/conversations/custo
 import { type ContentPanelDescriptor } from '../../../driver-common/sidebar/ContentPanelViewDriver';
 import isStreakAppId from '../../../lib/isStreakAppId';
 import censorHTMLstring from '../../../../common/censorHTMLstring';
+import type GmailRouteView from './gmail-route-view/gmail-route-view';
 
 let hasLoggedAddonInfo = false;
 
@@ -29,7 +30,7 @@ class GmailThreadView {
   _eventStream: Bus<any, unknown>;
   _stopper = kefirStopper();
   _widthManager: WidthManager | null | undefined = null;
-  _toolbarView: any;
+  _toolbarView?: GmailToolbarView;
   _messageViewDrivers: any[];
   _newMessageMutationObserver: MutationObserver | null | undefined;
   _readyStream: Kefir.Observable<any, unknown>;
@@ -50,7 +51,7 @@ class GmailThreadView {
 
   constructor(
     element: HTMLElement,
-    routeViewDriver: any,
+    routeViewDriver: GmailRouteView,
     driver: GmailDriver,
     isPreviewedThread: boolean = false,
   ) {
@@ -154,7 +155,7 @@ class GmailThreadView {
     return this._isPreviewedThread;
   }
 
-  getToolbarView(): any {
+  getToolbarView() {
     return this._toolbarView;
   }
 
@@ -689,7 +690,7 @@ class GmailThreadView {
   _isToolbarContainerRelevant(toolbarContainerElement: HTMLElement): boolean {
     if (
       toolbarContainerElement.parentElement!.parentElement ===
-      (this._element as any).parentElement.parentElement
+      this._element.parentElement!.parentElement
     ) {
       return true;
     }
