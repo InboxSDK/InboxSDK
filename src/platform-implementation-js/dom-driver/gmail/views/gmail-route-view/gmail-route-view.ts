@@ -304,7 +304,7 @@ class GmailRouteView {
       await this.#waitForMainElementSafe();
 
       this.#monitorRowListElements();
-      this._setupContentAndSidebarView();
+      this.#setupContentAndSidebarView();
       this._setupScrollStream();
     });
   }
@@ -345,7 +345,7 @@ class GmailRouteView {
     });
   }
 
-  async _setupContentAndSidebarView() {
+  async #setupContentAndSidebarView() {
     let container:
       | {
           threadContainerElement?: HTMLElement;
@@ -415,7 +415,7 @@ class GmailRouteView {
         view: gmailThreadView,
       });
     } else if (container?.previewPaneContainerElement) {
-      this._startMonitoringPreviewPaneForThread(
+      this.#startMonitoringPreviewPaneForThread(
         container.previewPaneContainerElement,
       );
     } else {
@@ -443,13 +443,13 @@ class GmailRouteView {
     }
   }
 
-  async _startMonitoringPreviewPaneForThread(
+  async #startMonitoringPreviewPaneForThread(
     previewPaneContainer: HTMLElement,
   ) {
     let threadContainerElement;
 
     const selector = 'table.Bs > tr';
-    const selector_2023_11_16 = '.ao8:has(.a98.iY)';
+    const selector_2023_11_16 = '.ao8:has(.a98.iY), .ao9:has(.apa)';
 
     try {
       threadContainerElement = await waitFor(() => {
