@@ -43,6 +43,7 @@ class GmailRouteView {
   _hasAddedCollapsibleSection: boolean;
   _cachedRouteData: Record<string, any>;
   #page: PageParserTree;
+  #destroyed = false;
 
   constructor(
     { urlObject, type, routeID, cachedRouteData }: Record<string, any>,
@@ -99,6 +100,8 @@ class GmailRouteView {
   }
 
   destroy() {
+    this.#destroyed = true;
+
     this._stopper.destroy();
 
     this._eventStream.end();
@@ -301,7 +304,7 @@ class GmailRouteView {
       await this.#waitForMainElementSafe();
 
       this.#monitorRowListElements();
-      this._setupContentAndSidebarView();
+      this.#setupContentAndSidebarView();
       this._setupScrollStream();
     });
   }
@@ -342,12 +345,16 @@ class GmailRouteView {
     });
   }
 
-  _setupContentAndSidebarView() {
-    const threadContainerElement = this._getThreadContainerElement();
+  async #setupContentAndSidebarView() {
+    const parseResult = await this.#waitForThreadContainerSafe();
 
-    if (threadContainerElement) {
+    if (this.#destroyed) {
+      return;
+    }
+
+    if (parseResult?.threadContainerElement) {
       var gmailThreadView = new GmailThreadView(
-        threadContainerElement,
+        parseResult.threadContainerElement,
         this,
         this._driver,
       );
@@ -357,18 +364,70 @@ class GmailRouteView {
         eventName: 'newGmailThreadView',
         view: gmailThreadView,
       });
+    } else if (parseResult?.previewPaneContainerElement) {
+      this.#startMonitoringPreviewPaneForThread(
+        parseResult.previewPaneContainerElement,
+      );
     } else {
-      // This element is always present in thread lists, but it only has contents
-      // when in preview pane mode. We want to monitor it in either case
-      // because the user could switch into preview pane mode.
-      const previewPaneContainer = document.querySelector<HTMLElement>(
-        'div[role=main] .aia',
+      // if neither container element was found, then the page only shows thread rows
+      // (or error will be logged in #waitForThreadContainerSafe)
+    }
+  }
+
+  async #waitForThreadContainerSafe() {
+    let parseResult: {
+      threadContainerElement?: HTMLElement;
+      previewPaneContainerElement?: HTMLElement;
+    } | null = null;
+
+    try {
+      // additionally to page loading state, gmail might render content asynchronously
+      // wait until any of the content container elements appear in the DOM
+      parseResult = await waitFor(() => {
+        if (this.#destroyed) {
+          return {};
+        }
+
+        const threadContainerElement = this._getThreadContainerElement();
+        if (threadContainerElement) {
+          return { threadContainerElement };
+        }
+
+        const previewPaneContainerElement =
+          GmailElementGetter.getPreviewPaneContainerElement();
+        if (previewPaneContainerElement) {
+          return { previewPaneContainerElement };
+        }
+
+        return null;
+      }, 15_000);
+    } catch {
+      // not found error is logged below
+    }
+
+    if (parseResult === null) {
+      // check if the page contains list of thread rows
+      const viewWithRows =
+        this.#page.tree.getAllByTag('rowListElement').values().size > 0;
+
+      const readingPaneDisabled = !document.querySelector(
+        '.bGI[role=main] .Nu.S3.aZ6',
       );
 
-      if (previewPaneContainer) {
-        this._startMonitoringPreviewPaneForThread(previewPaneContainer);
+      if (viewWithRows && readingPaneDisabled) {
+        // (.aia) element is not present when reading pane is disabled in Gmail settings
+        // avoid logging not found error in this case
+      } else {
+        const error = new Error("Thread container element wasn't found");
+        if (isStreakAppId(this._driver.getAppId())) {
+          this._driver.getLogger().error(error, {
+            html: extractDocumentHtmlAndCss(),
+          });
+        }
       }
     }
+
+    return parseResult;
   }
 
   _setupScrollStream() {
@@ -391,16 +450,20 @@ class GmailRouteView {
     }
   }
 
-  async _startMonitoringPreviewPaneForThread(
+  async #startMonitoringPreviewPaneForThread(
     previewPaneContainer: HTMLElement,
   ) {
-    let threadContainerElement;
+    let threadContainerElement: HTMLElement | 'destroyed';
 
     const selector = 'table.Bs > tr';
     const selector_2023_11_16 = '.ao8:has(.a98.iY), .ao9:has(.apa)';
 
     try {
       threadContainerElement = await waitFor(() => {
+        if (this.#destroyed) {
+          return 'destroyed';
+        }
+
         const threadContainerElement =
           previewPaneContainer.querySelector<HTMLElement>(selector);
 
@@ -426,6 +489,10 @@ class GmailRouteView {
       }
 
       throw selectorError;
+    }
+
+    if (threadContainerElement === 'destroyed') {
+      return;
     }
 
     const elementStream = makeElementChildStream(threadContainerElement).filter(
@@ -724,11 +791,9 @@ class GmailRouteView {
       .map((part) => part.substring(1));
   }
 
-  _getThreadContainerElement: () => HTMLElement | null | undefined = once(
-    () => {
-      return GmailElementGetter.getThreadContainerElement();
-    },
-  );
+  _getThreadContainerElement() {
+    return GmailElementGetter.getThreadContainerElement();
+  }
 }
 
 export default GmailRouteView;
