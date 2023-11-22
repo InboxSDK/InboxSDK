@@ -453,13 +453,17 @@ class GmailRouteView {
   async #startMonitoringPreviewPaneForThread(
     previewPaneContainer: HTMLElement,
   ) {
-    let threadContainerElement;
+    let threadContainerElement: HTMLElement | 'destroyed';
 
     const selector = 'table.Bs > tr';
     const selector_2023_11_16 = '.ao8:has(.a98.iY), .ao9:has(.apa)';
 
     try {
       threadContainerElement = await waitFor(() => {
+        if (this.#destroyed) {
+          return 'destroyed';
+        }
+
         const threadContainerElement =
           previewPaneContainer.querySelector<HTMLElement>(selector);
 
@@ -485,6 +489,10 @@ class GmailRouteView {
       }
 
       throw selectorError;
+    }
+
+    if (threadContainerElement === 'destroyed') {
+      return;
     }
 
     const elementStream = makeElementChildStream(threadContainerElement).filter(
