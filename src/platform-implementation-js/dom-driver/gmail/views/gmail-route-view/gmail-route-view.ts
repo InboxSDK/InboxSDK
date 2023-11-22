@@ -397,7 +397,7 @@ class GmailRouteView {
     let threadContainerElement;
 
     const selector = 'table.Bs > tr';
-    const selector_2023_11_16 = '.ao8:has(.a98.iY)';
+    const selector_2023_11_16 = '.ao8:has(.a98.iY), .ao9:has(.apa)';
 
     try {
       threadContainerElement = await waitFor(() => {
@@ -432,7 +432,8 @@ class GmailRouteView {
       (event) =>
         !!event.el.querySelector('.if') ||
         !!event.el.querySelector('.PeIF1d') ||
-        !!event.el.querySelector('.a98.iY'),
+        !!event.el.querySelector('.a98.iY') ||
+        event.el.matches('.a98.iY'),
     );
 
     this._eventStream.plug(
