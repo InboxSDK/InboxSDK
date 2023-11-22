@@ -346,58 +346,9 @@ class GmailRouteView {
   }
 
   async #setupContentAndSidebarView() {
-    let parseResult:
-      | {
-          threadContainerElement?: HTMLElement;
-          previewPaneContainerElement?: HTMLElement;
-        }
-      | 'skip'
-      | null = null;
+    const parseResult = await this.#waitForThreadContainerSafe();
 
-    try {
-      // additionally to page loading state, gmail can render content asynchronously
-      // wait until any of the content container elements appear in the DOM
-      parseResult = await waitFor(() => {
-        if (this.#destroyed) {
-          return 'skip';
-        }
-
-        const threadContainerElement = this._getThreadContainerElement();
-
-        if (threadContainerElement) {
-          return { threadContainerElement };
-        }
-
-        const previewPaneContainerElement =
-          GmailElementGetter.getPreviewPaneContainerElement();
-
-        if (previewPaneContainerElement) {
-          return { previewPaneContainerElement };
-        }
-
-        return null;
-      }, 15_000);
-    } catch {
-      // if user has reading pane disabled in Gmail settings, even preview pane container is not rendered
-      // avoid throwing an error if there are thread rows available
-      const rowsAvailable =
-        this.#page.tree.getAllByTag('rowListElement').values().size > 0;
-
-      if (rowsAvailable) {
-        parseResult = 'skip';
-      } else {
-        const error = new Error("Thread container element wasn't found");
-        if (isStreakAppId(this._driver.getAppId())) {
-          this._driver.getLogger().error(error, {
-            html: extractDocumentHtmlAndCss(),
-          });
-        }
-
-        throw error;
-      }
-    }
-
-    if (parseResult === 'skip' || this.#destroyed) {
+    if (this.#destroyed) {
       return;
     }
 
@@ -418,8 +369,61 @@ class GmailRouteView {
         parseResult.previewPaneContainerElement,
       );
     } else {
-      throw new Error(`Thread container element wasn't found`);
+      // if neither container element was found, then the page only shows thread rows
+      // (or error will be logged in #waitForThreadContainerSafe)
     }
+  }
+
+  async #waitForThreadContainerSafe() {
+    let parseResult: {
+      threadContainerElement?: HTMLElement;
+      previewPaneContainerElement?: HTMLElement;
+    } | null = null;
+
+    try {
+      // additionally to page loading state, gmail might render content asynchronously
+      // wait until any of the content container elements appear in the DOM
+      parseResult = await waitFor(() => {
+        if (this.#destroyed) {
+          return {};
+        }
+
+        const threadContainerElement = this._getThreadContainerElement();
+        if (threadContainerElement) {
+          return { threadContainerElement };
+        }
+
+        const previewPaneContainerElement =
+          GmailElementGetter.getPreviewPaneContainerElement();
+        if (previewPaneContainerElement) {
+          return { previewPaneContainerElement };
+        }
+
+        return null;
+      }, 15_000);
+    } catch {
+      // not found error is logged below
+    }
+
+    if (parseResult === null) {
+      const readingPaneDisabled = !document.querySelector(
+        '.bGI[role=main] .Nu.S3.aZ6',
+      );
+
+      if (readingPaneDisabled) {
+        // (.aia) element is not present when reading pane is disabled in Gmail settings
+        // avoid logging not found error in this case
+      } else {
+        const error = new Error("Thread container element wasn't found");
+        if (isStreakAppId(this._driver.getAppId())) {
+          this._driver.getLogger().error(error, {
+            html: extractDocumentHtmlAndCss(),
+          });
+        }
+      }
+    }
+
+    return parseResult;
   }
 
   _setupScrollStream() {
