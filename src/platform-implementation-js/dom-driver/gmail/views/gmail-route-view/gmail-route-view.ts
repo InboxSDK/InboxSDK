@@ -406,11 +406,15 @@ class GmailRouteView {
     }
 
     if (parseResult === null) {
+      // check if the page contains list of thread rows
+      const viewWithRows =
+        this.#page.tree.getAllByTag('rowListElement').values().size > 0;
+
       const readingPaneDisabled = !document.querySelector(
         '.bGI[role=main] .Nu.S3.aZ6',
       );
 
-      if (readingPaneDisabled) {
+      if (viewWithRows && readingPaneDisabled) {
         // (.aia) element is not present when reading pane is disabled in Gmail settings
         // avoid logging not found error in this case
       } else {
