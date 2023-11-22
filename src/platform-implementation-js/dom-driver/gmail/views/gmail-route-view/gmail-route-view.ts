@@ -433,8 +433,7 @@ class GmailRouteView {
         !!event.el.querySelector('.if') ||
         !!event.el.querySelector('.PeIF1d') ||
         !!event.el.querySelector('.a98.iY') ||
-        (event.el.classList.contains('a98') &&
-          event.el.classList.contains('iY')),
+        event.el.matches('.a98.iY'),
     );
 
     this._eventStream.plug(
