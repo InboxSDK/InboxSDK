@@ -379,7 +379,7 @@ class GmailRouteView {
       }, 15_000);
     } catch {
       // if user has reading pane disabled in Gmail settings, even preview pane container is not rendered
-      // avoid throwing and error in valid case if there are thread rows available
+      // avoid throwing an error if there are thread rows available
       const rowsAvailable =
         this.#page.tree.getAllByTag('rowListElement').values().size > 0;
 
