@@ -294,7 +294,7 @@ const GmailElementGetter = {
     return document.querySelector(selector_2023_11_16);
   },
 
-  getPreviewPaneThreadContainerElement(): HTMLElement | null | undefined {
+  getPreviewPaneThreadContainerElement(): HTMLElement | null {
     // This element is always present in thread lists, but it only has contents
     // when in preview pane mode. We want to monitor it in either case
     // because the user could switch into preview pane mode.

@@ -43,6 +43,7 @@ class GmailRouteView {
   _hasAddedCollapsibleSection: boolean;
   _cachedRouteData: Record<string, any>;
   #page: PageParserTree;
+  #destroyed = false;
 
   constructor(
     { urlObject, type, routeID, cachedRouteData }: Record<string, any>,
@@ -99,6 +100,8 @@ class GmailRouteView {
   }
 
   destroy() {
+    this.#destroyed = true;
+
     this._stopper.destroy();
 
     this._eventStream.end();
@@ -343,15 +346,22 @@ class GmailRouteView {
   }
 
   async _setupContentAndSidebarView() {
-    let contentElement: {
-      threadContainerElement?: HTMLElement;
-      previewPanelThreadContainerElement?: HTMLElement;
-    } | null = null;
+    let contentElement:
+      | {
+          threadContainerElement?: HTMLElement;
+          previewPanelThreadContainerElement?: HTMLElement;
+        }
+      | 'destroyed'
+      | null = null;
 
     try {
       // additionally to page loading state, gmail can render content asynchronously
       // wait until any of the content container elements appear in the DOM
       contentElement = await waitFor(() => {
+        if (this.#destroyed) {
+          return 'destroyed';
+        }
+
         const threadContainerElement = this._getThreadContainerElement();
 
         if (threadContainerElement) {
@@ -359,7 +369,7 @@ class GmailRouteView {
         }
 
         const previewPanelThreadContainerElement =
-          this._getPreviewPaneThreadContainerElement();
+          GmailElementGetter.getPreviewPaneThreadContainerElement();
 
         if (previewPanelThreadContainerElement) {
           return { previewPanelThreadContainerElement };
@@ -376,6 +386,10 @@ class GmailRouteView {
       }
 
       throw error;
+    }
+
+    if (contentElement === 'destroyed' || this.#destroyed) {
+      return;
     }
 
     if (contentElement?.threadContainerElement) {
@@ -717,12 +731,8 @@ class GmailRouteView {
       .map((part) => part.substring(1));
   }
 
-  _getThreadContainerElement(): HTMLElement | null | undefined {
+  _getThreadContainerElement() {
     return GmailElementGetter.getThreadContainerElement();
-  }
-
-  _getPreviewPaneThreadContainerElement(): HTMLElement | null | undefined {
-    return GmailElementGetter.getPreviewPaneThreadContainerElement();
   }
 }
 
