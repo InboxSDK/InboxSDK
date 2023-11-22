@@ -346,20 +346,20 @@ class GmailRouteView {
   }
 
   async _setupContentAndSidebarView() {
-    let contentElement:
+    let container:
       | {
           threadContainerElement?: HTMLElement;
-          previewPanelThreadContainerElement?: HTMLElement;
+          previewPaneContainerElement?: HTMLElement;
         }
-      | 'destroyed'
+      | 'skip'
       | null = null;
 
     try {
       // additionally to page loading state, gmail can render content asynchronously
       // wait until any of the content container elements appear in the DOM
-      contentElement = await waitFor(() => {
+      container = await waitFor(() => {
         if (this.#destroyed) {
-          return 'destroyed';
+          return 'skip';
         }
 
         const threadContainerElement = this._getThreadContainerElement();
@@ -368,33 +368,43 @@ class GmailRouteView {
           return { threadContainerElement };
         }
 
-        const previewPanelThreadContainerElement =
-          GmailElementGetter.getPreviewPaneThreadContainerElement();
+        const previewPaneContainerElement =
+          GmailElementGetter.getPreviewPaneContainerElement();
 
-        if (previewPanelThreadContainerElement) {
-          return { previewPanelThreadContainerElement };
+        if (previewPaneContainerElement) {
+          return { previewPaneContainerElement };
         }
 
         return null;
       }, 15_000);
     } catch {
-      const error = new Error("Thread container element wasn't found");
-      if (isStreakAppId(this._driver.getAppId())) {
-        this._driver.getLogger().error(error, {
-          html: extractDocumentHtmlAndCss(),
-        });
-      }
+      // if user has reading pane disabled in Gmail settings, even preview pane container is not rendered
+      // so to avoid throwing and error in valid case, check if there are thread rows available, otherwise throw
 
-      throw error;
+      const rowsAvailable =
+        this.#page.tree.getAllByTag('rowListElement').values().size > 0;
+
+      if (rowsAvailable) {
+        container = 'skip';
+      } else {
+        const error = new Error("Thread container element wasn't found");
+        if (isStreakAppId(this._driver.getAppId())) {
+          this._driver.getLogger().error(error, {
+            html: extractDocumentHtmlAndCss(),
+          });
+        }
+
+        throw error;
+      }
     }
 
-    if (contentElement === 'destroyed' || this.#destroyed) {
+    if (container === 'skip' || this.#destroyed) {
       return;
     }
 
-    if (contentElement?.threadContainerElement) {
+    if (container?.threadContainerElement) {
       var gmailThreadView = new GmailThreadView(
-        contentElement.threadContainerElement,
+        container.threadContainerElement,
         this,
         this._driver,
       );
@@ -404,12 +414,12 @@ class GmailRouteView {
         eventName: 'newGmailThreadView',
         view: gmailThreadView,
       });
-    } else if (contentElement?.previewPanelThreadContainerElement) {
+    } else if (container?.previewPaneContainerElement) {
       this._startMonitoringPreviewPaneForThread(
-        contentElement.previewPanelThreadContainerElement,
+        container.previewPaneContainerElement,
       );
     } else {
-      throw new Error(`Thread content element wasn't found`);
+      throw new Error(`Thread container element wasn't found`);
     }
   }
 
@@ -434,13 +444,48 @@ class GmailRouteView {
   }
 
   async _startMonitoringPreviewPaneForThread(
-    threadContainerElement: HTMLElement,
+    previewPaneContainer: HTMLElement,
   ) {
+    let threadContainerElement;
+
+    const selector = 'table.Bs > tr';
+    const selector_2023_11_16 = '.ao8:has(.a98.iY)';
+
+    try {
+      threadContainerElement = await waitFor(() => {
+        const threadContainerElement =
+          previewPaneContainer.querySelector<HTMLElement>(selector);
+
+        if (threadContainerElement) {
+          return threadContainerElement;
+        }
+
+        return previewPaneContainer.querySelector<HTMLElement>(
+          selector_2023_11_16,
+        );
+      }, 15_000);
+    } catch {
+      const selectorError = new SelectorError(
+        `${selector}, ${selector_2023_11_16}`,
+        {
+          cause: new Error("Thread container for preview pane wasn't found"),
+        },
+      );
+      if (isStreakAppId(this._driver.getAppId())) {
+        this._driver.getLogger().error(selectorError, {
+          html: extractDocumentHtmlAndCss(),
+        });
+      }
+
+      throw selectorError;
+    }
+
     const elementStream = makeElementChildStream(threadContainerElement).filter(
       (event) =>
         !!event.el.querySelector('.if') ||
         !!event.el.querySelector('.PeIF1d') ||
-        !!event.el.querySelector('.a98.iY'),
+        !!event.el.querySelector('.a98.iY') ||
+        event.el.matches('.a98.iY'),
     );
 
     this._eventStream.plug(

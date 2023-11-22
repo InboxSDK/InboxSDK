@@ -294,29 +294,11 @@ const GmailElementGetter = {
     return document.querySelector(selector_2023_11_16);
   },
 
-  getPreviewPaneThreadContainerElement(): HTMLElement | null {
+  getPreviewPaneContainerElement(): HTMLElement | null {
     // This element is always present in thread lists, but it only has contents
     // when in preview pane mode. We want to monitor it in either case
     // because the user could switch into preview pane mode.
-    const previewPaneContainer = document.querySelector<HTMLElement>(
-      'div[role=main] .aia',
-    );
-
-    if (!previewPaneContainer) {
-      return null;
-    }
-
-    const selector = 'table.Bs > tr';
-    const selector_2023_11_16 = '.ao8:has(.a98.iY)';
-
-    const threadContainerElement =
-      previewPaneContainer.querySelector<HTMLElement>(selector);
-
-    if (threadContainerElement) {
-      return threadContainerElement;
-    }
-
-    return previewPaneContainer.querySelector<HTMLElement>(selector_2023_11_16);
+    return document.querySelector<HTMLElement>('div[role=main] .aia');
   },
 
   getToolbarElement(): HTMLElement {
