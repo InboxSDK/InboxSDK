@@ -346,7 +346,7 @@ class GmailRouteView {
   }
 
   async #setupContentAndSidebarView() {
-    let container:
+    let parseResult:
       | {
           threadContainerElement?: HTMLElement;
           previewPaneContainerElement?: HTMLElement;
@@ -357,7 +357,7 @@ class GmailRouteView {
     try {
       // additionally to page loading state, gmail can render content asynchronously
       // wait until any of the content container elements appear in the DOM
-      container = await waitFor(() => {
+      parseResult = await waitFor(() => {
         if (this.#destroyed) {
           return 'skip';
         }
@@ -379,13 +379,12 @@ class GmailRouteView {
       }, 15_000);
     } catch {
       // if user has reading pane disabled in Gmail settings, even preview pane container is not rendered
-      // so to avoid throwing and error in valid case, check if there are thread rows available, otherwise throw
-
+      // avoid throwing and error in valid case if there are thread rows available
       const rowsAvailable =
         this.#page.tree.getAllByTag('rowListElement').values().size > 0;
 
       if (rowsAvailable) {
-        container = 'skip';
+        parseResult = 'skip';
       } else {
         const error = new Error("Thread container element wasn't found");
         if (isStreakAppId(this._driver.getAppId())) {
@@ -398,13 +397,13 @@ class GmailRouteView {
       }
     }
 
-    if (container === 'skip' || this.#destroyed) {
+    if (parseResult === 'skip' || this.#destroyed) {
       return;
     }
 
-    if (container?.threadContainerElement) {
+    if (parseResult?.threadContainerElement) {
       var gmailThreadView = new GmailThreadView(
-        container.threadContainerElement,
+        parseResult.threadContainerElement,
         this,
         this._driver,
       );
@@ -414,9 +413,9 @@ class GmailRouteView {
         eventName: 'newGmailThreadView',
         view: gmailThreadView,
       });
-    } else if (container?.previewPaneContainerElement) {
+    } else if (parseResult?.previewPaneContainerElement) {
       this.#startMonitoringPreviewPaneForThread(
-        container.previewPaneContainerElement,
+        parseResult.previewPaneContainerElement,
       );
     } else {
       throw new Error(`Thread container element wasn't found`);
