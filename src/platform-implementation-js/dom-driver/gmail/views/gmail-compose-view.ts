@@ -79,7 +79,7 @@ import type {
 import type GmailDriver from '../gmail-driver';
 import { Contact } from '../../../../inboxsdk';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
-import { type PublicOnly } from '../../../../../types';
+import { type PublicOnly } from '../../../../types/public-only';
 
 let hasReportedMissingBody = false;
 
