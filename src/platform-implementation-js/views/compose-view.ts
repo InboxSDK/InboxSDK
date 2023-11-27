@@ -502,7 +502,7 @@ export default class ComposeView extends (EventEmitter as new () => TypedEventEm
   }
 
   registerRequestModifier(
-    modifier: (composeParams: { body: string }) =>
+    modifier: (composeParams: { body: string; isPlainText?: boolean }) =>
       | {
           body: string;
         }
