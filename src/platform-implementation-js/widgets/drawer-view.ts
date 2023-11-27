@@ -1,7 +1,7 @@
 import Kefir from 'kefir';
 import EventEmitter from '../lib/safe-event-emitter';
 import ComposeView from '../views/compose-view';
-import type { DrawerViewDriver } from '../driver-interfaces/driver'; // documented in src/docs/
+import type { DrawerViewDriver } from '../driver-interfaces/driver';
 
 class DrawerView extends EventEmitter {
   destroyed: boolean = false;

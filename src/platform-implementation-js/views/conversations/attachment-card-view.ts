@@ -4,7 +4,7 @@ import type MessageView from './message-view';
 import type {
   Driver,
   AttachmentCardViewDriver,
-} from '../../driver-interfaces/driver'; // documented in src/docs/
+} from '../../driver-interfaces/driver';
 import type { CustomButtonDescriptor } from '../../dom-driver/gmail/views/gmail-attachment-card-view';
 import TypedEventEmitter from 'typed-emitter';
 

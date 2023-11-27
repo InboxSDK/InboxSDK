@@ -16,7 +16,7 @@ interface Members {
   navItemViewDriver: GmailNavItemView | null | undefined;
   navItemViewDriverPromise: Promise<GmailNavItemView>;
 }
-const memberMap = new WeakMap<NavItemView, Members>(); // documented in src/docs/
+const memberMap = new WeakMap<NavItemView, Members>();
 
 export default class NavItemView extends EventEmitter {
   destroyed: boolean = false;

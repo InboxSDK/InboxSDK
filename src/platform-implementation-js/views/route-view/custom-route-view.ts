@@ -1,7 +1,7 @@
 import { defonce } from 'ud';
 import RouteView from './route-view';
 import type { RouteViewDriver } from '../../driver-interfaces/route-view-driver';
-import get from '../../../common/get-or-fail'; // documented in src/docs/
+import get from '../../../common/get-or-fail';
 
 class CustomRouteView extends RouteView {
   constructor(routeViewDriver: RouteViewDriver) {

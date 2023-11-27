@@ -9,7 +9,7 @@ interface Members {
   threadRowViewRegistry: HandlerRegistry<ThreadRowView>;
 }
 
-const memberMap = new WeakMap<Lists, Members>(); // documented in src/docs/
+const memberMap = new WeakMap<Lists, Members>();
 
 export default class Lists {
   ActionButtonTypes = ActionButtonTypes;
