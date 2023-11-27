@@ -23,7 +23,6 @@ const memberMap = new WeakMap<
   }
 >();
 
-// documented in src/docs/
 export default class ButterBar {
   constructor(appId: string, driver: Driver) {
     const members = {

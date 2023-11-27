@@ -12,7 +12,6 @@ interface Options {
   extraElementsToIgnore?: HTMLElement[];
 }
 
-// documented in src/docs/
 export default class DropdownView extends EventEmitter {
   private _dropdownViewDriver: any;
   destroyed: boolean = false;

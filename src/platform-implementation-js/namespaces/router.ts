@@ -30,7 +30,7 @@ interface Members {
   listRouteHandlerRegistries: Record<string, HandlerRegistry<ListRouteView>>;
 }
 const memberMap = defonce(module, () => new WeakMap<Router, Members>());
-const SAMPLE_RATE = 0.01; // documented in src/docs/
+const SAMPLE_RATE = 0.01;
 
 class Router {
   NativeRouteIDs = NATIVE_ROUTE_IDS;
