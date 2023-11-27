@@ -23,6 +23,7 @@ import {
 } from './sync-compose-processor';
 
 import type { Wrapper, XHRProxyConnectionDetails } from '../xhr-proxy-factory';
+import { type InboxSdkModifyComposeRequest } from '../../platform-implementation-js/dom-driver/gmail/views/gmail-compose-view';
 
 function logErrorExceptEventListeners(err: unknown, details: string) {
   // Don't log Gmail's errors
@@ -119,7 +120,7 @@ export function setupGmailInterceptorOnFrames(
       },
       requestChanger: async function (connection, request) {
         let composeParams = querystring.parse(request.body);
-        const composeid = composeParams.composeid;
+        const composeid = composeParams.composeid as string | undefined;
         const composeModifierIds = modifiers[composeParams.composeid as any];
 
         if (!composeModifierIds || composeModifierIds.length === 0) {
@@ -145,10 +146,10 @@ export function setupGmailInterceptorOnFrames(
             composeid,
             modifierId,
             composeParams: {
-              body: composeParams.body,
+              body: composeParams.body as string,
               isPlainText: composeParams.ishtml !== '1',
             },
-          });
+          } satisfies InboxSdkModifyComposeRequest);
           const newComposeParams = await modificationPromise;
           composeParams = Object.assign({}, composeParams, newComposeParams);
         }
@@ -283,7 +284,7 @@ export function setupGmailInterceptorOnFrames(
                 body: newEmailBody,
                 isPlainText: false,
               },
-            });
+            } satisfies InboxSdkModifyComposeRequest);
             const newComposeParams = await modificationPromise;
             newEmailBody = newComposeParams.body;
           }

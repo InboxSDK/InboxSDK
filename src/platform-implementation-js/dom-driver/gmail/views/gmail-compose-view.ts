@@ -83,6 +83,10 @@ import { type PublicOnly } from '../../../../types/public-only';
 
 let hasReportedMissingBody = false;
 
+type RequestModifier = Parameters<
+  GmailComposeView['registerRequestModifier']
+>[0];
+
 class GmailComposeView {
   #element: HTMLElement;
   #seenBodyElement!: HTMLElement;
@@ -109,16 +113,7 @@ class GmailComposeView {
   #threadID: string | null | undefined;
   #stopper: Stopper;
   #lastSelectionRange: Range | null | undefined;
-  #requestModifiers: Record<
-    string,
-    (composeParams: { body: string }) =>
-      | {
-          body: string;
-        }
-      | Promise<{
-          body: string;
-        }>
-  >;
+  #requestModifiers: Record<string, RequestModifier>;
   #isListeningToAjaxInterceptStream: boolean;
   #formattingArea: HTMLElement | null | undefined;
   #closedProgrammatically = false;
@@ -1626,12 +1621,14 @@ class GmailComposeView {
   }
 
   registerRequestModifier(
-    modifier: (composeParams: { body: string }) =>
+    modifier: (composeParams: { body: string; isPlainText?: boolean }) =>
       | {
           body: string;
+          isPlainText?: boolean;
         }
       | Promise<{
           body: string;
+          isPlainText?: boolean;
         }>,
   ) {
     const keyId = this.#getDraftIDfromForm();
@@ -1669,40 +1666,42 @@ class GmailComposeView {
           Boolean(this.#requestModifiers[modifierId]),
       )
       .takeUntilBy(this.#stopper)
-      .onValue(({ modifierId, composeParams }) => {
-        if (this.#driver.getLogger().shouldTrackEverything()) {
-          this.#driver.getLogger().eventSite('inboxSDKmodifyComposeRequest');
-        }
+      .onValue(
+        ({ modifierId, composeParams }: InboxSdkModifyComposeRequest) => {
+          if (this.#driver.getLogger().shouldTrackEverything()) {
+            this.#driver.getLogger().eventSite('inboxSDKmodifyComposeRequest');
+          }
 
-        const modifier = this.#requestModifiers[modifierId];
-        const result = new Promise((resolve) =>
-          resolve(modifier(composeParams)),
-        );
-        result
-          .then((newComposeParams) =>
-            this.#driver
-              .getPageCommunicator()
-              .modifyComposeRequest(
-                keyId,
-                modifierId,
-                newComposeParams || composeParams,
-              ),
-          )
-          .then((x) => {
-            if (this.#driver.getLogger().shouldTrackEverything()) {
-              this.#driver.getLogger().eventSite('composeRequestModified');
-            }
+          const modifier = this.#requestModifiers[modifierId];
+          const result = new Promise<ReturnType<RequestModifier>>((resolve) =>
+            resolve(modifier(composeParams)),
+          );
+          result
+            .then((newComposeParams) =>
+              this.#driver
+                .getPageCommunicator()
+                .modifyComposeRequest(
+                  keyId,
+                  modifierId,
+                  newComposeParams || composeParams,
+                ),
+            )
+            .then((x) => {
+              if (this.#driver.getLogger().shouldTrackEverything()) {
+                this.#driver.getLogger().eventSite('composeRequestModified');
+              }
 
-            return x;
-          })
-          .catch((err) => {
-            this.#driver
-              .getPageCommunicator()
-              .modifyComposeRequest(keyId, modifierId, composeParams);
+              return x;
+            })
+            .catch((err) => {
+              this.#driver
+                .getPageCommunicator()
+                .modifyComposeRequest(keyId, modifierId, composeParams);
 
-            this.#driver.getLogger().error(err);
-          });
-      });
+              this.#driver.getLogger().error(err);
+            });
+        },
+      );
 
     this.#isListeningToAjaxInterceptStream = true;
   }
@@ -1715,6 +1714,17 @@ class GmailComposeView {
     }
   }
 }
+
+export type InboxSdkModifyComposeRequest = {
+  type: 'inboxSDKmodifyComposeRequest';
+  composeid?: string;
+  draftID?: string;
+  modifierId: string;
+  composeParams: {
+    body: string;
+    isPlainText?: boolean;
+  };
+};
 
 export default GmailComposeView;
 export type ComposeViewDriver = PublicOnly<GmailComposeView>;
