@@ -4,7 +4,7 @@ import type { Driver } from '../driver-interfaces/driver';
 import type AppToolbarButtonViewDriver from '../dom-driver/gmail/views/gmail-app-toolbar-button-view';
 import type { AppToolbarButtonView as IAppToolbarButtonView } from '../../inboxsdk';
 import TypedEventEmitter from 'typed-emitter';
-const memberMap = new WeakMap(); // Documented in src/docs/app-toolbar-button-view.js
+const memberMap = new WeakMap();
 
 export default class AppToolbarButtonView
   extends (EventEmitter as new () => TypedEventEmitter<{ destroy: () => void }>)

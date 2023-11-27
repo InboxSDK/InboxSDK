@@ -1,10 +1,5 @@
 *~
-/flow-typed
-/flow-libs
-/src/docs
-/src/inboxsdk-js/header.js
 /dist
-/overrides
 /coverage
 /examples
 #/examples/*/inboxsdk.js*
