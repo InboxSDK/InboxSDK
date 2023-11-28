@@ -9,7 +9,7 @@ import get from '../../../common/get-or-fail';
 import type MessageView from './message-view';
 import type { Driver, ThreadViewDriver } from '../../driver-interfaces/driver';
 import type CustomMessageView from '../../views/conversations/custom-message-view';
-import type { Contact, ThreadView as IThreadView } from '../../../inboxsdk';
+import type { Contact } from '../../../inboxsdk';
 import type TypedEventEmitter from 'typed-emitter';
 import { type ContentPanelDescriptor } from '../../driver-common/sidebar/ContentPanelViewDriver';
 
@@ -31,10 +31,7 @@ export type ThreadViewEvents = {
 
 const memberMap = defonce(module, () => new WeakMap<ThreadView, Members>());
 
-class ThreadView
-  extends (EventEmitter as new () => TypedEventEmitter<ThreadViewEvents>)
-  implements IThreadView
-{
+class ThreadView extends (EventEmitter as new () => TypedEventEmitter<ThreadViewEvents>) {
   destroyed = false;
 
   constructor(

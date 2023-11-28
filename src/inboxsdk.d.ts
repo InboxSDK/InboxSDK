@@ -13,7 +13,7 @@ import type GmailRouteProcessor from './platform-implementation-js/dom-driver/gm
 import type GmailDriver from './platform-implementation-js/dom-driver/gmail/gmail-driver';
 import type GmailRowListView from './platform-implementation-js/dom-driver/gmail/views/gmail-row-list-view';
 import type { AppLogger } from './platform-implementation-js/lib/logger';
-import type { IThreadRowView as ThreadRowView } from './platform-implementation-js/views/thread-row-view';
+import type ThreadRowView from './platform-implementation-js/views/thread-row-view';
 import TypedEventEmitter from 'typed-emitter';
 import { MessageViewEvent } from './platform-implementation-js/views/conversations/message-view';
 import type { ThreadViewEvents } from './platform-implementation-js/views/conversations/thread-view';
@@ -239,7 +239,7 @@ export interface Lists {
 }
 
 export {
-  IThreadRowView as ThreadRowView,
+  default as ThreadRowView,
   ImageDescriptor,
 } from './platform-implementation-js/views/thread-row-view';
 
