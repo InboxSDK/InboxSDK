@@ -16,8 +16,7 @@ labels: 'status: Unconfirmed'
 
 **Describe the bug**
 
-**To Reproduce**
-Steps to reproduce the behavior:
+**Reproduction steps**
 
 1.
 2.

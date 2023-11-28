@@ -13,7 +13,7 @@ interface Members {
   composeViewStream: Kefir.Stream<ComposeView, unknown>;
 }
 const memberMap = ud.defonce(module, () => new WeakMap<Compose, Members>());
-const SAMPLE_RATE = 0.01; // documented in src/docs/
+const SAMPLE_RATE = 0.01;
 
 class Compose {
   constructor(driver: Driver, membrane: Membrane) {

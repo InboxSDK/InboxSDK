@@ -16,6 +16,9 @@ import GmailToolbarView from './gmail-toolbar-view';
 import WidthManager from './gmail-thread-view/width-manager';
 import type { CustomMessageDescriptor } from '../../../views/conversations/custom-message-view';
 import { type ContentPanelDescriptor } from '../../../driver-common/sidebar/ContentPanelViewDriver';
+import isStreakAppId from '../../../lib/isStreakAppId';
+import censorHTMLstring from '../../../../common/censorHTMLstring';
+import type GmailRouteView from './gmail-route-view/gmail-route-view';
 
 let hasLoggedAddonInfo = false;
 
@@ -27,7 +30,7 @@ class GmailThreadView {
   _eventStream: Bus<any, unknown>;
   _stopper = kefirStopper();
   _widthManager: WidthManager | null | undefined = null;
-  _toolbarView: any;
+  _toolbarView?: GmailToolbarView;
   _messageViewDrivers: any[];
   _newMessageMutationObserver: MutationObserver | null | undefined;
   _readyStream: Kefir.Observable<any, unknown>;
@@ -48,7 +51,7 @@ class GmailThreadView {
 
   constructor(
     element: HTMLElement,
-    routeViewDriver: any,
+    routeViewDriver: GmailRouteView,
     driver: GmailDriver,
     isPreviewedThread: boolean = false,
   ) {
@@ -152,7 +155,7 @@ class GmailThreadView {
     return this._isPreviewedThread;
   }
 
-  getToolbarView(): any {
+  getToolbarView() {
     return this._toolbarView;
   }
 
@@ -196,18 +199,26 @@ class GmailThreadView {
     [2018]: '.if > .nH',
   };
 
+  _subjectContainerSelectorsAfterNov162023 = {
+    '2023_11_16': '* > .nH',
+  };
+
   addNoticeBar(): SimpleElementView {
     const el = document.createElement('div');
     el.className = idMap('thread_noticeBar');
     let version;
     let subjectContainer;
 
-    for (const [currentVersion, selector] of Object.entries(
-      this._subjectContainerSelectors,
-    )) {
-      // Flow should be able to infer selector to be a string,
-      // Typescript can. Remove this when ported.
-      const el = this._element.querySelector(selector as any);
+    let selectorsToTry: Record<string, string> =
+      this._subjectContainerSelectors;
+
+    if (this._element.matches('.a98.iY')) {
+      // thread view gmail update Nov 16, 2023
+      selectorsToTry = this._subjectContainerSelectorsAfterNov162023;
+    }
+
+    for (const [currentVersion, selector] of Object.entries(selectorsToTry)) {
+      const el = this._element.querySelector(selector);
 
       if (!el) {
         continue;
@@ -617,7 +628,39 @@ class GmailThreadView {
   _setupToolbarView() {
     const toolbarElement = this._findToolbarElement();
 
-    if (!toolbarElement) throw new Error('No toolbar element found');
+    if (!toolbarElement) {
+      if (isStreakAppId(this._driver.getAppId())) {
+        const threadViewEl = document.querySelector('.nH.bkK');
+        if (threadViewEl instanceof HTMLElement) {
+          this._driver
+            .getLogger()
+            .error(new Error('Thread view toolbar cannot be found'), {
+              threadViewHtml: censorHTMLstring(threadViewEl.innerHTML),
+            });
+        } else {
+          const pageHtml = document.querySelector('.nH');
+
+          if (pageHtml instanceof HTMLElement) {
+            this._driver
+              .getLogger()
+              .error(new Error('Thread view toolbar cannot be found'), {
+                threadViewHtml: '.nH.bkK cannot be found',
+                pageHtml: censorHTMLstring(pageHtml.innerHTML),
+              });
+          } else {
+            this._driver
+              .getLogger()
+              .error(new Error('Thread view toolbar cannot be found'), {
+                threadViewHtml: '.nH.bkK cannot be found',
+                pageHtml: '.nH cannot be found',
+              });
+          }
+        }
+      }
+
+      throw new Error('No toolbar element found');
+    }
+
     const toolbarParent = toolbarElement.parentElement;
     if (toolbarParent)
       toolbarParent.classList.add('inboxsdk__thread_toolbar_parent');
@@ -646,38 +689,40 @@ class GmailThreadView {
 
   _isToolbarContainerRelevant(toolbarContainerElement: HTMLElement): boolean {
     if (
-      (toolbarContainerElement as any).parentElement.parentElement ===
-      (this._element as any).parentElement.parentElement
+      toolbarContainerElement.parentElement!.parentElement ===
+      this._element.parentElement!.parentElement
     ) {
       return true;
     }
 
     if (
-      (toolbarContainerElement as any).parentElement.getAttribute('role') !==
-        'main' &&
-      (this._element as any).parentElement.getAttribute('role') !== 'main'
+      toolbarContainerElement.parentElement!.getAttribute('role') !== 'main' &&
+      this._element.parentElement!.getAttribute('role') !== 'main'
     ) {
       return true;
     }
 
     if (
-      (toolbarContainerElement as any).parentElement.getAttribute('role') ===
-        'main' &&
-      (toolbarContainerElement as any).parentElement.querySelector(
+      toolbarContainerElement.parentElement!.getAttribute('role') === 'main' &&
+      toolbarContainerElement.parentElement!.querySelector(
         '.if, .PeIF1d, .a98.iY',
       ) &&
-      (toolbarContainerElement as any).parentElement.querySelector(
+      (toolbarContainerElement.parentElement!.querySelector(
         '.if, .PeIF1d, .a98.iY',
-      ).parentElement === this._element
+      )!.parentElement === this._element ||
+        toolbarContainerElement.parentElement!.querySelector('.a98.iY') ===
+          this._element)
     ) {
       let version = '2018';
 
-      if (
-        (toolbarContainerElement as any).parentElement.querySelector('.a98.iY')
+      if (this._element.matches('.a98.iY')) {
+        version = '2023-11-16';
+      } else if (
+        toolbarContainerElement.parentElement!.querySelector('.a98.iY')
       ) {
         version = '2022-10-20';
       } else if (
-        (toolbarContainerElement as any).parentElement.querySelector('.PeIF1d')
+        toolbarContainerElement.parentElement!.querySelector('.PeIF1d')
       ) {
         version = '2022-10-12';
       }

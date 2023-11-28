@@ -11,7 +11,7 @@ declare global {
   };
 }
 
-if (!global.__InboxSDKImpLoader) {
+if (!globalThis.__InboxSDKImpLoader) {
   var piMainStarted = Date.now();
   var wasAccountSwitcherReadyAtStart = !!document.querySelector(
     '[role=banner] div[aria-label] div div a[href^="https://myaccount.google."], [role=banner]+div div[aria-label] div div a[href^="https://myaccount.google."]',
@@ -36,7 +36,7 @@ if (!global.__InboxSDKImpLoader) {
     }
   });
 
-  global.__InboxSDKImpLoader = {
+  globalThis.__InboxSDKImpLoader = {
     async load(version, appId, opts) {
       if (version !== '0.1') {
         throw new Error('Unsupported InboxSDK version');
@@ -46,6 +46,16 @@ if (!global.__InboxSDKImpLoader) {
       // some users are on old version
       if (appId === 'dropbox') {
         throw new Error('No longer supported');
+      }
+
+      if (
+        location.hostname === 'mail.google.com' &&
+        location.pathname.endsWith('/popout')
+      ) {
+        throw new URIError(
+          `@inboxsdk/core doesn't currently support Gmail pop out windows. See
+              https://github.com/InboxSDK/InboxSDK/issues/1062#issuecomment-1821327292 for context on why we'd be open to supporting them.`,
+        );
       }
 
       var piLoadStarted = Date.now();

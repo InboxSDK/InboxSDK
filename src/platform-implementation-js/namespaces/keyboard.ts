@@ -2,7 +2,7 @@ import * as ud from 'ud';
 import get from '../../common/get-or-fail';
 import KeyboardShortcutHandle from '../views/keyboard-shortcut-handle';
 import type { Driver } from '../driver-interfaces/driver';
-const memberMap = ud.defonce(module, () => new WeakMap()); // documented in src/docs/
+const memberMap = ud.defonce(module, () => new WeakMap());
 
 class Keyboard {
   constructor(

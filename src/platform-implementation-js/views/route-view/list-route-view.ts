@@ -5,7 +5,7 @@ import CollapsibleSectionView from '../collapsible-section-view';
 import SectionView from '../section-view';
 import get from '../../../common/get-or-fail';
 import type { RouteViewDriver } from '../../driver-interfaces/route-view-driver';
-import type { Driver } from '../../driver-interfaces/driver'; // documented in src/docs/
+import type { Driver } from '../../driver-interfaces/driver';
 
 class ListRouteView extends RouteView {
   constructor(routeViewDriver: RouteViewDriver, driver: Driver, appId: string) {

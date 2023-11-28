@@ -23,7 +23,7 @@ export const MessageViewViewStates = Object.freeze({
 });
 export const MessageViewToolbarSectionNames = Object.freeze({
   MORE: 'MORE',
-}); // documented in src/docs/
+});
 
 class Conversations {
   MessageViewViewStates: typeof MessageViewViewStates = MessageViewViewStates;

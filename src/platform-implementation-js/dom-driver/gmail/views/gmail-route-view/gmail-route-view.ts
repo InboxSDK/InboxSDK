@@ -11,18 +11,20 @@ import makeElementChildStream from '../../../../lib/dom/make-element-child-strea
 import makeElementViewStream from '../../../../lib/dom/make-element-view-stream';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
 import getInsertBeforeElement from '../../../../lib/dom/get-insert-before-element';
-import type { RouteViewDriver } from '../../../../driver-interfaces/route-view-driver';
 import GmailRowListView from '../gmail-row-list-view';
 import GmailThreadView from '../gmail-thread-view';
 import GmailCollapsibleSectionView from '../gmail-collapsible-section-view';
 import GmailElementGetter from '../../gmail-element-getter';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
-import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import type GmailDriver from '../../gmail-driver';
 import type GmailRouteProcessor from '../gmail-route-view/gmail-route-processor';
 import PageParserTree from 'page-parser-tree';
 import { makePageParser } from './page-parser';
 import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
+import waitFor from '../../../../lib/wait-for';
+import { SelectorError } from '../../../../lib/dom/querySelectorOrFail';
+import isStreakAppId from '../../../../lib/isStreakAppId';
+import { extractDocumentHtmlAndCss } from '../../../../../common/extractDocumentHtmlAndCss';
 
 class GmailRouteView {
   _type: string;
@@ -34,20 +36,26 @@ class GmailRouteView {
   _rowListViews: GmailRowListView[];
   _gmailRouteProcessor: GmailRouteProcessor;
   _driver: GmailDriver;
-  _eventStream: Bus<any, unknown>;
+  _eventStream: Bus<
+    | { eventName: 'newGmailRowListView'; view: GmailRowListView }
+    | {
+        eventName: 'newGmailThreadView';
+        view: GmailThreadView;
+      },
+    unknown
+  >;
   _customViewElement: HTMLElement | null | undefined;
   _threadView: GmailThreadView | null | undefined;
   _hasAddedCollapsibleSection: boolean;
   _cachedRouteData: Record<string, any>;
   #page: PageParserTree;
+  #destroyed = false;
 
   constructor(
     { urlObject, type, routeID, cachedRouteData }: Record<string, any>,
     gmailRouteProcessor: GmailRouteProcessor,
     driver: GmailDriver,
   ) {
-    // Check we implement interface
-    this as RouteViewDriver;
     this._type = type;
     this._hash = urlObject.hash;
     this._name = urlObject.name;
@@ -79,7 +87,9 @@ class GmailRouteView {
     if (this._type === 'CUSTOM_LIST') {
       Kefir.later(500, undefined)
         .takeUntilBy(this._stopper)
-        .onValue(() => {
+        .onValue(async () => {
+          await this.#waitForMainElementSafe();
+
           var last = driver.getLastCustomThreadListActivity();
 
           if (
@@ -94,6 +104,8 @@ class GmailRouteView {
   }
 
   destroy() {
+    this.#destroyed = true;
+
     this._stopper.destroy();
 
     this._eventStream.end();
@@ -290,13 +302,26 @@ class GmailRouteView {
   }
 
   _setupSubViews() {
-    asap(() => {
+    asap(async () => {
       if (!this._eventStream) return;
 
+      await this.#waitForMainElementSafe();
+
       this.#monitorRowListElements();
-      this._setupContentAndSidebarView();
+      this.#setupContentAndSidebarView();
       this._setupScrollStream();
     });
+  }
+
+  async #waitForMainElementSafe() {
+    try {
+      // role=main attribute is not set while page in a loading state
+      await waitFor(() => document.querySelector('[role=main]'), 15_000);
+    } catch {
+      this._driver.getLogger().error(new SelectorError('[role=main]'), {
+        html: extractDocumentHtmlAndCss(),
+      });
+    }
   }
 
   #monitorRowListElements() {
@@ -311,7 +336,7 @@ class GmailRouteView {
     var rootElement = rowListElement.parentElement;
     if (!rootElement) throw new Error('no rootElement');
     var gmailRowListView = new GmailRowListView(
-      rootElement as any,
+      rootElement,
       this,
       this._driver,
     );
@@ -324,12 +349,16 @@ class GmailRouteView {
     });
   }
 
-  _setupContentAndSidebarView() {
-    const threadContainerElement = this._getThreadContainerElement();
+  async #setupContentAndSidebarView() {
+    const parseResult = await this.#waitForThreadContainerSafe();
 
-    if (threadContainerElement) {
+    if (this.#destroyed) {
+      return;
+    }
+
+    if (parseResult?.threadContainerElement) {
       var gmailThreadView = new GmailThreadView(
-        threadContainerElement,
+        parseResult.threadContainerElement,
         this,
         this._driver,
       );
@@ -339,18 +368,70 @@ class GmailRouteView {
         eventName: 'newGmailThreadView',
         view: gmailThreadView,
       });
+    } else if (parseResult?.previewPaneContainerElement) {
+      this.#startMonitoringPreviewPaneForThread(
+        parseResult.previewPaneContainerElement,
+      );
     } else {
-      // This element is always present in thread lists, but it only has contents
-      // when in preview pane mode. We want to monitor it in either case
-      // because the user could switch into preview pane mode.
-      const previewPaneContainer = document.querySelector<HTMLElement>(
-        'div[role=main] .aia',
+      // if neither container element was found, then the page only shows thread rows
+      // (or error will be logged in #waitForThreadContainerSafe)
+    }
+  }
+
+  async #waitForThreadContainerSafe() {
+    let parseResult: {
+      threadContainerElement?: HTMLElement;
+      previewPaneContainerElement?: HTMLElement;
+    } | null = null;
+
+    try {
+      // additionally to page loading state, gmail might render content asynchronously
+      // wait until any of the content container elements appear in the DOM
+      parseResult = await waitFor(() => {
+        if (this.#destroyed) {
+          return {};
+        }
+
+        const threadContainerElement = this._getThreadContainerElement();
+        if (threadContainerElement) {
+          return { threadContainerElement };
+        }
+
+        const previewPaneContainerElement =
+          GmailElementGetter.getPreviewPaneContainerElement();
+        if (previewPaneContainerElement) {
+          return { previewPaneContainerElement };
+        }
+
+        return null;
+      }, 15_000);
+    } catch {
+      // not found error is logged below
+    }
+
+    if (parseResult === null) {
+      // check if the page contains list of thread rows
+      const viewWithRows =
+        this.#page.tree.getAllByTag('rowListElement').values().size > 0;
+
+      const readingPaneDisabled = !document.querySelector(
+        '.bGI[role=main] .Nu.S3.aZ6',
       );
 
-      if (previewPaneContainer) {
-        this._startMonitoringPreviewPaneForThread(previewPaneContainer);
+      if (viewWithRows && readingPaneDisabled) {
+        // (.aia) element is not present when reading pane is disabled in Gmail settings
+        // avoid logging not found error in this case
+      } else {
+        const error = new Error("Thread container element wasn't found");
+        if (isStreakAppId(this._driver.getAppId())) {
+          this._driver.getLogger().error(error, {
+            html: extractDocumentHtmlAndCss(),
+          });
+        }
       }
     }
+
+    return parseResult;
   }
 
   _setupScrollStream() {
@@ -373,18 +454,57 @@ class GmailRouteView {
     }
   }
 
-  _startMonitoringPreviewPaneForThread(previewPaneContainer: HTMLElement) {
-    const threadContainerTableElement = querySelector(
-      previewPaneContainer,
-      'table.Bs > tr',
-    );
-    const elementStream = makeElementChildStream(
-      threadContainerTableElement,
-    ).filter(
+  async #startMonitoringPreviewPaneForThread(
+    previewPaneContainer: HTMLElement,
+  ) {
+    let threadContainerElement: HTMLElement | 'destroyed';
+
+    const selector = 'table.Bs > tr';
+    const selector_2023_11_16 = '.ao8:has(.a98.iY), .ao9:has(.apa)';
+
+    try {
+      threadContainerElement = await waitFor(() => {
+        if (this.#destroyed) {
+          return 'destroyed';
+        }
+
+        const threadContainerElement =
+          previewPaneContainer.querySelector<HTMLElement>(selector);
+
+        if (threadContainerElement) {
+          return threadContainerElement;
+        }
+
+        return previewPaneContainer.querySelector<HTMLElement>(
+          selector_2023_11_16,
+        );
+      }, 15_000);
+    } catch {
+      const selectorError = new SelectorError(
+        `${selector}, ${selector_2023_11_16}`,
+        {
+          cause: new Error("Thread container for preview pane wasn't found"),
+        },
+      );
+      if (isStreakAppId(this._driver.getAppId())) {
+        this._driver.getLogger().error(selectorError, {
+          html: extractDocumentHtmlAndCss(),
+        });
+      }
+
+      throw selectorError;
+    }
+
+    if (threadContainerElement === 'destroyed') {
+      return;
+    }
+
+    const elementStream = makeElementChildStream(threadContainerElement).filter(
       (event) =>
         !!event.el.querySelector('.if') ||
         !!event.el.querySelector('.PeIF1d') ||
-        !!event.el.querySelector('.a98.iY'),
+        !!event.el.querySelector('.a98.iY') ||
+        event.el.matches('.a98.iY'),
     );
 
     this._eventStream.plug(
@@ -675,11 +795,9 @@ class GmailRouteView {
       .map((part) => part.substring(1));
   }
 
-  _getThreadContainerElement: () => HTMLElement | null | undefined = once(
-    () => {
-      return GmailElementGetter.getThreadContainerElement();
-    },
-  );
+  _getThreadContainerElement() {
+    return GmailElementGetter.getThreadContainerElement();
+  }
 }
 
 export default GmailRouteView;

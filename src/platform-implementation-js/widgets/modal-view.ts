@@ -3,7 +3,7 @@ import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
 import EventEmitter from '../lib/safe-event-emitter';
 import type { Backdrop, Driver } from '../driver-interfaces/driver';
-import type ModalViewDriver from '../dom-driver/gmail/widgets/gmail-modal-view-driver'; // documented in src/docs/
+import type ModalViewDriver from '../dom-driver/gmail/widgets/gmail-modal-view-driver';
 
 class ModalView extends EventEmitter {
   destroyed: boolean = false;

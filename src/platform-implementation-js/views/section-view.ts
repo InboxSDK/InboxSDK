@@ -2,7 +2,7 @@ import EventEmitter from '../lib/safe-event-emitter';
 import get from '../../common/get-or-fail';
 import type { Driver } from '../driver-interfaces/driver';
 import type GmailCollapsibleSectionView from '../dom-driver/gmail/views/gmail-collapsible-section-view';
-const membersMap = new WeakMap(); // documented in src/docs/
+const membersMap = new WeakMap();
 
 class SectionView extends EventEmitter {
   destroyed: boolean;

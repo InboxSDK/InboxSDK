@@ -1,7 +1,7 @@
 import EventEmitter from '../../lib/safe-event-emitter';
 import get from '../../../common/get-or-fail';
 import type { MinRouteViewDriver } from '../../driver-interfaces/route-view-driver';
-const membersMap = new WeakMap(); // documented in src/docs/
+const membersMap = new WeakMap();
 
 class RouteView extends EventEmitter {
   destroyed: boolean;
