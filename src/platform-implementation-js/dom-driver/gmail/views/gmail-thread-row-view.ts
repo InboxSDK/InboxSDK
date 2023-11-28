@@ -7,7 +7,9 @@ import flatMap from 'lodash/flatMap';
 import { defonce } from 'ud';
 import * as Kefir from 'kefir';
 import asap from 'asap';
-import querySelector from '../../../lib/dom/querySelectorOrFail';
+import querySelector, {
+  SelectorError,
+} from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import kefirCast from 'kefir-cast';
@@ -26,7 +28,6 @@ import type {
   LabelDescriptor,
   ThreadDateDescriptor,
 } from '../../../../inboxsdk';
-import { querySelectorOrWarn } from '../../../lib/dom/querySelectorOrWarn';
 import { assert } from '../../../../common/assert';
 
 type LabelMod = {
@@ -325,10 +326,17 @@ class GmailThreadRowView {
     /**
      * If the SDK is used alongside the https://chrome.google.com/webstore/detail/mailtrack-for-gmail-inbox/ndnaehgpjlnokgebbaldlmgkapkpjkkb/utm_source/gmail/utm_medium/signature/utm_campaign/signaturevirality/th138p9fIBkLHUhniapN extension, the recipientsElement will sometimes be null.
      */
-    const recipientsElement = querySelectorOrWarn<HTMLElement>(
-      this._elements[0],
-      'td div.yW',
-    );
+    let recipientsElement;
+
+    try {
+      recipientsElement = querySelector(this._elements[0], 'td div.yW');
+    } catch (e: unknown) {
+      if (e instanceof SelectorError) {
+        this._driver.logger.errorSite(e);
+      } else {
+        throw e;
+      }
+    }
 
     if (!recipientsElement) {
       return (this.#counts = {
