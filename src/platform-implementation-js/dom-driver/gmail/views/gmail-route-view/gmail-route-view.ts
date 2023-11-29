@@ -460,7 +460,7 @@ class GmailRouteView {
     let threadContainerElement: HTMLElement | 'destroyed';
 
     const selector = 'table.Bs > tr';
-    const selector_2023_11_16 = '.ao8:has(.a98.iY), .ao9:has(.apa)';
+    const selector_2023_11_16 = '.ao9:has(.a98.iY), .ao9:has(.apa)';
 
     try {
       threadContainerElement = await waitFor(() => {
