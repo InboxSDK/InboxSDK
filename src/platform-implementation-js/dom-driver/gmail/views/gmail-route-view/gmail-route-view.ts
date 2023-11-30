@@ -499,13 +499,42 @@ class GmailRouteView {
       return;
     }
 
-    const elementStream = makeElementChildStream(threadContainerElement).filter(
-      (event) =>
-        !!event.el.querySelector('.if') ||
-        !!event.el.querySelector('.PeIF1d') ||
-        !!event.el.querySelector('.a98.iY') ||
-        event.el.matches('.a98.iY'),
-    );
+    const enum ReleventChildSelector {
+      _2023_11_22 = '.a98.iY',
+      _2022_11_21 = ':has(.a98.iY)',
+      _2022_10_12 = ':has(.PeIF1d)',
+      _2014_11_06 = ':has(.if)',
+    }
+
+    const elementStream = makeElementChildStream(threadContainerElement)
+      .filter(
+        (event) =>
+          !!event.el.querySelector('.if') ||
+          !!event.el.querySelector('.PeIF1d') ||
+          !!event.el.querySelector('.a98.iY') ||
+          event.el.matches('.a98.iY'),
+      )
+      .onValue(({ el }) => {
+        const versions = [];
+
+        // TODO: remove this once we're sure that all users are on the latest version
+        if (el.matches(ReleventChildSelector._2014_11_06)) {
+          versions.push('2014-11-06');
+        } else if (el.matches(ReleventChildSelector._2022_10_12)) {
+          versions.push('2022-10-12');
+        } else if (el.matches(ReleventChildSelector._2022_11_21)) {
+          return versions.push('2022-11-21');
+        } else if (el.matches(ReleventChildSelector._2023_11_22)) {
+          versions.push('2023-11-22');
+        }
+
+        this.#driver.logger.eventSdkPassive(
+          'routeView#startMonitoringPreviewPaneForThread',
+          {
+            versions,
+          },
+        );
+      });
 
     this._eventStream.plug(
       elementStream
