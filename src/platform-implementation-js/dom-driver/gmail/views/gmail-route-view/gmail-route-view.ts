@@ -460,7 +460,7 @@ class GmailRouteView {
     let threadContainerElement: HTMLElement | 'destroyed';
 
     const selector = 'table.Bs > tr';
-    const selector_2023_11_16 = '.ao9:has(.a98.iY), .ao9:has(.apa)';
+    const selector_2023_11_30 = '.ao9:has(.a98.iY, .apa)';
 
     try {
       threadContainerElement = await waitFor(() => {
@@ -476,12 +476,12 @@ class GmailRouteView {
         }
 
         return previewPaneContainer.querySelector<HTMLElement>(
-          selector_2023_11_16,
+          selector_2023_11_30,
         );
       }, 15_000);
     } catch {
       const selectorError = new SelectorError(
-        `${selector}, ${selector_2023_11_16}`,
+        `${selector}, ${selector_2023_11_30}`,
         {
           cause: new Error("Thread container for preview pane wasn't found"),
         },
@@ -511,8 +511,7 @@ class GmailRouteView {
       elementStream
         .flatMap(
           makeElementViewStream(
-            (element) =>
-              new (GmailThreadView as any)(element, this, this.#driver, true),
+            (element) => new GmailThreadView(element, this, this.#driver, true),
           ),
         )
         .map((view) => {
