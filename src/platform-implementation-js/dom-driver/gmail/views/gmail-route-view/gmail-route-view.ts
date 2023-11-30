@@ -35,7 +35,7 @@ class GmailRouteView {
   _stopper = kefirStopper();
   _rowListViews: GmailRowListView[];
   _gmailRouteProcessor: GmailRouteProcessor;
-  _driver: GmailDriver;
+  #driver: GmailDriver;
   _eventStream: Bus<
     | { eventName: 'newGmailRowListView'; view: GmailRowListView }
     | {
@@ -65,7 +65,7 @@ class GmailRouteView {
     this._stopper = kefirStopper();
     this._rowListViews = [];
     this._gmailRouteProcessor = gmailRouteProcessor;
-    this._driver = driver;
+    this.#driver = driver;
     this._eventStream = kefirBus();
     this._hasAddedCollapsibleSection = false;
     this.#page = makePageParser(document.body, driver.getLogger());
@@ -224,7 +224,7 @@ class GmailRouteView {
   ): GmailCollapsibleSectionView {
     this._hasAddedCollapsibleSection = true;
     var gmailResultsSectionView = new GmailCollapsibleSectionView(
-      this._driver,
+      this.#driver,
       groupOrderHint,
       this.getRouteID() === this._gmailRouteProcessor.NativeRouteIDs.SEARCH,
       isCollapsible,
@@ -318,7 +318,7 @@ class GmailRouteView {
       // role=main attribute is not set while page in a loading state
       await waitFor(() => document.querySelector('[role=main]'), 15_000);
     } catch {
-      this._driver.getLogger().error(new SelectorError('[role=main]'), {
+      this.#driver.getLogger().error(new SelectorError('[role=main]'), {
         html: extractDocumentHtmlAndCss(),
       });
     }
@@ -338,7 +338,7 @@ class GmailRouteView {
     var gmailRowListView = new GmailRowListView(
       rootElement,
       this,
-      this._driver,
+      this.#driver,
     );
 
     this._rowListViews.push(gmailRowListView);
@@ -360,7 +360,7 @@ class GmailRouteView {
       var gmailThreadView = new GmailThreadView(
         parseResult.threadContainerElement,
         this,
-        this._driver,
+        this.#driver,
       );
       this._threadView = gmailThreadView;
 
@@ -423,8 +423,8 @@ class GmailRouteView {
         // avoid logging not found error in this case
       } else {
         const error = new Error("Thread container element wasn't found");
-        if (isStreakAppId(this._driver.getAppId())) {
-          this._driver.getLogger().error(error, {
+        if (isStreakAppId(this.#driver.getAppId())) {
+          this.#driver.getLogger().error(error, {
             html: extractDocumentHtmlAndCss(),
           });
         }
@@ -486,8 +486,8 @@ class GmailRouteView {
           cause: new Error("Thread container for preview pane wasn't found"),
         },
       );
-      if (isStreakAppId(this._driver.getAppId())) {
-        this._driver.getLogger().error(selectorError, {
+      if (isStreakAppId(this.#driver.getAppId())) {
+        this.#driver.getLogger().error(selectorError, {
           html: extractDocumentHtmlAndCss(),
         });
       }
@@ -512,7 +512,7 @@ class GmailRouteView {
         .flatMap(
           makeElementViewStream(
             (element) =>
-              new (GmailThreadView as any)(element, this, this._driver, true),
+              new (GmailThreadView as any)(element, this, this.#driver, true),
           ),
         )
         .map((view) => {
@@ -710,7 +710,7 @@ class GmailRouteView {
 
     if (threadContainerElement) {
       try {
-        threadID = this._driver
+        threadID = this.#driver
           .getPageCommunicator()
           .getCurrentThreadID(threadContainerElement);
       } catch (err) {
