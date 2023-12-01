@@ -7,7 +7,9 @@ import flatMap from 'lodash/flatMap';
 import { defonce } from 'ud';
 import * as Kefir from 'kefir';
 import asap from 'asap';
-import querySelector from '../../../lib/dom/querySelectorOrFail';
+import querySelector, {
+  SelectorError,
+} from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import kefirCast from 'kefir-cast';
@@ -140,7 +142,7 @@ class GmailThreadRowView {
   _refresher: Kefir.Observable<any, any> | null | undefined;
   _subjectRefresher: Kefir.Observable<any, any> | null | undefined;
   _imageRefresher: Kefir.Observable<any, any> | null | undefined;
-  _counts: Counts | null | undefined;
+  #counts: Counts | null = null;
   _isVertical: boolean;
   _isDestroyed: boolean = false;
 
@@ -214,7 +216,6 @@ class GmailThreadRowView {
     this._refresher = null;
     this._subjectRefresher = null;
     this._imageRefresher = null;
-    this._counts = null;
 
     this._elements[0].setAttribute('data-inboxsdk-thread-row', 'true');
   }
@@ -317,27 +318,46 @@ class GmailThreadRowView {
     this._userView = userView;
   }
 
-  getCounts(): Counts {
-    let counts = this._counts;
-
-    if (!counts) {
-      const recipientsElement = querySelector(this._elements[0], 'td div.yW');
-
-      const draftCount = recipientsElement.querySelectorAll('.boq').length;
-      const messageCountMatch = recipientsElement.querySelector('.bx0');
-      const messageCount =
-        messageCountMatch && messageCountMatch.innerHTML
-          ? +messageCountMatch.innerHTML
-          : draftCount
-          ? 0
-          : 1;
-      counts = this._counts = {
-        messageCount,
-        draftCount,
-      };
+  #getCounts(): Counts {
+    if (this.#counts) {
+      return this.#counts;
     }
 
-    return counts;
+    /**
+     * If the SDK is used alongside the https://chrome.google.com/webstore/detail/mailtrack-for-gmail-inbox/ndnaehgpjlnokgebbaldlmgkapkpjkkb/utm_source/gmail/utm_medium/signature/utm_campaign/signaturevirality/th138p9fIBkLHUhniapN extension, the recipientsElement will sometimes be null.
+     */
+    let recipientsElement;
+
+    try {
+      recipientsElement = querySelector(this._elements[0], 'td div.yW');
+    } catch (e: unknown) {
+      if (e instanceof SelectorError) {
+        this._driver.logger.errorSite(e);
+      } else {
+        throw e;
+      }
+    }
+
+    if (!recipientsElement) {
+      return (this.#counts = {
+        messageCount: 0,
+        draftCount: 0,
+      });
+    }
+
+    const draftCount = recipientsElement.querySelectorAll('.boq').length;
+    const messageCountMatch = recipientsElement.querySelector('.bx0');
+    const messageCount = messageCountMatch?.innerHTML
+      ? +messageCountMatch.innerHTML
+      : draftCount
+      ? 0
+      : 1;
+    this.#counts = {
+      messageCount,
+      draftCount,
+    };
+
+    return this.#counts;
   }
 
   _expandColumn(colSelector: string, width: number) {
@@ -1203,11 +1223,11 @@ class GmailThreadRowView {
   }
 
   getVisibleDraftCount(): number {
-    return this.getCounts().draftCount;
+    return this.#getCounts().draftCount;
   }
 
   getVisibleMessageCount(): number {
-    return this.getCounts().messageCount;
+    return this.#getCounts().messageCount;
   }
 
   getContacts(): Contact[] {
