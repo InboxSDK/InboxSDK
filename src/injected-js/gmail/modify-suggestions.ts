@@ -142,7 +142,11 @@ function modifySuggestions(
       newItem[7] += ' asor_i4';
     }
 
-    parsed[0][3].push(newItem);
+    if (Array.isArray(parsed[0][3])) {
+      parsed[0][3].push(newItem);
+    } else {
+      parsed[0][3] = [newItem];
+    }
   }
   return GRP.serialize(parsed, options);
 }
