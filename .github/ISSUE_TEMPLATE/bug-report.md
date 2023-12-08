@@ -28,6 +28,8 @@ labels: 'status: Unconfirmed'
 **Screenshots**
 
 **Version** 
+
 Are you using the remote loaded SDK or bundled from NPM? if NPM, which version?
+
 
 **Add any other context about the problem here if anything**
