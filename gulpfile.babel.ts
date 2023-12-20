@@ -90,6 +90,7 @@ async function setupExamples() {
     stream.on('finish', () => {
       resolve(undefined);
     });
+    stream.resume();
   });
   if (args.reloader) {
     await extReloader();
