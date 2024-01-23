@@ -33,6 +33,8 @@ import type {
   default as Toolbars,
   LegacyToolbarButtonDescriptor,
 } from './platform-implementation-js/namespaces/toolbars';
+import type CollapsibleSectionView from './platform-implementation-js/views/collapsible-section-view';
+import ListRouteView from './platform-implementation-js/views/route-view/list-route-view';
 
 export type { User };
 
@@ -277,9 +279,7 @@ export interface SectionView extends EventEmitter {
   remove(): void;
 }
 
-export interface CollapsibleSectionView extends SectionView {
-  setCollapsed(value: boolean): void;
-}
+export { CollapsibleSectionView };
 
 export class RouteView extends EventEmitter {
   constructor(
@@ -297,11 +297,70 @@ export class RouteView extends EventEmitter {
   isCustomRouteBelongingToApp(): boolean;
 }
 
-export interface ListRouteView extends RouteView {
-  addCollapsibleSection(options: any): CollapsibleSectionView;
-  addSection(options: any): SectionView;
-  refresh(): void;
+/** Represents the a single row to render in SectionViews and CollapsibleSectionViews
+ */
+interface RowDescriptor {
+  /** First textual column */
+  title: string;
+  /** Second textual column */
+  body: string;
+  /** Last text right-aligned. Often used for dates. */
+  shortDetailText: string;
+  /**
+   * Whether the row should be rendered as read or unread similar to Gmail styles.
+   *
+   * @TODO is this actually required like the docs say?
+   */
+  isRead?: string;
+  /** Any labels that should be rendered. */
+  labels: LabelDescriptor[];
+  /** An optional class to apply to the icon. */
+  iconClass?: string;
+  /** An optional HTML to an icon to display on the left side of the row */
+  iconHtml?: string;
+  /** An optional url to an icon to display on the left side of the row */
+  iconUrl?: string;
+  /** The name of the route to navigate to when the row is clicked on. */
+  routeID?: string;
+  /** The parameters of the route being navigated to when the row is clicked on. */
+  routeParams?: string[];
+  /** Callback for when the row is clicked on. */
+  onClick?(e: unknown): void;
 }
+
+/** The properties required to create a SectionView or CollapsibleSectionView. */
+export interface SectionDescriptor {
+  /** Main title */
+  title: string;
+  /** Subtitle */
+  subtitle?: string | null;
+  /** Link to display in the summary area of the SectionView. Typically page counts are displayed here.	*/
+  /** A function to call when the title link has been clicked. */
+  titleLinkText?: string;
+  onTitleLinkClick?(e: MouseEvent): void;
+  /** Whether to display a dropdown arrow for more options on the collapsible section. */
+  hasDropdown?: boolean;
+  /**
+   * A function to call when the dropdown is opened. Your function is passed an event object with a single dropdown property.
+   */
+  onDropdownClick?(e: unknown): void;
+  /** The rows that should be shown. */
+  tableRows?: RowDescriptor[];
+  /** An arbitrary HTML element to place above the table rows but below the title. */
+  contentElement?: HTMLElement;
+  /** A link to place in the footer of the SectionView.	 */
+  footerLinkText?: string;
+  /** A function to call when the link in the footer is clicked. */
+  onFooterLinkClick?(e: MouseEvent): void;
+  /** @internal */
+  orderHint?: unknown;
+  /** @internal */
+  footerLinkIconUrl?: unknown;
+  /** @internal */
+  footerLinkIconClass?: unknown;
+}
+
+export { ListRouteView };
 
 export interface CustomRouteView extends RouteView {
   getElement(): HTMLElement;

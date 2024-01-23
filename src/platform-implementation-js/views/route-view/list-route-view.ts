@@ -1,10 +1,11 @@
 import RouteView from './route-view';
-import Kefir from 'kefir';
+import Kefir, { Observable } from 'kefir';
 import kefirCast from 'kefir-cast';
 import CollapsibleSectionView from '../collapsible-section-view';
 import SectionView from '../section-view';
 import type { RouteViewDriver } from '../../driver-interfaces/route-view-driver';
 import type { Driver } from '../../driver-interfaces/driver';
+import type { SectionDescriptor } from '../../../inboxsdk';
 
 class ListRouteView extends RouteView {
   #routeViewDriver;
@@ -22,11 +23,21 @@ class ListRouteView extends RouteView {
   }
 
   addCollapsibleSection(
-    collapsibleSectionDescriptor: Record<string, any> | null | undefined,
+    collapsibleSectionDescriptor:
+      | SectionDescriptor
+      | Observable<SectionDescriptor | null | undefined, unknown>
+      | null
+      | undefined,
   ): CollapsibleSectionView {
     const collapsibleSectionViewDriver =
       this.#routeViewDriver.addCollapsibleSection(
-        kefirCast(Kefir, collapsibleSectionDescriptor).toProperty(),
+        kefirCast(
+          Kefir,
+          collapsibleSectionDescriptor,
+        ).toProperty() as Observable<
+          SectionDescriptor | null | undefined,
+          unknown
+        >,
         this.#appId,
       );
     const collapsibleSectionView = new CollapsibleSectionView(

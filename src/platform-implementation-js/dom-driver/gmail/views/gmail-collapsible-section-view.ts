@@ -9,13 +9,14 @@ import InboxDropdownButtonView from '../widgets/buttons/inbox-dropdown-button-vi
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 import DropdownButtonViewController from '../../../widgets/buttons/dropdown-button-view-controller';
 import type GmailDriver from '../gmail-driver';
+import { type SectionDescriptor } from '../../../../inboxsdk';
 
 class GmailCollapsibleSectionView {
   #driver: GmailDriver;
   #groupOrderHint: number;
   #isReadyDeferred: Record<string, any>;
   #isCollapsible: boolean;
-  #collapsibleSectionDescriptor: Record<string, any> = {};
+  #collapsibleSectionDescriptor: SectionDescriptor = {} as SectionDescriptor;
   #isSearch: boolean;
   #element: HTMLElement | null | undefined = null;
   #headerElement: HTMLElement | null | undefined = null;
@@ -42,7 +43,7 @@ class GmailCollapsibleSectionView {
     this.#groupOrderHint = groupOrderHint;
     this.#isCollapsible = isCollapsible;
     this.#eventStream = kefirBus();
-    this.#isReadyDeferred = new (defer as any)();
+    this.#isReadyDeferred = defer();
   }
 
   destroy() {
@@ -72,7 +73,7 @@ class GmailCollapsibleSectionView {
 
   setCollapsibleSectionDescriptorProperty(
     collapsibleSectionDescriptorProperty: Kefir.Observable<
-      Record<string, any> | null | undefined,
+      SectionDescriptor | null | undefined,
       unknown
     >,
   ) {
@@ -95,7 +96,7 @@ class GmailCollapsibleSectionView {
   }
 
   #updateValues(
-    collapsibleSectionDescriptor: Record<string, any> | null | undefined,
+    collapsibleSectionDescriptor: SectionDescriptor | null | undefined,
   ) {
     const element = this.#element;
 
@@ -138,7 +139,7 @@ class GmailCollapsibleSectionView {
     this.#collapsibleSectionDescriptor = collapsibleSectionDescriptor;
   }
 
-  _setupElement(collapsibleSectionDescriptor: Record<string, any>) {
+  _setupElement(collapsibleSectionDescriptor: SectionDescriptor) {
     const element = (this.#element = document.createElement('div'));
     element.setAttribute('class', 'inboxsdk__resultsSection');
     element.setAttribute('data-group-order-hint', String(this.#groupOrderHint));
@@ -192,7 +193,7 @@ class GmailCollapsibleSectionView {
     });
   }
 
-  _setupHeader(collapsibleSectionDescriptor: Record<string, any>) {
+  _setupHeader(collapsibleSectionDescriptor: SectionDescriptor) {
     const headerElement = (this.#headerElement = document.createElement('div'));
     headerElement.classList.add('inboxsdk__resultsSection_header', 'Wg');
 
@@ -203,7 +204,7 @@ class GmailCollapsibleSectionView {
 
   _setupGmailv2Header(
     headerElement: HTMLElement,
-    collapsibleSectionDescriptor: Record<string, any>,
+    collapsibleSectionDescriptor: SectionDescriptor,
   ) {
     const titleElement = (this.#titleElement = document.createElement('div'));
     titleElement.setAttribute('class', 'inboxsdk__resultsSection_title');
@@ -228,7 +229,7 @@ class GmailCollapsibleSectionView {
     if (this.#bodyElement) this.#bodyElement.appendChild(footerElement);
   }
 
-  _updateElement(collapsibleSectionDescriptor: Record<string, any>) {
+  _updateElement(collapsibleSectionDescriptor: SectionDescriptor) {
     if (
       this.#collapsibleSectionDescriptor.orderHint !==
       collapsibleSectionDescriptor.orderHint
@@ -250,7 +251,7 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  #updateHeader(collapsibleSectionDescriptor: Record<string, any>) {
+  #updateHeader(collapsibleSectionDescriptor: SectionDescriptor) {
     if (
       this.#isCollapsible ||
       collapsibleSectionDescriptor.title ||
@@ -264,7 +265,7 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  #updateTitle(collapsibleSectionDescriptor: Record<string, any>) {
+  #updateTitle(collapsibleSectionDescriptor: SectionDescriptor) {
     if (
       this.#collapsibleSectionDescriptor.title !==
       collapsibleSectionDescriptor.title
@@ -278,7 +279,7 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  #updateSubtitle(collapsibleSectionDescriptor: Record<string, any>) {
+  #updateSubtitle(collapsibleSectionDescriptor: SectionDescriptor) {
     const titleElement = this.#titleElement;
     if (!titleElement) return;
     let subtitleElement = titleElement.querySelector(
@@ -314,7 +315,7 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  #updateSummaryText(collapsibleSectionDescriptor: Record<string, any>) {
+  #updateSummaryText(collapsibleSectionDescriptor: SectionDescriptor) {
     const headerElement = this.#headerElement;
     if (!headerElement) return;
     let summaryTextElement = headerElement.querySelector(
@@ -373,7 +374,7 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  #updateDropdown(collapsibleSectionDescriptor: Record<string, any>) {
+  #updateDropdown(collapsibleSectionDescriptor: SectionDescriptor) {
     if (
       !collapsibleSectionDescriptor.hasDropdown ||
       !collapsibleSectionDescriptor.onDropdownClick
@@ -412,7 +413,7 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  #updateContentElement(collapsibleSectionDescriptor: Record<string, any>) {
+  #updateContentElement(collapsibleSectionDescriptor: SectionDescriptor) {
     const contentElement = this.#contentElement;
     if (!contentElement) return;
     contentElement.innerHTML = '';
@@ -425,7 +426,7 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  #updateTableRows(collapsibleSectionDescriptor: Record<string, any>) {
+  #updateTableRows(collapsibleSectionDescriptor: SectionDescriptor) {
     const { tableRows } = collapsibleSectionDescriptor;
     const tableBodyElement = this.#tableBodyElement;
     if (!tableBodyElement) return;
@@ -466,7 +467,7 @@ class GmailCollapsibleSectionView {
     });
   }
 
-  #updateMessageElement(collapsibleSectionDescriptor: Record<string, any>) {
+  #updateMessageElement(collapsibleSectionDescriptor: SectionDescriptor) {
     const messageElement = this.#messageElement;
 
     if (
@@ -512,7 +513,7 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  #updateFooter(collapsibleSectionDescriptor: Record<string, any>) {
+  #updateFooter(collapsibleSectionDescriptor: SectionDescriptor) {
     const footerElement = this.#footerElement;
     if (!footerElement) return;
     footerElement.innerHTML = '';
@@ -528,7 +529,7 @@ class GmailCollapsibleSectionView {
       const footerLinkElement = document.createElement('span');
       footerLinkElement.setAttribute('class', 'e Wb');
       footerLinkElement.textContent =
-        collapsibleSectionDescriptor.footerLinkText;
+        collapsibleSectionDescriptor.footerLinkText!;
 
       this.#eventStream.plug(
         Kefir.fromEvents(footerLinkElement, 'click').map(() => {
