@@ -11,25 +11,25 @@ import DropdownButtonViewController from '../../../widgets/buttons/dropdown-butt
 import type GmailDriver from '../gmail-driver';
 
 class GmailCollapsibleSectionView {
-  _driver: GmailDriver;
-  _groupOrderHint: number;
-  _isReadyDeferred: Record<string, any>;
-  _isCollapsible: boolean;
-  _collapsibleSectionDescriptor: Record<string, any> = {};
-  _isSearch: boolean;
-  _element: HTMLElement | null | undefined = null;
-  _headerElement: HTMLElement | null | undefined = null;
-  _titleElement: HTMLElement | null | undefined = null;
-  _bodyElement: HTMLElement | null | undefined = null;
-  _contentElement: HTMLElement | null | undefined = null;
-  _tableBodyElement: HTMLElement | null | undefined = null;
-  _collapsedContainer: HTMLElement | null | undefined = null;
-  _messageElement: HTMLElement | null | undefined = null;
-  _footerElement: HTMLElement | null | undefined = null;
-  _eventStream: Bus<any, unknown>;
-  _isCollapsed: boolean = false;
-  _inboxDropdownButtonView: Record<string, any> | null | undefined = null;
-  _dropdownViewController: Record<string, any> | null | undefined = null;
+  #driver: GmailDriver;
+  #groupOrderHint: number;
+  #isReadyDeferred: Record<string, any>;
+  #isCollapsible: boolean;
+  #collapsibleSectionDescriptor: Record<string, any> = {};
+  #isSearch: boolean;
+  #element: HTMLElement | null | undefined = null;
+  #headerElement: HTMLElement | null | undefined = null;
+  #titleElement: HTMLElement | null | undefined = null;
+  #bodyElement: HTMLElement | null | undefined = null;
+  #contentElement: HTMLElement | null | undefined = null;
+  #tableBodyElement: HTMLElement | null | undefined = null;
+  #collapsedContainer: HTMLElement | null | undefined = null;
+  #messageElement: HTMLElement | null | undefined = null;
+  #footerElement: HTMLElement | null | undefined = null;
+  #eventStream: Bus<any, unknown>;
+  #isCollapsed: boolean = false;
+  #inboxDropdownButtonView: Record<string, any> | null | undefined = null;
+  #dropdownViewController: Record<string, any> | null | undefined = null;
 
   constructor(
     driver: GmailDriver,
@@ -37,37 +37,37 @@ class GmailCollapsibleSectionView {
     isSearch: boolean,
     isCollapsible: boolean,
   ) {
-    this._driver = driver;
-    this._isSearch = isSearch;
-    this._groupOrderHint = groupOrderHint;
-    this._isCollapsible = isCollapsible;
-    this._eventStream = kefirBus();
-    this._isReadyDeferred = new (defer as any)();
+    this.#driver = driver;
+    this.#isSearch = isSearch;
+    this.#groupOrderHint = groupOrderHint;
+    this.#isCollapsible = isCollapsible;
+    this.#eventStream = kefirBus();
+    this.#isReadyDeferred = new (defer as any)();
   }
 
   destroy() {
-    if (this._element) this._element.remove();
-    if (this._eventStream) this._eventStream.end();
-    if (this._headerElement) this._headerElement.remove();
-    if (this._titleElement) this._titleElement.remove();
-    if (this._bodyElement) this._bodyElement.remove();
-    if (this._contentElement) this._contentElement.remove();
-    if (this._tableBodyElement) this._tableBodyElement.remove();
-    if (this._collapsedContainer) this._collapsedContainer.remove();
-    if (this._messageElement) this._messageElement.remove();
-    if (this._inboxDropdownButtonView) this._inboxDropdownButtonView.destroy();
-    if (this._dropdownViewController) this._dropdownViewController.destroy();
+    if (this.#element) this.#element.remove();
+    if (this.#eventStream) this.#eventStream.end();
+    if (this.#headerElement) this.#headerElement.remove();
+    if (this.#titleElement) this.#titleElement.remove();
+    if (this.#bodyElement) this.#bodyElement.remove();
+    if (this.#contentElement) this.#contentElement.remove();
+    if (this.#tableBodyElement) this.#tableBodyElement.remove();
+    if (this.#collapsedContainer) this.#collapsedContainer.remove();
+    if (this.#messageElement) this.#messageElement.remove();
+    if (this.#inboxDropdownButtonView) this.#inboxDropdownButtonView.destroy();
+    if (this.#dropdownViewController) this.#dropdownViewController.destroy();
   }
 
   getElement(): HTMLElement {
-    const element = this._element;
+    const element = this.#element;
     if (!element)
       throw new Error('tried to access element that does not exist');
     return element;
   }
 
   getEventStream() {
-    return this._eventStream;
+    return this.#eventStream;
   }
 
   setCollapsibleSectionDescriptorProperty(
@@ -77,27 +77,27 @@ class GmailCollapsibleSectionView {
     >,
   ) {
     const stoppedProperty = collapsibleSectionDescriptorProperty.takeUntilBy(
-      this._eventStream.filter(() => false).beforeEnd(() => null),
+      this.#eventStream.filter(() => false).beforeEnd(() => null),
     );
-    stoppedProperty.onValue((x) => this._updateValues(x));
-    stoppedProperty.take(1).onValue(() => this._isReadyDeferred.resolve(this));
+    stoppedProperty.onValue((x) => this.#updateValues(x));
+    stoppedProperty.take(1).onValue(() => this.#isReadyDeferred.resolve(this));
   }
 
   setCollapsed(value: boolean) {
-    if (!this._isCollapsible) {
+    if (!this.#isCollapsible) {
       return;
     }
 
-    this._isReadyDeferred.promise.then(() => {
-      if (value) this._collapse();
-      else this._expand();
+    this.#isReadyDeferred.promise.then(() => {
+      if (value) this.#collapse();
+      else this.#expand();
     });
   }
 
-  _updateValues(
+  #updateValues(
     collapsibleSectionDescriptor: Record<string, any> | null | undefined,
   ) {
-    const element = this._element;
+    const element = this.#element;
 
     if (!collapsibleSectionDescriptor) {
       if (element) {
@@ -112,36 +112,36 @@ class GmailCollapsibleSectionView {
     if (!element) {
       this._setupElement(collapsibleSectionDescriptor);
 
-      this._showLoadingMessage();
+      this.#showLoadingMessage();
     } else {
       this._updateElement(collapsibleSectionDescriptor);
     }
 
-    this._updateHeader(collapsibleSectionDescriptor);
+    this.#updateHeader(collapsibleSectionDescriptor);
 
-    this._updateTitle(collapsibleSectionDescriptor);
+    this.#updateTitle(collapsibleSectionDescriptor);
 
-    this._updateSubtitle(collapsibleSectionDescriptor);
+    this.#updateSubtitle(collapsibleSectionDescriptor);
 
-    this._updateSummaryText(collapsibleSectionDescriptor);
+    this.#updateSummaryText(collapsibleSectionDescriptor);
 
-    this._updateDropdown(collapsibleSectionDescriptor);
+    this.#updateDropdown(collapsibleSectionDescriptor);
 
-    this._updateContentElement(collapsibleSectionDescriptor);
+    this.#updateContentElement(collapsibleSectionDescriptor);
 
-    this._updateTableRows(collapsibleSectionDescriptor);
+    this.#updateTableRows(collapsibleSectionDescriptor);
 
-    this._updateMessageElement(collapsibleSectionDescriptor);
+    this.#updateMessageElement(collapsibleSectionDescriptor);
 
-    this._updateFooter(collapsibleSectionDescriptor);
+    this.#updateFooter(collapsibleSectionDescriptor);
 
-    this._collapsibleSectionDescriptor = collapsibleSectionDescriptor;
+    this.#collapsibleSectionDescriptor = collapsibleSectionDescriptor;
   }
 
   _setupElement(collapsibleSectionDescriptor: Record<string, any>) {
-    const element = (this._element = document.createElement('div'));
+    const element = (this.#element = document.createElement('div'));
     element.setAttribute('class', 'inboxsdk__resultsSection');
-    element.setAttribute('data-group-order-hint', String(this._groupOrderHint));
+    element.setAttribute('data-group-order-hint', String(this.#groupOrderHint));
     element.setAttribute(
       'data-order-hint',
       String(
@@ -150,42 +150,42 @@ class GmailCollapsibleSectionView {
           : 0,
       ),
     );
-    if (!this._isCollapsible)
+    if (!this.#isCollapsible)
       element.classList.add('inboxsdk__resultsSection_nonCollapsible');
 
     this._setupHeader(collapsibleSectionDescriptor);
 
-    const bodyElement = (this._bodyElement = document.createElement('div'));
+    const bodyElement = (this.#bodyElement = document.createElement('div'));
     const bodyContentsElement = document.createElement('div');
     bodyContentsElement.classList.add('zE');
     bodyElement.appendChild(bodyContentsElement);
     element.appendChild(bodyElement);
-    const contentElement = (this._contentElement =
+    const contentElement = (this.#contentElement =
       document.createElement('div'));
     bodyContentsElement.appendChild(contentElement);
-    const messageElement = (this._messageElement =
+    const messageElement = (this.#messageElement =
       document.createElement('div'));
     bodyContentsElement.appendChild(messageElement);
-    const tableBodyElement = (this._tableBodyElement =
+    const tableBodyElement = (this.#tableBodyElement =
       document.createElement('div'));
     bodyContentsElement.appendChild(tableBodyElement);
 
     this._setupFooter();
 
-    if (this._isCollapsible && this._titleElement) {
-      Kefir.fromEvents(this._titleElement, 'click').onValue(() =>
-        this._toggleCollapseState(),
+    if (this.#isCollapsible && this.#titleElement) {
+      Kefir.fromEvents(this.#titleElement, 'click').onValue(() =>
+        this.#toggleCollapseState(),
       );
     }
 
     Kefir.fromEvents(element, 'removeCollapsedContainer').onValue(() =>
-      this._destroyCollapsedContainer(),
+      this.#destroyCollapsedContainer(),
     );
     Kefir.fromEvents(element, 'readdToCollapsedContainer').onValue(() =>
-      this._addToCollapsedContainer(),
+      this.#addToCollapsedContainer(),
     );
 
-    this._eventStream.emit({
+    this.#eventStream.emit({
       type: 'update',
       property: 'orderHint',
       sectionDescriptor: collapsibleSectionDescriptor,
@@ -193,19 +193,19 @@ class GmailCollapsibleSectionView {
   }
 
   _setupHeader(collapsibleSectionDescriptor: Record<string, any>) {
-    const headerElement = (this._headerElement = document.createElement('div'));
+    const headerElement = (this.#headerElement = document.createElement('div'));
     headerElement.classList.add('inboxsdk__resultsSection_header', 'Wg');
 
     this._setupGmailv2Header(headerElement, collapsibleSectionDescriptor);
 
-    if (this._element) this._element.appendChild(headerElement);
+    if (this.#element) this.#element.appendChild(headerElement);
   }
 
   _setupGmailv2Header(
     headerElement: HTMLElement,
     collapsibleSectionDescriptor: Record<string, any>,
   ) {
-    const titleElement = (this._titleElement = document.createElement('div'));
+    const titleElement = (this.#titleElement = document.createElement('div'));
     titleElement.setAttribute('class', 'inboxsdk__resultsSection_title');
     titleElement.innerHTML = [
       '<h3 class="Wr iR">',
@@ -217,23 +217,23 @@ class GmailCollapsibleSectionView {
     ].join('');
     const floatRightElement = document.createElement('div');
     floatRightElement.classList.add('Cr');
-    if (this._isSearch) floatRightElement.classList.add('Wg');
+    if (this.#isSearch) floatRightElement.classList.add('Wg');
     headerElement.appendChild(titleElement);
     headerElement.appendChild(floatRightElement);
   }
 
   _setupFooter() {
-    const footerElement = (this._footerElement = document.createElement('div'));
+    const footerElement = (this.#footerElement = document.createElement('div'));
     footerElement.classList.add('inboxsdk__resultsSection_footer');
-    if (this._bodyElement) this._bodyElement.appendChild(footerElement);
+    if (this.#bodyElement) this.#bodyElement.appendChild(footerElement);
   }
 
   _updateElement(collapsibleSectionDescriptor: Record<string, any>) {
     if (
-      this._collapsibleSectionDescriptor.orderHint !==
+      this.#collapsibleSectionDescriptor.orderHint !==
       collapsibleSectionDescriptor.orderHint
     ) {
-      const element = this._element;
+      const element = this.#element;
       if (element)
         element.setAttribute(
           'data-order-hint',
@@ -243,43 +243,43 @@ class GmailCollapsibleSectionView {
               : 0),
         );
 
-      this._eventStream.emit({
+      this.#eventStream.emit({
         type: 'update',
         property: 'orderHint',
       });
     }
   }
 
-  _updateHeader(collapsibleSectionDescriptor: Record<string, any>) {
+  #updateHeader(collapsibleSectionDescriptor: Record<string, any>) {
     if (
-      this._isCollapsible ||
+      this.#isCollapsible ||
       collapsibleSectionDescriptor.title ||
       collapsibleSectionDescriptor.subtitle ||
       collapsibleSectionDescriptor.titleLinkText ||
       collapsibleSectionDescriptor.hasDropdown
     ) {
-      if (this._headerElement) this._headerElement.style.display = '';
+      if (this.#headerElement) this.#headerElement.style.display = '';
     } else {
-      if (this._headerElement) this._headerElement.style.display = 'none';
+      if (this.#headerElement) this.#headerElement.style.display = 'none';
     }
   }
 
-  _updateTitle(collapsibleSectionDescriptor: Record<string, any>) {
+  #updateTitle(collapsibleSectionDescriptor: Record<string, any>) {
     if (
-      this._collapsibleSectionDescriptor.title !==
+      this.#collapsibleSectionDescriptor.title !==
       collapsibleSectionDescriptor.title
     ) {
       const selector = 'h3 > .Wn';
 
-      if (this._titleElement) {
-        querySelector(this._titleElement, selector).textContent =
+      if (this.#titleElement) {
+        querySelector(this.#titleElement, selector).textContent =
           collapsibleSectionDescriptor.title;
       }
     }
   }
 
-  _updateSubtitle(collapsibleSectionDescriptor: Record<string, any>) {
-    const titleElement = this._titleElement;
+  #updateSubtitle(collapsibleSectionDescriptor: Record<string, any>) {
+    const titleElement = this.#titleElement;
     if (!titleElement) return;
     let subtitleElement = titleElement.querySelector(
       '.inboxsdk__resultsSection_title_subtitle',
@@ -290,7 +290,7 @@ class GmailCollapsibleSectionView {
         subtitleElement.remove();
       }
     } else if (
-      this._collapsibleSectionDescriptor.subtitle !==
+      this.#collapsibleSectionDescriptor.subtitle !==
       collapsibleSectionDescriptor.subtitle
     ) {
       if (!subtitleElement) {
@@ -314,8 +314,8 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  _updateSummaryText(collapsibleSectionDescriptor: Record<string, any>) {
-    const headerElement = this._headerElement;
+  #updateSummaryText(collapsibleSectionDescriptor: Record<string, any>) {
+    const headerElement = this.#headerElement;
     if (!headerElement) return;
     let summaryTextElement = headerElement.querySelector(
       '.inboxsdk__resultsSection_header_summaryText',
@@ -327,7 +327,7 @@ class GmailCollapsibleSectionView {
       }
     } else if (
       collapsibleSectionDescriptor.titleLinkText !==
-      this._collapsibleSectionDescriptor.titleLinkText
+      this.#collapsibleSectionDescriptor.titleLinkText
     ) {
       if (!summaryTextElement) {
         summaryTextElement = document.createElement('div');
@@ -346,10 +346,10 @@ class GmailCollapsibleSectionView {
           '</span>',
         ].join('');
 
-        this._eventStream.plug(
+        this.#eventStream.plug(
           Kefir.fromEvents(summaryTextElement, 'click').map(() => ({
             eventName: 'titleLinkClicked',
-            sectionDescriptor: this._collapsibleSectionDescriptor,
+            sectionDescriptor: this.#collapsibleSectionDescriptor,
           })),
         );
 
@@ -373,27 +373,27 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  _updateDropdown(collapsibleSectionDescriptor: Record<string, any>) {
+  #updateDropdown(collapsibleSectionDescriptor: Record<string, any>) {
     if (
       !collapsibleSectionDescriptor.hasDropdown ||
       !collapsibleSectionDescriptor.onDropdownClick
     ) {
-      if (this._inboxDropdownButtonView)
-        this._inboxDropdownButtonView.destroy();
-      if (this._dropdownViewController) this._dropdownViewController.destroy();
+      if (this.#inboxDropdownButtonView)
+        this.#inboxDropdownButtonView.destroy();
+      if (this.#dropdownViewController) this.#dropdownViewController.destroy();
     } else if (
       collapsibleSectionDescriptor.hasDropdown &&
       collapsibleSectionDescriptor.onDropdownClick
     ) {
-      if (!this._inboxDropdownButtonView || !this._dropdownViewController) {
-        const inboxDropdownButtonView = (this._inboxDropdownButtonView =
+      if (!this.#inboxDropdownButtonView || !this.#dropdownViewController) {
+        const inboxDropdownButtonView = (this.#inboxDropdownButtonView =
           new InboxDropdownButtonView());
-        this._dropdownViewController = new DropdownButtonViewController({
+        this.#dropdownViewController = new DropdownButtonViewController({
           buttonView: inboxDropdownButtonView,
           dropdownViewDriverClass: GmailDropdownView,
           dropdownShowFunction: collapsibleSectionDescriptor.onDropdownClick,
         });
-        const headerElement = this._headerElement;
+        const headerElement = this.#headerElement;
 
         if (headerElement) {
           const childElement = headerElement.querySelector('.Cr');
@@ -402,18 +402,18 @@ class GmailCollapsibleSectionView {
         }
       } else if (
         collapsibleSectionDescriptor.onDropdownClick !==
-        this._collapsibleSectionDescriptor.onDropdownClick
+        this.#collapsibleSectionDescriptor.onDropdownClick
       ) {
-        if (this._dropdownViewController)
-          this._dropdownViewController.setDropdownShowFunction(
+        if (this.#dropdownViewController)
+          this.#dropdownViewController.setDropdownShowFunction(
             collapsibleSectionDescriptor.onDropdownClick,
           );
       }
     }
   }
 
-  _updateContentElement(collapsibleSectionDescriptor: Record<string, any>) {
-    const contentElement = this._contentElement;
+  #updateContentElement(collapsibleSectionDescriptor: Record<string, any>) {
+    const contentElement = this.#contentElement;
     if (!contentElement) return;
     contentElement.innerHTML = '';
 
@@ -425,9 +425,9 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  _updateTableRows(collapsibleSectionDescriptor: Record<string, any>) {
+  #updateTableRows(collapsibleSectionDescriptor: Record<string, any>) {
     const { tableRows } = collapsibleSectionDescriptor;
-    const tableBodyElement = this._tableBodyElement;
+    const tableBodyElement = this.#tableBodyElement;
     if (!tableBodyElement) return;
     tableBodyElement.innerHTML = '';
 
@@ -436,18 +436,18 @@ class GmailCollapsibleSectionView {
     } else {
       tableBodyElement.style.display = '';
 
-      this._renderTable(tableRows);
+      this.#renderTable(tableRows);
     }
   }
 
-  _renderTable(tableRows: Array<Record<string, any>>) {
+  #renderTable(tableRows: Array<Record<string, any>>) {
     const tableElement = document.createElement('table');
     tableElement.setAttribute('class', 'F cf zt');
     tableElement.innerHTML = _getTableHTML();
-    if (this._tableBodyElement)
-      this._tableBodyElement.appendChild(tableElement);
+    if (this.#tableBodyElement)
+      this.#tableBodyElement.appendChild(tableElement);
     const tbody = tableElement.querySelector('tbody');
-    const eventStream = this._eventStream;
+    const eventStream = this.#eventStream;
     tableRows.forEach((result) => {
       const rowElement = document.createElement('tr');
       rowElement.setAttribute(
@@ -466,8 +466,8 @@ class GmailCollapsibleSectionView {
     });
   }
 
-  _updateMessageElement(collapsibleSectionDescriptor: Record<string, any>) {
-    const messageElement = this._messageElement;
+  #updateMessageElement(collapsibleSectionDescriptor: Record<string, any>) {
+    const messageElement = this.#messageElement;
 
     if (
       (collapsibleSectionDescriptor.tableRows &&
@@ -483,12 +483,12 @@ class GmailCollapsibleSectionView {
       collapsibleSectionDescriptor.tableRows.length === 0 &&
       !collapsibleSectionDescriptor.contentElement
     ) {
-      this._showEmptyMessage();
+      this.#showEmptyMessage();
     }
   }
 
-  _showLoadingMessage() {
-    const messageElement = this._messageElement;
+  #showLoadingMessage() {
+    const messageElement = this.#messageElement;
 
     if (messageElement) {
       messageElement.setAttribute(
@@ -501,8 +501,8 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  _showEmptyMessage() {
-    const messageElement = this._messageElement;
+  #showEmptyMessage() {
+    const messageElement = this.#messageElement;
 
     if (messageElement) {
       messageElement.setAttribute('class', 'TB TC');
@@ -512,8 +512,8 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  _updateFooter(collapsibleSectionDescriptor: Record<string, any>) {
-    const footerElement = this._footerElement;
+  #updateFooter(collapsibleSectionDescriptor: Record<string, any>) {
+    const footerElement = this.#footerElement;
     if (!footerElement) return;
     footerElement.innerHTML = '';
 
@@ -530,11 +530,11 @@ class GmailCollapsibleSectionView {
       footerLinkElement.textContent =
         collapsibleSectionDescriptor.footerLinkText;
 
-      this._eventStream.plug(
+      this.#eventStream.plug(
         Kefir.fromEvents(footerLinkElement, 'click').map(() => {
           return {
             eventName: 'footerClicked',
-            sectionDescriptor: this._collapsibleSectionDescriptor,
+            sectionDescriptor: this.#collapsibleSectionDescriptor,
           };
         }),
       );
@@ -544,16 +544,16 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  _toggleCollapseState() {
-    if (this._isCollapsed) {
-      this._expand();
+  #toggleCollapseState() {
+    if (this.#isCollapsed) {
+      this.#expand();
     } else {
-      this._collapse();
+      this.#collapse();
     }
   }
 
-  _collapse() {
-    const element = this._element;
+  #collapse() {
+    const element = this.#element;
 
     if (!element) {
       return;
@@ -561,14 +561,14 @@ class GmailCollapsibleSectionView {
 
     element.classList.add('inboxsdk__resultsSection_collapsed');
 
-    if (!this._isSearch) {
-      this._addToCollapsedContainer();
+    if (!this.#isSearch) {
+      this.#addToCollapsedContainer();
     }
 
     const selector = 'h3 > img.Wp';
 
-    if (this._titleElement) {
-      const arrowSpan = querySelector(this._titleElement, selector);
+    if (this.#titleElement) {
+      const arrowSpan = querySelector(this.#titleElement, selector);
 
       if (arrowSpan) {
         arrowSpan.classList.remove('Wq');
@@ -576,16 +576,16 @@ class GmailCollapsibleSectionView {
       }
     }
 
-    if (this._bodyElement) this._bodyElement.style.display = 'none';
-    this._isCollapsed = true;
+    if (this.#bodyElement) this.#bodyElement.style.display = 'none';
+    this.#isCollapsed = true;
 
-    this._eventStream.emit({
+    this.#eventStream.emit({
       eventName: 'collapsed',
     });
   }
 
-  _expand() {
-    const element = this._element;
+  #expand() {
+    const element = this.#element;
 
     if (!element) {
       return;
@@ -593,14 +593,14 @@ class GmailCollapsibleSectionView {
 
     element.classList.remove('inboxsdk__resultsSection_collapsed');
 
-    if (!this._isSearch) {
-      this._removeFromCollapsedContainer();
+    if (!this.#isSearch) {
+      this.#removeFromCollapsedContainer();
     }
 
     const selector = 'h3 > img.Wp';
 
-    if (this._titleElement) {
-      const arrowSpan = querySelector(this._titleElement, selector);
+    if (this.#titleElement) {
+      const arrowSpan = querySelector(this.#titleElement, selector);
 
       if (arrowSpan) {
         arrowSpan.classList.remove('Wo');
@@ -608,22 +608,22 @@ class GmailCollapsibleSectionView {
       }
     }
 
-    if (this._bodyElement) this._bodyElement.style.display = '';
-    this._isCollapsed = false;
+    if (this.#bodyElement) this.#bodyElement.style.display = '';
+    this.#isCollapsed = false;
 
-    this._eventStream.emit({
+    this.#eventStream.emit({
       eventName: 'expanded',
     });
   }
 
-  _addToCollapsedContainer() {
-    const element = this._element;
+  #addToCollapsedContainer() {
+    const element = this.#element;
     if (!element) return;
-    if (this._headerElement) this._headerElement.classList.remove('Wg');
+    if (this.#headerElement) this.#headerElement.classList.remove('Wg');
 
     if (
-      this._isCollapsedContainer(element.previousElementSibling) &&
-      this._isCollapsedContainer(element.nextElementSibling)
+      this.#isCollapsedContainer(element.previousElementSibling) &&
+      this.#isCollapsedContainer(element.nextElementSibling)
     ) {
       //we are surrounded by collapse containers, let's favor our previous sibling
       const otherCollapseContainer = element.nextElementSibling;
@@ -638,19 +638,19 @@ class GmailCollapsibleSectionView {
         otherCollapseContainer.children[0].children,
       ).concat(Array.from(otherCollapseContainer.children[1].children));
       if (otherCollapseContainer)
-        this._pulloutSectionsFromCollapsedContainer(
+        this.#pulloutSectionsFromCollapsedContainer(
           otherCollapseContainer as any,
         );
 
-      this._recollapse(elementsToRecollapse);
+      this.#recollapse(elementsToRecollapse);
     } else {
-      this._readdToCollapsedContainer();
+      this.#readdToCollapsedContainer();
     }
   }
 
-  _removeFromCollapsedContainer() {
-    if (this._headerElement) this._headerElement.classList.add('Wg');
-    const element = this._element;
+  #removeFromCollapsedContainer() {
+    if (this.#headerElement) this.#headerElement.classList.add('Wg');
+    const element = this.#element;
     if (!element) return;
     const parentElement = element.parentElement;
     if (!parentElement) return;
@@ -667,14 +667,14 @@ class GmailCollapsibleSectionView {
       container.children[0].children,
     ).concat(Array.from(container.children[1].children));
 
-    this._pulloutSectionsFromCollapsedContainer(container as any);
+    this.#pulloutSectionsFromCollapsedContainer(container as any);
 
-    this._destroyCollapsedContainer();
+    this.#destroyCollapsedContainer();
 
-    this._recollapse(elementsToRecollapse.filter((child) => child !== element));
+    this.#recollapse(elementsToRecollapse.filter((child) => child !== element));
   }
 
-  _pulloutSectionsFromCollapsedContainer(container: HTMLElement) {
+  #pulloutSectionsFromCollapsedContainer(container: HTMLElement) {
     const prependedChildren = Array.from(container.children[0].children);
     prependedChildren.forEach((child) =>
       (container as any).insertAdjacentElement('beforebegin', child),
@@ -687,14 +687,14 @@ class GmailCollapsibleSectionView {
     );
   }
 
-  _readdToCollapsedContainer() {
-    const element = this._element;
+  #readdToCollapsedContainer() {
+    const element = this.#element;
     if (!element) return;
 
-    if (this._collapsedContainer) {
-      this._collapsedContainer.children[0].insertBefore(
+    if (this.#collapsedContainer) {
+      this.#collapsedContainer.children[0].insertBefore(
         element,
-        this._collapsedContainer.children[1].firstElementChild,
+        this.#collapsedContainer.children[1].firstElementChild,
       );
 
       return;
@@ -703,18 +703,18 @@ class GmailCollapsibleSectionView {
     let collapsedContainer;
     let isPrepend;
 
-    if (this._isCollapsedContainer(element.previousElementSibling)) {
+    if (this.#isCollapsedContainer(element.previousElementSibling)) {
       isPrepend = false;
       collapsedContainer = element.previousElementSibling;
-    } else if (this._isCollapsedContainer(element.nextElementSibling)) {
+    } else if (this.#isCollapsedContainer(element.nextElementSibling)) {
       isPrepend = true;
       collapsedContainer = element.nextElementSibling;
     } else {
       isPrepend = true;
 
-      this._createCollapsedContainer();
+      this.#createCollapsedContainer();
 
-      collapsedContainer = this._collapsedContainer;
+      collapsedContainer = this.#collapsedContainer;
     }
 
     if (isPrepend && collapsedContainer) {
@@ -727,14 +727,14 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  _isCollapsedContainer(element: any) {
+  #isCollapsedContainer(element: any) {
     return (
       element &&
       element.classList.contains('inboxsdk__results_collapsedContainer')
     );
   }
 
-  _recollapse(children: Array<Record<string, any>>) {
+  #recollapse(children: Array<Record<string, any>>) {
     children.forEach((child) => {
       const removeEvent = document.createEvent('CustomEvent');
       (removeEvent as any).initCustomEvent(
@@ -755,8 +755,8 @@ class GmailCollapsibleSectionView {
     });
   }
 
-  _createCollapsedContainer() {
-    const collapsedContainer = (this._collapsedContainer =
+  #createCollapsedContainer() {
+    const collapsedContainer = (this.#collapsedContainer =
       document.createElement('div'));
     collapsedContainer.setAttribute(
       'class',
@@ -764,16 +764,16 @@ class GmailCollapsibleSectionView {
     );
     collapsedContainer.innerHTML =
       '<div class="inboxsdk__results_collapsedContainer_prepend"></div><div class="inboxsdk__results_collapsedContainer_append"></div>';
-    const element = this._element;
+    const element = this.#element;
     if (element)
       (element as any).insertAdjacentElement('afterend', collapsedContainer);
   }
 
-  _destroyCollapsedContainer() {
-    if (this._collapsedContainer) {
-      this._collapsedContainer.remove();
+  #destroyCollapsedContainer() {
+    if (this.#collapsedContainer) {
+      this.#collapsedContainer.remove();
 
-      this._collapsedContainer = null;
+      this.#collapsedContainer = null;
     }
   }
 }
