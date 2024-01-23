@@ -34,7 +34,8 @@ import type {
   LegacyToolbarButtonDescriptor,
 } from './platform-implementation-js/namespaces/toolbars';
 import type CollapsibleSectionView from './platform-implementation-js/views/collapsible-section-view';
-import ListRouteView from './platform-implementation-js/views/route-view/list-route-view';
+import type ListRouteView from './platform-implementation-js/views/route-view/list-route-view';
+import type SectionView from './platform-implementation-js/views/section-view';
 
 export type { User };
 
@@ -275,11 +276,7 @@ export interface ThreadRowAttachmentIconDescriptor {
 
 export { NavItemView };
 
-export interface SectionView extends EventEmitter {
-  remove(): void;
-}
-
-export { CollapsibleSectionView };
+export { SectionView, CollapsibleSectionView };
 
 export class RouteView extends EventEmitter {
   constructor(
