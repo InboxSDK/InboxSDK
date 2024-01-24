@@ -356,8 +356,8 @@ export interface SectionDescriptor {
   /** Subtitle */
   subtitle?: string | null;
   /** Link to display in the summary area of the {@link SectionView}. Typically page counts are displayed here.	*/
-  /** A function to call when the title link has been clicked. */
   titleLinkText?: string;
+  /** A function to call when the title link has been clicked. */
   onTitleLinkClick?(e: MouseEvent): void;
   /** Whether to display a dropdown arrow for more options on the collapsible section. */
   hasDropdown?: boolean;
