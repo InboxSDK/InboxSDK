@@ -7,6 +7,9 @@ import type { RouteViewDriver } from '../../driver-interfaces/route-view-driver'
 import type { Driver } from '../../driver-interfaces/driver';
 import type { SectionDescriptor } from '../../../inboxsdk';
 
+/**
+ * Extends {@link RouteView}. {@link ListRouteView}s represent pages within Gmail that show a list of emails. Typical examples are the Inbox, Sent Mail, Drafts, etc. However, views like the Conversation view or Settings would not be a ListRouteView.
+ */
 class ListRouteView extends RouteView {
   #routeViewDriver;
   #driver;
@@ -22,6 +25,9 @@ class ListRouteView extends RouteView {
     this.#bindToEventStream();
   }
 
+  /**
+   * Adds a collapsible section to the top of the page.
+   */
   addCollapsibleSection(
     collapsibleSectionDescriptor:
       | SectionDescriptor
@@ -48,6 +54,7 @@ class ListRouteView extends RouteView {
     return collapsibleSectionView;
   }
 
+  /** Adds a non-collapsible section to the top of the page. */
   addSection(
     sectionDescriptor: Record<string, any> | null | undefined,
   ): SectionView {
@@ -60,6 +67,7 @@ class ListRouteView extends RouteView {
     return sectionView;
   }
 
+  /** Simulates a click on the Gmail thread list refresh button. */
   refresh() {
     this.#routeViewDriver.refresh();
   }
