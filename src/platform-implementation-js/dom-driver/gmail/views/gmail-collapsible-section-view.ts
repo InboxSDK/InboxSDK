@@ -9,12 +9,16 @@ import InboxDropdownButtonView from '../widgets/buttons/inbox-dropdown-button-vi
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 import DropdownButtonViewController from '../../../widgets/buttons/dropdown-button-view-controller';
 import type GmailDriver from '../gmail-driver';
-import { type SectionDescriptor } from '../../../../inboxsdk';
+import type {
+  LabelDescriptor,
+  RowDescriptor,
+  SectionDescriptor,
+} from '../../../../inboxsdk';
 
 class GmailCollapsibleSectionView {
   #driver: GmailDriver;
   #groupOrderHint: number;
-  #isReadyDeferred: Record<string, any>;
+  #isReadyDeferred;
   #isCollapsible: boolean;
   #collapsibleSectionDescriptor: SectionDescriptor = {} as SectionDescriptor;
   #isSearch: boolean;
@@ -29,8 +33,9 @@ class GmailCollapsibleSectionView {
   #footerElement: HTMLElement | null | undefined = null;
   #eventStream: Bus<any, unknown>;
   #isCollapsed: boolean = false;
-  #inboxDropdownButtonView: Record<string, any> | null | undefined = null;
-  #dropdownViewController: Record<string, any> | null | undefined = null;
+  #inboxDropdownButtonView: InboxDropdownButtonView | null | undefined = null;
+  #dropdownViewController: DropdownButtonViewController | null | undefined =
+    null;
 
   constructor(
     driver: GmailDriver,
@@ -305,7 +310,7 @@ class GmailCollapsibleSectionView {
 
           if (insertionPoint) {
             subtitleElement.classList.add('aw5');
-            (insertionPoint as any).appendChild(subtitleElement);
+            insertionPoint.appendChild(subtitleElement);
           }
         }
       }
@@ -363,7 +368,7 @@ class GmailCollapsibleSectionView {
         });
         const insertionPoint = headerElement.querySelector('.Cr');
         if (insertionPoint)
-          (insertionPoint as any).insertAdjacentElement(
+          insertionPoint.insertAdjacentElement(
             'afterbegin',
             summaryTextElement,
           );
@@ -441,7 +446,7 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  #renderTable(tableRows: Array<Record<string, any>>) {
+  #renderTable(tableRows: RowDescriptor[]) {
     const tableElement = document.createElement('table');
     tableElement.setAttribute('class', 'F cf zt');
     tableElement.innerHTML = _getTableHTML();
@@ -639,9 +644,7 @@ class GmailCollapsibleSectionView {
         otherCollapseContainer.children[0].children,
       ).concat(Array.from(otherCollapseContainer.children[1].children));
       if (otherCollapseContainer)
-        this.#pulloutSectionsFromCollapsedContainer(
-          otherCollapseContainer as any,
-        );
+        this.#pulloutSectionsFromCollapsedContainer(otherCollapseContainer);
 
       this.#recollapse(elementsToRecollapse);
     } else {
@@ -668,23 +671,23 @@ class GmailCollapsibleSectionView {
       container.children[0].children,
     ).concat(Array.from(container.children[1].children));
 
-    this.#pulloutSectionsFromCollapsedContainer(container as any);
+    this.#pulloutSectionsFromCollapsedContainer(container);
 
     this.#destroyCollapsedContainer();
 
     this.#recollapse(elementsToRecollapse.filter((child) => child !== element));
   }
 
-  #pulloutSectionsFromCollapsedContainer(container: HTMLElement) {
+  #pulloutSectionsFromCollapsedContainer(container: Element) {
     const prependedChildren = Array.from(container.children[0].children);
     prependedChildren.forEach((child) =>
-      (container as any).insertAdjacentElement('beforebegin', child),
+      container.insertAdjacentElement('beforebegin', child),
     );
     const appendedChildren = Array.from(
       container.children[1].children,
     ).reverse();
     appendedChildren.forEach((child) =>
-      (container as any).insertAdjacentElement('afterend', child),
+      container.insertAdjacentElement('afterend', child),
     );
   }
 
@@ -728,17 +731,17 @@ class GmailCollapsibleSectionView {
     }
   }
 
-  #isCollapsedContainer(element: any) {
+  #isCollapsedContainer(element: Element | null) {
     return (
       element &&
       element.classList.contains('inboxsdk__results_collapsedContainer')
     );
   }
 
-  #recollapse(children: Array<Record<string, any>>) {
+  #recollapse(children: Element[]) {
     children.forEach((child) => {
       const removeEvent = document.createEvent('CustomEvent');
-      (removeEvent as any).initCustomEvent(
+      removeEvent.initCustomEvent(
         'removeCollapsedContainer',
         false,
         false,
@@ -746,7 +749,7 @@ class GmailCollapsibleSectionView {
       );
       child.dispatchEvent(removeEvent);
       const readdEvent = document.createEvent('CustomEvent');
-      (readdEvent as any).initCustomEvent(
+      readdEvent.initCustomEvent(
         'readdToCollapsedContainer',
         false,
         false,
@@ -766,8 +769,7 @@ class GmailCollapsibleSectionView {
     collapsedContainer.innerHTML =
       '<div class="inboxsdk__results_collapsedContainer_prepend"></div><div class="inboxsdk__results_collapsedContainer_append"></div>';
     const element = this.#element;
-    if (element)
-      (element as any).insertAdjacentElement('afterend', collapsedContainer);
+    if (element) element.insertAdjacentElement('afterend', collapsedContainer);
   }
 
   #destroyCollapsedContainer() {
@@ -795,7 +797,7 @@ function _getTableHTML() {
   ].join('');
 }
 
-function _getRowHTML(result: Record<string, any>) {
+function _getRowHTML(result: RowDescriptor) {
   let iconHtml = '';
 
   if (result.iconHtml != null) {
@@ -853,14 +855,14 @@ function _getRowHTML(result: Record<string, any>) {
   return rowArr.join('');
 }
 
-function _getLabelHTML(label: Record<string, any>) {
+function _getLabelHTML(label: LabelDescriptor) {
   const backgroundColor = label.backgroundColor || 'rgb(194, 194, 194)'; //grey
 
   const foregroundColor = label.foregroundColor || 'rgb(255, 255, 255)'; //white
 
   const maxWidth = label.maxWidth || '90px';
   const retArray = [
-    autoHtml`<div class="ar as" data-tooltip="${label.title}">
+    autoHtml`<div class="ar as" data-tooltip="${label.title!}">
       <div class="at" style="background-color: ${backgroundColor}; border-color: ${backgroundColor};">
         <div class="au" style="border-color: ${backgroundColor};">`,
   ];
@@ -897,7 +899,7 @@ function _getLabelHTML(label: Record<string, any>) {
 
   retArray.push(autoHtml`
           <div class="av" style="color: ${foregroundColor}; max-width: ${maxWidth}">
-            ${label.title}
+            ${label.title!}
           </div>
         </div>
       </div>

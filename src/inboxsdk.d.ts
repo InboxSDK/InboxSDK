@@ -257,14 +257,35 @@ export interface DraftLabelDescriptor {
   count?: string | number;
 }
 
+/**
+ * This type is used to describe labels that you add to {@link ThreadRowView} and {@link CollapsibleSectionView}.
+ */
 export interface LabelDescriptor {
+  /**
+   * Text of the label.
+   *
+   * @todo marked as required in the docs.
+   */
   title?: string;
+  /** @internal is this still used? */
   titleHtml?: string;
+  /** A background color to put on the icon element if present. */
+  iconBackgroundColor?: string;
+  /**
+   * URL for the icon to show on the label. Should be a local extension file URL or a HTTPS URL.
+   *
+   * @todo marked as required in the docs
+   */
   iconUrl?: string;
+  /** A CSS class to apply to the icon. */
   iconClass?: string;
+  /** Html for the icon to show on the label. This property can't be used with iconUrl or iconClass. */
   iconHtml?: string;
+  /** The text color of the label. */
   foregroundColor?: string;
+  /** The background color of the label. */
   backgroundColor?: string;
+  /** Max width for the label title.The default label title max-width is 90px */
   maxWidth?: string;
 }
 
@@ -294,9 +315,10 @@ export class RouteView extends EventEmitter {
   isCustomRouteBelongingToApp(): boolean;
 }
 
-/** Represents the a single row to render in SectionViews and CollapsibleSectionViews
+/**
+ * Represents the a single row to render in {@link SectionView}s and {@link CollapsibleSectionView}s
  */
-interface RowDescriptor {
+export interface RowDescriptor {
   /** First textual column */
   title: string;
   /** Second textual column */
@@ -325,13 +347,15 @@ interface RowDescriptor {
   onClick?(e: unknown): void;
 }
 
-/** The properties required to create a SectionView or CollapsibleSectionView. */
+/**
+ * The properties required to create a {@link SectionVie}w or {@link CollapsibleSectionView}.
+ */
 export interface SectionDescriptor {
   /** Main title */
   title: string;
   /** Subtitle */
   subtitle?: string | null;
-  /** Link to display in the summary area of the SectionView. Typically page counts are displayed here.	*/
+  /** Link to display in the summary area of the {@link SectionView}. Typically page counts are displayed here.	*/
   /** A function to call when the title link has been clicked. */
   titleLinkText?: string;
   onTitleLinkClick?(e: MouseEvent): void;
@@ -345,7 +369,7 @@ export interface SectionDescriptor {
   tableRows?: RowDescriptor[];
   /** An arbitrary HTML element to place above the table rows but below the title. */
   contentElement?: HTMLElement;
-  /** A link to place in the footer of the SectionView.	 */
+  /** A link to place in the footer of the {@link SectionView}.	 */
   footerLinkText?: string;
   /** A function to call when the link in the footer is clicked. */
   onFooterLinkClick?(e: MouseEvent): void;
