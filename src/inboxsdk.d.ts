@@ -348,7 +348,7 @@ export interface RowDescriptor {
 }
 
 /**
- * The properties required to create a {@link SectionVie}w or {@link CollapsibleSectionView}.
+ * The properties required to create a {@link SectionView} or {@link CollapsibleSectionView}.
  */
 export interface SectionDescriptor {
   /** Main title */
