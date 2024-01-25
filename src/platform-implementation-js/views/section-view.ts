@@ -1,18 +1,14 @@
 import EventEmitter from '../lib/safe-event-emitter';
-import get from '../../common/get-or-fail';
 import type { Driver } from '../driver-interfaces/driver';
 import type GmailCollapsibleSectionView from '../dom-driver/gmail/views/gmail-collapsible-section-view';
-const membersMap = new WeakMap();
 
 class SectionView extends EventEmitter {
   destroyed: boolean;
+  #sectionViewDriver;
 
   constructor(sectionViewDriver: GmailCollapsibleSectionView, driver: Driver) {
     super();
-    const members = {
-      sectionViewDriver,
-    };
-    membersMap.set(this, members);
+    this.#sectionViewDriver = sectionViewDriver;
     this.destroyed = false;
 
     _bindToEventStream(this, sectionViewDriver, driver);
@@ -23,8 +19,7 @@ class SectionView extends EventEmitter {
   }
 
   destroy() {
-    const members = get(membersMap, this);
-    members.sectionViewDriver.destroy();
+    this.#sectionViewDriver.destroy();
     this.removeAllListeners();
   }
 }

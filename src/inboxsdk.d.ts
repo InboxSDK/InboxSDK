@@ -33,6 +33,9 @@ import type {
   default as Toolbars,
   LegacyToolbarButtonDescriptor,
 } from './platform-implementation-js/namespaces/toolbars';
+import type CollapsibleSectionView from './platform-implementation-js/views/collapsible-section-view';
+import type ListRouteView from './platform-implementation-js/views/route-view/list-route-view';
+import type SectionView from './platform-implementation-js/views/section-view';
 
 export type { User };
 
@@ -254,14 +257,35 @@ export interface DraftLabelDescriptor {
   count?: string | number;
 }
 
+/**
+ * This type is used to describe labels that you add to {@link ThreadRowView} and {@link CollapsibleSectionView}.
+ */
 export interface LabelDescriptor {
+  /**
+   * Text of the label.
+   *
+   * @todo marked as required in the docs.
+   */
   title?: string;
+  /** @internal is this still used? */
   titleHtml?: string;
+  /** A background color to put on the icon element if present. */
+  iconBackgroundColor?: string;
+  /**
+   * URL for the icon to show on the label. Should be a local extension file URL or a HTTPS URL.
+   *
+   * @todo marked as required in the docs
+   */
   iconUrl?: string;
+  /** A CSS class to apply to the icon. */
   iconClass?: string;
+  /** Html for the icon to show on the label. This property can't be used with iconUrl or iconClass. */
   iconHtml?: string;
+  /** The text color of the label. */
   foregroundColor?: string;
+  /** The background color of the label. */
   backgroundColor?: string;
+  /** Max width for the label title.The default label title max-width is 90px */
   maxWidth?: string;
 }
 
@@ -273,13 +297,7 @@ export interface ThreadRowAttachmentIconDescriptor {
 
 export { NavItemView };
 
-export interface SectionView extends EventEmitter {
-  remove(): void;
-}
-
-export interface CollapsibleSectionView extends SectionView {
-  setCollapsed(value: boolean): void;
-}
+export { SectionView, CollapsibleSectionView };
 
 export class RouteView extends EventEmitter {
   constructor(
@@ -297,11 +315,73 @@ export class RouteView extends EventEmitter {
   isCustomRouteBelongingToApp(): boolean;
 }
 
-export interface ListRouteView extends RouteView {
-  addCollapsibleSection(options: any): CollapsibleSectionView;
-  addSection(options: any): SectionView;
-  refresh(): void;
+/**
+ * Represents the a single row to render in {@link SectionView}s and {@link CollapsibleSectionView}s
+ */
+export interface RowDescriptor {
+  /** First textual column */
+  title: string;
+  /** Second textual column */
+  body: string;
+  /** Last text right-aligned. Often used for dates. */
+  shortDetailText: string;
+  /**
+   * Whether the row should be rendered as read or unread similar to Gmail styles.
+   *
+   * @TODO is this actually required like the docs say?
+   */
+  isRead?: string;
+  /** Any labels that should be rendered. */
+  labels: LabelDescriptor[];
+  /** An optional class to apply to the icon. */
+  iconClass?: string;
+  /** An optional HTML to an icon to display on the left side of the row */
+  iconHtml?: string;
+  /** An optional url to an icon to display on the left side of the row */
+  iconUrl?: string;
+  /** The name of the route to navigate to when the row is clicked on. */
+  routeID?: string;
+  /** The parameters of the route being navigated to when the row is clicked on. */
+  routeParams?: string[];
+  /** Callback for when the row is clicked on. */
+  onClick?(e: unknown): void;
 }
+
+/**
+ * The properties required to create a {@link SectionView} or {@link CollapsibleSectionView}.
+ */
+export interface SectionDescriptor {
+  /** Main title */
+  title: string;
+  /** Subtitle */
+  subtitle?: string | null;
+  /** Link to display in the summary area of the {@link SectionView}. Typically page counts are displayed here.	*/
+  titleLinkText?: string;
+  /** A function to call when the title link has been clicked. */
+  onTitleLinkClick?(e: MouseEvent): void;
+  /** Whether to display a dropdown arrow for more options on the collapsible section. */
+  hasDropdown?: boolean;
+  /**
+   * A function to call when the dropdown is opened. Your function is passed an event object with a single dropdown property.
+   */
+  onDropdownClick?(e: unknown): void;
+  /** The rows that should be shown. */
+  tableRows?: RowDescriptor[];
+  /** An arbitrary HTML element to place above the table rows but below the title. */
+  contentElement?: HTMLElement;
+  /** A link to place in the footer of the {@link SectionView}.	 */
+  footerLinkText?: string;
+  /** A function to call when the link in the footer is clicked. */
+  onFooterLinkClick?(e: MouseEvent): void;
+  /** @internal */
+  orderHint?: unknown;
+  /** @internal */
+  footerLinkIconUrl?: unknown;
+  /** @internal */
+  footerLinkIconClass?: unknown;
+}
+
+export { ListRouteView };
 
 export interface CustomRouteView extends RouteView {
   getElement(): HTMLElement;

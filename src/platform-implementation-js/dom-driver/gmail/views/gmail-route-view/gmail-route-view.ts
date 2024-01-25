@@ -25,6 +25,7 @@ import waitFor from '../../../../lib/wait-for';
 import { SelectorError } from '../../../../lib/dom/querySelectorOrFail';
 import isStreakAppId from '../../../../lib/isStreakAppId';
 import { extractDocumentHtmlAndCss } from '../../../../../common/extractDocumentHtmlAndCss';
+import { type SectionDescriptor } from '../../../../../inboxsdk';
 
 class GmailRouteView {
   _type: string;
@@ -191,10 +192,10 @@ class GmailRouteView {
 
   addCollapsibleSection(
     sectionDescriptorProperty: Kefir.Observable<
-      Record<string, any> | null | undefined,
+      SectionDescriptor | null | undefined,
       unknown
     >,
-    groupOrderHint: any,
+    groupOrderHint: number,
   ): GmailCollapsibleSectionView {
     return this.#addCollapsibleSection(
       sectionDescriptorProperty,
@@ -205,10 +206,10 @@ class GmailRouteView {
 
   addSection(
     sectionDescriptorProperty: Kefir.Observable<
-      Record<string, any> | null | undefined,
+      SectionDescriptor | null | undefined,
       unknown
     >,
-    groupOrderHint: any,
+    groupOrderHint: number,
   ): GmailCollapsibleSectionView {
     return this.#addCollapsibleSection(
       sectionDescriptorProperty,
@@ -218,8 +219,11 @@ class GmailRouteView {
   }
 
   #addCollapsibleSection(
-    collapsibleSectionDescriptorProperty: any,
-    groupOrderHint: any,
+    collapsibleSectionDescriptorProperty: Kefir.Observable<
+      SectionDescriptor | null | undefined,
+      unknown
+    >,
+    groupOrderHint: number,
     isCollapsible: boolean,
   ): GmailCollapsibleSectionView {
     this._hasAddedCollapsibleSection = true;
