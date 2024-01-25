@@ -8,6 +8,7 @@ InboxSDK.load(1.0, 'search-example').then(function (inboxSDK) {
         title: 'Inbox Monkeys',
         titleLinkText: 'View All',
         hasDropdown: true,
+        /** A dropdown would go here, but isn't hooked up in this example. */
         onDropdownClick: () => {
           console.log('title link clicked');
         },

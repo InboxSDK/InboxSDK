@@ -2206,16 +2206,6 @@ shows up on our elements preventing them from collapsing.
   flex: 1;
 }
 
-.inboxsdk__results_collapsedContainer
-  > div
-  > .inboxsdk__resultsSection_collapsed:first-child:last-child
-  > .inboxsdk__resultsSection_header
-  > .Cr {
-  display: flex;
-  align-items: center;
-  margin-left: auto;
-}
-
 /* end lone collapsed SectionView in Gmailv2 */
 
 .inboxsdk__resultsSection.inboxsdk__resultsSection_collapsed {
@@ -2232,8 +2222,9 @@ shows up on our elements preventing them from collapsing.
   margin-right: 0px;
 }
 
-.inboxsdk__resultsSection_collapsed .Cr {
-  display: none;
+/* 2024-01-25 Prevent the addition of extra padding on the right side of the header from `.Wg` */
+.inboxsdk__resultsSection_collapsed .inboxsdk__resultsSection_header {
+  padding-right: 0;
 }
 
 .inboxsdk__resultsSection_title {
