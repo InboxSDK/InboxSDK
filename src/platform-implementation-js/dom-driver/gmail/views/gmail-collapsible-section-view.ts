@@ -288,7 +288,7 @@ class GmailCollapsibleSectionView {
 
       if (this.#titleElement) {
         querySelector(this.#titleElement, selector).textContent =
-          collapsibleSectionDescriptor.title;
+          collapsibleSectionDescriptor.title!;
       }
     }
   }

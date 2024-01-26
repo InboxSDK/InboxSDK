@@ -1,53 +1,51 @@
 import EventEmitter from '../../lib/safe-event-emitter';
-import get from '../../../common/get-or-fail';
 import type { MinRouteViewDriver } from '../../driver-interfaces/route-view-driver';
-const membersMap = new WeakMap();
 
+/**
+ * {@link RouteView}s represent pages within Gmail that a user can navigate to. RouteViews can be "custom", those that the application developer registers, or they can be "builtin" which are those that the email client natively supports like "Sent", "Drafts", or "Inbox"
+
+ * This class mostly just gives you metadata about the route, most of the functionality to modify the route are defined in subclasses like ListRouteView and CustomRouteView, which you get by handling those types specifically in the Router.
+ */
 class RouteView extends EventEmitter {
   destroyed: boolean;
+  #routeID: string | null = null;
+  #routeType: string | null = null;
+  #params: Record<string, string> | null = null;
+  #routeViewDriver;
 
   constructor(routeViewDriver: MinRouteViewDriver) {
     super();
-    const members = {
-      routeID: null as string | null | undefined,
-      routeType: null as string | null | undefined,
-      params: null as Record<string, string> | null | undefined,
-      routeViewDriver,
-    };
-    membersMap.set(this, members);
     this.destroyed = false;
+    this.#routeViewDriver = routeViewDriver;
 
     _bindToEventStream(routeViewDriver, this);
   }
 
+  /**
+   * @returns a string of the ID of the RouteView. This is the same routeID that you give Router.goto() or Router.createLink(). This will be a value from NativeRouteIDs.
+   */
   getRouteID(): string {
-    const members = get(membersMap, this);
-
-    if (!members.routeID) {
-      members.routeID = members.routeViewDriver.getRouteID();
+    if (!this.#routeID) {
+      this.#routeID = this.#routeViewDriver.getRouteID();
     }
 
-    return members.routeID;
+    return this.#routeID;
   }
 
   getRouteType(): string {
-    const members = get(membersMap, this);
-
-    if (!members.routeType) {
-      members.routeType = members.routeViewDriver.getRouteType();
+    if (!this.#routeType) {
+      this.#routeType = this.#routeViewDriver.getRouteType();
     }
 
-    return members.routeType;
+    return this.#routeType;
   }
 
   getParams(): Record<string, string> {
-    const members = get(membersMap, this);
-
-    if (!members.params) {
-      members.params = members.routeViewDriver.getParams();
+    if (!this.#params) {
+      this.#params = this.#routeViewDriver.getParams();
     }
 
-    return members.params;
+    return this.#params;
   }
 }
 

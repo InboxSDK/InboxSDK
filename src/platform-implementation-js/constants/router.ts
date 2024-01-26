@@ -31,8 +31,8 @@ export const NATIVE_ROUTE_IDS = Object.freeze({
   /** FEB 2023 */
   MEET: 'calls',
   ANY_LIST: '*',
-} as const);
-export const NATIVE_LIST_ROUTE_IDS: Record<string, string> = Object.freeze({
+});
+export const NATIVE_LIST_ROUTE_IDS = Object.freeze({
   INBOX: NATIVE_ROUTE_IDS.INBOX,
   ALL_MAIL: NATIVE_ROUTE_IDS.ALL_MAIL,
   SENT: NATIVE_ROUTE_IDS.SENT,
@@ -48,7 +48,7 @@ export const NATIVE_LIST_ROUTE_IDS: Record<string, string> = Object.freeze({
   SEARCH: NATIVE_ROUTE_IDS.SEARCH,
   ANY_LIST: NATIVE_ROUTE_IDS.ANY_LIST,
 });
-export const ROUTE_TYPES: Record<string, string> = Object.freeze({
+export const ROUTE_TYPES = Object.freeze({
   LIST: 'LIST',
   THREAD: 'THREAD',
   SETTINGS: 'SETTINGS',
