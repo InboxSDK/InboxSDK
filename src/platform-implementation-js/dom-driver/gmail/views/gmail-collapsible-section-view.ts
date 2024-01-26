@@ -15,6 +15,16 @@ import type {
   SectionDescriptor,
 } from '../../../../inboxsdk';
 
+const enum GmailClass {
+  titleRight_2015 = 'Cr',
+  titleRight_2024_01_25 = 'chp5lb',
+}
+
+const enum GmailSelector {
+  titleRight_2015 = `.${GmailClass.titleRight_2015}`,
+  titleRight_2024_01_25 = `.${GmailClass.titleRight_2024_01_25}`,
+}
+
 class GmailCollapsibleSectionView {
   #driver: GmailDriver;
   #groupOrderHint: number;
@@ -221,11 +231,10 @@ class GmailCollapsibleSectionView {
       '</div>',
       '</h3>',
     ].join('');
-    const floatRightElement = document.createElement('div');
-    floatRightElement.classList.add('Cr');
-    if (this.#isSearch) floatRightElement.classList.add('Wg');
+    const headerRightElement = document.createElement('div');
+    headerRightElement.classList.add(GmailClass.titleRight_2024_01_25);
     headerElement.appendChild(titleElement);
-    headerElement.appendChild(floatRightElement);
+    headerElement.appendChild(headerRightElement);
   }
 
   #setupFooter() {
@@ -366,7 +375,9 @@ class GmailCollapsibleSectionView {
         summaryTextElement.addEventListener('mouseleave', function () {
           _summaryTextElement.classList.remove('aqi');
         });
-        const insertionPoint = headerElement.querySelector('.Cr');
+        const insertionPoint = headerElement.querySelector(
+          GmailSelector.titleRight_2024_01_25,
+        );
         if (insertionPoint)
           insertionPoint.insertAdjacentElement(
             'afterbegin',
@@ -402,7 +413,9 @@ class GmailCollapsibleSectionView {
         const headerElement = this.#headerElement;
 
         if (headerElement) {
-          const childElement = headerElement.querySelector('.Cr');
+          const childElement = headerElement.querySelector(
+            GmailSelector.titleRight_2024_01_25,
+          );
           if (childElement)
             childElement.appendChild(inboxDropdownButtonView.getElement());
         }
@@ -625,7 +638,6 @@ class GmailCollapsibleSectionView {
   #addToCollapsedContainer() {
     const element = this.#element;
     if (!element) return;
-    if (this.#headerElement) this.#headerElement.classList.remove('Wg');
 
     if (
       this.#isCollapsedContainer(element.previousElementSibling) &&
@@ -653,7 +665,6 @@ class GmailCollapsibleSectionView {
   }
 
   #removeFromCollapsedContainer() {
-    if (this.#headerElement) this.#headerElement.classList.add('Wg');
     const element = this.#element;
     if (!element) return;
     const parentElement = element.parentElement;
