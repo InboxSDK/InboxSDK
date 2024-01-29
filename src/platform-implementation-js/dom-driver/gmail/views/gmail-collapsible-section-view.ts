@@ -26,34 +26,31 @@ const enum GmailSelector {
 }
 
 class GmailCollapsibleSectionView {
-  #driver: GmailDriver;
   #groupOrderHint: number;
   #isReadyDeferred;
   #isCollapsible: boolean;
   #collapsibleSectionDescriptor: SectionDescriptor = {} as SectionDescriptor;
   #isSearch: boolean;
-  #element: HTMLElement | null | undefined = null;
-  #headerElement: HTMLElement | null | undefined = null;
-  #titleElement: HTMLElement | null | undefined = null;
-  #bodyElement: HTMLElement | null | undefined = null;
-  #contentElement: HTMLElement | null | undefined = null;
-  #tableBodyElement: HTMLElement | null | undefined = null;
-  #collapsedContainer: HTMLElement | null | undefined = null;
-  #messageElement: HTMLElement | null | undefined = null;
-  #footerElement: HTMLElement | null | undefined = null;
+  #element: HTMLElement | null = null;
+  #headerElement: HTMLElement | null = null;
+  #titleElement: HTMLElement | null = null;
+  #bodyElement: HTMLElement | null = null;
+  #contentElement: HTMLElement | null = null;
+  #tableBodyElement: HTMLElement | null = null;
+  #collapsedContainer: HTMLElement | null = null;
+  #messageElement: HTMLElement | null = null;
+  #footerElement: HTMLElement | null = null;
   #eventStream: Bus<any, unknown>;
   #isCollapsed: boolean = false;
-  #inboxDropdownButtonView: InboxDropdownButtonView | null | undefined = null;
-  #dropdownViewController: DropdownButtonViewController | null | undefined =
-    null;
+  #inboxDropdownButtonView: InboxDropdownButtonView | null = null;
+  #dropdownViewController: DropdownButtonViewController | null = null;
 
   constructor(
-    driver: GmailDriver,
+    _driver: GmailDriver,
     groupOrderHint: number,
     isSearch: boolean,
     isCollapsible: boolean,
   ) {
-    this.#driver = driver;
     this.#isSearch = isSearch;
     this.#groupOrderHint = groupOrderHint;
     this.#isCollapsible = isCollapsible;
@@ -62,17 +59,17 @@ class GmailCollapsibleSectionView {
   }
 
   destroy() {
-    if (this.#element) this.#element.remove();
+    this.#element?.remove();
     if (this.#eventStream) this.#eventStream.end();
-    if (this.#headerElement) this.#headerElement.remove();
-    if (this.#titleElement) this.#titleElement.remove();
-    if (this.#bodyElement) this.#bodyElement.remove();
-    if (this.#contentElement) this.#contentElement.remove();
-    if (this.#tableBodyElement) this.#tableBodyElement.remove();
-    if (this.#collapsedContainer) this.#collapsedContainer.remove();
-    if (this.#messageElement) this.#messageElement.remove();
-    if (this.#inboxDropdownButtonView) this.#inboxDropdownButtonView.destroy();
-    if (this.#dropdownViewController) this.#dropdownViewController.destroy();
+    this.#headerElement?.remove();
+    this.#titleElement?.remove();
+    this.#bodyElement?.remove();
+    this.#contentElement?.remove();
+    this.#tableBodyElement?.remove();
+    this.#collapsedContainer?.remove();
+    this.#messageElement?.remove();
+    this.#inboxDropdownButtonView?.destroy();
+    this.#dropdownViewController?.destroy();
   }
 
   getElement(): HTMLElement {
