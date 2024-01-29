@@ -3,16 +3,19 @@
 InboxSDK.load(1.0, 'search-example').then(function (inboxSDK) {
   const sheet = new CSSStyleSheet();
   sheet.insertRule(`.titleTest {
-    color: hotpink !important;
+    color: hsla(0, 0%, 0%, 0.54) !important;
   }`);
-  sheet.insertRule('.subtitleTest { margin: 0;  } ');
+  sheet.insertRule(`.subtitleTest {
+    margin: 0;
+    color: hsla(0, 0%, 0%, 87%) !important;
+  }`);
   document.adoptedStyleSheets.push(sheet);
 
   inboxSDK.Router.handleListRoute(
     inboxSDK.Router.NativeRouteIDs.INBOX,
     (listRouteView) => {
       listRouteView.addCollapsibleSection({
-        title: 'Inbox Monkeys',
+        title: 'Inbox Monkeys / ',
         titleClass: 'titleTest',
         subtitle: 'Subtitle',
         subtitleClass: 'subtitleTest',
