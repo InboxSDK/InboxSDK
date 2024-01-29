@@ -14,15 +14,23 @@ import type {
   RowDescriptor,
   SectionDescriptor,
 } from '../../../../inboxsdk';
+import * as s from './gmail-collapsible-section-view.module.css';
 
 const enum GmailClass {
   titleRight_2015 = 'Cr',
   titleRight_2024_01_25 = 'chp5lb',
+  /** Adds en dash before the subtitle */
+  subtitle_2018_04_16 = 'aw5',
 }
 
 const enum GmailSelector {
   titleRight_2015 = `.${GmailClass.titleRight_2015}`,
   titleRight_2024_01_25 = `.${GmailClass.titleRight_2024_01_25}`,
+}
+
+const enum CustomSelector {
+  subtitleInsert = '.Wn',
+  title_2024_01_29 = 'h3 > .Wn',
 }
 
 class GmailCollapsibleSectionView {
@@ -228,6 +236,11 @@ class GmailCollapsibleSectionView {
       '</div>',
       '</h3>',
     ].join('');
+    if (collapsibleSectionDescriptor.titleClass) {
+      titleElement
+        .querySelector(CustomSelector.subtitleInsert)!
+        .classList.add(collapsibleSectionDescriptor.titleClass);
+    }
     const headerRightElement = document.createElement('div');
     headerRightElement.classList.add(GmailClass.titleRight_2024_01_25);
     headerElement.appendChild(titleElement);
@@ -281,11 +294,11 @@ class GmailCollapsibleSectionView {
       this.#collapsibleSectionDescriptor.title !==
       collapsibleSectionDescriptor.title
     ) {
-      const selector = 'h3 > .Wn';
-
       if (this.#titleElement) {
-        querySelector(this.#titleElement, selector).textContent =
-          collapsibleSectionDescriptor.title!;
+        querySelector(
+          this.#titleElement,
+          CustomSelector.title_2024_01_29,
+        ).textContent = collapsibleSectionDescriptor.title!;
       }
     }
   }
@@ -293,9 +306,7 @@ class GmailCollapsibleSectionView {
   #updateSubtitle(collapsibleSectionDescriptor: SectionDescriptor) {
     const titleElement = this.#titleElement;
     if (!titleElement) return;
-    let subtitleElement = titleElement.querySelector(
-      '.inboxsdk__resultsSection_title_subtitle',
-    );
+    let subtitleElement = titleElement.getElementsByClassName(s.subtitle)[0];
 
     if (!collapsibleSectionDescriptor.subtitle) {
       if (subtitleElement) {
@@ -309,20 +320,31 @@ class GmailCollapsibleSectionView {
         subtitleElement = document.createElement('span');
 
         if (subtitleElement && titleElement) {
-          subtitleElement.classList.add(
-            'inboxsdk__resultsSection_title_subtitle',
+          subtitleElement.classList.add(s.subtitle);
+          const insertionPoint = titleElement.querySelector(
+            CustomSelector.subtitleInsert,
           );
-          const insertionPoint = titleElement.querySelector('.Wn');
 
           if (insertionPoint) {
-            subtitleElement.classList.add('aw5');
+            const className =
+              collapsibleSectionDescriptor.subtitleClass ??
+              GmailClass.subtitle_2018_04_16;
+            subtitleElement.classList.add(className);
             insertionPoint.appendChild(subtitleElement);
           }
         }
       }
 
-      subtitleElement.textContent =
-        '(' + collapsibleSectionDescriptor.subtitle + ')';
+      /**
+       * @TODO Do we need the parens wrapping default for the subtitle still? This may be from before 2014.
+       * https://github.com/InboxSDK/InboxSDK/blame/ac83a7899f770d4ffab2e0a7bb422cd5eea5ee56/src/platform-implementation-js/dom-driver/gmail/views/gmail-collapsible-section-view.js#L291
+       */
+      const textTransform =
+        collapsibleSectionDescriptor.subtitleTextTransform ?? ((x) => `(${x})`);
+
+      subtitleElement.textContent = textTransform(
+        collapsibleSectionDescriptor.subtitle,
+      );
     }
   }
 

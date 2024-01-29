@@ -1,11 +1,22 @@
 /// <reference path="../types.d.ts" />
 
 InboxSDK.load(1.0, 'search-example').then(function (inboxSDK) {
+  const sheet = new CSSStyleSheet();
+  sheet.insertRule(`.titleTest {
+    color: hotpink !important;
+  }`);
+  sheet.insertRule('.subtitleTest { margin: 0;  } ');
+  document.adoptedStyleSheets.push(sheet);
+
   inboxSDK.Router.handleListRoute(
     inboxSDK.Router.NativeRouteIDs.INBOX,
     (listRouteView) => {
       listRouteView.addCollapsibleSection({
         title: 'Inbox Monkeys',
+        titleClass: 'titleTest',
+        subtitle: 'Subtitle',
+        subtitleClass: 'subtitleTest',
+        subtitleTextTransform: (s) => s,
         titleLinkText: 'View All',
         hasDropdown: true,
         /** A dropdown would go here, but isn't hooked up in this example. */

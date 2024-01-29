@@ -356,8 +356,14 @@ export interface SectionDescriptor {
    * @note required in docs, but in {@link SectionView} we have spots not passing it.
    */
   title?: string;
+  /** @internal CSS class applied to {@link SectionDescriptor#title} parent. */
+  titleClass?: string;
   /** Subtitle */
   subtitle?: string | null;
+  /** @internal CSS class applied to {@link SectionDescriptor#subtitle} parent. */
+  subtitleClass?: string;
+  /** @internal Defaults to wrapping the {@link SectionDescriptor#subtitle} in parens. */
+  subtitleTextTransform?(subtitle: string | undefined): string | null;
   /** Link to display in the summary area of the {@link SectionView}. Typically page counts are displayed here.	*/
   titleLinkText?: string;
   /** A function to call when the title link has been clicked. */
