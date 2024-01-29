@@ -6,6 +6,7 @@ import SectionView from '../section-view';
 import type { RouteViewDriver } from '../../driver-interfaces/route-view-driver';
 import type { Driver } from '../../driver-interfaces/driver';
 import type { SectionDescriptor } from '../../../inboxsdk';
+import type { Descriptor } from '../../../types/descriptor';
 
 /**
  * Extends {@link RouteView}. {@link ListRouteView}s represent pages within Gmail that show a list of emails. Typical examples are the Inbox, Sent Mail, Drafts, etc. However, views like the Conversation view or Settings would not be a ListRouteView.
@@ -29,11 +30,9 @@ class ListRouteView extends RouteView {
    * Adds a collapsible section to the top of the page.
    */
   addCollapsibleSection(
-    collapsibleSectionDescriptor:
-      | SectionDescriptor
-      | Observable<SectionDescriptor | null | undefined, unknown>
-      | null
-      | undefined,
+    collapsibleSectionDescriptor: Descriptor<
+      SectionDescriptor | null | undefined
+    >,
   ): CollapsibleSectionView {
     const collapsibleSectionViewDriver =
       this.#routeViewDriver.addCollapsibleSection(
@@ -56,10 +55,13 @@ class ListRouteView extends RouteView {
 
   /** Adds a non-collapsible section to the top of the page. */
   addSection(
-    sectionDescriptor: Record<string, any> | null | undefined,
+    sectionDescriptor: Descriptor<SectionDescriptor | null | undefined>,
   ): SectionView {
     const sectionViewDriver = this.#routeViewDriver.addSection(
-      kefirCast(Kefir, sectionDescriptor).toProperty(),
+      kefirCast(Kefir, sectionDescriptor).toProperty() as Observable<
+        SectionDescriptor | null | undefined,
+        unknown
+      >,
       this.#appId,
     );
     const sectionView = new SectionView(sectionViewDriver, this.#driver);

@@ -26,8 +26,9 @@ import { SelectorError } from '../../../../lib/dom/querySelectorOrFail';
 import isStreakAppId from '../../../../lib/isStreakAppId';
 import { extractDocumentHtmlAndCss } from '../../../../../common/extractDocumentHtmlAndCss';
 import { type SectionDescriptor } from '../../../../../inboxsdk';
+import type { RouteViewDriver } from '../../../../driver-interfaces/route-view-driver';
 
-class GmailRouteView {
+class GmailRouteView implements RouteViewDriver {
   _type: string;
   _hash: string;
   _name: string;

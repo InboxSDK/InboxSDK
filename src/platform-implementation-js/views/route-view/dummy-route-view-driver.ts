@@ -3,13 +3,9 @@ import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import type { MinRouteViewDriver } from '../../driver-interfaces/route-view-driver';
 
-class DummyRouteViewDriver {
+class DummyRouteViewDriver implements MinRouteViewDriver {
   _eventStream = kefirBus<Record<string, any>, unknown>();
   _stopper = kefirStopper();
-
-  constructor() {
-    this as MinRouteViewDriver;
-  }
 
   getRouteType() {
     return 'UNKNOWN';

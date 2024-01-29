@@ -351,8 +351,11 @@ export interface RowDescriptor {
  * The properties required to create a {@link SectionView} or {@link CollapsibleSectionView}.
  */
 export interface SectionDescriptor {
-  /** Main title */
-  title: string;
+  /** Main title.
+   *
+   * @note required in docs, but in {@link SectionView} we have spots not passing it.
+   */
+  title?: string;
   /** Subtitle */
   subtitle?: string | null;
   /** Link to display in the summary area of the {@link SectionView}. Typically page counts are displayed here.	*/
