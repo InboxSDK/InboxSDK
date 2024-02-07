@@ -143,6 +143,10 @@ class ThreadView extends (EventEmitter as new () => TypedEventEmitter<ThreadView
   addLabel(): SimpleElementView {
     return get(memberMap, this).threadViewImplementation.addLabel();
   }
+
+  addSubjectButton(buttonDescriptor: Record<string, any>) {
+    return get(memberMap, this).threadViewImplementation.addSubjectButton(buttonDescriptor);
+  }
 }
 
 export default ThreadView;

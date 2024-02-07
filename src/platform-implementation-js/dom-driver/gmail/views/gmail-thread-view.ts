@@ -19,6 +19,8 @@ import { type ContentPanelDescriptor } from '../../../driver-common/sidebar/Cont
 import isStreakAppId from '../../../lib/isStreakAppId';
 import censorHTMLstring from '../../../../common/censorHTMLstring';
 import type GmailRouteView from './gmail-route-view/gmail-route-view';
+import ButtonView from '../widgets/buttons/button-view';
+import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
 let hasLoggedAddonInfo = false;
 
@@ -625,6 +627,25 @@ class GmailThreadView {
     return view;
   }
 
+  addSubjectButton(button: any) {
+    const subjectToolbarElement = this._findSubjectToolbarElement();
+    if (!subjectToolbarElement) {
+      throw new Error('Subject toolbar element not found');
+    }
+    // gmail has these spacer spans. Not sure if important or a good idea to use this way
+    const el = document.createElement('span');
+    el.setAttribute('data-unique-tt-id', 'ucc-2');
+    el.style.width = '8px';
+    subjectToolbarElement.appendChild(el);
+
+    const buttonOptions = {
+      ...button,
+    };
+    buttonOptions.buttonView = new ButtonView(buttonOptions);
+    subjectToolbarElement.appendChild(buttonOptions.buttonView.getElement());
+    return new BasicButtonViewController(buttonOptions);
+  }
+
   _setupToolbarView() {
     const toolbarElement = this._findToolbarElement();
 
@@ -685,6 +706,12 @@ class GmailThreadView {
     }
 
     return null;
+  }
+
+  _findSubjectToolbarElement(): HTMLElement | null | undefined {
+    var toolbarContainerElements =
+      this._element.querySelectorAll<HTMLElement>('.bHJ');
+    return toolbarContainerElements[0];
   }
 
   _isToolbarContainerRelevant(toolbarContainerElement: HTMLElement): boolean {
