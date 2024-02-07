@@ -634,15 +634,14 @@ class GmailThreadView {
     }
     // gmail has these spacer spans. Not sure if important or a good idea to use this way
     const el = document.createElement('span');
-    el.setAttribute('data-unique-tt-id', 'ucc-2');
     el.style.width = '8px';
-    subjectToolbarElement.appendChild(el);
+    subjectToolbarElement.prepend(el);
 
     const buttonOptions = {
       ...button,
     };
     buttonOptions.buttonView = new ButtonView(buttonOptions);
-    subjectToolbarElement.appendChild(buttonOptions.buttonView.getElement());
+    subjectToolbarElement.prepend(buttonOptions.buttonView.getElement());
     return new BasicButtonViewController(buttonOptions);
   }
 
