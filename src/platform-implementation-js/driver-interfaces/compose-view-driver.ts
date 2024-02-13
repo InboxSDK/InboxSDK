@@ -18,6 +18,9 @@ export type StatusBar = EventEmitter & {
   setHeight(height: number): void;
 };
 
+/**
+ * This type is passed into the  ComposeViewDriver#addButton method as a way to configure the button shown.
+ */
 export interface ComposeButtonDescriptor {
   title?: string;
   iconUrl?: string;

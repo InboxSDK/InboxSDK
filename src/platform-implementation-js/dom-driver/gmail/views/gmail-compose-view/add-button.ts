@@ -27,7 +27,7 @@ export default function addButton(
       .takeUntilBy(gmailComposeView.getStopper())
       .onValue((buttonDescriptor) => {
         const buttonOptions = _processButtonDescriptor(
-          buttonDescriptor!,
+          buttonDescriptor,
           extraOnClickOptions,
           gmailComposeView.getGmailDriver(),
         );
