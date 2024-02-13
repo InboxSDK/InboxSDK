@@ -649,7 +649,10 @@ class GmailThreadView {
     const observer = new MutationObserver((mutationsList) => {
       if (mutationsList.some((mutation) => mutation.type === 'childList')) {
         const subjectToolbarElement = this._findSubjectToolbarElement();
-        if (subjectToolbarElement && !subjectToolbarElement.contains(buttonElement)) {
+        if (
+          subjectToolbarElement &&
+          !subjectToolbarElement.contains(buttonElement)
+        ) {
           subjectToolbarElement.prepend(buttonElement);
         }
       }
@@ -658,6 +661,16 @@ class GmailThreadView {
       childList: true,
       subtree: true,
     });
+
+    this._stopper
+      .takeUntilBy(Kefir.fromEvents(buttonElement, 'destroy'))
+      .onValue(() => buttonOptions.buttonView.destroy());
+
+    Kefir.fromEvents(buttonElement, 'destroy')
+      .take(1)
+      .onValue(() => {
+        observer.disconnect();
+      });
 
     return new BasicButtonViewController(buttonOptions);
   }
