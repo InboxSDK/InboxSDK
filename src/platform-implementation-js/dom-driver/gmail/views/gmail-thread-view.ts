@@ -628,20 +628,37 @@ class GmailThreadView {
   }
 
   addSubjectButton(button: any) {
-    const subjectToolbarElement = this._findSubjectToolbarElement();
-    if (!subjectToolbarElement) {
-      throw new Error('Subject toolbar element not found');
+    const subjectParent = this._element.querySelector('.V8djrc.byY');
+    if (!subjectParent) {
+      throw new Error('Subject wrapper element not found');
     }
-    // gmail has these spacer spans. Not sure if important or a good idea to use this way
-    const el = document.createElement('span');
-    el.style.width = '8px';
-    subjectToolbarElement.prepend(el);
 
     const buttonOptions = {
       ...button,
     };
     buttonOptions.buttonView = new ButtonView(buttonOptions);
-    subjectToolbarElement.prepend(buttonOptions.buttonView.getElement());
+    const buttonElement = buttonOptions.buttonView.getElement();
+
+    // Sometimes it is there right away
+    const subjectToolbarElement = this._findSubjectToolbarElement();
+    if (subjectToolbarElement) {
+      subjectToolbarElement.prepend(buttonElement);
+    }
+
+    // Sometimes the container is lazy loaded or re-loaded, so we observe too
+    const observer = new MutationObserver((mutationsList) => {
+      if (mutationsList.some((mutation) => mutation.type === 'childList')) {
+        const subjectToolbarElement = this._findSubjectToolbarElement();
+        if (subjectToolbarElement && !subjectToolbarElement.contains(buttonElement)) {
+          subjectToolbarElement.prepend(buttonElement);
+        }
+      }
+    });
+    observer.observe(subjectParent, {
+      childList: true,
+      subtree: true,
+    });
+
     return new BasicButtonViewController(buttonOptions);
   }
 
