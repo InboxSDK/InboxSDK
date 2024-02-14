@@ -1,6 +1,8 @@
 import * as Kefir from 'kefir';
 import type GmailDriver from '../../gmail-driver';
-import GmailComposeButtonView from './gmail-compose-button-view';
+import GmailComposeButtonView, {
+  type ButtonViewOptions,
+} from './gmail-compose-button-view';
 import BasicButtonViewController from '../../../../widgets/buttons/basic-button-view-controller';
 import DropdownButtonViewController from '../../../../widgets/buttons/dropdown-button-view-controller';
 import GmailDropdownView from '../../widgets/gmail-dropdown-view';
@@ -141,7 +143,7 @@ function _addButtonToSendActionArea(
   return buttonViewController;
 }
 
-function _getButtonViewController(buttonDescriptor: Record<string, any>) {
+function _getButtonViewController(buttonDescriptor: ButtonViewOptions) {
   const buttonView = new GmailComposeButtonView(buttonDescriptor);
   const options = {
     buttonView,
