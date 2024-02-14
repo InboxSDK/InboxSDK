@@ -723,6 +723,14 @@ export function setupGmailInterceptorOnFrames(
           }
         }
 
+        logger.eventSdkPassive(
+          'suggestionsModified.skipped',
+          {
+            query: currentQuery,
+            originalResponseText: responseText,
+          },
+          true,
+        );
         return responseText;
       },
     });
