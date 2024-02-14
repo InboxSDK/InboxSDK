@@ -34,6 +34,14 @@ export default function addButton(
           gmailComposeView.getGmailDriver(),
         );
 
+        if (
+          buttonViewController instanceof DropdownButtonViewController &&
+          buttonOptions?.hasDropdown !== true
+        ) {
+          buttonViewController.destroy();
+          buttonViewController = undefined;
+        }
+
         if (!buttonViewController) {
           if (buttonOptions) {
             buttonViewController = _addButton(
@@ -186,7 +194,7 @@ function _processButtonDescriptor(
   };
   const oldOnClick = buttonOptions.onClick;
 
-  buttonOptions.onClick = function (event: any) {
+  buttonOptions.onClick = function (event) {
     driver.getLogger().eventSdkActive('composeView.addedButton.click');
     oldOnClick({ ...extraOnClickOptions, ...event });
   };
