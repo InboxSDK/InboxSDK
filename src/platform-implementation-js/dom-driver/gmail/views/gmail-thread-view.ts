@@ -690,7 +690,7 @@ class GmailThreadView {
     // Sometimes it is there right away
     const subjectToolbarElement = this._findBottomReplyToolbarElement();
     if (subjectToolbarElement) {
-      subjectToolbarElement.prepend(buttonElement);
+      subjectToolbarElement.appendChild(buttonElement);
     }
 
     // Sometimes the container is lazy loaded or re-loaded, so we observe too
