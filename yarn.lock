@@ -2210,6 +2210,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/dompurify@npm:^3":
+  version: 3.0.5
+  resolution: "@types/dompurify@npm:3.0.5"
+  dependencies:
+    "@types/trusted-types": "npm:*"
+  checksum: e544b3ce53c41215cabff3d89256ff707c7ee8e0c9a1b5034b22014725d288b16e6942cdcdeeb4221c578c3421a6a4721aa0676431f55d7abd18c07368855c5e
+  languageName: node
+  linkType: hard
+
 "@types/eslint-scope@npm:^3.7.3":
   version: 3.7.4
   resolution: "@types/eslint-scope@npm:3.7.4"
@@ -2497,6 +2506,13 @@ __metadata:
   version: 0.3.0
   resolution: "@types/transducers.js@npm:0.3.0"
   checksum: 93fe162520b6875cf08463ca049be8cce4e85ae40103a57453b5c352682aff30a275a79f1e0d2c10b51bb28859a466cee638ae7c524e58e2b6d3a0f34d71b76c
+  languageName: node
+  linkType: hard
+
+"@types/trusted-types@npm:*":
+  version: 2.0.7
+  resolution: "@types/trusted-types@npm:2.0.7"
+  checksum: 8e4202766a65877efcf5d5a41b7dd458480b36195e580a3b1085ad21e948bc417d55d6f8af1fd2a7ad008015d4117d5fdfe432731157da3c68678487174e4ba3
   languageName: node
   linkType: hard
 
@@ -4813,6 +4829,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dompurify@npm:^3.0.8":
+  version: 3.0.8
+  resolution: "dompurify@npm:3.0.8"
+  checksum: 671fa18bd4bcb1a6ff2e59ecf919f807615b551e7add8834b27751d4e0f3d754a67725482d1efdd259317cadcaaccb72a8afc3aba829ac59730e760041591a1a
+  languageName: node
+  linkType: hard
+
 "duplexify@npm:^3.6.0":
   version: 3.7.1
   resolution: "duplexify@npm:3.7.1"
@@ -6716,6 +6739,7 @@ __metadata:
     "@macil/simple-base-converter": "npm:^1.0.0"
     "@types/asap": "npm:^2.0.0"
     "@types/classnames": "npm:^2.2.8"
+    "@types/dompurify": "npm:^3"
     "@types/gulp": "npm:^4.0.6"
     "@types/http-server": "npm:^0.10.1"
     "@types/jest": "npm:^29"
@@ -6745,6 +6769,7 @@ __metadata:
     concat-stream: "npm:^2.0.0"
     contain-by-screen: "npm:^1.0.3"
     css-loader: "npm:^6.7.3"
+    dompurify: "npm:^3.0.8"
     eslint: "npm:^8.41.0"
     eslint-plugin-deprecate: "npm:^0.7.0"
     eslint-plugin-react: "npm:^7.32.2"
