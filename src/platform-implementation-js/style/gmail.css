@@ -429,6 +429,14 @@ div.T-I.inboxsdk__button {
   text-shadow: none;
 }
 
+.ams.inboxsdk__button::before {
+  width: 0;
+  margin: 0;
+}
+.ams.inboxsdk__button:focus {
+  background: rgba(0, 0, 0, 0);
+}
+
 .inboxsdk__menu {
   min-width: 1em;
   min-height: 1em;

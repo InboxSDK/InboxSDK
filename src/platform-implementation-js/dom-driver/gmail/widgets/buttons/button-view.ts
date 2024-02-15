@@ -435,17 +435,22 @@ export default class ButtonView implements ButtonViewI {
         BUTTON_COLOR_CLASSES[this._buttonColor].HOVER_CLASS,
       );
       this._element.classList.remove('inboxsdk__button_hover');
+      this._element.classList.add(
+        BUTTON_COLOR_CLASSES[this._buttonColor].INACTIVE_CLASS,
+      );
     });
 
     Kefir.fromEvents(this._element, 'focus').onValue(() => {
-      this._element.classList.add('T-I-JO');
-    });
-
-    Kefir.fromEvents(this._element, 'mouseup').onValue(() => {
-      if (!this._hasDropdown) {
-        this._element.classList.remove('T-I-JO');
+      if (!this._buttonColor.match(/outline/)) {
+        this._element.classList.add('T-I-JO');
       }
     });
+
+    if (!this._hasDropdown && !this._buttonColor.match(/outline/)) {
+      Kefir.fromEvents(this._element, 'mouseup').onValue(() => {
+        this._element.classList.remove('T-I-JO');
+      });
+    }
 
     Kefir.fromEvents(this._element, 'blur').onValue(() => {
       this._element.classList.remove('T-I-JO');
