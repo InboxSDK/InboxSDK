@@ -151,7 +151,7 @@ class ThreadView extends (EventEmitter as new () => TypedEventEmitter<ThreadView
     );
   }
 
-  addFooterButton(buttonDescriptor: Record<string, any>) {
+  addFooterButton(buttonDescriptor: Descriptor<ButtonDescriptor>) {
     return get(memberMap, this).threadViewImplementation.addFooterButton(
       buttonDescriptor,
     );

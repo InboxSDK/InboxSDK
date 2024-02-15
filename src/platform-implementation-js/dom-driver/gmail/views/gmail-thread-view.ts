@@ -791,7 +791,7 @@ class GmailThreadView {
     return toolbarContainerElements[0];
   }
 
-  _findBottomReplyToolbarElement(): HTMLElement | null | undefined {
+  _findBottomReplyToolbarElement(): HTMLElement | null {
     var toolbarContainerElements =
       this._element.querySelectorAll<HTMLElement>('table .amn');
     return toolbarContainerElements[0];
