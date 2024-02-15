@@ -429,6 +429,7 @@ div.T-I.inboxsdk__button {
   text-shadow: none;
 }
 
+/* For the outline style button. We need to counteract a few of gmail's styles */
 .ams.inboxsdk__button::before {
   width: 0;
   margin: 0;
