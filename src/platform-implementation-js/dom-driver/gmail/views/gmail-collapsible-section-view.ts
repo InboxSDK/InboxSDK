@@ -231,16 +231,12 @@ class GmailCollapsibleSectionView {
     titleElement.innerHTML = [
       '<h3 class="Wr iR">',
       '<img alt="" src="//ssl.gstatic.com/ui/v1/icons/mail/images/cleardot.gif" class="qi Wp Wq">',
-      '<div class="Wn">',
+      `<div class="Wn ${s.title}">`,
       escape(collapsibleSectionDescriptor.title),
       '</div>',
       '</h3>',
     ].join('');
-    if (collapsibleSectionDescriptor.titleClass) {
-      titleElement
-        .querySelector(CustomSelector.subtitleInsert)!
-        .classList.add(collapsibleSectionDescriptor.titleClass);
-    }
+
     const headerRightElement = document.createElement('div');
     headerRightElement.classList.add(GmailClass.titleRight_2024_01_25);
     headerElement.appendChild(titleElement);
@@ -326,25 +322,12 @@ class GmailCollapsibleSectionView {
           );
 
           if (insertionPoint) {
-            const className =
-              collapsibleSectionDescriptor.subtitleClass ??
-              GmailClass.subtitle_2018_04_16;
-            subtitleElement.classList.add(className);
             insertionPoint.appendChild(subtitleElement);
           }
         }
       }
 
-      /**
-       * @TODO Do we need the parens wrapping default for the subtitle still? This may be from before 2014.
-       * https://github.com/InboxSDK/InboxSDK/blame/ac83a7899f770d4ffab2e0a7bb422cd5eea5ee56/src/platform-implementation-js/dom-driver/gmail/views/gmail-collapsible-section-view.js#L291
-       */
-      const textTransform =
-        collapsibleSectionDescriptor.subtitleTextTransform ?? ((x) => `(${x})`);
-
-      subtitleElement.textContent = textTransform(
-        collapsibleSectionDescriptor.subtitle,
-      );
+      subtitleElement.textContent = collapsibleSectionDescriptor.subtitle;
     }
   }
 

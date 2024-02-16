@@ -1,4 +1,16 @@
+.title {
+  color: rgb(0 0 0 / 54%) !important;
+}
+
 .subtitle {
-  margin-left: 1em;
-  color: rgb(94 94 94);
+  margin: 0;
+  color: rgb(0 0 0 / 87%) !important;
+}
+
+:global(.inboxsdk__gmail_dark_theme) .title {
+  color: rgb(255 255 255 / 70%) !important;
+}
+
+:global(.inboxsdk__gmail_dark_theme) .subtitle {
+  color: rgb(255 255 255) !important;
 }
