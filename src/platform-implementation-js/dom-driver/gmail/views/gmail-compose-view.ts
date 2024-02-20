@@ -696,13 +696,7 @@ class GmailComposeView {
     extraOnClickOptions: Record<string, any>,
     bus: Bus<AddedButtonEvents, unknown>,
   ) {
-    return addButton(
-      this,
-      buttonDescriptor,
-      groupOrderHint,
-      extraOnClickOptions,
-      bus,
-    );
+    addButton(this, buttonDescriptor, groupOrderHint, extraOnClickOptions, bus);
   }
 
   addTooltipToButton(

@@ -9,7 +9,6 @@ import GmailDropdownView from '../../widgets/gmail-dropdown-view';
 import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 import type GmailComposeView from '../gmail-compose-view';
 import type { ComposeButtonDescriptor } from '../../../../driver-interfaces/compose-view-driver';
-import type { Options } from '../../../../views/compose-button-view';
 import type { Bus } from 'kefir-bus';
 
 export type AddedButtonEvents = {
@@ -30,51 +29,45 @@ export default function addButton(
   extraOnClickOptions: Record<string, any>,
   bus: Bus<AddedButtonEvents, unknown>,
 ) {
-  return new Promise<Options | null>((resolve) => {
-    let buttonViewController:
-      | BasicButtonViewController
-      | DropdownButtonViewController
-      | undefined;
-    buttonDescriptorStream
-      .takeUntilBy(gmailComposeView.getStopper())
-      .onValue((buttonDescriptor) => {
-        const buttonOptions = _processButtonDescriptor(
-          buttonDescriptor,
-          extraOnClickOptions,
-          gmailComposeView.getGmailDriver(),
-        );
+  let buttonViewController:
+    | BasicButtonViewController
+    | DropdownButtonViewController
+    | undefined;
+  buttonDescriptorStream
+    .takeUntilBy(gmailComposeView.getStopper())
+    .onValue((buttonDescriptor) => {
+      const buttonOptions = _processButtonDescriptor(
+        buttonDescriptor,
+        extraOnClickOptions,
+        gmailComposeView.getGmailDriver(),
+      );
 
-        if (
-          (buttonViewController instanceof DropdownButtonViewController &&
-            buttonOptions?.hasDropdown !== true) ||
-          (buttonViewController instanceof BasicButtonViewController &&
-            buttonOptions?.hasDropdown === true)
-        ) {
-          buttonViewController.destroy();
-          buttonViewController = undefined;
-        }
+      if (
+        (buttonViewController instanceof DropdownButtonViewController &&
+          buttonOptions?.hasDropdown !== true) ||
+        (buttonViewController instanceof BasicButtonViewController &&
+          buttonOptions?.hasDropdown === true)
+      ) {
+        buttonViewController.destroy();
+        buttonViewController = undefined;
+      }
 
-        if (!buttonViewController) {
-          if (buttonOptions) {
-            buttonViewController = _addButton(
-              gmailComposeView,
-              buttonOptions,
-              groupOrderHint,
-            );
-            bus.emit({
-              buttonViewController: buttonViewController,
-              buttonDescriptor: buttonDescriptor,
-            });
-          }
-        } else {
-          buttonViewController.update(buttonOptions as any);
+      if (!buttonViewController) {
+        if (buttonOptions) {
+          buttonViewController = _addButton(
+            gmailComposeView,
+            buttonOptions,
+            groupOrderHint,
+          );
+          bus.emit({
+            buttonViewController: buttonViewController,
+            buttonDescriptor: buttonDescriptor,
+          });
         }
-      })
-      .onEnd(() => {
-        // Just in case things end without ever resolving above.
-        resolve(null);
-      });
-  });
+      } else {
+        buttonViewController.update(buttonOptions as any);
+      }
+    });
 }
 
 function _addButton(
