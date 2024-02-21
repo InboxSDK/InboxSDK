@@ -322,7 +322,7 @@ class GmailCollapsibleSectionView {
           );
 
           if (insertionPoint) {
-            insertionPoint.appendChild(subtitleElement);
+            insertionPoint.prepend(subtitleElement);
           }
         }
       }
