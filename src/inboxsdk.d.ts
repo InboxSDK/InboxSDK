@@ -322,13 +322,13 @@ export interface RowDescriptor {
   /** First textual column */
   title: string;
   /** Second textual column. After {@link RowDescriptor#labels} if they're provided. */
-  body: string | ((el: HTMLElement) => void);
+  body: string | ((args: { el: HTMLElement; onDestroy(): void }) => void);
   /**
    * Render an HTMLElement in the attachment icon area. This is often used to render an icon for the attachment type.
    *
    * @TODO do we need some sort of destroy hook here?
    */
-  renderAttachmentIcon?(el: HTMLElement): void;
+  renderAttachmentIcon?(args: { el: HTMLElement; onDestroy(): void }): void;
   /** Last text right-aligned. Often used for dates. */
   shortDetailText: string;
   /**
