@@ -39,7 +39,9 @@ import ensureAppButtonToolbarsAreClosed from './gmail-compose-view/ensure-app-bu
 import sizeFixer from './gmail-compose-view/size-fixer';
 import addTooltipToButton from './gmail-compose-view/add-tooltip-to-button';
 import addRecipientRow from './gmail-compose-view/add-recipient-row';
-import addButton from './gmail-compose-view/add-button';
+import addButton, {
+  type AddedButtonEvents,
+} from './gmail-compose-view/add-button';
 import setRecipients from './gmail-compose-view/set-recipients';
 import focus from './gmail-compose-view/focus';
 import monitorSelectionRange from './gmail-compose-view/monitor-selection-range';
@@ -692,13 +694,9 @@ class GmailComposeView {
     >,
     groupOrderHint: string,
     extraOnClickOptions: Record<string, any>,
+    bus: Bus<AddedButtonEvents, unknown>,
   ) {
-    return addButton(
-      this,
-      buttonDescriptor,
-      groupOrderHint,
-      extraOnClickOptions,
-    );
+    addButton(this, buttonDescriptor, groupOrderHint, extraOnClickOptions, bus);
   }
 
   addTooltipToButton(

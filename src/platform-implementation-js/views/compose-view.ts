@@ -20,6 +20,8 @@ import type {
   RecipientsChangedEvent,
 } from '../dom-driver/gmail/views/gmail-compose-view/get-address-changes-stream';
 import type { Descriptor } from '../../types/descriptor';
+import kefirBus from 'kefir-bus';
+import type { AddedButtonEvents } from '../dom-driver/gmail/views/gmail-compose-view/add-button';
 
 interface Members {
   driver: Driver;
@@ -158,16 +160,25 @@ export default class ComposeView extends (EventEmitter as new () => TypedEventEm
       buttonDescriptor,
     ) as Observable<ComposeButtonDescriptor | null | undefined, unknown>;
 
-    const optionsPromise = members.composeViewImplementation.addButton(
+    const bus = kefirBus<AddedButtonEvents, unknown>();
+
+    members.composeViewImplementation.addButton(
       buttonDescriptorStream,
       members.driver.getAppId(),
       { composeView: this },
+      bus,
     );
-    return new ComposeButtonView(
-      optionsPromise,
+    const view = new ComposeButtonView(
+      bus,
       members.composeViewImplementation,
       members.driver,
     );
+
+    view.on('destroy', () => {
+      bus.end();
+    });
+
+    return view;
   }
 
   addComposeNotice(composeNoticeDescriptor?: {

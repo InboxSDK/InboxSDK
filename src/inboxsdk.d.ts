@@ -635,9 +635,12 @@ export type ComposeViewDestroyEvent = Parameters<
 
 export { ComposeButtonDescriptor };
 
+/**
+ * If the associated {@link ComposeButtonDescriptor#hasDropdown} is true, `dropdown` will be defined.
+ */
 export interface ComposeViewButtonOnClickEvent {
   composeView: ComposeView;
-  dropdown: DropdownView;
+  dropdown?: DropdownView;
 }
 
 export interface RecipientRowOptions {
