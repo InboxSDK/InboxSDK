@@ -333,7 +333,7 @@ export interface RowDescriptor {
   shortDetailText: string;
   /**
    * Whether the row should be rendered as read or unread similar to Gmail styles.
-   * Defaults to unread, which in a light theme, is 700 weight text and a white background.
+   * Defaults to unread which is 700 weight text and, in a light Gmail theme, a white background.
    *
    * @TODO is this actually required like the docs say?
    */
