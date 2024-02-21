@@ -321,16 +321,36 @@ export class RouteView extends EventEmitter {
 export interface RowDescriptor {
   /** First textual column */
   title: string;
-  /** Second textual column */
-  body: string;
+  /** Second textual column. After {@link RowDescriptor#labels} if they're provided. */
+  body: string | ((el: HTMLElement) => void);
+  /**
+   * Render an HTMLElement in the attachment icon area. This is often used to render an icon for the attachment type.
+   *
+   * @TODO do we need some sort of destroy hook here?
+   */
+  renderAttachmentIcon?(el: HTMLElement): void;
   /** Last text right-aligned. Often used for dates. */
   shortDetailText: string;
   /**
    * Whether the row should be rendered as read or unread similar to Gmail styles.
+   * Defaults to unread, which in a light theme, is 700 weight text and a white background.
    *
    * @TODO is this actually required like the docs say?
    */
-  isRead?: string;
+  isRead?:
+    | string
+    | {
+        /**
+         * Whether the background of the row should be rendered as read or unread similar to Gmail styles.
+         * If true, in light themes, the background will be darker. If false, the background will be white.
+         */
+        background: boolean;
+        /**
+         * Whether the background of the row should be rendered as read or unread similar to Gmail styles.
+         * If true, Row text will be a 400 weight, if false, Row text will be a 700 weight.
+         */
+        text: boolean;
+      };
   /** Any labels that should be rendered. */
   labels: LabelDescriptor[];
   /** An optional class to apply to the icon. */
@@ -339,6 +359,15 @@ export interface RowDescriptor {
   iconHtml?: string;
   /** An optional url to an icon to display on the left side of the row */
   iconUrl?: string;
+  /**
+   * Where to place the Row's icon.
+   *
+   * If unset, center the provided icon within the three icons at the start of the row. This was the behavior prior to the introduction of this property.
+   *
+   * If set to 'start', place the icon at the start of
+   * the three icons, collapse the two icons down, and add saved space to {@link RowDescriptor#title}'s width.
+   */
+  iconPosition?: 'start';
   /** The name of the route to navigate to when the row is clicked on. */
   routeID?: string;
   /** The parameters of the route being navigated to when the row is clicked on. */
