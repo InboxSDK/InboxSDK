@@ -1,16 +1,17 @@
-.title {
-  color: rgb(0 0 0 / 54%) !important;
+:global(.Wn) {
+  --inboxsdk-title-color: rgb(0 0 0 / 54%);
+  --inboxsdk-subtitle-color: rgb(0 0 0 / 87%);
 }
 
-.subtitle {
-  margin: 0;
-  color: rgb(0 0 0 / 87%) !important;
+:global(.inboxsdk__gmail_dark_theme .Wn) {
+  --inboxsdk-title-color: rgb(255 255 255 / 70%);
+  --inboxsdk-subtitle-color: rgb(255 255 255);
 }
 
-:global(.inboxsdk__gmail_dark_theme) .title {
-  color: rgb(255 255 255 / 70%) !important;
+:global(.Wn).title {
+  color: var(--inboxsdk-title-color);
 }
 
-:global(.inboxsdk__gmail_dark_theme) .subtitle {
-  color: rgb(255 255 255) !important;
+:global(.Wn) .subtitle {
+  color: var(--inboxsdk-subtitle-color);
 }
