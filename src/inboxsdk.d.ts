@@ -336,10 +336,10 @@ export interface RowDescriptor {
   /** Last text right-aligned. Often used for dates. */
   shortDetailText: string;
   /**
-   * Whether the row should be rendered as read or unread similar to Gmail styles.
-   * Defaults to unread which is 700 weight text and, in a light Gmail theme, a white background.
+   * Controls whether the row should be rendered as a read or unread message similar to Gmail styles.
+   * This affects the row background and font weight. These can be separately controlled by passing an object.
    *
-   * @TODO is this actually required like the docs say?
+   * @defaultValue { background: false, text: true }
    */
   isRead?:
     | boolean
