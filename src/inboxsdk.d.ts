@@ -316,6 +316,20 @@ export class RouteView extends EventEmitter {
 }
 
 /**
+ * Provides the ability to pass arbitrary HTML into a cell in a {@link SectionView} or {@link CollapsibleSectionView} `tableRow`.
+ */
+export type RowDescriptorCellRenderer = (args: {
+  /**
+   * The element to render the column into.
+   */
+  el: HTMLElement;
+  /**
+   * A promise that resolves when the row is unmounted. This is useful for cleaning up any resources that were created when the row was mounted.
+   */
+  unmountPromise: Promise<void>;
+}) => void;
+
+/**
  * Represents the a single row to render in {@link SectionView}s and {@link CollapsibleSectionView}s
  */
 export interface RowDescriptor {
@@ -326,13 +340,11 @@ export interface RowDescriptor {
    */
   body: string;
   /** Second textual column. After {@link RowDescriptor#labels} if they're provided. */
-  snippet?: string | ((args: { el: HTMLElement; onDestroy(): void }) => void);
+  snippet?: string | RowDescriptorCellRenderer;
   /**
    * Render an HTMLElement in the attachment icon area. This is often used to render an icon for the attachment type.
-   *
-   * @TODO do we need some sort of destroy hook here?
    */
-  attachmentIcon?(args: { el: HTMLElement; onDestroy(): void }): void;
+  attachmentIcon?: RowDescriptorCellRenderer;
   /** Last text right-aligned. Often used for dates. */
   shortDetailText: string;
   /**
