@@ -334,13 +334,13 @@ export type RowDescriptorCellRenderer = (args: {
  */
 export type RowDescriptor = {
   /** First textual column */
-  title: string;
+  title: string | RowDescriptorCellRenderer;
   /**
    * Render an HTMLElement in the attachment icon area. This is often used to render an icon for the attachment type.
    */
   attachmentIcon?: RowDescriptorCellRenderer;
   /** Last text right-aligned. Often used for dates. */
-  shortDetailText: string;
+  shortDetailText: string | RowDescriptorCellRenderer;
   /**
    * Controls whether the row should be rendered as a read or unread message similar to Gmail styles.
    * This affects the row background and font weight. These can be separately controlled by passing an object.

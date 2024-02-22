@@ -15,3 +15,16 @@
 :global(.Wn) .subtitle {
   color: var(--inboxsdk-subtitle-color);
 }
+
+/* Rows */
+.recipients {
+  content: '';
+}
+
+.snippet {
+  content: '';
+}
+
+.shortDetail {
+  content: '';
+}
