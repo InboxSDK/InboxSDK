@@ -345,8 +345,7 @@ export interface RowDescriptor {
     | boolean
     | {
         /**
-         * Whether the background of the row should be rendered as read or unread similar to Gmail styles.
-         * If true, in light themes, the background will be darker. If false, the background will be white.
+         * Controls whether the row background should be styled as read (in light themes: gray background) or unread (bright white background) similar to Gmail styles.
          */
         background: boolean;
         /**
