@@ -342,7 +342,7 @@ export interface RowDescriptor {
    * @TODO is this actually required like the docs say?
    */
   isRead?:
-    | string
+    | boolean
     | {
         /**
          * Whether the background of the row should be rendered as read or unread similar to Gmail styles.
