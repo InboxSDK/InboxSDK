@@ -4,9 +4,7 @@ import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
 import defer from '../../../../common/defer';
 import autoHtml from 'auto-html';
-import querySelector, {
-  SelectorError,
-} from '../../../lib/dom/querySelectorOrFail';
+import querySelector from '../../../lib/dom/querySelectorOrFail';
 import InboxDropdownButtonView from '../widgets/buttons/inbox-dropdown-button-view';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 import DropdownButtonViewController from '../../../widgets/buttons/dropdown-button-view-controller';
@@ -879,9 +877,10 @@ function _getRowHTML(result: RowDescriptor) {
     (typeof isRead === 'object' && isRead.text) || result.isRead === true;
   const rowArr = [
     '<td class="xY PF"></td>',
-    '<td class="xY oZ-x3"></td>',
-    '<td class="xY WA">',
+    '<td class="xY oZ-x3">',
     iconHtml,
+    '</td>',
+    '<td class="xY WA">',
     '</td>',
     '<td class="xY WA"></td>',
     '<td class="xY yX inboxsdk__resultsSection_result_title">',
