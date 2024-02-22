@@ -351,7 +351,8 @@ export interface RowDescriptor {
  * The properties required to create a {@link SectionView} or {@link CollapsibleSectionView}.
  */
 export interface SectionDescriptor {
-  /** Main title.
+  /**
+   * Main title. After @inboxsdk/core@2.1.32, {@link SectionDescriptor#title} is placed after {@link SectionDescriptor#subtitle} if both are provided. If this behavior is not desired, we're open to a PR to add an option to configure it.
    *
    * @note required in docs, but in {@link SectionView} we have spots not passing it.
    */
