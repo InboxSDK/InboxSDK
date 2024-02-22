@@ -23,6 +23,10 @@
   overflow: hidden;
 }
 
+.iconAtStart {
+  content: '';
+}
+
 .recipients {
   content: '';
 }

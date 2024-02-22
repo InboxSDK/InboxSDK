@@ -364,7 +364,7 @@ export type RowDescriptor = {
   /** An optional class to apply to the icon. */
   iconClass?: string;
   /** An optional HTML to an icon to display on the left side of the row */
-  iconHtml?: string;
+  iconHtml?: string | RowDescriptorCellRenderer;
   /** An optional url to an icon to display on the left side of the row */
   iconUrl?: string;
   /** The name of the route to navigate to when the row is clicked on. */

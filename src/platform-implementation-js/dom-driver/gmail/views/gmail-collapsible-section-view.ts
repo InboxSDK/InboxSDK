@@ -484,6 +484,7 @@ class GmailCollapsibleSectionView {
     for (const result of tableRows) {
       const rowElement = document.createElement('tr');
       const {
+        iconHtml,
         isRead = { background: false },
         title: recipients,
         shortDetailText,
@@ -498,13 +499,14 @@ class GmailCollapsibleSectionView {
       rowElement.innerHTML = _getRowHTML(result);
 
       const arbitraryHTMLAndClassName = [
+        [iconHtml, s.iconAtStart],
         [recipients, s.recipients],
         ...('snippet' in result ? [[result.snippet, s.snippet] as const] : []),
         [shortDetailText, s.shortDetail],
       ] as const;
 
       for (const [maybeRenderer, className] of arbitraryHTMLAndClassName) {
-        if (typeof maybeRenderer === 'string') {
+        if (!maybeRenderer || typeof maybeRenderer === 'string') {
           continue;
         }
 
@@ -856,7 +858,7 @@ function _getTableHTML() {
 function _getRowHTML(result: RowDescriptor) {
   let iconHtml = '';
 
-  if (result.iconHtml != null) {
+  if (result.iconHtml != null && typeof result.iconHtml === 'string') {
     iconHtml = autoHtml`<div class="inboxsdk__resultsSection_result_icon inboxsdk__resultsSection_result_iconHtml">
         ${{
           __html: result.iconHtml,
@@ -877,7 +879,7 @@ function _getRowHTML(result: RowDescriptor) {
     (typeof isRead === 'object' && isRead.text) || result.isRead === true;
   const rowArr = [
     '<td class="xY PF"></td>',
-    '<td class="xY oZ-x3">',
+    `<td class="xY oZ-x3 ${s.iconAtStart}">`,
     iconHtml,
     '</td>',
     '<td class="xY WA"></td>',
