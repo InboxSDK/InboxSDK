@@ -17,6 +17,12 @@
 }
 
 /* Rows */
+.resultTitle span {
+  text-overflow: ellipsis;
+  display: block;
+  overflow: hidden;
+}
+
 .recipients {
   content: '';
 }
