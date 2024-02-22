@@ -361,15 +361,6 @@ export interface RowDescriptor {
   iconHtml?: string;
   /** An optional url to an icon to display on the left side of the row */
   iconUrl?: string;
-  /**
-   * Where to place the Row's icon.
-   *
-   * If unset, center the provided icon within the three icons at the start of the row. This was the behavior prior to the introduction of this property.
-   *
-   * If set to 'start', place the icon at the start of
-   * the three icons, collapse the two icons down, and add saved space to {@link RowDescriptor#title}'s width.
-   */
-  iconPosition?: 'start';
   /** The name of the route to navigate to when the row is clicked on. */
   routeID?: string;
   /** The parameters of the route being navigated to when the row is clicked on. */
