@@ -1,0 +1,17 @@
+:global(.Wn) {
+  --inboxsdk-title-color: rgb(0 0 0 / 87%);
+  --inboxsdk-subtitle-color: rgb(0 0 0 / 54%);
+}
+
+:global(.inboxsdk__gmail_dark_theme .Wn) {
+  --inboxsdk-title-color: rgb(255 255 255);
+  --inboxsdk-subtitle-color: rgb(255 255 255 / 70%);
+}
+
+:global(.Wn).title {
+  color: var(--inboxsdk-title-color);
+}
+
+:global(.Wn) .subtitle {
+  color: var(--inboxsdk-subtitle-color);
+}

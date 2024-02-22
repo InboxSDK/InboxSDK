@@ -14,10 +14,13 @@ import type {
   RowDescriptor,
   SectionDescriptor,
 } from '../../../../inboxsdk';
+import * as s from './gmail-collapsible-section-view.module.css';
 
 const enum GmailClass {
   titleRight_2015 = 'Cr',
   titleRight_2024_01_25 = 'chp5lb',
+  /** Adds en dash before the subtitle */
+  subtitle_2018_04_16 = 'aw5',
 }
 
 const enum GmailSelector {
@@ -25,35 +28,37 @@ const enum GmailSelector {
   titleRight_2024_01_25 = `.${GmailClass.titleRight_2024_01_25}`,
 }
 
+const enum CustomSelector {
+  subtitleInsert = '.Wn',
+  title_2024_01_29 = 'h3 > .Wn',
+}
+
 class GmailCollapsibleSectionView {
-  #driver: GmailDriver;
   #groupOrderHint: number;
   #isReadyDeferred;
   #isCollapsible: boolean;
   #collapsibleSectionDescriptor: SectionDescriptor = {} as SectionDescriptor;
   #isSearch: boolean;
-  #element: HTMLElement | null | undefined = null;
-  #headerElement: HTMLElement | null | undefined = null;
-  #titleElement: HTMLElement | null | undefined = null;
-  #bodyElement: HTMLElement | null | undefined = null;
-  #contentElement: HTMLElement | null | undefined = null;
-  #tableBodyElement: HTMLElement | null | undefined = null;
-  #collapsedContainer: HTMLElement | null | undefined = null;
-  #messageElement: HTMLElement | null | undefined = null;
-  #footerElement: HTMLElement | null | undefined = null;
+  #element: HTMLElement | null = null;
+  #headerElement: HTMLElement | null = null;
+  #titleElement: HTMLElement | null = null;
+  #bodyElement: HTMLElement | null = null;
+  #contentElement: HTMLElement | null = null;
+  #tableBodyElement: HTMLElement | null = null;
+  #collapsedContainer: HTMLElement | null = null;
+  #messageElement: HTMLElement | null = null;
+  #footerElement: HTMLElement | null = null;
   #eventStream: Bus<any, unknown>;
   #isCollapsed: boolean = false;
-  #inboxDropdownButtonView: InboxDropdownButtonView | null | undefined = null;
-  #dropdownViewController: DropdownButtonViewController | null | undefined =
-    null;
+  #inboxDropdownButtonView: InboxDropdownButtonView | null = null;
+  #dropdownViewController: DropdownButtonViewController | null = null;
 
   constructor(
-    driver: GmailDriver,
+    _driver: GmailDriver,
     groupOrderHint: number,
     isSearch: boolean,
     isCollapsible: boolean,
   ) {
-    this.#driver = driver;
     this.#isSearch = isSearch;
     this.#groupOrderHint = groupOrderHint;
     this.#isCollapsible = isCollapsible;
@@ -62,17 +67,17 @@ class GmailCollapsibleSectionView {
   }
 
   destroy() {
-    if (this.#element) this.#element.remove();
+    this.#element?.remove();
     if (this.#eventStream) this.#eventStream.end();
-    if (this.#headerElement) this.#headerElement.remove();
-    if (this.#titleElement) this.#titleElement.remove();
-    if (this.#bodyElement) this.#bodyElement.remove();
-    if (this.#contentElement) this.#contentElement.remove();
-    if (this.#tableBodyElement) this.#tableBodyElement.remove();
-    if (this.#collapsedContainer) this.#collapsedContainer.remove();
-    if (this.#messageElement) this.#messageElement.remove();
-    if (this.#inboxDropdownButtonView) this.#inboxDropdownButtonView.destroy();
-    if (this.#dropdownViewController) this.#dropdownViewController.destroy();
+    this.#headerElement?.remove();
+    this.#titleElement?.remove();
+    this.#bodyElement?.remove();
+    this.#contentElement?.remove();
+    this.#tableBodyElement?.remove();
+    this.#collapsedContainer?.remove();
+    this.#messageElement?.remove();
+    this.#inboxDropdownButtonView?.destroy();
+    this.#dropdownViewController?.destroy();
   }
 
   getElement(): HTMLElement {
@@ -226,11 +231,12 @@ class GmailCollapsibleSectionView {
     titleElement.innerHTML = [
       '<h3 class="Wr iR">',
       '<img alt="" src="//ssl.gstatic.com/ui/v1/icons/mail/images/cleardot.gif" class="qi Wp Wq">',
-      '<div class="Wn">',
+      `<div class="Wn ${s.title}">`,
       escape(collapsibleSectionDescriptor.title),
       '</div>',
       '</h3>',
     ].join('');
+
     const headerRightElement = document.createElement('div');
     headerRightElement.classList.add(GmailClass.titleRight_2024_01_25);
     headerElement.appendChild(titleElement);
@@ -284,11 +290,11 @@ class GmailCollapsibleSectionView {
       this.#collapsibleSectionDescriptor.title !==
       collapsibleSectionDescriptor.title
     ) {
-      const selector = 'h3 > .Wn';
-
       if (this.#titleElement) {
-        querySelector(this.#titleElement, selector).textContent =
-          collapsibleSectionDescriptor.title!;
+        querySelector(
+          this.#titleElement,
+          CustomSelector.title_2024_01_29,
+        ).textContent = collapsibleSectionDescriptor.title!;
       }
     }
   }
@@ -296,9 +302,7 @@ class GmailCollapsibleSectionView {
   #updateSubtitle(collapsibleSectionDescriptor: SectionDescriptor) {
     const titleElement = this.#titleElement;
     if (!titleElement) return;
-    let subtitleElement = titleElement.querySelector(
-      '.inboxsdk__resultsSection_title_subtitle',
-    );
+    let subtitleElement = titleElement.getElementsByClassName(s.subtitle)[0];
 
     if (!collapsibleSectionDescriptor.subtitle) {
       if (subtitleElement) {
@@ -312,20 +316,18 @@ class GmailCollapsibleSectionView {
         subtitleElement = document.createElement('span');
 
         if (subtitleElement && titleElement) {
-          subtitleElement.classList.add(
-            'inboxsdk__resultsSection_title_subtitle',
+          subtitleElement.classList.add(s.subtitle);
+          const insertionPoint = titleElement.querySelector(
+            CustomSelector.subtitleInsert,
           );
-          const insertionPoint = titleElement.querySelector('.Wn');
 
           if (insertionPoint) {
-            subtitleElement.classList.add('aw5');
-            insertionPoint.appendChild(subtitleElement);
+            insertionPoint.prepend(subtitleElement);
           }
         }
       }
 
-      subtitleElement.textContent =
-        '(' + collapsibleSectionDescriptor.subtitle + ')';
+      subtitleElement.textContent = collapsibleSectionDescriptor.subtitle;
     }
   }
 
