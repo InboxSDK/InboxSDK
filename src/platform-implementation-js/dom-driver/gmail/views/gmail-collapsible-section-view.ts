@@ -852,7 +852,7 @@ function _getRowHTML(result: RowDescriptor) {
     '<div class="y6">',
     '<span class="bog">',
     result.isRead ? '' : '<b>',
-    escape(result.body || ''),
+    escape(('body' in result && result.body) || ''),
     result.isRead ? '' : '</b>',
     '</span>',
     '</div>',

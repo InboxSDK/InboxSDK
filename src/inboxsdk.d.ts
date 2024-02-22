@@ -332,15 +332,9 @@ export type RowDescriptorCellRenderer = (args: {
 /**
  * Represents the a single row to render in {@link SectionView}s and {@link CollapsibleSectionView}s
  */
-export interface RowDescriptor {
+export type RowDescriptor = {
   /** First textual column */
   title: string;
-  /**
-   * @deprecated alias for {@link RowDescriptor#snippet}.
-   */
-  body: string;
-  /** Second textual column. After {@link RowDescriptor#labels} if they're provided. */
-  snippet?: string | RowDescriptorCellRenderer;
   /**
    * Render an HTMLElement in the attachment icon area. This is often used to render an icon for the attachment type.
    */
@@ -379,7 +373,18 @@ export interface RowDescriptor {
   routeParams?: string[];
   /** Callback for when the row is clicked on. */
   onClick?(e: unknown): void;
-}
+} & (
+  | {
+      /**
+       * @deprecated alias for {@link RowDescriptor#snippet}.
+       */
+      body: string;
+    }
+  | {
+      /** Second textual column. After {@link RowDescriptor#labels} if they're provided. */
+      snippet: string | RowDescriptorCellRenderer;
+    }
+);
 
 /**
  * The properties required to create a {@link SectionView} or {@link CollapsibleSectionView}.
