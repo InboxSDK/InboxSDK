@@ -350,8 +350,7 @@ export interface RowDescriptor {
          */
         background: boolean;
         /**
-         * Whether the background of the row should be rendered as read or unread similar to Gmail styles.
-         * If true, Row text will be a 400 weight, if false, Row text will be a 700 weight.
+         * Controls whether the row text should be styled as read (regular non-bold) or unread (bold text) similar to Gmail styles.
          */
         text: boolean;
       };
