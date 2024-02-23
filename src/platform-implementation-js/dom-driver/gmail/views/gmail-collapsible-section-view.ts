@@ -15,7 +15,6 @@ import type {
   SectionDescriptor,
 } from '../../../../inboxsdk';
 import * as s from './gmail-collapsible-section-view.module.css';
-import { sanitize } from 'dompurify';
 
 const enum GmailClass {
   titleRight_2015 = 'Cr',
@@ -53,7 +52,7 @@ class GmailCollapsibleSectionView {
   #isCollapsed: boolean = false;
   #inboxDropdownButtonView: InboxDropdownButtonView | null = null;
   #dropdownViewController: DropdownButtonViewController | null = null;
-  #unmountPromiseResolutions = new Set<() => void>();
+  #tableRowsUnmountResolution: (() => void) | null = null;
 
   constructor(
     _driver: GmailDriver,
@@ -85,9 +84,8 @@ class GmailCollapsibleSectionView {
   }
 
   #unmountRows() {
-    for (const resolve of this.#unmountPromiseResolutions) {
-      resolve();
-    }
+    this.#tableRowsUnmountResolution?.();
+    this.#tableRowsUnmountResolution = null;
   }
 
   getElement(): HTMLElement {
@@ -481,6 +479,13 @@ class GmailCollapsibleSectionView {
     const eventStream = this.#eventStream;
     this.#unmountRows();
 
+    /**
+     * @todo use Promise.withResolvers when target ES2024 added to TS.
+     */
+    const promise = new Promise<void>(
+      (res) => (this.#tableRowsUnmountResolution = res),
+    );
+
     for (const result of tableRows) {
       const rowElement = document.createElement('tr');
       const {
@@ -491,12 +496,6 @@ class GmailCollapsibleSectionView {
       } = result;
       const useReadBackground =
         (typeof isRead === 'object' && isRead.background) || isRead === true;
-      rowElement.setAttribute(
-        'class',
-        'inboxsdk__resultsSection_tableRow zA ' +
-          (useReadBackground ? 'yO' : 'zE'),
-      );
-      rowElement.innerHTML = _getRowHTML(result);
 
       const arbitraryHTMLAndClassName = [
         [iconHtml, s.iconAtStart],
@@ -505,16 +504,17 @@ class GmailCollapsibleSectionView {
         [shortDetailText, s.shortDetail],
       ] as const;
 
+      rowElement.setAttribute(
+        'class',
+        'inboxsdk__resultsSection_tableRow zA ' +
+          (useReadBackground ? 'yO' : 'zE'),
+      );
+      rowElement.innerHTML = _getRowHTML(result);
+
       for (const [maybeRenderer, className] of arbitraryHTMLAndClassName) {
         if (!maybeRenderer || typeof maybeRenderer === 'string') {
           continue;
         }
-
-        // @todo use Promise.withResolvers when target ES2024 added to TS.
-        let resolve: undefined | (() => void);
-        const promise = new Promise<void>((res) => (resolve = res));
-
-        this.#unmountPromiseResolutions.add(resolve!);
 
         const el = querySelector(rowElement, `.${className}`);
 
