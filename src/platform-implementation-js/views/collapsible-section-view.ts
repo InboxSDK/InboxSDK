@@ -1,6 +1,7 @@
 import EventEmitter from '../lib/safe-event-emitter';
 import type { Driver } from '../driver-interfaces/driver';
 import type GmailCollapsibleSectionView from '../dom-driver/gmail/views/gmail-collapsible-section-view';
+import type { RowDescriptor } from '../../inboxsdk';
 
 /**
 * {@link CollapsibleSectionView}s allow you to display additional content on ListRouteViews. They are typically rendered as additional content above the list of threads below. The visual style is similar to that of multiple inbox sections used in native Gmail. Note that the rendering may vary slightly depending on the actual ListRouteView that the {@link CollapsibleSectionView} is rendered in. For example, {@link CollapsibleSectionViews} rendered on search results pages use different header styles to match Gmail's style more accurately.
@@ -52,7 +53,7 @@ function _bindToEventStream(
   collapsibleSectionViewDriver
     .getEventStream()
     .filter(({ eventName }) => eventName === 'rowClicked')
-    .onValue(({ rowDescriptor }) => {
+    .onValue(({ rowDescriptor }: { rowDescriptor: RowDescriptor }) => {
       if (rowDescriptor.routeID) {
         driver.goto(rowDescriptor.routeID, rowDescriptor.routeParams);
       }

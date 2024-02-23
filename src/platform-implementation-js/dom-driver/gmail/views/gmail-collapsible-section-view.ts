@@ -897,7 +897,7 @@ function _getRowHTML(result: RowDescriptor) {
     '<div class="yi">',
     labelsHtml,
     '</div>',
-    '<div class="y6">',
+    `<div class="y6 ${s.snippet}">`,
     '<span class="bog">',
     useReadText ? '' : '<b>',
     escape(('body' in result && result.body) || ''),

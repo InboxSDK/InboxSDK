@@ -36,6 +36,7 @@ import type {
 import type CollapsibleSectionView from './platform-implementation-js/views/collapsible-section-view';
 import type ListRouteView from './platform-implementation-js/views/route-view/list-route-view';
 import type SectionView from './platform-implementation-js/views/section-view';
+import type { RouteParams } from './platform-implementation-js/namespaces/router';
 
 export type { User };
 
@@ -370,9 +371,9 @@ export type RowDescriptor = {
   /** The name of the route to navigate to when the row is clicked on. */
   routeID?: string;
   /** The parameters of the route being navigated to when the row is clicked on. */
-  routeParams?: string[];
+  routeParams?: RouteParams;
   /** Callback for when the row is clicked on. */
-  onClick?(e: unknown): void;
+  onClick?(): void;
 } & (
   | {
       /**
