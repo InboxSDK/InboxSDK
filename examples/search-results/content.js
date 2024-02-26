@@ -110,6 +110,7 @@ InboxSDK.load(1.0, 'search-example').then(function (inboxSDK) {
                 text: isTextRead,
                 background: isBackgroundread,
               },
+              shortDetailText: 'extra',
             })),
           ),
         ],

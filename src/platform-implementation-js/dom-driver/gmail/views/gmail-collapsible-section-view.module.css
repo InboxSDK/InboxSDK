@@ -57,3 +57,13 @@
 .shortDetail {
   content: '';
 }
+
+/* Without this monkey patch, in light Gmail themes, .shortDetail is fully opaque black. */
+.shortDetail.unread {
+  color: rgb(95 99 104);
+}
+
+/* Without this monkey patch, in dark Gmail themes, .shortDetail is fully opaque white. */
+:global(.inboxsdk__gmail_dark_theme) .shortDetail.unread {
+  color: rgb(255 255 255 / 50%);
+}

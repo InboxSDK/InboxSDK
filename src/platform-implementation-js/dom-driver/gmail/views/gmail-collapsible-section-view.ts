@@ -911,7 +911,7 @@ function _getRowHTML(result: RowDescriptor) {
     '</div>',
     '</td>',
     '<td class="xY xW">',
-    `<span class="${s.shortDetail}${useReadText ? '' : ' bq3'}">`,
+    `<span class="${s.shortDetail} ${useReadText ? s.unread : 'bq3'}">`,
     ...(typeof shortDetailText === 'string' ? [escape(shortDetailText)] : []),
     '</span>',
     '</td>',
