@@ -52,6 +52,7 @@ class GmailCollapsibleSectionView {
   #isCollapsed: boolean = false;
   #inboxDropdownButtonView: InboxDropdownButtonView | null = null;
   #dropdownViewController: DropdownButtonViewController | null = null;
+  #tableRowsUnmountResolution: (() => void) | null = null;
 
   constructor(
     _driver: GmailDriver,
@@ -67,6 +68,8 @@ class GmailCollapsibleSectionView {
   }
 
   destroy() {
+    this.#unmountRows();
+
     this.#element?.remove();
     if (this.#eventStream) this.#eventStream.end();
     this.#headerElement?.remove();
@@ -78,6 +81,11 @@ class GmailCollapsibleSectionView {
     this.#messageElement?.remove();
     this.#inboxDropdownButtonView?.destroy();
     this.#dropdownViewController?.destroy();
+  }
+
+  #unmountRows() {
+    this.#tableRowsUnmountResolution?.();
+    this.#tableRowsUnmountResolution = null;
   }
 
   getElement(): HTMLElement {
@@ -469,13 +477,52 @@ class GmailCollapsibleSectionView {
       this.#tableBodyElement.appendChild(tableElement);
     const tbody = tableElement.querySelector('tbody');
     const eventStream = this.#eventStream;
-    tableRows.forEach((result) => {
+    this.#unmountRows();
+
+    /**
+     * @todo use Promise.withResolvers when target ES2024 added to TS.
+     */
+    const promise = new Promise<void>(
+      (res) => (this.#tableRowsUnmountResolution = res),
+    );
+
+    for (const result of tableRows) {
       const rowElement = document.createElement('tr');
+      const {
+        iconHtml,
+        isRead = { background: false },
+        title: recipients,
+        shortDetailText,
+        attachmentIcon,
+      } = result;
+      const useReadBackground =
+        (typeof isRead === 'object' && isRead.background) || isRead === true;
+
+      const arbitraryHTMLAndClassName = [
+        [iconHtml, s.iconAtStart],
+        [recipients, s.recipients],
+        ...('snippet' in result ? [[result.snippet, s.snippet] as const] : []),
+        [attachmentIcon, s.attachmentIcon],
+        [shortDetailText, s.shortDetail],
+      ] as const;
+
       rowElement.setAttribute(
         'class',
-        'inboxsdk__resultsSection_tableRow zA ' + (result.isRead ? 'yO' : 'zE'),
+        'inboxsdk__resultsSection_tableRow zA ' +
+          (useReadBackground ? 'yO' : 'zE'),
       );
       rowElement.innerHTML = _getRowHTML(result);
+
+      for (const [maybeRenderer, className] of arbitraryHTMLAndClassName) {
+        if (!maybeRenderer || typeof maybeRenderer === 'string') {
+          continue;
+        }
+
+        const el = querySelector(rowElement, `.${className}`);
+
+        maybeRenderer({ el, unmountPromise: promise });
+      }
+
       if (!tbody) throw new Error('should not happen');
       tbody.appendChild(rowElement);
       eventStream.plug(
@@ -484,7 +531,7 @@ class GmailCollapsibleSectionView {
           rowDescriptor: result,
         })),
       );
-    });
+    }
   }
 
   #updateMessageElement(collapsibleSectionDescriptor: SectionDescriptor) {
@@ -813,7 +860,7 @@ function _getTableHTML() {
 function _getRowHTML(result: RowDescriptor) {
   let iconHtml = '';
 
-  if (result.iconHtml != null) {
+  if (result.iconHtml != null && typeof result.iconHtml === 'string') {
     iconHtml = autoHtml`<div class="inboxsdk__resultsSection_result_icon inboxsdk__resultsSection_result_iconHtml">
         ${{
           __html: result.iconHtml,
@@ -829,17 +876,20 @@ function _getRowHTML(result: RowDescriptor) {
   const labelsHtml = Array.isArray(result.labels)
     ? result.labels.map(_getLabelHTML).join('')
     : '';
+  const { isRead = { text: true }, title, shortDetailText } = result;
+  const useReadText =
+    (typeof isRead === 'object' && isRead.text) || result.isRead === true;
   const rowArr = [
     '<td class="xY PF"></td>',
-    '<td class="xY oZ-x3"></td>',
-    '<td class="xY WA">',
+    `<td class="xY oZ-x3 ${s.iconAtStart}">`,
     iconHtml,
     '</td>',
-    '<td class="xY WA"></td>',
-    '<td class="xY yX inboxsdk__resultsSection_result_title">',
+    // Native Gmail thread rows include this '<td class="xY WA"></td>',
+    // and this '<td class="xY WA"></td>',
+    `<td class="xY yX ${s.resultTitle}">`,
     '<div class="yW">',
-    '<span ' + (result.isRead ? '' : 'class="zF"') + '>',
-    escape(result.title),
+    `<span class="${s.recipients}${useReadText ? '' : ' zF'}">`,
+    ...(typeof title === 'string' ? [escape(title)] : []),
     '</span>',
     '</div>',
     '</td>',
@@ -849,19 +899,20 @@ function _getRowHTML(result: RowDescriptor) {
     '<div class="yi">',
     labelsHtml,
     '</div>',
-    '<div class="y6">',
-    '<span class="bog">',
-    result.isRead ? '' : '<b>',
-    escape(result.body || ''),
-    result.isRead ? '' : '</b>',
+    `<div class="y6 ${s.snippet}">`,
+    `<span class="bog${useReadText ? '' : ' ' + s.unread}">`,
+    useReadText ? '' : '<b>',
+    escape(('body' in result && result.body) || ''),
+    useReadText ? '' : '</b>',
     '</span>',
     '</div>',
+    `<div class="${s.attachmentIcon}"></div>`,
     '</div>',
     '</div>',
     '</td>',
     '<td class="xY xW">',
-    '<span' + (result.isRead ? '' : ' class="bq3"') + '>',
-    escape(result.shortDetailText || ''),
+    `<span class="${s.shortDetail} ${useReadText ? s.unread : 'bq3'}">`,
+    ...(typeof shortDetailText === 'string' ? [escape(shortDetailText)] : []),
     '</span>',
     '</td>',
   ];

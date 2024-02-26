@@ -15,6 +15,21 @@ InboxSDK.load(1.0, 'search-example').then(function (inboxSDK) {
         },
         tableRows: [
           {
+            title: 'new after @inboxsdk/core@2.1.32',
+            snippet: ({ el, unmountPromise }) => {
+              el.textContent = 'I set text content';
+              unmountPromise.then(() => {
+                console.log('unmounting table row');
+              });
+            },
+            attachmentIcon: ({ el, unmountPromise }) => {
+              el.textContent = '[attachment content]';
+              unmountPromise.then(() => {
+                console.log('unmounting attachment icon');
+              });
+            },
+          },
+          {
             title: 'title',
             body: 'body',
             shortDetailText: 'extra',
@@ -28,7 +43,7 @@ InboxSDK.load(1.0, 'search-example').then(function (inboxSDK) {
             title: 'row uses icon html',
             body: 'body',
             shortDetailText: 'extra',
-            isRead: true,
+            isRead: false,
             iconHtml: '<div>x</div>',
             onClick: function () {
               console.log('hi');
@@ -87,6 +102,17 @@ InboxSDK.load(1.0, 'search-example').then(function (inboxSDK) {
               console.log('hi');
             },
           },
+          ...[true, false].flatMap((isTextRead) =>
+            [true, false].map((isBackgroundread) => ({
+              title: 'check read display',
+              body: `text read? ${isTextRead} background read? ${isBackgroundread}`,
+              isRead: {
+                text: isTextRead,
+                background: isBackgroundread,
+              },
+              shortDetailText: 'extra',
+            })),
+          ),
         ],
       });
     },

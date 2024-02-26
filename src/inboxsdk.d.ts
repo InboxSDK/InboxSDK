@@ -36,6 +36,7 @@ import type {
 import type CollapsibleSectionView from './platform-implementation-js/views/collapsible-section-view';
 import type ListRouteView from './platform-implementation-js/views/route-view/list-route-view';
 import type SectionView from './platform-implementation-js/views/section-view';
+import type { RouteParams } from './platform-implementation-js/namespaces/router';
 
 export type { User };
 
@@ -316,36 +317,83 @@ export class RouteView extends EventEmitter {
 }
 
 /**
+ * @alpha
+ *
+ * Provides the ability to pass arbitrary HTML into a cell in a {@link SectionView} or {@link CollapsibleSectionView} `tableRow`.
+ */
+export type RowDescriptorCellRenderer = (args: {
+  /**
+   * The element to render the column into.
+   */
+  el: HTMLElement;
+  /**
+   * A promise that resolves when the row is unmounted. This is useful for cleaning up any resources that were created when the row was mounted.
+   */
+  unmountPromise: Promise<void>;
+}) => void;
+
+/**
  * Represents the a single row to render in {@link SectionView}s and {@link CollapsibleSectionView}s
  */
-export interface RowDescriptor {
+export type RowDescriptor = {
   /** First textual column */
-  title: string;
-  /** Second textual column */
-  body: string;
-  /** Last text right-aligned. Often used for dates. */
-  shortDetailText: string;
+  title: string | RowDescriptorCellRenderer;
   /**
-   * Whether the row should be rendered as read or unread similar to Gmail styles.
+   * @alpha
    *
-   * @TODO is this actually required like the docs say?
+   * Render an HTMLElement in the attachment icon area. This is often used to render an icon for the attachment type.
    */
-  isRead?: string;
+  attachmentIcon?: RowDescriptorCellRenderer;
+  /** Last text right-aligned. Often used for dates. */
+  shortDetailText: string | RowDescriptorCellRenderer;
+  /**
+   * Controls whether the row should be rendered as a read or unread message similar to Gmail styles.
+   * This affects the row background and font weight. These can be separately controlled by passing an object.
+   *
+   * @defaultValue { background: false, text: true }
+   */
+  isRead?:
+    | boolean
+    | {
+        /**
+         * Controls whether the row background should be styled as read (in light themes: gray background) or unread (bright white background) similar to Gmail styles.
+         */
+        background: boolean;
+        /**
+         * Controls whether the row text should be styled as read (regular non-bold) or unread (bold text) similar to Gmail styles.
+         */
+        text: boolean;
+      };
   /** Any labels that should be rendered. */
   labels: LabelDescriptor[];
   /** An optional class to apply to the icon. */
   iconClass?: string;
   /** An optional HTML to an icon to display on the left side of the row */
-  iconHtml?: string;
+  iconHtml?: string | RowDescriptorCellRenderer;
   /** An optional url to an icon to display on the left side of the row */
   iconUrl?: string;
   /** The name of the route to navigate to when the row is clicked on. */
   routeID?: string;
   /** The parameters of the route being navigated to when the row is clicked on. */
-  routeParams?: string[];
+  routeParams?: RouteParams;
   /** Callback for when the row is clicked on. */
-  onClick?(e: unknown): void;
-}
+  onClick?(): void;
+} & (
+  | {
+      /**
+       * @deprecated alias for {@link RowDescriptor#snippet}.
+       */
+      body: string;
+    }
+  | {
+      /**
+       * @alpha
+       *
+       * Second textual column. After {@link RowDescriptor#labels} if they're provided.
+       */
+      snippet: string | RowDescriptorCellRenderer;
+    }
+);
 
 /**
  * The properties required to create a {@link SectionView} or {@link CollapsibleSectionView}.
