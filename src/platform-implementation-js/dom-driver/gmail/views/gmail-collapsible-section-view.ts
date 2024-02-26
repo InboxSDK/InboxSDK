@@ -493,6 +493,7 @@ class GmailCollapsibleSectionView {
         isRead = { background: false },
         title: recipients,
         shortDetailText,
+        attachmentIcon,
       } = result;
       const useReadBackground =
         (typeof isRead === 'object' && isRead.background) || isRead === true;
@@ -501,6 +502,7 @@ class GmailCollapsibleSectionView {
         [iconHtml, s.iconAtStart],
         [recipients, s.recipients],
         ...('snippet' in result ? [[result.snippet, s.snippet] as const] : []),
+        [attachmentIcon, s.attachmentIcon],
         [shortDetailText, s.shortDetail],
       ] as const;
 
@@ -904,6 +906,7 @@ function _getRowHTML(result: RowDescriptor) {
     useReadText ? '' : '</b>',
     '</span>',
     '</div>',
+    `<div class="${s.attachmentIcon}"></div>`,
     '</div>',
     '</div>',
     '</td>',
