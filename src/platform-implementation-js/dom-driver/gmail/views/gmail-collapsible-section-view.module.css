@@ -16,6 +16,16 @@
   color: var(--inboxsdk-subtitle-color);
 }
 
+/* Make the recipient's column wider after taking out two of the native rows icons. */
+:global(.xY).resultTitle {
+  /*
+   * 168px is the max width of the recipients' column element.
+   * 30px is the width of each rows' individual icons.
+   */
+  max-width: calc(168px + (30px * 2));
+  flex-basis: calc(168px + (30px * 2));
+}
+
 /* Rows */
 .resultTitle span {
   text-overflow: ellipsis;
