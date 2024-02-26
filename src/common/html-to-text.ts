@@ -1,45 +1,19 @@
-import { sanitize } from 'dompurify';
-
-interface Policy {
-  /**
-   * This method returns a {@link TrustedTypePolicy},
-   * but typescript@5.3.3's lib.dom doesn't support assigning non-strings
-   * to {@link HTMLElement.innerHTML}.
-   */
-  createHTML(string: string): string;
-}
-
-declare global {
-  /**
-   * typescript@5.3.3 doesn't ship types for trustedTypes yet.
-   * Safari 17.2 doesn't support it either, so a fallback is needed if
-   * it's not defined.
-   * @see https://developer.mozilla.org/en-US/docs/Web/API/TrustedHTML
-   */
-  var trustedTypes:
-    | {
-        createPolicy(name: string, policy: Policy): Policy;
-      }
-    | undefined;
-}
-
-const escapeHTMLPolicy = globalThis.trustedTypes?.createPolicy(
-  'inboxSdkEscapePolicy',
-  {
-    createHTML: (string: string) => sanitize(string),
-  },
-) ?? {
-  createHTML(string: string) {
-    return sanitize(string);
-  },
-};
+import { removeHtmlTagsPolicy } from './removeHtmlTags';
 
 /**
- * Quick function for converting HTML with entities into text without
- * introducing an XSS vulnerability.
+ * Converts HTML to unformatted plain text.
+ * Works by stripping all HTML tags and converting entities to symbols.
+ * Safe to use on arbitrary input.
+ *
+ * Converts text like `String with <b>html</b> &amp; entities &lt;&gt;` to
+ * `String with html & entities <>`.
+ *
+ * This is *not* for creating "safe HTML" from user input to assign to
+ * an element's innerHTML. The result of this function should not be treated
+ * as HTML.
  */
 export default function htmlToText(html: string): string {
   const div = document.createElement('div');
-  div.innerHTML = escapeHTMLPolicy.createHTML(html);
+  div.innerHTML = removeHtmlTagsPolicy.createHTML(html);
   return div.textContent!;
 }
