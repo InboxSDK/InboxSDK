@@ -1,5 +1,3 @@
-import { sanitize } from 'dompurify';
-
 interface Policy {
   /**
    * This method returns a {@link TrustedTypePolicy},
@@ -23,14 +21,20 @@ declare global {
     | undefined;
 }
 
+function removeHtmlTags(html: string): string {
+  return html.replace(/<[^>]*>?/g, '');
+}
+
 const escapeHTMLPolicy = globalThis.trustedTypes?.createPolicy(
   'inboxSdkEscapePolicy',
   {
-    createHTML: (string: string) => sanitize(string),
+    createHTML(string: string) {
+      return removeHtmlTags(string);
+    },
   },
 ) ?? {
   createHTML(string: string) {
-    return sanitize(string);
+    return removeHtmlTags(string);
   },
 };
 
