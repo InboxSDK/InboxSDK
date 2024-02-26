@@ -25,8 +25,8 @@ function removeHtmlTags(html: string): string {
   return html.replace(/<[^>]*>?/g, '');
 }
 
-const escapeHTMLPolicy = globalThis.trustedTypes?.createPolicy(
-  'inboxSdkEscapePolicy',
+const removeHtmlTagsPolicy = globalThis.trustedTypes?.createPolicy(
+  'inboxSdk__removeHtmlTagsPolicy',
   {
     createHTML(string: string) {
       return removeHtmlTags(string);
@@ -41,9 +41,14 @@ const escapeHTMLPolicy = globalThis.trustedTypes?.createPolicy(
 /**
  * Quick function for converting HTML with entities into text without
  * introducing an XSS vulnerability.
+ * Converts text like "&amp;" into "&" and "&lt;" into "<".
+ *
+ * This is *not* for creating "safe HTML" from user input to assign to
+ * an element's innerHTML. The result of this function should not be treated
+ * as HTML.
  */
 export default function htmlToText(html: string): string {
   const div = document.createElement('div');
-  div.innerHTML = escapeHTMLPolicy.createHTML(html);
+  div.innerHTML = removeHtmlTagsPolicy.createHTML(html);
   return div.textContent!;
 }
