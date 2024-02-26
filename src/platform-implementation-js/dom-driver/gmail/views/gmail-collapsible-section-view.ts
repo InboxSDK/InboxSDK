@@ -900,7 +900,7 @@ function _getRowHTML(result: RowDescriptor) {
     labelsHtml,
     '</div>',
     `<div class="y6 ${s.snippet}">`,
-    '<span class="bog">',
+    `<span class="bog${useReadText ? '' : ' ' + s.unread}">`,
     useReadText ? '' : '<b>',
     escape(('body' in result && result.body) || ''),
     useReadText ? '' : '</b>',

@@ -45,6 +45,11 @@
   content: '';
 }
 
+/* if `isRead: { text: false, background: true }` is passed to the corresponding RowDescriptor, account for Gmail rule making b tags 400 weight. */
+.unread b {
+  font-weight: 700;
+}
+
 .attachmentIcon {
   content: '';
 }
