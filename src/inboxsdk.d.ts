@@ -317,6 +317,8 @@ export class RouteView extends EventEmitter {
 }
 
 /**
+ * @alpha
+ *
  * Provides the ability to pass arbitrary HTML into a cell in a {@link SectionView} or {@link CollapsibleSectionView} `tableRow`.
  */
 export type RowDescriptorCellRenderer = (args: {
@@ -337,6 +339,8 @@ export type RowDescriptor = {
   /** First textual column */
   title: string | RowDescriptorCellRenderer;
   /**
+   * @alpha
+   *
    * Render an HTMLElement in the attachment icon area. This is often used to render an icon for the attachment type.
    */
   attachmentIcon?: RowDescriptorCellRenderer;
@@ -382,7 +386,11 @@ export type RowDescriptor = {
       body: string;
     }
   | {
-      /** Second textual column. After {@link RowDescriptor#labels} if they're provided. */
+      /**
+       * @alpha
+       *
+       * Second textual column. After {@link RowDescriptor#labels} if they're provided.
+       */
       snippet: string | RowDescriptorCellRenderer;
     }
 );
