@@ -92,7 +92,7 @@
     "thirty-two": "^1.0.1",
     "transducers.js": "^0.3.2",
     "typed-emitter": "^2.1.0",
-    "typescript": "^5.0.3",
+    "typescript": "^5.3.3",
     "ud": "^3.3.1",
     "ud-kefir": "^2.0.1"
   },
