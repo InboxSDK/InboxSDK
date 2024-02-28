@@ -410,7 +410,7 @@ export interface SectionDescriptor {
   /** Link to display in the summary area of the {@link SectionView}. Typically page counts are displayed here.	*/
   titleLinkText?: string;
   /** A function to call when the title link has been clicked. */
-  onTitleLinkClick?(e: MouseEvent): void;
+  onTitleLinkClick?(e: CollapsibleSectionView | SectionView): void;
   /** Whether to display a dropdown arrow for more options on the collapsible section. */
   hasDropdown?: boolean;
   /**
@@ -424,7 +424,7 @@ export interface SectionDescriptor {
   /** A link to place in the footer of the {@link SectionView}.	 */
   footerLinkText?: string;
   /** A function to call when the link in the footer is clicked. */
-  onFooterLinkClick?(e: MouseEvent): void;
+  onFooterLinkClick?(e: CollapsibleSectionView | SectionView): void;
   /** @internal */
   orderHint?: unknown;
   /** @internal */
