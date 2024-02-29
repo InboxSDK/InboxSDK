@@ -3,6 +3,16 @@ import Logger from '../../../../lib/logger';
 import censorHTMLtree from '../../../../../common/censorHTMLtree';
 import isNotNil from '../../../../lib/isNotNil';
 
+const enum Selector {
+  bodyScrollParent = '.nH.bkK',
+  rowListContainer = ':has(> .bGI.nH)',
+}
+
+export const enum Tag {
+  bodyScrollParent = 'bodyScrollParent',
+  rowListElementContainer = 'rowListElementContainer',
+}
+
 export function makePageParser(element: HTMLElement, logger: Logger) {
   return new PageParserTree(element, {
     logError(err, el) {
@@ -16,13 +26,26 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
     watchers: [
       {
         sources: [null],
-        tag: 'rowListElementContainer',
+        tag: 'bodyScrollParent',
         selectors: [
-          { $map: () => document.querySelector('.bGI.nH')?.parentElement },
+          {
+            $map: () =>
+              document.querySelector<HTMLElement>(Selector.bodyScrollParent),
+          },
         ],
       },
       {
-        sources: ['rowListElementContainer'],
+        sources: [Tag.bodyScrollParent],
+        tag: Tag.rowListElementContainer,
+        selectors: [
+          {
+            $map: () =>
+              document.querySelector<HTMLElement>(Selector.rowListContainer),
+          },
+        ],
+      },
+      {
+        sources: [Tag.rowListElementContainer],
         tag: 'rowListElement',
         selectors: [
           { $or: [[], ['.bGI.nH', '.bf5', '.bv9', '.bGC']] },
@@ -32,9 +55,17 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
       },
     ],
     finders: {
-      rowListElementContainer: {
+      [Tag.bodyScrollParent]: {
+        fn: () =>
+          [
+            document.querySelector<HTMLElement>(Selector.bodyScrollParent),
+          ].filter(isNotNil),
+      },
+      [Tag.rowListElementContainer]: {
         fn: (root) =>
-          [root.querySelector('.bGI.nH')?.parentElement].filter(isNotNil),
+          [root.querySelector<HTMLElement>(Selector.rowListContainer)].filter(
+            isNotNil,
+          ),
       },
       rowListElement: {
         fn: (root) => root.querySelectorAll('[gh=tl]'),

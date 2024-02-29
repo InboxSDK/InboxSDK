@@ -19,7 +19,7 @@ import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import type GmailDriver from '../../gmail-driver';
 import type GmailRouteProcessor from '../gmail-route-view/gmail-route-processor';
 import PageParserTree from 'page-parser-tree';
-import { makePageParser } from './page-parser';
+import { Tag, makePageParser } from './page-parser';
 import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
 import waitFor from '../../../../lib/wait-for';
 import { SelectorError } from '../../../../lib/dom/querySelectorOrFail';
@@ -27,6 +27,7 @@ import isStreakAppId from '../../../../lib/isStreakAppId';
 import { extractDocumentHtmlAndCss } from '../../../../../common/extractDocumentHtmlAndCss';
 import { type SectionDescriptor } from '../../../../../inboxsdk';
 import type { RouteViewDriver } from '../../../../driver-interfaces/route-view-driver';
+import * as s from './gmail-route-view.module.css';
 
 class GmailRouteView implements RouteViewDriver {
   _type: string;
@@ -531,7 +532,7 @@ class GmailRouteView implements RouteViewDriver {
 
   #getSectionsContainer(): Kefir.Observable<HTMLElement, never> {
     return toItemWithLifetimeStream(
-      this.#page.tree.getAllByTag('rowListElementContainer'),
+      this.#page.tree.getAllByTag(Tag.bodyScrollParent),
     )
       .takeUntilBy(this._stopper)
       .take(1)
@@ -543,7 +544,12 @@ class GmailRouteView implements RouteViewDriver {
 
         if (!sectionsContainer) {
           sectionsContainer = document.createElement('div');
-          sectionsContainer.classList.add('inboxsdk__custom_sections');
+          sectionsContainer.classList.add(
+            'inboxsdk__custom_sections',
+            s.main,
+            // add background color from .bhK>.nH gmail rule
+            'nH',
+          );
           main.insertBefore(sectionsContainer, main.firstChild);
         } else if (
           sectionsContainer.classList.contains('Wc') &&

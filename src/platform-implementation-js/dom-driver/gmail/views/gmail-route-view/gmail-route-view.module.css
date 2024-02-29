@@ -1,0 +1,7 @@
+.main {
+  max-height: calc(50vh - /* header height */ 64px);
+}
+
+.main:global(.nH) {
+  overflow-y: auto;
+}
