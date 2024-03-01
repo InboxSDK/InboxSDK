@@ -3,7 +3,8 @@ import Logger from '../../../lib/logger';
 import waitFor, { WaitForError } from '../../../lib/wait-for';
 import GmailElementGetter from '../gmail-element-getter';
 
-const RGB_REGEX = /^rgb\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*\)/;
+/** should handle rgb and rgba */
+const RGB_REGEX = /^rgba?\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*(,\s*(0\.)?\d+)?\)/;
 
 function getDensity(): 'compact' | 'default' {
   const navItemElement = document.querySelector('.aim');
@@ -36,10 +37,24 @@ export async function checkForDarkThemeSafe() {
     throw e;
   }
 
-  return isDarkTheme();
+  return isFrameDarkTheme();
 }
 
-function isDarkTheme(): boolean {
+function extractRgbColor(colorString: string) {
+  const match = RGB_REGEX.exec(colorString);
+  if (!match) {
+    Logger.error(new Error('Failed to read color string'), { colorString });
+    return;
+  }
+
+  return {
+    r: +match[1],
+    g: +match[2],
+    b: +match[3],
+  };
+}
+
+function isFrameDarkTheme(): boolean {
   // get the color of the left-nav-menu entries to determine whether Gmail is
   // in dark theme mode.
   const navItem = getNavItem();
@@ -48,28 +63,43 @@ function isDarkTheme(): boolean {
     return false;
   }
   const colorString = getComputedStyle(navItem).getPropertyValue('color');
-  const colorMatch = RGB_REGEX.exec(colorString);
-  if (!colorMatch) {
-    Logger.error(new Error('Failed to read color string'), { colorString });
+  const { r } = extractRgbColor(colorString) ?? {};
+
+  if (r === undefined) {
     return false;
   }
-  const r = +colorMatch[1],
-    g = +colorMatch[2],
-    b = +colorMatch[3];
-  // rgb(32, 33, 36) is the default color of nav items in Material Gmail
-  if (r === 32 && g === 33 && b === 36) {
-    return false;
-  }
-  if (r !== g || r !== b) {
-    Logger.error(new Error('Nav item color not grayscale'), { r, g, b });
-  }
+
   return r > 128;
 }
 
+function isBodyDarkTheme() {
+  const bodyEl = document.querySelector('.bkK > .nH');
+
+  if (!bodyEl) {
+    return false;
+  }
+
+  const bgColor = getComputedStyle(bodyEl).backgroundColor;
+  const { r } = extractRgbColor(bgColor) ?? {};
+
+  if (r != null) {
+    return r < 128;
+  }
+
+  return false;
+}
+
 export const stylesStream = kefirBus<
-  { type: 'theme'; isDarkMode: boolean },
+  { type: 'theme'; isDarkMode: { frame: boolean; body: boolean } },
   unknown
 >();
+
+const enum ClassName {
+  /** Applied if Gmail's frame is a dark theme. Useful for styling nav items. */
+  darkFrameTheme = 'inboxsdk__gmail_dark_theme',
+  /** Applied if Gmail's body is a light theme. Useful for styling inbox and search adjacent items. */
+  darkBodyTheme = 'inboxsdk__gmail_dark_body_theme',
+}
 
 export default async function trackGmailStyles() {
   if (
@@ -83,6 +113,8 @@ export default async function trackGmailStyles() {
   let currentDensity: string | null = null;
   let currentDarkTheme: boolean | null = null;
 
+  console.log('hmmm');
+
   function checkStyles() {
     const newDensity = getDensity();
     if (currentDensity !== newDensity) {
@@ -95,20 +127,29 @@ export default async function trackGmailStyles() {
       document.body.classList.add('inboxsdk__gmail_density_' + currentDensity);
     }
 
-    const newDarkTheme = isDarkTheme();
+    const newDarkTheme = isFrameDarkTheme();
     if (currentDarkTheme !== newDarkTheme) {
       currentDarkTheme = newDarkTheme;
-      if (currentDarkTheme) {
-        document.body.classList.add('inboxsdk__gmail_dark_theme');
-      } else {
-        document.body.classList.remove('inboxsdk__gmail_dark_theme');
-      }
 
-      stylesStream.emit({
-        type: 'theme',
-        isDarkMode: newDarkTheme,
-      });
+      if (currentDarkTheme) {
+        document.body.classList.add(ClassName.darkFrameTheme);
+      } else {
+        document.body.classList.remove(ClassName.darkFrameTheme);
+      }
     }
+
+    const newBodyDarkTheme = isBodyDarkTheme();
+
+    if (newBodyDarkTheme) {
+      document.body.classList.add(ClassName.darkBodyTheme);
+    } else {
+      document.body.classList.remove(ClassName.darkBodyTheme);
+    }
+
+    stylesStream.emit({
+      type: 'theme',
+      isDarkMode: { frame: currentDarkTheme, body: newBodyDarkTheme },
+    });
   }
 
   try {

@@ -324,6 +324,7 @@ const GmailElementGetter = {
     );
   },
 
+  /** @deprecated this doesn't include Gmail themes where the frame is dark and the body is not. Use Global.gmailTheme instead */
   isDarkTheme(): boolean {
     return document.body.classList.contains('inboxsdk__gmail_dark_theme');
   },
