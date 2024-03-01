@@ -53,13 +53,15 @@ class GmailCollapsibleSectionView {
   #inboxDropdownButtonView: InboxDropdownButtonView | null = null;
   #dropdownViewController: DropdownButtonViewController | null = null;
   #tableRowsUnmountResolution: (() => void) | null = null;
+  #driver: GmailDriver;
 
   constructor(
-    _driver: GmailDriver,
+    driver: GmailDriver,
     groupOrderHint: number,
     isSearch: boolean,
     isCollapsible: boolean,
   ) {
+    this.#driver = driver;
     this.#isSearch = isSearch;
     this.#groupOrderHint = groupOrderHint;
     this.#isCollapsible = isCollapsible;
@@ -110,6 +112,11 @@ class GmailCollapsibleSectionView {
     );
     stoppedProperty.onValue((x) => this.#updateValues(x));
     stoppedProperty.take(1).onValue(() => this.#isReadyDeferred.resolve(this));
+    this.#driver.gmailThemeStream.onValue(() => {
+      if (Object.keys(this.#collapsibleSectionDescriptor).length) {
+        this.#updateValues(this.#collapsibleSectionDescriptor);
+      }
+    });
   }
 
   setCollapsed(value: boolean) {

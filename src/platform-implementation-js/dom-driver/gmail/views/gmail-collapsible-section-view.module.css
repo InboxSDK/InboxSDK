@@ -3,7 +3,7 @@
   --inboxsdk-subtitle-color: rgb(0 0 0 / 54%);
 }
 
-:global(.inboxsdk__gmail_dark_theme .Wn) {
+:global(.inboxsdk__gmail_dark_body_theme .Wn) {
   --inboxsdk-title-color: rgb(255 255 255);
   --inboxsdk-subtitle-color: rgb(255 255 255 / 70%);
 }
@@ -64,6 +64,6 @@
 }
 
 /* Without this monkey patch, in dark Gmail themes, .shortDetail is fully opaque white. */
-:global(.inboxsdk__gmail_dark_theme) .shortDetail.unread {
+:global(.inboxsdk__gmail_dark_body_theme) .shortDetail.unread {
   color: rgb(255 255 255 / 50%);
 }

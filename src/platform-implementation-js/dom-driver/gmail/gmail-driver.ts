@@ -32,7 +32,9 @@ import KeyboardShortcutHelpModifier from './gmail-driver/keyboard-shortcut-help-
 import openDraftByMessageID from './gmail-driver/open-draft-by-message-id';
 import UserInfo from './gmail-driver/user-info';
 import GmailButterBarDriver from './gmail-butter-bar-driver';
-import trackGmailStyles from './gmail-driver/track-gmail-styles';
+import trackGmailStyles, {
+  stylesStream,
+} from './gmail-driver/track-gmail-styles';
 import temporaryTrackDownloadUrlValidity from './gmail-driver/temporary-track-download-url-validity';
 import getGmailThreadIdForRfcMessageId from '../../driver-common/getGmailThreadIdForRfcMessageId';
 import getRfcMessageIdForGmailThreadId from './gmail-driver/get-rfc-message-id-for-gmail-thread-id';
@@ -107,6 +109,12 @@ import isNotNil from '../../lib/isNotNil';
  * @internal
  */
 class GmailDriver {
+  #gmailTheme = {
+    isDarkMode: {
+      frame: false,
+      body: false,
+    },
+  };
   #appId: string;
   #logger: Logger;
   #opts: PiOpts;
@@ -759,6 +767,25 @@ class GmailDriver {
     );
     keyboardShortcutHandle.once('destroy', () => {
       this.getKeyboardShortcutHelpModifier().delete(keyboardShortcutHandle);
+    });
+  }
+
+  get gmailTheme() {
+    return this.#gmailTheme;
+  }
+
+  /**
+   * Listen for if Gmail changes its theme (dark, light, or frame dark / body light mode).
+   */
+  get gmailThemeStream() {
+    return stylesStream.flatMap((event) => {
+      if (event.type !== 'theme') {
+        return Kefir.never();
+      }
+
+      this.#gmailTheme.isDarkMode = event.isDarkMode;
+
+      return Kefir.constant(event.isDarkMode);
     });
   }
 
