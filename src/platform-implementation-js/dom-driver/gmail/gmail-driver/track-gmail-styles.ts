@@ -113,8 +113,6 @@ export default async function trackGmailStyles() {
   let currentDensity: string | null = null;
   let currentDarkTheme: boolean | null = null;
 
-  console.log('hmmm');
-
   function checkStyles() {
     const newDensity = getDensity();
     if (currentDensity !== newDensity) {
