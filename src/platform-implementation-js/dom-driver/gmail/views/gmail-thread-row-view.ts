@@ -1,3 +1,4 @@
+import cx from 'classnames';
 import once from 'lodash/once';
 import flatten from 'lodash/flatten';
 import includes from 'lodash/includes';
@@ -592,9 +593,11 @@ class GmailThreadRowView {
                 this.groupElement.remove();
               },
             };
-            groupedImageMod.groupElement.className =
-              'inboxsdk__thread_row_group_icon_wrapper';
           }
+          groupedImageMod.groupElement.className = cx(
+            'inboxsdk__thread_row_group_icon_wrapper',
+            groupedImagesDescriptor.groupClass,
+          );
 
           this._modifications.groupedImages.claimed.push(groupedImageMod);
         }
