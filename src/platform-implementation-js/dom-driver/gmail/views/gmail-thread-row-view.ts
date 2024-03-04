@@ -32,6 +32,7 @@ import type {
 } from '../../../../inboxsdk';
 import { assert } from '../../../../common/assert';
 import type { Descriptor } from '../../../../types/descriptor';
+import * as s from './gmail-thread-row-view.module.css';
 
 type LabelMod = {
   gmailLabelView: Record<string, any>;
@@ -148,6 +149,7 @@ class GmailThreadRowView {
   #counts: Counts | null = null;
   _isVertical: boolean;
   _isDestroyed: boolean = false;
+  #imageContainerRefreshResolution: (() => void) | null = null;
 
   constructor(
     element: HTMLElement,
@@ -224,6 +226,8 @@ class GmailThreadRowView {
   }
 
   destroy() {
+    this.#imageContainerRefreshResolution?.();
+
     if (!this._elements.length) {
       return;
     }
@@ -433,8 +437,6 @@ class GmailThreadRowView {
       });
   }
 
-  #imageContainerRefreshResolution: (() => void) | null = null;
-
   addImage(inIconDescriptor: Descriptor<ImageDescriptor | null>) {
     if (!this._elements.length) {
       console.warn('addImage called on destroyed thread row');
@@ -457,9 +459,6 @@ class GmailThreadRowView {
 
     let imageMod: ImageMod | null | undefined = null;
     prop.onValue(([iconDescriptor]) => {
-      this.#imageContainerRefreshResolution?.();
-      this.#imageContainerRefreshResolution = null;
-
       if (!iconDescriptor) {
         if (imageMod) {
           imageMod.remove();
@@ -488,29 +487,39 @@ class GmailThreadRowView {
             },
           };
           imageMod.iconWrapper.className = 'inboxsdk__thread_row_icon_wrapper';
+          if (iconDescriptor.image) {
+            imageMod.iconWrapper.classList.add(s.minWidthIconWrapper);
+          }
         }
 
         this._modifications.image.claimed.push(imageMod);
       }
 
       const { iconSettings, iconWrapper } = imageMod;
+
+      updateIcon(
+        iconSettings,
+        iconWrapper,
+        false,
+        iconDescriptor.imageClass,
+        iconDescriptor.imageUrl,
+      );
+
       if (iconDescriptor.image) {
+        this.#imageContainerRefreshResolution?.();
+
         const promise = new Promise<void>(
           (res) => (this.#imageContainerRefreshResolution = res),
         );
 
+        const child = iconWrapper.appendChild(document.createElement('div'));
+
         iconDescriptor.image({
           el: iconWrapper,
-          unmountPromise: promise,
+          unmountPromise: promise.then(() => {
+            child.remove();
+          }),
         });
-      } else {
-        updateIcon(
-          iconSettings,
-          iconWrapper,
-          false,
-          iconDescriptor.imageClass,
-          iconDescriptor.imageUrl,
-        );
       }
       const containerRow =
         this._elements.length === 3 ? this._elements[2] : this._elements[0];

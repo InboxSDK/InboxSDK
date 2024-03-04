@@ -1,0 +1,4 @@
+.minWidthIconWrapper {
+  width: fit-content;
+  min-width: 20px;
+}
