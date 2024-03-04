@@ -84,25 +84,27 @@ const cachedModificationsByRow: WeakMap<HTMLElement, Mods> = defonce(
   () => new WeakMap(),
 );
 
-function focusAndNoPropagation(this: any, event: Event) {
+function focusAndNoPropagation(this: HTMLElement, event: Event) {
   this.focus();
   event.stopImmediatePropagation();
 }
 
-function starGroupEventInterceptor(this: any, event: MouseEvent) {
-  const isOnStar = this.firstElementChild.contains(event.target);
+function starGroupEventInterceptor(this: HTMLElement, event: MouseEvent) {
+  const isOnStar = this.firstElementChild!.contains(
+    event.target as Node | null,
+  );
   const isOnSDKButton = !isOnStar && this !== event.target;
 
   if (!isOnStar) {
     event.stopImmediatePropagation();
 
     if (!isOnSDKButton || event.type == 'mouseover') {
-      const newEvent: Record<string, any> = document.createEvent('MouseEvents');
+      const newEvent = document.createEvent('MouseEvents');
       newEvent.initMouseEvent(
         event.type,
         event.bubbles,
         event.cancelable,
-        event.view,
+        event.view!,
         event.detail,
         event.screenX,
         event.screenY,
@@ -115,7 +117,7 @@ function starGroupEventInterceptor(this: any, event: MouseEvent) {
         event.button,
         event.relatedTarget,
       );
-      this.parentElement.dispatchEvent(newEvent);
+      this.parentElement!.dispatchEvent(newEvent);
     }
   }
 }
@@ -139,9 +141,9 @@ class GmailThreadRowView {
     | null
     | undefined;
   _stopper = kefirStopper();
-  _refresher: Kefir.Observable<any, any> | null | undefined;
-  _subjectRefresher: Kefir.Observable<any, any> | null | undefined;
-  _imageRefresher: Kefir.Observable<any, any> | null | undefined;
+  _refresher: Kefir.Observable<null, any> | null | undefined;
+  _subjectRefresher: Kefir.Observable<null, any> | null | undefined;
+  _imageRefresher: Kefir.Observable<null, any> | null | undefined;
   #counts: Counts | null = null;
   _isVertical: boolean;
   _isDestroyed: boolean = false;
@@ -381,9 +383,9 @@ class GmailThreadRowView {
     > = kefirCast(Kefir, label).takeUntilBy(this._stopper).toProperty();
     let labelMod: LabelMod | null | undefined = null;
     prop
-      .combine(this._getRefresher())
+      .combine(this._getRefresher(), (value, _ignored) => value)
       .takeUntilBy(this._stopper)
-      .onValue(([labelDescriptor]: any) => {
+      .onValue((labelDescriptor) => {
         if (!labelDescriptor) {
           if (labelMod) {
             labelMod.remove();
@@ -440,7 +442,12 @@ class GmailThreadRowView {
       return;
     }
 
-    const prop = kefirCast(Kefir, inIconDescriptor)
+    const prop = (
+      kefirCast(Kefir, inIconDescriptor) as Kefir.Observable<
+        ImageDescriptor,
+        unknown
+      >
+    )
       .toProperty()
       .combine(
         Kefir.merge([
@@ -448,10 +455,11 @@ class GmailThreadRowView {
           this._getSubjectRefresher(),
           this._getImageContainerRefresher(),
         ]),
+        (value, ..._ignored) => value,
       )
       .takeUntilBy(this._stopper);
     let imageMod: ImageMod | null | undefined = null;
-    prop.onValue(([iconDescriptor]: any) => {
+    prop.onValue((iconDescriptor) => {
       if (!iconDescriptor) {
         if (imageMod) {
           imageMod.remove();
@@ -544,155 +552,160 @@ class GmailThreadRowView {
       }
     });
 
-    prop.combine(this._getRefresher()).onValue(([_buttonDescriptor]: any) => {
-      const buttonDescriptor = _buttonDescriptor;
+    prop
+      .combine(this._getRefresher(), (value, _ignored) => value)
+      .onValue((_buttonDescriptor) => {
+        const buttonDescriptor = _buttonDescriptor;
 
-      if (!buttonDescriptor) {
-        if (buttonMod) {
-          buttonMod.remove();
+        if (!buttonDescriptor) {
+          if (buttonMod) {
+            buttonMod.remove();
 
-          this._modifications.button.claimed.splice(
-            this._modifications.button.claimed.indexOf(buttonMod),
-            1,
-          );
+            this._modifications.button.claimed.splice(
+              this._modifications.button.claimed.indexOf(buttonMod),
+              1,
+            );
 
-          buttonMod = null;
-        }
-      } else {
-        // compat workaround
-        if (buttonDescriptor.className) {
-          buttonDescriptor.iconClass = buttonDescriptor.className;
-          delete buttonDescriptor.className;
-        }
+            buttonMod = null;
+          }
+        } else {
+          // compat workaround
+          if (buttonDescriptor.className) {
+            buttonDescriptor.iconClass = buttonDescriptor.className;
+            delete buttonDescriptor.className;
+          }
 
-        let buttonSpan: HTMLElement, iconSettings;
+          let buttonSpan: HTMLElement, iconSettings;
 
-        const buttonToolbar =
-          this._elements[0].querySelector<HTMLElement>('ul[role=toolbar]');
-
-        if (!buttonMod) {
-          buttonMod = this._modifications.button.unclaimed.shift();
+          const buttonToolbar =
+            this._elements[0].querySelector<HTMLElement>('ul[role=toolbar]');
 
           if (!buttonMod) {
-            if (buttonToolbar) {
-              buttonSpan = document.createElement('li');
-              buttonSpan.classList.add('bqX');
-            } else {
-              buttonSpan = document.createElement('span');
-              // T-KT is one of the class names on the star button.
-              buttonSpan.classList.add('T-KT');
+            buttonMod = this._modifications.button.unclaimed.shift();
+
+            if (!buttonMod) {
+              if (buttonToolbar) {
+                buttonSpan = document.createElement('li');
+                buttonSpan.classList.add('bqX');
+              } else {
+                buttonSpan = document.createElement('span');
+                // T-KT is one of the class names on the star button.
+                buttonSpan.classList.add('T-KT');
+              }
+
+              buttonSpan.classList.add('inboxsdk__thread_row_button');
+
+              if (buttonDescriptor.title) {
+                buttonSpan.setAttribute('title', buttonDescriptor.title);
+                buttonSpan.setAttribute('data-tooltip', buttonDescriptor.title);
+              } else {
+                buttonSpan.removeAttribute('title');
+              }
+
+              buttonSpan.setAttribute('tabindex', '-1');
+              buttonSpan.setAttribute(
+                'data-order-hint',
+                String(buttonDescriptor.orderHint || 0),
+              );
+              buttonSpan.addEventListener('onmousedown', focusAndNoPropagation);
+              iconSettings = {};
+              buttonMod = {
+                buttonSpan,
+                iconSettings,
+                remove: buttonSpan.remove.bind(buttonSpan),
+              };
             }
 
-            buttonSpan.classList.add('inboxsdk__thread_row_button');
+            this._modifications.button.claimed.push(buttonMod);
+          }
 
-            if (buttonDescriptor.title) {
-              buttonSpan.setAttribute('title', buttonDescriptor.title);
-              buttonSpan.setAttribute('data-tooltip', buttonDescriptor.title);
-            } else {
-              buttonSpan.removeAttribute('title');
-            }
+          // could also be trash icon
+          const starGroup = buttonToolbar
+            ? null
+            : querySelector(this._elements[0], 'td.apU.xY, td.aqM.xY');
+          buttonSpan = buttonMod.buttonSpan;
+          iconSettings = buttonMod.iconSettings;
 
-            buttonSpan.setAttribute('tabindex', '-1');
-            buttonSpan.setAttribute(
-              'data-order-hint',
-              String(buttonDescriptor.orderHint || 0),
-            );
-            buttonSpan.addEventListener('onmousedown', focusAndNoPropagation);
-            iconSettings = {};
-            buttonMod = {
-              buttonSpan,
-              iconSettings,
-              remove: buttonSpan.remove.bind(buttonSpan),
+          if (buttonDescriptor.onClick) {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            buttonSpan.onclick = (event) => {
+              const appEvent = {
+                dropdown: null as DropdownView | null | undefined,
+                threadRowView: this._userView,
+              };
+
+              if (buttonDescriptor.hasDropdown) {
+                if (activeDropdown) {
+                  this._elements[0].classList.remove(
+                    'inboxsdk__dropdown_active',
+                  );
+
+                  this._elements[0].classList.remove('buL'); // gmail class to force row button toolbar to be visible
+
+                  activeDropdown.close();
+                  activeDropdown = null;
+                  return;
+                } else {
+                  this._elements[0].classList.add('inboxsdk__dropdown_active');
+
+                  this._elements[0].classList.add('buL'); // gmail class to force row button toolbar to be visible
+
+                  appEvent.dropdown = activeDropdown = new DropdownView(
+                    new GmailDropdownView(),
+                    buttonSpan,
+                    null,
+                  );
+                  activeDropdown.setPlacementOptions({
+                    position: 'bottom',
+                    hAlign: 'left',
+                    vAlign: 'top',
+                  });
+                  // remember this reference before the destroy event and setTimeout
+                  // because this._elements may be cleared by then.
+                  const firstEl = this._elements[0];
+                  activeDropdown.on('destroy', () => {
+                    setTimeout(() => {
+                      firstEl.classList.remove('inboxsdk__dropdown_active');
+                      firstEl.classList.remove('buL'); // gmail class to force row button toolbar to be visible
+
+                      activeDropdown = null;
+                    }, 1);
+                  });
+                }
+              }
+
+              buttonDescriptor.onClick.call(null, appEvent);
             };
           }
 
-          this._modifications.button.claimed.push(buttonMod);
+          updateIcon(
+            iconSettings,
+            buttonSpan,
+            false,
+            buttonDescriptor.iconClass,
+            buttonDescriptor.iconUrl,
+          );
+
+          if (buttonToolbar && buttonSpan.parentElement !== buttonToolbar) {
+            insertElementInOrder(buttonToolbar, buttonSpan, undefined, true);
+          } else if (starGroup && buttonSpan.parentElement !== starGroup) {
+            insertElementInOrder(starGroup, buttonSpan);
+
+            this._expandColumn('col.y5', 26 * starGroup.children.length);
+
+            // Don't let the whole column count as the star for click and mouse over purposes.
+            // Click events that aren't directly on the star should be stopped.
+            // Mouseover events that aren't directly on the star should be stopped and
+            // re-emitted from the thread row, so the thread row still has the mouseover
+            // appearance.
+            // Click events that are on one of our buttons should be stopped. Click events
+            // that aren't on the star button or our buttons should be re-emitted from the
+            // thread row so it counts as clicking on the thread.
+            starGroup.onmouseover = starGroup.onclick =
+              starGroupEventInterceptor as typeof starGroup.onclick;
+          }
         }
-
-        // could also be trash icon
-        const starGroup = buttonToolbar
-          ? null
-          : querySelector(this._elements[0], 'td.apU.xY, td.aqM.xY');
-        buttonSpan = buttonMod.buttonSpan;
-        iconSettings = buttonMod.iconSettings;
-
-        if (buttonDescriptor.onClick) {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          buttonSpan.onclick = (event) => {
-            const appEvent = {
-              dropdown: null as DropdownView | null | undefined,
-              threadRowView: this._userView,
-            };
-
-            if (buttonDescriptor.hasDropdown) {
-              if (activeDropdown) {
-                this._elements[0].classList.remove('inboxsdk__dropdown_active');
-
-                this._elements[0].classList.remove('buL'); // gmail class to force row button toolbar to be visible
-
-                activeDropdown.close();
-                activeDropdown = null;
-                return;
-              } else {
-                this._elements[0].classList.add('inboxsdk__dropdown_active');
-
-                this._elements[0].classList.add('buL'); // gmail class to force row button toolbar to be visible
-
-                appEvent.dropdown = activeDropdown = new DropdownView(
-                  new GmailDropdownView(),
-                  buttonSpan,
-                  null,
-                );
-                activeDropdown.setPlacementOptions({
-                  position: 'bottom',
-                  hAlign: 'left',
-                  vAlign: 'top',
-                });
-                // remember this reference before the destroy event and setTimeout
-                // because this._elements may be cleared by then.
-                const firstEl = this._elements[0];
-                activeDropdown.on('destroy', () => {
-                  setTimeout(() => {
-                    firstEl.classList.remove('inboxsdk__dropdown_active');
-                    firstEl.classList.remove('buL'); // gmail class to force row button toolbar to be visible
-
-                    activeDropdown = null;
-                  }, 1);
-                });
-              }
-            }
-
-            buttonDescriptor.onClick.call(null, appEvent);
-          };
-        }
-
-        updateIcon(
-          iconSettings,
-          buttonSpan,
-          false,
-          buttonDescriptor.iconClass,
-          buttonDescriptor.iconUrl,
-        );
-
-        if (buttonToolbar && buttonSpan.parentElement !== buttonToolbar) {
-          insertElementInOrder(buttonToolbar, buttonSpan, undefined, true);
-        } else if (starGroup && buttonSpan.parentElement !== starGroup) {
-          insertElementInOrder(starGroup, buttonSpan);
-
-          this._expandColumn('col.y5', 26 * starGroup.children.length);
-
-          // Don't let the whole column count as the star for click and mouse over purposes.
-          // Click events that aren't directly on the star should be stopped.
-          // Mouseover events that aren't directly on the star should be stopped and
-          // re-emitted from the thread row, so the thread row still has the mouseover
-          // appearance.
-          // Click events that are on one of our buttons should be stopped. Click events
-          // that aren't on the star button or our buttons should be re-emitted from the
-          // thread row so it counts as clicking on the thread.
-          starGroup.onmouseover = starGroup.onclick = starGroupEventInterceptor;
-        }
-      }
-    });
+      });
   }
 
   addActionButton(actionButtonDescriptor: Record<string, any>) {
@@ -803,9 +816,9 @@ class GmailThreadRowView {
       unknown
     > = kefirCast(Kefir, opts).toProperty();
     prop
-      .combine(this._getRefresher())
+      .combine(this._getRefresher(), (value, _ignored) => value)
       .takeUntilBy(this._stopper)
-      .onValue(([opts]: any) => {
+      .onValue((opts) => {
         const attachmentDiv = querySelector(this._elements[0], 'td.yf.xY');
 
         if (!opts) {
@@ -923,9 +936,9 @@ class GmailThreadRowView {
       unknown
     > = kefirCast(Kefir, opts).toProperty();
     prop
-      .combine(this._getRefresher())
+      .combine(this._getRefresher(), (value, _ignored) => value)
       .takeUntilBy(this._stopper)
-      .onValue(([opts]: any) => {
+      .onValue((opts) => {
         const originalLabel = querySelector(this._elements[0], 'td > div.yW');
         const recipientsContainer = originalLabel.parentElement;
         if (!recipientsContainer) throw new Error('Should not happen');
@@ -1034,9 +1047,9 @@ class GmailThreadRowView {
       unknown
     > = kefirCast(Kefir, opts).toProperty();
     prop
-      .combine(this._getRefresher())
+      .combine(this._getRefresher(), (value, _ignored) => value)
       .takeUntilBy(this._stopper)
-      .onValue(([opts]: any) => {
+      .onValue((opts) => {
         const dateContainer = querySelector(
           this._elements[0],
           'td.xW, td.yf > div.apm',
@@ -1287,7 +1300,7 @@ class GmailThreadRowView {
     return refresher;
   }
 
-  _getSubjectRefresher(): Kefir.Observable<any, unknown> {
+  _getSubjectRefresher(): Kefir.Observable<null, unknown> {
     // emit an event whenever the subject element is swapped out for a new one.
     let subjectRefresher = this._subjectRefresher;
 
@@ -1311,7 +1324,7 @@ class GmailThreadRowView {
     return subjectRefresher;
   }
 
-  _getImageContainerRefresher(): Kefir.Observable<any, unknown> {
+  _getImageContainerRefresher(): Kefir.Observable<null, unknown> {
     let imageRefresher = this._imageRefresher;
 
     if (!imageRefresher) {
