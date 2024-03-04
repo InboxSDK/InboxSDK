@@ -333,6 +333,13 @@ export type RowDescriptorCellRenderer = (args: {
 }) => void;
 
 /**
+ * @alpha @internal
+ *
+ * Provides the ability to pass arbitrary HTML.
+ */
+export type ArbitraryHtmlRenderer = RowDescriptorCellRenderer;
+
+/**
  * Represents the a single row to render in {@link SectionView}s and {@link CollapsibleSectionView}s
  */
 export type RowDescriptor = {

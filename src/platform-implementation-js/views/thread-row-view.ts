@@ -6,11 +6,14 @@ import type {
   LabelDescriptor,
   ThreadDateDescriptor,
   DraftLabelDescriptor,
+  ArbitraryHtmlRenderer,
 } from '../../inboxsdk';
 import { Observable } from 'kefir';
 import type TypedEventEmitter from 'typed-emitter';
+import { Descriptor } from '../../types/descriptor';
 
 export interface ImageDescriptor {
+  image?: ArbitraryHtmlRenderer;
   imageUrl?: string;
   imageClass?: string;
   tooltip?: string;
@@ -53,9 +56,12 @@ export default class ThreadRowView extends (EventEmitter as new () => EmitterTyp
     get(membersMap, this).threadRowViewDriver.addLabel(labelDescriptor);
   }
 
-  addImage(
-    imageDescriptor: ImageDescriptor | Observable<ImageDescriptor | null, any>,
-  ) {
+  /**
+   * Adds an image to the thread row view.
+   *
+   * @param imageDescriptor - An options object for the image.
+   */
+  addImage(imageDescriptor: Descriptor<ImageDescriptor | null>) {
     get(membersMap, this).threadRowViewDriver.addImage(imageDescriptor);
   }
 

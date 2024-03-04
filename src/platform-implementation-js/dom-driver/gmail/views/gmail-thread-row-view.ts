@@ -21,7 +21,9 @@ import GmailLabelView from '../widgets/gmail-label-view';
 import GmailActionButtonView from '../widgets/gmail-action-button-view';
 import type GmailDriver from '../gmail-driver';
 import type GmailRowListView from './gmail-row-list-view';
-import updateIcon from '../../../driver-common/update-icon';
+import updateIcon, {
+  type IconSettings,
+} from '../../../driver-common/update-icon';
 import type {
   Contact,
   ImageDescriptor,
@@ -29,6 +31,7 @@ import type {
   ThreadDateDescriptor,
 } from '../../../../inboxsdk';
 import { assert } from '../../../../common/assert';
+import type { Descriptor } from '../../../../types/descriptor';
 
 type LabelMod = {
   gmailLabelView: Record<string, any>;
@@ -44,7 +47,7 @@ type ButtonMod = {
   remove(): void;
 };
 type ImageMod = {
-  iconSettings: Record<string, any>;
+  iconSettings: IconSettings;
   iconWrapper: HTMLElement;
   remove(): void;
 };
@@ -430,28 +433,33 @@ class GmailThreadRowView {
       });
   }
 
-  addImage(
-    inIconDescriptor:
-      | ImageDescriptor
-      | Kefir.Observable<ImageDescriptor | null, any>,
-  ) {
+  #imageContainerRefreshResolution: (() => void) | null = null;
+
+  addImage(inIconDescriptor: Descriptor<ImageDescriptor | null>) {
     if (!this._elements.length) {
       console.warn('addImage called on destroyed thread row');
       return;
     }
 
-    const prop = kefirCast(Kefir, inIconDescriptor)
+    const prop: Kefir.Observable<[ImageDescriptor | null], unknown> = kefirCast(
+      Kefir,
+      inIconDescriptor,
+    )
       .toProperty()
       .combine(
         Kefir.merge([
           this._getRefresher(),
           this._getSubjectRefresher(),
-          this._getImageContainerRefresher(),
+          this.#getImageContainerRefresher(),
         ]),
       )
-      .takeUntilBy(this._stopper);
+      .takeUntilBy(this._stopper) as any;
+
     let imageMod: ImageMod | null | undefined = null;
-    prop.onValue(([iconDescriptor]: any) => {
+    prop.onValue(([iconDescriptor]) => {
+      this.#imageContainerRefreshResolution?.();
+      this.#imageContainerRefreshResolution = null;
+
       if (!iconDescriptor) {
         if (imageMod) {
           imageMod.remove();
@@ -463,27 +471,39 @@ class GmailThreadRowView {
 
           imageMod = null;
         }
-      } else {
+
+        return;
+      }
+
+      if (!imageMod) {
+        imageMod = this._modifications.image.unclaimed.shift();
+
         if (!imageMod) {
-          imageMod = this._modifications.image.unclaimed.shift();
+          imageMod = {
+            iconSettings: {},
+            iconWrapper: document.createElement('div'),
 
-          if (!imageMod) {
-            imageMod = {
-              iconSettings: {},
-              iconWrapper: document.createElement('div'),
-
-              remove() {
-                this.iconWrapper.remove();
-              },
-            };
-            imageMod.iconWrapper.className =
-              'inboxsdk__thread_row_icon_wrapper';
-          }
-
-          this._modifications.image.claimed.push(imageMod);
+            remove() {
+              this.iconWrapper.remove();
+            },
+          };
+          imageMod.iconWrapper.className = 'inboxsdk__thread_row_icon_wrapper';
         }
 
-        const { iconSettings, iconWrapper } = imageMod;
+        this._modifications.image.claimed.push(imageMod);
+      }
+
+      const { iconSettings, iconWrapper } = imageMod;
+      if (iconDescriptor.image) {
+        const promise = new Promise<void>(
+          (res) => (this.#imageContainerRefreshResolution = res),
+        );
+
+        iconDescriptor.image({
+          el: iconWrapper,
+          unmountPromise: promise,
+        });
+      } else {
         updateIcon(
           iconSettings,
           iconWrapper,
@@ -491,24 +511,24 @@ class GmailThreadRowView {
           iconDescriptor.imageClass,
           iconDescriptor.imageUrl,
         );
-        const containerRow =
-          this._elements.length === 3 ? this._elements[2] : this._elements[0];
-        containerRow.classList.add('inboxsdk__thread_row_image_added');
+      }
+      const containerRow =
+        this._elements.length === 3 ? this._elements[2] : this._elements[0];
+      containerRow.classList.add('inboxsdk__thread_row_image_added');
 
-        if (iconDescriptor.tooltip) {
-          iconWrapper.setAttribute('data-tooltip', iconDescriptor.tooltip);
-        } else {
-          iconWrapper.removeAttribute('data-tooltip');
-        }
+      if (iconDescriptor.tooltip) {
+        iconWrapper.setAttribute('data-tooltip', iconDescriptor.tooltip);
+      } else {
+        iconWrapper.removeAttribute('data-tooltip');
+      }
 
-        const labelParent = this._getLabelParent();
+      const labelParent = this._getLabelParent();
 
-        if (!labelParent.contains(iconWrapper)) {
-          querySelector(labelParent, '.y6').insertAdjacentElement(
-            'beforebegin',
-            iconWrapper,
-          );
-        }
+      if (!labelParent.contains(iconWrapper)) {
+        querySelector(labelParent, '.y6').insertAdjacentElement(
+          'beforebegin',
+          iconWrapper,
+        );
       }
     });
   }
@@ -1311,7 +1331,7 @@ class GmailThreadRowView {
     return subjectRefresher;
   }
 
-  _getImageContainerRefresher(): Kefir.Observable<any, unknown> {
+  #getImageContainerRefresher() {
     let imageRefresher = this._imageRefresher;
 
     if (!imageRefresher) {
