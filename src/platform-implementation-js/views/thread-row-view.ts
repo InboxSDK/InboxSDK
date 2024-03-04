@@ -10,10 +10,19 @@ import type {
 import { Observable } from 'kefir';
 import type TypedEventEmitter from 'typed-emitter';
 
-export interface ImageDescriptor {
+export interface GroupedImageDescriptor {
   imageUrl?: string;
   imageClass?: string;
   tooltip?: string;
+}
+
+export interface ImageDescriptor extends GroupedImageDescriptor {
+  orderHint?: number;
+}
+
+export interface GroupedImagesDescriptor {
+  group: GroupedImageDescriptor[];
+  groupClass?: string;
   orderHint?: number;
 }
 
@@ -57,6 +66,16 @@ export default class ThreadRowView extends (EventEmitter as new () => EmitterTyp
     imageDescriptor: ImageDescriptor | Observable<ImageDescriptor | null, any>,
   ) {
     get(membersMap, this).threadRowViewDriver.addImage(imageDescriptor);
+  }
+
+  addImageGroup(
+    groupedImagesDescriptor:
+      | GroupedImagesDescriptor
+      | Observable<GroupedImagesDescriptor | null, any>,
+  ) {
+    get(membersMap, this).threadRowViewDriver.addImageGroup(
+      groupedImagesDescriptor,
+    );
   }
 
   addButton(buttonDescriptor: any) {

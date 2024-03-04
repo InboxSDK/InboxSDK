@@ -42,6 +42,21 @@ InboxSDK.load(2, 'thread-rows').then(function (inboxSDK) {
       }),
     );
 
+    threadRowView.addImageGroup({
+      group: [
+        {
+          imageUrl:
+            'https://lh6.googleusercontent.com/-dSK6wJEXzP8/AAAAAAAAAAI/AAAAAAAAAAA/Som6EQiIJa8/s64-c/photo.jpg',
+          tooltip: 'Monkeys',
+        },
+        {
+          imageUrl:
+            'https://lh6.googleusercontent.com/-dSK6wJEXzP8/AAAAAAAAAAI/AAAAAAAAAAA/Som6EQiIJa8/s64-c/photo.jpg',
+          tooltip: 'Monkeys',
+        },
+      ],
+    });
+
     threadRowView.addLabel(
       Kefir.repeatedly(5000, [
         { title: 'A' },

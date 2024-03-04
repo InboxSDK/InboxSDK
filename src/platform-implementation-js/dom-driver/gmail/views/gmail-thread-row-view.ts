@@ -29,6 +29,7 @@ import type {
   ThreadDateDescriptor,
 } from '../../../../inboxsdk';
 import { assert } from '../../../../common/assert';
+import { GroupedImagesDescriptor } from '../../../views/thread-row-view';
 
 type LabelMod = {
   gmailLabelView: Record<string, any>;
@@ -48,6 +49,11 @@ type ImageMod = {
   iconWrapper: HTMLElement;
   remove(): void;
 };
+interface GroupedImageMod {
+  groupElement: HTMLElement;
+  groupIconSettings: Array<Record<string, any>>;
+  remove(): void;
+}
 type ReplacedDateMod = {
   el: HTMLElement;
   remove(): void;
@@ -69,6 +75,10 @@ type Mods = {
   image: {
     unclaimed: ImageMod[];
     claimed: ImageMod[];
+  };
+  groupedImages: {
+    unclaimed: GroupedImageMod[];
+    claimed: GroupedImageMod[];
   };
   replacedDate: {
     unclaimed: ReplacedDateMod[];
@@ -194,6 +204,10 @@ class GmailThreadRowView {
           unclaimed: [],
           claimed: [],
         },
+        groupedImages: {
+          unclaimed: [],
+          claimed: [],
+        },
         replacedDate: {
           unclaimed: [],
           claimed: [],
@@ -248,6 +262,11 @@ class GmailThreadRowView {
         this._modifications.image.unclaimed,
       );
     this._modifications.image.claimed.length = 0;
+    this._modifications.groupedImages.unclaimed =
+      this._modifications.groupedImages.claimed.concat(
+        this._modifications.groupedImages.unclaimed,
+      );
+    this._modifications.groupedImages.claimed.length = 0;
     this._modifications.replacedDate.unclaimed =
       this._modifications.replacedDate.claimed.concat(
         this._modifications.replacedDate.unclaimed,
@@ -515,6 +534,124 @@ class GmailThreadRowView {
           querySelector(labelParent, '.y6').insertAdjacentElement(
             'beforebegin',
             iconWrapper,
+          );
+        }
+      }
+    });
+  }
+
+  addImageGroup(
+    inIconDescriptor:
+      | GroupedImagesDescriptor
+      | Kefir.Observable<GroupedImagesDescriptor | null, any>,
+  ) {
+    if (!this._elements.length) {
+      console.warn('addImage called on destroyed thread row');
+      return;
+    }
+
+    const prop = (
+      kefirCast(Kefir, inIconDescriptor) as Kefir.Observable<
+        GroupedImagesDescriptor,
+        unknown
+      >
+    )
+      .toProperty()
+      .combine(
+        Kefir.merge([
+          this._getRefresher(),
+          this._getSubjectRefresher(),
+          this._getImageContainerRefresher(),
+        ]),
+        (value, ..._ignored) => value,
+      )
+      .takeUntilBy(this._stopper);
+    let groupedImageMod: GroupedImageMod | null | undefined = null;
+    prop.onValue((groupedImagesDescriptor) => {
+      if (!groupedImagesDescriptor) {
+        if (groupedImageMod) {
+          groupedImageMod.remove();
+
+          this._modifications.groupedImages.claimed.splice(
+            this._modifications.groupedImages.claimed.indexOf(groupedImageMod),
+            1,
+          );
+
+          groupedImageMod = null;
+        }
+      } else {
+        if (!groupedImageMod) {
+          groupedImageMod = this._modifications.groupedImages.unclaimed.shift();
+
+          if (!groupedImageMod) {
+            groupedImageMod = {
+              groupIconSettings: [],
+              groupElement: document.createElement('div'),
+
+              remove() {
+                this.groupElement.remove();
+              },
+            };
+            groupedImageMod.groupElement.className =
+              'inboxsdk__thread_row_group_icon_wrapper';
+          }
+
+          this._modifications.groupedImages.claimed.push(groupedImageMod);
+        }
+
+        if (
+          groupedImageMod.groupElement.childElementCount >
+          groupedImagesDescriptor.group.length
+        ) {
+          const toRemove = Array.from(
+            groupedImageMod.groupElement.children,
+          ).slice(groupedImagesDescriptor.group.length);
+          toRemove.forEach((el) => el.remove());
+        }
+
+        for (let i = 0; i < groupedImagesDescriptor.group.length; i++) {
+          const iconDescriptor = groupedImagesDescriptor.group[i];
+          let iconSettings = groupedImageMod.groupIconSettings[i];
+
+          if (!iconSettings) {
+            iconSettings = {};
+            groupedImageMod.groupIconSettings[i] = iconSettings;
+          }
+
+          let iconElement = groupedImageMod.groupElement.children[i] as
+            | HTMLElement
+            | undefined;
+          if (!iconElement) {
+            iconElement = document.createElement('div');
+            iconElement.className = 'inboxsdk__thread_row_icon_wrapper';
+            groupedImageMod.groupElement.appendChild(iconElement);
+          }
+
+          updateIcon(
+            iconSettings,
+            iconElement,
+            false,
+            iconDescriptor.imageClass,
+            iconDescriptor.imageUrl,
+          );
+
+          if (iconSettings.tooltip) {
+            iconElement.setAttribute('data-tooltip', iconSettings.tooltip);
+          } else {
+            iconElement.removeAttribute('data-tooltip');
+          }
+        }
+
+        const containerRow =
+          this._elements.length === 3 ? this._elements[2] : this._elements[0];
+        containerRow.classList.add('inboxsdk__thread_row_image_added');
+
+        const labelParent = this._getLabelParent();
+
+        if (!labelParent.contains(groupedImageMod.groupElement)) {
+          querySelector(labelParent, '.y6').insertAdjacentElement(
+            'beforebegin',
+            groupedImageMod.groupElement,
           );
         }
       }
@@ -1403,6 +1540,14 @@ function _removeThreadRowUnclaimedModifications(modifications: Mods) {
   }
 
   modifications.image.unclaimed.length = 0;
+
+  for (let ii = 0; ii < modifications.groupedImages.unclaimed.length; ii++) {
+    const mod = modifications.groupedImages.unclaimed[ii];
+    //console.log('removing unclaimed groupedImages mod', mod);
+    mod.remove();
+  }
+
+  modifications.groupedImages.unclaimed.length = 0;
 
   for (let ii = 0; ii < modifications.replacedDate.unclaimed.length; ii++) {
     const mod = modifications.replacedDate.unclaimed[ii];

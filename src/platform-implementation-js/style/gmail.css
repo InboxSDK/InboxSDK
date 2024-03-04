@@ -337,7 +337,8 @@ a.inboxsdk__appid_register {
   margin-left: 1em;
 }
 
-.inboxsdk__thread_row_icon_wrapper {
+.inboxsdk__thread_row_icon_wrapper,
+.inboxsdk__thread_row_group_icon_wrapper {
   display: inline-block;
 }
 
