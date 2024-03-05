@@ -21,7 +21,7 @@ import GmailLabelView from '../widgets/gmail-label-view';
 import GmailActionButtonView from '../widgets/gmail-action-button-view';
 import type GmailDriver from '../gmail-driver';
 import type GmailRowListView from './gmail-row-list-view';
-import updateIcon from '../../../driver-common/update-icon';
+import updateIcon, { IconSettings } from '../../../driver-common/update-icon';
 import type {
   Contact,
   ImageDescriptor,
@@ -40,11 +40,11 @@ type ActionButtonMod = {
 };
 type ButtonMod = {
   buttonSpan: HTMLElement;
-  iconSettings: Record<string, any>;
+  iconSettings: IconSettings;
   remove(): void;
 };
 type ImageMod = {
-  iconSettings: Record<string, any>;
+  iconSettings: IconSettings;
   iconWrapper: HTMLElement;
   remove(): void;
 };
