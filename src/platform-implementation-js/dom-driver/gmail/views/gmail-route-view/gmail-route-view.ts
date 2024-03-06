@@ -237,8 +237,12 @@ class GmailRouteView implements RouteViewDriver {
 
     Kefir.combine([
       this.#getSectionsContainer(),
-      gmailResultsSectionView.getEventStream().filter((event) => {
-        return event.type === 'update' && event.property === 'orderHint';
+      gmailResultsSectionView.eventStream.filter((event) => {
+        return (
+          'type' in event &&
+          event.type === 'update' &&
+          event.property === 'orderHint'
+        );
       }),
     ]).onValue(([sectionsContainer]) => {
       const children = sectionsContainer.children;

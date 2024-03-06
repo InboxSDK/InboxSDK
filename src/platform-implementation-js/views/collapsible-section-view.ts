@@ -1,7 +1,16 @@
 import EventEmitter from '../lib/safe-event-emitter';
 import type { Driver } from '../driver-interfaces/driver';
 import type GmailCollapsibleSectionView from '../dom-driver/gmail/views/gmail-collapsible-section-view';
-import type { RowDescriptor } from '../../inboxsdk';
+import TypedEventEmitter from 'typed-emitter';
+
+export type ViewEvent = {
+  collapsed(): void;
+  destroy(): void;
+  expanded(): void;
+  footerClicked(): void;
+  rowClicked(): void;
+  titleLinkClicked(): void;
+};
 
 /**
 * {@link CollapsibleSectionView}s allow you to display additional content on ListRouteViews. They are typically rendered as additional content above the list of threads below. The visual style is similar to that of multiple inbox sections used in native Gmail. Note that the rendering may vary slightly depending on the actual ListRouteView that the {@link CollapsibleSectionView} is rendered in. For example, {@link CollapsibleSectionViews} rendered on search results pages use different header styles to match Gmail's style more accurately.
@@ -11,7 +20,7 @@ import type { RowDescriptor } from '../../inboxsdk';
  * @see ListRouteView.addCollapsibleSection for more information.
  * @todo the docs mention this class extending SectionView. That doesn't seem to be the case.
 */
-class CollapsibleSectionView extends EventEmitter {
+class CollapsibleSectionView extends (EventEmitter as new () => TypedEventEmitter<ViewEvent>) {
   /** This property is set to true once the view is destroyed. */
   destroyed: boolean;
   #collapsibleSectionViewDriver: GmailCollapsibleSectionView;
@@ -47,38 +56,52 @@ function _bindToEventStream(
   collapsibleSectionViewDriver: GmailCollapsibleSectionView,
   driver: Driver,
 ) {
-  collapsibleSectionViewDriver.getEventStream().onValue(({ eventName }) => {
+  collapsibleSectionViewDriver.eventStream.onValue((event) => {
+    if (!('eventName' in event)) {
+      return;
+    }
+
+    const { eventName } = event;
     collapsibleSectionView.emit(eventName);
   });
-  collapsibleSectionViewDriver
-    .getEventStream()
-    .filter(({ eventName }) => eventName === 'rowClicked')
-    .onValue(({ rowDescriptor }: { rowDescriptor: RowDescriptor }) => {
-      if (rowDescriptor.routeID) {
-        driver.goto(rowDescriptor.routeID, rowDescriptor.routeParams);
-      }
+  collapsibleSectionViewDriver.eventStream.onValue((event) => {
+    if (!('eventName' in event) || event.eventName !== 'rowClicked') {
+      return;
+    }
 
-      if (typeof rowDescriptor.onClick === 'function') {
-        rowDescriptor.onClick();
-      }
-    });
-  collapsibleSectionViewDriver
-    .getEventStream()
-    .filter(({ eventName }) => eventName === 'titleLinkClicked')
-    .onValue(({ sectionDescriptor }) => {
-      if (sectionDescriptor.onTitleLinkClick) {
-        sectionDescriptor.onTitleLinkClick(collapsibleSectionView);
-      }
-    });
-  collapsibleSectionViewDriver
-    .getEventStream()
-    .filter(({ eventName }) => eventName === 'footerClicked')
-    .onValue(({ sectionDescriptor }) => {
-      if (sectionDescriptor.onFooterLinkClick) {
-        sectionDescriptor.onFooterLinkClick(collapsibleSectionView);
-      }
-    });
-  collapsibleSectionViewDriver.getEventStream().onEnd(() => {
+    const { rowDescriptor } = event;
+
+    if (rowDescriptor.routeID) {
+      driver.goto(rowDescriptor.routeID, rowDescriptor.routeParams);
+    }
+
+    if (typeof rowDescriptor.onClick === 'function') {
+      rowDescriptor.onClick();
+    }
+  });
+  collapsibleSectionViewDriver.eventStream.onValue((event) => {
+    if (!('eventName' in event) || event.eventName !== 'titleLinkClicked') {
+      return;
+    }
+
+    const { sectionDescriptor } = event;
+
+    if (sectionDescriptor.onTitleLinkClick) {
+      sectionDescriptor.onTitleLinkClick(collapsibleSectionView);
+    }
+  });
+  collapsibleSectionViewDriver.eventStream.onValue((event) => {
+    if (!('eventName' in event) || event.eventName !== 'footerClicked') {
+      return;
+    }
+
+    const { sectionDescriptor } = event;
+
+    if (sectionDescriptor.onFooterLinkClick) {
+      sectionDescriptor.onFooterLinkClick(collapsibleSectionView);
+    }
+  });
+  collapsibleSectionViewDriver.eventStream.onEnd(() => {
     collapsibleSectionView.destroyed = true;
     collapsibleSectionView.emit('destroy');
   });

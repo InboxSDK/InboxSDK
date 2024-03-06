@@ -33,6 +33,31 @@ const enum CustomSelector {
   title_2024_01_29 = 'h3 > .Wn',
 }
 
+type ViewEvent =
+  | {
+      type: 'update';
+      property: 'orderHint';
+      sectionDescriptor?: SectionDescriptor;
+    }
+  | {
+      eventName: 'titleLinkClicked';
+      sectionDescriptor: SectionDescriptor;
+    }
+  | {
+      eventName: 'rowClicked';
+      rowDescriptor: RowDescriptor;
+    }
+  | {
+      eventName: 'footerClicked';
+      sectionDescriptor: SectionDescriptor;
+    }
+  | {
+      eventName: 'collapsed';
+    }
+  | {
+      eventName: 'expanded';
+    };
+
 class GmailCollapsibleSectionView {
   #groupOrderHint: number;
   #isReadyDeferred;
@@ -48,7 +73,7 @@ class GmailCollapsibleSectionView {
   #collapsedContainer: HTMLElement | null = null;
   #messageElement: HTMLElement | null = null;
   #footerElement: HTMLElement | null = null;
-  #eventStream: Bus<any, unknown>;
+  #eventStream: Bus<ViewEvent, unknown>;
   #isCollapsed: boolean = false;
   #inboxDropdownButtonView: InboxDropdownButtonView | null = null;
   #dropdownViewController: DropdownButtonViewController | null = null;
@@ -97,7 +122,7 @@ class GmailCollapsibleSectionView {
     return element;
   }
 
-  getEventStream() {
+  get eventStream() {
     return this.#eventStream;
   }
 
