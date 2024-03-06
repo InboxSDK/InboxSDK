@@ -481,6 +481,8 @@ class GmailThreadRowView {
               iconWrapper: document.createElement('div'),
 
               remove() {
+                // Trigger any mouseleave handlers that were added by onHover.
+                this.iconWrapper.dispatchEvent(new MouseEvent('mouseleave'));
                 this.iconWrapper.remove();
               },
             };
