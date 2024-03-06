@@ -39,6 +39,12 @@ InboxSDK.load(2, 'thread-rows').then(function (inboxSDK) {
         imageUrl:
           'https://lh6.googleusercontent.com/-dSK6wJEXzP8/AAAAAAAAAAI/AAAAAAAAAAA/Som6EQiIJa8/s64-c/photo.jpg',
         tooltip: 'Monkeys',
+        onHover(e) {
+          console.log('hovered over image', e);
+          e.hoverEnd.then(() => {
+            console.log('hover ended');
+          });
+        },
       }),
     );
 

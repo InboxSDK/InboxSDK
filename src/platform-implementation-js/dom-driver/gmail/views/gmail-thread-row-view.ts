@@ -481,6 +481,8 @@ class GmailThreadRowView {
               iconWrapper: document.createElement('div'),
 
               remove() {
+                // Trigger any mouseleave handlers that were added by onHover.
+                this.iconWrapper.dispatchEvent(new MouseEvent('mouseleave'));
                 this.iconWrapper.remove();
               },
             };
@@ -507,6 +509,27 @@ class GmailThreadRowView {
           iconWrapper.setAttribute('data-tooltip', iconDescriptor.tooltip);
         } else {
           iconWrapper.removeAttribute('data-tooltip');
+        }
+
+        if (iconDescriptor.onHover) {
+          const { onHover } = iconDescriptor;
+          // Using property instead of addEventListener so we replace any old handler
+          // added by a previous iconDescriptor emitted from the stream.
+          iconWrapper.onmouseenter = () => {
+            // We only add the mouseleave listener here and use addEventListener so
+            // it doesn't get replaced if a new iconDescriptor is emitted from the
+            // stream while the user is hovering.
+            const hoverEnd = new Promise<void>((resolve) => {
+              iconWrapper.addEventListener(
+                'mouseleave',
+                () => {
+                  resolve();
+                },
+                { once: true },
+              );
+            });
+            onHover({ hoverEnd });
+          };
         }
 
         const labelParent = this._getLabelParent();
