@@ -15,6 +15,7 @@ export interface ImageDescriptor {
   imageClass?: string;
   tooltip?: string;
   orderHint?: number;
+  onHover?: (event: { hoverEnd: Promise<void> }) => void;
 }
 
 type EmitterType = TypedEventEmitter<{ destroy: () => void }>;
