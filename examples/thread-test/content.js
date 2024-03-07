@@ -76,6 +76,21 @@ InboxSDK.load(2, 'thread-example').then((sdk) => {
         console.log('label removed');
         labelView.destroy();
       }, 5000);
+
+      threadView.addSubjectButton({
+        tooltip: 'Hi a thing',
+        iconUrl: `//ssl.gstatic.com/ui/v1/icons/mail/rfr/ic_open_in_full_16px_1x.png`,
+        onClick: function (event) {
+          console.log('button click');
+        },
+      });
+      threadView.addSubjectButton({
+        tooltip: 'Hi a second thing',
+        iconUrl: `//ssl.gstatic.com/ui/v1/icons/mail/rfr/ic_open_in_full_16px_1x.png`,
+        onClick: function (event) {
+          console.log('button 2 click');
+        },
+      });
     })();
   });
 

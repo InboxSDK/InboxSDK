@@ -19,6 +19,8 @@ import { type ContentPanelDescriptor } from '../../../driver-common/sidebar/Cont
 import isStreakAppId from '../../../lib/isStreakAppId';
 import censorHTMLstring from '../../../../common/censorHTMLstring';
 import type GmailRouteView from './gmail-route-view/gmail-route-view';
+import ButtonView from '../widgets/buttons/button-view';
+import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 
 let hasLoggedAddonInfo = false;
 
@@ -625,6 +627,54 @@ class GmailThreadView {
     return view;
   }
 
+  addSubjectButton(button: any) {
+    const subjectParent = this._element.querySelector('.V8djrc.byY');
+    if (!subjectParent) {
+      throw new Error('Subject wrapper element not found');
+    }
+
+    const buttonOptions = {
+      ...button,
+    };
+    buttonOptions.buttonView = new ButtonView(buttonOptions);
+    const buttonElement = buttonOptions.buttonView.getElement();
+
+    // Sometimes it is there right away
+    const subjectToolbarElement = this._findSubjectToolbarElement();
+    if (subjectToolbarElement) {
+      subjectToolbarElement.prepend(buttonElement);
+    }
+
+    // Sometimes the container is lazy loaded or re-loaded, so we observe too
+    const observer = new MutationObserver((mutationsList) => {
+      if (mutationsList.some((mutation) => mutation.type === 'childList')) {
+        const subjectToolbarElement = this._findSubjectToolbarElement();
+        if (
+          subjectToolbarElement &&
+          !subjectToolbarElement.contains(buttonElement)
+        ) {
+          subjectToolbarElement.prepend(buttonElement);
+        }
+      }
+    });
+    observer.observe(subjectParent, {
+      childList: true,
+      subtree: true,
+    });
+
+    this._stopper
+      .takeUntilBy(Kefir.fromEvents(buttonElement, 'destroy'))
+      .onValue(() => buttonOptions.buttonView.destroy());
+
+    Kefir.fromEvents(buttonElement, 'destroy')
+      .take(1)
+      .onValue(() => {
+        observer.disconnect();
+      });
+
+    return new BasicButtonViewController(buttonOptions);
+  }
+
   _setupToolbarView() {
     const toolbarElement = this._findToolbarElement();
 
@@ -685,6 +735,12 @@ class GmailThreadView {
     }
 
     return null;
+  }
+
+  _findSubjectToolbarElement(): HTMLElement | null {
+    var toolbarContainerElements =
+      this._element.querySelectorAll<HTMLElement>('.bHJ');
+    return toolbarContainerElements[0];
   }
 
   _isToolbarContainerRelevant(toolbarContainerElement: HTMLElement): boolean {
