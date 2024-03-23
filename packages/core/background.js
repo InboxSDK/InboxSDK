@@ -1,7 +1,13 @@
-/* global chrome */
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+/** @type {import('webextension-polyfill').Browser} */
+const browser = globalThis.chrome || globalThis.browser;
+
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'inboxsdk__injectPageWorld' && sender.tab) {
-    if (chrome.scripting) {
+    // NPM_MV2_SUPPORT is required for firefox
+    // as MAIN world execution is not supported in firefox yet
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=1736575
+    if ('browser' in globalThis) sendResponse(true);
+    else if (browser.scripting) {
       // MV3
       let documentIds;
       let frameIds;
@@ -13,7 +19,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       } else {
         frameIds = [sender.frameId];
       }
-      chrome.scripting.executeScript({
+      browser.scripting.executeScript({
         target: { tabId: sender.tab.id, documentIds, frameIds },
         world: 'MAIN',
         files: ['pageWorld.js'],

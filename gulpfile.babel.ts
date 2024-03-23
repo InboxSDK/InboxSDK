@@ -241,7 +241,7 @@ async function webpackTask({
          * in Chrome Web Store reviews checking for dynamically loaded code in MV3 extensions.
          * This flag has no effect for remote/non-npm builds.
          */
-        NPM_MV2_SUPPORT: JSON.stringify(false),
+        NPM_MV2_SUPPORT: JSON.stringify(!args.production),
       }),
       ...(willMinify || args.production
         ? [

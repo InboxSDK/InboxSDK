@@ -1,14 +1,14 @@
 import once from 'lodash/once';
+import browser from 'webextension-polyfill';
 
 const getExtensionId = once((): string | null => {
   try {
-    const chrome: any = (globalThis as any).chrome;
-    if (chrome?.runtime?.getURL) {
-      return chrome.runtime.getURL('');
+    if (browser?.runtime?.getURL) {
+      return browser.runtime.getURL('');
     }
     // MV2
-    if (chrome?.extension?.getURL) {
-      return chrome.extension.getURL('');
+    if (browser?.extension?.getURL) {
+      return browser.extension.getURL('');
     }
   } catch (e) {
     // When an extension is reloaded or removed, then Chrome APIs in any of its
@@ -17,6 +17,7 @@ const getExtensionId = once((): string | null => {
     // shouldn't treat this as fatal.
     console.error('Failed to read extension ID:', e);
   }
+
   return null;
 });
 
