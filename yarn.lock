@@ -2706,6 +2706,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/webextension-polyfill@npm:^0.10.7":
+  version: 0.10.7
+  resolution: "@types/webextension-polyfill@npm:0.10.7"
+  checksum: b2d9b4f4e7ebafb299e8dfc75ac2c3cc6cc29bebce5f590c01533388b0d22d4a9fa8e7cb547cb69d1092c3a8d573675df3355d46c64de77d690b30ae641eeb77
+  languageName: node
+  linkType: hard
+
 "@types/yargs-parser@npm:*":
   version: 20.2.0
   resolution: "@types/yargs-parser@npm:20.2.0"
@@ -6951,6 +6958,7 @@ __metadata:
     "@types/sinon-test": "npm:^2.4.0"
     "@types/transducers.js": "npm:^0.3.0"
     "@types/vinyl-source-stream": "npm:^0.0.30"
+    "@types/webextension-polyfill": "npm:^0.10.7"
     "@typescript-eslint/eslint-plugin": "npm:^5.59.8"
     "@typescript-eslint/parser": "npm:^5.59.8"
     asap: "npm:^2.0.3"
@@ -7024,6 +7032,7 @@ __metadata:
     typescript: "npm:^5.3.3"
     ud: "npm:^3.3.1"
     ud-kefir: "npm:^2.0.1"
+    webextension-polyfill: "npm:^0.10.0"
     webpack: "npm:^5.76.3"
   languageName: unknown
   linkType: soft
@@ -12773,6 +12782,13 @@ __metadata:
     glob-to-regexp: "npm:^0.4.1"
     graceful-fs: "npm:^4.1.2"
   checksum: 0736ebd20b75d3931f9b6175c819a66dee29297c1b389b2e178bc53396a6f867ecc2fd5d87a713ae92dcb73e487daec4905beee20ca00a9e27f1184a7c2bca5e
+  languageName: node
+  linkType: hard
+
+"webextension-polyfill@npm:^0.10.0":
+  version: 0.10.0
+  resolution: "webextension-polyfill@npm:0.10.0"
+  checksum: 51ff30ebed4b1aa802b7f0347f05021b2fe492078bb1a597223d43995fcee96e2da8f914a2f6e36f988c1877ed5ab36ca7077f2f3ab828955151a59e4c01bf7e
   languageName: node
   linkType: hard
 
