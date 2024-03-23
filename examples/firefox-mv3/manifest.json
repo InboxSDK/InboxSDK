@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Firefox MV3",
+  "description": "InboxSDK example!",
+  "version": "1.0",
+  "host_permissions": ["https://mail.google.com/"],
+  "permissions": ["scripting"],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://mail.google.com/*"],
+      "js": ["inboxsdk.js", "content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "matches": ["*://mail.google.com/*"],
+      "resources": ["pageWorld.js", "monkey.png"]
+    }
+  ]
+}

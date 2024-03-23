@@ -1,0 +1,18 @@
+{
+  "manifest_version": 2,
+  "name": "Firefox MV2",
+  "description": "InboxSDK example!",
+  "version": "1.0",
+  "permissions": ["scripting"],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://mail.google.com/*"],
+      "js": ["inboxsdk.js", "content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": ["pageWorld.js", "monkey.png"]
+}
