@@ -12,7 +12,8 @@ let injectScriptImplementation: () => void = () => {
   browser.runtime
     .sendMessage({ type: 'inboxsdk__injectPageWorld' })
     .then((didExecute: boolean) => {
-      if (!didExecute) return;
+      /** pageWorld was injected successfully */
+      if (didExecute) return;
 
       if (NPM_MV2_SUPPORT) {
         // MV2 support.
@@ -53,6 +54,21 @@ export const injectScript = once((): Promise<null> => {
     .toPromise();
 });
 
+/** This function can be used override the logic for injecting pageWorld.js to Gmail page.
+ * Useful for firefox browser or mv2
+ *
+ * @example
+ * ```ts
+ * InboxSDK.setInjectScriptImplementation(() => {
+ *    const script = document.createElement('script');
+ *    script.type = 'text/javascript';
+ *    script.src = browser.runtime.getURL('pageWorld.js');
+ *    document.documentElement.appendChild(script);
+ * })
+ *
+ * InboxSDK.load(2, ...);
+ * ```
+ */
 export function setInjectScriptImplementation(fn: () => void) {
   injectScriptImplementation = fn;
 }

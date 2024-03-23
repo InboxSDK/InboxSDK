@@ -3,11 +3,7 @@ const browser = globalThis.chrome || globalThis.browser;
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'inboxsdk__injectPageWorld' && sender.tab) {
-    // NPM_MV2_SUPPORT is required for firefox
-    // as MAIN world execution is not supported in firefox yet
-    // https://bugzilla.mozilla.org/show_bug.cgi?id=1736575
-    if ('browser' in globalThis) sendResponse(true);
-    else if (browser.scripting) {
+    if (browser.scripting) {
       // MV3
       let documentIds;
       let frameIds;

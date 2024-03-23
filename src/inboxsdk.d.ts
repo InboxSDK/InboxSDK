@@ -40,6 +40,8 @@ import type {
   PlatformImplementation,
 } from './platform-implementation-js/platform-implementation';
 
+export { setInjectScriptImplementation } from './platform-implementation-js/lib/inject-script';
+
 export type { User };
 
 export const LOADER_VERSION: string;
