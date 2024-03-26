@@ -1,5 +1,11 @@
 import once from 'lodash/once';
-import browser from 'webextension-polyfill';
+
+/** Refers to {@link chrome} or `browser` in firefox */
+export const browser = globalThis.chrome || (globalThis as any).browser;
+
+if (!browser) {
+  throw new Error('chrome or browser not available in current context.');
+}
 
 const getExtensionId = once((): string | null => {
   try {
@@ -24,5 +30,3 @@ const getExtensionId = once((): string | null => {
 // pre-cache the extension ID so we still know it inside this content script if
 // the extension is reloaded or removed later.
 getExtensionId();
-
-export default getExtensionId;

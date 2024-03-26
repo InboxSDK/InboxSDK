@@ -1,4 +1,4 @@
-// Add support for webextension-polyfill in unit tests
+// Adds support for `chrome` in unit tests
 if (!globalThis.chrome) {
   globalThis.chrome = {
     runtime: {

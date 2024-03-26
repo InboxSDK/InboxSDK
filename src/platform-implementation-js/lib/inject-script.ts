@@ -1,7 +1,7 @@
-import browser from 'webextension-polyfill';
 import once from 'lodash/once';
 import Kefir from 'kefir';
 import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chunked-stream';
+import { browser } from '../../common/extension-apis';
 
 declare global {
   /** Set by webpack.DefinePlugin to remove a code block potentially flagged by Chrome Web Store reviews. */

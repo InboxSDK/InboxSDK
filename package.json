@@ -94,8 +94,7 @@
     "typed-emitter": "^2.1.0",
     "typescript": "^5.3.3",
     "ud": "^3.3.1",
-    "ud-kefir": "^2.0.1",
-    "webextension-polyfill": "^0.10.0"
+    "ud-kefir": "^2.0.1"
   },
   "description": "Library for browser extensions to interact with Gmail.",
   "license": "(MIT OR Apache-2.0)",
