@@ -5,10 +5,9 @@ import ajax from './ajax';
 import delay from 'pdelay';
 
 const isContentScript: () => boolean = once(function () {
-  const ctx = global as any;
-  const env = ['chrome', 'browser', 'safari'] as const;
-
-  return env.some((key) => ctx[key] && !!ctx[key].extension);
+  if ((global as any).chrome && (global as any).chrome.extension) return true;
+  if ((global as any).safari && (global as any).safari.extension) return true;
+  return false;
 });
 
 function addScriptToPage(url: string, cors: boolean): Promise<void> {
