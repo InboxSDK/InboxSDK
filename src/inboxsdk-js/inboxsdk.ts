@@ -3,6 +3,8 @@ import { BUILD_VERSION } from '../common/version';
 import { loadScript as _loadScript } from './load-script-proxy';
 import type { LoadScriptOptions } from '../common/load-script';
 
+export { setInjectScriptImplementation } from '../platform-implementation-js/lib/inject-script';
+
 declare global {
   var __test_origin: string | undefined;
 }

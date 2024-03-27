@@ -1,9 +1,11 @@
-/* global chrome */
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+/** @type {import('webextension-polyfill').Browser} */
+const browser = globalThis.chrome || globalThis.browser;
+
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'inboxsdk__injectPageWorld' && sender.tab) {
-    if (chrome.scripting) {
+    if (browser.scripting) {
       // MV3
-      chrome.scripting.executeScript({
+      browser.scripting.executeScript({
         target: { tabId: sender.tab.id },
         world: 'MAIN',
         files: ['pageWorld.js'],
