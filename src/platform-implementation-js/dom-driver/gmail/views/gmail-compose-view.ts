@@ -82,6 +82,7 @@ import type GmailDriver from '../gmail-driver';
 import { Contact } from '../../../../inboxsdk';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 import { type PublicOnly } from '../../../../types/public-only';
+import isNotNil from '../../../../common/isNotNil';
 
 let hasReportedMissingBody = false;
 
@@ -230,7 +231,7 @@ class GmailComposeView {
           }
         }
       })
-      .filter(Boolean);
+      .filter(isNotNil);
 
     this.#eventStream.plug(
       Kefir.merge<any, any>([

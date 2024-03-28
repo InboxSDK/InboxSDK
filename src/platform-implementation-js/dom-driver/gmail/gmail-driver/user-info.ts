@@ -2,6 +2,7 @@ import find from 'lodash/find';
 import uniqBy from 'lodash/uniqBy';
 import { Driver } from '../../../driver-interfaces/driver';
 import { Contact } from '../../../../inboxsdk';
+import isNotNil from '../../../../common/isNotNil';
 
 export default class UserInfo {
   _failedWaitFor: boolean;
@@ -38,17 +39,17 @@ export default class UserInfo {
       ),
     )
       .slice(0, 1)
-      .map((btn: HTMLElement) => {
-        const btnParent: HTMLElement = btn.parentElement!;
+      .map((btn) => {
+        const btnParent = btn.parentElement!;
         const nameEl = btnParent.children[0];
         const emailAddressEl = btnParent.children[1];
         if (!nameEl || !emailAddressEl) return null;
         return {
-          name: nameEl.textContent,
-          emailAddress: emailAddressEl.textContent,
+          name: nameEl.textContent!,
+          emailAddress: emailAddressEl.textContent!,
         };
       })
-      .filter(Boolean) as Contact[];
+      .filter(isNotNil);
     const extras: Contact[] = Array.from(
       document.querySelectorAll<HTMLElement>(
         '[role=banner] div[aria-label] div > a[target="_blank"] > img + div',

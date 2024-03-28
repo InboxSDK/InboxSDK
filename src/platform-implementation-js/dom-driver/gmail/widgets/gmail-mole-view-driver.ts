@@ -9,7 +9,7 @@ import * as styles from './mole-view.module.css';
 import cx from 'classnames';
 import PageParserTree from 'page-parser-tree';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
-import isNotNil from '../../../lib/isNotNil';
+import isNotNil from '../../../../common/isNotNil';
 
 export type MoleButtonDescriptor = {
   title: string;

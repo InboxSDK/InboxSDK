@@ -2,15 +2,16 @@ import * as Kefir from 'kefir';
 import udKefir from 'ud-kefir';
 
 import kefirMakeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
-import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
+import makeElementChildStream, {
+  ElementWithLifetime,
+} from '../../../lib/dom/make-element-child-stream';
 import elementViewMapper from '../../../lib/dom/element-view-mapper';
 import makeElementStreamMerger from '../../../lib/dom/make-element-stream-merger';
 import GmailElementGetter from '../gmail-element-getter';
-
 import GmailComposeView from '../views/gmail-compose-view';
 import type GmailMessageView from '../views/gmail-message-view';
-
 import type GmailDriver from '../gmail-driver';
+import isNotNil from '../../../../common/isNotNil';
 
 var impStream = udKefir(module, imp);
 
@@ -31,8 +32,8 @@ function imp(
 ): Kefir.Observable<GmailComposeView, unknown> {
   return Kefir.fromPromise(GmailElementGetter.waitForGmailModeToSettle())
     .flatMap(() => {
-      var elementStream;
-      var isStandalone = false;
+      let elementStream: Kefir.Observable<ElementWithLifetime, never>;
+      let isStandalone = false;
 
       if (GmailElementGetter.isStandaloneComposeWindow()) {
         elementStream = _setupStandaloneComposeElementStream();
@@ -74,7 +75,7 @@ function _setupStandardComposeElementStream() {
     GmailElementGetter.getComposeWindowContainer(),
   )
     .flatMap((composeGrandParent) => {
-      var composeParentEl =
+      const composeParentEl =
         composeGrandParent.el.querySelector<HTMLElement>('div.AD');
       if (composeParentEl) {
         return makeElementChildStream(composeParentEl)
@@ -94,7 +95,9 @@ function _setupStandardComposeElementStream() {
           // If you close a fullscreen compose while it's still saving, Gmail never
           // removes it from the DOM, and instead only removes a specific child
           // element. Ugh. Watch for its removal too.
-          const targetEl = el.querySelector('[role=dialog] div.aaZ');
+          const targetEl = el.querySelector<HTMLElement>(
+            '[role=dialog] div.aaZ',
+          );
           if (!targetEl) return null;
           var hiddenStream = kefirMakeMutationObserverChunkedStream(targetEl, {
             childList: true,
@@ -106,11 +109,11 @@ function _setupStandardComposeElementStream() {
             removalStream: removalStream.merge(hiddenStream).take(1),
           };
         })
-        .filter(Boolean),
+        .filter(isNotNil),
     )
     .flatMap((event) => {
       if (!event) throw new Error('Should not happen');
-      const el = event.el.querySelector('[role=dialog]');
+      const el = event.el.querySelector<HTMLElement>('[role=dialog]');
       if (!el || !el.querySelector('form')) {
         return Kefir.never();
       }
@@ -122,7 +125,10 @@ function _setupStandardComposeElementStream() {
     .flatMap(makeElementStreamMerger());
 }
 
-function _setupStandaloneComposeElementStream() {
+function _setupStandaloneComposeElementStream(): Kefir.Observable<
+  ElementWithLifetime,
+  never
+> {
   return _waitForContainerAndMonitorChildrenStream(() =>
     GmailElementGetter.StandaloneCompose.getComposeWindowContainer(),
   );
@@ -139,7 +145,7 @@ function _waitForContainerAndMonitorChildrenStream(
 }
 
 function _informElement(eventName: string) {
-  return function (event: any) {
+  return function <T extends { readonly el?: HTMLElement }>(event: T): T {
     const composeEl =
       event &&
       event.el &&

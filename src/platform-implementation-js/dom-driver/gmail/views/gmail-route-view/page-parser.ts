@@ -1,7 +1,7 @@
 import PageParserTree from 'page-parser-tree';
 import Logger from '../../../../lib/logger';
 import censorHTMLtree from '../../../../../common/censorHTMLtree';
-import isNotNil from '../../../../lib/isNotNil';
+import isNotNil from '../../../../../common/isNotNil';
 
 export function makePageParser(element: HTMLElement, logger: Logger) {
   return new PageParserTree(element, {
