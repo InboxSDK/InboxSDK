@@ -249,7 +249,16 @@ const setupSearchReplacing = (
           threadDescriptors = [];
         }
 
+        const visited = new Set<ThreadDescriptor>();
         const initialIDPairs: InitialIDPair[] = threadDescriptors
+          .filter(function (threadDescriptor) {
+            if (visited.has(threadDescriptor)) {
+              return false;
+            }
+
+            visited.add(threadDescriptor);
+            return true;
+          })
           .map(threadDescriptorToInitialIDPair)
           .filter(Boolean) as InitialIDPair[];
 
