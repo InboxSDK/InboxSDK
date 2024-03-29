@@ -5,15 +5,13 @@ import { Contact } from '../../../../inboxsdk';
 import isNotNil from '../../../../common/isNotNil';
 
 export default class UserInfo {
-  _failedWaitFor: boolean;
-  _userEmail: string;
+  #userEmail: string;
 
   constructor(driver: Driver) {
-    this._failedWaitFor = false;
-    this._userEmail = driver.getUserEmailAddress();
+    this.#userEmail = driver.getUserEmailAddress();
   }
 
-  // deprecated
+  /** @deprecated */
   getUserName(): string {
     const nameEl = document.querySelector<HTMLElement>(
       'div.gb_w div.gb_B .gb_D',
@@ -23,12 +21,12 @@ export default class UserInfo {
     }
     const contact: Contact = find(
       this.getAccountSwitcherContactList(),
-      (contact: Contact) => contact.emailAddress === this._userEmail,
+      (contact) => contact.emailAddress === this.#userEmail,
     )!;
     if (contact && contact.name != null) {
       return contact.name;
     }
-    return this._userEmail;
+    return this.#userEmail;
   }
 
   /** @deprecated */

@@ -1,11 +1,10 @@
-import { defonce } from 'ud';
 import asap from 'asap';
 import EventEmitter from '../../lib/safe-event-emitter';
 import type Membrane from '../../lib/Membrane';
-import get from '../../../common/get-or-fail';
 import type AttachmentCardView from './attachment-card-view';
-import Conversations, {
+import {
   MessageViewToolbarSectionNames,
+  MessageViewViewStates,
 } from '../../namespaces/conversations';
 import type { Driver } from '../../driver-interfaces/driver';
 import type { Contact, MessageView as IMessageView } from '../../../inboxsdk';
@@ -19,20 +18,12 @@ import type MessageViewDriver from '../../dom-driver/gmail/views/gmail-message-v
 
 export type VIEW_STATE = 'HIDDEN' | 'COLLAPSED' | 'EXPANDED';
 
-type MessageViewLinkDescriptor = {
+interface MessageViewLinkDescriptor {
   text: string;
   html: string;
   element: HTMLElement;
   href: string;
   isInQuotedArea: boolean;
-};
-
-interface Members {
-  Conversations: Conversations;
-  driver: Driver;
-  linksInBody: Array<MessageViewLinkDescriptor> | null | undefined;
-  membrane: Membrane;
-  messageViewImplementation: MessageViewDriver;
 }
 
 export type MessageViewEvent = {
@@ -48,43 +39,35 @@ export type MessageViewEvent = {
   }): void;
 };
 
-const memberMap = defonce(module, () => new WeakMap<MessageView, Members>());
-
-class MessageView
+export default class MessageView
   extends (EventEmitter as new () => TypedEventEmitter<MessageViewEvent>)
   implements IMessageView
 {
   destroyed: boolean = false;
 
+  #driver: Driver;
+  #linksInBody: Array<MessageViewLinkDescriptor> | null | undefined;
+  #membrane: Membrane;
+  #messageViewImplementation: MessageViewDriver;
+
   constructor(
     messageViewImplementation: MessageViewDriver,
-    appId: string,
     membrane: Membrane,
-    Conversations: Conversations,
     driver: Driver,
   ) {
     super();
-    const members = {
-      messageViewImplementation,
-      membrane,
-      Conversations,
-      driver,
-      linksInBody: null as Array<MessageViewLinkDescriptor> | null | undefined,
-    };
-    memberMap.set(this, members);
+    this.#driver = driver;
+    this.#linksInBody = null;
+    this.#membrane = membrane;
+    this.#messageViewImplementation = messageViewImplementation;
 
-    _bindToEventStream(
-      this,
-      members,
-      messageViewImplementation.getEventStream(),
-    );
+    this.#bindToEventStream(messageViewImplementation.getEventStream());
   }
 
   addAttachmentCardView(cardOptions: Record<string, any>): AttachmentCardView {
-    const { messageViewImplementation, membrane } = get(memberMap, this);
     const attachmentCardViewDriver =
-      messageViewImplementation.addAttachmentCard(cardOptions);
-    const attachmentCardView = membrane.get(attachmentCardViewDriver);
+      this.#messageViewImplementation.addAttachmentCard(cardOptions);
+    const attachmentCardView = this.#membrane.get(attachmentCardViewDriver);
     attachmentCardViewDriver.getPreviewClicks().onValue((e) => {
       if (cardOptions.previewOnClick) {
         cardOptions.previewOnClick({
@@ -104,14 +87,13 @@ class MessageView
   }
 
   addAttachmentsToolbarButton(buttonOptions: Record<string, any>) {
-    const { messageViewImplementation, membrane } = get(memberMap, this);
-    messageViewImplementation.addButtonToDownloadAllArea({
+    this.#messageViewImplementation.addButtonToDownloadAllArea({
       tooltip: buttonOptions.tooltip,
       iconUrl: buttonOptions.iconUrl,
       onClick: () => {
-        const attachmentCardViews = messageViewImplementation
+        const attachmentCardViews = this.#messageViewImplementation
           .getAttachmentCardViewDrivers()
-          .map((cardDriver) => membrane.get(cardDriver));
+          .map((cardDriver) => this.#membrane.get(cardDriver));
         buttonOptions.onClick({
           attachmentCardViews,
         });
@@ -120,14 +102,14 @@ class MessageView
   }
 
   addToolbarButton(
-    buttonOptions?: Parameters<IMessageView['addToolbarButton']>[0],
+    buttonOptions: Parameters<IMessageView['addToolbarButton']>[0],
   ) {
     if (
-      typeof buttonOptions!.onClick !== 'function' ||
-      typeof buttonOptions!.title !== 'string' ||
+      typeof buttonOptions.onClick !== 'function' ||
+      typeof buttonOptions.title !== 'string' ||
       !Object.prototype.hasOwnProperty.call(
         MessageViewToolbarSectionNames,
-        buttonOptions!.section,
+        buttonOptions.section,
       )
     ) {
       throw new Error(
@@ -135,52 +117,49 @@ class MessageView
       );
     }
 
-    const { messageViewImplementation } = get(memberMap, this);
-    messageViewImplementation.addMoreMenuItem(buttonOptions!);
+    this.#messageViewImplementation.addMoreMenuItem(buttonOptions);
   }
 
   getBodyElement(): HTMLElement {
-    return get(memberMap, this).messageViewImplementation.getContentsElement();
+    return this.#messageViewImplementation.getContentsElement();
   }
 
   getMessageID(): string {
-    get(memberMap, this)
-      .driver.getLogger()
+    this.#driver
+      .getLogger()
       .deprecationWarning(
         'messageView.getMessageID',
         'messageView.getMessageIDAsync',
       );
-    return get(memberMap, this).messageViewImplementation.getMessageID();
+    return this.#messageViewImplementation.getMessageID();
   }
 
   getMessageIDAsync(): Promise<string> {
-    return get(memberMap, this).messageViewImplementation.getMessageIDAsync();
+    return this.#messageViewImplementation.getMessageIDAsync();
   }
 
   // TODO non-file-attachment card views are asynchronously loaded. Add some sort of
   // registerAttachmentCardViewHandler function to listen for other types of
   // attachment cards if we want to continue support for them.
   getFileAttachmentCardViews(): Array<AttachmentCardView> {
-    const { messageViewImplementation, membrane } = get(memberMap, this);
-    return messageViewImplementation
+    return this.#messageViewImplementation
       .getAttachmentCardViewDrivers()
       .filter((cardDriver) => cardDriver.getAttachmentType() === 'FILE')
       .map((attachmentCardViewDriver) =>
-        membrane.get(attachmentCardViewDriver),
+        this.#membrane.get(attachmentCardViewDriver),
       );
   }
 
   // Deprecated name
   getAttachmentCardViews(): Array<AttachmentCardView> {
-    const { driver } = get(memberMap, this);
-    driver
+    this.#driver
       .getLogger()
       .deprecationWarning(
         'MessageView.getAttachmentCardViews',
         'MessageView.getFileAttachmentCardViews',
       );
 
-    if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
+    if (this.#driver.getOpts().REQUESTED_API_VERSION !== 1) {
       throw new Error('This method was discontinued after API version 1');
     }
 
@@ -188,21 +167,17 @@ class MessageView
   }
 
   isElementInQuotedArea(element: HTMLElement): boolean {
-    return get(memberMap, this).messageViewImplementation.isElementInQuotedArea(
-      element,
-    );
+    return this.#messageViewImplementation.isElementInQuotedArea(element);
   }
 
   isLoaded(): boolean {
-    return get(memberMap, this).messageViewImplementation.isLoaded();
+    return this.#messageViewImplementation.isLoaded();
   }
 
   getLinksInBody(): Array<MessageViewLinkDescriptor> {
-    const members = get(memberMap, this);
-
-    if (!members.linksInBody) {
+    if (!this.#linksInBody) {
       const anchors = this.getBodyElement().querySelectorAll('a');
-      members.linksInBody = Array.from(anchors).map(
+      this.#linksInBody = Array.from(anchors).map(
         (anchor: HTMLAnchorElement) => ({
           text: anchor.textContent!,
           html: anchor.innerHTML,
@@ -213,16 +188,16 @@ class MessageView
       );
     }
 
-    return members.linksInBody;
+    return this.#linksInBody;
   }
 
   getSender(): Contact {
-    return get(memberMap, this).messageViewImplementation.getSender();
+    return this.#messageViewImplementation.getSender();
   }
 
   getRecipients(): Array<Contact> {
-    get(memberMap, this)
-      .driver.getLogger()
+    this.#driver
+      .getLogger()
       .deprecationWarning(
         'MessageView.getRecipients',
         'MessageView.getRecipientEmailAddresses() or MessageView.getRecipientsFull()',
@@ -234,110 +209,92 @@ class MessageView
   }
 
   getRecipientEmailAddresses(): Array<string> {
-    return get(
-      memberMap,
-      this,
-    ).messageViewImplementation.getRecipientEmailAddresses();
+    return this.#messageViewImplementation.getRecipientEmailAddresses();
   }
 
   getRecipientsFull(): Promise<Array<Contact>> {
-    return get(memberMap, this).messageViewImplementation.getRecipientsFull();
+    return this.#messageViewImplementation.getRecipientsFull();
   }
 
   getThreadView(): ReturnType<IMessageView['getThreadView']> {
-    const { messageViewImplementation, membrane } = get(memberMap, this);
-    return membrane.get(messageViewImplementation.getThreadViewDriver());
+    return this.#membrane.get(
+      this.#messageViewImplementation.getThreadViewDriver(),
+    );
   }
 
   getDateString(): string {
-    return get(memberMap, this).messageViewImplementation.getDateString();
+    return this.#messageViewImplementation.getDateString();
   }
 
   addAttachmentIcon(
     iconDescriptor: Parameters<IMessageView['addAttachmentIcon']>[0],
   ) {
-    return get(memberMap, this).messageViewImplementation.addAttachmentIcon(
-      iconDescriptor,
-    );
+    return this.#messageViewImplementation.addAttachmentIcon(iconDescriptor);
   }
 
   getViewState(): VIEW_STATE {
-    const members = get(memberMap, this);
-    return members.Conversations.MessageViewViewStates[
-      members.messageViewImplementation.getViewState()
+    return MessageViewViewStates[
+      this.#messageViewImplementation.getViewState()
     ];
   }
 
   hasOpenReply(): boolean {
-    const { driver } = get(memberMap, this);
-    driver.getLogger().deprecationWarning('MessageView.hasOpenReply');
+    this.#driver.getLogger().deprecationWarning('MessageView.hasOpenReply');
 
-    if (driver.getOpts().REQUESTED_API_VERSION !== 1) {
+    if (this.#driver.getOpts().REQUESTED_API_VERSION !== 1) {
       throw new Error('This method was discontinued after API version 1');
     }
 
-    return get(memberMap, this).messageViewImplementation.hasOpenReply();
+    return this.#messageViewImplementation.hasOpenReply();
   }
-}
 
-function _bindToEventStream(
-  messageView: MessageView,
-  members: Members,
-  stream: Observable<MessageViewDriverEvents, any>,
-) {
-  stream.onEnd(function () {
-    messageView.destroyed = true;
-    messageView.emit('destroy');
-    messageView.removeAllListeners();
-  });
-  stream
-    .filter(
-      function (event): event is MessageViewDriverEventByName['contactHover'] {
-        return event.type !== 'internal' && event.eventName === 'contactHover';
-      },
-    )
-    .onValue(function (event) {
-      messageView.emit(event.eventName, {
-        contactType: event.contactType,
-        contact: event.contact,
-        messageView: messageView,
-        threadView: messageView.getThreadView(),
-      });
+  #bindToEventStream(stream: Observable<MessageViewDriverEvents, any>) {
+    stream.onEnd(() => {
+      this.destroyed = true;
+      this.emit('destroy');
+      this.removeAllListeners();
     });
-
-  if (messageView.isLoaded()) {
-    asap(() => {
-      messageView.emit('load', {
-        messageView,
-      });
-    });
-  } else {
     stream
-      .filter((event) => event.eventName === 'messageLoad')
-      .onValue(() => {
-        messageView.emit('load', {
-          messageView: messageView,
+      .filter(
+        (event): event is MessageViewDriverEventByName['contactHover'] =>
+          event.type !== 'internal' && event.eventName === 'contactHover',
+      )
+      .onValue((event) => {
+        this.emit(event.eventName, {
+          contactType: event.contactType,
+          contact: event.contact,
+          messageView: this,
+          threadView: this.getThreadView(),
+        });
+      });
+
+    if (this.isLoaded()) {
+      asap(() => {
+        this.emit('load', {
+          messageView: this,
+        });
+      });
+    } else {
+      stream
+        .filter((event) => event.eventName === 'messageLoad')
+        .onValue(() => {
+          this.emit('load', {
+            messageView: this,
+          });
+        });
+    }
+
+    stream
+      .filter(
+        (event): event is MessageViewDriverEventByName['viewStateChange'] =>
+          event.eventName === 'viewStateChange',
+      )
+      .onValue((event) => {
+        this.emit('viewStateChange', {
+          oldViewState: MessageViewViewStates[event.oldValue],
+          newViewState: MessageViewViewStates[event.newValue],
+          messageView: this,
         });
       });
   }
-
-  stream
-    .filter(
-      function (
-        event,
-      ): event is MessageViewDriverEventByName['viewStateChange'] {
-        return event.eventName === 'viewStateChange';
-      },
-    )
-    .onValue(function (event) {
-      messageView.emit('viewStateChange', {
-        oldViewState:
-          members.Conversations.MessageViewViewStates[event.oldValue!],
-        newViewState:
-          members.Conversations.MessageViewViewStates[event.newValue!],
-        messageView: messageView,
-      });
-    });
 }
-
-export default MessageView;

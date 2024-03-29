@@ -8,13 +8,13 @@ import type {
 import type { CustomButtonDescriptor } from '../../dom-driver/gmail/views/gmail-attachment-card-view';
 import TypedEventEmitter from 'typed-emitter';
 
-class AttachmentCardView extends (EventEmitter as new () => TypedEventEmitter<{
+export default class AttachmentCardView extends (EventEmitter as new () => TypedEventEmitter<{
   destroy(): void;
 }>) {
-  _attachmentCardImplementation: AttachmentCardViewDriver;
-  _driver: Driver;
-  _membrane: Membrane;
-  destroyed: boolean;
+  #attachmentCardImplementation: AttachmentCardViewDriver;
+  #driver: Driver;
+  #membrane: Membrane;
+  destroyed: boolean = false;
 
   constructor(
     attachmentCardImplementation: AttachmentCardViewDriver,
@@ -22,53 +22,50 @@ class AttachmentCardView extends (EventEmitter as new () => TypedEventEmitter<{
     membrane: Membrane,
   ) {
     super();
-    this.destroyed = false;
-    this._driver = driver;
-    this._membrane = membrane;
-    this._attachmentCardImplementation = attachmentCardImplementation;
+    this.#driver = driver;
+    this.#membrane = membrane;
+    this.#attachmentCardImplementation = attachmentCardImplementation;
 
-    this._attachmentCardImplementation.getStopper().onValue(() => {
+    this.#attachmentCardImplementation.getStopper().onValue(() => {
       this.destroyed = true;
       this.emit('destroy');
     });
   }
 
   getAttachmentType() {
-    return this._attachmentCardImplementation.getAttachmentType();
+    return this.#attachmentCardImplementation.getAttachmentType();
   }
 
   addButton(buttonOptions: CustomButtonDescriptor) {
-    this._attachmentCardImplementation.addButton(buttonOptions);
+    this.#attachmentCardImplementation.addButton(buttonOptions);
   }
 
   getTitle(): string {
-    return this._attachmentCardImplementation.getTitle();
+    return this.#attachmentCardImplementation.getTitle();
   }
 
   /**
    * @deprecated  Please use the same-named method on the AttachmentCardClickEvent object instead.
    */
   getDownloadURL(): Promise<string | null | undefined> {
-    this._driver
+    this.#driver
       .getLogger()
       .deprecationWarning(
         'AttachmentCardView.getDownloadURL',
         'AttachmentCardView.addButton -> onClick -> AttachmentCardClickEvent',
       );
 
-    if (this._driver.getOpts().REQUESTED_API_VERSION !== 1) {
+    if (this.#driver.getOpts().REQUESTED_API_VERSION !== 1) {
       throw new Error('This method was discontinued after API version 1');
     }
 
-    return this._attachmentCardImplementation.getDownloadURL();
+    return this.#attachmentCardImplementation.getDownloadURL();
   }
 
   getMessageView(): MessageView | null {
     const messageViewDriver =
-      this._attachmentCardImplementation.getMessageViewDriver();
+      this.#attachmentCardImplementation.getMessageViewDriver();
 
-    return messageViewDriver ? this._membrane.get(messageViewDriver) : null;
+    return messageViewDriver ? this.#membrane.get(messageViewDriver) : null;
   }
 }
-
-export default AttachmentCardView;
