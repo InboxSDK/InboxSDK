@@ -103,7 +103,7 @@ import type {
   SearchSuggestionsProvider,
   SearchQueryRewriter,
 } from '../../namespaces/search';
-import isNotNil from '../../lib/isNotNil';
+import isNotNil from '../../../common/isNotNil';
 
 /**
  * @internal

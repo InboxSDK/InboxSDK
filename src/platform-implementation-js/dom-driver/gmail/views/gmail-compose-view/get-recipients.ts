@@ -3,7 +3,7 @@ import { getRecipientChips } from './page-parser';
 
 import getAddressInformationExtractor from './get-address-information-extractor';
 import { ReceiverType } from './set-recipients';
-import isNotNil from '../../../../lib/isNotNil';
+import isNotNil from '../../../../../common/isNotNil';
 import { Contact } from '../../../../../inboxsdk';
 
 export default function getRecipients(

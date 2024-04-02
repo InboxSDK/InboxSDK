@@ -5,6 +5,7 @@ import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
 import isStreakAppId from '../../../lib/isStreakAppId';
 import update from 'immutability-helper';
+import isNotNil from '../../../../common/isNotNil';
 
 type ThreadDescriptor =
   | string
@@ -251,7 +252,7 @@ const setupSearchReplacing = (
 
         const initialIDPairs: InitialIDPair[] = threadDescriptors
           .map(threadDescriptorToInitialIDPair)
-          .filter(Boolean) as InitialIDPair[];
+          .filter(isNotNil);
 
         const idPairsWithRFC: IDPairWithRFC[] = (
           await Promise.all(
@@ -259,7 +260,7 @@ const setupSearchReplacing = (
               initialIDPairToIDPairWithRFC(driver, pair, findIdFailure),
             ),
           )
-        ).filter(Boolean) as IDPairWithRFC[];
+        ).filter(isNotNil);
 
         const messageIDQuery: string =
           idPairsWithRFC.length > 0
@@ -298,7 +299,7 @@ const setupSearchReplacing = (
               idPairWithRFCToCompletedIDPair(driver, pair, findIdFailure),
             ),
           )
-        ).filter(Boolean) as CompletedIDPair[];
+        ).filter(isNotNil);
 
         const response = await searchResultsResponse_promise;
 
@@ -315,7 +316,7 @@ const setupSearchReplacing = (
             .map(({ gtid }) =>
               find(extractedThreads, (t) => t.oldGmailThreadID === gtid),
             )
-            .filter(Boolean);
+            .filter(isNotNil);
 
           const doesNeedReorder =
             extractedThreads.length !==
@@ -331,7 +332,7 @@ const setupSearchReplacing = (
             const now = Date.now();
             reorderedThreads = extractedThreadsInCompletedIDPairsOrder.map(
               (extractedThread, index) => {
-                const newFormat = Array.isArray(extractedThread!.rawResponse);
+                const newFormat = Array.isArray(extractedThread.rawResponse);
 
                 const newTime = String(now - index);
                 let newThread = update(extractedThread, {
@@ -352,8 +353,8 @@ const setupSearchReplacing = (
 
                 if (
                   newFormat
-                    ? extractedThread!.rawResponse[0][4]
-                    : extractedThread!.rawResponse[1][5]
+                    ? extractedThread.rawResponse[0][4]
+                    : extractedThread.rawResponse[1][5]
                 ) {
                   newThread = update(newThread, {
                     rawResponse: newFormat
@@ -383,7 +384,7 @@ const setupSearchReplacing = (
                         },
                   });
                 }
-                return newThread!;
+                return newThread;
               },
             );
           } else {

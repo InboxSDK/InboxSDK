@@ -613,7 +613,7 @@ export interface MessageView extends TypedEventEmitter<MessageViewEvent> {
       | MessageAttachmentIconDescriptor
       | Kefir.Stream<MessageAttachmentIconDescriptor, never>,
   ): AttachmentIcon;
-  addToolbarButton(opts?: MessageViewToolbarButtonDescriptor): void;
+  addToolbarButton(opts: MessageViewToolbarButtonDescriptor): void;
   getBodyElement(): HTMLElement;
   isElementInQuotedArea(element: HTMLElement): boolean;
   /**
