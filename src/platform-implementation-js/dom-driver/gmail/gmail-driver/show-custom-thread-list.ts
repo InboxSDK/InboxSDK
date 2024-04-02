@@ -1,4 +1,5 @@
 import find from 'lodash/find';
+import uniqBy from 'lodash/uniqBy';
 import GmailElementGetter from '../gmail-element-getter';
 import * as SyncGRP from '../gmail-sync-response-processor';
 import type Logger from '../../../lib/logger';
@@ -293,13 +294,18 @@ const setupSearchReplacing = (
           .toPromise();
 
         // Figure out any gmail thread ids we don't know yet.
-        const completedIDPairs: Array<CompletedIDPair> = (
-          await Promise.all(
-            idPairsWithRFC.map((pair) =>
-              idPairWithRFCToCompletedIDPair(driver, pair, findIdFailure),
-            ),
-          )
-        ).filter(isNotNil);
+        // Use uniqBy to remove duplicates which cause issues with Gmail sometimes
+        // https://github.com/InboxSDK/InboxSDK/issues/1130
+        const completedIDPairs: Array<CompletedIDPair> = uniqBy(
+          (
+            await Promise.all(
+              idPairsWithRFC.map((pair) =>
+                idPairWithRFCToCompletedIDPair(driver, pair, findIdFailure),
+              ),
+            )
+          ).filter(isNotNil),
+          (p) => p.gtid,
+        );
 
         const response = await searchResultsResponse_promise;
 
