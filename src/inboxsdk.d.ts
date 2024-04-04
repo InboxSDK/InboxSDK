@@ -217,7 +217,7 @@ export interface AppToolbarButtonDescriptor {
   titleClass?: string;
   iconUrl: string;
   iconClass?: string;
-  onClick: (e: MouseEvent) => void;
+  onClick: (e: { dropdown?: DropdownView }) => void;
   arrowColor?: string | null;
 }
 
