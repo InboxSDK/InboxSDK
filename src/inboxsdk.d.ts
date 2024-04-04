@@ -15,10 +15,9 @@ import type GmailRowListView from './platform-implementation-js/dom-driver/gmail
 import type { AppLogger } from './platform-implementation-js/lib/logger';
 import type ThreadRowView from './platform-implementation-js/views/thread-row-view';
 import TypedEventEmitter from 'typed-emitter';
-import { MessageViewEvent } from './platform-implementation-js/views/conversations/message-view';
+import { default as MessageView } from './platform-implementation-js/views/conversations/message-view';
 import type { ThreadViewEvents } from './platform-implementation-js/views/conversations/thread-view';
 import type { ComposeViewEvent } from './platform-implementation-js/views/compose-view';
-import type AttachmentCardView from './platform-implementation-js/views/conversations/attachment-card-view';
 import type TopMessageBarView from './platform-implementation-js/widgets/top-message-bar-view';
 import type { IMoleView as MoleView } from './platform-implementation-js/widgets/mole-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
@@ -586,56 +585,13 @@ export type AttachmentIcon = TypedEmitter<{
   tooltipShown: () => void;
 }>;
 
-export type MessageViewToolbarSectionNames = 'MORE';
-
-export interface MessageViewToolbarButtonDescriptor {
-  section: MessageViewToolbarSectionNames;
-  title: string;
-  iconUrl?: string;
-  iconClass?: string;
-  onClick: (e: MouseEvent) => void;
-  orderHint?: number;
-}
-
 export type { MessageViewViewStates } from './platform-implementation-js/namespaces/conversations';
 
-/**
- * Represents a visible message in the UI. There are properties to access data about the message itself as well as change the state of the UI. MessageViews have a view state as well as a loaded state. These 2 properties are orthogonal to each other.
-
- * A messages' view state can be one of {@link MessageViewViewStates.EXPANDED}, {@link MessageViewViewStates.COLLAPSED} or {@link MessageViewViewStates.HIDDEN}. Gmail visually display messages in a thread in different ways depending on what they are trying to show a user. These values are described in the enum MessageViewViewStates. The load state of a message determines whether all of the data pertaining to a message has been loaded in the UI. In some case, not all the information (such as recipients or the body) may be loaded, typically when the the view state is COLLAPSED or HIDDEN.
-
- * @note You should not depend on any relationship between the view state
- * and load state. Instead, use the provided {MessageView#getViewState} and {MessageView#isLoaded} methods.
- */
-export interface MessageView extends TypedEventEmitter<MessageViewEvent> {
-  addAttachmentIcon(
-    opts:
-      | MessageAttachmentIconDescriptor
-      | Kefir.Stream<MessageAttachmentIconDescriptor, never>,
-  ): AttachmentIcon;
-  addToolbarButton(opts: MessageViewToolbarButtonDescriptor): void;
-  getBodyElement(): HTMLElement;
-  isElementInQuotedArea(element: HTMLElement): boolean;
-  /**
-   * Returns whether this message has been loaded yet. If the message has not been loaded, some of the data related methods on this object may return empty results. The message may be loaded once the user clicks on the message stub.
-   */
-  isLoaded(): boolean;
-  getFileAttachmentCardViews(): AttachmentCardView[];
-  /**
-   * Get the contact of the sender of this message.
-
-    * @returns {Contact} The contact of the sender of this message.
-    * @throws {Error} If the message has not been loaded yet.
-    *
-    * @note If you're using this method on an array of {MessageView}s returned by {@link ThreadRowView#getMessageViewsAll}, make sure to check {@link MessageView#isLoaded} before calling this method.
-   */
-  getSender(): Contact;
-  getRecipients(): Array<Contact>;
-  getRecipientsFull(): Promise<Array<Contact>>;
-  getLinksInBody(): Array<MessageViewLinkDescriptor>;
-  getThreadView(): ThreadView;
-  getMessageIDAsync(): Promise<string>;
-}
+export {
+  default as MessageView,
+  MessageViewToolbarButtonDescriptor,
+  MessageViewToolbarSectionNames,
+} from './platform-implementation-js/views/conversations/message-view';
 
 export interface Contact {
   name: string;
