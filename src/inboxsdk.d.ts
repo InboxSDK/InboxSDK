@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import type * as Kefir from 'kefir';
 import type TypedEmitter from 'typed-emitter';
 import AppMenu from './platform-implementation-js/namespaces/app-menu';
+import Compose from './platform-implementation-js/namespaces/compose';
 import type Global from './platform-implementation-js/namespaces/global';
 import type {
   NavItemTypes,
@@ -86,11 +87,7 @@ export interface Conversations {
   ): () => void;
 }
 
-export interface Compose {
-  openDraftByMessageID(messageId: string): Promise<ComposeView>;
-  openNewComposeView(): Promise<ComposeView>;
-  registerComposeViewHandler(handler: (composeView: ComposeView) => void): void;
-}
+export { Compose };
 
 export interface ButterBar {
   showMessage(messageDescriptor: MessageDescriptor): { destroy: () => void };
