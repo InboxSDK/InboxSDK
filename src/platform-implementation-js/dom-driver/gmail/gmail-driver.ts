@@ -94,7 +94,12 @@ import type ContentPanelViewDriver from '../../driver-common/sidebar/ContentPane
 import GmailNavItemView, {
   type NavItemDescriptor,
 } from './views/gmail-nav-item-view';
-import { AppToolbarButtonDescriptor, Contact } from '../../../inboxsdk';
+import {
+  AppToolbarButtonDescriptor,
+  Contact,
+  DropdownView,
+  ToolbarButtonDescriptor,
+} from '../../../inboxsdk';
 import GmailAttachmentCardView from './views/gmail-attachment-card-view';
 import type { PersonDetails } from '../../namespaces/user';
 import getPersonDetails from './gmail-driver/getPersonDetails';
@@ -397,7 +402,16 @@ class GmailDriver {
     } as const;
   }
 
-  registerThreadButton(options: any) {
+  registerThreadButton(
+    options: Omit<ToolbarButtonDescriptor, 'hideFor' | 'onClick'> & {
+      onClick(event: {
+        position: 'ROW' | 'LIST' | 'THREAD';
+        dropdown: DropdownView;
+        selectedThreadViewDrivers: GmailThreadView[];
+        selectedThreadRowViewDrivers: GmailThreadRowView[];
+      }): void;
+    },
+  ) {
     const unregister = kefirStopper();
 
     const removeButtonOnUnregister = (button: any) => {
@@ -420,7 +434,7 @@ class GmailDriver {
                   position: 'THREAD',
                   dropdown: event.dropdown,
                   selectedThreadViewDrivers: [
-                    gmailToolbarView.getThreadViewDriver(),
+                    gmailToolbarView.getThreadViewDriver()!,
                   ],
                   selectedThreadRowViewDrivers: [],
                 });

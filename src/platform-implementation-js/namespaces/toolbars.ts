@@ -16,11 +16,9 @@ import type {
   ThreadView,
 } from '../../inboxsdk';
 
-export interface ToolbarButtonOnClickEvent {
-  selectedThreadViews: Array<ThreadView>;
-  selectedThreadRowViews: Array<ThreadRowView>;
+export interface LegacyToolbarButtonOnClickEvent {
+  threadView: ThreadView;
   dropdown?: DropdownView;
-  threadView?: ThreadView;
 }
 
 export interface LegacyToolbarButtonDescriptor {
@@ -28,11 +26,30 @@ export interface LegacyToolbarButtonDescriptor {
   iconUrl?: string;
   iconClass?: string;
   section: 'INBOX_STATE' | 'METADATA_STATE' | 'OTHER';
-  onClick(event: ToolbarButtonOnClickEvent): void;
+  onClick(event: LegacyToolbarButtonOnClickEvent): void;
   hasDropdown?: boolean;
   hideFor?: (routeView: RouteView) => boolean;
   keyboardShortcutHandle?: KeyboardShortcutHandle;
   orderHint?: number;
+}
+
+export interface LegacyListToolbarButtonOnClickEvent {
+  selectedThreadRowViews: Array<ThreadRowView>;
+  /** @deprecated use {@link selectedThreadRowViews} instead */
+  threadRowViews: Array<ThreadRowView>;
+  dropdown?: DropdownView;
+}
+
+export interface LegacyListToolbarButtonDescriptor
+  extends Omit<LegacyToolbarButtonDescriptor, 'onClick'> {
+  onClick(event: LegacyListToolbarButtonOnClickEvent): void;
+}
+
+export interface ToolbarButtonOnClickEvent {
+  position: 'THREAD' | 'ROW' | 'LIST';
+  selectedThreadViews: Array<ThreadView>;
+  selectedThreadRowViews: Array<ThreadRowView>;
+  dropdown?: DropdownView;
 }
 
 export interface ToolbarButtonDescriptor {
@@ -43,7 +60,7 @@ export interface ToolbarButtonDescriptor {
   threadSection?: string;
   listSection?: string;
   onClick(event: ToolbarButtonOnClickEvent): void;
-  hasDropdown: boolean;
+  hasDropdown?: boolean;
   hideFor?: (routeView: RouteView) => boolean;
   keyboardShortcutHandle?: KeyboardShortcutHandle;
   orderHint?: number;
@@ -94,20 +111,19 @@ export default class Toolbars extends EventEmitter {
     const registerThreadButton = () => {
       return this.#driver.registerThreadButton({
         ..._buttonDescriptor,
-        onClick: (event: any) => {
+        onClick: (event) => {
           if (!_buttonDescriptor.onClick) return;
 
           _buttonDescriptor.onClick({
-            // Is this shape correct, or do we want positions here instead?
             position: event.position,
             dropdown: event.dropdown,
-            selectedThreadViews: event.selectedThreadViewDrivers.map((x: any) =>
+            selectedThreadViews: event.selectedThreadViewDrivers.map((x) =>
               this.#membrane.get(x),
             ),
             selectedThreadRowViews: event.selectedThreadRowViewDrivers.map(
-              (x: any) => this.#membrane.get(x),
+              (x) => this.#membrane.get(x),
             ),
-          } as any);
+          });
         },
       });
     };
@@ -150,24 +166,28 @@ export default class Toolbars extends EventEmitter {
    *
    * Registers a toolbar button to appear above any list page such as the Inbox or Sent Mail.
    */
-  registerToolbarButtonForList(buttonDescriptor: Record<string, any>) {
+  registerToolbarButtonForList(
+    buttonDescriptor: LegacyListToolbarButtonDescriptor,
+  ) {
     return this.registerThreadButton({
       positions: ['LIST'],
       listSection: buttonDescriptor.section,
       title: buttonDescriptor.title,
       iconUrl: buttonDescriptor.iconUrl,
       iconClass: buttonDescriptor.iconClass,
-      onClick: (event: any) => {
+      onClick: (event) => {
         if (!buttonDescriptor.onClick) return;
+        const driver = this.#driver;
         buttonDescriptor.onClick({
           dropdown: event.dropdown,
           selectedThreadRowViews: event.selectedThreadRowViews,
 
           get threadRowViews() {
-            this.#driver
+            driver
               .getLogger()
               .deprecationWarning(
                 'Toolbars.registerToolbarButtonForList onClick event.threadRowViews',
+                'Toolbars.registerToolbarButtonForList onClick event.selectedThreadRowViews',
               );
             return event.selectedThreadRowViews;
           },
@@ -194,14 +214,14 @@ export default class Toolbars extends EventEmitter {
       title: buttonDescriptor.title,
       iconUrl: buttonDescriptor.iconUrl,
       iconClass: buttonDescriptor.iconClass,
-      onClick: (event: any) => {
+      onClick: (event) => {
         if (event.selectedThreadViews.length !== 1)
           throw new Error('should not happen');
         if (!buttonDescriptor.onClick) return;
         buttonDescriptor.onClick({
           dropdown: event.dropdown,
           threadView: event.selectedThreadViews[0],
-        } as any);
+        });
       },
       hasDropdown: buttonDescriptor.hasDropdown!,
       orderHint: buttonDescriptor.orderHint,
