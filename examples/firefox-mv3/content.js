@@ -2,16 +2,6 @@
 
 console.log('InboxSDK: content script loaded');
 
-// Set InboxSDK inject method
-InboxSDK.setInjectScriptImplementation(() => {
-  const script = document.createElement('script');
-  script.type = 'text/javascript';
-  script.src = browser.runtime.getURL('pageWorld.js');
-  document.documentElement.appendChild(script);
-
-  console.log('InboxSDK: pageWorld.js manually injected!');
-});
-
 InboxSDK.load(2, 'firefox-mv3-example', {
   appName: 'Twitter',
   appIconUrl:

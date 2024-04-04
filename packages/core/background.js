@@ -1,8 +1,16 @@
 /** @type {import('webextension-polyfill').Browser} */
 const browser = globalThis.chrome || globalThis.browser;
+const isFirefox = 'browser' in globalThis;
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'inboxsdk__injectPageWorld' && sender.tab) {
+  const eventKey = 'inboxsdk__injectPageWorld';
+
+  if (message.type === eventKey && sender.tab) {
+    // Relay event to firefox content script handler
+    if (isFirefox) {
+      return browser.tabs.sendMessage(sender.tab.id, { type: eventKey });
+    }
+
     if (browser.scripting) {
       // MV3
       let documentIds;

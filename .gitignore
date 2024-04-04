@@ -5,6 +5,8 @@
 /examples/*/dist/
 /examples/*/pageWorld.js*
 /examples/*/background.js*
+/examples/*/firefox.js*
+/examples/*/platform-implementation.js*
 *~
 npm-debug.log
 yarn-debug.log
@@ -13,6 +15,7 @@ yarn-debug.log
 /.inboxsdk_test_secret
 yarn-error.log
 /packages/core/inboxsdk.js*
+/packages/core/firefox.js*
 /packages/core/inboxsdk.min.js
 /packages/core/pageWorld.js*
 /packages/core/platform-implementation.js*

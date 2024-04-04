@@ -4,8 +4,6 @@ import { loadScript as _loadScript } from './load-script-proxy';
 import type { LoadScriptOptions } from '../common/load-script';
 import type { PiOpts } from '../platform-implementation-js/platform-implementation';
 
-export { setInjectScriptImplementation } from '../platform-implementation-js/lib/inject-script';
-
 declare global {
   var __test_origin: string | undefined;
 }
