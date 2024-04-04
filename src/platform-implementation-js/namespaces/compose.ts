@@ -10,12 +10,12 @@ interface Members {
   driver: Driver;
   membrane: Membrane;
   handlerRegistry: HandlerRegistry<ComposeView>;
-  composeViewStream: Kefir.Stream<ComposeView, unknown>;
+  composeViewStream: Kefir.Observable<ComposeView, unknown>;
 }
 const memberMap = ud.defonce(module, () => new WeakMap<Compose, Members>());
 const SAMPLE_RATE = 0.01;
 
-class Compose {
+export default class Compose {
   constructor(driver: Driver, membrane: Membrane) {
     const members = {
       driver,
@@ -68,6 +68,7 @@ class Compose {
       .toPromise();
   }
 
+  /** @deprecated Use {@link openNewComposeView} instead */
   getComposeView(): Promise<ComposeView> {
     const { driver } = get(memberMap, this);
     driver
@@ -84,5 +85,3 @@ class Compose {
     return this.openNewComposeView();
   }
 }
-
-export default Compose;
