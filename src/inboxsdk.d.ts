@@ -576,8 +576,8 @@ export interface MessageAttachmentIconDescriptor {
   iconUrl?: string;
   iconClass?: string;
   iconHtml?: string | null;
-  tooltip: string | HTMLElement;
-  onClick: () => void;
+  tooltip?: string | HTMLElement;
+  onClick?: () => void;
 }
 
 export type AttachmentIcon = TypedEmitter<{
