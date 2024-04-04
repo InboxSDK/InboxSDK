@@ -540,7 +540,7 @@ class GmailMessageView {
   addAttachmentIcon(
     iconDescriptor:
       | MessageAttachmentIconDescriptor
-      | Kefir.Stream<MessageAttachmentIconDescriptor, never>,
+      | Kefir.Observable<MessageAttachmentIconDescriptor, never>,
   ) {
     const attachmentIcon = new AttachmentIcon();
 

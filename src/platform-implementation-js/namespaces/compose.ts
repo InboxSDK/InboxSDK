@@ -10,7 +10,7 @@ interface Members {
   driver: Driver;
   membrane: Membrane;
   handlerRegistry: HandlerRegistry<ComposeView>;
-  composeViewStream: Kefir.Stream<ComposeView, unknown>;
+  composeViewStream: Kefir.Observable<ComposeView, unknown>;
 }
 const memberMap = ud.defonce(module, () => new WeakMap<Compose, Members>());
 const SAMPLE_RATE = 0.01;

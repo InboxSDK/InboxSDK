@@ -1,4 +1,4 @@
-import Kefir, { type Stream } from 'kefir';
+import Kefir, { type Observable } from 'kefir';
 import kefirCast from 'kefir-cast';
 import kefirStopper from 'kefir-stopper';
 import EventEmitter from '../lib/safe-event-emitter';
@@ -214,7 +214,7 @@ export default class Toolbars extends EventEmitter {
   setAppToolbarButton(
     appToolbarButtonDescriptor:
       | AppToolbarButtonDescriptor
-      | Stream<AppToolbarButtonDescriptor, any>,
+      | Observable<AppToolbarButtonDescriptor, any>,
   ) {
     this.#driver
       .getLogger()
@@ -236,9 +236,9 @@ export default class Toolbars extends EventEmitter {
   addToolbarButtonForApp(
     buttonDescriptor:
       | AppToolbarButtonDescriptor
-      | Stream<AppToolbarButtonDescriptor, any>,
+      | Observable<AppToolbarButtonDescriptor, any>,
   ) {
-    const buttonDescriptorStream: Stream<AppToolbarButtonDescriptor, any> =
+    const buttonDescriptorStream: Observable<AppToolbarButtonDescriptor, any> =
       kefirCast(Kefir, buttonDescriptor);
     const appToolbarButtonViewDriverPromise =
       this.#driver.addToolbarButtonForApp(buttonDescriptorStream);

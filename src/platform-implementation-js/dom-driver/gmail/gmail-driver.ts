@@ -591,7 +591,7 @@ class GmailDriver {
   }
 
   addToolbarButtonForApp(
-    buttonDescriptor: Kefir.Stream<AppToolbarButtonDescriptor, any>,
+    buttonDescriptor: Kefir.Observable<AppToolbarButtonDescriptor, any>,
   ): Promise<GmailAppToolbarButtonView> {
     return addToolbarButtonForApp(this, buttonDescriptor);
   }
