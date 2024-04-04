@@ -68,4 +68,21 @@ export default class AttachmentCardView extends (EventEmitter as new () => Typed
 
     return messageViewDriver ? this.#membrane.get(messageViewDriver) : null;
   }
+
+  private get _attachmentCardImplementation() {
+    this.#driver
+      .getLogger()
+      .deprecationWarning(
+        'AttachmentCardView._attachmentCardImplementation._element',
+        'AttachmentCardView.getElement',
+      );
+
+    return {
+      _element: this.getElement(),
+    };
+  }
+
+  getElement(): HTMLElement {
+    return this.#attachmentCardImplementation.getElement();
+  }
 }
