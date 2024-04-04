@@ -7,7 +7,10 @@ import {
   MessageViewViewStates,
 } from '../../namespaces/conversations';
 import type { Driver } from '../../driver-interfaces/driver';
-import type { Contact, MessageView as IMessageView } from '../../../inboxsdk';
+import type {
+  Contact,
+  MessageAttachmentIconDescriptor,
+} from '../../../inboxsdk';
 import type { Observable } from 'kefir';
 import type {
   MessageViewDriverEvents,
@@ -15,8 +18,21 @@ import type {
 } from '../../dom-driver/gmail/views/gmail-message-view';
 import type TypedEventEmitter from 'typed-emitter';
 import type MessageViewDriver from '../../dom-driver/gmail/views/gmail-message-view';
+import ThreadView from './thread-view';
+import { Descriptor } from '../../../types/descriptor';
 
 export type VIEW_STATE = 'HIDDEN' | 'COLLAPSED' | 'EXPANDED';
+
+export type MessageViewToolbarSectionNames = 'MORE';
+
+export interface MessageViewToolbarButtonDescriptor {
+  section: MessageViewToolbarSectionNames;
+  title: string;
+  iconUrl?: string;
+  iconClass?: string;
+  onClick: (e: MouseEvent) => void;
+  orderHint?: number;
+}
 
 interface MessageViewLinkDescriptor {
   text: string;
@@ -39,10 +55,15 @@ export type MessageViewEvent = {
   }): void;
 };
 
-export default class MessageView
-  extends (EventEmitter as new () => TypedEventEmitter<MessageViewEvent>)
-  implements IMessageView
-{
+/**
+ * Represents a visible message in the UI. There are properties to access data about the message itself as well as change the state of the UI. MessageViews have a view state as well as a loaded state. These 2 properties are orthogonal to each other.
+
+ * A messages' view state can be one of {@link MessageViewViewStates.EXPANDED}, {@link MessageViewViewStates.COLLAPSED} or {@link MessageViewViewStates.HIDDEN}. Gmail visually display messages in a thread in different ways depending on what they are trying to show a user. These values are described in the enum MessageViewViewStates. The load state of a message determines whether all of the data pertaining to a message has been loaded in the UI. In some case, not all the information (such as recipients or the body) may be loaded, typically when the the view state is COLLAPSED or HIDDEN.
+
+ * @note You should not depend on any relationship between the view state
+ * and load state. Instead, use the provided {MessageView#getViewState} and {MessageView#isLoaded} methods.
+ */
+export default class MessageView extends (EventEmitter as new () => TypedEventEmitter<MessageViewEvent>) {
   destroyed: boolean = false;
 
   #driver: Driver;
@@ -101,9 +122,7 @@ export default class MessageView
     });
   }
 
-  addToolbarButton(
-    buttonOptions: Parameters<IMessageView['addToolbarButton']>[0],
-  ) {
+  addToolbarButton(buttonOptions: MessageViewToolbarButtonDescriptor) {
     if (
       typeof buttonOptions.onClick !== 'function' ||
       typeof buttonOptions.title !== 'string' ||
@@ -170,6 +189,9 @@ export default class MessageView
     return this.#messageViewImplementation.isElementInQuotedArea(element);
   }
 
+  /**
+   * Returns whether this message has been loaded yet. If the message has not been loaded, some of the data related methods on this object may return empty results. The message may be loaded once the user clicks on the message stub.
+   */
   isLoaded(): boolean {
     return this.#messageViewImplementation.isLoaded();
   }
@@ -191,6 +213,14 @@ export default class MessageView
     return this.#linksInBody;
   }
 
+  /**
+   * Get the contact of the sender of this message.
+
+    * @returns {Contact} The contact of the sender of this message.
+    * @throws {Error} If the message has not been loaded yet.
+    *
+    * @note If you're using this method on an array of {MessageView}s returned by {@link ThreadRowView#getMessageViewsAll}, make sure to check {@link MessageView#isLoaded} before calling this method.
+   */
   getSender(): Contact {
     return this.#messageViewImplementation.getSender();
   }
@@ -216,7 +246,7 @@ export default class MessageView
     return this.#messageViewImplementation.getRecipientsFull();
   }
 
-  getThreadView(): ReturnType<IMessageView['getThreadView']> {
+  getThreadView(): ThreadView {
     return this.#membrane.get(
       this.#messageViewImplementation.getThreadViewDriver(),
     );
@@ -227,7 +257,7 @@ export default class MessageView
   }
 
   addAttachmentIcon(
-    iconDescriptor: Parameters<IMessageView['addAttachmentIcon']>[0],
+    iconDescriptor: Descriptor<MessageAttachmentIconDescriptor, never>,
   ) {
     return this.#messageViewImplementation.addAttachmentIcon(iconDescriptor);
   }
