@@ -323,7 +323,6 @@ gulp.task('clean', async () => {
 
   const outputFiles = [
     './packages/core/inboxsdk.js',
-    './packages/core/firefox.js',
     './packages/core/platform-implementation.js',
     './packages/core/pageWorld.js',
     './packages/core/firefox.js',
@@ -418,14 +417,6 @@ if (args.remote) {
           type: OutputLibraryType.UMD,
         },
         import: './src/inboxsdk-js/inboxsdk-NONREMOTE',
-      },
-      firefox: {
-        library: {
-          export: 'default',
-          name: 'InboxSDK',
-          type: OutputLibraryType.UMD,
-        },
-        import: './src/inboxsdk-js/inboxsdk-FIREFOX',
       },
     },
     disableMinification: true,

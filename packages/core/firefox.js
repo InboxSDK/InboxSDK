@@ -1,5 +1,5 @@
-import { browser } from '../common/extension-apis';
-import InboxSDK from './inboxsdk-NONREMOTE';
+/** @type {import('webextension-polyfill').Browser} */
+const browser = globalThis.chrome || globalThis.browser;
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'inboxsdk__injectPageWorld') {
@@ -17,5 +17,3 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse(true);
   }
 });
-
-export default InboxSDK;

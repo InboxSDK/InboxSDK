@@ -1,6 +1,6 @@
 /** @type {import('webextension-polyfill').Browser} */
 const browser = globalThis.chrome || globalThis.browser;
-const isFirefox = 'browser' in globalThis;
+const isFirefox = /Firefox/.test(navigator.userAgent);
 
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   const eventKey = 'inboxsdk__injectPageWorld';
