@@ -1,4 +1,3 @@
-import find from 'lodash/find';
 import intersection from 'lodash/intersection';
 import HandlerRegistry from '../lib/handler-registry';
 import RouteView from '../views/route-view/route-view';
@@ -65,7 +64,7 @@ class Router {
     });
     driver.getStopper().onValue(() => {
       this.#allRoutesHandlerRegistry.dumpHandlers();
-      Object.values(this.#listRouteHandlerRegistries).forEach((reg: any) => {
+      Object.values(this.#listRouteHandlerRegistries).forEach((reg) => {
         reg.dumpHandlers();
       });
     });
@@ -236,8 +235,7 @@ class Router {
   ) {
     const routeID = routeView.getRouteID();
     const routeIDArray = Array.isArray(routeID) ? routeID : [routeID];
-    const relevantCustomRoute = find(
-      this.#customRoutes,
+    const relevantCustomRoute = this.#customRoutes.find(
       (customRoute) =>
         intersection(
           Array.isArray(customRoute.routeID)
@@ -254,7 +252,7 @@ class Router {
       this.#driver.showCustomRouteView(customViewElement);
 
       try {
-        (relevantCustomRoute as any).onActivate(customRouteView);
+        relevantCustomRoute.onActivate(customRouteView);
       } catch (err) {
         this.#driver.getLogger().error(err);
       }
