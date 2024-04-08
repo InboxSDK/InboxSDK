@@ -35,7 +35,10 @@ import type {
 import type CollapsibleSectionView from './platform-implementation-js/views/collapsible-section-view';
 import type ListRouteView from './platform-implementation-js/views/route-view/list-route-view';
 import type SectionView from './platform-implementation-js/views/section-view';
-import type { RouteParams } from './platform-implementation-js/namespaces/router';
+import Router, {
+  type RouteParams,
+} from './platform-implementation-js/namespaces/router';
+import CustomRouteView from './platform-implementation-js/views/route-view/custom-route-view';
 
 export type { User };
 
@@ -131,71 +134,7 @@ export interface NavMenu {
   ): NavItemView;
 }
 
-export interface Router {
-  createLink(routeID: string, params?: any): string;
-  getCurrentRouteView(): RouteView;
-  goto(routeID: string, params?: any): Promise<void>;
-  handleAllRoutes(handler: (routeView: RouteView) => void): () => void;
-  handleCustomRoute(
-    routeID: string,
-    handler: (customRouteView: CustomRouteView) => void,
-  ): () => void;
-  handleCustomListRoute(
-    routeID: string,
-    handler: (offset: number, max: number) => void,
-  ): void;
-  handleListRoute(
-    routeID: string,
-    handler: (listRouteView: ListRouteView) => void,
-  ): () => void;
-  NativeRouteIDs: Record<NativeRouteIdTypes, string>;
-  NativeListRouteIDs: Record<
-    | 'ALL_MAIL'
-    | 'ANY_LIST'
-    | 'DRAFTS'
-    | 'IMPORTANT'
-    | 'INBOX'
-    | 'LABEL'
-    | 'SEARCH'
-    | 'SEARCH'
-    | 'SENT'
-    | 'SPAM'
-    | 'STARRED'
-    | 'TRASH',
-    string
-  >;
-  RouteTypes: Record<RouteTypes, string>;
-}
-
-type NativeRouteIdTypes =
-  | 'INBOX'
-  | 'ALL_MAIL'
-  | 'SENT'
-  | 'STARRED'
-  | 'DRAFTS'
-  | 'SNOOZED'
-  | 'DONE'
-  | 'REMINDERS'
-  | 'LABEL'
-  | 'TRASH'
-  | 'SPAM'
-  | 'IMPORTANT'
-  | 'SEARCH'
-  | 'THREAD'
-  | 'CHATS'
-  | 'CHAT'
-  | 'CONTACTS'
-  | 'CONTACT'
-  | 'SETTINGS'
-  | 'ANY_LIST';
-
-type RouteTypes =
-  | 'CHAT'
-  | 'CUSTOM'
-  | 'LIST'
-  | 'SETTINGS'
-  | 'THREAD'
-  | 'UNKNOWN';
+export { Router };
 
 export interface Widgets {
   /** check whether mole view has light title bar as part of gmail new view / original view  */
@@ -434,9 +373,7 @@ export interface SectionDescriptor {
 
 export { ListRouteView };
 
-export interface CustomRouteView extends RouteView {
-  getElement(): HTMLElement;
-}
+export { CustomRouteView };
 
 export interface CustomListDescriptor {
   hasMore?: boolean;
