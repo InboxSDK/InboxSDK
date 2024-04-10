@@ -31,6 +31,7 @@ import type ComposeView from './platform-implementation-js/views/compose-view';
 import type Search from './platform-implementation-js/namespaces/search';
 import type {
   default as Toolbars,
+  LegacyToolbarButtonOnClickEvent,
   LegacyToolbarButtonDescriptor,
 } from './platform-implementation-js/namespaces/toolbars';
 import type CollapsibleSectionView from './platform-implementation-js/views/collapsible-section-view';
@@ -142,7 +143,11 @@ export interface Widgets {
   showTopMessageBarView(opts: { el: Element }): TopMessageBarView;
 }
 
-export { Toolbars, LegacyToolbarButtonDescriptor };
+export {
+  Toolbars,
+  LegacyToolbarButtonDescriptor,
+  LegacyToolbarButtonOnClickEvent,
+};
 export {
   ToolbarButtonDescriptor,
   ToolbarButtonOnClickEvent,
