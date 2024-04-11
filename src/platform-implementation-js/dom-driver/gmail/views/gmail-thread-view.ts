@@ -5,7 +5,9 @@ import kefirStopper from 'kefir-stopper';
 import type { Bus } from 'kefir-bus';
 import findParent from '../../../../common/find-parent';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
-import querySelector from '../../../lib/dom/querySelectorOrFail';
+import querySelector, {
+  SelectorError,
+} from '../../../lib/dom/querySelectorOrFail';
 import idMap from '../../../lib/idMap';
 import SimpleElementView from '../../../views/SimpleElementView';
 import CustomMessageView from '../../../views/conversations/custom-message-view';
@@ -630,7 +632,9 @@ class GmailThreadView {
   addSubjectButton(button: any) {
     const subjectParent = this._element.querySelector('.V8djrc.byY');
     if (!subjectParent) {
-      throw new Error('Subject wrapper element not found');
+      throw new SelectorError('.V8djrc.byY', {
+        cause: 'Subject wrapper element not found',
+      });
     }
 
     const buttonOptions = {
@@ -738,9 +742,9 @@ class GmailThreadView {
   }
 
   _findSubjectToolbarElement(): HTMLElement | null {
-    var toolbarContainerElements =
-      this._element.querySelectorAll<HTMLElement>('.bHJ');
-    return toolbarContainerElements[0];
+    var toolbarContainerElement =
+      this._element.querySelector<HTMLElement>('.bHJ');
+    return toolbarContainerElement;
   }
 
   _isToolbarContainerRelevant(toolbarContainerElement: HTMLElement): boolean {
