@@ -2,6 +2,7 @@ import { EventEmitter } from 'events';
 import type * as Kefir from 'kefir';
 import type TypedEmitter from 'typed-emitter';
 import AppMenu from './platform-implementation-js/namespaces/app-menu';
+import Compose from './platform-implementation-js/namespaces/compose';
 import type Global from './platform-implementation-js/namespaces/global';
 import type {
   NavItemTypes,
@@ -15,10 +16,9 @@ import type GmailRowListView from './platform-implementation-js/dom-driver/gmail
 import type { AppLogger } from './platform-implementation-js/lib/logger';
 import type ThreadRowView from './platform-implementation-js/views/thread-row-view';
 import TypedEventEmitter from 'typed-emitter';
-import { MessageViewEvent } from './platform-implementation-js/views/conversations/message-view';
+import { default as MessageView } from './platform-implementation-js/views/conversations/message-view';
 import type { ThreadViewEvents } from './platform-implementation-js/views/conversations/thread-view';
 import type { ComposeViewEvent } from './platform-implementation-js/views/compose-view';
-import type AttachmentCardView from './platform-implementation-js/views/conversations/attachment-card-view';
 import type TopMessageBarView from './platform-implementation-js/widgets/top-message-bar-view';
 import type { IMoleView as MoleView } from './platform-implementation-js/widgets/mole-view';
 export * from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
@@ -31,11 +31,16 @@ import type ComposeView from './platform-implementation-js/views/compose-view';
 import type Search from './platform-implementation-js/namespaces/search';
 import type {
   default as Toolbars,
+  LegacyToolbarButtonOnClickEvent,
   LegacyToolbarButtonDescriptor,
 } from './platform-implementation-js/namespaces/toolbars';
 import type CollapsibleSectionView from './platform-implementation-js/views/collapsible-section-view';
 import type ListRouteView from './platform-implementation-js/views/route-view/list-route-view';
 import type SectionView from './platform-implementation-js/views/section-view';
+import Router, {
+  type RouteParams,
+} from './platform-implementation-js/namespaces/router';
+import CustomRouteView from './platform-implementation-js/views/route-view/custom-route-view';
 
 export type { User };
 
@@ -86,11 +91,7 @@ export interface Conversations {
   ): () => void;
 }
 
-export interface Compose {
-  openDraftByMessageID(messageId: string): Promise<ComposeView>;
-  openNewComposeView(): Promise<ComposeView>;
-  registerComposeViewHandler(handler: (composeView: ComposeView) => void): void;
-}
+export { Compose };
 
 export interface ButterBar {
   showMessage(messageDescriptor: MessageDescriptor): { destroy: () => void };
@@ -131,71 +132,7 @@ export interface NavMenu {
   ): NavItemView;
 }
 
-export interface Router {
-  createLink(routeID: string, params?: any): string;
-  getCurrentRouteView(): RouteView;
-  goto(routeID: string, params?: any): Promise<void>;
-  handleAllRoutes(handler: (routeView: RouteView) => void): () => void;
-  handleCustomRoute(
-    routeID: string,
-    handler: (customRouteView: CustomRouteView) => void,
-  ): () => void;
-  handleCustomListRoute(
-    routeID: string,
-    handler: (offset: number, max: number) => void,
-  ): void;
-  handleListRoute(
-    routeID: string,
-    handler: (listRouteView: ListRouteView) => void,
-  ): () => void;
-  NativeRouteIDs: Record<NativeRouteIdTypes, string>;
-  NativeListRouteIDs: Record<
-    | 'ALL_MAIL'
-    | 'ANY_LIST'
-    | 'DRAFTS'
-    | 'IMPORTANT'
-    | 'INBOX'
-    | 'LABEL'
-    | 'SEARCH'
-    | 'SEARCH'
-    | 'SENT'
-    | 'SPAM'
-    | 'STARRED'
-    | 'TRASH',
-    string
-  >;
-  RouteTypes: Record<RouteTypes, string>;
-}
-
-type NativeRouteIdTypes =
-  | 'INBOX'
-  | 'ALL_MAIL'
-  | 'SENT'
-  | 'STARRED'
-  | 'DRAFTS'
-  | 'SNOOZED'
-  | 'DONE'
-  | 'REMINDERS'
-  | 'LABEL'
-  | 'TRASH'
-  | 'SPAM'
-  | 'IMPORTANT'
-  | 'SEARCH'
-  | 'THREAD'
-  | 'CHATS'
-  | 'CHAT'
-  | 'CONTACTS'
-  | 'CONTACT'
-  | 'SETTINGS'
-  | 'ANY_LIST';
-
-type RouteTypes =
-  | 'CHAT'
-  | 'CUSTOM'
-  | 'LIST'
-  | 'SETTINGS'
-  | 'THREAD'
-  | 'UNKNOWN';
+export { Router };
 
 export interface Widgets {
   /** check whether mole view has light title bar as part of gmail new view / original view  */
@@ -206,7 +143,11 @@ export interface Widgets {
   showTopMessageBarView(opts: { el: Element }): TopMessageBarView;
 }
 
-export { Toolbars, LegacyToolbarButtonDescriptor };
+export {
+  Toolbars,
+  LegacyToolbarButtonDescriptor,
+  LegacyToolbarButtonOnClickEvent,
+};
 export {
   ToolbarButtonDescriptor,
   ToolbarButtonOnClickEvent,
@@ -217,7 +158,7 @@ export interface AppToolbarButtonDescriptor {
   titleClass?: string;
   iconUrl: string;
   iconClass?: string;
-  onClick: (e: MouseEvent) => void;
+  onClick: (e: { dropdown?: DropdownView }) => void;
   arrowColor?: string | null;
 }
 
@@ -316,42 +257,90 @@ export class RouteView extends EventEmitter {
 }
 
 /**
+ * @alpha
+ *
+ * Provides the ability to pass arbitrary HTML into a cell in a {@link SectionView} or {@link CollapsibleSectionView} `tableRow`.
+ */
+export type RowDescriptorCellRenderer = (args: {
+  /**
+   * The element to render the column into.
+   */
+  el: HTMLElement;
+  /**
+   * A promise that resolves when the row is unmounted. This is useful for cleaning up any resources that were created when the row was mounted.
+   */
+  unmountPromise: Promise<void>;
+}) => void;
+
+/**
  * Represents the a single row to render in {@link SectionView}s and {@link CollapsibleSectionView}s
  */
-export interface RowDescriptor {
+export type RowDescriptor = {
   /** First textual column */
-  title: string;
-  /** Second textual column */
-  body: string;
-  /** Last text right-aligned. Often used for dates. */
-  shortDetailText: string;
+  title: string | RowDescriptorCellRenderer;
   /**
-   * Whether the row should be rendered as read or unread similar to Gmail styles.
+   * @alpha
    *
-   * @TODO is this actually required like the docs say?
+   * Render an HTMLElement in the attachment icon area. This is often used to render an icon for the attachment type.
    */
-  isRead?: string;
+  attachmentIcon?: RowDescriptorCellRenderer;
+  /** Last text right-aligned. Often used for dates. */
+  shortDetailText: string | RowDescriptorCellRenderer;
+  /**
+   * Controls whether the row should be rendered as a read or unread message similar to Gmail styles.
+   * This affects the row background and font weight. These can be separately controlled by passing an object.
+   *
+   * @defaultValue { background: false, text: true }
+   */
+  isRead?:
+    | boolean
+    | {
+        /**
+         * Controls whether the row background should be styled as read (in light themes: gray background) or unread (bright white background) similar to Gmail styles.
+         */
+        background: boolean;
+        /**
+         * Controls whether the row text should be styled as read (regular non-bold) or unread (bold text) similar to Gmail styles.
+         */
+        text: boolean;
+      };
   /** Any labels that should be rendered. */
   labels: LabelDescriptor[];
   /** An optional class to apply to the icon. */
   iconClass?: string;
   /** An optional HTML to an icon to display on the left side of the row */
-  iconHtml?: string;
+  iconHtml?: string | RowDescriptorCellRenderer;
   /** An optional url to an icon to display on the left side of the row */
   iconUrl?: string;
   /** The name of the route to navigate to when the row is clicked on. */
   routeID?: string;
   /** The parameters of the route being navigated to when the row is clicked on. */
-  routeParams?: string[];
+  routeParams?: RouteParams;
   /** Callback for when the row is clicked on. */
-  onClick?(e: unknown): void;
-}
+  onClick?(): void;
+} & (
+  | {
+      /**
+       * @deprecated alias for {@link RowDescriptor#snippet}.
+       */
+      body: string;
+    }
+  | {
+      /**
+       * @alpha
+       *
+       * Second textual column. After {@link RowDescriptor#labels} if they're provided.
+       */
+      snippet: string | RowDescriptorCellRenderer;
+    }
+);
 
 /**
  * The properties required to create a {@link SectionView} or {@link CollapsibleSectionView}.
  */
 export interface SectionDescriptor {
-  /** Main title.
+  /**
+   * Main title. After @inboxsdk/core@2.1.32, {@link SectionDescriptor#title} is placed after {@link SectionDescriptor#subtitle} if both are provided. If this behavior is not desired, we're open to a PR to add an option to configure it.
    *
    * @note required in docs, but in {@link SectionView} we have spots not passing it.
    */
@@ -361,7 +350,7 @@ export interface SectionDescriptor {
   /** Link to display in the summary area of the {@link SectionView}. Typically page counts are displayed here.	*/
   titleLinkText?: string;
   /** A function to call when the title link has been clicked. */
-  onTitleLinkClick?(e: MouseEvent): void;
+  onTitleLinkClick?(e: CollapsibleSectionView | SectionView): void;
   /** Whether to display a dropdown arrow for more options on the collapsible section. */
   hasDropdown?: boolean;
   /**
@@ -375,7 +364,7 @@ export interface SectionDescriptor {
   /** A link to place in the footer of the {@link SectionView}.	 */
   footerLinkText?: string;
   /** A function to call when the link in the footer is clicked. */
-  onFooterLinkClick?(e: MouseEvent): void;
+  onFooterLinkClick?(e: CollapsibleSectionView | SectionView): void;
   /** @internal */
   orderHint?: unknown;
   /** @internal */
@@ -386,9 +375,7 @@ export interface SectionDescriptor {
 
 export { ListRouteView };
 
-export interface CustomRouteView extends RouteView {
-  getElement(): HTMLElement;
-}
+export { CustomRouteView };
 
 export interface CustomListDescriptor {
   hasMore?: boolean;
@@ -528,8 +515,8 @@ export interface MessageAttachmentIconDescriptor {
   iconUrl?: string;
   iconClass?: string;
   iconHtml?: string | null;
-  tooltip: string | HTMLElement;
-  onClick: () => void;
+  tooltip?: string | HTMLElement;
+  onClick?: () => void;
 }
 
 export type AttachmentIcon = TypedEmitter<{
@@ -537,56 +524,13 @@ export type AttachmentIcon = TypedEmitter<{
   tooltipShown: () => void;
 }>;
 
-export type MessageViewToolbarSectionNames = 'MORE';
-
-export interface MessageViewToolbarButtonDescriptor {
-  section: MessageViewToolbarSectionNames;
-  title: string;
-  iconUrl?: string;
-  iconClass?: string;
-  onClick: (e: MouseEvent) => void;
-  orderHint?: number;
-}
-
 export type { MessageViewViewStates } from './platform-implementation-js/namespaces/conversations';
 
-/**
- * Represents a visible message in the UI. There are properties to access data about the message itself as well as change the state of the UI. MessageViews have a view state as well as a loaded state. These 2 properties are orthogonal to each other.
-
- * A messages' view state can be one of {@link MessageViewViewStates.EXPANDED}, {@link MessageViewViewStates.COLLAPSED} or {@link MessageViewViewStates.HIDDEN}. Gmail visually display messages in a thread in different ways depending on what they are trying to show a user. These values are described in the enum MessageViewViewStates. The load state of a message determines whether all of the data pertaining to a message has been loaded in the UI. In some case, not all the information (such as recipients or the body) may be loaded, typically when the the view state is COLLAPSED or HIDDEN.
-
- * @note You should not depend on any relationship between the view state
- * and load state. Instead, use the provided {MessageView#getViewState} and {MessageView#isLoaded} methods.
- */
-export interface MessageView extends TypedEventEmitter<MessageViewEvent> {
-  addAttachmentIcon(
-    opts:
-      | MessageAttachmentIconDescriptor
-      | Kefir.Stream<MessageAttachmentIconDescriptor, never>,
-  ): AttachmentIcon;
-  addToolbarButton(opts?: MessageViewToolbarButtonDescriptor): void;
-  getBodyElement(): HTMLElement;
-  isElementInQuotedArea(element: HTMLElement): boolean;
-  /**
-   * Returns whether this message has been loaded yet. If the message has not been loaded, some of the data related methods on this object may return empty results. The message may be loaded once the user clicks on the message stub.
-   */
-  isLoaded(): boolean;
-  getFileAttachmentCardViews(): AttachmentCardView[];
-  /**
-   * Get the contact of the sender of this message.
-
-    * @returns {Contact} The contact of the sender of this message.
-    * @throws {Error} If the message has not been loaded yet.
-    *
-    * @note If you're using this method on an array of {MessageView}s returned by {@link ThreadRowView#getMessageViewsAll}, make sure to check {@link MessageView#isLoaded} before calling this method.
-   */
-  getSender(): Contact;
-  getRecipients(): Array<Contact>;
-  getRecipientsFull(): Promise<Array<Contact>>;
-  getLinksInBody(): Array<MessageViewLinkDescriptor>;
-  getThreadView(): ThreadView;
-  getMessageIDAsync(): Promise<string>;
-}
+export {
+  default as MessageView,
+  MessageViewToolbarButtonDescriptor,
+  MessageViewToolbarSectionNames,
+} from './platform-implementation-js/views/conversations/message-view';
 
 export interface Contact {
   name: string;
@@ -635,9 +579,12 @@ export type ComposeViewDestroyEvent = Parameters<
 
 export { ComposeButtonDescriptor };
 
+/**
+ * If the associated {@link ComposeButtonDescriptor#hasDropdown} is true, `dropdown` will be defined.
+ */
 export interface ComposeViewButtonOnClickEvent {
   composeView: ComposeView;
-  dropdown: DropdownView;
+  dropdown?: DropdownView;
 }
 
 export interface RecipientRowOptions {

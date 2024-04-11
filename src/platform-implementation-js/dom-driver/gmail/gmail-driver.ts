@@ -32,7 +32,9 @@ import KeyboardShortcutHelpModifier from './gmail-driver/keyboard-shortcut-help-
 import openDraftByMessageID from './gmail-driver/open-draft-by-message-id';
 import UserInfo from './gmail-driver/user-info';
 import GmailButterBarDriver from './gmail-butter-bar-driver';
-import trackGmailStyles from './gmail-driver/track-gmail-styles';
+import trackGmailStyles, {
+  stylesStream,
+} from './gmail-driver/track-gmail-styles';
 import temporaryTrackDownloadUrlValidity from './gmail-driver/temporary-track-download-url-validity';
 import getGmailThreadIdForRfcMessageId from '../../driver-common/getGmailThreadIdForRfcMessageId';
 import getRfcMessageIdForGmailThreadId from './gmail-driver/get-rfc-message-id-for-gmail-thread-id';
@@ -92,7 +94,12 @@ import type ContentPanelViewDriver from '../../driver-common/sidebar/ContentPane
 import GmailNavItemView, {
   type NavItemDescriptor,
 } from './views/gmail-nav-item-view';
-import { AppToolbarButtonDescriptor, Contact } from '../../../inboxsdk';
+import {
+  AppToolbarButtonDescriptor,
+  Contact,
+  DropdownView,
+  ToolbarButtonDescriptor,
+} from '../../../inboxsdk';
 import GmailAttachmentCardView from './views/gmail-attachment-card-view';
 import type { PersonDetails } from '../../namespaces/user';
 import getPersonDetails from './gmail-driver/getPersonDetails';
@@ -101,12 +108,18 @@ import type {
   SearchSuggestionsProvider,
   SearchQueryRewriter,
 } from '../../namespaces/search';
-import isNotNil from '../../lib/isNotNil';
+import isNotNil from '../../../common/isNotNil';
 
 /**
  * @internal
  */
 class GmailDriver {
+  #gmailTheme = {
+    isDarkMode: {
+      frame: false,
+      body: false,
+    },
+  };
   #appId: string;
   #logger: Logger;
   #opts: PiOpts;
@@ -389,7 +402,16 @@ class GmailDriver {
     } as const;
   }
 
-  registerThreadButton(options: any) {
+  registerThreadButton(
+    options: Omit<ToolbarButtonDescriptor, 'hideFor' | 'onClick'> & {
+      onClick(event: {
+        position: 'ROW' | 'LIST' | 'THREAD';
+        dropdown: DropdownView;
+        selectedThreadViewDrivers: GmailThreadView[];
+        selectedThreadRowViewDrivers: GmailThreadRowView[];
+      }): void;
+    },
+  ) {
     const unregister = kefirStopper();
 
     const removeButtonOnUnregister = (button: any) => {
@@ -412,7 +434,7 @@ class GmailDriver {
                   position: 'THREAD',
                   dropdown: event.dropdown,
                   selectedThreadViewDrivers: [
-                    gmailToolbarView.getThreadViewDriver(),
+                    gmailToolbarView.getThreadViewDriver()!,
                   ],
                   selectedThreadRowViewDrivers: [],
                 });
@@ -583,7 +605,7 @@ class GmailDriver {
   }
 
   addToolbarButtonForApp(
-    buttonDescriptor: Kefir.Stream<AppToolbarButtonDescriptor, any>,
+    buttonDescriptor: Kefir.Observable<AppToolbarButtonDescriptor, any>,
   ): Promise<GmailAppToolbarButtonView> {
     return addToolbarButtonForApp(this, buttonDescriptor);
   }
@@ -759,6 +781,25 @@ class GmailDriver {
     );
     keyboardShortcutHandle.once('destroy', () => {
       this.getKeyboardShortcutHelpModifier().delete(keyboardShortcutHandle);
+    });
+  }
+
+  get gmailTheme() {
+    return this.#gmailTheme;
+  }
+
+  /**
+   * Listen for if Gmail changes its theme (dark, light, or frame dark / body light mode).
+   */
+  get gmailThemeStream() {
+    return stylesStream.flatMap((event) => {
+      if (event.type !== 'theme') {
+        return Kefir.never();
+      }
+
+      this.#gmailTheme.isDarkMode = event.isDarkMode;
+
+      return Kefir.constant(event.isDarkMode);
     });
   }
 

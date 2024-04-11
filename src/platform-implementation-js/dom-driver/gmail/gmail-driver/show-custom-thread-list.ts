@@ -1,10 +1,12 @@
 import find from 'lodash/find';
+import uniqBy from 'lodash/uniqBy';
 import GmailElementGetter from '../gmail-element-getter';
 import * as SyncGRP from '../gmail-sync-response-processor';
 import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
 import isStreakAppId from '../../../lib/isStreakAppId';
 import update from 'immutability-helper';
+import isNotNil from '../../../../common/isNotNil';
 
 type ThreadDescriptor =
   | string
@@ -251,7 +253,7 @@ const setupSearchReplacing = (
 
         const initialIDPairs: InitialIDPair[] = threadDescriptors
           .map(threadDescriptorToInitialIDPair)
-          .filter(Boolean) as InitialIDPair[];
+          .filter(isNotNil);
 
         const idPairsWithRFC: IDPairWithRFC[] = (
           await Promise.all(
@@ -259,7 +261,7 @@ const setupSearchReplacing = (
               initialIDPairToIDPairWithRFC(driver, pair, findIdFailure),
             ),
           )
-        ).filter(Boolean) as IDPairWithRFC[];
+        ).filter(isNotNil);
 
         const messageIDQuery: string =
           idPairsWithRFC.length > 0
@@ -292,13 +294,18 @@ const setupSearchReplacing = (
           .toPromise();
 
         // Figure out any gmail thread ids we don't know yet.
-        const completedIDPairs: Array<CompletedIDPair> = (
-          await Promise.all(
-            idPairsWithRFC.map((pair) =>
-              idPairWithRFCToCompletedIDPair(driver, pair, findIdFailure),
-            ),
-          )
-        ).filter(Boolean) as CompletedIDPair[];
+        // Use uniqBy to remove duplicates which cause issues with Gmail sometimes
+        // https://github.com/InboxSDK/InboxSDK/issues/1130
+        const completedIDPairs: Array<CompletedIDPair> = uniqBy(
+          (
+            await Promise.all(
+              idPairsWithRFC.map((pair) =>
+                idPairWithRFCToCompletedIDPair(driver, pair, findIdFailure),
+              ),
+            )
+          ).filter(isNotNil),
+          (p) => p.gtid,
+        );
 
         const response = await searchResultsResponse_promise;
 
@@ -315,7 +322,7 @@ const setupSearchReplacing = (
             .map(({ gtid }) =>
               find(extractedThreads, (t) => t.oldGmailThreadID === gtid),
             )
-            .filter(Boolean);
+            .filter(isNotNil);
 
           const doesNeedReorder =
             extractedThreads.length !==
@@ -331,7 +338,7 @@ const setupSearchReplacing = (
             const now = Date.now();
             reorderedThreads = extractedThreadsInCompletedIDPairsOrder.map(
               (extractedThread, index) => {
-                const newFormat = Array.isArray(extractedThread!.rawResponse);
+                const newFormat = Array.isArray(extractedThread.rawResponse);
 
                 const newTime = String(now - index);
                 let newThread = update(extractedThread, {
@@ -352,8 +359,8 @@ const setupSearchReplacing = (
 
                 if (
                   newFormat
-                    ? extractedThread!.rawResponse[0][4]
-                    : extractedThread!.rawResponse[1][5]
+                    ? extractedThread.rawResponse[0][4]
+                    : extractedThread.rawResponse[1][5]
                 ) {
                   newThread = update(newThread, {
                     rawResponse: newFormat
@@ -383,7 +390,7 @@ const setupSearchReplacing = (
                         },
                   });
                 }
-                return newThread!;
+                return newThread;
               },
             );
           } else {

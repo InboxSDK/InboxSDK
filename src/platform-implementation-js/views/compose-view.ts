@@ -19,6 +19,9 @@ import type {
   AddressChangeEventName,
   RecipientsChangedEvent,
 } from '../dom-driver/gmail/views/gmail-compose-view/get-address-changes-stream';
+import type { Descriptor } from '../../types/descriptor';
+import kefirBus from 'kefir-bus';
+import type { AddedButtonEvents } from '../dom-driver/gmail/views/gmail-compose-view/add-button';
 
 interface Members {
   driver: Driver;
@@ -143,27 +146,39 @@ export default class ComposeView extends (EventEmitter as new () => TypedEventEm
     });
   }
 
+  /**
+   * Inserts a button into the compose bar. This method also accepts a stream of {@link ComposeButtonDescriptor}s so that you can change the appearance of your button after you've added it.
+   *
+   * @param buttonDescriptor The details of the button to add to the compose bar.
+   */
   addButton(
-    buttonDescriptor:
-      | ComposeButtonDescriptor
-      | Observable<ComposeButtonDescriptor, any>,
+    buttonDescriptor: Descriptor<ComposeButtonDescriptor | null | undefined>,
   ) {
     const members = get(memberMap, this);
     const buttonDescriptorStream = kefirCast(
       Kefir,
       buttonDescriptor,
-    ) as Observable<ComposeButtonDescriptor, any>;
+    ) as Observable<ComposeButtonDescriptor | null | undefined, unknown>;
 
-    const optionsPromise = members.composeViewImplementation.addButton(
+    const bus = kefirBus<AddedButtonEvents, unknown>();
+
+    members.composeViewImplementation.addButton(
       buttonDescriptorStream,
       members.driver.getAppId(),
       { composeView: this },
+      bus,
     );
-    return new ComposeButtonView(
-      optionsPromise,
+    const view = new ComposeButtonView(
+      bus,
       members.composeViewImplementation,
       members.driver,
     );
+
+    view.on('destroy', () => {
+      bus.end();
+    });
+
+    return view;
   }
 
   addComposeNotice(composeNoticeDescriptor?: {

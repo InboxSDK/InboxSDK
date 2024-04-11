@@ -1,23 +1,25 @@
 import type * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import SafeEventEmitter from '../../lib/safe-event-emitter';
-export type CustomMessageDescriptor = {
+
+export interface CustomMessageDescriptor {
   collapsedEl: HTMLElement;
   headerEl: HTMLElement;
   bodyEl: HTMLElement;
   iconUrl: string;
   sortDate: Date;
-};
+}
+
 export default class CustomMessageView extends SafeEventEmitter {
-  _el!: HTMLElement;
-  _iconEl!: HTMLElement;
-  _contentEl!: HTMLElement;
-  _contentHeaderEl!: HTMLElement;
-  _contentBodyEl!: HTMLElement;
-  _destroyed: boolean = false;
-  _stopper = kefirStopper();
-  _isCollapsed: boolean = true;
-  _lastDescriptor: CustomMessageDescriptor | null | undefined;
+  #el: HTMLElement;
+  #iconEl: HTMLElement;
+  #contentEl: HTMLElement;
+  #contentHeaderEl: HTMLElement;
+  #contentBodyEl: HTMLElement;
+  destroyed: boolean = false;
+  #stopper = kefirStopper();
+  #isCollapsed: boolean = true;
+  #lastDescriptor: CustomMessageDescriptor | null | undefined;
 
   constructor(
     descriptorStream: Kefir.Observable<CustomMessageDescriptor, unknown>,
@@ -25,18 +27,48 @@ export default class CustomMessageView extends SafeEventEmitter {
   ) {
     super();
 
-    this._setupElement();
+    this.#el = document.createElement('div');
+    this.#el.classList.add('inboxsdk__custom_message_view');
+    this.#el.classList.add('inboxsdk__custom_message_view_collapsed');
+
+    this.#iconEl = document.createElement('div');
+    this.#iconEl.classList.add('inboxsdk__custom_message_view_icon');
+
+    this.#contentEl = document.createElement('div');
+    this.#contentEl.classList.add('inboxsdk__custom_message_view_content');
+
+    this.#contentHeaderEl = document.createElement('div');
+    this.#contentHeaderEl.classList.add('inboxsdk__custom_message_view_header');
+
+    this.#contentBodyEl = document.createElement('div');
+    this.#contentBodyEl.classList.add('inboxsdk__custom_message_view_body');
+
+    this.#el.appendChild(this.#iconEl);
+    this.#el.appendChild(this.#contentEl);
+    this.#el.addEventListener('click', (e: MouseEvent) => {
+      if (this.#isCollapsed) {
+        this.expand();
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+
+    this.#contentHeaderEl.addEventListener('click', (e: MouseEvent) => {
+      this.collapse();
+      e.preventDefault();
+      e.stopPropagation();
+    });
 
     descriptorStream
-      .takeUntilBy(this._stopper)
+      .takeUntilBy(this.#stopper)
       .onValue((descriptor) => {
-        this._el.setAttribute(
+        this.#el.setAttribute(
           'data-inboxsdk-sortdate',
           String(descriptor.sortDate.getTime()),
         );
 
-        const previousDescriptor = this._lastDescriptor;
-        this._lastDescriptor = descriptor;
+        const previousDescriptor = this.#lastDescriptor;
+        this.#lastDescriptor = descriptor;
 
         if (
           !previousDescriptor ||
@@ -44,19 +76,19 @@ export default class CustomMessageView extends SafeEventEmitter {
         ) {
           const img = document.createElement('img');
           img.src = descriptor.iconUrl;
-          this._iconEl.innerHTML = '';
+          this.#iconEl.innerHTML = '';
 
-          this._iconEl.appendChild(img);
+          this.#iconEl.appendChild(img);
         }
 
         if (
           (!previousDescriptor ||
             previousDescriptor.collapsedEl !== descriptor.collapsedEl) &&
-          this._isCollapsed
+          this.#isCollapsed
         ) {
           if (previousDescriptor) previousDescriptor.collapsedEl.remove();
 
-          this._contentEl.appendChild(descriptor.collapsedEl);
+          this.#contentEl.appendChild(descriptor.collapsedEl);
         }
 
         if (
@@ -65,7 +97,7 @@ export default class CustomMessageView extends SafeEventEmitter {
         ) {
           if (previousDescriptor) previousDescriptor.headerEl.remove();
 
-          this._contentHeaderEl.appendChild(descriptor.headerEl);
+          this.#contentHeaderEl.appendChild(descriptor.headerEl);
         }
 
         if (
@@ -74,7 +106,7 @@ export default class CustomMessageView extends SafeEventEmitter {
         ) {
           if (previousDescriptor) previousDescriptor.bodyEl.remove();
 
-          this._contentBodyEl.appendChild(descriptor.bodyEl);
+          this.#contentBodyEl.appendChild(descriptor.bodyEl);
         }
       })
       .take(1)
@@ -82,96 +114,54 @@ export default class CustomMessageView extends SafeEventEmitter {
   }
 
   destroy() {
-    if (this._destroyed) return;
-    this._destroyed = true;
+    if (this.destroyed) return;
+    this.destroyed = true;
 
-    this._stopper.destroy();
+    this.#stopper.destroy();
 
     this.emit('destroy');
 
-    this._el.remove();
+    this.#el.remove();
   }
 
   expand() {
-    this._isCollapsed = false;
-    const descriptor = this._lastDescriptor;
+    this.#isCollapsed = false;
+    const descriptor = this.#lastDescriptor;
     if (descriptor) descriptor.collapsedEl.remove();
 
-    this._contentEl.appendChild(this._contentHeaderEl);
+    this.#contentEl.appendChild(this.#contentHeaderEl);
 
-    this._contentEl.appendChild(this._contentBodyEl);
+    this.#contentEl.appendChild(this.#contentBodyEl);
 
-    this._el.classList.remove('inboxsdk__custom_message_view_collapsed');
+    this.#el.classList.remove('inboxsdk__custom_message_view_collapsed');
 
     this.emit('expanded');
   }
 
   collapse() {
-    this._isCollapsed = true;
+    this.#isCollapsed = true;
 
-    this._contentHeaderEl.remove();
+    this.#contentHeaderEl.remove();
 
-    this._contentBodyEl.remove();
+    this.#contentBodyEl.remove();
 
-    const descriptor = this._lastDescriptor;
+    const descriptor = this.#lastDescriptor;
 
     if (descriptor) {
-      this._contentEl.appendChild(descriptor.collapsedEl);
+      this.#contentEl.appendChild(descriptor.collapsedEl);
     }
 
-    this._el.classList.add('inboxsdk__custom_message_view_collapsed');
+    this.#el.classList.add('inboxsdk__custom_message_view_collapsed');
 
     this.emit('collapsed');
   }
 
   getElement() {
-    return this._el;
+    return this.#el;
   }
 
   getSortDate() {
-    if (this._lastDescriptor) return this._lastDescriptor.sortDate;
+    if (this.#lastDescriptor) return this.#lastDescriptor.sortDate;
     else return null;
-  }
-
-  _setupElement() {
-    this._el = document.createElement('div');
-
-    this._el.classList.add('inboxsdk__custom_message_view');
-
-    this._el.classList.add('inboxsdk__custom_message_view_collapsed');
-
-    this._iconEl = document.createElement('div');
-
-    this._iconEl.classList.add('inboxsdk__custom_message_view_icon');
-
-    this._contentEl = document.createElement('div');
-
-    this._contentEl.classList.add('inboxsdk__custom_message_view_content');
-
-    this._contentHeaderEl = document.createElement('div');
-
-    this._contentHeaderEl.classList.add('inboxsdk__custom_message_view_header');
-
-    this._contentBodyEl = document.createElement('div');
-
-    this._contentBodyEl.classList.add('inboxsdk__custom_message_view_body');
-
-    this._el.appendChild(this._iconEl);
-
-    this._el.appendChild(this._contentEl);
-
-    this._el.addEventListener('click', (e: MouseEvent) => {
-      if (this._isCollapsed) {
-        this.expand();
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    });
-
-    this._contentHeaderEl.addEventListener('click', (e: MouseEvent) => {
-      this.collapse();
-      e.preventDefault();
-      e.stopPropagation();
-    });
   }
 }

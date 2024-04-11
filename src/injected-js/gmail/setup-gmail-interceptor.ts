@@ -719,7 +719,23 @@ export function setupGmailInterceptorOnFrames(
           const modifications = await (connection as any)._defer.promise;
 
           if (modifications) {
-            return modifySuggestions(responseText, modifications);
+            let modified: string;
+            try {
+              modified = modifySuggestions(responseText, modifications);
+            } catch (e) {
+              logger.eventSdkPassive(
+                'suggestionsModified.error',
+                {
+                  query: currentQuery,
+                  originalResponseText: responseText,
+                  error: e instanceof Error && e.message,
+                },
+                true,
+              );
+
+              throw e;
+            }
+            return modified;
           }
         }
 

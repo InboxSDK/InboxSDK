@@ -8,6 +8,7 @@ import GmailRouteView from '../views/gmail-route-view/gmail-route-view';
 import getURLObject from './get-url-object';
 
 import routeIDmatchesHash from '../../../lib/routeIDmatchesHash';
+import isNotNil from '../../../../common/isNotNil';
 
 export default function setupRouteViewDriverStream(
   gmailRouteProcessor: GmailRouteProcessor,
@@ -175,15 +176,15 @@ export default function setupRouteViewDriverStream(
       }
       return new GmailRouteView(options, gmailRouteProcessor, driver);
     })
-    .filter(Boolean)
+    .filter(isNotNil)
     .map((gmailRouteView) => {
       if (latestGmailRouteView) {
         latestGmailRouteView.destroy();
       }
-      latestGmailRouteView = gmailRouteView!;
+      latestGmailRouteView = gmailRouteView;
       lastHash = getURLObject(document.location.href).hash;
 
-      return gmailRouteView!;
+      return gmailRouteView;
     });
 }
 

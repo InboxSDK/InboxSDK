@@ -2,17 +2,16 @@ import find from 'lodash/find';
 import uniqBy from 'lodash/uniqBy';
 import { Driver } from '../../../driver-interfaces/driver';
 import { Contact } from '../../../../inboxsdk';
+import isNotNil from '../../../../common/isNotNil';
 
 export default class UserInfo {
-  _failedWaitFor: boolean;
-  _userEmail: string;
+  #userEmail: string;
 
   constructor(driver: Driver) {
-    this._failedWaitFor = false;
-    this._userEmail = driver.getUserEmailAddress();
+    this.#userEmail = driver.getUserEmailAddress();
   }
 
-  // deprecated
+  /** @deprecated */
   getUserName(): string {
     const nameEl = document.querySelector<HTMLElement>(
       'div.gb_w div.gb_B .gb_D',
@@ -22,12 +21,12 @@ export default class UserInfo {
     }
     const contact: Contact = find(
       this.getAccountSwitcherContactList(),
-      (contact: Contact) => contact.emailAddress === this._userEmail,
+      (contact) => contact.emailAddress === this.#userEmail,
     )!;
     if (contact && contact.name != null) {
       return contact.name;
     }
-    return this._userEmail;
+    return this.#userEmail;
   }
 
   /** @deprecated */
@@ -38,17 +37,17 @@ export default class UserInfo {
       ),
     )
       .slice(0, 1)
-      .map((btn: HTMLElement) => {
-        const btnParent: HTMLElement = btn.parentElement!;
+      .map((btn) => {
+        const btnParent = btn.parentElement!;
         const nameEl = btnParent.children[0];
         const emailAddressEl = btnParent.children[1];
         if (!nameEl || !emailAddressEl) return null;
         return {
-          name: nameEl.textContent,
-          emailAddress: emailAddressEl.textContent,
+          name: nameEl.textContent!,
+          emailAddress: emailAddressEl.textContent!,
         };
       })
-      .filter(Boolean) as Contact[];
+      .filter(isNotNil);
     const extras: Contact[] = Array.from(
       document.querySelectorAll<HTMLElement>(
         '[role=banner] div[aria-label] div > a[target="_blank"] > img + div',

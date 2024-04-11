@@ -33,8 +33,8 @@ let hasSeenOldElement = false;
 export type MessageViewDriverEventByName = {
   viewStateChange: {
     eventName: 'viewStateChange';
-    newValue?: VIEW_STATE;
-    oldValue?: VIEW_STATE;
+    newValue: VIEW_STATE;
+    oldValue: VIEW_STATE;
   };
   contactHover: {
     eventName: 'contactHover';
@@ -540,7 +540,7 @@ class GmailMessageView {
   addAttachmentIcon(
     iconDescriptor:
       | MessageAttachmentIconDescriptor
-      | Kefir.Stream<MessageAttachmentIconDescriptor, never>,
+      | Kefir.Observable<MessageAttachmentIconDescriptor, never>,
   ) {
     const attachmentIcon = new AttachmentIcon();
 
@@ -568,7 +568,7 @@ class GmailMessageView {
       return div;
     });
     let added = false;
-    let currentIconUrl: string | null = null;
+    let currentIconUrl: string | undefined | null = null;
 
     this.#stopper.onValue(() => {
       if (added) {
@@ -579,8 +579,13 @@ class GmailMessageView {
       }
     });
 
-    kefirCast(Kefir, iconDescriptor)
-      .combine<any, any, any>(
+    (
+      kefirCast(Kefir, iconDescriptor) as Kefir.Observable<
+        MessageAttachmentIconDescriptor,
+        unknown
+      >
+    )
+      .combine<unknown, unknown, MessageAttachmentIconDescriptor>(
         this.#eventStream
           .filter((event) => event.eventName === 'viewStateChange')
           .toProperty(() => null),
@@ -740,7 +745,7 @@ class GmailMessageView {
         attributeOldValue: true,
       })
         .takeUntilBy(this.#stopper)
-        .map(function (mutation) {
+        .map((mutation) => {
           const currentClassList = (mutation.target as HTMLElement).classList;
           const mutationOldValue = mutation.oldValue!;
           let oldValue: VIEW_STATE | undefined;
@@ -780,25 +785,25 @@ class GmailMessageView {
             currentClassList,
           };
         })
-        .map(function (event) {
+        .map((event) => {
           if (event.newValue === 'EXPANDED' && event.oldValue !== 'EXPANDED') {
             self.#checkMessageOpenState(event.currentClassList);
           }
 
           return event;
         })
-        .filter(function (event) {
+        .filter((event) => {
           return (
             event.newValue !== event.oldValue &&
             !!event.oldValue &&
             !!event.newValue
           );
         })
-        .map(function (event) {
+        .map((event) => {
           return {
             eventName: 'viewStateChange',
-            oldValue: event.oldValue,
-            newValue: event.newValue,
+            oldValue: event.oldValue!,
+            newValue: event.newValue!,
           };
         }),
     );

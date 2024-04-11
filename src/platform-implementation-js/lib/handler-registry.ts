@@ -2,7 +2,7 @@ import remove from 'lodash/remove';
 import asap from 'asap';
 import Logger from './logger';
 
-export type Handler<T> = (target: T) => void;
+export type Handler<T> = (target: T) => void | Promise<void>;
 
 export default class HandlerRegistry<T> {
   private _targets: Array<T> = [];

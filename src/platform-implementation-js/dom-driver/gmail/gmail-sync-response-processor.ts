@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import isNotNil from '../../lib/isNotNil';
+import isNotNil from '../../../common/isNotNil';
 
 interface Recipient {
   emailAddress: string;

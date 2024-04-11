@@ -5,6 +5,9 @@ import {
   ComposeViewDriver,
 } from '../driver-interfaces/compose-view-driver';
 import { Driver } from '../driver-interfaces/driver';
+import { AddedButtonEvents } from '../dom-driver/gmail/views/gmail-compose-view/add-button';
+import { Bus } from 'kefir-bus';
+import BasicButtonViewController from '../widgets/buttons/basic-button-view-controller';
 
 export interface TooltipDescriptor {
   el?: null | HTMLElement;
@@ -22,24 +25,25 @@ const memberMap = new WeakMap<
   ComposeButtonView,
   {
     driver: Driver;
-    optionsPromise: Promise<Options | null | undefined>;
     composeViewDriver: ComposeViewDriver;
   }
 >();
 
 export default class ComposeButtonView extends EventEmitter {
   destroyed: boolean = false;
+  #addedEventBus;
 
   constructor(
-    optionsPromise: Promise<Options | null | undefined>,
+    addedEventBus: Bus<AddedButtonEvents, unknown>,
     composeViewDriver: ComposeViewDriver,
     driver: Driver,
   ) {
     super();
-    const members = { optionsPromise, composeViewDriver, driver };
+    this.#addedEventBus = addedEventBus;
+    const members = { composeViewDriver, driver };
     memberMap.set(this, members);
 
-    members.optionsPromise.then((options) => {
+    this.#addedEventBus.toProperty().onValue((options) => {
       if (!options) {
         _destroy(this);
         return;
@@ -58,10 +62,10 @@ export default class ComposeButtonView extends EventEmitter {
       .eventSdkPassive('ComposeButtonView.showTooltip', {
         keys: Object.keys(tooltipDescriptor),
       });
-    members.optionsPromise.then((options) => {
+    this.#addedEventBus.onValue((options) => {
       if (!options) return;
       members.composeViewDriver.addTooltipToButton(
-        options.buttonViewController,
+        options.buttonViewController as BasicButtonViewController,
         options.buttonDescriptor!,
         tooltipDescriptor,
       );
@@ -70,10 +74,10 @@ export default class ComposeButtonView extends EventEmitter {
 
   closeTooltip() {
     const members = get(memberMap, this);
-    members.optionsPromise.then((options) => {
+    this.#addedEventBus.onValue((options) => {
       if (!options) return;
       members.composeViewDriver.closeButtonTooltip(
-        options.buttonViewController,
+        options.buttonViewController!,
       );
     });
   }

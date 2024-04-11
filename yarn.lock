@@ -3865,17 +3865,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:^1.0.30001449":
-  version: 1.0.30001532
-  resolution: "caniuse-lite@npm:1.0.30001532"
-  checksum: 3be6aae89a588f1111eec0cd9d3125f24a5bb2a9ca2b2ead5a3bee529b85f32b01fd5aa751f292d18da0941948288187ff558b2ca199dac37fed18fba25047ec
-  languageName: node
-  linkType: hard
-
-"caniuse-lite@npm:^1.0.30001541":
-  version: 1.0.30001546
-  resolution: "caniuse-lite@npm:1.0.30001546"
-  checksum: efa765c9891beb187715dc794b6b21cd30c23cdaea5788b736b58dbea7a568d73577fd9e97202874ee19fea5e783a55a20296606d473153250b4f9a36aba58de
+"caniuse-lite@npm:^1.0.30001449, caniuse-lite@npm:^1.0.30001541":
+  version: 1.0.30001589
+  resolution: "caniuse-lite@npm:1.0.30001589"
+  checksum: 5e1d2eb7c32d48c52204227bc1377f0f4c758ef889c53b9b479e28470e7f82eb1db5853e7754be9600ee662ae32a1d58e8bef0fde6edab06322ddbabfd9d212f
   languageName: node
   linkType: hard
 
@@ -6800,7 +6793,7 @@ __metadata:
     thirty-two: "npm:^1.0.1"
     transducers.js: "npm:^0.3.2"
     typed-emitter: "npm:^2.1.0"
-    typescript: "npm:^5.0.3"
+    typescript: "npm:^5.3.3"
     ud: "npm:^3.3.1"
     ud-kefir: "npm:^2.0.1"
     webpack: "npm:^5.76.3"
@@ -12126,23 +12119,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.0.3":
-  version: 5.0.3
-  resolution: "typescript@npm:5.0.3"
+"typescript@npm:^5.3.3":
+  version: 5.3.3
+  resolution: "typescript@npm:5.3.3"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 8879c84676a0d7e358c1aa1ec0a0b65117413d10c03c77bdf963fe538ef24833ee8493562ef0b0fcb2cfae4075d3135ed4bcd183b11baa9409b78144cd68993e
+  checksum: 6e4e6a14a50c222b3d14d4ea2f729e79f972fa536ac1522b91202a9a65af3605c2928c4a790a4a50aa13694d461c479ba92cedaeb1e7b190aadaa4e4b96b8e18
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.0.3#optional!builtin<compat/typescript>":
-  version: 5.0.3
-  resolution: "typescript@patch:typescript@npm%3A5.0.3#optional!builtin<compat/typescript>::version=5.0.3&hash=b5f058"
+"typescript@patch:typescript@npm%3A^5.3.3#optional!builtin<compat/typescript>":
+  version: 5.3.3
+  resolution: "typescript@patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=29ae49"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: f1122fdfd2bba3ba92c9afc6a6670eeedf754ea74e3b511f04bdf7350a03c4458590538f2dcc4aace4ebc21ad391054779c526a311776799f3d5054ccb50ad88
+  checksum: 57bf073a0b88f9bf76e5a24be3df864a8f9d0e70f8316969f4992ae26e30cb8d078708922da2ade1f2c8d1faee13b28bcb69876ebb1e37910e31c54aa9126aa2
   languageName: node
   linkType: hard
 
