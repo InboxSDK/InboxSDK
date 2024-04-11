@@ -9,17 +9,18 @@ import GmailTooltipView from '../widgets/gmail-tooltip-view';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
 import monitorTopBannerSizeAndReact from './gmail-app-toolbar-button-view/monitor-top-banner-size-and-react';
 import type Driver from '../gmail-driver';
+import { AppToolbarButtonDescriptor } from '../../../../inboxsdk';
 export default class GmailAppToolbarButtonView {
   _stopper: Stopper;
   _iconSettings: Record<string, any>;
   _element: HTMLElement | null | undefined = null;
   _activeDropdown: DropdownView | null | undefined;
-  _buttonDescriptor: Record<string, any> | null | undefined;
+  _buttonDescriptor: AppToolbarButtonDescriptor | null | undefined;
   _driver: Driver;
 
   constructor(
     driver: Driver,
-    inButtonDescriptor: Kefir.Observable<Record<string, any>, unknown>,
+    inButtonDescriptor: Kefir.Observable<AppToolbarButtonDescriptor, unknown>,
   ) {
     this._driver = driver;
     this._stopper = kefirStopper();
@@ -76,7 +77,7 @@ export default class GmailAppToolbarButtonView {
     }
   }
 
-  _handleButtonDescriptor(buttonDescriptor: Record<string, any>) {
+  _handleButtonDescriptor(buttonDescriptor: AppToolbarButtonDescriptor) {
     if (!buttonDescriptor) {
       throw new Error(
         'The application passed an invalid value for buttonDescriptor',
@@ -164,7 +165,7 @@ export default class GmailAppToolbarButtonView {
 
 function _createAppButtonElement(
   driver: Driver,
-  onclick: (event: Record<string, any>) => void,
+  onclick: (event: MouseEvent) => void,
 ): HTMLElement {
   const element = document.createElement('div');
   element.setAttribute('class', 'inboxsdk__appButton');
@@ -215,7 +216,10 @@ function _createAppButtonElement(
   }
 }
 
-function _updateTitle(element: HTMLElement, descriptor: Record<string, any>) {
+function _updateTitle(
+  element: HTMLElement,
+  descriptor: AppToolbarButtonDescriptor,
+) {
   element.textContent = descriptor.title;
   element.className = `inboxsdk__appButton_title ${
     descriptor.titleClass || ''

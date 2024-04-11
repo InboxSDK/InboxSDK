@@ -1,0 +1,69 @@
+:global(.Wn) {
+  --inboxsdk-title-color: rgb(0 0 0 / 87%);
+  --inboxsdk-subtitle-color: rgb(0 0 0 / 54%);
+}
+
+:global(.inboxsdk__gmail_dark_body_theme .Wn) {
+  --inboxsdk-title-color: rgb(255 255 255);
+  --inboxsdk-subtitle-color: rgb(255 255 255 / 70%);
+}
+
+:global(.Wn).title {
+  color: var(--inboxsdk-title-color);
+}
+
+:global(.Wn) .subtitle {
+  color: var(--inboxsdk-subtitle-color);
+}
+
+/* Make the recipient's column wider after taking out two of the native rows icons. */
+:global(.xY).resultTitle {
+  /*
+   * 168px is the max width of the recipients' column element.
+   * 30px is the width of each rows' individual icons.
+   */
+  max-width: calc(168px + (30px * 2));
+  flex-basis: calc(168px + (30px * 2));
+}
+
+/* Rows */
+.resultTitle span {
+  text-overflow: ellipsis;
+  display: block;
+  overflow: hidden;
+}
+
+.iconAtStart {
+  content: '';
+}
+
+.recipients {
+  content: '';
+}
+
+.snippet {
+  content: '';
+}
+
+/* if `isRead: { text: false, background: true }` is passed to the corresponding RowDescriptor, account for Gmail rule making b tags 400 weight. */
+.unread b {
+  font-weight: 700;
+}
+
+.attachmentIcon {
+  content: '';
+}
+
+.shortDetail {
+  content: '';
+}
+
+/* Without this monkey patch, in light Gmail themes, .shortDetail is fully opaque black. */
+.shortDetail.unread {
+  color: rgb(95 99 104);
+}
+
+/* Without this monkey patch, in dark Gmail themes, .shortDetail is fully opaque white. */
+:global(.inboxsdk__gmail_dark_body_theme) .shortDetail.unread {
+  color: rgb(255 255 255 / 50%);
+}

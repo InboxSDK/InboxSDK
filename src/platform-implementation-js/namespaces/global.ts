@@ -9,11 +9,13 @@ import { type ContentPanelDescriptor } from '../driver-common/sidebar/ContentPan
 
 export default class Global {
   #driver: Driver;
-  #piOpts: PiOpts;
 
-  constructor(appId: string, driver: Driver, piOpts: PiOpts) {
+  constructor(appId: string, driver: Driver, _piOpts: PiOpts) {
     this.#driver = driver;
-    this.#piOpts = piOpts;
+  }
+
+  get gmailTheme() {
+    return this.#driver.gmailTheme;
   }
 
   async addSidebarContentPanel(

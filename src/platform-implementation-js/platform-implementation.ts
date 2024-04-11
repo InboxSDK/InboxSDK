@@ -93,14 +93,7 @@ export class PlatformImplementation extends SafeEventEmitter {
       ],
       [
         GmailMessageView,
-        (viewDriver) =>
-          new MessageView(
-            viewDriver,
-            appId,
-            membrane,
-            this.Conversations,
-            driver,
-          ),
+        (viewDriver) => new MessageView(viewDriver, membrane, driver),
       ],
       [
         GmailThreadView,

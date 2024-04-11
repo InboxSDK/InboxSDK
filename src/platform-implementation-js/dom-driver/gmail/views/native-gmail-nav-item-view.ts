@@ -9,6 +9,7 @@ import GmailNavItemView, {
   getLeftIndentationPaddingValue,
 } from './gmail-nav-item-view';
 import type GmailDriver from '../gmail-driver';
+import isNotNil from '../../../../common/isNotNil';
 
 export default class NativeGmailNavItemView {
   _driver: GmailDriver;
@@ -46,9 +47,9 @@ export default class NativeGmailNavItemView {
             `.aim a[href*="#${this._navItemName}"]`,
           ),
         )
-        .filter(Boolean)
-        .map((link) => findParent(link!, (el) => el.classList.contains('aim')))
-        .filter(Boolean)
+        .filter(isNotNil)
+        .map((link) => findParent(link, (el) => el.classList.contains('aim')))
+        .filter(isNotNil)
         .filter((newElement) => newElement !== this._element)
         .onValue((newElement) => {
           if (newElement) {

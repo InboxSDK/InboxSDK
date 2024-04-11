@@ -8,6 +8,7 @@ import once from 'lodash/once';
 import { assert } from '../common/assert';
 import EventEmitter from 'events';
 import { parse as deparam } from 'querystring';
+import isNotNil from '../common/isNotNil';
 export type Opts = {
   logError: (error: unknown, details?: any) => void;
 };
@@ -658,13 +659,13 @@ export default function XHRProxyFactory(
       this._connection,
     );
     this._responseTextChangers = this._activeWrappers
-      .map(function (wrapper) {
+      .map((wrapper) => {
         return (
           wrapper.responseTextChanger &&
           wrapper.responseTextChanger.bind(wrapper)
         );
       })
-      .filter(Boolean);
+      .filter(isNotNil);
     this.responseText = '';
     this._openState = true;
 
@@ -674,10 +675,10 @@ export default function XHRProxyFactory(
 
     if (this._connection.async) {
       this._requestChangers = this._activeWrappers
-        .map(function (wrapper) {
+        .map((wrapper) => {
           return wrapper.requestChanger && wrapper.requestChanger.bind(wrapper);
         })
-        .filter(Boolean);
+        .filter(isNotNil);
 
       if (this._requestChangers.length) {
         if (this.readyState != 1) {

@@ -5,7 +5,9 @@ import kefirStopper from 'kefir-stopper';
 import type { Bus } from 'kefir-bus';
 import findParent from '../../../../common/find-parent';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
-import querySelector from '../../../lib/dom/querySelectorOrFail';
+import querySelector, {
+  SelectorError,
+} from '../../../lib/dom/querySelectorOrFail';
 import idMap from '../../../lib/idMap';
 import SimpleElementView from '../../../views/SimpleElementView';
 import CustomMessageView from '../../../views/conversations/custom-message-view';
@@ -630,7 +632,9 @@ class GmailThreadView {
   addSubjectButton(button: any) {
     const subjectParent = this._element.querySelector('.V8djrc.byY');
     if (!subjectParent) {
-      throw new Error('Subject wrapper element not found');
+      throw new SelectorError('.V8djrc.byY', {
+        cause: 'Subject wrapper element not found',
+      });
     }
 
     const buttonOptions = {
@@ -640,7 +644,7 @@ class GmailThreadView {
     const buttonElement = buttonOptions.buttonView.getElement();
 
     // Sometimes it is there right away
-    const subjectToolbarElement = this._findSubjectToolbarElement();
+    const subjectToolbarElement = this.#findSubjectToolbarElement();
     if (subjectToolbarElement) {
       subjectToolbarElement.prepend(buttonElement);
     }
@@ -648,7 +652,7 @@ class GmailThreadView {
     // Sometimes the container is lazy loaded or re-loaded, so we observe too
     const observer = new MutationObserver((mutationsList) => {
       if (mutationsList.some((mutation) => mutation.type === 'childList')) {
-        const subjectToolbarElement = this._findSubjectToolbarElement();
+        const subjectToolbarElement = this.#findSubjectToolbarElement();
         if (
           subjectToolbarElement &&
           !subjectToolbarElement.contains(buttonElement)
@@ -785,10 +789,10 @@ class GmailThreadView {
     return null;
   }
 
-  _findSubjectToolbarElement(): HTMLElement | null {
-    var toolbarContainerElements =
-      this._element.querySelectorAll<HTMLElement>('.bHJ');
-    return toolbarContainerElements[0];
+  #findSubjectToolbarElement(): HTMLElement | null {
+    var toolbarContainerElement =
+      this._element.querySelector<HTMLElement>('.bHJ');
+    return toolbarContainerElement;
   }
 
   _findBottomReplyToolbarElement(): HTMLElement | null {

@@ -13,6 +13,7 @@ import type {
   AutocompleteSearchResultWithId,
 } from '../../../../injected-js/gmail/modify-suggestions';
 import type { SearchSuggestionsProvider } from '../../../namespaces/search';
+import isNotNil from '../../../../common/isNotNil';
 
 export default function registerSearchSuggestionsProvider(
   driver: GmailDriver,
@@ -74,8 +75,8 @@ export default function registerSearchSuggestionsProvider(
   const searchBoxStream: Kefir.Observable<HTMLInputElement, unknown> = driver
     .getRouteViewDriverStream()
     .toProperty(() => null)
-    .map(() => gmailElementGetter.getSearchInput()!)
-    .filter(Boolean)
+    .map(() => gmailElementGetter.getSearchInput())
+    .filter(isNotNil)
     .take(1);
 
   // Wait for the search box to be focused before looking for the suggestions box.
@@ -83,9 +84,9 @@ export default function registerSearchSuggestionsProvider(
     searchBoxStream
       .flatMapLatest((searchBox) => Kefir.fromEvents(searchBox, 'focus'))
       .map(() => gmailElementGetter.getSearchSuggestionsBoxParent())
-      .filter(Boolean)
-      .flatMapLatest(makeElementChildStream as any)
-      .map((x: any) => x.el.firstElementChild)
+      .filter(isNotNil)
+      .flatMapLatest(makeElementChildStream)
+      .map((x) => x.el.firstElementChild as HTMLElement)
       .take(1)
       .toProperty();
 

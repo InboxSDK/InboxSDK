@@ -8,7 +8,8 @@
     "allowSyntheticDefaultImports": true,
     "target": "ES2022",
     "moduleResolution": "node",
-    "isolatedModules": true
+    "isolatedModules": true,
+    "moduleDetection": "force"
   },
   "exclude": ["packages/core"]
 }

@@ -1,7 +1,7 @@
 import sortBy from 'lodash/sortBy';
 import intersection from 'lodash/intersection';
 
-import isNotNil from '../../platform-implementation-js/lib/isNotNil';
+import isNotNil from '../../common/isNotNil';
 import {
   ComposeRequestType,
   DRAFT_SAVING_ACTIONS,

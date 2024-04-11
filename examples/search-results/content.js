@@ -5,7 +5,8 @@ InboxSDK.load(1.0, 'search-example').then(function (inboxSDK) {
     inboxSDK.Router.NativeRouteIDs.INBOX,
     (listRouteView) => {
       listRouteView.addCollapsibleSection({
-        title: 'Inbox Monkeys',
+        title: ' Inbox Monkeys',
+        subtitle: 'Subtitle /',
         titleLinkText: 'View All',
         hasDropdown: true,
         /** A dropdown would go here, but isn't hooked up in this example. */
@@ -13,6 +14,21 @@ InboxSDK.load(1.0, 'search-example').then(function (inboxSDK) {
           console.log('title link clicked');
         },
         tableRows: [
+          {
+            title: 'new after @inboxsdk/core@2.1.32',
+            snippet: ({ el, unmountPromise }) => {
+              el.textContent = 'I set text content';
+              unmountPromise.then(() => {
+                console.log('unmounting table row');
+              });
+            },
+            attachmentIcon: ({ el, unmountPromise }) => {
+              el.textContent = '[attachment content]';
+              unmountPromise.then(() => {
+                console.log('unmounting attachment icon');
+              });
+            },
+          },
           {
             title: 'title',
             body: 'body',
@@ -27,7 +43,7 @@ InboxSDK.load(1.0, 'search-example').then(function (inboxSDK) {
             title: 'row uses icon html',
             body: 'body',
             shortDetailText: 'extra',
-            isRead: true,
+            isRead: false,
             iconHtml: '<div>x</div>',
             onClick: function () {
               console.log('hi');
@@ -86,6 +102,17 @@ InboxSDK.load(1.0, 'search-example').then(function (inboxSDK) {
               console.log('hi');
             },
           },
+          ...[true, false].flatMap((isTextRead) =>
+            [true, false].map((isBackgroundread) => ({
+              title: 'check read display',
+              body: `text read? ${isTextRead} background read? ${isBackgroundread}`,
+              isRead: {
+                text: isTextRead,
+                background: isBackgroundread,
+              },
+              shortDetailText: 'extra',
+            })),
+          ),
         ],
       });
     },

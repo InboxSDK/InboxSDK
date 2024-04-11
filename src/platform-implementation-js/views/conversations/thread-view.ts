@@ -1,11 +1,9 @@
-import { defonce } from 'ud';
 import EventEmitter from '../../lib/safe-event-emitter';
 import type Membrane from '../../lib/Membrane';
 import type SimpleElementView from '../../views/SimpleElementView';
 import kefirCast from 'kefir-cast';
 import Kefir, { type Observable } from 'kefir';
 import ContentPanelView from '../content-panel-view';
-import get from '../../../common/get-or-fail';
 import type MessageView from './message-view';
 import type { Driver, ThreadViewDriver } from '../../driver-interfaces/driver';
 import type CustomMessageView from '../../views/conversations/custom-message-view';
@@ -13,13 +11,6 @@ import type { ButtonDescriptor, Contact } from '../../../inboxsdk';
 import type TypedEventEmitter from 'typed-emitter';
 import { type ContentPanelDescriptor } from '../../driver-common/sidebar/ContentPanelViewDriver';
 import { Descriptor } from '../../../types/descriptor';
-
-interface Members {
-  threadViewImplementation: ThreadViewDriver;
-  appId: string;
-  driver: Driver;
-  membrane: Membrane;
-}
 
 export type ThreadViewEvents = {
   destroy(): void;
@@ -30,9 +21,11 @@ export type ThreadViewEvents = {
   }): void;
 };
 
-const memberMap = defonce(module, () => new WeakMap<ThreadView, Members>());
-
 class ThreadView extends (EventEmitter as new () => TypedEventEmitter<ThreadViewEvents>) {
+  #threadViewImplementation: ThreadViewDriver;
+  #appId: string;
+  #driver: Driver;
+  #membrane: Membrane;
   destroyed = false;
 
   constructor(
@@ -42,32 +35,26 @@ class ThreadView extends (EventEmitter as new () => TypedEventEmitter<ThreadView
     membrane: Membrane,
   ) {
     super();
-    const members = {
-      threadViewImplementation,
-      appId,
-      driver,
-      membrane,
-    };
-    memberMap.set(this, members);
+    this.#threadViewImplementation = threadViewImplementation;
+    this.#appId = appId;
+    this.#driver = driver;
+    this.#membrane = membrane;
 
-    _bindToStreamEvents(this, threadViewImplementation);
+    this.#bindToStreamEvents();
   }
 
   addSidebarContentPanel(
-    descriptor:
-      | ContentPanelDescriptor
-      | Observable<ContentPanelDescriptor, unknown>,
+    descriptor: Descriptor<ContentPanelDescriptor>,
   ): ContentPanelView {
     const descriptorPropertyStream: Observable<
       ContentPanelDescriptor,
       unknown
     > = kefirCast(Kefir, descriptor).toProperty();
-    const members = get(memberMap, this);
-    members.driver
+    this.#driver
       .getLogger()
       .eventSdkPassive('threadView.addSidebarContentPanel');
     const contentPanelImplementation =
-      members.threadViewImplementation.addSidebarContentPanel(
+      this.#threadViewImplementation.addSidebarContentPanel(
         descriptorPropertyStream,
       );
 
@@ -79,10 +66,13 @@ class ThreadView extends (EventEmitter as new () => TypedEventEmitter<ThreadView
   }
 
   addNoticeBar(): SimpleElementView {
-    const members = get(memberMap, this);
-    return members.threadViewImplementation.addNoticeBar();
+    return this.#threadViewImplementation.addNoticeBar();
   }
 
+  /**
+   * @alpha
+   * @internal
+   */
   registerHiddenCustomMessageNoticeProvider(
     provider: (
       numberCustomMessagesHidden: number,
@@ -90,26 +80,29 @@ class ThreadView extends (EventEmitter as new () => TypedEventEmitter<ThreadView
       unmountPromise: Promise<void>,
     ) => HTMLElement,
   ) {
-    const members = get(memberMap, this);
-    return members.threadViewImplementation.registerHiddenCustomMessageNoticeProvider(
+    return this.#threadViewImplementation.registerHiddenCustomMessageNoticeProvider(
       provider,
     );
   }
 
+  /**
+   * @alpha
+   * @internal
+   */
   addCustomMessage(descriptor: Record<string, any>): CustomMessageView {
-    const descriptorPropertyStream = kefirCast(
-      Kefir as any,
-      descriptor,
-    ).toProperty();
-    const members = get(memberMap, this);
-    members.driver.getLogger().eventSdkPassive('threadView.addCustomMessage');
-    return members.threadViewImplementation.addCustomMessage(
+    const descriptorPropertyStream = kefirCast(Kefir, descriptor).toProperty();
+    this.#driver.getLogger().eventSdkPassive('threadView.addCustomMessage');
+    return this.#threadViewImplementation.addCustomMessage(
       descriptorPropertyStream,
     );
   }
 
+  /**
+   * @returns {MessageView[]} of all the loaded MessageView objects currently in the thread. @see MessageView for more information on what "loaded" means. Note that more messages may load into the thread later! If it's important to get future messages, use {@link Conversations#registerMessageViewHandler} instead.
+   */
   getMessageViews(): Array<MessageView> {
-    const { threadViewImplementation, membrane } = get(memberMap, this);
+    const threadViewImplementation = this.#threadViewImplementation;
+    const membrane = this.#membrane;
     return threadViewImplementation
       .getMessageViewDrivers()
       .filter((messageViewDriver) => messageViewDriver.isLoaded())
@@ -117,70 +110,72 @@ class ThreadView extends (EventEmitter as new () => TypedEventEmitter<ThreadView
   }
 
   getMessageViewsAll(): Array<MessageView> {
-    const { threadViewImplementation, membrane } = get(memberMap, this);
+    const threadViewImplementation = this.#threadViewImplementation;
+    const membrane = this.#membrane;
+
     return threadViewImplementation
       .getMessageViewDrivers()
       .map((messageViewDriver) => membrane.get(messageViewDriver));
   }
 
   getSubject(): string {
-    return get(memberMap, this).threadViewImplementation.getSubject();
+    return this.#threadViewImplementation.getSubject();
   }
 
+  /**
+   * @deprecated
+   */
   getThreadID(): string {
-    get(memberMap, this)
-      .driver.getLogger()
+    this.#driver
+      .getLogger()
       .deprecationWarning(
         'threadView.getThreadID',
         'threadView.getThreadIDAsync',
       );
-    return get(memberMap, this).threadViewImplementation.getThreadID();
+    return this.#threadViewImplementation.getThreadID();
   }
 
   getThreadIDAsync(): Promise<string> {
-    return get(memberMap, this).threadViewImplementation.getThreadIDAsync();
+    return this.#threadViewImplementation.getThreadIDAsync();
   }
 
   addLabel(): SimpleElementView {
-    return get(memberMap, this).threadViewImplementation.addLabel();
+    return this.#threadViewImplementation.addLabel();
+  }
+
+  #bindToStreamEvents() {
+    this.#threadViewImplementation.getEventStream().onEnd(() => {
+      this.destroyed = true;
+      this.emit('destroy');
+      this.removeAllListeners();
+    });
+    this.#threadViewImplementation
+      .getEventStream()
+      .filter(function (event) {
+        return event.type !== 'internal' && event.eventName === 'contactHover';
+      })
+      .onValue((event) => {
+        const membrane = this.#membrane;
+        this.emit(event.eventName, {
+          contactType: event.contactType,
+          messageView: membrane.get(event.messageViewDriver),
+          contact: event.contact,
+          threadView: this,
+        });
+      });
   }
 
   addSubjectButton(buttonDescriptor: Descriptor<ButtonDescriptor>) {
-    return get(memberMap, this).threadViewImplementation.addSubjectButton(
+    return this.#threadViewImplementation.addSubjectButton(
       buttonDescriptor,
     );
   }
 
   addFooterButton(buttonDescriptor: Descriptor<ButtonDescriptor>) {
-    return get(memberMap, this).threadViewImplementation.addFooterButton(
+    return this.#threadViewImplementation.addFooterButton(
       buttonDescriptor,
     );
   }
 }
 
 export default ThreadView;
-
-function _bindToStreamEvents(
-  threadView: ThreadView,
-  threadViewImplementation: ThreadViewDriver,
-) {
-  threadViewImplementation.getEventStream().onEnd(function () {
-    threadView.destroyed = true;
-    threadView.emit('destroy');
-    threadView.removeAllListeners();
-  });
-  threadViewImplementation
-    .getEventStream()
-    .filter(function (event) {
-      return event.type !== 'internal' && event.eventName === 'contactHover';
-    })
-    .onValue(function (event) {
-      const { membrane } = get(memberMap, threadView);
-      threadView.emit(event.eventName, {
-        contactType: event.contactType,
-        messageView: membrane.get(event.messageViewDriver),
-        contact: event.contact,
-        threadView: threadView,
-      });
-    });
-}
