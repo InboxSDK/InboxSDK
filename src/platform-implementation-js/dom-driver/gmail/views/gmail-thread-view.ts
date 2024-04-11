@@ -644,7 +644,7 @@ class GmailThreadView {
     const buttonElement = buttonOptions.buttonView.getElement();
 
     // Sometimes it is there right away
-    const subjectToolbarElement = this._findSubjectToolbarElement();
+    const subjectToolbarElement = this.#findSubjectToolbarElement();
     if (subjectToolbarElement) {
       subjectToolbarElement.prepend(buttonElement);
     }
@@ -652,7 +652,7 @@ class GmailThreadView {
     // Sometimes the container is lazy loaded or re-loaded, so we observe too
     const observer = new MutationObserver((mutationsList) => {
       if (mutationsList.some((mutation) => mutation.type === 'childList')) {
-        const subjectToolbarElement = this._findSubjectToolbarElement();
+        const subjectToolbarElement = this.#findSubjectToolbarElement();
         if (
           subjectToolbarElement &&
           !subjectToolbarElement.contains(buttonElement)
@@ -741,7 +741,7 @@ class GmailThreadView {
     return null;
   }
 
-  _findSubjectToolbarElement(): HTMLElement | null {
+  #findSubjectToolbarElement(): HTMLElement | null {
     var toolbarContainerElement =
       this._element.querySelector<HTMLElement>('.bHJ');
     return toolbarContainerElement;
