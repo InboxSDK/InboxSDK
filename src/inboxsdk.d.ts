@@ -13,7 +13,6 @@ import type { Stopper } from 'kefir-stopper';
 import type GmailRouteProcessor from './platform-implementation-js/dom-driver/gmail/views/gmail-route-view/gmail-route-processor';
 import type GmailDriver from './platform-implementation-js/dom-driver/gmail/gmail-driver';
 import type GmailRowListView from './platform-implementation-js/dom-driver/gmail/views/gmail-row-list-view';
-import type { AppLogger } from './platform-implementation-js/lib/logger';
 import type ThreadRowView from './platform-implementation-js/views/thread-row-view';
 import { default as MessageView } from './platform-implementation-js/views/conversations/message-view';
 import type ThreadView from './platform-implementation-js/views/conversations/thread-view';
@@ -27,7 +26,6 @@ import type ContentPanelView from './platform-implementation-js/views/content-pa
 import type { MoleOptions } from './platform-implementation-js/dom-driver/gmail/widgets/gmail-mole-view-driver';
 import type { ComposeButtonDescriptor } from './platform-implementation-js/driver-interfaces/compose-view-driver';
 import type ComposeView from './platform-implementation-js/views/compose-view';
-import type Search from './platform-implementation-js/namespaces/search';
 import type {
   default as Toolbars,
   LegacyToolbarButtonOnClickEvent,
@@ -40,6 +38,7 @@ import Router, {
   type RouteParams,
 } from './platform-implementation-js/namespaces/router';
 import CustomRouteView from './platform-implementation-js/views/route-view/custom-route-view';
+import type { PlatformImplementation } from './platform-implementation-js/platform-implementation';
 
 export type { User };
 
@@ -53,22 +52,7 @@ export function load(
 
 // types
 
-export interface InboxSDK {
-  Conversations: Conversations;
-  Compose: Compose;
-  ButterBar: ButterBar;
-  Lists: Lists;
-  Logger: AppLogger;
-  NavMenu: NavMenu;
-  AppMenu: AppMenu;
-  Router: Router;
-  Widgets: Widgets;
-  Toolbars: Toolbars;
-  User: User;
-  Keyboard: Keyboard;
-  Search: Search;
-  Global: Global;
-}
+export type InboxSDK = PlatformImplementation;
 
 export { type ContentPanelDescriptor };
 export { type Global };

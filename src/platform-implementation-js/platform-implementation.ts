@@ -52,7 +52,13 @@ export type PiOpts = {
 };
 export class PlatformImplementation extends SafeEventEmitter {
   destroyed: boolean;
+  /**
+   * @internal
+   */
   LOADER_VERSION: string;
+  /**
+   * @internal
+   */
   IMPL_VERSION: string;
   Compose: Compose;
   Conversations: Conversations;
@@ -66,7 +72,10 @@ export class PlatformImplementation extends SafeEventEmitter {
   Toolbars: Toolbars;
   ButterBar: ButterBar;
   Widgets: Widgets;
-  Global: Global | null | undefined;
+  Global!: Global;
+  /**
+   * @deprecated
+   */
   Modal: Modal | null | undefined;
   Logger: AppLogger;
 
