@@ -15,9 +15,8 @@ import type GmailDriver from './platform-implementation-js/dom-driver/gmail/gmai
 import type GmailRowListView from './platform-implementation-js/dom-driver/gmail/views/gmail-row-list-view';
 import type { AppLogger } from './platform-implementation-js/lib/logger';
 import type ThreadRowView from './platform-implementation-js/views/thread-row-view';
-import TypedEventEmitter from 'typed-emitter';
 import { default as MessageView } from './platform-implementation-js/views/conversations/message-view';
-import type { ThreadViewEvents } from './platform-implementation-js/views/conversations/thread-view';
+import type ThreadView from './platform-implementation-js/views/conversations/thread-view';
 import type { ComposeViewEvent } from './platform-implementation-js/views/compose-view';
 import type TopMessageBarView from './platform-implementation-js/widgets/top-message-bar-view';
 import type { IMoleView as MoleView } from './platform-implementation-js/widgets/mole-view';
@@ -452,54 +451,7 @@ export interface SimpleElementView extends EventEmitter {
   destroy(): void;
 }
 
-export interface ThreadView extends TypedEventEmitter<ThreadViewEvents> {
-  addLabel(): SimpleElementView;
-  addSidebarContentPanel(
-    contentPanelDescriptor:
-      | ContentPanelDescriptor
-      | Kefir.Observable<ContentPanelDescriptor, unknown>,
-  ): ContentPanelView;
-  /**
-   * @returns {MessageView[]} of all the loaded MessageView objects currently in the thread. @see MessageView for more information on what "loaded" means. Note that more messages may load into the thread later! If it's important to get future messages, use {@link Conversations#registerMessageViewHandler} instead.
-   */
-  getMessageViews(): Array<MessageView>;
-  /**
-   * @returns {MessageView[]} of all the MessageView objects in the thread regardless of their load state. @see MessageView for more information on what "loaded" means.
-   */
-  getMessageViewsAll(): Array<MessageView>;
-  getSubject(): string;
-  /**
-   * @deprecated
-   */
-  getThreadID(): string;
-  getThreadIDAsync(): Promise<string>;
-  addNoticeBar(): SimpleElementView;
-}
-
-export interface UNSTABLE_ThreadView extends ThreadView {
-  //#region Undocumented methods
-  /**
-   * @internal
-   */
-  addCustomMessage: (descriptor: {
-    collapsedEl: HTMLElement;
-    headerEl: HTMLElement;
-    bodyEl: HTMLElement;
-    iconUrl: string;
-    sortDate: Date;
-  }) => CustomMessageView;
-  /**
-   * @internal
-   */
-  registerHiddenCustomMessageNoticeProvider: (
-    provider: (
-      numCustomHidden: number,
-      numberNativeHidden: number,
-      unmountPromise: Promise<void>,
-    ) => HTMLElement | null,
-  ) => void;
-  //#endregion
-}
+export { ThreadView };
 
 export interface CustomMessageView extends EventEmitter {
   destroy(): void;
