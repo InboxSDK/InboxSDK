@@ -52,13 +52,7 @@ export type PiOpts = {
 };
 export class PlatformImplementation extends SafeEventEmitter {
   destroyed: boolean;
-  /**
-   * @internal
-   */
   LOADER_VERSION: string;
-  /**
-   * @internal
-   */
   IMPL_VERSION: string;
   Compose: Compose;
   Conversations: Conversations;
