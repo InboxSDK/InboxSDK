@@ -369,6 +369,11 @@ div.T-I.inboxsdk__button {
   min-width: 27px;
 }
 
+/* subject line buttons */
+div.bHJ .inboxsdk__button {
+  margin-left: 8px;
+}
+
 .inboxsdk__no_bg {
   background: none;
 }

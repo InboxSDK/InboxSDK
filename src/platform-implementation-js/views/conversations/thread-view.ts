@@ -7,10 +7,10 @@ import ContentPanelView from '../content-panel-view';
 import type MessageView from './message-view';
 import type { Driver, ThreadViewDriver } from '../../driver-interfaces/driver';
 import type CustomMessageView from '../../views/conversations/custom-message-view';
-import type { Contact } from '../../../inboxsdk';
+import type { ButtonDescriptor, Contact } from '../../../inboxsdk';
 import type TypedEventEmitter from 'typed-emitter';
 import { type ContentPanelDescriptor } from '../../driver-common/sidebar/ContentPanelViewDriver';
-import type { Descriptor } from '../../../types/descriptor';
+import { Descriptor } from '../../../types/descriptor';
 
 export type ThreadViewEvents = {
   destroy(): void;
@@ -163,6 +163,13 @@ class ThreadView extends (EventEmitter as new () => TypedEventEmitter<ThreadView
           threadView: this,
         });
       });
+  }
+
+  /**
+   * @internal
+   */
+  addSubjectButton(buttonDescriptor: ButtonDescriptor) {
+    return this.#threadViewImplementation.addSubjectButton(buttonDescriptor);
   }
 }
 

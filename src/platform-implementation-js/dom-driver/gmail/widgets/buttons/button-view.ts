@@ -441,6 +441,12 @@ export default class ButtonView implements ButtonViewI {
       this._element.classList.add('T-I-JO');
     });
 
+    Kefir.fromEvents(this._element, 'mouseup').onValue(() => {
+      if (!this._hasDropdown) {
+        this._element.classList.remove('T-I-JO');
+      }
+    });
+
     Kefir.fromEvents(this._element, 'blur').onValue(() => {
       this._element.classList.remove('T-I-JO');
     });
