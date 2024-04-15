@@ -22,7 +22,10 @@ import isStreakAppId from '../../../lib/isStreakAppId';
 import censorHTMLstring from '../../../../common/censorHTMLstring';
 import type GmailRouteView from './gmail-route-view/gmail-route-view';
 import ButtonView from '../widgets/buttons/button-view';
-import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
+import BasicButtonViewController, {
+  type Options,
+} from '../../../widgets/buttons/basic-button-view-controller';
+import { type ButtonDescriptor } from '../../../../inboxsdk';
 
 let hasLoggedAddonInfo = false;
 
@@ -629,7 +632,7 @@ class GmailThreadView {
     return view;
   }
 
-  addSubjectButton(button: any) {
+  addSubjectButton(button: ButtonDescriptor) {
     const subjectParent = this._element.querySelector('.V8djrc.byY');
     if (!subjectParent) {
       throw new SelectorError('.V8djrc.byY', {
@@ -638,9 +641,10 @@ class GmailThreadView {
     }
 
     const buttonOptions = {
-      ...button,
-    };
-    buttonOptions.buttonView = new ButtonView(buttonOptions);
+      buttonView: new ButtonView(button),
+      activateFunction: button.activateFunction,
+      onClick: button.onClick,
+    } satisfies Options;
     const buttonElement = buttonOptions.buttonView.getElement();
 
     // Sometimes it is there right away
