@@ -686,17 +686,18 @@ class GmailThreadView {
   addFooterButton(button: any) {
     const footerParent = this._element.querySelector('.gA.gt.acV');
     if (!footerParent) {
-      throw new Error('Subject wrapper element not found');
+      throw new Error('Footer buttons wrapper element not found');
     }
 
     const buttonOptions = {
-      ...button,
-    };
-    buttonOptions.buttonView = new ButtonView(buttonOptions);
+      buttonView: new ButtonView(button),
+      activateFunction: button.activateFunction,
+      onClick: button.onClick,
+    } satisfies Options;
     const buttonElement = buttonOptions.buttonView.getElement();
 
     // Sometimes it is there right away
-    const subjectToolbarElement = this._findBottomReplyToolbarElement();
+    const subjectToolbarElement = this.#findBottomReplyToolbarElement();
     if (subjectToolbarElement) {
       subjectToolbarElement.appendChild(buttonElement);
     }
@@ -704,7 +705,7 @@ class GmailThreadView {
     // Sometimes the container is lazy loaded or re-loaded, so we observe too
     const observer = new MutationObserver((mutationsList) => {
       if (mutationsList.some((mutation) => mutation.type === 'childList')) {
-        const subjectToolbarElement = this._findBottomReplyToolbarElement();
+        const subjectToolbarElement = this.#findBottomReplyToolbarElement();
         if (
           subjectToolbarElement &&
           !subjectToolbarElement.contains(buttonElement)
@@ -799,7 +800,7 @@ class GmailThreadView {
     return toolbarContainerElement;
   }
 
-  _findBottomReplyToolbarElement(): HTMLElement | null {
+  #findBottomReplyToolbarElement(): HTMLElement | null {
     var toolbarContainerElements =
       this._element.querySelectorAll<HTMLElement>('table .amn');
     return toolbarContainerElements[0];
