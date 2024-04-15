@@ -44,21 +44,7 @@ export default class AttachmentCardView extends (EventEmitter as new () => Typed
     return this.#attachmentCardImplementation.getTitle();
   }
 
-  /**
-   * @deprecated  Please use the same-named method on the AttachmentCardClickEvent object instead.
-   */
   getDownloadURL(): Promise<string | null | undefined> {
-    this.#driver
-      .getLogger()
-      .deprecationWarning(
-        'AttachmentCardView.getDownloadURL',
-        'AttachmentCardView.addButton -> onClick -> AttachmentCardClickEvent',
-      );
-
-    if (this.#driver.getOpts().REQUESTED_API_VERSION !== 1) {
-      throw new Error('This method was discontinued after API version 1');
-    }
-
     return this.#attachmentCardImplementation.getDownloadURL();
   }
 
