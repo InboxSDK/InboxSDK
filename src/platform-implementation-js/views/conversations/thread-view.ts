@@ -165,6 +165,9 @@ class ThreadView extends (EventEmitter as new () => TypedEventEmitter<ThreadView
       });
   }
 
+  /**
+   * @internal
+   */
   addSubjectButton(buttonDescriptor: ButtonDescriptor) {
     return this.#threadViewImplementation.addSubjectButton(buttonDescriptor);
   }
