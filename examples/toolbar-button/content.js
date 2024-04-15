@@ -14,13 +14,12 @@ InboxSDK.load(1, 'toolbar-example', {
   inboxSDK.Toolbars.registerThreadButton({
     iconUrl: chrome.runtime.getURL('monkey.png'),
     title: 'Monkeys (registerThreadButton)',
-    hasDropdown: false,
+    hasDropdown: true,
     onClick(event) {
-      console.log('click lala');
-      // event.dropdown.el.innerHTML =
-      //   '<div><button type="button">foo</button></div><div>text</div>';
-      // console.log('thread button click event', event);
-      // window._e = event;
+      event.dropdown.el.innerHTML =
+        '<div><button type="button">foo</button></div><div>text</div>';
+      console.log('thread button click event', event);
+      window._e = event;
     },
   });
 

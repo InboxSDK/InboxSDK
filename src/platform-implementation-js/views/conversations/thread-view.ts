@@ -165,16 +165,18 @@ class ThreadView extends (EventEmitter as new () => TypedEventEmitter<ThreadView
       });
   }
 
-  addSubjectButton(buttonDescriptor: Descriptor<ButtonDescriptor>) {
-    return this.#threadViewImplementation.addSubjectButton(
-      buttonDescriptor,
-    );
+  /**
+   * @internal
+   */
+  addSubjectButton(buttonDescriptor: ButtonDescriptor) {
+    return this.#threadViewImplementation.addSubjectButton(buttonDescriptor);
   }
 
-  addFooterButton(buttonDescriptor: Descriptor<ButtonDescriptor>) {
-    return this.#threadViewImplementation.addFooterButton(
-      buttonDescriptor,
-    );
+  /**
+   * @internal
+   */
+  addFooterButton(buttonDescriptor: ButtonDescriptor) {
+    return this.#threadViewImplementation.addFooterButton(buttonDescriptor);
   }
 }
 

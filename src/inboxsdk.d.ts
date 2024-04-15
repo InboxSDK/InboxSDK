@@ -434,7 +434,7 @@ export interface ButtonDescriptor {
   iconUrl?: string;
   iconClass?: string;
   hasDropdown?: boolean;
-  onClick(e: MouseEvent): void;
+  onClick(e?: MouseEvent): void;
   activateFunction?: (e: Event) => void;
   buttonColor?: string;
   dropdownShowFunction?: (e: Event) => void;
