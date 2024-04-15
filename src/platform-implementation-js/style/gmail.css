@@ -439,8 +439,9 @@ div.bHJ .inboxsdk__button {
   width: 0;
   margin: 0;
 }
+
 .ams.inboxsdk__button:focus {
-  background: rgba(0, 0, 0, 0);
+  background: rgb(0 0 0 / 0%);
 }
 
 .inboxsdk__menu {
