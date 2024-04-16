@@ -683,10 +683,12 @@ class GmailThreadView {
     return new BasicButtonViewController(buttonOptions);
   }
 
-  addFooterButton(button: any) {
+  addFooterButton(button: ButtonDescriptor) {
     const footerParent = this._element.querySelector('.gA.gt.acV');
     if (!footerParent) {
-      throw new Error('Footer buttons wrapper element not found');
+      throw new SelectorError('.gA.gt.acV', {
+        cause: 'Footer buttons wrapper element not found',
+      });
     }
 
     const buttonOptions = {
