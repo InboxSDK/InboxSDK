@@ -13,6 +13,7 @@ export interface ButtonViewOptions {
   hasButtonToLeft?: boolean | null;
   hasButtonToRight?: boolean | null;
   iconClass?: string | null;
+  iconLiga?: string;
   iconUrl?: string | null;
   text?: string | null;
   title?: string | null;
@@ -32,6 +33,7 @@ export default class ButtonView implements ButtonViewI {
   private _iconImgElement: HTMLImageElement | undefined;
   private _iconClass: string | null | undefined;
   private _iconUrl: string | null | undefined;
+  #iconLiga?: string;
   private _title: string | null | undefined;
   private _tooltip: string | null | undefined;
   private _hasDropdown: boolean;
@@ -41,11 +43,13 @@ export default class ButtonView implements ButtonViewI {
   private _eventStream: Bus<any, any>;
 
   constructor(options: ButtonViewOptions) {
+    const { iconLiga, iconClass, iconUrl } = options;
     this._hasDropdown = false;
     this._isEnabled = options.enabled !== false;
 
-    this._iconClass = options.iconClass;
-    this._iconUrl = options.iconUrl;
+    this._iconClass = iconClass;
+    this._iconUrl = iconUrl;
+    this.#iconLiga = iconLiga;
 
     this._title = options.text || options.title;
     this._tooltip = options.tooltip || options.title;
@@ -222,7 +226,11 @@ export default class ButtonView implements ButtonViewI {
     iconElement.classList.add('inboxsdk__button_icon');
 
     if (this._iconClass) {
-      iconElement.innerHTML = '&nbsp;';
+      if (this.#iconLiga != null) {
+        iconElement.innerText = this.#iconLiga;
+      } else {
+        iconElement.innerHTML = '&nbsp;';
+      }
       iconElement.setAttribute(
         'class',
         'inboxsdk__button_icon ' + this._iconClass,
