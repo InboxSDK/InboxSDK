@@ -415,6 +415,13 @@ export interface DrawerDescriptor {
 export { type MoleOptions as MoleDescriptor };
 export interface ButtonDescriptor {
   title?: string;
+  /**
+   * The innerText of the button.
+   * If you want to use an icon font with ligatures enabled, you can use the `iconLigaDefault` property.
+   *
+   * @default '&nbsp;'
+   */
+  iconLigaDefault?: string;
   iconUrl?: string;
   iconClass?: string;
   hasDropdown?: boolean;
