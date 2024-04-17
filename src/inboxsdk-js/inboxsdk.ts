@@ -2,6 +2,7 @@ import { PlatformImplementationLoader } from './loading/platform-implementation-
 import { BUILD_VERSION } from '../common/version';
 import { loadScript as _loadScript } from './load-script-proxy';
 import type { LoadScriptOptions } from '../common/load-script';
+import type { PiOpts } from '../platform-implementation-js/platform-implementation';
 
 declare global {
   var __test_origin: string | undefined;
@@ -20,7 +21,7 @@ export function loadScript(
   return _loadScript(url, opts);
 }
 
-export function load(version: any, appId: string, opts: any) {
+export function load(version: number, appId: string, opts?: Partial<PiOpts>) {
   opts = Object.assign(
     {
       // defaults
@@ -33,9 +34,9 @@ export function load(version: any, appId: string, opts: any) {
       VERSION: LOADER_VERSION,
       REQUESTED_API_VERSION: version,
     },
-  );
+  ) satisfies PiOpts;
 
-  return PlatformImplementationLoader.load(appId, opts);
+  return PlatformImplementationLoader.load(appId, opts as PiOpts);
 }
 
 const pageOrigin: string =

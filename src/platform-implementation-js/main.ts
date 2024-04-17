@@ -1,12 +1,12 @@
 import Kefir from 'kefir';
-import { type PlatformImplementation } from './platform-implementation';
+import type { PiOpts, PlatformImplementation } from './platform-implementation';
 
 declare global {
   var __InboxSDKImpLoader: {
     load: (
       version: string,
       appId: string,
-      opts: any,
+      opts: PiOpts,
     ) => Promise<PlatformImplementation>;
   };
 }

@@ -7,6 +7,7 @@ import PersistentQueue from './persistent-queue';
 import makeMutationObserverStream from './dom/make-mutation-observer-stream';
 import { getXMLHttpRequest } from 'ext-corb-workaround';
 import isStreakAppId from './isStreakAppId';
+import type { PiOpts } from '../platform-implementation';
 
 // Yeah, this module is a singleton with some shared state. This is just for
 // logging convenience. Other modules should avoid doing this!
@@ -62,7 +63,7 @@ export default class Logger {
 
   constructor(
     appId: string,
-    opts: any,
+    opts: PiOpts,
     loaderVersion: string,
     implVersion: string,
   ) {
@@ -244,7 +245,7 @@ export default class Logger {
 
 function _extensionLoggerSetup(
   appId: string,
-  opts: any,
+  opts: PiOpts,
   loaderVersion: string,
   implVersion: string,
 ) {
@@ -272,7 +273,7 @@ function _extensionLoggerSetup(
 
   _extensionLoaderVersion = loaderVersion;
   _extensionImplVersion = implVersion;
-  _extensionUseEventTracking = opts.eventTracking;
+  _extensionUseEventTracking = opts.eventTracking ?? false;
 
   if (opts.globalErrorLogging) {
     if (Error.stackTraceLimit < 40) {
@@ -307,8 +308,8 @@ function _extensionLoggerSetup(
     });
 
     const ETp =
-      ((window as any).EventTarget && (window as any).EventTarget.prototype) ||
-      (window as any).Node.prototype;
+      (window.EventTarget && window.EventTarget.prototype) ||
+      window.Node.prototype;
     replaceFunction(ETp, 'addEventListener', function (original) {
       return function wrappedAddEventListener(this: any, ...args: any[]) {
         if (typeof args[1] == 'function') {

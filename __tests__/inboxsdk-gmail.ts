@@ -3,6 +3,7 @@ import _ from 'lodash';
 import InboxSDK from '../src/inboxsdk-js/inboxsdk-TEST';
 //preload implementation
 import '../src/platform-implementation-js/platform-implementation';
+import { PiOpts } from '../src/platform-implementation-js/platform-implementation';
 
 globalThis.MutationObserver = MockMutationObserver as any;
 document.documentElement.innerHTML = `
@@ -24,7 +25,7 @@ document.head.setAttribute(
 document.head.setAttribute('data-inboxsdk-using-sync-api', 'false');
 
 test('loads in gmail mock', () => {
-  const appOpts = { globalErrorLogging: false };
+  const appOpts = { globalErrorLogging: false } as PiOpts;
 
   expect(InboxSDK.LOADER_VERSION).toBe('beep');
 

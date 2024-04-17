@@ -50,7 +50,7 @@ export const LOADER_VERSION: string;
 export function load(
   version: number,
   appId: string,
-  opts: PiOpts,
+  opts?: Partial<PiOpts>,
 ): Promise<InboxSDK>;
 
 // types

@@ -35,12 +35,16 @@ import isValidAppId from './lib/is-valid-app-id';
 import type { AppLogger } from './lib/logger';
 const loadedAppIds: Set<string> = new Set();
 export type PiOpts = {
-  appName: string | null | undefined;
-  appIconUrl: string | null | undefined;
-  suppressAddonTitle?: string | null | undefined;
+  appName?: string | null;
+  appIconUrl?: string | null;
+  /**
+   * @deprecated Is this used?
+   */
+  appVersion?: string;
+  suppressAddonTitle?: string | null;
   VERSION: string;
   globalErrorLogging: boolean;
-  eventTracking: boolean;
+  eventTracking?: boolean;
   REQUESTED_API_VERSION: number;
   primaryColor?: string;
   secondaryColor?: string;
