@@ -698,9 +698,19 @@ class GmailThreadView {
     } satisfies Options;
     const buttonElement = buttonOptions.buttonView.getElement();
 
+    const spacer = document.createElement('span');
+    const spacerID = 'inboxsdk__thread_view_footer_button_spacer';
+    spacer.style.width = '8px';
+    spacer.id = spacerID;
+
     // Sometimes it is there right away
     const subjectToolbarElement = this.#findBottomReplyToolbarElement();
     if (subjectToolbarElement) {
+      const reactionButton = this._element.querySelector('.amn .wrsVRe');
+      if (reactionButton && !this._element.querySelector(`#${spacerID}`)) {
+        subjectToolbarElement.appendChild(spacer);
+      }
+
       subjectToolbarElement.appendChild(buttonElement);
     }
 
@@ -712,6 +722,11 @@ class GmailThreadView {
           subjectToolbarElement &&
           !subjectToolbarElement.contains(buttonElement)
         ) {
+          const reactionButton = this._element.querySelector('.amn .wrsVRe');
+          if (reactionButton && !this._element.querySelector(`#${spacerID}`)) {
+            subjectToolbarElement.appendChild(spacer);
+          }
+
           subjectToolbarElement.appendChild(buttonElement);
         }
       }

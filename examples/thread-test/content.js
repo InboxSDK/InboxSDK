@@ -79,33 +79,34 @@ InboxSDK.load(2, 'thread-example').then((sdk) => {
 
       threadView.addSubjectButton({
         tooltip: 'Hi a thing',
-        iconUrl: `//ssl.gstatic.com/ui/v1/icons/mail/gm3/1x/forward_baseline_nv700_20dp.png`,
+        iconUrl: `//ssl.gstatic.com/ui/v1/icons/mail/gm3/2x/forward_baseline_nv700_20dp.png`,
         onClick: function (event) {
           console.log('button click');
         },
       });
       threadView.addSubjectButton({
         tooltip: 'Hi a second thing',
-        iconUrl: `//ssl.gstatic.com/ui/v1/icons/mail/gm3/1x/forward_baseline_nv700_20dp.png`,
+        iconUrl: `//ssl.gstatic.com/ui/v1/icons/mail/gm3/2x/forward_baseline_nv700_20dp.png`,
         onClick: function (event) {
           console.log('button 2 click');
         },
       });
       threadView.addFooterButton({
-        title: 'Get link',
-        iconUrl: `//ssl.gstatic.com/ui/v1/icons/mail/gm3/1x/forward_baseline_nv700_20dp.png`,
+        title: 'Button',
+        iconUrl: `//ssl.gstatic.com/ui/v1/icons/mail/gm3/2x/forward_baseline_nv700_20dp.png`,
         buttonColor: 'outline',
         onClick: function (event) {
           console.log('bottom button click');
         },
       });
-      // threadView.addFooterButton({
-      //   iconUrl: `//ssl.gstatic.com/ui/v1/icons/mail/rfr/ic_open_in_full_16px_1x.png`,
-      //   buttonColor: 'outline',
-      //   onClick: function (event) {
-      //     console.log('bottom icon button click');
-      //   },
-      // });
+      threadView.addFooterButton({
+        title: 'Another button',
+        iconUrl: `//ssl.gstatic.com/ui/v1/icons/mail/gm3/2x/forward_baseline_nv700_20dp.png`,
+        buttonColor: 'outline',
+        onClick: function (event) {
+          console.log('bottom button 2 click');
+        },
+      });
     })();
   });
 

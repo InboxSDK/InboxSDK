@@ -371,7 +371,7 @@ div.T-I.inboxsdk__button {
 
 /* subject line buttons */
 div.bHJ .inboxsdk__button {
-  margin-left: 8px;
+  margin: 0 2px 0 10px;
 }
 
 .inboxsdk__no_bg {
