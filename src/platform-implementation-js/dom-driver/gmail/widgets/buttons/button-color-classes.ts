@@ -40,6 +40,12 @@ const ButtonColorClasses: { [name: string]: ButtonColors } = {
     HOVER_CLASS: 'inboxsdk__button_green_hover',
     ACTIVE_CLASS: 'inboxsdk__button_green_active',
   },
+
+  outline: {
+    INACTIVE_CLASS: 'ams',
+    HOVER_CLASS: 'ams',
+    ACTIVE_CLASS: 'ams',
+  },
 };
 
 export default ButtonColorClasses;
