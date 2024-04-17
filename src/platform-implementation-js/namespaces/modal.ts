@@ -1,25 +1,26 @@
-import { defonce } from 'ud';
 import ModalView from '../widgets/modal-view';
-import get from '../../common/get-or-fail';
 import type { Driver } from '../driver-interfaces/driver';
 import type { PiOpts } from '../platform-implementation';
-const memberMap = defonce(module, () => new WeakMap()); // Deprecated, applications should use Widgets instead.
 
+/**
+ * @deprecated applications should use Widgets instead.
+ */
 class Modal {
+  #driver: Driver;
+  #piOpts: PiOpts;
+
   constructor(appId: string, driver: Driver, piOpts: PiOpts) {
-    const members = {
-      appId,
-      driver,
-      piOpts,
-    };
-    memberMap.set(this, members);
+    this.#driver = driver;
+    this.#piOpts = piOpts;
   }
 
-  // Deprecated, use Widgets.showModalView
+  /**
+   * @deprecated use Widgets.showModalView
+   */
   show(options: Record<string, any>): ModalView {
-    const driver = get(memberMap, this).driver;
+    const driver = this.#driver;
 
-    if (get(memberMap, this).piOpts.inboxBeta) {
+    if (this.#piOpts.REQUESTED_API_VERSION < 2) {
       driver
         .getLogger()
         .deprecationWarning('Modal.show', 'Widgets.showModalView');
@@ -36,7 +37,7 @@ class Modal {
 
   // Deprecated, does not have an exact replacement. Use Widgets.showModalView.
   createModalView(options: Record<string, any>): ModalView {
-    const driver = get(memberMap, this).driver;
+    const driver = this.#driver;
     driver
       .getLogger()
       .deprecationWarning('Modal.createModalView', 'Widgets.showModalView');
