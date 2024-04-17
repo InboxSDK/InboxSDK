@@ -434,7 +434,7 @@ div.bHJ .inboxsdk__button {
   text-shadow: none;
 }
 
-/* For the outline style button. We need to counteract a few of gmail's styles */
+/* For the outline style button (ams). We need to counteract a few of gmail's styles */
 .ams.inboxsdk__button::before {
   width: 0;
   margin: 0;
@@ -442,6 +442,11 @@ div.bHJ .inboxsdk__button {
 
 .ams.inboxsdk__button:focus {
   background: rgb(0 0 0 / 0%);
+}
+
+.ams.inboxsdk__button .asa:not(.bjy)::after {
+  width: auto;
+  height: auto;
 }
 
 .inboxsdk__menu {
