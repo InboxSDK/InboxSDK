@@ -685,7 +685,7 @@ class GmailThreadView {
 
   addFooterButton(button: ButtonDescriptor) {
     // This element contains either an inline reply or the row of buttons
-    const lastMessageFooterSelector = 'div.nH .aHU div[role="list"] .gA';
+    const lastMessageFooterSelector = 'div.nH .aHU div[role="list"] [role=“listitem”]:last-child .gA';
     const lastMessageFooter = this._element.querySelector(
       lastMessageFooterSelector,
     );
