@@ -685,11 +685,12 @@ class GmailThreadView {
 
   addFooterButton(button: ButtonDescriptor) {
     // This element contains either an inline reply or the row of buttons
+    const lastMessageFooterSelector = 'div.nH .aHU div[role="list"] .gA';
     const lastMessageFooter = this._element.querySelector(
-      'div.nH .aHU div[role="list"] .gA',
+      lastMessageFooterSelector,
     );
     if (!lastMessageFooter) {
-      throw new SelectorError('div.nH .aHU div[role="list"] .gA', {
+      throw new SelectorError(lastMessageFooterSelector, {
         cause: 'Last message footer element not found',
       });
     }
