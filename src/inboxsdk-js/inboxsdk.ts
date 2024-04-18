@@ -34,9 +34,9 @@ export function load(version: number, appId: string, opts?: Partial<PiOpts>) {
       VERSION: LOADER_VERSION,
       REQUESTED_API_VERSION: version,
     },
-  ) satisfies PiOpts;
+  );
 
-  return PlatformImplementationLoader.load(appId, opts as PiOpts);
+  return PlatformImplementationLoader.load(appId, opts);
 }
 
 const pageOrigin: string =

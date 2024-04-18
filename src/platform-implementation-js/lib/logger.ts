@@ -273,7 +273,7 @@ function _extensionLoggerSetup(
 
   _extensionLoaderVersion = loaderVersion;
   _extensionImplVersion = implVersion;
-  _extensionUseEventTracking = opts.eventTracking ?? false;
+  _extensionUseEventTracking = opts.eventTracking;
 
   if (opts.globalErrorLogging) {
     if (Error.stackTraceLimit < 40) {

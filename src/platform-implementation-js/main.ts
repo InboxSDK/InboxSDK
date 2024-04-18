@@ -6,7 +6,7 @@ declare global {
     load: (
       version: string,
       appId: string,
-      opts: PiOpts,
+      opts: Partial<PiOpts>,
     ) => Promise<PlatformImplementation>;
   };
 }

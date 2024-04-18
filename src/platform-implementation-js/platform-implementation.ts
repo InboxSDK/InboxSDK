@@ -44,7 +44,7 @@ export type PiOpts = {
   suppressAddonTitle?: string | null;
   VERSION: string;
   globalErrorLogging: boolean;
-  eventTracking?: boolean;
+  eventTracking: boolean;
   REQUESTED_API_VERSION: number;
   primaryColor?: string;
   secondaryColor?: string;
@@ -73,19 +73,11 @@ export class PlatformImplementation extends SafeEventEmitter {
   Logger: AppLogger;
 
   #driver: GmailDriver;
-  /**
-   * @internal only available in dev builds
-   */
-  private _members?: { driver: GmailDriver };
 
   constructor(driver: GmailDriver, appId: string, piOpts: PiOpts) {
     super();
     const { appName, appIconUrl, VERSION: LOADER_VERSION } = piOpts;
     this.#driver = driver;
-
-    if (process.env.NODE_ENV !== 'production') {
-      this._members = { driver };
-    }
 
     const membrane: Membrane = new Membrane([
       [
