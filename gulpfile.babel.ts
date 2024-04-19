@@ -162,6 +162,12 @@ async function webpackTask({
           type: 'asset/source',
         },
         {
+          test: /\.m?js$/,
+          include: /node_modules/,
+          enforce: 'pre',
+          use: ['source-map-loader'],
+        },
+        {
           exclude: /(node_modules|dist|packages\/core)/,
           test: /\.m?[jt]sx?$/,
           use: {
@@ -352,7 +358,8 @@ const sourceMapPlugin = new webpack.SourceMapDevToolPlugin({
 if (args.remote) {
   config = {
     ...remoteCompatConfig,
-    devtool: false,
+    devtool: false, // using manually-configured plugin instead
+    plugins: [sourceMapPlugin],
     entry: {
       [sdkFilename]: {
         library: {
@@ -365,7 +372,6 @@ if (args.remote) {
       'platform-implementation':
         './src/platform-implementation-js/main-INTEGRATED-PAGEWORLD',
     },
-    plugins: [sourceMapPlugin],
   };
 } else if (args.integratedPageWorld) {
   // non-remote bundle built for compatibility with remote bundle
@@ -386,7 +392,6 @@ if (args.remote) {
 } else {
   // standard npm non-remote bundle
   config = {
-    devtool: args.production ? false : 'inline-source-map',
     entry: {
       ...pageWorld,
       [sdkFilename]: {
@@ -406,8 +411,10 @@ if (args.remote) {
 }
 
 gulp.task('sdk', async () => {
-  // Only the npm build contains pageWorld as of writing.
   if (config.entry instanceof Object && !('pageWorld' in config.entry)) {
+    // For non-npm builds with an integrated pageWorld script, we need to
+    // first build the pageWorld script separately so it can be embedded as a
+    // string in the main build.
     await webpackTask({
       entry: pageWorld,
       devtool: args.remote ? false : 'inline-source-map',
