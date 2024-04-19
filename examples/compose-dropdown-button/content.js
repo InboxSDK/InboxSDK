@@ -1,6 +1,5 @@
 InboxSDK.load(1, 'simple-example', {
   iconImageUrl: chrome.runtime.getURL('monkey.png'),
-  inboxBeta: true,
 }).then(function (inboxSDK) {
   window._sdk = inboxSDK;
 

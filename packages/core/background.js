@@ -4,7 +4,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (chrome.scripting) {
       // MV3
       chrome.scripting.executeScript({
-        target: { tabId: sender.tab.id },
+        target: { tabId: sender.tab.id, frameIds: [sender.frameId] },
         world: 'MAIN',
         files: ['pageWorld.js'],
       });
