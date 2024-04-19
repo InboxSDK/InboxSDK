@@ -685,7 +685,6 @@ class GmailThreadView {
   }
 
   addFooterButton(button: ButtonDescriptor) {
-    // This element contains either an inline reply or the row of buttons
     const messagesSelector = 'div.nH .aHU';
     const messagesContainer = this._element.querySelector(messagesSelector);
     if (!messagesContainer) {
