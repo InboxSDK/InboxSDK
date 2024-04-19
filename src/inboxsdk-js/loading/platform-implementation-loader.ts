@@ -16,7 +16,7 @@ export class PlatformImplementationLoader {
 
   static async load(
     appId: string,
-    opts: PiOpts,
+    opts: Partial<PiOpts>,
   ): Promise<PlatformImplementation> {
     if (!globalThis.__InboxSDKImpLoader) {
       await this.loadScript();

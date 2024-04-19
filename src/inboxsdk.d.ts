@@ -38,7 +38,10 @@ import Router, {
   type RouteParams,
 } from './platform-implementation-js/namespaces/router';
 import CustomRouteView from './platform-implementation-js/views/route-view/custom-route-view';
-import type { PlatformImplementation } from './platform-implementation-js/platform-implementation';
+import type {
+  PiOpts,
+  PlatformImplementation,
+} from './platform-implementation-js/platform-implementation';
 
 export type { User };
 
@@ -47,7 +50,7 @@ export const LOADER_VERSION: string;
 export function load(
   version: number,
   appId: string,
-  opts: any,
+  opts?: Partial<PiOpts>,
 ): Promise<InboxSDK>;
 
 // types

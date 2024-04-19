@@ -1,8 +1,5 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
-
 import SafeEventEmitter from './lib/safe-event-emitter';
 import { BUILD_VERSION } from '../common/version';
-import get from '../common/get-or-fail';
 import Membrane from './lib/Membrane';
 import AttachmentCardView from './views/conversations/attachment-card-view';
 import GmailAttachmentCardView from './dom-driver/gmail/views/gmail-attachment-card-view';
@@ -37,15 +34,17 @@ import isValidAppId from './lib/is-valid-app-id';
 // Some types
 import type { AppLogger } from './lib/logger';
 const loadedAppIds: Set<string> = new Set();
-const memberMap = new WeakMap();
 export type PiOpts = {
-  appName: string | null | undefined;
-  appIconUrl: string | null | undefined;
-  suppressAddonTitle?: string | null | undefined;
+  appName?: string | null;
+  appIconUrl?: string | null;
+  /**
+   * @deprecated Is this used?
+   */
+  appVersion?: string;
+  suppressAddonTitle?: string | null;
   VERSION: string;
   globalErrorLogging: boolean;
   eventTracking: boolean;
-  inboxBeta: boolean;
   REQUESTED_API_VERSION: number;
   primaryColor?: string;
   secondaryColor?: string;
@@ -73,17 +72,12 @@ export class PlatformImplementation extends SafeEventEmitter {
   Modal: Modal | null | undefined;
   Logger: AppLogger;
 
+  #driver: GmailDriver;
+
   constructor(driver: GmailDriver, appId: string, piOpts: PiOpts) {
     super();
     const { appName, appIconUrl, VERSION: LOADER_VERSION } = piOpts;
-    const members = {
-      driver,
-    };
-    memberMap.set(this, members);
-
-    if (process.env.NODE_ENV !== 'production') {
-      (this as any)._members = members;
-    }
+    this.#driver = driver;
 
     const membrane: Membrane = new Membrane([
       [
@@ -131,7 +125,7 @@ export class PlatformImplementation extends SafeEventEmitter {
 
     if (piOpts.REQUESTED_API_VERSION >= 2) {
       // new Global namespace only available in v2 or above
-      this.Global = new Global(appId, driver, piOpts);
+      this.Global = new Global(appId, driver);
     }
 
     this.Logger = driver.getLogger().getAppLogger();
@@ -140,7 +134,7 @@ export class PlatformImplementation extends SafeEventEmitter {
   destroy() {
     if (!this.destroyed) {
       this.destroyed = true;
-      get(memberMap, this).driver.destroy();
+      this.#driver.destroy();
       this.emit('destroy');
     }
   }
@@ -164,16 +158,12 @@ export function makePlatformImplementation(
     // defaults
     globalErrorLogging: true,
     eventTracking: true,
-    inboxBeta: false,
     ..._opts,
   } as PiOpts;
   opts.REQUESTED_API_VERSION = +opts.REQUESTED_API_VERSION;
 
   switch (opts.REQUESTED_API_VERSION) {
     case 2:
-      opts.inboxBeta = true;
-      break;
-
     case 1:
       break;
 
@@ -191,7 +181,7 @@ export function makePlatformImplementation(
     document.location.origin;
 
   if (origin !== 'https://mail.google.com') {
-    // never resolve
+    /* eslint-disable-next-line @typescript-eslint/no-empty-function -- never resolve */
     return new Promise(() => {});
   }
 
