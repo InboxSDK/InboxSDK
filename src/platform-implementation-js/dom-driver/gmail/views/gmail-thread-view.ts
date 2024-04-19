@@ -26,6 +26,7 @@ import BasicButtonViewController, {
   type Options,
 } from '../../../widgets/buttons/basic-button-view-controller';
 import { type ButtonDescriptor } from '../../../../inboxsdk';
+import censorHTMLtree from '../../../../common/censorHTMLtree';
 
 let hasLoggedAddonInfo = false;
 
@@ -685,13 +686,13 @@ class GmailThreadView {
 
   addFooterButton(button: ButtonDescriptor) {
     // This element contains either an inline reply or the row of buttons
-    const lastMessageFooterSelector =
-      'div.nH .aHU div[role="list"] [role=“listitem”]:last-child .gA';
-    const lastMessageFooter = this._element.querySelector(
-      lastMessageFooterSelector,
-    );
-    if (!lastMessageFooter) {
-      throw new SelectorError(lastMessageFooterSelector, {
+    const messagesSelector = 'div.nH .aHU';
+    const messagesContainer = this._element.querySelector(messagesSelector);
+    if (!messagesContainer) {
+      this._driver.getLogger().eventSdkPassive('Footer button selector fail', {
+        html: censorHTMLtree(this._element),
+      });
+      throw new SelectorError(messagesSelector, {
         cause: 'Last message footer element not found',
       });
     }
@@ -736,7 +737,7 @@ class GmailThreadView {
         }
       }
     });
-    observer.observe(lastMessageFooter, {
+    observer.observe(messagesContainer, {
       childList: true,
       subtree: true,
     });
