@@ -684,10 +684,15 @@ class GmailThreadView {
   }
 
   addFooterButton(button: ButtonDescriptor) {
-    const footerParent = this._element.querySelector('.gA.gt.acV');
-    if (!footerParent) {
-      throw new SelectorError('.gA.gt.acV', {
-        cause: 'Footer buttons wrapper element not found',
+    // This element contains either an inline reply or the row of buttons
+    const lastMessageFooterSelector =
+      'div.nH .aHU div[role="list"] [role=“listitem”]:last-child .gA';
+    const lastMessageFooter = this._element.querySelector(
+      lastMessageFooterSelector,
+    );
+    if (!lastMessageFooter) {
+      throw new SelectorError(lastMessageFooterSelector, {
+        cause: 'Last message footer element not found',
       });
     }
 
@@ -731,7 +736,7 @@ class GmailThreadView {
         }
       }
     });
-    observer.observe(footerParent, {
+    observer.observe(lastMessageFooter, {
       childList: true,
       subtree: true,
     });
