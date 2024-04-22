@@ -1,7 +1,5 @@
-import { InboxSDK as InboxSDK_ } from '../src/inboxsdk';
+import * as SDK from '../src/inboxsdk';
 
 declare global {
-  var InboxSDK: {
-    load(version: string, moduleName: string): Promise<InboxSDK_>;
-  };
+  var InboxSDK: typeof SDK;
 }

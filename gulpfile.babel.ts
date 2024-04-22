@@ -64,6 +64,7 @@ async function setupExamples() {
       './packages/core/inboxsdk.js',
       './packages/core/pageWorld.js',
       './packages/core/background.js',
+      './packages/core/firefox.js',
     ];
 
     dirs = dirs.concat(await fg(['examples/*'], { onlyDirectories: true }));

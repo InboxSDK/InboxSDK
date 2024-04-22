@@ -1,9 +1,19 @@
-/* global chrome */
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === 'inboxsdk__injectPageWorld' && sender.tab) {
-    if (chrome.scripting) {
+/** @type {import('webextension-polyfill').Browser} */
+const browser = globalThis.chrome || globalThis.browser;
+const isFirefox = /Firefox/.test(navigator.userAgent);
+
+browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  const eventKey = 'inboxsdk__injectPageWorld';
+
+  if (message.type === eventKey && sender.tab) {
+    // Relay event to firefox content script handler
+    if (isFirefox) {
+      return browser.tabs.sendMessage(sender.tab.id, { type: eventKey });
+    }
+
+    if (browser.scripting) {
       // MV3
-      chrome.scripting.executeScript({
+      browser.scripting.executeScript({
         target: { tabId: sender.tab.id, frameIds: [sender.frameId] },
         world: 'MAIN',
         files: ['pageWorld.js'],

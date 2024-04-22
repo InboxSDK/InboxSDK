@@ -5,6 +5,7 @@
 /examples/*/inboxsdk.js*
 /examples/*/pageWorld.js*
 /examples/*/background.js*
+/examples/*/firefox.js*
 /examples/*/platform-implementation.js*
 *~
 npm-debug.log
