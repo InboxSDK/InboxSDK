@@ -23,6 +23,21 @@ jobs:
       - run:
           name: Clean
           command: yarn gulp clean
+  'build inboxsdk core examples':
+    executor: sdk
+    steps:
+      - checkout
+      - node/install-packages:
+          pkg-manager: yarn-berry
+      - run:
+          name: Build
+          command: yarn gulp --examples
+      - run:
+          name: Check output files exist
+          command: ls packages/app-menu/dist/content.js
+      - run:
+          name: Clean
+          command: yarn gulp clean
   # MV2 Remote Build
   'build REMOTE':
     executor: sdk
@@ -95,6 +110,10 @@ jobs:
       - checkout
       - node/install-packages:
           pkg-manager: yarn-berry
+
+      - run:
+          name: Build
+          command: yarn gulp
       - run:
           name: Typecheck (tsc)
           command: yarn tsc

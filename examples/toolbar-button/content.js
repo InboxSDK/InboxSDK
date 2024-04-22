@@ -1,4 +1,4 @@
-'use strict';
+import * as InboxSDK from '@inboxsdk/core';
 
 InboxSDK.load(1, 'toolbar-example', {
   appIconUrl: chrome.runtime.getURL('monkey.png'),

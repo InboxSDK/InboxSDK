@@ -5,7 +5,7 @@
   "content_scripts": [
     {
       "matches": ["https://mail.google.com/*"],
-      "js": ["inboxsdk.js", "bacon.js", "content.js"],
+      "js": ["bacon.js", "dist/content.js"],
       "css": ["extension.css"],
       "run_at": "document_end"
     }
@@ -14,7 +14,13 @@
   "web_accessible_resources": [
     {
       "matches": ["https://mail.google.com/*"],
-      "resources": ["pageWorld.js", "monkey.png", "monkey-face.jpg", "lion.png"]
+      "resources": [
+        "pageWorld.js",
+        "monkey.png",
+        "monkey-face.jpg",
+        "lion.png",
+        "*.map"
+      ]
     }
   ],
   "background": {

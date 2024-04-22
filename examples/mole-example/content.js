@@ -1,6 +1,4 @@
-/// <reference path="../types.d.ts" />
-
-'use strict';
+import * as InboxSDK from '@inboxsdk/core';
 
 InboxSDK.load(2, 'simple-example').then(function (inboxSDK) {
   let i = 0;

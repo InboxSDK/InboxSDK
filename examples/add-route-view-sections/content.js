@@ -1,4 +1,4 @@
-'use strict';
+import * as InboxSDK from '@inboxsdk/core';
 
 InboxSDK.load(1.0, 'route-view-sections-example').then(function (inboxSDK) {
   window._sdk = inboxSDK;

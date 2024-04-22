@@ -1,5 +1,4 @@
-/// <reference path="../types.d.ts" />
-'use strict';
+import * as InboxSDK from '@inboxsdk/core';
 
 InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
   window._sdk = inboxSDK;

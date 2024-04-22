@@ -8,8 +8,8 @@
         "kefir.min.js",
         "react.production.min.js",
         "react-dom.production.min.js",
-        "inboxsdk.js",
-        "content.js"
+
+        "dist/content.js"
       ],
       "css": ["app.css"],
       "run_at": "document_end"
@@ -19,7 +19,7 @@
   "web_accessible_resources": [
     {
       "matches": ["https://mail.google.com/*"],
-      "resources": ["pageWorld.js", "partycat.jpg", "zipicon.png"]
+      "resources": ["pageWorld.js", "partycat.jpg", "zipicon.png", "*.map"]
     }
   ],
   "background": {

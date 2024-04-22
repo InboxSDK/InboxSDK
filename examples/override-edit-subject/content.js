@@ -1,3 +1,5 @@
+import * as InboxSDK from '@inboxsdk/core';
+
 InboxSDK.load(1, 'simple-example', {}).then(function (inboxSDK) {
   inboxSDK.Compose.registerComposeViewHandler(function (composeView) {
     window.composeView = composeView;

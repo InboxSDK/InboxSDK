@@ -1,4 +1,4 @@
-/// <reference path="../types.d.ts" />
+import * as InboxSDK from '@inboxsdk/core';
 
 function log() {
   console.log.apply(

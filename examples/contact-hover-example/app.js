@@ -1,3 +1,5 @@
+import * as InboxSDK from '@inboxsdk/core';
+
 InboxSDK.load(1, 'contact-hover-example').then(function(sdk){
 
   window._sdk = sdk;

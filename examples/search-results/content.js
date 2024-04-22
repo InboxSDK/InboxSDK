@@ -1,4 +1,4 @@
-/// <reference path="../types.d.ts" />
+import * as InboxSDK from '@inboxsdk/core';
 
 InboxSDK.load(1.0, 'search-example').then(function (inboxSDK) {
   inboxSDK.Router.handleListRoute(

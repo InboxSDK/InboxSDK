@@ -6,7 +6,7 @@
     {
       "matches": ["https://mail.google.com/*"],
       "css": [],
-      "js": ["inboxsdk.js", "content.js"],
+      "js": ["dist/content.js"],
       "run_at": "document_start"
     }
   ],
@@ -14,7 +14,7 @@
   "web_accessible_resources": [
     {
       "matches": ["https://mail.google.com/*"],
-      "resources": ["pageWorld.js"]
+      "resources": ["pageWorld.js", "*.map"]
     }
   ],
   "background": {

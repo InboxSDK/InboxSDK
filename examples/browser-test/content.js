@@ -1,4 +1,4 @@
-'use strict';
+import * as InboxSDK from '@inboxsdk/core';
 
 function setupErrorTracking() {
   // Make a "_errors" global in the page's execution context that puppeteer can access.

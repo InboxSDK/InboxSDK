@@ -81,8 +81,8 @@ feature themselves.
 # Development Cycle Essentials
 
 Run `yarn` to install the necessary dependencies, and run `yarn start` to start
-the automatic builder. Then load `examples/hello-world/` as an unpacked
-extension into Google Chrome.
+the automatic builder. Then load `examples/app-menu/` as an unpacked extension
+into Google Chrome.
 
 The
 [Chrome Extensions Reloader](https://chrome.google.com/webstore/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid)

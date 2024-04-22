@@ -1,6 +1,4 @@
-/// <reference path="../types.d.ts" />
-
-'use strict';
+import * as InboxSDK from '@inboxsdk/core';
 
 var div = document.createElement('div');
 div.style.width = '800px';

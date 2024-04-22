@@ -6,10 +6,10 @@
     "@babel/node": "^7.22.19",
     "@babel/plugin-transform-runtime": "^7.22.15",
     "@babel/preset-env": "^7.22.20",
-    "@babel/preset-flow": "^7.22.15",
     "@babel/preset-react": "^7.22.15",
     "@babel/preset-typescript": "^7.23.0",
     "@babel/register": "^7.22.15",
+    "@inboxsdk/examples": "workspace:*",
     "@macil/simple-base-converter": "^1.0.0",
     "@types/asap": "^2.0.0",
     "@types/classnames": "^2.2.8",
@@ -113,7 +113,7 @@
     "prettier:check": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "puppeteer": "jest -c test/chrome/jest.config.js --runInBand",
-    "start": "gulp default -w --reloader",
+    "start": "gulp default -w --reloader --examples",
     "test": "jest"
   },
   "lint-staged": {
@@ -121,6 +121,7 @@
   },
   "version": "0.7.25",
   "workspaces": [
+    "examples",
     "packages/*"
   ],
   "packageManager": "yarn@4.0.1",

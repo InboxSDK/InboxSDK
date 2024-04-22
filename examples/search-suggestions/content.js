@@ -1,4 +1,4 @@
-'use strict';
+import * as InboxSDK from '@inboxsdk/core';
 
 function log(...args) {
   console.log('search-suggestions', ...args);

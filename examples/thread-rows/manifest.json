@@ -5,7 +5,7 @@
   "content_scripts": [
     {
       "matches": ["https://mail.google.com/*"],
-      "js": ["inboxsdk.js", "kefir.js", "content.js"],
+      "js": ["kefir.js", "dist/content.js"],
       "css": ["content.css"],
       "run_at": "document_start"
     }
@@ -14,7 +14,7 @@
   "web_accessible_resources": [
     {
       "matches": ["https://mail.google.com/*"],
-      "resources": ["pageWorld.js"]
+      "resources": ["pageWorld.js", "*.map"]
     }
   ],
   "background": {

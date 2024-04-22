@@ -1,3 +1,5 @@
+import * as InboxSDK from '@inboxsdk/core';
+
 InboxSDK.load(2, 'sidebar-contact-example').then(function (sdk) {
   window._sdk = sdk;
 
