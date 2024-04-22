@@ -45,20 +45,14 @@ export default class AttachmentCardView extends (EventEmitter as new () => Typed
   }
 
   /**
-   * @deprecated  Please use the same-named method on the AttachmentCardClickEvent object instead.
+   * Get the URL for the attachment card's download link as a promise for a string.
+   * For FILE attachment cards, the URL will be a short-lived URL that can be 
+   * accessed without cookies. For CUSTOM attachment cards, the URL will be the    
+   * downloadUrl property of the card's download button if it has one, otherwise 
+   * null. Other attachment card types may not have a download URL, and the promise 
+   * may resolve to null.
    */
-  getDownloadURL(): Promise<string | null | undefined> {
-    this.#driver
-      .getLogger()
-      .deprecationWarning(
-        'AttachmentCardView.getDownloadURL',
-        'AttachmentCardView.addButton -> onClick -> AttachmentCardClickEvent',
-      );
-
-    if (this.#driver.getOpts().REQUESTED_API_VERSION !== 1) {
-      throw new Error('This method was discontinued after API version 1');
-    }
-
+   getDownloadURL(): Promise<string | null | undefined> {
     return this.#attachmentCardImplementation.getDownloadURL();
   }
 
