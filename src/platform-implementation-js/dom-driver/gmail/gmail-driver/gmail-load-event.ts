@@ -42,6 +42,10 @@ export default async function gmailLoadEvent(driver: GmailDriver) {
   const timing = performance?.timing;
 
   driver.logger.eventSite('gmailSettings', {
+    /**
+     * Whether or not Google Chat, Google Meet, or both enabled. If they are, the SDK's
+     * AppMenu is available for the left nav.
+     */
     isGmailIntegratedView: isIntegratedViewGmail(),
     /**
      * This is the panel on the left side of the screen. If the top left burger of Gmail is collapsed, then this is true.
