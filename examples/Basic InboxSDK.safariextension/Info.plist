@@ -24,7 +24,7 @@
 			<array>
 				<string>inboxsdk.js</string>
 				<string>kefir.js</string>
-				<string>content.js</string>
+				<string>dist/content.js</string>
 			</array>
 		</dict>
 		<key>Whitelist</key>

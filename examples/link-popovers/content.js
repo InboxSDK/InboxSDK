@@ -1,3 +1,5 @@
+import * as InboxSDK from '@inboxsdk/core';
+
 InboxSDK.load(2, 'popover-example').then(function (sdk) {
   sdk.Compose.registerComposeViewHandler(function (composeView) {
     // Watch for gmail's link popover to appear

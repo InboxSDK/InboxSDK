@@ -7,6 +7,7 @@ import stdio from 'stdio';
 import extReloader from './live/extReloader';
 import fg from 'fast-glob';
 import exec from './src/build/exec';
+import { buildExamples } from '@inboxsdk/examples/build';
 
 const sdkFilename = 'inboxsdk';
 
@@ -29,7 +30,10 @@ const args = stdio.getopt({
     key: 'c',
     description: 'Copy dev build to Streak dev build folder',
   },
-});
+  examples: {
+    description: 'Copy inboxsdk.js to all subdirs under examples/',
+  },
+})!;
 
 // Don't let production be built without minification.
 // Could just make the production flag imply the minify flag, but that seems
@@ -51,22 +55,18 @@ process.env.IMPLEMENTATION_URL = args.production
   ? 'https://www.inboxsdk.com/build/platform-implementation.js'
   : 'http://localhost:4567/platform-implementation.js';
 
+/**
+ * @deprecated when MV2 support is removed, delete this function.
+ */
 async function setupExamples() {
-  // Copy inboxsdk.js (and .map) to all subdirs under examples/
-  let dirs: string[] = [];
+  const dirs: string[] = [];
   if (args.copyToStreak) {
     dirs.push('../MailFoo/extensions/devBuilds/chrome/');
   }
 
   let srcs: string[] = [];
   if (!args.remote && !args.integratedPageWorld) {
-    srcs = [
-      './packages/core/inboxsdk.js',
-      './packages/core/pageWorld.js',
-      './packages/core/background.js',
-    ];
-
-    dirs = dirs.concat(await fg(['examples/*'], { onlyDirectories: true }));
+    return;
   } else if (args.remote) {
     dirs.push('./dist');
     srcs = [
@@ -92,6 +92,7 @@ async function setupExamples() {
     });
     stream.resume();
   });
+
   if (args.reloader) {
     await extReloader();
   }
@@ -128,7 +129,7 @@ async function getVersion(): Promise<string> {
 }
 
 const enum OutputLibraryType {
-  /** Remote and npm output format for compatibility's sake */
+  /** @deprecated Remote and npm output format for compatibility's sake */
   UMD = 'umd',
   /** Future output format */
   ESM = 'module',
@@ -300,7 +301,15 @@ const pageWorld: webpack.EntryObject = {
 };
 
 gulp.task('clean', async () => {
-  const folders = ['./dist', './packages/core/src', './packages/core/test'];
+  const folders = [
+    './dist',
+    './packages/core/src',
+    './packages/core/test',
+    ...(await fg('./examples/*/dist', { onlyDirectories: true })),
+    ...(await fg('./examples/*/pageWorld*')),
+    ...(await fg('./examples/*/background*')),
+    ...(await fg('./examples/*/inboxsdk*')),
+  ];
   await Promise.all([
     ...folders.map((folder) =>
       fs.promises.rm(folder, { force: true, recursive: true }),
@@ -405,7 +414,21 @@ if (args.remote) {
     },
     disableMinification: true,
     afterBuild: async () => {
-      setupExamples();
+      if (args.examples) {
+        const contentScriptFps = await fg(
+          ['.ts', '.js'].map((ext) => './examples/*/content' + ext),
+        );
+
+        await buildExamples({
+          contentScriptFps,
+          minify: args.minify,
+          watch: args.watch,
+        });
+      }
+
+      if (args.reloader) {
+        await extReloader();
+      }
     },
   };
 }

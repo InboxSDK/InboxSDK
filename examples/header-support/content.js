@@ -1,3 +1,5 @@
+import * as InboxSDK from '@inboxsdk/core';
+
 InboxSDK.load(2, 'header support button').then(function (sdk) {
   window._sdk = sdk;
 

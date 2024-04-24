@@ -1,3 +1,5 @@
+import * as InboxSDK from '@inboxsdk/core';
+
 InboxSDK.load(1, 'simple-example', {
   iconImageUrl: chrome.runtime.getURL('monkey.png'),
 }).then(function (inboxSDK) {

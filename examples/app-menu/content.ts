@@ -1,11 +1,13 @@
-/// <reference path="../types.d.ts" />
+import * as InboxSDK from '@inboxsdk/core';
 
-function log() {
-  console.log(...['app-menu'].concat(arguments));
+function log(...args: any[]) {
+  console.log(...['app-menu'].concat(args));
 }
 
+var chrome = (globalThis as any).chrome
+
 InboxSDK.load(2, 'app-menu').then(async (sdk) => {
-  var appendStylesheet = function (url) {
+  var appendStylesheet = function (url: string) {
     const css =
       '.inboxsdk__button_icon.bentoBoxIndicator { background: transparent url(https://assets.streak.com/clientjs-commit-builds/assets/pipelineIndicator.ebfc97a74f09365a433e8537ff414815.png) no-repeat; height: 18px; width: 18px; }';
     const head = document.head || document.getElementsByTagName('head')[0];
@@ -76,15 +78,15 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
         lightTheme: chrome.runtime.getURL('monkey-face.jpg'),
       },
     }),
-    panel1 = await customItem1.addCollapsiblePanel({
+    panel1 = (await customItem1.addCollapsiblePanel({
       // title: 'Lion panel',
       primaryButton: {
         name: 'Lion panel',
         onClick: () => alert('clicked custom panel 1'),
         iconUrl: { lightTheme: chrome.runtime.getURL('lion.png') },
       },
-    }),
-    panel2 = await customItem2.addCollapsiblePanel({
+    }))!,
+    panel2 = (await customItem2.addCollapsiblePanel({
       loadingIcon: `<div>
         Slow loading...20s&nbsp;
         <img src="${chrome.runtime.getURL(
@@ -96,12 +98,12 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
         onClick: () => alert('clicked custom panel 2'),
         iconUrl: { lightTheme: chrome.runtime.getURL('monkey.png') },
       },
-    });
+    }))!;
 
   panel2.setLoading(true);
 
   // Simulate very slow loading.
-  new Promise((resolve) => {
+  new Promise<void>((resolve) => {
     setTimeout(() => {
       resolve();
     }, 20_000);
@@ -115,7 +117,7 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
   });
 
   sdk.AppMenu.events
-    .filter((event) => event.type === 'collapseToggled')
+    .filter((event) => event.name === 'collapseToggled')
     .onValue((event) => {
       console.log('collapseToggled', event);
     });

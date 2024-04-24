@@ -1,4 +1,4 @@
-/// <reference path="../types.d.ts" />
+import * as InboxSDK from '@inboxsdk/core';
 
 InboxSDK.load(2, 'simple-example').then(function (inboxSDK) {
   inboxSDK.Compose.registerComposeViewHandler(function (composeView) {

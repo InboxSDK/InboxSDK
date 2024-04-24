@@ -1,0 +1,9 @@
+{
+  "name": "@inboxsdk/examples",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@inboxsdk/core": "workspace:*",
+    "esbuild": "^0.20.2"
+  }
+}

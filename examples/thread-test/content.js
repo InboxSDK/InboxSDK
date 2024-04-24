@@ -1,4 +1,4 @@
-/// <reference path="../types.d.ts" />
+import * as InboxSDK from '@inboxsdk/core';
 
 function addCustomMessage(sortDate) {
   const collapsedEl = document.createElement('div');

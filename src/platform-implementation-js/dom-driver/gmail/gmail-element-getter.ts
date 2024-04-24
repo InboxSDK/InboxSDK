@@ -208,9 +208,7 @@ const GmailElementGetter = {
   },
 
   isAppBurgerMenuOpen() {
-    return (
-      this.getAppBurgerMenu()?.getAttribute('aria-expanded') === 'true' ?? false
-    );
+    return this.getAppBurgerMenu()?.getAttribute('aria-expanded') === 'true';
   },
 
   getAppMenuContainer() {
