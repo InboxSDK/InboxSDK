@@ -136,16 +136,20 @@ const enum OutputLibraryType {
 }
 
 interface WebpackTaskOptions {
+  chunkLoading?: NonNullable<webpack.Configuration['output']>['chunkLoading'];
   entry: webpack.Configuration['entry'];
   devtool?: webpack.Configuration['devtool'];
   disableMinification?: boolean;
+  externals?: webpack.Configuration['externals'];
   afterBuild?: () => Promise<void>;
   plugins?: webpack.Configuration['plugins'];
 }
 
 async function webpackTask({
+  chunkLoading,
   entry,
   disableMinification,
+  externals,
   ...options
 }: WebpackTaskOptions): Promise<void> {
   const willMinify = (args.minify && !disableMinification) ?? false;
@@ -155,6 +159,10 @@ async function webpackTask({
   const bundler = webpack({
     devtool: options.devtool ?? 'source-map',
     entry,
+    experiments: {
+      outputModule: true,
+    },
+    externals,
     mode: args.production ? 'production' : 'development',
     module: {
       rules: [
@@ -164,7 +172,6 @@ async function webpackTask({
         },
         {
           test: /\.m?js$/,
-          include: /node_modules/,
           enforce: 'pre',
           use: ['source-map-loader'],
         },
@@ -226,8 +233,10 @@ async function webpackTask({
       minimize: willMinify,
     },
     output: {
+      filename: '[name].js',
       path: path.join(__dirname, 'packages/core'),
       uniqueName: 'inboxsdk_' + VERSION,
+      chunkLoading,
     },
     plugins: [
       new webpack.DefinePlugin({
@@ -401,17 +410,58 @@ if (args.remote) {
 } else {
   // standard npm non-remote bundle
   config = {
+    chunkLoading: 'jsonp',
     entry: {
       ...pageWorld,
       [sdkFilename]: {
         library: {
-          export: 'default',
-          name: 'InboxSDK',
-          type: OutputLibraryType.UMD,
+          type: OutputLibraryType.ESM,
         },
         import: './src/inboxsdk-js/inboxsdk-NONREMOTE',
       },
     },
+    externals: [
+      '@babel/runtime',
+      '@macil/simple-base-converter',
+      'asap',
+      'auto-html',
+      'bignumber.js',
+      'bimapcache',
+      'buffer',
+      'classnames',
+      'closest-ng',
+      'combokeys-capture',
+      'contain-by-screen',
+      'event-listener-with-options',
+      'ext-corb-workaround',
+      'fast-deep-equal',
+      'immutability-helper',
+      'kefir',
+      'kefir-bus',
+      'kefir-cast',
+      'kefir-stopper',
+      'live-set',
+      /live-set\/.*/,
+      'lodash',
+      /lodash\/.*/,
+      'map-indexed-xf',
+      'matches-selector-ng',
+      'order-manager',
+      'page-parser-tree',
+      'pdelay',
+      'querystring-es3',
+      /node_modules\/querystring-es3\/.*/g,
+      'react',
+      'react-dom',
+      'react-draggable-list',
+      'react-smooth-collapse',
+      'sha.js',
+      /sha\.js\/.*/,
+      'ud',
+      'ud-kefir',
+      'tag-tree',
+      'transducers.js',
+    ],
     disableMinification: true,
     afterBuild: async () => {
       if (args.examples) {
