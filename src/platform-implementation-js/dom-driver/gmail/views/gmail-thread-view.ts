@@ -211,6 +211,10 @@ class GmailThreadView {
     '2023_11_16': '* > .nH',
   };
 
+  _subjectAISuggestionsContainerSelectors = {
+    '2024_04_26': '.nH > .einvLd',
+  };
+
   addNoticeBar(): SimpleElementView {
     const el = document.createElement('div');
     el.className = idMap('thread_noticeBar');
@@ -242,6 +246,30 @@ class GmailThreadView {
     this._driver.getLogger().eventSdkPassive('addNoticeBar subjectContainer', {
       version,
     });
+
+    // AI suggestions container could be rendered after the subject container so
+    // if present, we need to adjust spacing when inserting the notice bar in between subject and AI suggestions
+    for (const [currentVersion, selector] of Object.entries(
+      this._subjectAISuggestionsContainerSelectors,
+    )) {
+      const hasAIButtonsSubjectContainer =
+        !!this._element.querySelector(selector);
+
+      if (!hasAIButtonsSubjectContainer) {
+        continue;
+      }
+
+      this._driver
+        .getLogger()
+        .eventSdkPassive('addNoticeBar AIButtonsSubjectContainer', {
+          version: currentVersion,
+        });
+
+      // AI suggestions container is present, adjust spacing of notice bar by the same amount as the subject container bottom spacing for consistency
+      el.style.marginBottom = '8px';
+
+      break;
+    }
 
     subjectContainer.insertAdjacentElement('afterend', el);
     const view = new SimpleElementView(el);
