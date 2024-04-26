@@ -5,12 +5,13 @@ import kefirCast from 'kefir-cast';
 import Kefir, { type Observable } from 'kefir';
 import ContentPanelView from '../content-panel-view';
 import type MessageView from './message-view';
-import type { Driver, ThreadViewDriver } from '../../driver-interfaces/driver';
+import type { Driver } from '../../driver-interfaces/driver';
 import type CustomMessageView from '../../views/conversations/custom-message-view';
 import type { ButtonDescriptor, Contact } from '../../../inboxsdk';
 import type TypedEventEmitter from 'typed-emitter';
 import { type ContentPanelDescriptor } from '../../driver-common/sidebar/ContentPanelViewDriver';
 import { Descriptor } from '../../../types/descriptor';
+import type GmailThreadView from '../../dom-driver/gmail/views/gmail-thread-view';
 
 export type ThreadViewEvents = {
   destroy(): void;
@@ -22,14 +23,14 @@ export type ThreadViewEvents = {
 };
 
 class ThreadView extends (EventEmitter as new () => TypedEventEmitter<ThreadViewEvents>) {
-  #threadViewImplementation: ThreadViewDriver;
+  #threadViewImplementation: GmailThreadView;
   #appId: string;
   #driver: Driver;
   #membrane: Membrane;
   destroyed = false;
 
   constructor(
-    threadViewImplementation: ThreadViewDriver,
+    threadViewImplementation: GmailThreadView,
     appId: string,
     driver: Driver,
     membrane: Membrane,

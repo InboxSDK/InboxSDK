@@ -2,8 +2,6 @@ import type * as Kefir from 'kefir';
 import type ComposeView from '../views/compose-view';
 import type InboxBackdrop from '../dom-driver/inbox/views/inbox-backdrop';
 export type Backdrop = GmailBackdrop | InboxBackdrop;
-import type GmailThreadView from '../dom-driver/gmail/views/gmail-thread-view';
-export type ThreadViewDriver = GmailThreadView;
 import type GmailAttachmentCardView from '../dom-driver/gmail/views/gmail-attachment-card-view';
 export type AttachmentCardViewDriver = GmailAttachmentCardView;
 export type DrawerViewOptions = {
