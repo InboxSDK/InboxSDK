@@ -12,10 +12,29 @@ export interface ContentPanelDescriptor {
   id?: string;
   hideTitleBar?: boolean;
   iconClass?: string;
+  iconLiga?: string;
   iconUrl?: string;
   orderHint?: number;
   primaryColor?: string;
   secondaryColor?: string;
+  title?: string;
+}
+
+export interface SidebarPanelEvent {
+  appIconUrl?: string;
+  appId: string;
+  appName: string;
+  hideTitleBar: boolean;
+  iconLiga?: string;
+  iconClass?: string;
+  iconUrl?: string;
+  id: string;
+  instanceId: string;
+  isGlobal?: boolean;
+  orderHint: number;
+  primaryColor?: string;
+  secondaryColor?: string;
+  sidebarId: string;
   title?: string;
 }
 
@@ -88,6 +107,7 @@ class ContentPanelViewDriver {
         const {
           el,
           iconUrl,
+          iconLiga,
           iconClass,
           title,
           orderHint,
@@ -109,7 +129,7 @@ class ContentPanelViewDriver {
           : 'inboxsdkNewSidebarPanel';
         hasPlacedAlready = true;
         el.dispatchEvent(
-          new CustomEvent(eventName, {
+          new CustomEvent<SidebarPanelEvent>(eventName, {
             bubbles: true,
             cancelable: false,
             detail: {
@@ -119,6 +139,7 @@ class ContentPanelViewDriver {
               appName,
               hideTitleBar: Boolean(hideTitleBar),
               iconClass,
+              iconLiga,
               iconUrl,
               id: String(id || title),
               instanceId: this.#instanceId,

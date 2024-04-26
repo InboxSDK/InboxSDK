@@ -31,8 +31,9 @@ export type PanelDescriptor = {
   instanceId: string;
   appId: string;
   id: string;
-  title: string;
+  title?: string;
   iconClass: string | null | undefined;
+  iconLiga?: string;
   iconUrl: string | null | undefined;
   hideTitleBar: boolean;
   el: HTMLElement;
@@ -369,7 +370,7 @@ class Panel extends React.Component<PanelProps> {
       dragHandleProps,
       itemSelected,
       item: {
-        panelDescriptor: { title, appName, iconClass, iconUrl, el },
+        panelDescriptor: { title, appName, iconClass, iconUrl, iconLiga, el },
         showControls,
         expanded,
         onExpandedToggle,
@@ -415,6 +416,7 @@ class Panel extends React.Component<PanelProps> {
                   iconClass,
                 )}
               >
+                {!!iconLiga && iconLiga}
                 {iconUrl && <img src={iconUrl} />}
               </span>
             </span>

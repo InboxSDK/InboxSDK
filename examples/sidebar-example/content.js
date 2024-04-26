@@ -1,5 +1,18 @@
 import * as InboxSDK from '@inboxsdk/core';
 
+function addStyle(href) {
+  const linkEl = document.createElement('link');
+  linkEl.rel = 'stylesheet';
+  linkEl.href = href;
+
+  if (!document.head) throw new Error('missing head');
+  document.head.appendChild(linkEl);
+}
+
+addStyle(
+  'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..24,400..500,0,0',
+);
+
 InboxSDK.load(2, 'sidebar-example', {
   appName: 'Twitter',
   appIconUrl:
@@ -100,5 +113,25 @@ InboxSDK.load(2, 'sidebar-example', {
     iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
     el: globalPanelEl2,
     orderHint: 2,
+  });
+
+  try {
+    document.styleSheets[0].insertRule(
+      `.test-ligature:first-child {
+      font-family: 'Material Symbols Outlined';
+      line-height: 1;
+    }`,
+    );
+  } catch (e) {
+    console.error(e);
+  }
+
+  inboxSDK.Global.addSidebarContentPanel({
+    title: 'Panel 3.0',
+    appName: 'Not Twitter 3.0',
+    iconClass: 'test-ligature',
+    iconLiga: 'task_alt',
+    el: globalPanelEl2.cloneNode(true),
+    orderHint: 3,
   });
 });
