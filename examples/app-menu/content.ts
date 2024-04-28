@@ -6,6 +6,7 @@ function log(...args: any[]) {
 
 var chrome = (globalThis as any).chrome
 
+// replace app-menu with your app id
 InboxSDK.load(2, 'app-menu').then(async (sdk) => {
   var appendStylesheet = function (url: string) {
     const css =
@@ -33,73 +34,82 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
   }
 
   const customItem1 = sdk.AppMenu.addMenuItem({
-      name: 'Lion menu item',
-      insertIndex: 1,
-      iconUrl: {
-        lightTheme: chrome.runtime.getURL('lion.png'),
-      },
-      onClick: () => {
-        log('clicked custom menu item 1');
-      },
-      routeID: 'custom-route-1',
-      isRouteActive: (route) => {
-        const routeID = route.getRouteID();
-        return routeID === 'custom-route-1';
-      },
-    }),
-    customItem2 = sdk.AppMenu.addMenuItem({
-      name: 'monkey',
-      onClick: () => {
-        log('clicked custom menu item 2');
-        sdk.Router.goto('custom-route-2');
-      },
-      routeID: 'custom-route-2',
-      isRouteActive: (route) => {
-        const routeID = route.getRouteID();
-        return routeID === 'custom-route-2';
-      },
-      iconUrl: {
-        lightTheme: chrome.runtime.getURL('monkey.png'),
-      },
-    }),
-    /** No panel with this menu item */
-    customItem3 = sdk.AppMenu.addMenuItem({
-      name: 'No panel',
-      onClick: () => {
-        log('clicked custom menu item 3');
-        // sdk.Router.goto('custom-route-3');
-      },
-      routeID: 'custom-route-3',
-      isRouteActive: (route) => {
-        const routeID = route.getRouteID();
-        return routeID === 'custom-route-3';
-      },
-      iconUrl: {
-        lightTheme: chrome.runtime.getURL('monkey-face.jpg'),
-      },
-    }),
-    panel1 = (await customItem1.addCollapsiblePanel({
-      // title: 'Lion panel',
-      primaryButton: {
-        name: 'Lion panel',
-        onClick: () => alert('clicked custom panel 1'),
-        iconUrl: { lightTheme: chrome.runtime.getURL('lion.png') },
-      },
-    }))!,
-    panel2 = (await customItem2.addCollapsiblePanel({
-      loadingIcon: `<div>
-        Slow loading...20s&nbsp;
-        <img src="${chrome.runtime.getURL(
-          'monkey.png',
-        )}" width="20" height="20" />
-      </div>`,
-      primaryButton: {
-        name: 'Monkey panel',
-        onClick: () => alert('clicked custom panel 2'),
-        iconUrl: { lightTheme: chrome.runtime.getURL('monkey.png') },
-      },
-    }))!;
-
+    name: 'Lion menu item',
+    insertIndex: 1,
+    iconUrl: {
+      lightTheme: chrome.runtime.getURL('lion.png'),
+    },
+    onClick: () => {
+      log('clicked custom menu item 1');
+    },
+    routeID: 'custom-route-1',
+    isRouteActive: (route) => {
+      const routeID = route.getRouteID();
+      return routeID === 'custom-route-1';
+    },
+  })
+  const customItem2 = sdk.AppMenu.addMenuItem({
+    name: 'monkey',
+    onClick: () => {
+      log('clicked custom menu item 2');
+      sdk.Router.goto('custom-route-2');
+    },
+    routeID: 'custom-route-2',
+    isRouteActive: (route) => {
+      const routeID = route.getRouteID();
+      return routeID === 'custom-route-2';
+    },
+    iconUrl: {
+      lightTheme: chrome.runtime.getURL('monkey.png'),
+    },
+  })
+  // /** No panel with this menu item */
+  const customItem3 = sdk.AppMenu.addMenuItem({
+    name: 'No panel',
+    onClick: () => {
+      log('clicked custom menu item 3');
+      sdk.Router.goto('custom-route-3');
+    },
+    routeID: 'custom-route-3',
+    isRouteActive: (route) => {
+      const routeID = route.getRouteID();
+      return routeID === 'custom-route-3';
+    },
+    iconUrl: {
+      lightTheme: chrome.runtime.getURL('monkey-face.jpg'),
+    },
+  })
+  const panel1 = await customItem1.addCollapsiblePanel({
+    // title: 'Lion panel',
+    primaryButton: {
+      name: 'Lion panel',
+      onClick: () => alert('clicked custom panel 1'),
+      iconUrl: { lightTheme: chrome.runtime.getURL('lion.png') },
+    },
+  })
+  if (!panel1) {
+    // make sure that your app menu is enabled by going to Gmail's `Settings > Chat and Meet` and enabling
+    // at least either Chat or Meet.
+    throw new Error('panel1 is undefined');
+  }
+  const panel2 = (await customItem2.addCollapsiblePanel({
+    loadingIcon: `<div>
+      Slow loading...20s&nbsp;
+      <img src="${chrome.runtime.getURL(
+        'monkey.png',
+      )}" width="20" height="20" />
+    </div>`,
+    primaryButton: {
+      name: 'Monkey panel',
+      onClick: () => alert('clicked custom panel 2'),
+      iconUrl: { lightTheme: chrome.runtime.getURL('monkey.png') },
+    },
+  }));
+  if (!panel2) {
+    // make sure that your app menu is enabled by going to Gmail's `Settings > Chat and Meet` and enabling
+    // at least either Chat or Meet.
+    throw new Error('panel1 is undefined');
+  }
   panel2.setLoading(true);
 
   // Simulate very slow loading.
