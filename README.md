@@ -55,7 +55,7 @@ InboxSDK.load(2, 'YOUR_APP_ID_HERE').then((sdk) => {
 });
 ```
 
-See https://github.com/InboxSDK/hello-world for an example extension using the
+See <https://github.com/InboxSDK/hello-world> for an example extension using the
 InboxSDK.
 
 # Licensing
@@ -82,7 +82,8 @@ feature themselves.
 
 Run `yarn` to install the necessary dependencies, and run `yarn start` to start
 the automatic builder. Then load `examples/app-menu/` as an unpacked extension
-into Google Chrome.
+into Google Chrome. You may need to manually copy `background.js` from
+`packages/core/` to the `examples/app-menu/` directory.
 
 The
 [Chrome Extensions Reloader](https://chrome.google.com/webstore/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid)
@@ -100,6 +101,10 @@ isolation in an example extension, and must not depend on Streak (including
 Streak's CSS). Any new features that add elements controlled by the extension
 ought to be styled (positioned) reasonably by the InboxSDK without requiring the
 extension to include its own non-trivial CSS.
+
+If you are using the default `example/app-menu` extension, make sure that your
+app menu is enabled by going to Gmail's `Settings > Chat and Meet` and enabling
+at least either Chat or Meet.
 
 ## Technology Choices
 
