@@ -82,8 +82,7 @@ feature themselves.
 
 Run `yarn` to install the necessary dependencies, and run `yarn start` to start
 the automatic builder. Then load `examples/app-menu/` as an unpacked extension
-into Google Chrome. You may need to manually copy `background.js` from
-`packages/core/` to the `examples/app-menu/` directory.
+into Google Chrome.
 
 The
 [Chrome Extensions Reloader](https://chrome.google.com/webstore/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid)
