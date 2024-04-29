@@ -55,7 +55,7 @@ InboxSDK.load(2, 'YOUR_APP_ID_HERE').then((sdk) => {
 });
 ```
 
-See https://github.com/InboxSDK/hello-world for an example extension using the
+See <https://github.com/InboxSDK/hello-world> for an example extension using the
 InboxSDK.
 
 # Licensing
@@ -100,6 +100,10 @@ isolation in an example extension, and must not depend on Streak (including
 Streak's CSS). Any new features that add elements controlled by the extension
 ought to be styled (positioned) reasonably by the InboxSDK without requiring the
 extension to include its own non-trivial CSS.
+
+If you are using the default `example/app-menu` extension, make sure that your
+app menu is enabled by going to Gmail's `Settings > Chat and Meet` and enabling
+at least either Chat or Meet.
 
 ## Technology Choices
 

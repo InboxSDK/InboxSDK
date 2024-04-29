@@ -24,6 +24,7 @@ import renderCustomIcon from '../../../driver-common/render-custom-icon';
 import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 
 import GmailDriver from '../gmail-driver';
+import DropdownView from '../../../widgets/buttons/dropdown-view';
 
 let NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED = 0;
 
@@ -43,7 +44,7 @@ type IconButtonAccessoryDescriptor = {
 
 type DropdownButtonAccessoryDescriptor = {
   type: 'DROPDOWN_BUTTON';
-  onClick: (e: MouseEvent) => void;
+  onClick: (e: { dropdown: DropdownView }) => void;
 };
 
 export type NavItemTypes = typeof NAV_ITEM_TYPES;
