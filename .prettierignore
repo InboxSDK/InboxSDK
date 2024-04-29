@@ -2,6 +2,7 @@
 examples/*/*
 !**/examples/*/manifest.json
 !**/examples/*/content.js
+!**/examples/*/content.ts
 /test/data/**/*.html
 /__tests__/**/*.html
 *.snap
