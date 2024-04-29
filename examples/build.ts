@@ -110,7 +110,10 @@ async function watchOrBuild({
         ...config,
       });
 
-      (await state).watch();
+      // For @inboxsdk/core files, we need to build prior to copying the files into each example folder
+      (await state).rebuild();
+
+      state.then((noBlock) => noBlock.watch());
     } else {
       if (awaitRebuild) {
         await watcher.cancel();
