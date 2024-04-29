@@ -1,5 +1,4 @@
 import findIndex from 'lodash/findIndex';
-import autoHtml from 'auto-html';
 import asap from 'asap';
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
@@ -26,6 +25,10 @@ import {
   sidebarWaitingPlatformClassName,
   sidebarWaitingPlatformSelector,
 } from '../../../../../driver-common/sidebar/constants';
+import { type SidebarPanelEvent } from '../../../../../driver-common/sidebar/ContentPanelViewDriver';
+import escape from 'lodash/escape';
+import * as s from './index.module.css';
+
 const ACTIVE_ADD_ON_ICON_SELECTOR = '.aT5-aOt-I-KO';
 const COMPANION_SIDEBAR_CONTENT_CLOSED_SHADOW_CLASS = 'brC-brG-btc';
 
@@ -52,7 +55,7 @@ class GmailAppSidebarPrimary {
    */
   #instanceId: string = `${Date.now()}-${Math.random()}`;
   #companionSidebarContentContainerEl: HTMLElement;
-  #instanceIdsToDescriptors: Map<string, Record<string, any>> = new Map();
+  #instanceIdsToDescriptors = new Map<string, SidebarPanelEvent>();
   #threadSidebarComponent: AppSidebar | null | undefined = null;
   #threadIconArea: HTMLElement | null | undefined = null;
   #globalIconArea: HTMLElement | null | undefined = null;
@@ -339,7 +342,7 @@ class GmailAppSidebarPrimary {
 
   #addButton(
     iconArea: HTMLElement,
-    event: Record<string, any>,
+    event: CustomEvent<SidebarPanelEvent>,
     isGlobal: boolean,
   ) {
     // we put adding the content panel icon in the iconArea in an asap so that we
@@ -354,7 +357,8 @@ class GmailAppSidebarPrimary {
           ? event.detail.iconUrl
           : event.detail.appIconUrl;
       const appName = event.detail.appName;
-      const iconClass = event.detail.iconClass || '';
+      const { iconClass = '', iconLiga } = event.detail;
+
       // If there's an existing button for the app, then just increment its
       // data-count attribute instead of adding a new button.
       const existingButtonContainer = isGlobal
@@ -374,9 +378,19 @@ class GmailAppSidebarPrimary {
         buttonContainer = document.createElement('div');
         buttonContainer.className = idMap('sidebar_button_container');
         buttonContainer.setAttribute('data-app-name', appName);
-        buttonContainer.innerHTML = autoHtml`
-          <button class="inboxsdk__button_icon ${iconClass}" type="button" data-tooltip="${appName}">
-            <img class="inboxsdk__button_iconImg" src="${iconUrl}">
+        buttonContainer.innerHTML = `
+          <button class="inboxsdk__button_icon ${escape(
+            iconClass,
+          )}" type="button" data-tooltip="${escape(appName)}">
+            ${
+              iconLiga
+                ? `<span class="${escape(s.iconLiga)}">${escape(
+                    iconLiga,
+                  ).trim()}</div>`
+                : `<img class="inboxsdk__button_iconImg" src="${escape(
+                    iconUrl,
+                  )}">`
+            }
           </button>
           <div class="inboxsdk__button_selectedIndicator"></div>
         `;
@@ -722,7 +736,10 @@ class GmailAppSidebarPrimary {
 
           this.#renderThreadSidebarIfPresent();
         });
-      Kefir.fromEvents<any, unknown>(document.body, 'inboxsdkNewSidebarPanel')
+      Kefir.fromEvents<CustomEvent<SidebarPanelEvent>, unknown>(
+        document.body,
+        'inboxsdkNewSidebarPanel',
+      )
         .filter(
           (e) => e.detail.sidebarId === this.#instanceId && !e.detail.isGlobal,
         )
@@ -751,9 +768,10 @@ class GmailAppSidebarPrimary {
               instanceId: event.detail.instanceId,
               title: event.detail.title,
               iconClass: event.detail.iconClass,
+              iconLiga: event.detail.iconLiga,
               iconUrl: event.detail.iconUrl,
               hideTitleBar: event.detail.hideTitleBar,
-              el: event.target,
+              el: event.target as HTMLElement,
             },
           });
 
@@ -778,7 +796,7 @@ class GmailAppSidebarPrimary {
 
           this.#addButton(threadIconArea, event, false);
         });
-      Kefir.fromEvents<any, unknown>(
+      Kefir.fromEvents<CustomEvent<SidebarPanelEvent>, unknown>(
         document.body,
         'inboxsdkUpdateSidebarPanel',
       )
@@ -803,9 +821,10 @@ class GmailAppSidebarPrimary {
             instanceId: event.detail.instanceId,
             title: event.detail.title,
             iconClass: event.detail.iconClass,
+            iconLiga: event.detail.iconLiga,
             iconUrl: event.detail.iconUrl,
             hideTitleBar: event.detail.hideTitleBar,
-            el: event.target,
+            el: event.target as HTMLElement,
           });
 
           this.#renderThreadSidebar();
@@ -946,12 +965,12 @@ class GmailAppSidebarPrimary {
 
           this.#addButton(globalIconArea, event, true);
         });
-      Kefir.fromEvents<any, unknown>(
+      Kefir.fromEvents<CustomEvent<SidebarPanelEvent>, unknown>(
         document.body,
         'inboxsdkUpdateSidebarPanel',
       )
         .filter(
-          (e) => e.detail.sidebarId === this.#instanceId && e.detail.isGlobal,
+          (e) => e.detail.sidebarId === this.#instanceId && e.detail.isGlobal!,
         )
         .takeUntilBy(this.#stopper)
         .onValue((event) => {
@@ -960,10 +979,15 @@ class GmailAppSidebarPrimary {
           );
 
           if (!buttonContainer) return;
-          const iconClass = event.detail.iconClass || '';
-          const iconUrl = event.detail.iconUrl || event.detail.appIconUrl;
-          const imgElement = querySelector(buttonContainer, 'img');
-          imgElement.setAttribute('src', iconUrl);
+          const {
+            iconClass = '',
+            iconLiga,
+            iconUrl = event.detail.appIconUrl,
+          } = event.detail;
+          if (!iconLiga) {
+            const imgElement = querySelector(buttonContainer, 'img');
+            imgElement.setAttribute('src', iconUrl!);
+          }
           const button = querySelector(buttonContainer, 'button');
           button.setAttribute('class', `inboxsdk__button_icon ${iconClass}`);
         });
@@ -1057,7 +1081,7 @@ class GmailAppSidebarPrimary {
         .onValue((event) => {
           this.#instanceIdsToDescriptors.delete(event.detail.instanceId);
         });
-      Kefir.fromEvents<any, unknown>(
+      Kefir.fromEvents<CustomEvent<SidebarPanelEvent>, unknown>(
         document.body,
         'inboxsdkUpdateSidebarPanel',
       )
