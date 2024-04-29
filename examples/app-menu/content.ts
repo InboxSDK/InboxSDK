@@ -4,8 +4,9 @@ function log(...args: any[]) {
   console.log(...['app-menu'].concat(args));
 }
 
-var chrome = (globalThis as any).chrome
+var chrome = (globalThis as any).chrome;
 
+// replace app-menu with your app id
 InboxSDK.load(2, 'app-menu').then(async (sdk) => {
   var appendStylesheet = function (url: string) {
     const css =
@@ -78,28 +79,36 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
         lightTheme: chrome.runtime.getURL('monkey-face.jpg'),
       },
     }),
-    panel1 = (await customItem1.addCollapsiblePanel({
+    panel1 = await customItem1.addCollapsiblePanel({
       // title: 'Lion panel',
       primaryButton: {
         name: 'Lion panel',
         onClick: () => alert('clicked custom panel 1'),
         iconUrl: { lightTheme: chrome.runtime.getURL('lion.png') },
       },
-    }))!,
-    panel2 = (await customItem2.addCollapsiblePanel({
+    }),
+    panel2 = await customItem2.addCollapsiblePanel({
       loadingIcon: `<div>
-        Slow loading...20s&nbsp;
-        <img src="${chrome.runtime.getURL(
-          'monkey.png',
-        )}" width="20" height="20" />
-      </div>`,
+      Slow loading...20s&nbsp;
+      <img src="${chrome.runtime.getURL(
+        'monkey.png',
+      )}" width="20" height="20" />
+    </div>`,
       primaryButton: {
         name: 'Monkey panel',
         onClick: () => alert('clicked custom panel 2'),
         iconUrl: { lightTheme: chrome.runtime.getURL('monkey.png') },
       },
-    }))!;
-
+    });
+  // if either of following error is thrown, it means that your app menu is not enabled
+  // make sure that your app menu is enabled by going to Gmail's `Settings > Chat and Meet` and enabling
+  // at least either Chat or Meet.
+  if (!panel1) {
+    throw new Error('panel1 is undefined');
+  }
+  if (!panel2) {
+    throw new Error('panel2 is undefined');
+  }
   panel2.setLoading(true);
 
   // Simulate very slow loading.
