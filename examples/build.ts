@@ -61,7 +61,12 @@ export async function buildExamples({
 
   const copyingFiles = contentScriptFps.map((examplePath) => {
     (async () => {
-      await sdkFileBuild;
+      if (watchingSdkOutput == null) {
+        await sdkFileBuild;
+      } else {
+        // We need these files built before we copy the first time
+        (await watchingSdkOutput).rebuild();
+      }
       const dirname = path.dirname(examplePath);
       return fs.cp('examples/dist', dirname, {
         force: true,
@@ -110,10 +115,7 @@ async function watchOrBuild({
         ...config,
       });
 
-      // For @inboxsdk/core files, we need to build prior to copying the files into each example folder
-      (await state).rebuild();
-
-      state.then((noBlock) => noBlock.watch());
+      (await state).watch();
     } else {
       if (awaitRebuild) {
         await watcher.cancel();
