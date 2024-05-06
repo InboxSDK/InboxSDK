@@ -1,4 +1,3 @@
-import fs from 'node:fs/promises';
 import path from 'node:path';
 
 import esbuild from 'esbuild';
@@ -43,13 +42,21 @@ export async function buildExamples({
     minify,
   };
 
-  await fs.mkdir('examples/dist', { recursive: true });
+  const sdkEntryPoints = buildSdkFiles.flatMap((sdkFile) =>
+    contentScriptFps.flatMap((c) => [
+      {
+        out: path.join(path.dirname(c), path.basename(sdkFile)),
+        in: sdkFile,
+      },
+    ]),
+  );
 
   const sdkBuildConfig: BuildConfig = {
     ...sharedConfig,
-    entryPoints: buildSdkFiles,
-    outbase: '',
-    outdir: 'examples/dist',
+    entryPoints: sdkEntryPoints,
+    outbase: '.',
+    outdir: '.',
+    entryNames: '[dir]/[name]',
   };
 
   const sdkFileBuild = watchOrBuild({
@@ -59,25 +66,6 @@ export async function buildExamples({
     watch,
   });
 
-  const copyingFiles = contentScriptFps.map((examplePath) => {
-    (async () => {
-      if (watchingSdkOutput == null) {
-        await sdkFileBuild;
-      } else {
-        // We need these files built before we copy the first time
-        (await watchingSdkOutput).rebuild();
-      }
-      const dirname = path.dirname(examplePath);
-      return fs.cp('examples/dist', dirname, {
-        force: true,
-        // This key doesn't exist in @types/node@18 (but does in @types/node@20)
-        ...{ mode: fs.constants.COPYFILE_FICLONE },
-        preserveTimestamps: true,
-        recursive: true,
-      });
-    })();
-  });
-
   const contentScriptOpts = {
     ...sharedConfig,
     entryPoints: contentScriptFps,
@@ -85,14 +73,14 @@ export async function buildExamples({
     outdir: 'examples',
   } as const;
 
-  const contentScriptBuild = await watchOrBuild({
+  const contentScriptBuild = watchOrBuild({
     config: contentScriptOpts,
     awaitRebuild: false,
     state: watchingContentScripts,
     watch,
   });
 
-  await Promise.all([sdkFileBuild, ...copyingFiles, contentScriptBuild]);
+  await Promise.all([sdkFileBuild, contentScriptBuild]);
   console.timeEnd(TIMING_LABEL);
 }
 
