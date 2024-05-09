@@ -171,6 +171,7 @@ export default class NativeGmailNavItemView {
   }
 
   _addNavItemElement(gmailNavItemView: GmailNavItemView) {
+    console.log('native-gmail-nav-item-view.ts _addNavItemElement');
     const itemContainerElement = this._getItemContainerElement();
 
     const insertBeforeElement = getInsertBeforeElement(
@@ -182,9 +183,12 @@ export default class NativeGmailNavItemView {
       gmailNavItemView.getElement(),
       insertBeforeElement,
     );
-    const element = gmailNavItemView.getElement();
-    querySelector(element, '.TN').style.marginLeft =
-      getLeftIndentationPaddingValue() + 'px';
+
+    if (!gmailNavItemView.isSection()) {
+      const element = gmailNavItemView.getElement();
+      querySelector(element, '.TN').style.marginLeft =
+        getLeftIndentationPaddingValue() + 'px';
+    }
 
     this._setHeights();
   }
@@ -325,9 +329,8 @@ export default class NativeGmailNavItemView {
   }
 
   _setHeights() {
-    const toElement = querySelector(this._element, '.TO');
-
     if (this._element.classList.contains('ain') && this._itemContainerElement) {
+      const toElement = querySelector(this._element, '.TO');
       this._element.style.height = '';
       const totalHeight = this._element.clientHeight;
       const itemHeight = toElement.clientHeight;

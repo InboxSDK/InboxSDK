@@ -28,6 +28,7 @@ const panelLoadingClass = `${loadingElementClass}--active` as const;
 const loadingElementSelector = `.${loadingElementClass}` as const;
 
 const NAV_MENU_CONTAINER_ELEMENT_SELECTOR = '.at9 .n3 .TK' as const;
+const NAV_MENU_ROOT_CONTAINER_ELEMENT_SELECTOR = '.at9 .nM' as const;
 
 type MessageEvents = {
   /**
@@ -146,6 +147,41 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     const navMenuContainerElement = querySelector(
       element,
       NAV_MENU_CONTAINER_ELEMENT_SELECTOR,
+    );
+
+    const appId = `collapsible-panel-${this.#id}`;
+
+    const navItemDescriptorPropertyStream = kefirCast(
+      Kefir,
+      navItemDescriptor,
+    ).toProperty();
+
+    const gmailNavItemView = this.#driver.addNavItem(
+      appId,
+      navItemDescriptorPropertyStream,
+      navMenuContainerElement,
+    );
+
+    const navItemView = new NavItemView(
+      appId,
+      this.#driver,
+      navItemDescriptorPropertyStream,
+      gmailNavItemView,
+    );
+
+    return navItemView;
+  }
+
+  /**
+   * @param navItemDescriptor Add a single or Kefir.Observable nav menu item to the CollapsiblePanel.
+   */
+  addNavItemCategory(navItemDescriptor: NavItemDescriptor) {
+    this.setLoading(false);
+    const { element } = this;
+
+    const navMenuContainerElement = querySelector(
+      element,
+      NAV_MENU_ROOT_CONTAINER_ELEMENT_SELECTOR,
     );
 
     const appId = `collapsible-panel-${this.#id}`;

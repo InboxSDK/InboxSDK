@@ -18,6 +18,10 @@ const navItemTypes = Object.freeze({
 
   // Old alias for LINK
   MANAGE: 'MANAGE',
+
+  SECTION: 'SECTION',
 } as const);
+
+console.log('navItemTypes', navItemTypes);
 
 export default navItemTypes;

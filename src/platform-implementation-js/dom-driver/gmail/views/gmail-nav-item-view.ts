@@ -107,10 +107,18 @@ export default class GmailNavItemView {
     this._isNewLeftNavParent =
       !GmailElementGetter.shouldAddNavItemsInline() && this._level === 1;
 
+    this._element = this.#setupElement();
+  }
+
+  #setupElement(navItemDescriptor?: NavItemDescriptor) {
+    console.warn('setupElement');
+
     if (this._isNewLeftNavParent) {
-      this._element = this._setupParentElement();
+      return this._setupParentElement();
+    } else if (navItemDescriptor?.type === NAV_ITEM_TYPES.SECTION) {
+      return this._setupSectionElement();
     } else {
-      this._element = this._setupChildElement();
+      return this._setupChildElement();
     }
   }
 
@@ -176,6 +184,10 @@ export default class GmailNavItemView {
     return this._isCollapsed;
   }
 
+  isSection() {
+    return this._type === NAV_ITEM_TYPES.SECTION;
+  }
+
   remove() {
     this.destroy();
   }
@@ -236,9 +248,12 @@ export default class GmailNavItemView {
       unknown
     >,
   ) {
+    console.warn('setNavItemDescriptor');
+
     navItemDescriptorPropertyStream
       .takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null))
-      .onValue((x) => this._updateValues(x));
+      // .onValue((x) => this._updateValues(x));
+      .onValue((x) => this._updateValues2(x));
   }
 
   toggleCollapse() {
@@ -708,8 +723,31 @@ export default class GmailNavItemView {
       });
   }
 
+  private _setupSectionElement(): HTMLElement {
+    const element = this._element ?? document.createElement('div');
+
+    element.setAttribute('class', 'aAw FgKVne inboxsdk__navItem');
+    element.innerHTML = [
+      '<span class="aAv inboxsdk__navItem_name" role="heading">',
+      'Labels',
+      '</span>',
+      '<div class="aAu arN" aria-label="Create new label" data-tooltip="Create new label" role="button" tabindex="0" type="button">',
+      '</div>',
+    ].join('');
+
+    const innerElement = querySelector(element, '.aAu');
+
+    this._eventStream.plug(
+      Kefir.fromEvents<MouseEvent, never>(innerElement, 'click').map(
+        this._makeEventMapper('click'),
+      ),
+    );
+
+    return element;
+  }
+
   private _setupChildElement(): HTMLElement {
-    const element = document.createElement('div');
+    const element = this._element ?? document.createElement('div');
     element.setAttribute('class', 'aim inboxsdk__navItem');
 
     element.innerHTML = [
@@ -756,7 +794,7 @@ export default class GmailNavItemView {
   }
 
   private _setupParentElement(): HTMLElement {
-    const element = document.createElement('div');
+    const element = this._element ?? document.createElement('div');
     element.className = 'Xa wT W8 XJ inboxsdk__navItem';
     element.innerHTML = [
       '<div class="V6 CL Y2">',
@@ -873,6 +911,10 @@ export default class GmailNavItemView {
   }
 
   private _updateIcon(navItemDescriptor: any) {
+    if (this._type === NAV_ITEM_TYPES.SECTION) {
+      return;
+    }
+
     const iconContainerElement = this._isNewLeftNavParent
       ? querySelector(this._element, '.Yh')
       : querySelector(this._element, '.qj');
@@ -913,19 +955,26 @@ export default class GmailNavItemView {
       this._element,
       '.inboxsdk__navItem_name',
     );
-    navItemNameElement.textContent = name;
-    navItemNameElement.setAttribute('title', name);
-    if (this._expandoElement) {
-      this._expandoElement.title = `Expand ${name}`;
-    }
 
-    if (this._navItemDescriptor?.tooltipAlignment) {
-      const align = this._navItemDescriptor?.tooltipAlignment[0];
-      this._element.firstElementChild?.setAttribute('data-tooltip', name);
-      this._element.firstElementChild?.setAttribute(
-        'data-tooltip-align',
-        align,
-      );
+    navItemNameElement.textContent = name;
+
+    if (this._type === NAV_ITEM_TYPES.SECTION) {
+      this._element.querySelector('.aAu')?.setAttribute('data-tooltip', name);
+      this._element.querySelector('.aAu')?.setAttribute('aria-label', name);
+    } else {
+      navItemNameElement.setAttribute('title', name);
+      if (this._expandoElement) {
+        this._expandoElement.title = `Expand ${name}`;
+      }
+
+      if (this._navItemDescriptor?.tooltipAlignment) {
+        const align = this._navItemDescriptor?.tooltipAlignment[0];
+        this._element.firstElementChild?.setAttribute('data-tooltip', name);
+        this._element.firstElementChild?.setAttribute(
+          'data-tooltip-align',
+          align,
+        );
+      }
     }
 
     this._name = name;
@@ -969,7 +1018,7 @@ export default class GmailNavItemView {
   }
 
   private _updateSubtitle(navItemDescriptor: NavItemDescriptor) {
-    if (this._isNewLeftNavParent) {
+    if (this._isNewLeftNavParent || this._type === NAV_ITEM_TYPES.SECTION) {
       return;
     }
 
@@ -1024,6 +1073,40 @@ export default class GmailNavItemView {
     }
 
     this._type = type;
+  }
+
+  private _updateValues2(navItemDescriptor: NavItemDescriptor) {
+    if (this._navItemDescriptor?.type !== navItemDescriptor.type) {
+      this._element = this.#setupElement(navItemDescriptor);
+    }
+
+    this._navItemDescriptor = navItemDescriptor;
+
+    if (this._collapseKey == null) {
+      this._collapseKey = navItemDescriptor.key || `${navItemDescriptor.name}`;
+      this._isCollapsed =
+        localStorage.getItem(
+          'inboxsdk__navitem_collapsed__' + this._collapseKey,
+        ) === 'true';
+    }
+
+    this._updateType(navItemDescriptor.type);
+    this._updateName(navItemDescriptor.name);
+    this._updateSubtitle(navItemDescriptor);
+    this._updateOrder(navItemDescriptor);
+
+    if (this._isNewLeftNavParent) {
+      this._updateRole(navItemDescriptor.routeID);
+    }
+
+    if (this._type === NAV_ITEM_TYPES.GROUPER) {
+      this._setupGrouper();
+      return;
+    }
+
+    this._updateAccessory(navItemDescriptor.accessory);
+    this._updateIcon(navItemDescriptor);
+    this._updateClickability(navItemDescriptor);
   }
 
   private _updateValues(navItemDescriptor: NavItemDescriptor) {
