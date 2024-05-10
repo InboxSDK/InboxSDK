@@ -70,6 +70,7 @@ export type NavItemDescriptor = {
   type: keyof NavItemTypes;
   tooltipAlignment: 'left' | 'top' | 'right' | 'bottom' | null;
   subtitle: string;
+  spacingAfter?: boolean;
 }>;
 
 // TODO could we recreate this with React? There's so much statefulness that it's
@@ -1075,6 +1076,14 @@ export default class GmailNavItemView {
     this._type = type;
   }
 
+  private _updateSpacing(navItemDescriptor: NavItemDescriptor) {
+    if (this._isNewLeftNavParent) {
+      return;
+    }
+
+    this._element.classList.toggle('yJ', !!navItemDescriptor.spacingAfter);
+  }
+
   private _updateValues2(navItemDescriptor: NavItemDescriptor) {
     if (this._navItemDescriptor?.type !== navItemDescriptor.type) {
       this._element = this.#setupElement(navItemDescriptor);
@@ -1107,6 +1116,8 @@ export default class GmailNavItemView {
     this._updateAccessory(navItemDescriptor.accessory);
     this._updateIcon(navItemDescriptor);
     this._updateClickability(navItemDescriptor);
+
+    this._updateSpacing(navItemDescriptor);
   }
 
   private _updateValues(navItemDescriptor: NavItemDescriptor) {
