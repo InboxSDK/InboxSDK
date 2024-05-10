@@ -726,7 +726,7 @@ export default class GmailNavItemView {
   private _setupSectionElement(): HTMLElement {
     const element = this._element ?? document.createElement('div');
 
-    element.setAttribute('class', 'aAw FgKVne inboxsdk__navItem');
+    element.setAttribute('class', 'aAw FgKVne inboxsdk__navItem__section');
     element.innerHTML = [
       '<span class="aAv inboxsdk__navItem_name" role="heading">',
       'Labels',
