@@ -28,7 +28,7 @@ const panelLoadingClass = `${loadingElementClass}--active` as const;
 const loadingElementSelector = `.${loadingElementClass}` as const;
 
 const NAV_ITEMS_CONTAINER_ELEMENT_SELECTOR = '.at9 .n3 .TK' as const;
-const NAV_MENU_ROOT_CONTENT_CONTAINER_ELEMENT_SELECTOR = '.at9 .nM' as const;
+const NAV_ITEMS_CATEGORY_CONTAINER_ELEMENT_SELECTOR = '.at9 .nM' as const;
 
 type MessageEvents = {
   /**
@@ -65,23 +65,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   #element: HTMLElement;
   #destroyed = false;
   #id = Math.random().toFixed(3);
-  #getNavItemContainerHTMLTemplate() {
-    const ARIA_LABELLED_BY_ID = Math.random().toFixed(3);
-    return `
-      <div class="yJ">
-        <div class="ajl aib aZ6" aria-labelledby="${ARIA_LABELLED_BY_ID}">
-          <h2 class="aWk" id="${ARIA_LABELLED_BY_ID}">Labels</h2>
-          <div class="wT">
-            <div class="n3">
-              <div class="byl">
-                <div class="TK"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-  }
+  #ARIA_LABELLED_BY_ID = Math.random().toFixed(3);
   #driver;
   #loading;
 
@@ -149,37 +133,6 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     this.emit('destroy');
   }
 
-  private getNewNavItemContainerElement(): HTMLElement {
-    const navMenuContentContainerElement = querySelector(
-      this.element,
-      NAV_MENU_ROOT_CONTENT_CONTAINER_ELEMENT_SELECTOR,
-    );
-
-    const lastChild =
-      navMenuContentContainerElement.lastElementChild as HTMLElement;
-
-    // The nav items container exists, so we don't need to create a new one
-    if (
-      !lastChild ||
-      !(
-        lastChild.classList.contains('yJ') &&
-        querySelector(lastChild, NAV_ITEMS_CONTAINER_ELEMENT_SELECTOR)
-      )
-    ) {
-      lastChild.insertAdjacentHTML(
-        'afterend',
-        this.#getNavItemContainerHTMLTemplate(),
-      );
-    }
-
-    const navItemsContainerElement = querySelector(
-      navMenuContentContainerElement.lastElementChild!,
-      NAV_ITEMS_CONTAINER_ELEMENT_SELECTOR,
-    );
-
-    return navItemsContainerElement;
-  }
-
   /**
    * @param navItemDescriptor Add a single or Kefir.Observable nav menu item to the CollapsiblePanel.
    */
@@ -189,7 +142,12 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       | Kefir.Observable<NavItemDescriptor, any>,
   ) {
     this.setLoading(false);
-    const navMenuContainerElement = this.getNewNavItemContainerElement();
+    const { element } = this;
+
+    const navMenuContainerElement = querySelector(
+      element,
+      NAV_ITEMS_CONTAINER_ELEMENT_SELECTOR,
+    );
 
     const appId = `collapsible-panel-${this.#id}`;
 
@@ -223,10 +181,14 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
 
     const navMenuContainerElement = querySelector(
       element,
-      NAV_MENU_ROOT_CONTENT_CONTAINER_ELEMENT_SELECTOR,
+      NAV_ITEMS_CATEGORY_CONTAINER_ELEMENT_SELECTOR,
     );
 
-    const appId = `collapsible-panel-${this.#id}`;
+    // TODO: change this
+    // const id = Math.random().toFixed(3);
+    const id = navItemDescriptor.name;
+
+    const appId = `collapsible-panel-${this.#id}-category-${id}`;
 
     const navItemDescriptorPropertyStream = kefirCast(
       Kefir,
@@ -291,8 +253,6 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     const { panelDefault: defaultIconUrl, panelHovered: hoverPanelIconUrl } =
       this.#extractPrimaryButtonTheme() ?? {};
 
-    const navItemsContainer = this.#getNavItemContainerHTMLTemplate();
-
     element.innerHTML = autoHtml`
       <div class="aBO">
         <div class="aic">
@@ -311,7 +271,22 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
               <div>
                 <div class="nM">
                   <div class="aic"></div>
-                  ${{ __html: navItemsContainer }}
+                  <div class="yJ">
+                    <div class="ajl aib aZ6" aria-labelledby="${
+                      this.#ARIA_LABELLED_BY_ID
+                    }">
+                      <h2 class="aWk" id="${
+                        this.#ARIA_LABELLED_BY_ID
+                      }">Labels</h2>
+                      <div class="wT">
+                        <div class="n3">
+                          <div class="byl">
+                            <div class="TK"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -320,7 +295,6 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       </div>
       <div class="aTV"></div>
     `.trim();
-
     const primaryBtnEl = querySelector(
       element,
       PRIMARY_BUTTON_ELEMENT_SELECTOR,

@@ -281,7 +281,9 @@ export default class GmailNavItemView {
     // actually use this._level - 1 as the indentationFactor if we don't want to further indent the
     // nested items (i.e. the current item is of type GROUPER and we're in Gmailv2).
     const indentationFactor =
-      this._type === NAV_ITEM_TYPES.GROUPER || this._isNewLeftNavParent
+      this._type === NAV_ITEM_TYPES.GROUPER ||
+      this._isNewLeftNavParent ||
+      this.isSection()
         ? this._level - 1
         : this._level;
 
@@ -642,6 +644,10 @@ export default class GmailNavItemView {
     if (this._isNewLeftNavParent) {
       return querySelector(this._element, '.TK');
     } else {
+      if (this.isSection()) {
+        return this.#getSectionItemContainerElement();
+      }
+
       let itemContainerElement = this._itemContainerElement;
       if (!itemContainerElement) {
         itemContainerElement = this._createItemContainerElement();
@@ -650,6 +656,59 @@ export default class GmailNavItemView {
 
       return itemContainerElement;
     }
+  }
+
+  #createCategoryNavItemsContainer() {
+    const element = document.createElement('div');
+    element.classList.add('yJ');
+    element.setAttribute('data-group-order-hint', this._orderGroup.toString());
+    const ARIA_LABELLED_BY_ID = Math.random().toFixed(3);
+
+    element.innerHTML = autoHtml`
+      <div class="ajl aib aZ6" aria-labelledby="${ARIA_LABELLED_BY_ID}">
+        <h2 class="aWk" id="${ARIA_LABELLED_BY_ID}">Labels</h2>
+        <div class="wT">
+          <div class="n3">
+            <div class="byl">
+              <div class="TK"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    return element;
+  }
+
+  #getSectionItemContainerElement() {
+    const element = this._element;
+    // Find this item in dom node
+    const parent = element.parentElement;
+
+    if (!parent) {
+      this._driver
+        .getLogger()
+        .error(
+          'Could not find parent element for nav item. Should not happen.',
+        );
+      throw new Error('Could not find parent element for nav item.');
+    }
+
+    const navItemsContainerSelector = `.yJ[data-group-order-hint="${this._orderGroup}"]`;
+    let navItemsContainer = parent.querySelector(navItemsContainerSelector);
+
+    if (!navItemsContainer) {
+      const container = this.#createCategoryNavItemsContainer();
+      parent.insertBefore(container, element.nextSibling);
+      navItemsContainer = parent.querySelector(navItemsContainerSelector)!;
+    }
+
+    const navItemsContainerElement = querySelector(
+      navItemsContainer,
+      '.at9 .n3 .TK',
+    );
+
+    return navItemsContainerElement;
   }
 
   private _isCollapsible() {
