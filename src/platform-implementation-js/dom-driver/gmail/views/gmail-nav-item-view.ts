@@ -71,6 +71,7 @@ export type NavItemDescriptor = {
   tooltipAlignment: 'left' | 'top' | 'right' | 'bottom' | null;
   subtitle: string;
   spacingAfter?: boolean;
+  sectionKey?: string;
 }>;
 
 // TODO could we recreate this with React? There's so much statefulness that it's
@@ -94,6 +95,7 @@ export default class GmailNavItemView {
   private _orderHint: any;
   private _type: string | null = null;
   private _collapseKey: string | null = null;
+  #sectionKey = (Math.random() * 10000).toFixed(0);
 
   // delete after new left nav is fully launched, use this._level === 1 instead
   private _isNewLeftNavParent: boolean;
@@ -112,8 +114,6 @@ export default class GmailNavItemView {
   }
 
   #setupElement(navItemDescriptor?: NavItemDescriptor) {
-    console.warn('setupElement');
-
     if (this._isNewLeftNavParent) {
       return this._setupParentElement();
     } else if (navItemDescriptor?.type === NAV_ITEM_TYPES.SECTION) {
@@ -249,8 +249,6 @@ export default class GmailNavItemView {
       unknown
     >,
   ) {
-    console.warn('setNavItemDescriptor');
-
     navItemDescriptorPropertyStream
       .takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null))
       // .onValue((x) => this._updateValues(x));
@@ -658,10 +656,18 @@ export default class GmailNavItemView {
     }
   }
 
-  #createCategoryNavItemsContainer() {
+  #createSectionNavItemsContainer() {
     const element = document.createElement('div');
     element.classList.add('yJ');
+    element.classList.add(
+      `inboxsdk__navItem__section__${this.#sectionKey}__list`,
+    );
     element.setAttribute('data-group-order-hint', this._orderGroup.toString());
+    element.setAttribute(
+      'data-insertion-order-hint',
+      this._navItemNumber.toString(),
+    );
+    element.setAttribute('data-order-hint', this._orderHint.toString());
     const ARIA_LABELLED_BY_ID = Math.random().toFixed(3);
 
     element.innerHTML = autoHtml`
@@ -694,13 +700,19 @@ export default class GmailNavItemView {
       throw new Error('Could not find parent element for nav item.');
     }
 
-    const navItemsContainerSelector = `.yJ[data-group-order-hint="${this._orderGroup}"]`;
-    let navItemsContainer = parent.querySelector(navItemsContainerSelector);
+    const sectionNavItemsContainerSelector = `.inboxsdk__navItem__section__${
+      this.#sectionKey
+    }__list`;
+    let navItemsContainer = parent.querySelector(
+      sectionNavItemsContainerSelector,
+    );
 
     if (!navItemsContainer) {
-      const container = this.#createCategoryNavItemsContainer();
+      const container = this.#createSectionNavItemsContainer();
       parent.insertBefore(container, element.nextSibling);
-      navItemsContainer = parent.querySelector(navItemsContainerSelector)!;
+      navItemsContainer = parent.querySelector(
+        sectionNavItemsContainerSelector,
+      )!;
     }
 
     const navItemsContainerElement = querySelector(
@@ -786,7 +798,10 @@ export default class GmailNavItemView {
   private _setupSectionElement(): HTMLElement {
     const element = this._element ?? document.createElement('div');
 
-    element.setAttribute('class', 'aAw FgKVne inboxsdk__navItem__section');
+    element.setAttribute(
+      'class',
+      `aAw FgKVne inboxsdk__navItem__section__${this.#sectionKey}`,
+    );
     element.innerHTML = [
       '<span class="aAv inboxsdk__navItem_name" role="heading">',
       'Labels',
