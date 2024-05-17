@@ -42,9 +42,7 @@ function shouldBlockEvent(event: KeyboardEvent): boolean {
 
   // Block all escape key presses inside a custom view, even when an input
   // is focused.
-  const target = event.target;
-  // ...
-  if (event.key === 'Escape' && target instanceof HTMLElement && target.closest('.inboxsdk__custom_view')) {
+  if (event.key === 'Escape' && target.closest('.inboxsdk__custom_view')) {
     return true;
   }
 
