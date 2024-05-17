@@ -35,14 +35,18 @@ function shouldBlockEvent(event: KeyboardEvent): boolean {
     return false;
   }
 
-  const target = event.target as HTMLElement;
+  const target = event.target;
 
   const key =
     event.key || /* safari*/ String.fromCharCode(event.which || event.keyCode);
 
   // Block all escape key presses inside a custom view, even when an input
   // is focused.
-  if (event.key === 'Escape' && target.closest('.inboxsdk__custom_view')) {
+  if (
+    event.key === 'Escape' &&
+    target instanceof HTMLElement &&
+    target.closest('.inboxsdk__custom_view')
+  ) {
     return true;
   }
 
