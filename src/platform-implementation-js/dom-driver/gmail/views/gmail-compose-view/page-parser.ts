@@ -1,4 +1,3 @@
-import closest from 'closest-ng';
 import PageParserTree from 'page-parser-tree';
 import censorHTMLtree from '../../../../../common/censorHTMLtree';
 import Logger from '../../../../lib/logger';
@@ -251,7 +250,7 @@ export function getOldRecipientRowForType(
     `.GS tr textarea.vO[name="${addressType}"], .GS tr input[name="${addressType}"]`,
   );
   if (input) {
-    return closest(input, 'tr');
+    return input.closest('tr');
   } else {
     return null;
   }

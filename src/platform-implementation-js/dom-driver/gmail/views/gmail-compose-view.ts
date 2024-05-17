@@ -9,7 +9,6 @@ import find from 'lodash/find';
 import asap from 'asap';
 import delay from 'pdelay';
 import * as Kefir from 'kefir';
-import closest from 'closest-ng';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
@@ -1165,7 +1164,7 @@ class GmailComposeView {
 
   getFormattingToolbarToggleButton(): HTMLElement {
     const innerElement = querySelector(this.#element, '[role=button] .dv');
-    const btn = closest(innerElement, '[role=button]');
+    const btn = innerElement.closest('[role=button]') as HTMLElement;
     if (!btn) throw new Error('failed to find button');
     return btn;
   }
