@@ -71,10 +71,12 @@ function shouldBlockEvent(event: KeyboardEvent): boolean {
     if (
       // Gmail already ignores events originating in these elements even if
       // they were made by an extension.
-      target.closest('input, textarea, button, [contenteditable]') ||
+      (target instanceof HTMLElement &&
+        target.closest('input, textarea, button, [contenteditable]')) ||
       // Gmail ignores events originating in its own interactive elements
       // which tend to have certain role attributes.
-      (!target.closest('.inboxsdk__custom_view') &&
+      (target instanceof HTMLElement &&
+        !target.closest('.inboxsdk__custom_view') &&
         target.closest('[role=button], [role=link]'))
     ) {
       return false;
