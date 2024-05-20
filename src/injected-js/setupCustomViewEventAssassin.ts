@@ -1,6 +1,5 @@
 import { defn } from 'ud';
 import includes from 'lodash/includes';
-import closest from 'closest-ng';
 import * as logger from './injected-logger';
 
 function md<T>(value: T): { value: T; configurable: boolean } {
@@ -36,14 +35,18 @@ function shouldBlockEvent(event: KeyboardEvent): boolean {
     return false;
   }
 
-  const target = event.target as HTMLElement;
+  const target = event.target;
 
   const key =
     event.key || /* safari*/ String.fromCharCode(event.which || event.keyCode);
 
   // Block all escape key presses inside a custom view, even when an input
   // is focused.
-  if (event.key === 'Escape' && closest(target, '.inboxsdk__custom_view')) {
+  if (
+    event.key === 'Escape' &&
+    target instanceof HTMLElement &&
+    target.closest('.inboxsdk__custom_view')
+  ) {
     return true;
   }
 
@@ -68,11 +71,13 @@ function shouldBlockEvent(event: KeyboardEvent): boolean {
     if (
       // Gmail already ignores events originating in these elements even if
       // they were made by an extension.
-      closest(target, 'input, textarea, button, [contenteditable]') ||
+      (target instanceof HTMLElement &&
+        target.closest('input, textarea, button, [contenteditable]')) ||
       // Gmail ignores events originating in its own interactive elements
       // which tend to have certain role attributes.
-      (!closest(target, '.inboxsdk__custom_view') &&
-        closest(target, '[role=button], [role=link]'))
+      (target instanceof HTMLElement &&
+        !target.closest('.inboxsdk__custom_view') &&
+        target.closest('[role=button], [role=link]'))
     ) {
       return false;
     }

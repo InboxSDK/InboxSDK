@@ -1,4 +1,3 @@
-import closest from 'closest-ng';
 export default function setupInboxCustomViewLinkFixer() {
   const allowedStartTerms = new Set();
   document.addEventListener(
@@ -13,7 +12,7 @@ export default function setupInboxCustomViewLinkFixer() {
     function (event: MouseEvent) {
       const target = event.target;
       if (!(target instanceof HTMLElement)) return;
-      const anchor = closest(target, 'a[href^="#"]');
+      const anchor = target.closest('a[href^="#"]');
       if (!anchor || !(anchor instanceof HTMLAnchorElement)) return;
       const m = /^#([^/]+)/.exec(anchor.getAttribute('href') || '');
       if (!m) return;

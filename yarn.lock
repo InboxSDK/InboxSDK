@@ -4269,15 +4269,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"closest-ng@npm:^1.0.0":
-  version: 1.1.0
-  resolution: "closest-ng@npm:1.1.0"
-  dependencies:
-    matches-selector-ng: "npm:^1.0.1"
-  checksum: 040dc3dcb532f98092a89794e76ff3cb5ccd47d07353c9068e7eaf729b799cd552b00c2fecdd9f0155b91e52cec542ba0310bf64a2890824a0a25c70cbcbb9ed
-  languageName: node
-  linkType: hard
-
 "co@npm:^4.6.0":
   version: 4.6.0
   resolution: "co@npm:4.6.0"
@@ -6978,7 +6969,6 @@ __metadata:
     bimapcache: "npm:^2.0.0"
     buffer: "npm:^6.0.3"
     classnames: "npm:^2.2.5"
-    closest-ng: "npm:^1.0.0"
     combokeys-capture: "npm:^2.4.2"
     concat-stream: "npm:^2.0.0"
     contain-by-screen: "npm:^1.0.3"
@@ -8836,7 +8826,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"matches-selector-ng@npm:^1.0.0, matches-selector-ng@npm:^1.0.1":
+"matches-selector-ng@npm:^1.0.0":
   version: 1.1.0
   resolution: "matches-selector-ng@npm:1.1.0"
   checksum: 6abc7e95fc903dac58baa7f4b0d8dc823cb854979d1c6839e1a847095cd87ae26752240d63a326780b8dd526cb7d277fa9905364e44573e951a50f001a0b9181

@@ -36,7 +36,6 @@
     "bimapcache": "^2.0.0",
     "buffer": "^6.0.3",
     "classnames": "^2.2.5",
-    "closest-ng": "^1.0.0",
     "combokeys-capture": "^2.4.2",
     "concat-stream": "^2.0.0",
     "contain-by-screen": "^1.0.3",
