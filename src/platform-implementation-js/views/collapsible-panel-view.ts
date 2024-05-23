@@ -28,7 +28,7 @@ const loadingElementClass =
 const panelLoadingClass = `${loadingElementClass}--active` as const;
 const loadingElementSelector = `.${loadingElementClass}` as const;
 
-const NAV_ITEMS_CONTAINER_ELEMENT_SELECTOR = '.at9 .n3 .TK' as const;
+const NAV_ITEMS_CONTAINER_ELEMENT_SELECTOR = '.n3 .TK' as const;
 const NAV_ITEMS_SECTIONS_CONTAINER_ELEMENT_SELECTOR = '.at9 .nM' as const;
 
 type MessageEvents = {
@@ -352,7 +352,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
                       <div class="wT">
                         <div class="n3">
                           <div class="byl">
-                            <div class="TK"></div>
+                            <div class="TK inboxsdk__navItem__section__default__list__items"></div>
                           </div>
                         </div>
                       </div>

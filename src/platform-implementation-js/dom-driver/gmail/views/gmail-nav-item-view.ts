@@ -114,7 +114,10 @@ export default class GmailNavItemView {
   }
 
   #setupElement(navItemDescriptor?: NavItemDescriptor) {
-    if (this._isNewLeftNavParent) {
+    if (
+      this._isNewLeftNavParent &&
+      navItemDescriptor?.type !== NAV_ITEM_TYPES.SECTION
+    ) {
       return this._setupParentElement();
     } else if (navItemDescriptor?.type === NAV_ITEM_TYPES.SECTION) {
       return this._setupSectionElement();
@@ -142,7 +145,10 @@ export default class GmailNavItemView {
 
     gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
-    if (this._isNewLeftNavParent) {
+    if (
+      this._isNewLeftNavParent &&
+      navItemDescriptor.type !== NAV_ITEM_TYPES.SECTION
+    ) {
       this._createExpandoParent();
     }
 
@@ -199,7 +205,8 @@ export default class GmailNavItemView {
       this._type === NAV_ITEM_TYPES.LINK ||
       this._type === NAV_ITEM_TYPES.MANAGE ||
       this._isActive === value ||
-      this._isNewLeftNavParent
+      this._isNewLeftNavParent ||
+      this.isSection()
     ) {
       return;
     }
@@ -272,6 +279,10 @@ export default class GmailNavItemView {
       gmailNavItemView.getElement(),
       insertBeforeElement,
     );
+
+    if (gmailNavItemView.isSection() || this.isSection()) {
+      return;
+    }
 
     // If the current nav-item is of type GROUPER and we are in Gmailv2, then any nested nav-items
     // should be at the same indentation as the current nav-item. Somewhat confusingly, this._level
@@ -639,13 +650,11 @@ export default class GmailNavItemView {
   }
 
   private _getItemContainerElement(): HTMLElement {
-    if (this._isNewLeftNavParent) {
+    if (this.isSection()) {
+      return this.#getSectionItemContainerElement();
+    } else if (this._isNewLeftNavParent) {
       return querySelector(this._element, '.TK');
     } else {
-      if (this.isSection()) {
-        return this.#getSectionItemContainerElement();
-      }
-
       let itemContainerElement = this._itemContainerElement;
       if (!itemContainerElement) {
         itemContainerElement = this._createItemContainerElement();
@@ -658,10 +667,10 @@ export default class GmailNavItemView {
 
   #createSectionNavItemsContainer() {
     const element = document.createElement('div');
-    element.classList.add('yJ');
-    element.classList.add(
-      `inboxsdk__navItem__section__${this.#sectionKey}__list`,
-    );
+    const className = `inboxsdk__navItem__section__${this.#sectionKey}__list`;
+    const navItemsClassName = className + '__items';
+
+    element.classList.add('yJ', className);
     element.setAttribute('data-group-order-hint', this._orderGroup.toString());
     element.setAttribute(
       'data-insertion-order-hint',
@@ -676,7 +685,7 @@ export default class GmailNavItemView {
         <div class="wT">
           <div class="n3">
             <div class="byl">
-              <div class="TK"></div>
+              <div class="TK ${navItemsClassName}"></div>
             </div>
           </div>
         </div>
@@ -700,24 +709,26 @@ export default class GmailNavItemView {
       throw new Error('Could not find parent element for nav item.');
     }
 
-    const sectionNavItemsContainerSelector = `.inboxsdk__navItem__section__${
+    const sectionNavItemsListContainerSelector = `.inboxsdk__navItem__section__${
       this.#sectionKey
     }__list`;
     let navItemsContainer = parent.querySelector(
-      sectionNavItemsContainerSelector,
+      sectionNavItemsListContainerSelector,
     );
 
     if (!navItemsContainer) {
       const container = this.#createSectionNavItemsContainer();
       parent.insertBefore(container, element.nextSibling);
       navItemsContainer = parent.querySelector(
-        sectionNavItemsContainerSelector,
+        sectionNavItemsListContainerSelector,
       )!;
     }
 
+    const sectionNavItemsListInnerSelector = `${sectionNavItemsListContainerSelector}__items`;
+
     const navItemsContainerElement = querySelector(
       navItemsContainer,
-      '.at9 .n3 .TK',
+      sectionNavItemsListInnerSelector,
     );
 
     return navItemsContainerElement;
@@ -1082,6 +1093,9 @@ export default class GmailNavItemView {
   }
 
   private _updateRole(routeID?: string) {
+    if (this.isSection()) {
+      return;
+    }
     const roleElement = querySelector(this._element, '.V6.CL');
 
     if (routeID) {
@@ -1093,7 +1107,7 @@ export default class GmailNavItemView {
   }
 
   private _updateSubtitle(navItemDescriptor: NavItemDescriptor) {
-    if (this._isNewLeftNavParent || this._type === NAV_ITEM_TYPES.SECTION) {
+    if (this._isNewLeftNavParent || this.isSection()) {
       return;
     }
 
