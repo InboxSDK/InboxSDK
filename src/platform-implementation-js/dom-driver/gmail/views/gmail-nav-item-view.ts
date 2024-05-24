@@ -131,7 +131,10 @@ export default class GmailNavItemView {
     navItemDescriptor: any,
   ): GmailNavItemView {
     const nestedNavItemLevel =
-      this._type === NAV_ITEM_TYPES.GROUPER ? this._level : this._level + 1;
+      this._type === NAV_ITEM_TYPES.GROUPER ||
+      this._type === NAV_ITEM_TYPES.SECTION
+        ? this._level
+        : this._level + 1;
     const gmailNavItemView = new GmailNavItemView(
       this._driver,
       orderGroup,
@@ -290,9 +293,7 @@ export default class GmailNavItemView {
     // actually use this._level - 1 as the indentationFactor if we don't want to further indent the
     // nested items (i.e. the current item is of type GROUPER and we're in Gmailv2).
     const indentationFactor =
-      this._type === NAV_ITEM_TYPES.GROUPER ||
-      this._isNewLeftNavParent ||
-      this.isSection()
+      this._type === NAV_ITEM_TYPES.GROUPER || this._isNewLeftNavParent
         ? this._level - 1
         : this._level;
 
