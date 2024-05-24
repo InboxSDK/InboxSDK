@@ -5568,13 +5568,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"event-listener-with-options@npm:^1.0.3":
-  version: 1.1.0
-  resolution: "event-listener-with-options@npm:1.1.0"
-  checksum: 2c7b8876c40e3d9f4e626a4dfeb8d72ebc194b22e8fc9f5a643675a97a8ebf76a9f3ed35c8f6edee1b8d242045e17d27eeb10bc0c252c3ee60783f1be8c67c3f
-  languageName: node
-  linkType: hard
-
 "eventemitter3@npm:^4.0.0":
   version: 4.0.7
   resolution: "eventemitter3@npm:4.0.7"
@@ -6976,7 +6969,6 @@ __metadata:
     eslint: "npm:^8.41.0"
     eslint-plugin-deprecate: "npm:^0.7.0"
     eslint-plugin-react: "npm:^7.32.2"
-    event-listener-with-options: "npm:^1.0.3"
     ext-corb-workaround: "npm:^2.0.0"
     fast-deep-equal: "npm:^3.1.3"
     fast-glob: "npm:^3.2.5"
