@@ -42,7 +42,6 @@
     "eslint": "^8.41.0",
     "eslint-plugin-deprecate": "^0.7.0",
     "eslint-plugin-react": "^7.32.2",
-    "event-listener-with-options": "^1.0.3",
     "ext-corb-workaround": "^2.0.0",
     "fast-deep-equal": "^3.1.3",
     "fast-glob": "^3.2.5",
