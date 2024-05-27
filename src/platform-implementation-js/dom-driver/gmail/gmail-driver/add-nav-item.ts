@@ -12,6 +12,24 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import GmailDriver from '../gmail-driver';
 import once from 'lodash/once';
 
+function attachGmailNavItemView(
+  gmailNavItemView: GmailNavItemView,
+  injectionContainer?: HTMLElement,
+) {
+  try {
+    const attacher = _attachNavItemView(gmailNavItemView, injectionContainer);
+
+    attacher();
+
+    gmailNavItemView
+      .getEventStream()
+      .filter((event) => event.eventName === 'orderChanged')
+      .onValue(attacher);
+  } catch (err) {
+    Logger.error(err);
+  }
+}
+
 export default async function addNavItem(
   driver: GmailDriver,
   orderGroup: string,
@@ -24,21 +42,29 @@ export default async function addNavItem(
   gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
   if (!GmailElementGetter.isStandalone()) {
-    try {
-      const attacher = _attachNavItemView(
-        gmailNavItemView,
-        navMenuInjectionContainer,
-      );
+    attachGmailNavItemView(gmailNavItemView, navMenuInjectionContainer);
+  }
 
-      attacher();
+  return gmailNavItemView;
+}
 
-      gmailNavItemView
-        .getEventStream()
-        .filter((event) => event.eventName === 'orderChanged')
-        .onValue(attacher);
-    } catch (err) {
-      Logger.error(err);
-    }
+export async function addNavItemToPanel(
+  driver: GmailDriver,
+  orderGroup: string,
+  navItemDescriptor: Kefir.Observable<NavItemDescriptor, unknown>,
+  panelElement: HTMLElement,
+): Promise<GmailNavItemView> {
+  await waitForMenuReady();
+
+  const gmailNavItemView = new GmailNavItemView(driver, orderGroup, 1);
+  gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
+
+  if (!GmailElementGetter.isStandalone()) {
+    const isSection = gmailNavItemView.isSection();
+    const container = isSection
+      ? getNewSectionInsertionContainerElement(panelElement)
+      : getSectionNavItemsContainerElement(panelElement);
+    attachGmailNavItemView(gmailNavItemView, container);
   }
 
   return gmailNavItemView;
@@ -141,4 +167,18 @@ function _createNavItemsHolder(): HTMLElement {
   });
 
   return querySelector(holder, '.TK');
+}
+
+function getNewSectionInsertionContainerElement(element: HTMLElement) {
+  return querySelector(element, `.at9 .nM`);
+}
+
+function getSectionNavItemsContainerElement(
+  element: HTMLElement,
+  sectionKey = 'default',
+) {
+  return querySelector(
+    element,
+    `.inboxsdk__navItem_section_${sectionKey}_list_items`,
+  );
 }

@@ -95,7 +95,7 @@ export default class GmailNavItemView {
   private _orderHint: any;
   private _type: string | null = null;
   private _collapseKey: string | null = null;
-  #sectionKey = (Math.random() * 10000).toFixed(0);
+  #sectionKey: string | null = null;
 
   // delete after new left nav is fully launched, use this._level === 1 instead
   private _isNewLeftNavParent: boolean;
@@ -668,8 +668,8 @@ export default class GmailNavItemView {
 
   #createSectionNavItemsContainer() {
     const element = document.createElement('div');
-    const className = `inboxsdk__navItem__section__${this.#sectionKey}__list`;
-    const navItemsClassName = className + '__items';
+    const className = `inboxsdk__navItem_section_${this.#sectionKey}_list`;
+    const navItemsClassName = className + '_items';
 
     element.classList.add('yJ', className);
     element.setAttribute('data-group-order-hint', this._orderGroup.toString());
@@ -710,9 +710,9 @@ export default class GmailNavItemView {
       throw new Error('Could not find parent element for nav item.');
     }
 
-    const sectionNavItemsListContainerSelector = `.inboxsdk__navItem__section__${
+    const sectionNavItemsListContainerSelector = `.inboxsdk__navItem_section_${
       this.#sectionKey
-    }__list`;
+    }_list`;
     let navItemsContainer = parent.querySelector(
       sectionNavItemsListContainerSelector,
     );
@@ -725,7 +725,7 @@ export default class GmailNavItemView {
       )!;
     }
 
-    const sectionNavItemsListInnerSelector = `${sectionNavItemsListContainerSelector}__items`;
+    const sectionNavItemsListInnerSelector = `${sectionNavItemsListContainerSelector}_items`;
 
     const navItemsContainerElement = querySelector(
       navItemsContainer,
@@ -812,7 +812,7 @@ export default class GmailNavItemView {
 
     element.setAttribute(
       'class',
-      `aAw FgKVne inboxsdk__navItem__section__${this.#sectionKey}`,
+      `aAw FgKVne inboxsdk__navItem_section_${this.#sectionKey}`,
     );
     element.innerHTML = [
       '<span class="aAv inboxsdk__navItem_name" role="heading">',
@@ -1174,6 +1174,12 @@ export default class GmailNavItemView {
   }
 
   private _updateValues2(navItemDescriptor: NavItemDescriptor) {
+    if (navItemDescriptor.sectionKey) {
+      this.#sectionKey = navItemDescriptor.sectionKey;
+    } else if (this.#sectionKey === null) {
+      this.#sectionKey = (Math.random() * 10000).toFixed(0);
+    }
+
     if (this._navItemDescriptor?.type !== navItemDescriptor.type) {
       this._element = this.#setupElement(navItemDescriptor);
     }
@@ -1242,4 +1248,40 @@ export default class GmailNavItemView {
 
 export function getLeftIndentationPaddingValue(): number {
   return GMAIL_V2_LEFT_INDENTATION_PADDING;
+}
+
+function createSectionNavItemsContainer(
+  sectionKey: string,
+  orderGroup: string,
+  orderHint?: string | number,
+  insertionOrderHint?: string | number,
+) {
+  const element = document.createElement('div');
+  element.classList.add('yJ', `inboxsdk__navItem_section_${sectionKey}_list`);
+  element.setAttribute('data-group-order-hint', orderGroup);
+  if (orderHint) {
+    element.setAttribute('data-order-hint', orderHint.toString());
+  }
+  if (insertionOrderHint) {
+    element.setAttribute(
+      'data-insertion-order-hint',
+      insertionOrderHint.toString(),
+    );
+  }
+  const ARIA_LABELLED_BY_ID = Math.random().toFixed(3);
+
+  element.innerHTML = autoHtml`
+    <div class="ajl aib aZ6" aria-labelledby="${ARIA_LABELLED_BY_ID}">
+      <h2 class="aWk" id="${ARIA_LABELLED_BY_ID}">Labels</h2>
+      <div class="wT">
+        <div class="n3">
+          <div class="byl">
+            <div class="TK"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  return element;
 }

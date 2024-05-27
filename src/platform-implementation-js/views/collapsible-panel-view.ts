@@ -13,7 +13,6 @@ import { NavItemDescriptor } from '../dom-driver/gmail/views/gmail-nav-item-view
 import NavItemView from './nav-item-view';
 import { stylesStream } from '../dom-driver/gmail/gmail-driver/track-gmail-styles';
 import isEqual from 'fast-deep-equal';
-import getInsertBeforeElement from '../lib/dom/get-insert-before-element';
 
 export const NATIVE_CLASS = 'aqn' as const;
 export const INBOXSDK_CLASS = 'inboxsdk__collapsiblePanel' as const;
@@ -27,9 +26,6 @@ const loadingElementClass =
   'inboxsdk__collapsiblePanel_loading_container' as const;
 const panelLoadingClass = `${loadingElementClass}--active` as const;
 const loadingElementSelector = `.${loadingElementClass}` as const;
-
-const NAV_ITEMS_CONTAINER_ELEMENT_SELECTOR = '.n3 .TK' as const;
-const NAV_ITEMS_SECTIONS_CONTAINER_ELEMENT_SELECTOR = '.at9 .nM' as const;
 
 type MessageEvents = {
   /**
@@ -135,73 +131,6 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     this.emit('destroy');
   }
 
-  #createSectionNavItemsContainer(
-    sectionKey: string,
-    orderHint?: string | number,
-  ) {
-    const element = document.createElement('div');
-    element.classList.add(
-      'yJ',
-      `inboxsdk__navItem__section__${sectionKey}__list`,
-    );
-    element.setAttribute('data-group-order-hint', this.#orderGroup.toString());
-    // element.setAttribute('data-insertion-order-hint', this._navItemNumber.toString());
-    if (orderHint) {
-      element.setAttribute('data-order-hint', orderHint.toString());
-    }
-    const ARIA_LABELLED_BY_ID = Math.random().toFixed(3);
-
-    element.innerHTML = autoHtml`
-      <div class="ajl aib aZ6" aria-labelledby="${ARIA_LABELLED_BY_ID}">
-        <h2 class="aWk" id="${ARIA_LABELLED_BY_ID}">Labels</h2>
-        <div class="wT">
-          <div class="n3">
-            <div class="byl">
-              <div class="TK"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    return element;
-  }
-
-  #getNavMenuContainerElement(sectionKey: string, orderHint?: number | string) {
-    const sectionNavItemsContainerSelector = `.inboxsdk__navItem__section__${sectionKey}__list`;
-    let navItemsContainer = this.element.querySelector(
-      sectionNavItemsContainerSelector,
-    ) as HTMLElement | null;
-
-    if (!navItemsContainer) {
-      const sectionElement = this.#createSectionNavItemsContainer(
-        sectionKey,
-        orderHint,
-      );
-      const sectionsContainerElement = querySelector(
-        this.element,
-        NAV_ITEMS_SECTIONS_CONTAINER_ELEMENT_SELECTOR,
-      );
-
-      const insertBeforeElement = getInsertBeforeElement(
-        sectionElement,
-        sectionsContainerElement.children,
-        ['data-group-order-hint', 'data-order-hint'],
-      );
-
-      sectionsContainerElement.insertBefore(
-        sectionElement,
-        insertBeforeElement,
-      );
-
-      navItemsContainer = this.element.querySelector(
-        sectionNavItemsContainerSelector,
-      )!;
-    }
-
-    return navItemsContainer;
-  }
-
   /**
    * @param navItemDescriptor Add a single or Kefir.Observable nav menu item to the CollapsiblePanel.
    */
@@ -209,21 +138,10 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     navItemDescriptor:
       | NavItemDescriptor
       | Kefir.Observable<NavItemDescriptor, any>,
-    sectionDescriptor: {
-      key: string;
-      orderHint?: number;
-    } = {
-      key: 'default',
-    },
   ) {
     this.setLoading(false);
     const { element } = this;
 
-    const navMenuContainerElement = this.#getNavMenuContainerElement(
-      sectionDescriptor.key,
-      sectionDescriptor.orderHint,
-    ).querySelector(NAV_ITEMS_CONTAINER_ELEMENT_SELECTOR) as HTMLElement;
-
     const orderGroup = this.#orderGroup;
 
     const navItemDescriptorPropertyStream = kefirCast(
@@ -231,45 +149,10 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       navItemDescriptor,
     ).toProperty();
 
-    const gmailNavItemView = this.#driver.addNavItem(
+    const gmailNavItemView = this.#driver.addNavItemToPanel(
       orderGroup,
       navItemDescriptorPropertyStream,
-      navMenuContainerElement,
-    );
-
-    const navItemView = new NavItemView(
-      orderGroup,
-      this.#driver,
-      navItemDescriptorPropertyStream,
-      gmailNavItemView,
-    );
-
-    return navItemView;
-  }
-
-  /**
-   * @param navItemDescriptor Add a single or Kefir.Observable nav menu item to the CollapsiblePanel.
-   */
-  addNavItemSection(navItemDescriptor: NavItemDescriptor) {
-    this.setLoading(false);
-    const { element } = this;
-
-    const navMenuContainerElement = querySelector(
       element,
-      NAV_ITEMS_SECTIONS_CONTAINER_ELEMENT_SELECTOR,
-    );
-
-    const orderGroup = this.#orderGroup;
-
-    const navItemDescriptorPropertyStream = kefirCast(
-      Kefir,
-      navItemDescriptor,
-    ).toProperty();
-
-    const gmailNavItemView = this.#driver.addNavItem(
-      orderGroup,
-      navItemDescriptorPropertyStream,
-      navMenuContainerElement,
     );
 
     const navItemView = new NavItemView(
@@ -342,7 +225,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
               <div>
                 <div class="nM">
                   <div class="aic"></div>
-                  <div class="yJ inboxsdk__navItem__section__default__list">
+                  <div class="yJ inboxsdk__navItem_section_default_list">
                     <div class="ajl aib aZ6" aria-labelledby="${
                       this.#ARIA_LABELLED_BY_ID
                     }">
@@ -352,7 +235,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
                       <div class="wT">
                         <div class="n3">
                           <div class="byl">
-                            <div class="TK inboxsdk__navItem__section__default__list__items"></div>
+                            <div class="TK inboxsdk__navItem_section_default_list_items"></div>
                           </div>
                         </div>
                       </div>
