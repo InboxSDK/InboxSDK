@@ -11,6 +11,10 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 
 import GmailDriver from '../gmail-driver';
 import once from 'lodash/once';
+import {
+  getPanelNavItemContainerElement,
+  getPanelSectionNavItemContainerElement,
+} from './nav-item-section';
 
 function attachGmailNavItemView(
   gmailNavItemView: GmailNavItemView,
@@ -60,11 +64,16 @@ export async function addNavItemToPanel(
   gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
   if (!GmailElementGetter.isStandalone()) {
-    const isSection = gmailNavItemView.isSection();
-    const container = isSection
-      ? getNewSectionInsertionContainerElement(panelElement)
-      : getSectionNavItemsContainerElement(panelElement);
-    attachGmailNavItemView(gmailNavItemView, container);
+    if (gmailNavItemView.isSection()) {
+      const container = getPanelSectionNavItemContainerElement(panelElement);
+      attachGmailNavItemView(gmailNavItemView, container);
+    } else {
+      const container = getPanelNavItemContainerElement(
+        panelElement,
+        gmailNavItemView.sectionKey,
+      );
+      attachGmailNavItemView(gmailNavItemView, container);
+    }
   }
 
   return gmailNavItemView;
@@ -167,18 +176,4 @@ function _createNavItemsHolder(): HTMLElement {
   });
 
   return querySelector(holder, '.TK');
-}
-
-function getNewSectionInsertionContainerElement(element: HTMLElement) {
-  return querySelector(element, `.at9 .nM`);
-}
-
-function getSectionNavItemsContainerElement(
-  element: HTMLElement,
-  sectionKey = 'default',
-) {
-  return querySelector(
-    element,
-    `.inboxsdk__navItem_section_${sectionKey}_list_items`,
-  );
 }

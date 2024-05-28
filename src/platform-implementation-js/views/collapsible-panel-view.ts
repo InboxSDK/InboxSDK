@@ -17,6 +17,8 @@ import isEqual from 'fast-deep-equal';
 export const NATIVE_CLASS = 'aqn' as const;
 export const INBOXSDK_CLASS = 'inboxsdk__collapsiblePanel' as const;
 const ELEMENT_CLASS = `${NATIVE_CLASS} ${INBOXSDK_CLASS} oy8Mbf` as const;
+const PANEL_NAV_ITEMS_CONTAINER_CLASS =
+  'inboxsdk__collapsiblePanel_navItems' as const;
 
 const PRIMARY_BUTTON_ELEMENT_CLASS = 'T-I T-I-KE L3' as const;
 const PRIMARY_BUTTON_ELEMENT_SELECTOR = '.T-I.T-I-KE.L3' as const;
@@ -26,6 +28,8 @@ const loadingElementClass =
   'inboxsdk__collapsiblePanel_loading_container' as const;
 const panelLoadingClass = `${loadingElementClass}--active` as const;
 const loadingElementSelector = `.${loadingElementClass}` as const;
+export const panelNavItemsContainerSelector =
+  `.${PANEL_NAV_ITEMS_CONTAINER_CLASS}` as const;
 
 type MessageEvents = {
   /**
@@ -223,24 +227,8 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
           <div class="Ls77Lb aZ6">
             <div class="pp" style="user-select: none;">
               <div>
-                <div class="nM">
+                <div class="${`nM ${PANEL_NAV_ITEMS_CONTAINER_CLASS}`}">
                   <div class="aic"></div>
-                  <div class="yJ inboxsdk__navItem_section_default_list">
-                    <div class="ajl aib aZ6" aria-labelledby="${
-                      this.#ARIA_LABELLED_BY_ID
-                    }">
-                      <h2 class="aWk" id="${
-                        this.#ARIA_LABELLED_BY_ID
-                      }">Labels</h2>
-                      <div class="wT">
-                        <div class="n3">
-                          <div class="byl">
-                            <div class="TK inboxsdk__navItem_section_default_list_items"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

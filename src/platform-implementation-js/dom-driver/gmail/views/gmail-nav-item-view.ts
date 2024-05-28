@@ -25,6 +25,10 @@ import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 
 import GmailDriver from '../gmail-driver';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
+import {
+  getSectionClassName,
+  getSectionNavItemsContainerElement,
+} from '../gmail-driver/nav-item-section';
 
 let NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED = 0;
 
@@ -71,7 +75,6 @@ export type NavItemDescriptor = {
   tooltipAlignment: 'left' | 'top' | 'right' | 'bottom' | null;
   subtitle: string;
   spacingAfter?: boolean;
-  sectionKey?: string;
 }>;
 
 // TODO could we recreate this with React? There's so much statefulness that it's
@@ -95,10 +98,14 @@ export default class GmailNavItemView {
   private _orderHint: any;
   private _type: string | null = null;
   private _collapseKey: string | null = null;
-  #sectionKey: string | null = null;
+  #sectionKey?: string;
 
   // delete after new left nav is fully launched, use this._level === 1 instead
   private _isNewLeftNavParent: boolean;
+
+  get sectionKey() {
+    return this.#sectionKey;
+  }
 
   constructor(driver: GmailDriver, orderGroup: number | string, level: number) {
     this._driver = driver;
@@ -261,8 +268,7 @@ export default class GmailNavItemView {
   ) {
     navItemDescriptorPropertyStream
       .takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null))
-      // .onValue((x) => this._updateValues(x));
-      .onValue((x) => this._updateValues2(x));
+      .onValue((x) => this._updateValues(x));
   }
 
   toggleCollapse() {
@@ -652,7 +658,13 @@ export default class GmailNavItemView {
 
   private _getItemContainerElement(): HTMLElement {
     if (this.isSection()) {
-      return this.#getSectionItemContainerElement();
+      return getSectionNavItemsContainerElement(
+        this._element,
+        this.#sectionKey,
+        this._orderGroup.toString(),
+        this._orderHint.toString(),
+        this._navItemNumber.toString(),
+      );
     } else if (this._isNewLeftNavParent) {
       return querySelector(this._element, '.TK');
     } else {
@@ -664,75 +676,6 @@ export default class GmailNavItemView {
 
       return itemContainerElement;
     }
-  }
-
-  #createSectionNavItemsContainer() {
-    const element = document.createElement('div');
-    const className = `inboxsdk__navItem_section_${this.#sectionKey}_list`;
-    const navItemsClassName = className + '_items';
-
-    element.classList.add('yJ', className);
-    element.setAttribute('data-group-order-hint', this._orderGroup.toString());
-    element.setAttribute(
-      'data-insertion-order-hint',
-      this._navItemNumber.toString(),
-    );
-    element.setAttribute('data-order-hint', this._orderHint.toString());
-    const ARIA_LABELLED_BY_ID = Math.random().toFixed(3);
-
-    element.innerHTML = autoHtml`
-      <div class="ajl aib aZ6" aria-labelledby="${ARIA_LABELLED_BY_ID}">
-        <h2 class="aWk" id="${ARIA_LABELLED_BY_ID}">Labels</h2>
-        <div class="wT">
-          <div class="n3">
-            <div class="byl">
-              <div class="TK ${navItemsClassName}"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-
-    return element;
-  }
-
-  #getSectionItemContainerElement() {
-    const element = this._element;
-    // Find this item in dom node
-    const parent = element.parentElement;
-
-    if (!parent) {
-      this._driver
-        .getLogger()
-        .error(
-          'Could not find parent element for nav item. Should not happen.',
-        );
-      throw new Error('Could not find parent element for nav item.');
-    }
-
-    const sectionNavItemsListContainerSelector = `.inboxsdk__navItem_section_${
-      this.#sectionKey
-    }_list`;
-    let navItemsContainer = parent.querySelector(
-      sectionNavItemsListContainerSelector,
-    );
-
-    if (!navItemsContainer) {
-      const container = this.#createSectionNavItemsContainer();
-      parent.insertBefore(container, element.nextSibling);
-      navItemsContainer = parent.querySelector(
-        sectionNavItemsListContainerSelector,
-      )!;
-    }
-
-    const sectionNavItemsListInnerSelector = `${sectionNavItemsListContainerSelector}_items`;
-
-    const navItemsContainerElement = querySelector(
-      navItemsContainer,
-      sectionNavItemsListInnerSelector,
-    );
-
-    return navItemsContainerElement;
   }
 
   private _isCollapsible() {
@@ -809,10 +752,10 @@ export default class GmailNavItemView {
 
   private _setupSectionElement(): HTMLElement {
     const element = this._element ?? document.createElement('div');
-
-    element.setAttribute(
-      'class',
-      `aAw FgKVne inboxsdk__navItem_section_${this.#sectionKey}`,
+    element.classList.add(
+      'aAw',
+      'FgKVne',
+      getSectionClassName(this.#sectionKey!),
     );
     element.innerHTML = [
       '<span class="aAv inboxsdk__navItem_name" role="heading">',
@@ -1173,10 +1116,11 @@ export default class GmailNavItemView {
     this._element.classList.toggle('yJ', !!navItemDescriptor.spacingAfter);
   }
 
-  private _updateValues2(navItemDescriptor: NavItemDescriptor) {
-    if (navItemDescriptor.sectionKey) {
-      this.#sectionKey = navItemDescriptor.sectionKey;
-    } else if (this.#sectionKey === null) {
+  private _updateValues(navItemDescriptor: NavItemDescriptor) {
+    if (
+      navItemDescriptor.type === NAV_ITEM_TYPES.SECTION &&
+      !this.#sectionKey
+    ) {
       this.#sectionKey = (Math.random() * 10000).toFixed(0);
     }
 
@@ -1214,74 +1158,8 @@ export default class GmailNavItemView {
 
     this._updateSpacing(navItemDescriptor);
   }
-
-  private _updateValues(navItemDescriptor: NavItemDescriptor) {
-    this._navItemDescriptor = navItemDescriptor;
-
-    if (this._collapseKey == null) {
-      this._collapseKey = navItemDescriptor.key || `${navItemDescriptor.name}`;
-      this._isCollapsed =
-        localStorage.getItem(
-          'inboxsdk__navitem_collapsed__' + this._collapseKey,
-        ) === 'true';
-    }
-
-    this._updateType(navItemDescriptor.type);
-    this._updateName(navItemDescriptor.name);
-    this._updateSubtitle(navItemDescriptor);
-    this._updateOrder(navItemDescriptor);
-
-    if (this._isNewLeftNavParent) {
-      this._updateRole(navItemDescriptor.routeID);
-    }
-
-    if (this._type === NAV_ITEM_TYPES.GROUPER) {
-      this._setupGrouper();
-      return;
-    }
-
-    this._updateAccessory(navItemDescriptor.accessory);
-    this._updateIcon(navItemDescriptor);
-    this._updateClickability(navItemDescriptor);
-  }
 }
 
 export function getLeftIndentationPaddingValue(): number {
   return GMAIL_V2_LEFT_INDENTATION_PADDING;
-}
-
-function createSectionNavItemsContainer(
-  sectionKey: string,
-  orderGroup: string,
-  orderHint?: string | number,
-  insertionOrderHint?: string | number,
-) {
-  const element = document.createElement('div');
-  element.classList.add('yJ', `inboxsdk__navItem_section_${sectionKey}_list`);
-  element.setAttribute('data-group-order-hint', orderGroup);
-  if (orderHint) {
-    element.setAttribute('data-order-hint', orderHint.toString());
-  }
-  if (insertionOrderHint) {
-    element.setAttribute(
-      'data-insertion-order-hint',
-      insertionOrderHint.toString(),
-    );
-  }
-  const ARIA_LABELLED_BY_ID = Math.random().toFixed(3);
-
-  element.innerHTML = autoHtml`
-    <div class="ajl aib aZ6" aria-labelledby="${ARIA_LABELLED_BY_ID}">
-      <h2 class="aWk" id="${ARIA_LABELLED_BY_ID}">Labels</h2>
-      <div class="wT">
-        <div class="n3">
-          <div class="byl">
-            <div class="TK"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  return element;
 }
