@@ -125,6 +125,37 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
     onClick: () => sdk.Router.goto('custom-route-3'),
   });
 
+  panel1.addNavItem({
+    name: 'Nav Item with spacing',
+    spacingAfter: true,
+    onClick: () => sdk.Router.goto('custom-route-3'),
+  });
+
+  panel1.addNavItem({
+    name: 'Another Nav Item',
+    onClick: () => sdk.Router.goto('custom-route-3'),
+  });
+
+  const p2 = panel1.addNavItem({
+    name: 'Categories (empty)',
+    type: 'SECTION',
+    onClick: () => alert('clicked Add Category button'),
+  });
+
+  const sectionNested = panel1.addNavItem({
+    name: 'Labels',
+    type: 'SECTION',
+    sectionTooltip: 'Add label',
+    onClick: () => alert('clicked Add Label button'),
+  });
+
+  new Array(10).fill(0).forEach((_, i) => {
+    sectionNested.addNavItem({
+      name: `Label ${i + 1}`,
+      onClick: () => sdk.Router.goto('custom-route-3'),
+    });
+  });
+
   sdk.AppMenu.events
     .filter((event) => event.name === 'collapseToggled')
     .onValue((event) => {
