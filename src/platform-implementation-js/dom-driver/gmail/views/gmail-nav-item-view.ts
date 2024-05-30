@@ -75,6 +75,7 @@ export type NavItemDescriptor = {
   tooltipAlignment: 'left' | 'top' | 'right' | 'bottom' | null;
   subtitle: string;
   spacingAfter?: boolean;
+  sectionTooltip?: string;
 }>;
 
 // TODO could we recreate this with React? There's so much statefulness that it's
@@ -138,8 +139,7 @@ export default class GmailNavItemView {
     navItemDescriptor: any,
   ): GmailNavItemView {
     const nestedNavItemLevel =
-      this._type === NAV_ITEM_TYPES.GROUPER ||
-      this._type === NAV_ITEM_TYPES.SECTION
+      this._type === NAV_ITEM_TYPES.GROUPER || this.isSection()
         ? this._level
         : this._level + 1;
     const gmailNavItemView = new GmailNavItemView(
@@ -165,12 +165,16 @@ export default class GmailNavItemView {
     return gmailNavItemView;
   }
 
-  destroy() {
-    this._element.remove();
+  #cleanupDOMElements() {
     if (this._accessoryViewController) this._accessoryViewController.destroy();
-    if (this._eventStream) this._eventStream.end();
     if (this._expandoElement) this._expandoElement.remove();
     if (this._itemContainerElement) this._itemContainerElement.remove();
+  }
+
+  destroy() {
+    this._element.remove();
+    if (this._eventStream) this._eventStream.end();
+    this.#cleanupDOMElements();
   }
 
   getElement(): HTMLElement {
@@ -751,7 +755,7 @@ export default class GmailNavItemView {
   }
 
   private _setupSectionElement(): HTMLElement {
-    const element = this._element ?? document.createElement('div');
+    const element = document.createElement('div');
     element.classList.add(
       'aAw',
       'FgKVne',
@@ -761,7 +765,7 @@ export default class GmailNavItemView {
       '<span class="aAv inboxsdk__navItem_name" role="heading">',
       'Labels',
       '</span>',
-      '<div class="aAu arN" aria-label="Create new label" data-tooltip="Create new label" role="button" tabindex="0" type="button">',
+      '<div class="aAu arN" aria-label="" data-tooltip="" role="button" tabindex="0" type="button">',
       '</div>',
     ].join('');
 
@@ -777,7 +781,7 @@ export default class GmailNavItemView {
   }
 
   private _setupChildElement(): HTMLElement {
-    const element = this._element ?? document.createElement('div');
+    const element = document.createElement('div');
     element.setAttribute('class', 'aim inboxsdk__navItem');
 
     element.innerHTML = [
@@ -824,7 +828,7 @@ export default class GmailNavItemView {
   }
 
   private _setupParentElement(): HTMLElement {
-    const element = this._element ?? document.createElement('div');
+    const element = document.createElement('div');
     element.className = 'Xa wT W8 XJ inboxsdk__navItem';
     element.innerHTML = [
       '<div class="V6 CL Y2">',
@@ -941,7 +945,7 @@ export default class GmailNavItemView {
   }
 
   private _updateIcon(navItemDescriptor: any) {
-    if (this._type === NAV_ITEM_TYPES.SECTION) {
+    if (this.isSection()) {
       return;
     }
 
@@ -985,29 +989,25 @@ export default class GmailNavItemView {
       this._element,
       '.inboxsdk__navItem_name',
     );
-
     navItemNameElement.textContent = name;
-
-    if (this._type === NAV_ITEM_TYPES.SECTION) {
-      this._element.querySelector('.aAu')?.setAttribute('data-tooltip', name);
-      this._element.querySelector('.aAu')?.setAttribute('aria-label', name);
-    } else {
-      navItemNameElement.setAttribute('title', name);
-      if (this._expandoElement) {
-        this._expandoElement.title = `Expand ${name}`;
-      }
-
-      if (this._navItemDescriptor?.tooltipAlignment) {
-        const align = this._navItemDescriptor?.tooltipAlignment[0];
-        this._element.firstElementChild?.setAttribute('data-tooltip', name);
-        this._element.firstElementChild?.setAttribute(
-          'data-tooltip-align',
-          align,
-        );
-      }
-    }
+    navItemNameElement.setAttribute('title', name);
 
     this._name = name;
+
+    if (this.isSection()) return;
+
+    if (this._expandoElement) {
+      this._expandoElement.title = `Expand ${name}`;
+    }
+
+    if (this._navItemDescriptor?.tooltipAlignment) {
+      const align = this._navItemDescriptor?.tooltipAlignment[0];
+      this._element.firstElementChild?.setAttribute('data-tooltip', name);
+      this._element.firstElementChild?.setAttribute(
+        'data-tooltip-align',
+        align,
+      );
+    }
   }
 
   private _updateOrder(navItemDescriptor: any) {
@@ -1116,15 +1116,30 @@ export default class GmailNavItemView {
     this._element.classList.toggle('yJ', !!navItemDescriptor.spacingAfter);
   }
 
+  private _updateSectionTooltip(navItemDescriptor: NavItemDescriptor) {
+    if (!this.isSection()) return;
+
+    const tooltip = navItemDescriptor.sectionTooltip;
+    if (tooltip) {
+      this._element
+        .querySelector('.aAu')
+        ?.setAttribute('data-tooltip', tooltip);
+      this._element.querySelector('.aAu')?.setAttribute('aria-label', tooltip);
+    }
+  }
+
   private _updateValues(navItemDescriptor: NavItemDescriptor) {
     if (
       navItemDescriptor.type === NAV_ITEM_TYPES.SECTION &&
       !this.#sectionKey
     ) {
+      // Set up section key for the first time for the Section NavItems
       this.#sectionKey = (Math.random() * 10000).toFixed(0);
     }
 
     if (this._navItemDescriptor?.type !== navItemDescriptor.type) {
+      this._element.remove();
+      this.#cleanupDOMElements();
       this._element = this.#setupElement(navItemDescriptor);
     }
 
@@ -1142,6 +1157,7 @@ export default class GmailNavItemView {
     this._updateName(navItemDescriptor.name);
     this._updateSubtitle(navItemDescriptor);
     this._updateOrder(navItemDescriptor);
+    this._updateSectionTooltip(navItemDescriptor);
 
     if (this._isNewLeftNavParent) {
       this._updateRole(navItemDescriptor.routeID);

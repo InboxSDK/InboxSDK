@@ -171,7 +171,6 @@ export default class NativeGmailNavItemView {
   }
 
   _addNavItemElement(gmailNavItemView: GmailNavItemView) {
-    console.log('native-gmail-nav-item-view.ts _addNavItemElement');
     const itemContainerElement = this._getItemContainerElement();
 
     const insertBeforeElement = getInsertBeforeElement(

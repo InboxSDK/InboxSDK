@@ -22,6 +22,4 @@ const navItemTypes = Object.freeze({
   SECTION: 'SECTION',
 } as const);
 
-console.log('navItemTypes', navItemTypes);
-
 export default navItemTypes;

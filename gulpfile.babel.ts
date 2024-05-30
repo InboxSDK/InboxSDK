@@ -35,8 +35,6 @@ const args = stdio.getopt({
   },
 })!;
 
-args.watch = true;
-
 // Don't let production be built without minification.
 // Could just make the production flag imply the minify flag, but that seems
 // like it would harm discoverability.
