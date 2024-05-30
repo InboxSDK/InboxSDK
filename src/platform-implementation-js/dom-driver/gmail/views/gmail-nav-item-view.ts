@@ -1157,7 +1157,7 @@ export default class GmailNavItemView {
     this._updateName(navItemDescriptor.name);
     this._updateSubtitle(navItemDescriptor);
     this._updateOrder(navItemDescriptor);
-    this._updateSectionTooltip(navItemDescriptor);
+    this._updateSpacing(navItemDescriptor);
 
     if (this._isNewLeftNavParent) {
       this._updateRole(navItemDescriptor.routeID);
@@ -1171,8 +1171,7 @@ export default class GmailNavItemView {
     this._updateAccessory(navItemDescriptor.accessory);
     this._updateIcon(navItemDescriptor);
     this._updateClickability(navItemDescriptor);
-
-    this._updateSpacing(navItemDescriptor);
+    this._updateSectionTooltip(navItemDescriptor);
   }
 }
 

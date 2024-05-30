@@ -66,7 +66,6 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   #element: HTMLElement;
   #destroyed = false;
   #id = Math.random().toFixed(3);
-  #ARIA_LABELLED_BY_ID = Math.random().toFixed(3);
   #driver;
   #loading;
   #orderGroup = `collapsible-panel-${this.#id}-nav-item`;
