@@ -262,6 +262,39 @@ InboxSDK.load(1, 'nav-menu').then(function (sdk) {
     });
   };
 
+  const initNavItemSection = () => {
+    const parent = sdk.NavMenu.addNavItem({
+      name: 'P - Root Nav Item',
+    });
+
+    parent.addNavItem({
+      name: 'C - Nested Nav Item',
+      routeID: 'this-is-a-child-custom-route',
+    });
+
+    parent.addNavItem({
+      name: 'C - Nested Nav Item 2',
+      spacingAfter: true,
+      routeID: 'this-is-a-child-custom-route',
+    });
+
+    const parent2 = parent.addNavItem({
+      name: 'C - Section Nav Item',
+      type: 'SECTION',
+      sectionTooltip: 'A tooltip here',
+      routeID: 'this-is-a-child-custom-route',
+    });
+
+    parent2.addNavItem({
+      name: 'D - Section Nav Item',
+      routeID: 'this-is-a-child-custom-route',
+    });
+
+    parent2.addNavItem({
+      name: 'D - Section Nav Item 2',
+      routeID: 'this-is-a-child-custom-route',
+    });
+  };
   // initNavItemAdd();
   // initNavItemSubtitle();
   initNavItemCollapse();
@@ -269,5 +302,6 @@ InboxSDK.load(1, 'nav-menu').then(function (sdk) {
   // initNavItemAccessoryAndIcon();
   // initNavItemAccessories();
   initNavItemIcons();
+  initNavItemSection();
   // initNavItemRoute();
 });

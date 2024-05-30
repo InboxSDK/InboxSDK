@@ -33,6 +33,12 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
     });
   }
 
+  if (!sdk.AppMenu.isShown()) {
+    alert(
+      'App menu is not enabled. Please enable Meet or Chat it in Gmail settings.',
+    );
+  }
+
   const customItem1 = sdk.AppMenu.addMenuItem({
       name: 'Lion menu item',
       insertIndex: 1,
