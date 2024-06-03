@@ -1,5 +1,5 @@
 import EventEmitter from '../lib/safe-event-emitter';
-import Kefir from 'kefir';
+import * as Kefir from 'kefir';
 import kefirCast from 'kefir-cast';
 import get from '../../common/get-or-fail';
 import NavItemView from './nav-item-view';
@@ -52,7 +52,7 @@ export default class NativeNavItemView extends EventEmitter {
     const navItemDescriptorPropertyStream = kefirCast(
       Kefir,
       navItemDescriptor,
-    ).toProperty();
+    ).toProperty() as Kefir.Observable<NavItemDescriptor, unknown>;
     const childNavItemView = new NavItemView(
       members.appId,
       members.driver,

@@ -8,6 +8,7 @@ import type { Driver } from '../driver-interfaces/driver';
 import type GmailNavItemView from '../dom-driver/gmail/views/gmail-nav-item-view';
 import { NavItemDescriptor } from '../dom-driver/gmail/views/gmail-nav-item-view';
 import { RouteViewDriver } from '../driver-interfaces/route-view-driver';
+import { Descriptor } from '../../types/descriptor';
 interface Members {
   appId: string;
   driver: Driver;
@@ -75,7 +76,9 @@ export default class NavItemView extends EventEmitter {
     });
   }
 
-  addNavItem(navItemDescriptor: Record<string, any>): NavItemView {
+  addNavItem(
+    navItemDescriptor: Descriptor<NavItemDescriptor | null>,
+  ): NavItemView {
     if (this.destroyed) throw new Error('this nav item view does not exist');
     const members = get(memberMap, this);
     const driver = members.driver;
@@ -84,7 +87,7 @@ export default class NavItemView extends EventEmitter {
     const navItemDescriptorPropertyStream = kefirCast(
       Kefir,
       navItemDescriptor,
-    ).toProperty();
+    ).toProperty() as Observable<NavItemDescriptor, unknown>;
     const childNavItemView = new NavItemView(
       appId,
       driver,

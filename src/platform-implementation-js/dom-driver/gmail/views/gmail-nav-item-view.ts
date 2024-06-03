@@ -26,7 +26,7 @@ import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 import GmailDriver from '../gmail-driver';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
 import {
-  getSectionClassName,
+  NAV_ITEM_SECTION_CLASS_NAME,
   getSectionNavItemsContainerElement,
 } from '../gmail-driver/nav-item-section';
 
@@ -58,10 +58,13 @@ export type NavItemDescriptor = {
 } & Partial<{
   key: string;
   orderHint: number;
-  routeID: string;
   iconUrl: string;
+  routeID: string;
   iconClass: string;
   iconElement: HTMLElement;
+  iconPosition: 'BEFORE_NAME';
+  /** Font ligature, can't use with an IconUrl */
+  iconLiga: string;
   routeParams: Record<string, string | number>;
   expanderForegroundColor: string;
   backgroundColor: string;
@@ -74,8 +77,8 @@ export type NavItemDescriptor = {
   type: keyof NavItemTypes;
   tooltipAlignment: 'left' | 'top' | 'right' | 'bottom' | null;
   subtitle: string;
-  spacingAfter?: boolean;
-  sectionTooltip?: string;
+  spacingAfter: boolean;
+  sectionTooltip: string;
 }>;
 
 // TODO could we recreate this with React? There's so much statefulness that it's
@@ -128,7 +131,7 @@ export default class GmailNavItemView {
     ) {
       return this._setupParentElement();
     } else if (navItemDescriptor?.type === NAV_ITEM_TYPES.SECTION) {
-      return this._setupSectionElement();
+      return this.#setupSectionElement();
     } else {
       return this._setupChildElement();
     }
@@ -136,7 +139,7 @@ export default class GmailNavItemView {
 
   addNavItem(
     orderGroup: number | string,
-    navItemDescriptor: any,
+    navItemDescriptor: Kefir.Observable<NavItemDescriptor, unknown>,
   ): GmailNavItemView {
     const nestedNavItemLevel =
       this._type === NAV_ITEM_TYPES.GROUPER || this.isSection()
@@ -155,10 +158,7 @@ export default class GmailNavItemView {
 
     gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
-    if (
-      this._isNewLeftNavParent &&
-      navItemDescriptor.type !== NAV_ITEM_TYPES.SECTION
-    ) {
+    if (this._isNewLeftNavParent && !gmailNavItemView.isSection()) {
       this._createExpandoParent();
     }
 
@@ -272,7 +272,7 @@ export default class GmailNavItemView {
   ) {
     navItemDescriptorPropertyStream
       .takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null))
-      .onValue((x) => this._updateValues(x));
+      .onValue((x) => this.#updateValues(x));
   }
 
   toggleCollapse() {
@@ -754,13 +754,10 @@ export default class GmailNavItemView {
       });
   }
 
-  private _setupSectionElement(): HTMLElement {
+  #setupSectionElement(): HTMLElement {
     const element = document.createElement('div');
-    element.classList.add(
-      'aAw',
-      'FgKVne',
-      getSectionClassName(this.#sectionKey!),
-    );
+    element.classList.add('aAw', 'FgKVne', NAV_ITEM_SECTION_CLASS_NAME);
+    element.dataset.sectionKey = this.#sectionKey;
     element.innerHTML = [
       '<span class="aAv inboxsdk__navItem_name" role="heading">',
       'Labels',
@@ -944,7 +941,7 @@ export default class GmailNavItemView {
     }
   }
 
-  private _updateIcon(navItemDescriptor: any) {
+  private _updateIcon(navItemDescriptor: NavItemDescriptor) {
     if (this.isSection()) {
       return;
     }
@@ -969,6 +966,9 @@ export default class GmailNavItemView {
       navItemDescriptor.iconPosition !== 'BEFORE_NAME',
       navItemDescriptor.iconClass,
       navItemDescriptor.iconUrl,
+      undefined,
+      undefined,
+      navItemDescriptor.iconLiga,
     );
 
     // Setting the border-color of the icon container element while in Gmailv2 will trigger an SDK
@@ -1108,7 +1108,7 @@ export default class GmailNavItemView {
     this._type = type;
   }
 
-  private _updateSpacing(navItemDescriptor: NavItemDescriptor) {
+  #updateSpacing(navItemDescriptor: NavItemDescriptor) {
     if (this._isNewLeftNavParent) {
       return;
     }
@@ -1116,7 +1116,7 @@ export default class GmailNavItemView {
     this._element.classList.toggle('yJ', !!navItemDescriptor.spacingAfter);
   }
 
-  private _updateSectionTooltip(navItemDescriptor: NavItemDescriptor) {
+  #updateSectionTooltip(navItemDescriptor: NavItemDescriptor) {
     if (!this.isSection()) return;
 
     const tooltip = navItemDescriptor.sectionTooltip;
@@ -1128,7 +1128,7 @@ export default class GmailNavItemView {
     }
   }
 
-  private _updateValues(navItemDescriptor: NavItemDescriptor) {
+  #updateValues(navItemDescriptor: NavItemDescriptor) {
     if (
       navItemDescriptor.type === NAV_ITEM_TYPES.SECTION &&
       !this.#sectionKey
@@ -1157,7 +1157,7 @@ export default class GmailNavItemView {
     this._updateName(navItemDescriptor.name);
     this._updateSubtitle(navItemDescriptor);
     this._updateOrder(navItemDescriptor);
-    this._updateSpacing(navItemDescriptor);
+    this.#updateSpacing(navItemDescriptor);
 
     if (this._isNewLeftNavParent) {
       this._updateRole(navItemDescriptor.routeID);
@@ -1171,7 +1171,7 @@ export default class GmailNavItemView {
     this._updateAccessory(navItemDescriptor.accessory);
     this._updateIcon(navItemDescriptor);
     this._updateClickability(navItemDescriptor);
-    this._updateSectionTooltip(navItemDescriptor);
+    this.#updateSectionTooltip(navItemDescriptor);
   }
 }
 

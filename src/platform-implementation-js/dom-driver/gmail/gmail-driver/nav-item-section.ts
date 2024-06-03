@@ -3,18 +3,15 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import { panelNavItemsContainerSelector } from '../../../views/collapsible-panel-view';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 
-export const getSectionClassName = (sectionKey: string) =>
-  `inboxsdk__navItem_section_${sectionKey}` as const;
+export const NAV_ITEM_SECTION_CLASS_NAME = 'inboxsdk__navItem_section';
 
-const getSectionListClassName = (sectionKey: string) =>
-  `inboxsdk__navItem_section_${sectionKey}_list` as const;
+const SECTION_LIST_CLASS_NAME = 'inboxsdk__navItem_section_list';
 const getSectionListSelector = (sectionKey: string) =>
-  `.${getSectionListClassName(sectionKey)}`;
+  `.${SECTION_LIST_CLASS_NAME}[data-section-key="${sectionKey}"]`;
 
-const getSectionItemsClassName = (sectionKey: string) =>
-  `inboxsdk__navItem_section_${sectionKey}_list_items` as const;
+const SECTION_ITEMS_CLASS_NAME = 'inboxsdk__navItem_section_list_items';
 const getSectionItemsSelector = (sectionKey: string) =>
-  `.${getSectionItemsClassName(sectionKey)}`;
+  `.${SECTION_ITEMS_CLASS_NAME}[data-section-key="${sectionKey}"]`;
 
 export function createSectionNavItemsContainer(
   sectionKey = 'default',
@@ -23,10 +20,8 @@ export function createSectionNavItemsContainer(
   insertionOrderHint?: string | number,
 ) {
   const element = document.createElement('div');
-  const className = getSectionListClassName(sectionKey);
-  const itemsClassName = getSectionItemsClassName(sectionKey);
-
-  element.classList.add('yJ', className);
+  element.classList.add('yJ', SECTION_LIST_CLASS_NAME);
+  element.dataset.sectionKey = sectionKey;
   if (orderGroup) {
     element.setAttribute('data-group-order-hint', orderGroup);
   }
@@ -47,7 +42,7 @@ export function createSectionNavItemsContainer(
       <div class="wT">
         <div class="n3">
           <div class="byl">
-            <div class="TK ${itemsClassName}"></div>
+            <div class="TK ${SECTION_ITEMS_CLASS_NAME}" data-section-key="${sectionKey}"></div>
           </div>
         </div>
       </div>

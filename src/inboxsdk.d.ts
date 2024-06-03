@@ -102,6 +102,7 @@ export interface ButterBar {
 export { AppMenu };
 export type { AppMenuItemView } from './platform-implementation-js/views/app-menu-item-view';
 export type { AppMenuItemPanelDescriptor } from './platform-implementation-js/namespaces/app-menu';
+export type { default as NavMenu } from './platform-implementation-js/namespaces/nav-menu';
 export type { CollapsiblePanelView } from './platform-implementation-js/views/collapsible-panel-view';
 
 export interface NativeNavItemView extends EventEmitter {
@@ -110,13 +111,13 @@ export interface NativeNavItemView extends EventEmitter {
   isCollapsed(): boolean;
 }
 
-export interface NavMenu {
-  SENT_MAIL: NativeNavItemView;
-  NavItemTypes: NavItemTypes;
-  addNavItem(
-    descriptor: NavItemDescriptor | Kefir.Observable<NavItemDescriptor, any>,
-  ): NavItemView;
-}
+// export interface NavMenu {
+//   SENT_MAIL: NativeNavItemView;
+//   NavItemTypes: NavItemTypes;
+//   addNavItem(
+//     descriptor: NavItemDescriptor | Kefir.Observable<NavItemDescriptor, any>,
+//   ): NavItemView;
+// }
 
 export { Router };
 
