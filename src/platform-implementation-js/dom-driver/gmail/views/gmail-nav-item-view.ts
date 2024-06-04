@@ -81,6 +81,13 @@ export type NavItemDescriptor = {
   sectionTooltip: string;
 }>;
 
+export type NavItemEvent =
+  | { eventName: 'collapsed' | 'expanded' | 'orderChanged' }
+  | {
+      eventName: 'click';
+      domEvent: MouseEvent;
+    };
+
 // TODO could we recreate this with React? There's so much statefulness that it's
 
 export default class GmailNavItemView {
@@ -88,7 +95,7 @@ export default class GmailNavItemView {
   private _accessoryViewController: any = null;
   private _driver: GmailDriver;
   private _element: HTMLElement;
-  private _eventStream: Bus<any, any>;
+  #eventStream: Bus<NavItemEvent, any>;
   private _expandoElement: HTMLElement | null = null;
   private _iconSettings: IconSettings = {};
   private _isActive: boolean = false;
@@ -113,7 +120,7 @@ export default class GmailNavItemView {
 
   constructor(driver: GmailDriver, orderGroup: number | string, level: number) {
     this._driver = driver;
-    this._eventStream = kefirBus();
+    this.#eventStream = kefirBus();
     this._level = level || 0;
     this._navItemNumber = ++NUMBER_OF_GMAIL_NAV_ITEM_VIEWS_CREATED;
     this._orderGroup = orderGroup;
@@ -153,7 +160,7 @@ export default class GmailNavItemView {
 
     gmailNavItemView
       .getEventStream()
-      .filter((event: any) => event.eventName === 'orderChanged')
+      .filter((event) => event.eventName === 'orderChanged')
       .onValue(() => this._addNavItemElement(gmailNavItemView));
 
     gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
@@ -173,7 +180,7 @@ export default class GmailNavItemView {
 
   destroy() {
     this._element.remove();
-    if (this._eventStream) this._eventStream.end();
+    if (this.#eventStream) this.#eventStream.end();
     this.#cleanupDOMElements();
   }
 
@@ -181,11 +188,11 @@ export default class GmailNavItemView {
     return this._element;
   }
 
-  getEventStream(): Kefir.Observable<any, any> {
-    return this._eventStream;
+  getEventStream() {
+    return this.#eventStream;
   }
 
-  getNavItemDescriptor(): any {
+  getNavItemDescriptor() {
     return this._navItemDescriptor;
   }
 
@@ -271,7 +278,7 @@ export default class GmailNavItemView {
     >,
   ) {
     navItemDescriptorPropertyStream
-      .takeUntilBy(this._eventStream.filter(() => false).beforeEnd(() => null))
+      .takeUntilBy(this.#eventStream.filter(() => false).beforeEnd(() => null))
       .onValue((x) => this.#updateValues(x));
   }
 
@@ -341,7 +348,7 @@ export default class GmailNavItemView {
       this._setHeights();
     }
 
-    this._eventStream.emit({
+    this.#eventStream.emit({
       eventName: 'collapsed',
     });
   }
@@ -655,7 +662,7 @@ export default class GmailNavItemView {
     }
 
     this._isCollapsed = false;
-    this._eventStream.emit({
+    this.#eventStream.emit({
       eventName: 'expanded',
     });
   }
@@ -688,9 +695,9 @@ export default class GmailNavItemView {
     );
   }
 
-  private _makeEventMapper(
-    eventName: string,
-  ): <T extends Event>(domEvent: T) => { eventName: string; domEvent: T } {
+  private _makeEventMapper<U extends string>(
+    eventName: U,
+  ): <T extends Event>(domEvent: T) => { eventName: U; domEvent: T } {
     return function (domEvent) {
       domEvent.stopPropagation();
       domEvent.preventDefault();
@@ -768,7 +775,7 @@ export default class GmailNavItemView {
 
     const innerElement = querySelector(element, '.aAu');
 
-    this._eventStream.plug(
+    this.#eventStream.plug(
       Kefir.fromEvents<MouseEvent, never>(innerElement, 'click').map(
         this._makeEventMapper('click'),
       ),
@@ -804,7 +811,13 @@ export default class GmailNavItemView {
 
     const innerElement = querySelector(element, '.TO');
 
-    Kefir.merge([
+    Kefir.merge<
+      {
+        eventName: 'mouseenter' | 'mouseleave';
+        domEvent: MouseEvent;
+      },
+      never
+    >([
       Kefir.fromEvents<MouseEvent, never>(innerElement, 'mouseenter').map(
         this._makeEventMapper('mouseenter'),
       ),
@@ -815,7 +828,7 @@ export default class GmailNavItemView {
       this._updateHighlight(event);
     });
 
-    this._eventStream.plug(
+    this.#eventStream.plug(
       Kefir.fromEvents<MouseEvent, never>(innerElement, 'click').map(
         this._makeEventMapper('click'),
       ),
@@ -868,7 +881,7 @@ export default class GmailNavItemView {
       });
 
     const innerElement = querySelector(element, '.V6.CL');
-    this._eventStream.plug(
+    this.#eventStream.plug(
       Kefir.fromEvents<MouseEvent, never>(innerElement, 'click').map(
         this._makeEventMapper('click'),
       ),
@@ -917,7 +930,7 @@ export default class GmailNavItemView {
     this._accessory = accessory;
   }
 
-  private _updateClickability(navItemDescriptor: any) {
+  private _updateClickability(navItemDescriptor: NavItemDescriptor) {
     if (
       navItemDescriptor.type === NAV_ITEM_TYPES.LINK ||
       navItemDescriptor.type === NAV_ITEM_TYPES.MANAGE
@@ -1010,7 +1023,7 @@ export default class GmailNavItemView {
     }
   }
 
-  private _updateOrder(navItemDescriptor: any) {
+  private _updateOrder(navItemDescriptor: NavItemDescriptor) {
     this._element.setAttribute('data-group-order-hint', '' + this._orderGroup);
     this._element.setAttribute(
       'data-insertion-order-hint',
@@ -1028,7 +1041,7 @@ export default class GmailNavItemView {
         '' + navItemDescriptor.orderHint,
       );
 
-      this._eventStream.emit({
+      this.#eventStream.emit({
         eventName: 'orderChanged',
       });
     }

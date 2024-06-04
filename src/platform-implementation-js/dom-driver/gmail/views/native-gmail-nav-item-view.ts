@@ -6,6 +6,7 @@ import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-ob
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import findParent from '../../../../common/find-parent';
 import GmailNavItemView, {
+  NavItemEvent,
   getLeftIndentationPaddingValue,
 } from './gmail-nav-item-view';
 import type GmailDriver from '../gmail-driver';
@@ -100,7 +101,7 @@ export default class NativeGmailNavItemView {
     navItemDescriptor: Kefir.Observable<any, any>,
   ): GmailNavItemView {
     const gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, 2);
-    Kefir.merge([
+    Kefir.merge<NavItemEvent | HTMLElement, unknown>([
       gmailNavItemView
         .getEventStream()
         .filter((event) => event.eventName === 'orderChanged'),
