@@ -12,11 +12,14 @@ const navItemTypes = Object.freeze({
    */
   LINK: 'LINK',
 
-  // nav item for logical grouping. In Gmailv2, the entire nav item can be clicked to expand/collapse its children and it ignores all NavItemDescriptor options other than `name` and `subtitle`.
-  // Behaves identically to NAVIGATION when in Gmailv1.
+  /**
+   * nav item for logical grouping. In Gmailv2, the entire nav item can be clicked to expand/collapse its children
+   * and it ignores all NavItemDescriptor options other than `name` and `subtitle`.
+   * Behaves identically to NAVIGATION when in Gmailv1.
+   */
   GROUPER: 'GROUPER',
 
-  // Old alias for LINK
+  /** Old alias for LINK */
   MANAGE: 'MANAGE',
 
   SECTION: 'SECTION',
