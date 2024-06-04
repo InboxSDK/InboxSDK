@@ -55,6 +55,7 @@ export default function updateIcon(
   newIconUrl: string | null | undefined,
   insertBeforeEl?: HTMLElement | null | undefined, // Should not be used with append: true — the append flag will override
   newIconHtml?: string,
+  iconLiga?: string,
 ) {
   if (append && insertBeforeEl)
     throw new Error('append and insertBeforeEl should not be used together');
@@ -121,6 +122,10 @@ export default function updateIcon(
         append,
         insertBeforeEl,
       );
+    }
+
+    if (iconLiga) {
+      iconSettings.iconElement.innerText = iconLiga;
     }
 
     iconSettings.iconElement.setAttribute(

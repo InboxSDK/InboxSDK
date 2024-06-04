@@ -5,7 +5,8 @@ import NavItemView from '../views/nav-item-view';
 import NativeNavItemView from '../views/native-nav-item-view';
 import type { Driver } from '../driver-interfaces/driver';
 import NavItemTypes from '../constants/nav-item-types';
-import type { NavItemDescriptor, NavMenu as INavMenu } from '../../inboxsdk';
+import type { NavItemDescriptor } from '../../inboxsdk';
+import type { Descriptor } from '../../types/descriptor';
 
 const memberMap = new WeakMap<
   NavMenu,
@@ -16,7 +17,7 @@ const memberMap = new WeakMap<
   }
 >();
 
-export default class NavMenu implements INavMenu {
+export default class NavMenu {
   NavItemTypes = NavItemTypes;
   SENT_MAIL: NativeNavItemView;
 
@@ -31,9 +32,7 @@ export default class NavMenu implements INavMenu {
   }
 
   addNavItem(
-    navItemDescriptor:
-      | NavItemDescriptor
-      | Observable<NavItemDescriptor, unknown>,
+    navItemDescriptor: Descriptor<NavItemDescriptor, unknown>,
   ): NavItemView {
     const members = get(memberMap, this);
     const navItemDescriptorPropertyStream = kefirCast(

@@ -43,7 +43,7 @@ import BiMapCache from 'bimapcache';
 import type KeyboardShortcutHandle from '../../views/keyboard-shortcut-handle';
 import getDraftIDForMessageID from './gmail-driver/get-draft-id-for-message-id';
 import type { GetDraftIdResult } from './gmail-driver/get-draft-id-for-message-id';
-import addNavItem from './gmail-driver/add-nav-item';
+import addNavItem, { addNavItemToPanel } from './gmail-driver/add-nav-item';
 import { addAppMenuItem } from './gmail-driver/add-app-menu-item';
 import addSupportItem from './gmail-driver/add-support-item';
 import gotoView from './gmail-driver/goto-view';
@@ -678,6 +678,22 @@ class GmailDriver {
       appId,
       navItemDescriptorPropertyStream,
       navMenuInjectionContainer,
+    );
+  }
+
+  addNavItemToPanel(
+    appId: string,
+    navItemDescriptorPropertyStream: Kefir.Observable<
+      NavItemDescriptor,
+      unknown
+    >,
+    panelElement: HTMLElement,
+  ): Promise<GmailNavItemView> {
+    return addNavItemToPanel(
+      this,
+      appId,
+      navItemDescriptorPropertyStream,
+      panelElement,
     );
   }
 

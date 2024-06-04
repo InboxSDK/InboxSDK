@@ -6,6 +6,7 @@ import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-ob
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import findParent from '../../../../common/find-parent';
 import GmailNavItemView, {
+  NavItemEvent,
   getLeftIndentationPaddingValue,
 } from './gmail-nav-item-view';
 import type GmailDriver from '../gmail-driver';
@@ -100,7 +101,7 @@ export default class NativeGmailNavItemView {
     navItemDescriptor: Kefir.Observable<any, any>,
   ): GmailNavItemView {
     const gmailNavItemView = new GmailNavItemView(this._driver, orderGroup, 2);
-    Kefir.merge([
+    Kefir.merge<NavItemEvent | HTMLElement, unknown>([
       gmailNavItemView
         .getEventStream()
         .filter((event) => event.eventName === 'orderChanged'),
@@ -182,9 +183,12 @@ export default class NativeGmailNavItemView {
       gmailNavItemView.getElement(),
       insertBeforeElement,
     );
-    const element = gmailNavItemView.getElement();
-    querySelector(element, '.TN').style.marginLeft =
-      getLeftIndentationPaddingValue() + 'px';
+
+    if (!gmailNavItemView.isSection()) {
+      const element = gmailNavItemView.getElement();
+      querySelector(element, '.TN').style.marginLeft =
+        getLeftIndentationPaddingValue() + 'px';
+    }
 
     this._setHeights();
   }
@@ -325,9 +329,8 @@ export default class NativeGmailNavItemView {
   }
 
   _setHeights() {
-    const toElement = querySelector(this._element, '.TO');
-
     if (this._element.classList.contains('ain') && this._itemContainerElement) {
+      const toElement = querySelector(this._element, '.TO');
       this._element.style.height = '';
       const totalHeight = this._element.clientHeight;
       const itemHeight = toElement.clientHeight;

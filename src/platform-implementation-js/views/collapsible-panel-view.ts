@@ -17,6 +17,8 @@ import isEqual from 'fast-deep-equal';
 export const NATIVE_CLASS = 'aqn' as const;
 export const INBOXSDK_CLASS = 'inboxsdk__collapsiblePanel' as const;
 const ELEMENT_CLASS = `${NATIVE_CLASS} ${INBOXSDK_CLASS} oy8Mbf` as const;
+const PANEL_NAV_ITEMS_CONTAINER_CLASS =
+  'inboxsdk__collapsiblePanel_navItems' as const;
 
 const PRIMARY_BUTTON_ELEMENT_CLASS = 'T-I T-I-KE L3' as const;
 const PRIMARY_BUTTON_ELEMENT_SELECTOR = '.T-I.T-I-KE.L3' as const;
@@ -26,8 +28,8 @@ const loadingElementClass =
   'inboxsdk__collapsiblePanel_loading_container' as const;
 const panelLoadingClass = `${loadingElementClass}--active` as const;
 const loadingElementSelector = `.${loadingElementClass}` as const;
-
-const NAV_MENU_CONTAINER_ELEMENT_SELECTOR = '.at9 .n3 .TK' as const;
+export const panelNavItemsContainerSelector =
+  `.${PANEL_NAV_ITEMS_CONTAINER_CLASS}` as const;
 
 type MessageEvents = {
   /**
@@ -64,9 +66,9 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   #element: HTMLElement;
   #destroyed = false;
   #id = Math.random().toFixed(3);
-  #ARIA_LABELLED_BY_ID = Math.random().toFixed(3);
   #driver;
   #loading;
+  #orderGroup = `collapsible-panel-${this.#id}-nav-item`;
 
   get loading() {
     return this.#loading;
@@ -143,26 +145,21 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     this.setLoading(false);
     const { element } = this;
 
-    const navMenuContainerElement = querySelector(
-      element,
-      NAV_MENU_CONTAINER_ELEMENT_SELECTOR,
-    );
-
-    const appId = `collapsible-panel-${this.#id}`;
+    const orderGroup = this.#orderGroup;
 
     const navItemDescriptorPropertyStream = kefirCast(
       Kefir,
       navItemDescriptor,
     ).toProperty();
 
-    const gmailNavItemView = this.#driver.addNavItem(
-      appId,
+    const gmailNavItemView = this.#driver.addNavItemToPanel(
+      orderGroup,
       navItemDescriptorPropertyStream,
-      navMenuContainerElement,
+      element,
     );
 
     const navItemView = new NavItemView(
-      appId,
+      orderGroup,
       this.#driver,
       navItemDescriptorPropertyStream,
       gmailNavItemView,
@@ -229,24 +226,8 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
           <div class="Ls77Lb aZ6">
             <div class="pp" style="user-select: none;">
               <div>
-                <div class="nM">
+                <div class="${`nM ${PANEL_NAV_ITEMS_CONTAINER_CLASS}`}">
                   <div class="aic"></div>
-                  <div class="yJ">
-                    <div class="ajl aib aZ6" aria-labelledby="${
-                      this.#ARIA_LABELLED_BY_ID
-                    }">
-                      <h2 class="aWk" id="${
-                        this.#ARIA_LABELLED_BY_ID
-                      }">Labels</h2>
-                      <div class="wT">
-                        <div class="n3">
-                          <div class="byl">
-                            <div class="TK"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
