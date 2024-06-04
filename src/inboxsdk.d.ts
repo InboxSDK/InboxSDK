@@ -4,10 +4,7 @@ import type TypedEmitter from 'typed-emitter';
 import AppMenu from './platform-implementation-js/namespaces/app-menu';
 import Compose from './platform-implementation-js/namespaces/compose';
 import type Global from './platform-implementation-js/namespaces/global';
-import type {
-  NavItemTypes,
-  NavItemDescriptor,
-} from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
+import type { NavItemDescriptor } from './platform-implementation-js/dom-driver/gmail/views/gmail-nav-item-view';
 import NavItemView from './platform-implementation-js/views/nav-item-view';
 import type { Stopper } from 'kefir-stopper';
 import type GmailRouteProcessor from './platform-implementation-js/dom-driver/gmail/views/gmail-route-view/gmail-route-processor';
@@ -110,14 +107,6 @@ export interface NativeNavItemView extends EventEmitter {
   setCollapsed(collapseState: boolean): void;
   isCollapsed(): boolean;
 }
-
-// export interface NavMenu {
-//   SENT_MAIL: NativeNavItemView;
-//   NavItemTypes: NavItemTypes;
-//   addNavItem(
-//     descriptor: NavItemDescriptor | Kefir.Observable<NavItemDescriptor, any>,
-//   ): NavItemView;
-// }
 
 export { Router };
 
