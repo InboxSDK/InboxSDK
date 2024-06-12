@@ -148,7 +148,7 @@ class GmailAttachmentCardView {
       const download_url = this._element.getAttribute('download_url');
 
       if (download_url) {
-        const m = /:(https:\/\/[^:]+)/.exec(download_url);
+        const m = /:(https:\/\/.+)/.exec(download_url);
         return m ? m[1] : null;
       }
     } else {
