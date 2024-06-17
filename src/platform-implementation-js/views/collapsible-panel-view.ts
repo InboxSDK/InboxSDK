@@ -61,6 +61,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     COLLAPSED_HOVER: 'bym',
     PANEL_LESS: 'a3W',
     TOGGLE_OPEN_STATE: 'aak',
+    SDK_ACTIVE: 'inboxsdk__collapsiblePanel_active',
   } as const;
   #panelDescriptor: AppMenuItemPanelDescriptor;
   #element: HTMLElement;

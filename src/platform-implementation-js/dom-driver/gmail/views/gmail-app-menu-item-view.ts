@@ -28,6 +28,7 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
   static elementCss = {
     HOVER: 'aIk',
     ACTIVE: 'apV',
+    SDK_ACTIVE: 'inboxsdk__appMenuItem_active',
   } as const;
 
   #menuItemDescriptor: AppMenuItemDescriptor;

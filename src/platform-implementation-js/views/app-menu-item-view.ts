@@ -90,28 +90,83 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
   >;
   static #menuItemToPanelMap = new Map<HTMLElement, HTMLElement | undefined>();
   static #appMenuItemViews = new Set<AppMenuItemView>();
-  static #getActivePanel() {
+
+  static getAllPanels() {
     const appMenuElement = GmailElementGetter.getAppMenuContainer();
-    const { ACTIVE } = CollapsiblePanelView.elementCss;
+
+    const nativePanels = appMenuElement?.querySelectorAll<HTMLElement>(
+      `.${PANEL_NATIVE_CLASS}`,
+    );
+
+    return Array.from(nativePanels ?? []);
+  }
+
+  static getActivePanel(useSdkActiveSelector = true) {
+    const appMenuElement = GmailElementGetter.getAppMenuContainer();
+    const { ACTIVE, SDK_ACTIVE } = CollapsiblePanelView.elementCss;
 
     const nativePanel = appMenuElement?.querySelector<HTMLElement>(
-      `.${PANEL_NATIVE_CLASS}.${ACTIVE}`,
+      useSdkActiveSelector
+        ? `.${PANEL_NATIVE_CLASS}.${ACTIVE}.${SDK_ACTIVE}`
+        : `.${PANEL_NATIVE_CLASS}.${ACTIVE}`,
     );
 
     return nativePanel;
   }
-  static #getActiveMenuItem() {
+
+  static deactivatePanel(panel: HTMLElement) {
+    const { ACTIVE, HOVER, SDK_ACTIVE } = CollapsiblePanelView.elementCss;
+
+    panel.style.removeProperty('height');
+    if (panel.classList.contains(HOVER)) {
+      panel.classList.remove(HOVER);
+    }
+    if (panel.classList.contains(ACTIVE)) {
+      panel.classList.remove(ACTIVE);
+    }
+    if (panel.classList.contains(SDK_ACTIVE)) {
+      panel.classList.remove(SDK_ACTIVE);
+    }
+  }
+
+  static isMenuItem(element: HTMLElement) {
+    return element.classList.contains(NATIVE_CLASS);
+  }
+
+  static getAllMenuItems() {
     const appMenuElement = GmailElementGetter.getAppMenuContainer();
-    const { ACTIVE } = GmailAppMenuItemView.elementCss;
+    return Array.from(
+      appMenuElement?.querySelectorAll<HTMLElement>(`.${NATIVE_CLASS}`) ?? [],
+    );
+  }
+
+  static getActiveMenuItem() {
+    const appMenuElement = GmailElementGetter.getAppMenuContainer();
+    const { ACTIVE, SDK_ACTIVE } = GmailAppMenuItemView.elementCss;
 
     const button = appMenuElement?.querySelector<HTMLElement>(
-      `.${NATIVE_CLASS}.${ACTIVE}`,
+      `.${NATIVE_CLASS}.${ACTIVE}.${SDK_ACTIVE}`,
     );
 
     return button;
   }
+
+  static deactivateMenuItem(menuItem: HTMLElement) {
+    const { ACTIVE, HOVER, SDK_ACTIVE } = GmailAppMenuItemView.elementCss;
+
+    if (menuItem.classList.contains(HOVER)) {
+      menuItem.classList.remove(HOVER);
+    }
+    if (menuItem.classList.contains(ACTIVE)) {
+      menuItem.classList.remove(ACTIVE);
+    }
+    if (menuItem.classList.contains(SDK_ACTIVE)) {
+      menuItem.classList.remove(SDK_ACTIVE);
+    }
+  }
+
   static #isPanelLess() {
-    const activePanel = AppMenuItemView.#getActivePanel();
+    const activePanel = AppMenuItemView.getActivePanel(false);
     return !activePanel;
   }
   static #adjustTooltipNub() {
@@ -304,25 +359,16 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
   static {
     AppMenuItemView.#menuItemChangeStream.onValue(async (v) => {
       const [type, menuItem, mouseEvent] = v;
-      const { ACTIVE, HOVER } = GmailAppMenuItemView.elementCss;
+      const { HOVER } = GmailAppMenuItemView.elementCss;
 
       function handleActivate() {
         const appMenuElement = GmailElementGetter.getAppMenuContainer();
 
-        // deactivate active panel
-        const activePanel = AppMenuItemView.#getActivePanel();
-        if (activePanel) {
-          activePanel.style.removeProperty('height');
-          activePanel.classList.remove(CollapsiblePanelView.elementCss.ACTIVE);
-          activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
-        }
-
         // deactivate menu items and handle keyboard accessibility
-        for (const menuItem_ of appMenuElement?.querySelectorAll(
+        for (const menuItem_ of appMenuElement?.querySelectorAll<HTMLElement>(
           `.${NATIVE_CLASS}`,
         ) ?? []) {
-          menuItem_.classList.remove(ACTIVE);
-          menuItem_.classList.remove(HOVER);
+          AppMenuItemView.deactivateMenuItem(menuItem_);
           // update tabindex
           const iconElement = menuItem_.querySelector<HTMLElement>(
             ICON_ELEMENT_SELECTOR,
@@ -333,19 +379,27 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         }
 
         // activate menu item
-        menuItem.classList.add(ACTIVE);
+        activateMenuItem(menuItem);
         // activate panel
         const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
         if (panel) {
-          panel.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
+          const otherPanels = AppMenuItemView.getAllPanels().filter(
+            (p) => p !== panel,
+          );
+
+          for (const otherPanel of otherPanels) {
+            AppMenuItemView.deactivatePanel(otherPanel);
+          }
+
+          activatePanel(panel);
         }
       }
 
       switch (type) {
         case 'mouseenter': {
           const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
-          const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
-          const activePanel = AppMenuItemView.#getActivePanel();
+          const activeMenuItem = AppMenuItemView.getActiveMenuItem();
+          const activePanel = AppMenuItemView.getActivePanel();
           const burgerMenuOpen = GmailElementGetter.isAppBurgerMenuOpen();
 
           // hover-styled panel is displayed for collapsed burger menu
@@ -358,11 +412,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
           // deactivate active panel
           if (activePanel) {
-            activePanel.style.removeProperty('height');
-            activePanel.classList.remove(
-              CollapsiblePanelView.elementCss.ACTIVE,
-            );
-            activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
+            AppMenuItemView.deactivatePanel(activePanel);
           }
 
           // activate new panel
@@ -370,10 +420,11 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
             const height =
               window.innerHeight - panel.getBoundingClientRect().top;
             panel.style.cssText = `height: ${height}px;`;
-            panel.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
-            panel.classList.add(CollapsiblePanelView.elementCss.HOVER);
+            activatePanel(panel, { hover: true });
             // hover menu item
-            menuItem.classList.add(HOVER);
+            if (!menuItem.classList.contains(HOVER)) {
+              menuItem.classList.add(HOVER);
+            }
             // handle burger menu collapsed
             if (!burgerMenuOpen) {
               for (const panel of document.querySelectorAll(
@@ -389,7 +440,9 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
             const panel =
               activeMenuItem &&
               AppMenuItemView.#menuItemToPanelMap.get(activeMenuItem);
-            panel?.classList.add(CollapsiblePanelView.elementCss.ACTIVE);
+            if (panel) {
+              activatePanel(panel);
+            }
           }
 
           break;
@@ -400,8 +453,8 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           const isPanelDropdownShown = AppMenuItemView.#isPanelDropdownShown();
           if (isPanelDropdownShown) return;
 
-          const activeMenuItem = AppMenuItemView.#getActiveMenuItem();
-          const activePanel = AppMenuItemView.#getActivePanel();
+          const activeMenuItem = AppMenuItemView.getActiveMenuItem();
+          const activePanel = AppMenuItemView.getActivePanel();
           const activeMenuItemPanel =
             activeMenuItem &&
             AppMenuItemView.#menuItemToPanelMap.get(activeMenuItem);
@@ -418,7 +471,9 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           if (activePanel === activeMenuItemPanel && burgerMenuOpen) return;
 
           // unhover menu item
-          menuItem.classList.remove(HOVER);
+          if (menuItem.classList.contains(HOVER)) {
+            menuItem.classList.remove(HOVER);
+          }
 
           // handle burger menu collapsed
           for (const panel of document.querySelectorAll(
@@ -431,18 +486,12 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
           // deactivate active panel
           if (activePanel) {
-            activePanel.style.removeProperty('height');
-            activePanel.classList.remove(
-              CollapsiblePanelView.elementCss.ACTIVE,
-            );
-            activePanel.classList.remove(CollapsiblePanelView.elementCss.HOVER);
+            AppMenuItemView.deactivatePanel(activePanel);
           }
 
           // activate active menu item panel
           if (activeMenuItemPanel) {
-            activeMenuItemPanel.classList.add(
-              CollapsiblePanelView.elementCss.ACTIVE,
-            );
+            activatePanel(activeMenuItemPanel);
           }
           break;
         }
@@ -617,5 +666,36 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       AppMenuItemView.#adjustTooltipNub();
     });
     AppMenuItemView.#appMenuItemViews.delete(this);
+  }
+}
+
+function activatePanel(panel: HTMLElement, options?: { hover?: boolean }) {
+  const { ACTIVE, HOVER, SDK_ACTIVE } = CollapsiblePanelView.elementCss;
+
+  if (!panel.classList.contains(ACTIVE)) {
+    panel.classList.add(ACTIVE);
+  }
+  if (!panel.classList.contains(SDK_ACTIVE)) {
+    panel.classList.add(SDK_ACTIVE);
+  }
+  if (options?.hover) {
+    if (!panel.classList.contains(HOVER)) {
+      panel.classList.add(HOVER);
+    }
+  } else {
+    if (panel.classList.contains(HOVER)) {
+      panel.classList.remove(HOVER);
+    }
+  }
+}
+
+function activateMenuItem(menuItem: HTMLElement) {
+  const { ACTIVE, SDK_ACTIVE } = GmailAppMenuItemView.elementCss;
+
+  if (!menuItem.classList.contains(ACTIVE)) {
+    menuItem.classList.add(ACTIVE);
+  }
+  if (!menuItem.classList.contains(SDK_ACTIVE)) {
+    menuItem.classList.add(SDK_ACTIVE);
   }
 }
