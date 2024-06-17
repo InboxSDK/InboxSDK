@@ -4,6 +4,8 @@ import GmailDriver from '../dom-driver/gmail/gmail-driver';
 import GmailElementGetter from '../dom-driver/gmail/gmail-element-getter';
 import { AppMenuItemView } from '../views/app-menu-item-view';
 import { CollapsiblePanelView } from '../views/collapsible-panel-view';
+import isNotNil from '../../common/isNotNil';
+import makeMutationObserverChunkedStream from '../lib/dom/make-mutation-observer-chunked-stream';
 
 type ThemedIcon =
   | string
@@ -163,6 +165,8 @@ export default class AppMenu {
 
   constructor(driver: GmailDriver) {
     this.#driver = driver;
+
+    AppMenu.#monitorAppMenuState();
   }
 
   /**
@@ -199,5 +203,68 @@ export default class AppMenu {
   async isShown() {
     const result = await GmailElementGetter.getAppMenuAsync();
     return !!result;
+  }
+
+  static #monitorInitialized = false;
+  static async #monitorAppMenuState() {
+    /**
+     * Gmail could set menu item to active asynchronously, monitor changes to the menu DOM and
+     * deactivate all other menu items that don't have the SDK specific active class name.
+     *
+     * Same applies to menu panel. Deactivate all other panels that don't have the SDK specific active class name.
+     */
+
+    if (this.#monitorInitialized) {
+      return;
+    }
+
+    this.#monitorInitialized = true;
+
+    kefir
+      .fromPromise<HTMLElement | undefined, unknown>(
+        GmailElementGetter.getAppMenuAsync(),
+      )
+      .filter(isNotNil)
+      .flatMap((appMenu) =>
+        makeMutationObserverChunkedStream(appMenu, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['class'],
+        }).delay(0),
+      )
+      .filter((mutations) =>
+        mutations.some(
+          (m) =>
+            m.target instanceof HTMLElement &&
+            AppMenuItemView.isMenuItem(m.target),
+        ),
+      )
+      .throttle(10, { leading: true, trailing: true })
+      .map(() => {
+        const activeMenuItem = AppMenuItemView.getActiveMenuItem();
+
+        if (activeMenuItem) {
+          const otherMenuItems = AppMenuItemView.getAllMenuItems().filter(
+            (menuItem) => menuItem !== activeMenuItem,
+          );
+
+          otherMenuItems.map((menuItem) =>
+            AppMenuItemView.deactivateMenuItem(menuItem),
+          );
+        }
+
+        const activePanel = AppMenuItemView.getActivePanel();
+        if (activePanel) {
+          const otherPanels = AppMenuItemView.getAllPanels().filter(
+            (panel) => panel !== activePanel,
+          );
+
+          otherPanels.map((panel) => AppMenuItemView.deactivatePanel(panel));
+        }
+      })
+      .onValue(() => {
+        // monitor forever
+      });
   }
 }
