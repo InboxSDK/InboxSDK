@@ -101,12 +101,14 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     return Array.from(nativePanels ?? []);
   }
 
-  static getActivePanel() {
+  static getActivePanel(useSdkActiveSelector = true) {
     const appMenuElement = GmailElementGetter.getAppMenuContainer();
     const { ACTIVE, SDK_ACTIVE } = CollapsiblePanelView.elementCss;
 
     const nativePanel = appMenuElement?.querySelector<HTMLElement>(
-      `.${PANEL_NATIVE_CLASS}.${ACTIVE}.${SDK_ACTIVE}`,
+      useSdkActiveSelector
+        ? `.${PANEL_NATIVE_CLASS}.${ACTIVE}.${SDK_ACTIVE}`
+        : `.${PANEL_NATIVE_CLASS}.${ACTIVE}`,
     );
 
     return nativePanel;
@@ -164,7 +166,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
   }
 
   static #isPanelLess() {
-    const activePanel = AppMenuItemView.getActivePanel();
+    const activePanel = AppMenuItemView.getActivePanel(false);
     return !activePanel;
   }
   static #adjustTooltipNub() {
