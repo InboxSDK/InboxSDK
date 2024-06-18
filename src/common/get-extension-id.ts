@@ -15,9 +15,13 @@ const getExtensionId = once((): string | null => {
     // pre-existing content scripts start throwing "Extension context
     // invalidated" errors. We only use extension IDs for logging, so we
     // shouldn't treat this as fatal.
-    console.error('Failed to get extension ID:', e);
+    console.error('Failed to read extension ID:', e);
   }
   return null;
 });
+
+// pre-cache the extension ID so we still know it inside this content script if
+// the extension is reloaded or removed later.
+getExtensionId();
 
 export default getExtensionId;
