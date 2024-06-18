@@ -1,6 +1,8 @@
-export default function getExtensionId(): string | null {
+import once from 'lodash/once';
+
+const getExtensionId = once((): string | null => {
   try {
-    const chrome: any = (global as any).chrome;
+    const chrome: any = (globalThis as any).chrome;
     if (chrome?.runtime?.getURL) {
       return chrome.runtime.getURL('');
     }
@@ -16,4 +18,6 @@ export default function getExtensionId(): string | null {
     console.error('Failed to get extension ID:', e);
   }
   return null;
-}
+});
+
+export default getExtensionId;
