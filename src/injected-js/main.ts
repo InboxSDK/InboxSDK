@@ -1,6 +1,36 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 declare let define: any;
 
+// Protections against https://github.com/w3c/webextensions/issues/8 before
+// running for browsers that don't support the documentIds option to
+// scripting.executeScript():
+// 1. Check the page URL to make sure the page hasn't been navigated away from
+//    Gmail since the injection was requested.
+// 2. Check that the document.head attribute the InboxSDK sets in the document
+//    before injection is present, to make sure we're not in the situation where
+//    the page has refreshed since the injection was requested and a new
+//    injection was not requested yet.
+// 3. Check that a global variable this script sets is not already set to make
+//    sure this script isn't running twice, to make sure we don't run twice if
+//    we're in the situation where the page has refreshed since the injection
+//    was requested and another injection was requested too.
+
+const pageOrigin: string =
+  (process.env.NODE_ENV === 'test' && global.__test_origin) ||
+  document.location.origin;
+
+if (pageOrigin !== 'https://mail.google.com') {
+  throw new Error(
+    "Should not happen: InboxSDK pageWorld.js running in document that didn't request it.",
+  );
+}
+
+if (!document.head?.hasAttribute('data-inboxsdk-script-injected')) {
+  throw new Error(
+    "Should not happen: InboxSDK pageWorld.js running in document that didn't request it.",
+  );
+}
+
 if (!(global as any).__InboxSDKInjected) {
   (global as any).__InboxSDKInjected = true;
 
@@ -39,16 +69,8 @@ if (!(global as any).__InboxSDKInjected) {
     const setupGmonkeyHandler =
       require('./gmail/setup-gmonkey-handler').default;
 
-    const pageOrigin: string =
-      (process.env.NODE_ENV === 'test' && global.__test_origin) ||
-      document.location.origin;
-
-    if (pageOrigin === 'https://mail.google.com') {
-      gmailInterceptor();
-      setupGmonkeyHandler();
-    } else {
-      throw new Error('Should not happen');
-    }
+    gmailInterceptor();
+    setupGmonkeyHandler();
 
     extCorbWorkaroundPageWorld.init();
     xhrHelper();
