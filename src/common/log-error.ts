@@ -71,20 +71,17 @@ export default function logError(
     // our own current stack just in case.
     const nowStack = getStackTrace();
 
-    const stuffToLog: any[] = ['Error logged:', err];
-    if (err && (err as any).stack) {
-      stuffToLog.push('\n\nOriginal error stack:\n' + (err as any).stack);
-    }
-    stuffToLog.push('\n\nError logged from:\n' + nowStack);
+    const stuffToLog: unknown[] = ['Error logged:', err];
     if (details) {
       stuffToLog.push('\n\nError details:', details);
     }
-    stuffToLog.push('\n\nExtension App Ids:', JSON.stringify(appIds, null, 2));
-    stuffToLog.push('\nSent by App:', sentByApp);
-    stuffToLog.push('\nSession Id:', sessionId);
-    stuffToLog.push('\nExtension Id:', getExtensionId());
-    stuffToLog.push('\nInboxSDK Loader Version:', loaderVersion);
-    stuffToLog.push('\nInboxSDK Implementation Version:', implVersion);
+    stuffToLog.push(`\
+\n\nExtension App Ids: ${JSON.stringify(appIds, null, 2)}
+Sent by App: ${sentByApp}
+Session Id: ${sessionId}
+Extension Id: ${getExtensionId()}
+InboxSDK Loader Version: ${loaderVersion}
+InboxSDK Implementation Version: ${implVersion}`);
 
     console.error(...stuffToLog);
 
