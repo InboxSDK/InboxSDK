@@ -403,18 +403,20 @@ export default class GmailNavItemView {
       );
       this._accessoryViewController = accessoryViewController;
 
-      const accessoryEl = querySelector(this._element, '.Yh');
-      const parentNode = accessoryEl.parentNode;
-      if (parentNode) {
-        buttonOptions.buttonView
-          .getElement()
-          .classList.add(...accessoryEl.classList);
-        parentNode.replaceChild(
-          buttonOptions.buttonView.getElement(),
-          accessoryEl,
-        );
-        this._iconSettings.iconElement = null;
-      }
+      const accessoryEl = querySelector(
+        this._element,
+        '.Yh:not(.inboxsdk__navItem_parent_accessory_button)',
+      );
+
+      buttonOptions.buttonView
+        .getElement()
+        .classList.add(...accessoryEl.classList);
+
+      accessoryEl.style.display = 'none';
+      accessoryEl.parentNode!.appendChild(
+        buttonOptions.buttonView.getElement(),
+      );
+      this._iconSettings.iconElement = null;
 
       return;
     }
@@ -611,18 +613,20 @@ export default class GmailNavItemView {
         buttonOptions,
       );
 
-      const accessoryEl = querySelector(this._element, '.Yh');
-      const parentNode = accessoryEl.parentNode;
-      if (parentNode) {
-        buttonOptions.buttonView
-          .getElement()
-          .classList.add(...accessoryEl.classList);
-        parentNode.replaceChild(
-          buttonOptions.buttonView.getElement(),
-          accessoryEl,
-        );
-        this._iconSettings.iconElement = null;
-      }
+      const accessoryEl = querySelector(
+        this._element,
+        '.Yh:not(.inboxsdk__navItem_parent_accessory_button)',
+      );
+
+      buttonOptions.buttonView
+        .getElement()
+        .classList.add(...accessoryEl.classList);
+
+      accessoryEl.style.display = 'none';
+      accessoryEl.parentNode!.appendChild(
+        buttonOptions.buttonView.getElement(),
+      );
+      this._iconSettings.iconElement = null;
 
       return;
     }
