@@ -103,7 +103,7 @@
     "typecheck": "tsc",
     "typedefs": "tsc -p tsconfig.declarations.json",
     "prepare": "husky install",
-    "publish-npm": "gulp clean && gulp --production && yarn workspace @inboxsdk/core npm publish && git push --follow-tags",
+    "publish-npm": "gulp clean && gulp --production --noExamples && yarn workspace @inboxsdk/core npm publish && git push --follow-tags",
     "lint": "yarn run lint:eslint && yarn run prettier:check",
     "lint:fix": "yarn run lint:eslint --fix && yarn run prettier:fix",
     "lint:eslint": "eslint . --report-unused-disable-directives --max-warnings 0",
@@ -111,7 +111,7 @@
     "prettier:check": "prettier --check .",
     "prettier:fix": "prettier --write .",
     "puppeteer": "jest -c test/chrome/jest.config.js --runInBand",
-    "start": "gulp default -w --reloader --examples",
+    "start": "gulp default -w --reloader",
     "test": "jest"
   },
   "lint-staged": {

@@ -30,8 +30,8 @@ const args = stdio.getopt({
     key: 'c',
     description: 'Copy dev build to Streak dev build folder',
   },
-  examples: {
-    description: 'Copy inboxsdk.js to all subdirs under examples/',
+  noExamples: {
+    description: `Don't build examples/ extensions`,
   },
 })!;
 
@@ -59,6 +59,9 @@ process.env.IMPLEMENTATION_URL = args.production
  * @deprecated when MV2 support is removed, delete this function.
  */
 async function setupExamples() {
+  if (args.noExamples) {
+    return;
+  }
   const dirs: string[] = [];
   if (args.copyToStreak) {
     dirs.push('../MailFoo/extensions/devBuilds/chrome/');
@@ -400,6 +403,8 @@ if (args.remote) {
   };
 } else {
   // standard npm non-remote bundle
+  let startedBuildingExamples = false;
+
   config = {
     entry: {
       ...pageWorld,
@@ -414,7 +419,9 @@ if (args.remote) {
     },
     disableMinification: true,
     afterBuild: async () => {
-      if (args.examples) {
+      if (!args.noExamples && !startedBuildingExamples) {
+        startedBuildingExamples = true;
+
         const contentScriptFps = await fg(
           ['.ts', '.js'].map((ext) => './examples/*/content' + ext),
         );
