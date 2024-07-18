@@ -1,4 +1,5 @@
 import * as InboxSDK from '@inboxsdk/core';
+import * as Kefir from 'kefir';
 
 function log() {
   console.log.apply(
@@ -93,15 +94,33 @@ InboxSDK.load(1, 'nav-menu').then(function (sdk) {
   };
 
   const initNavItemCollapse = () => {
-    const parent = sdk.NavMenu.addNavItem({
-      accessory: {
-        onClick: () => {
-          parent.setCollapsed(!parent.isCollapsed());
-        },
-        type: 'CREATE',
-      },
-      name: 'P - Toggle Collapse',
-    });
+    const parent = sdk.NavMenu.addNavItem(
+      Kefir.later(500, {
+        name: 'P - Toggle Collapse 1',
+      })
+        .merge(
+          Kefir.later(1000, {
+            accessory: {
+              onClick: () => {
+                parent.setCollapsed(!parent.isCollapsed());
+              },
+              type: 'CREATE',
+            },
+            name: 'P - Toggle Collapse 2',
+          }),
+        )
+        .merge(
+          Kefir.later(2000, {
+            accessory: {
+              onClick: () => {
+                parent.setCollapsed(!parent.isCollapsed());
+              },
+              type: 'CREATE',
+            },
+            name: 'P - Toggle Collapse 3',
+          }),
+        ),
+    );
 
     const child = parent.addNavItem({
       accessory: {
