@@ -611,7 +611,7 @@ export default class GmailNavItemView {
         buttonOptions,
       );
 
-      const accessoryEl = querySelector(this._element, '.Yh');
+      const accessoryEl = buttonOptions.buttonView.getElement(); // querySelector(this._element, '.Yh');
       const parentNode = accessoryEl.parentNode;
       if (parentNode) {
         buttonOptions.buttonView
