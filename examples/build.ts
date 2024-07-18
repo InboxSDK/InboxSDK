@@ -3,9 +3,7 @@ import path from 'node:path';
 import esbuild from 'esbuild';
 
 type BuildConfig = Parameters<typeof esbuild.build>[0];
-type Watcher = ReturnType<typeof esbuild.context>;
 
-let esbuildWatch: undefined | Watcher;
 const TIMING_LABEL = 'building ./examples took';
 
 const buildSdkFiles = ['@inboxsdk/core/pageWorld', '@inboxsdk/core/background'];
@@ -65,10 +63,9 @@ export async function buildExamples({
     entryNames: '[dir]/[name]',
   };
 
-  if (watch && esbuildWatch == null) {
-    esbuildWatch = esbuild.context(config);
-
-    (await esbuildWatch).watch();
+  if (watch) {
+    const esbuildWatch = await esbuild.context(config);
+    await esbuildWatch.watch();
   } else {
     await esbuild.build(config);
   }

@@ -400,6 +400,8 @@ if (args.remote) {
   };
 } else {
   // standard npm non-remote bundle
+  let startedBuildingExamples = false;
+
   config = {
     entry: {
       ...pageWorld,
@@ -414,7 +416,9 @@ if (args.remote) {
     },
     disableMinification: true,
     afterBuild: async () => {
-      if (args.examples) {
+      if (args.examples && !startedBuildingExamples) {
+        startedBuildingExamples = true;
+
         const contentScriptFps = await fg(
           ['.ts', '.js'].map((ext) => './examples/*/content' + ext),
         );
