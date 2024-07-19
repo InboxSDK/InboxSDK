@@ -1099,7 +1099,14 @@ export default class GmailNavItemView {
       return;
     }
 
-    const nameElement = this._element.querySelector('.inboxsdk__navItem_name');
+    let nameElement = this._element.querySelector('.inboxsdk__navItem_name');
+    if (
+      nameElement &&
+      nameElement.closest('.inboxsdk__navItem') !== this._element
+    ) {
+      // ignore the name element if it belongs to a child nav item
+      nameElement = null;
+    }
 
     switch (type) {
       case NAV_ITEM_TYPES.GROUPER:
