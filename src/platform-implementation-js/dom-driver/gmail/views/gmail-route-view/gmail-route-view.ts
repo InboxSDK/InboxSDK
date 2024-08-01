@@ -91,6 +91,7 @@ class GmailRouteView implements RouteViewDriver {
         .takeUntilBy(this._stopper)
         .onValue(async () => {
           await this.#waitForMainElementSafe();
+          if (this._stopper.stopped) return;
 
           var last = driver.getLastCustomThreadListActivity();
 
