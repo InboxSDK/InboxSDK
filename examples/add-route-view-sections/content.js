@@ -68,12 +68,17 @@ InboxSDK.load(1.0, 'route-view-sections-example').then(function (inboxSDK) {
       var el = document.createElement('div');
       el.innerHTML = 'Hello World';
 
-      var view3 = listRouteView.addSection({
-        title: 'No Collapse!',
-        contentElement: el,
-        footerLinkText: 'Smell my feet',
-        onFooterLinkClick: console.log.bind(console, 'they stink!'),
-      });
+      if (
+        listRouteView.getRouteID() === inboxSDK.Router.NativeRouteIDs.SEARCH
+      ) {
+        const view3 = listRouteView.addSection({
+          contentElement: el,
+          footerLinkText: 'Hide filter toolbars (present on search pages)',
+          onFooterLinkClick() {
+            listRouteView.hideSearchPageFilterToolbar();
+          },
+        });
+      }
 
       var bus = new Bacon.Bus();
       listRouteView.addCollapsibleSection(bus);

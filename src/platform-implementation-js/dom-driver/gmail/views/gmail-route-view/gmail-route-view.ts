@@ -268,6 +268,19 @@ class GmailRouteView implements RouteViewDriver {
     return gmailResultsSectionView;
   }
 
+  hideSearchPageFilterToolbar() {
+    toItemWithLifetimeStream(
+      this.#page.tree.getAllByTag('rowListElementContainer'),
+    )
+      .takeUntilBy(this._stopper)
+      .onValue(({ el, removalStream }) => {
+        el.getValue().classList.add('inboxsdk__hide_filter_toolbar');
+        removalStream.onValue(() => {
+          el.getValue().classList.remove('inboxsdk__hide_filter_toolbar');
+        });
+      });
+  }
+
   _setupCustomViewElement() {
     this._customViewElement = document.createElement('div');
 

@@ -30,6 +30,7 @@ export type RouteViewDriver = MinRouteViewDriver & {
     >,
     groupOrderHint: any,
   ): GmailCollapsibleSectionView;
+  hideSearchPageFilterToolbar(): void;
   getCustomViewElement(): HTMLElement | null | undefined;
   setFullWidth(fullWidth: boolean): void;
 };
