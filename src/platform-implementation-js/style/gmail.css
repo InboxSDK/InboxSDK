@@ -2813,3 +2813,14 @@ table[role='presentation'].inboxsdk__thread_view_with_custom_view > tr {
 .T-I.J-J5-Ji.T-I-ax7.inboxsdk__button .asa::after {
   width: auto;
 }
+
+/* ListRouteView hideFilterToolbar() support */
+.inboxsdk__hide_filter_toolbar .G6[role="toolbar"] /* chat+meet off */,
+.inboxsdk__hide_filter_toolbar .biW[data-srm="email"] /* chat+meet on */ {
+  display: none;
+}
+
+.inboxsdk__hide_filter_toolbar .G-atb.PY /* chat+meet off */ {
+  min-height: 32px !important;
+  height: 32px !important;
+}

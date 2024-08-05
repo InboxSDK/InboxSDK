@@ -69,6 +69,16 @@ class ListRouteView extends RouteView {
     return sectionView;
   }
 
+  /**
+   * Hides the search filter toolbar that appears on search pages.
+   *
+   * This method may not support other pages such as the Sent page, even though
+   * it has a very similar filter toolbar.
+   */
+  hideSearchPageFilterToolbar() {
+    this.#routeViewDriver.hideSearchPageFilterToolbar();
+  }
+
   /** Simulates a click on the Gmail thread list refresh button. */
   refresh() {
     this.#routeViewDriver.refresh();
