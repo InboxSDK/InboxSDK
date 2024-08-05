@@ -423,7 +423,9 @@ class GmailToolbarView {
   }
 
   _getMoveSectionElement(): HTMLElement | null | undefined {
-    return this._getSectionElementForButtonSelector('.asb, .ase, .ns, .mw');
+    return this._getSectionElementForButtonSelector(
+      '.asb, .ase, .ns, .mw, .bq5',
+    );
   }
 
   _getSectionElementForButtonSelector(
