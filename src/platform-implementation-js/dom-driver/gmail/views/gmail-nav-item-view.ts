@@ -59,7 +59,7 @@ export type NavItemDescriptor = {
   key: string;
   orderHint: number;
   iconUrl: string;
-  routeID: string;
+  routeID: string | string[];
   iconClass: string;
   iconElement: HTMLElement;
   iconPosition: 'BEFORE_NAME';
@@ -1053,7 +1053,7 @@ export default class GmailNavItemView {
     this._orderHint = navItemDescriptor.orderHint;
   }
 
-  private _updateRole(routeID?: string) {
+  private _updateRole(routeID?: string | string[]) {
     if (this.isSection()) {
       return;
     }

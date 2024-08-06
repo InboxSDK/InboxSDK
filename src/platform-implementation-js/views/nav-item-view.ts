@@ -172,7 +172,9 @@ export default class NavItemView extends (EventEmitter as new () => TypedEventEm
 
         if (navItemDescriptor.routeID) {
           this.#driver.goto(
-            navItemDescriptor.routeID,
+            Array.isArray(navItemDescriptor.routeID)
+              ? navItemDescriptor.routeID[0]
+              : navItemDescriptor.routeID,
             navItemDescriptor.routeParams,
           );
         } else {
@@ -193,9 +195,31 @@ function _handleRouteViewChange(
   navItemViewDriver: GmailNavItemView,
   [navItemDescriptor, routeViewDriver]: [NavItemDescriptor, RouteViewDriver],
 ) {
-  navItemViewDriver.setActive(
-    navItemDescriptor &&
-      routeViewDriver.getRouteID() === navItemDescriptor.routeID &&
-      isEqual(navItemDescriptor.routeParams || {}, routeViewDriver.getParams()),
-  );
+  let isAMatch = false;
+  const routeViewDriverRouteID = routeViewDriver.getRouteID();
+  const navItemDescriptorRouteID = navItemDescriptor.routeID;
+
+  if (Array.isArray(routeViewDriverRouteID)) {
+    if (Array.isArray(navItemDescriptorRouteID)) {
+      isAMatch = routeViewDriverRouteID.some((routeID) =>
+        navItemDescriptorRouteID.includes(routeID),
+      );
+    } else {
+      isAMatch = routeViewDriverRouteID.includes(
+        navItemDescriptorRouteID ?? '',
+      );
+    }
+  } else {
+    if (Array.isArray(navItemDescriptorRouteID)) {
+      isAMatch = navItemDescriptorRouteID.includes(routeViewDriverRouteID);
+    } else {
+      isAMatch =
+        routeViewDriverRouteID === navItemDescriptorRouteID &&
+        isEqual(
+          navItemDescriptor.routeParams || {},
+          routeViewDriver.getParams(),
+        );
+    }
+  }
+  navItemViewDriver.setActive(navItemDescriptor && isAMatch);
 }

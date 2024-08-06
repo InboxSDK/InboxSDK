@@ -8,7 +8,7 @@ import type { MinRouteViewDriver } from '../../driver-interfaces/route-view-driv
  */
 class RouteView extends EventEmitter {
   destroyed: boolean;
-  #routeID: string | null = null;
+  #routeID: string | string[] | null = null;
   #routeType: string | null = null;
   #params: Record<string, string> | null = null;
   #routeViewDriver;
@@ -22,9 +22,9 @@ class RouteView extends EventEmitter {
   }
 
   /**
-   * @returns a string of the ID of the RouteView. This is the same routeID that you give Router.goto() or Router.createLink(). This will be a value from NativeRouteIDs.
+   * @returns a string or string[] of the ID of the RouteView. This is the same routeID that you give Router.goto() or Router.createLink(). This will be a value from NativeRouteIDs.
    */
-  getRouteID(): string {
+  getRouteID(): string | string[] {
     if (!this.#routeID) {
       this.#routeID = this.#routeViewDriver.getRouteID();
     }

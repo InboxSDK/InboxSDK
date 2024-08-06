@@ -25,11 +25,12 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
     document.head.appendChild(sheet);
   };
 
-  for (const n of [1, 2, 3]) {
+  for (const n of [1, 2, 3, 4]) {
     sdk.Router.handleCustomRoute(`custom-route-${n}`, (customRouteView) => {
       const el = document.createElement('span');
       el.innerHTML = `This is custom route ${n}`;
       customRouteView.getElement().appendChild(el);
+      console.log('custom-route', n);
     });
   }
 
@@ -51,7 +52,7 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
       routeID: 'custom-route-1',
       isRouteActive: (route) => {
         const routeID = route.getRouteID();
-        return routeID === 'custom-route-1';
+        return routeID === 'custom-route-1' || routeID === 'custom-route-4';
       },
     }),
     customItem2 = sdk.AppMenu.addMenuItem({
@@ -128,7 +129,10 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
 
   panel1.addNavItem({
     name: 'Nav Item 1',
-    onClick: () => sdk.Router.goto('custom-route-3'),
+    routeID: ['custom-route-1', 'custom-route-4'],
+    onClick: () => {
+      sdk.Router.goto('custom-route-4');
+    },
   });
 
   panel1.addNavItem({
