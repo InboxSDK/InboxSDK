@@ -195,31 +195,20 @@ function _handleRouteViewChange(
   navItemViewDriver: GmailNavItemView,
   [navItemDescriptor, routeViewDriver]: [NavItemDescriptor, RouteViewDriver],
 ) {
-  let isAMatch = false;
-  const routeViewDriverRouteID = routeViewDriver.getRouteID();
-  const navItemDescriptorRouteID = navItemDescriptor.routeID;
-
-  if (Array.isArray(routeViewDriverRouteID)) {
-    if (Array.isArray(navItemDescriptorRouteID)) {
-      isAMatch = routeViewDriverRouteID.some((routeID) =>
-        navItemDescriptorRouteID.includes(routeID),
-      );
-    } else {
-      isAMatch = routeViewDriverRouteID.includes(
-        navItemDescriptorRouteID ?? '',
-      );
-    }
-  } else {
-    if (Array.isArray(navItemDescriptorRouteID)) {
-      isAMatch = navItemDescriptorRouteID.includes(routeViewDriverRouteID);
-    } else {
-      isAMatch =
-        routeViewDriverRouteID === navItemDescriptorRouteID &&
-        isEqual(
-          navItemDescriptor.routeParams || {},
-          routeViewDriver.getParams(),
-        );
-    }
+  let isActive = false;
+  if (navItemDescriptor) {
+    const routesToCheck = [
+      {
+        routeID: navItemDescriptor.routeID,
+        routeParams: navItemDescriptor.routeParams,
+      },
+      ...(navItemDescriptor.secondaryRoutes || []),
+    ];
+    isActive = routesToCheck.some(
+      (route) =>
+        routeViewDriver.getRouteID() === route.routeID &&
+        isEqual(routeViewDriver.getParams(), route.routeParams || {}),
+    );
   }
-  navItemViewDriver.setActive(navItemDescriptor && isAMatch);
+  navItemViewDriver.setActive(isActive);
 }

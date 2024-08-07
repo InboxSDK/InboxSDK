@@ -30,7 +30,16 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
       const el = document.createElement('span');
       el.innerHTML = `This is custom route ${n}`;
       customRouteView.getElement().appendChild(el);
-      console.log('custom-route', n);
+      if (n === 1) {
+        const btn = document.createElement('button');
+        el.appendChild(btn).innerText = 'go to custom-route-4';
+        btn.onclick = () => sdk.Router.goto('custom-route-4');
+      }
+      if (n === 4) {
+        const btn = document.createElement('button');
+        el.appendChild(btn).innerText = 'go to custom-route-1';
+        btn.onclick = () => sdk.Router.goto('custom-route-1');
+      }
     });
   }
 
@@ -129,9 +138,10 @@ InboxSDK.load(2, 'app-menu').then(async (sdk) => {
 
   panel1.addNavItem({
     name: 'Nav Item 1',
-    routeID: ['custom-route-1', 'custom-route-4'],
+    routeID: 'custom-route-1',
+    secondaryRoutes: [{ routeID: 'custom-route-4' }],
     onClick: () => {
-      sdk.Router.goto('custom-route-4');
+      sdk.Router.goto('custom-route-1');
     },
   });
 

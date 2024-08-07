@@ -59,7 +59,11 @@ export type NavItemDescriptor = {
   key: string;
   orderHint: number;
   iconUrl: string;
-  routeID: string | string[];
+  routeID: string;
+  secondaryRoutes?: Array<{
+    routeID: string;
+    routeParams?: Record<string, string | number>;
+  }>;
   iconClass: string;
   iconElement: HTMLElement;
   iconPosition: 'BEFORE_NAME';
