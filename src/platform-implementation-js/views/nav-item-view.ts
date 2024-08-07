@@ -172,9 +172,7 @@ export default class NavItemView extends (EventEmitter as new () => TypedEventEm
 
         if (navItemDescriptor.routeID) {
           this.#driver.goto(
-            Array.isArray(navItemDescriptor.routeID)
-              ? navItemDescriptor.routeID[0]
-              : navItemDescriptor.routeID,
+            navItemDescriptor.routeID,
             navItemDescriptor.routeParams,
           );
         } else {

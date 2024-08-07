@@ -1057,7 +1057,7 @@ export default class GmailNavItemView {
     this._orderHint = navItemDescriptor.orderHint;
   }
 
-  private _updateRole(routeID?: string | string[]) {
+  private _updateRole(routeID?: string) {
     if (this.isSection()) {
       return;
     }
