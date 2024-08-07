@@ -5,7 +5,7 @@ import { SectionDescriptor } from '../../inboxsdk';
 /** The necessary interface that Router and RouteView expect. */
 export type MinRouteViewDriver = {
   getRouteType(): string;
-  getRouteID(): string | string[];
+  getRouteID(): string;
   getParams(): Record<string, string>;
   getEventStream(): Kefir.Observable<Record<string, any>, unknown>;
   getStopper(): Kefir.Observable<any, unknown>;
