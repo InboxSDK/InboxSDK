@@ -193,9 +193,20 @@ function _handleRouteViewChange(
   navItemViewDriver: GmailNavItemView,
   [navItemDescriptor, routeViewDriver]: [NavItemDescriptor, RouteViewDriver],
 ) {
-  navItemViewDriver.setActive(
-    navItemDescriptor &&
-      routeViewDriver.getRouteID() === navItemDescriptor.routeID &&
-      isEqual(navItemDescriptor.routeParams || {}, routeViewDriver.getParams()),
-  );
+  let isActive = false;
+  if (navItemDescriptor) {
+    const routesToCheck = [
+      {
+        routeID: navItemDescriptor.routeID,
+        routeParams: navItemDescriptor.routeParams,
+      },
+      ...(navItemDescriptor.secondaryRoutes || []),
+    ];
+    isActive = routesToCheck.some(
+      (route) =>
+        routeViewDriver.getRouteID() === route.routeID &&
+        isEqual(routeViewDriver.getParams(), route.routeParams || {}),
+    );
+  }
+  navItemViewDriver.setActive(isActive);
 }
