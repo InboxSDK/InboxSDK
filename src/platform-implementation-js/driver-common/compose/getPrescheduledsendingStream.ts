@@ -25,7 +25,7 @@ export default function ({
   const domEventStream = Kefir.merge([
     fromEventTargetCapture(element, 'mouseup').filter(
       (domEvent) =>
-        (scheduleSendButton && scheduleSendButton.contains(domEvent.target)),
+        scheduleSendButton && scheduleSendButton.contains(domEvent.target),
     ),
   ]);
   return domEventStream
