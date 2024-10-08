@@ -1219,7 +1219,7 @@ class GmailComposeView {
   getScheduleSendButton(): HTMLElement {
     return querySelector(
       this.#element,
-      '[selector="scheduledSend"]',
+      '.q8NmZb:has([selector="scheduledSend"])',
     );
   }
 
