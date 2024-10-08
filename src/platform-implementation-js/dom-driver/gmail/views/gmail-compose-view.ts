@@ -58,6 +58,7 @@ import getBodyChangesStream from './gmail-compose-view/get-body-changes-stream';
 import getRecipients from './gmail-compose-view/get-recipients';
 import getResponseTypeChangesStream from './gmail-compose-view/get-response-type-changes-stream';
 import getPresendingStream from '../../../driver-common/compose/getPresendingStream';
+import getPrescheduledsendingStream from '../../../driver-common/compose/getPrescheduledsendingStream';
 import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
 import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
 import setupLinkPopOvers from './gmail-compose-view/setupLinkPopovers';
@@ -436,6 +437,13 @@ class GmailComposeView {
         element: this.getElement(),
         sendButton: this.getSendButton(),
         sendAndArchive: this.getSendAndArchiveButton(),
+      }),
+    );
+
+    this.#eventStream.plug(
+      getPrescheduledsendingStream({
+        element: this.getElement(),
+        scheduleSendButton: this.getScheduleSendButton(),
       }),
     );
 
@@ -1205,6 +1213,13 @@ class GmailComposeView {
     return querySelector(
       this.#element,
       '.IZ .Up div > div[role=button]:not(.Uo):not([aria-haspopup=true]):not([class^=inboxsdk_])',
+    );
+  }
+
+  getScheduleSendButton(): HTMLElement {
+    return querySelector(
+      this.#element,
+      '[selector="scheduledSend"]',
     );
   }
 
