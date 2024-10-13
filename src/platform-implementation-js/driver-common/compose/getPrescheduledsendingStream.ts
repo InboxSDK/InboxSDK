@@ -44,7 +44,7 @@ export default function ({
         domEvent.stopImmediatePropagation();
         return false;
       }
-      // Do not process event if the element is not initited by the user.
+      // Do not process event if the element is not initiated by the user.
       if (!domEvent.isTrusted) {
         return false;
       }
