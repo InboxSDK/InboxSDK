@@ -18,11 +18,19 @@ const dispatchCancel = (
 export default function ({
   element,
   scheduleSendButton,
+  moreSendOptionsButton,
 }: {
   element: HTMLElement;
   scheduleSendButton: HTMLElement;
+  moreSendOptionsButton: HTMLElement;
 }) {
   const domEventStream = Kefir.merge([
+    fromEventTargetCapture(element, 'keydown').filter(
+      (domEvent) =>
+        (domEvent.which === 13 || domEvent.keyCode === 13) &&
+        moreSendOptionsButton &&
+        moreSendOptionsButton.contains(domEvent.target),
+    ),
     fromEventTargetCapture(element, 'mouseup').filter(
       (domEvent) =>
         scheduleSendButton && scheduleSendButton.contains(domEvent.target),
@@ -34,6 +42,10 @@ export default function ({
         domEvent.preventDefault();
         domEvent.stopPropagation();
         domEvent.stopImmediatePropagation();
+        return false;
+      }
+      // Do not process event if the element is not initited by the user.
+      if (!domEvent.isTrusted) {
         return false;
       }
 

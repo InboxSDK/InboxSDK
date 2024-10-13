@@ -241,6 +241,10 @@ export default class ComposeView extends (EventEmitter as new () => TypedEventEm
     get(memberMap, this).composeViewImplementation.send({ sendAndArchive });
   }
 
+  scheduleSend() {
+    get(memberMap, this).composeViewImplementation.scheduleSend();
+  }
+
   discard() {
     get(memberMap, this).composeViewImplementation.discard();
   }

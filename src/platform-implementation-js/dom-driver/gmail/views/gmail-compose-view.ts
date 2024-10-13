@@ -444,6 +444,7 @@ class GmailComposeView {
       getPrescheduledsendingStream({
         element: this.getElement(),
         scheduleSendButton: this.getScheduleSendButton(),
+        moreSendOptionsButton: this.getMoreSendOptionsButton(),
       }),
     );
 
@@ -939,6 +940,14 @@ class GmailComposeView {
     });
   }
 
+  scheduleSend() {
+    // asap necessary so if scheduledSend() is called after prescheduledsending event.cancel(), the new prescheduledsending event
+    // must happen after the scheduledsendCanceled event (which is also delayed by asap).
+    asap(() => {
+      simulateClick(this.getScheduleSendButton());
+    });
+  }
+
   discard() {
     simulateClick(this.getDiscardButton());
   }
@@ -1217,10 +1226,11 @@ class GmailComposeView {
   }
 
   getScheduleSendButton(): HTMLElement {
-    return querySelector(
-      this.#element,
-      '.q8NmZb:has([selector="scheduledSend"])',
-    );
+    return querySelector(this.#element, '[selector="scheduledSend"]');
+  }
+
+  getMoreSendOptionsButton(): HTMLElement {
+    return querySelector(this.#element, '.hG');
   }
 
   // When schedule send is available, this returns the element that contains both buttons.
