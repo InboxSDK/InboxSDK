@@ -1806,7 +1806,7 @@ body :local(.sidebar_iconArea) .inboxsdk__button_icon {
   .sidebar_button_container_active
   .inboxsdk__button_selectedIndicator {
   height: 40px;
-  width: 4px;
+  width: 3px;
   position: absolute;
   right: 0px;
   bottom: 0px;
