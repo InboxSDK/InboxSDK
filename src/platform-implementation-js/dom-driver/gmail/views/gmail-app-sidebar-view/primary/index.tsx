@@ -704,6 +704,13 @@ class GmailAppSidebarPrimary {
       );
     }
 
+    // detect 2024-11-07 gmail update that moved sidebar icons to the right of
+    // the sidebar
+    if (this.#companionSidebarOuterWrapper.classList.contains('WN9Ejb')) {
+      document.body.classList.add('inboxsdk__sidebar_icons_right');
+      this.#driver.getLogger().eventSite('sidebar_icons_right');
+    }
+
     const contentContainer =
       this.#companionSidebarOuterWrapper.previousElementSibling;
 
