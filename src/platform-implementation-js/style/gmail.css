@@ -1808,9 +1808,19 @@ body :local(.sidebar_iconArea) .inboxsdk__button_icon {
   height: 40px;
   width: 3px;
   position: absolute;
-  right: 0px;
+  left: 0px;
   bottom: 0px;
   background-color: rgb(66 133 244);
+  border-radius: 0 3px 3px 0;
+}
+
+/* old pre-2024-11-07 sidebar where buttons were on the right of the panel */
+:local(.companion_container_app_sidebar_in_use)
+  :local(.sidebar_iconArea)
+  .sidebar_button_container_active
+  .inboxsdk__button_selectedIndicator {
+  left: unset;
+  right: 0;
   border-radius: 3px 0 0 3px;
 }
 
