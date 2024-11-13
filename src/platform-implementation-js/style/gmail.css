@@ -2800,7 +2800,6 @@ table[role='presentation'].inboxsdk__thread_view_with_custom_view > tr {
 .inboxsdk__linkPopOver_section_container {
   position: absolute;
   width: 100%;
-  top: 35px;
   left: 0;
 }
 
