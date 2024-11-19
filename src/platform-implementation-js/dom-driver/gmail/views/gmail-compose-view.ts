@@ -58,6 +58,7 @@ import getBodyChangesStream from './gmail-compose-view/get-body-changes-stream';
 import getRecipients from './gmail-compose-view/get-recipients';
 import getResponseTypeChangesStream from './gmail-compose-view/get-response-type-changes-stream';
 import getPresendingStream from '../../../driver-common/compose/getPresendingStream';
+import getPrescheduledsendingStream from '../../../driver-common/compose/getPrescheduledsendingStream';
 import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
 import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
 import setupLinkPopOvers from './gmail-compose-view/setupLinkPopovers';
@@ -436,6 +437,14 @@ class GmailComposeView {
         element: this.getElement(),
         sendButton: this.getSendButton(),
         sendAndArchive: this.getSendAndArchiveButton(),
+      }),
+    );
+
+    this.#eventStream.plug(
+      getPrescheduledsendingStream({
+        element: this.getElement(),
+        scheduleSendButton: this.getScheduleSendButton(),
+        moreSendOptionsButton: this.getMoreSendOptionsButton(),
       }),
     );
 
@@ -931,6 +940,14 @@ class GmailComposeView {
     });
   }
 
+  scheduleSend() {
+    // asap necessary so if scheduledSend() is called after prescheduledsending event.cancel(), the new prescheduledsending event
+    // must happen after the scheduledsendCanceled event (which is also delayed by asap).
+    asap(() => {
+      simulateClick(this.getScheduleSendButton());
+    });
+  }
+
   discard() {
     simulateClick(this.getDiscardButton());
   }
@@ -1206,6 +1223,14 @@ class GmailComposeView {
       this.#element,
       '.IZ .Up div > div[role=button]:not(.Uo):not([aria-haspopup=true]):not([class^=inboxsdk_])',
     );
+  }
+
+  getScheduleSendButton(): HTMLElement {
+    return querySelector(this.#element, '[selector="scheduledSend"]');
+  }
+
+  getMoreSendOptionsButton(): HTMLElement {
+    return querySelector(this.#element, '.hG');
   }
 
   // When schedule send is available, this returns the element that contains both buttons.

@@ -83,6 +83,12 @@ export type ComposeViewDriverEvent =
       };
     }
   | {
+      eventName: 'prescheduledsending';
+      data: {
+        cancel(): void;
+      };
+    }
+  | {
       eventName: 'sent';
       data: {
         getMessageID(): Promise<string>;
