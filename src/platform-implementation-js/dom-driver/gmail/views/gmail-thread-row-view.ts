@@ -1093,7 +1093,9 @@ class GmailThreadRowView {
           }
         } else {
           if (!dateMod) {
-            dateMod = this._modifications.replacedDate.unclaimed.shift();
+            dateMod = this._modifications.replacedDate.unclaimed.length 
+              ? this._modifications.replacedDate.unclaimed.shift()
+              : this._modifications.replacedDate.claimed.shift();
 
             if (!dateMod) {
               dateMod = {
