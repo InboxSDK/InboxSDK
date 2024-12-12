@@ -1806,11 +1806,21 @@ body :local(.sidebar_iconArea) .inboxsdk__button_icon {
   .sidebar_button_container_active
   .inboxsdk__button_selectedIndicator {
   height: 40px;
-  width: 4px;
+  width: 3px;
   position: absolute;
-  right: 0px;
+  left: 0px;
   bottom: 0px;
   background-color: rgb(66 133 244);
+  border-radius: 0 3px 3px 0;
+}
+
+/* old pre-2024-11-07 sidebar where buttons were on the right of the panel */
+body:not(.inboxsdk__sidebar_icons_right)
+  :local(.sidebar_iconArea)
+  .sidebar_button_container_active
+  .inboxsdk__button_selectedIndicator {
+  left: unset;
+  right: 0;
   border-radius: 3px 0 0 3px;
 }
 
@@ -1828,6 +1838,11 @@ body :local(.sidebar_iconArea) .inboxsdk__button_icon {
 }
 
 .bq9:not(.brC-brG).companion_app_sidebar_wrapper_visible {
+  display: block !important;
+}
+
+/* for 2024-11-07 gmail change moving sidebar icons to the right */
+.WN9Ejb.br3.companion_app_sidebar_wrapper_visible {
   display: block !important;
 }
 
@@ -2785,8 +2800,8 @@ table[role='presentation'].inboxsdk__thread_view_with_custom_view > tr {
 .inboxsdk__linkPopOver_section_container {
   position: absolute;
   width: 100%;
-  top: 35px;
   left: 0;
+  margin-top: 8px;
 }
 
 .inboxsdk__linkPopOver_section {
