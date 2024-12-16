@@ -255,7 +255,8 @@ class GmailRowListView {
         (rowEvent) =>
           Boolean(rowEvent.el.id) &&
           // let other extensions opt their rows out of our processing
-          !rowEvent.el.classList.contains('inboxsdk__ignore_row'),
+          !rowEvent.el.classList.contains('inboxsdk__ignore_row') &&
+          !rowEvent.el.classList.contains('bundle'),
       );
     const laterStream = Kefir.later(2, undefined);
     this._rowViewDriverStream = elementStream
