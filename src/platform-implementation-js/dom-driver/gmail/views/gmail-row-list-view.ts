@@ -241,17 +241,22 @@ class GmailRowListView {
     );
     const elementStream = Kefir.merge(
       tableDivParents.map(makeElementChildStream),
-    ).flatMap((event) => {
-      this._fixColumnWidths(event.el);
+    )
+      .flatMap((event) => {
+        this._fixColumnWidths(event.el);
 
-      const tbody = querySelector(event.el, 'table > tbody');
-      // In vertical preview pane mode, each thread row has three <tr>
-      // elements. We just want to pass the first one (which has an id) to
+        const tbody = querySelector(event.el, 'table > tbody');
+        return makeElementChildStream(tbody).takeUntilBy(event.removalStream);
+      })
+      // In vertical preview pane mode, each thread row has three <tr> elements.
+      // We just want to pass the first one (which has an id) to
       // GmailThreadRowView().
-      return makeElementChildStream(tbody)
-        .takeUntilBy(event.removalStream)
-        .filter((rowEvent) => rowEvent.el.id as unknown as boolean);
-    });
+      .filter(
+        (rowEvent) =>
+          Boolean(rowEvent.el.id) &&
+          // let other extensions opt their rows out of our processing
+          !rowEvent.el.classList.contains('inboxsdk__ignore_row'),
+      );
     const laterStream = Kefir.later(2, undefined);
     this._rowViewDriverStream = elementStream
       .map((event) => {
