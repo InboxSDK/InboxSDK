@@ -83,7 +83,7 @@ export type ComposeViewDriverEvent =
       };
     }
   | {
-      eventName: 'prescheduledsending';
+      eventName: 'prescheduledSending';
       data: {
         cancel(): void;
       };

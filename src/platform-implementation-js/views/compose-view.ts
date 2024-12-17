@@ -81,7 +81,7 @@ export type ComposeViewEvent = {
   discard(data: { cancel(): void }): void;
   responseTypeChanged(data: { isForward: boolean }): void;
   presending(data: { cancel(): void }): void;
-  prescheduledsending(data: { cancel(): void }): void;
+  prescheduledSending(data: { cancel(): void }): void;
   messageIDChange(data: string | null | undefined): void;
 } & AddressChangeEventsMapped;
 

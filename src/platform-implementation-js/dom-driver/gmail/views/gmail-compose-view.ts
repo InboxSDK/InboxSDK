@@ -58,7 +58,7 @@ import getBodyChangesStream from './gmail-compose-view/get-body-changes-stream';
 import getRecipients from './gmail-compose-view/get-recipients';
 import getResponseTypeChangesStream from './gmail-compose-view/get-response-type-changes-stream';
 import getPresendingStream from '../../../driver-common/compose/getPresendingStream';
-import getPrescheduledsendingStream from '../../../driver-common/compose/getPrescheduledsendingStream';
+import getPrescheduledSendingStream from '../../../driver-common/compose/getPrescheduledSendingStream';
 import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
 import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
 import setupLinkPopOvers from './gmail-compose-view/setupLinkPopovers';
@@ -441,7 +441,7 @@ class GmailComposeView {
     );
 
     this.#eventStream.plug(
-      getPrescheduledsendingStream({
+      getPrescheduledSendingStream({
         element: this.getElement(),
         scheduleSendButton: this.getScheduleSendButton(),
         moreSendOptionsButton: this.getMoreSendOptionsButton(),
@@ -941,8 +941,8 @@ class GmailComposeView {
   }
 
   scheduleSend() {
-    // asap necessary so if scheduledSend() is called after prescheduledsending event.cancel(), the new prescheduledsending event
-    // must happen after the scheduledsendCanceled event (which is also delayed by asap).
+    // asap necessary so if scheduledSend() is called after prescheduledSending event.cancel(), the new prescheduledSending event
+    // must happen after the scheduledSendCanceled event (which is also delayed by asap).
     asap(() => {
       simulateClick(this.getScheduleSendButton());
     });

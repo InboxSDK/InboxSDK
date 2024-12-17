@@ -7,7 +7,7 @@ const dispatchCancel = (
 ) =>
   asap(() =>
     element.dispatchEvent(
-      new CustomEvent('inboxSDKscheduledsendCanceled', {
+      new CustomEvent('inboxSDKscheduledSendCanceled', {
         bubbles: false,
         cancelable: false,
         detail: null,
@@ -15,7 +15,7 @@ const dispatchCancel = (
     ),
   );
 
-export default function ({
+export default function getPrescheduledSendingStream({
   element,
   scheduleSendButton,
   moreSendOptionsButton,
@@ -52,7 +52,7 @@ export default function ({
       return true;
     })
     .map((domEvent) => ({
-      eventName: 'prescheduledsending' as const,
+      eventName: 'prescheduledSending' as const,
       data: {
         cancel() {
           domEvent.preventDefault();
