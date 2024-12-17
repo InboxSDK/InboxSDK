@@ -8,7 +8,7 @@ const dispatchCancel = (
 ) =>
   asap(() =>
     element.dispatchEvent(
-      new CustomEvent('inboxSDKscheduledSendCanceled', {
+      new CustomEvent('inboxSDKscheduleSendMenuOpenCanceled', {
         bubbles: false,
         cancelable: false,
         detail: null,
@@ -50,7 +50,7 @@ export default function getPrescheduledSendingStream({
       return true;
     })
     .map((domEvent) => ({
-      eventName: 'prescheduledSending' as const,
+      eventName: 'scheduleSendMenuOpening' as const,
       data: {
         cancel() {
           domEvent.preventDefault();

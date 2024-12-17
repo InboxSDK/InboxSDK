@@ -83,10 +83,14 @@ export type ComposeViewDriverEvent =
       };
     }
   | {
-      eventName: 'prescheduledSending';
+      eventName: 'scheduleSendMenuOpening';
       data: {
         cancel(): void;
       };
+    }
+  | {
+      eventName: 'scheduleSendMenuOpenCanceled';
+      data?: undefined;
     }
   | {
       eventName: 'sent';

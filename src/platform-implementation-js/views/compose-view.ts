@@ -81,7 +81,8 @@ export type ComposeViewEvent = {
   discard(data: { cancel(): void }): void;
   responseTypeChanged(data: { isForward: boolean }): void;
   presending(data: { cancel(): void }): void;
-  prescheduledSending(data: { cancel(): void }): void;
+  scheduleSendMenuOpening(data: { cancel(): void }): void;
+  scheduleSendMenuOpenCanceled(): void;
   messageIDChange(data: string | null | undefined): void;
 } & AddressChangeEventsMapped;
 
@@ -241,8 +242,8 @@ export default class ComposeView extends (EventEmitter as new () => TypedEventEm
     get(memberMap, this).composeViewImplementation.send({ sendAndArchive });
   }
 
-  scheduleSend() {
-    get(memberMap, this).composeViewImplementation.scheduleSend();
+  openScheduleSendMenu() {
+    get(memberMap, this).composeViewImplementation.openScheduleSendMenu();
   }
 
   discard() {

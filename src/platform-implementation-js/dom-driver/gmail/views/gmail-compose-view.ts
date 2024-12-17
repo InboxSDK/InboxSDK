@@ -477,6 +477,15 @@ class GmailComposeView {
     );
 
     this.#eventStream.plug(
+      Kefir.fromEvents(
+        this.getElement(),
+        'inboxSDKscheduleSendMenuOpenCanceled',
+      ).map(() => ({
+        eventName: 'scheduleSendMenuOpenCanceled',
+      })),
+    );
+
+    this.#eventStream.plug(
       Kefir.fromEvents(this.getElement(), 'inboxSDKdiscardCanceled').map(
         () => ({
           eventName: 'discardCanceled',
@@ -940,9 +949,10 @@ class GmailComposeView {
     });
   }
 
-  scheduleSend() {
-    // asap necessary so if scheduledSend() is called after prescheduledSending event.cancel(), the new prescheduledSending event
-    // must happen after the scheduledSendCanceled event (which is also delayed by asap).
+  openScheduleSendMenu() {
+    // asap necessary so if this is called after scheduleSendMenuOpening
+    // event.cancel(), the new scheduleSendMenuOpening event must happen after
+    // the scheduleSendMenuOpenCanceled event (which is also delayed by asap).
     asap(() => {
       simulateClick(this.getScheduleSendButton());
     });
