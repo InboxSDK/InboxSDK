@@ -213,6 +213,15 @@ InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
     });
     composeView.on('sendCanceled', console.log.bind(console, 'sendCanceled'));
 
+    composeView.on(
+      'scheduleSendMenuOpening',
+      console.log.bind(console, 'scheduleSendMenuOpening'),
+    );
+    composeView.on(
+      'scheduleSendMenuOpenCanceled',
+      console.log.bind(console, 'scheduleSendMenuOpenCanceled'),
+    );
+
     composeView.on('subjectChanged', () => {
       console.log('subject changed', composeView.getSubject());
     });

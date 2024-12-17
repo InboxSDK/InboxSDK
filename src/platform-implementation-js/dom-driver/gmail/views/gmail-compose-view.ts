@@ -58,6 +58,7 @@ import getBodyChangesStream from './gmail-compose-view/get-body-changes-stream';
 import getRecipients from './gmail-compose-view/get-recipients';
 import getResponseTypeChangesStream from './gmail-compose-view/get-response-type-changes-stream';
 import getPresendingStream from '../../../driver-common/compose/getPresendingStream';
+import getPrescheduledSendingStream from '../../../driver-common/compose/getPrescheduledSendingStream';
 import getDiscardStream from '../../../driver-common/compose/getDiscardStream';
 import updateInsertMoreAreaLeft from './gmail-compose-view/update-insert-more-area-left';
 import setupLinkPopOvers from './gmail-compose-view/setupLinkPopovers';
@@ -439,6 +440,14 @@ class GmailComposeView {
       }),
     );
 
+    this.#eventStream.plug(
+      getPrescheduledSendingStream({
+        element: this.getElement(),
+        scheduleSendButton: this.getScheduleSendButton(),
+        moreSendOptionsButton: this.getMoreSendOptionsButton(),
+      }),
+    );
+
     let discardButton;
 
     try {
@@ -464,6 +473,15 @@ class GmailComposeView {
     this.#eventStream.plug(
       Kefir.fromEvents(this.getElement(), 'inboxSDKsendCanceled').map(() => ({
         eventName: 'sendCanceled',
+      })),
+    );
+
+    this.#eventStream.plug(
+      Kefir.fromEvents(
+        this.getElement(),
+        'inboxSDKscheduleSendMenuOpenCanceled',
+      ).map(() => ({
+        eventName: 'scheduleSendMenuOpenCanceled',
       })),
     );
 
@@ -931,6 +949,15 @@ class GmailComposeView {
     });
   }
 
+  openScheduleSendMenu() {
+    // asap necessary so if this is called after scheduleSendMenuOpening
+    // event.cancel(), the new scheduleSendMenuOpening event must happen after
+    // the scheduleSendMenuOpenCanceled event (which is also delayed by asap).
+    asap(() => {
+      simulateClick(this.getScheduleSendButton());
+    });
+  }
+
   discard() {
     simulateClick(this.getDiscardButton());
   }
@@ -1206,6 +1233,14 @@ class GmailComposeView {
       this.#element,
       '.IZ .Up div > div[role=button]:not(.Uo):not([aria-haspopup=true]):not([class^=inboxsdk_])',
     );
+  }
+
+  getScheduleSendButton(): HTMLElement {
+    return querySelector(this.#element, '[selector="scheduledSend"]');
+  }
+
+  getMoreSendOptionsButton(): HTMLElement {
+    return querySelector(this.#element, '.hG');
   }
 
   // When schedule send is available, this returns the element that contains both buttons.
