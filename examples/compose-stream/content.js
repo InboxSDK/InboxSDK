@@ -213,6 +213,15 @@ InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
     });
     composeView.on('sendCanceled', console.log.bind(console, 'sendCanceled'));
 
+    composeView.on(
+      'prescheduledSending',
+      console.log.bind(console, 'prescheduledSending'),
+    );
+    composeView.on(
+      'scheduledSendCanceled',
+      console.log.bind(console, 'scheduledSendCanceled'),
+    );
+
     composeView.on('subjectChanged', () => {
       console.log('subject changed', composeView.getSubject());
     });

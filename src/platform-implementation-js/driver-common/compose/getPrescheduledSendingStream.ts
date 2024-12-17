@@ -1,6 +1,7 @@
 import asap from 'asap';
 import * as Kefir from 'kefir';
 import fromEventTargetCapture from '../../lib/from-event-target-capture';
+import onMouseDownAndUp from '../../lib/dom/on-mouse-down-and-up';
 
 const dispatchCancel = (
   element: Element, // asap necessary so we don't emit this event during the click event dispatch
@@ -31,10 +32,7 @@ export default function getPrescheduledSendingStream({
         moreSendOptionsButton &&
         moreSendOptionsButton.contains(domEvent.target),
     ),
-    fromEventTargetCapture(element, 'mouseup').filter(
-      (domEvent) =>
-        scheduleSendButton && scheduleSendButton.contains(domEvent.target),
-    ),
+    onMouseDownAndUp(scheduleSendButton),
   ]);
   return domEventStream
     .filter((domEvent) => {
