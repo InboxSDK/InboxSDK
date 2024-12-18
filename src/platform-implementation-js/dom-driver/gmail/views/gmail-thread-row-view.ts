@@ -1081,10 +1081,16 @@ class GmailThreadRowView {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const originalDateSpan = dateContainer.firstElementChild;
 
+        console.log('bf this._modifications', this._modifications);
+        console.log(
+          'bf this._modifications.replacedDate',
+          this._modifications.replacedDate,
+        );
+
         if (!opts) {
 
           if (isNull(opts) && !dateMod) {
-            dateMod = this._modifications.replacedDate.claimed.shift()
+            dateMod = this._modifications.replacedDate.claimed.shift();
           }
 
           if (dateMod) {
