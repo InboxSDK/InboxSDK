@@ -968,6 +968,10 @@ class GmailThreadRowView {
         if (!recipientsContainer) throw new Error('Should not happen');
 
         if (!opts) {
+          if (isNull(opts) && !labelMod) {
+            labelMod = this._modifications.replacedDraftLabel.claimed.shift();
+          }
+
           if (labelMod) {
             labelMod.remove();
 
@@ -987,7 +991,9 @@ class GmailThreadRowView {
           );
 
           if (!labelMod) {
-            labelMod = this._modifications.replacedDraftLabel.unclaimed.shift();
+            labelMod = this._modifications.replacedDraftLabel.unclaimed.length
+              ? this._modifications.replacedDraftLabel.unclaimed.shift()
+              : this._modifications.replacedDraftLabel.claimed.shift();
 
             if (!labelMod) {
               labelMod = {
@@ -1081,14 +1087,7 @@ class GmailThreadRowView {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const originalDateSpan = dateContainer.firstElementChild;
 
-        console.log('bf this._modifications', this._modifications);
-        console.log(
-          'bf this._modifications.replacedDate',
-          this._modifications.replacedDate,
-        );
-
         if (!opts) {
-
           if (isNull(opts) && !dateMod) {
             dateMod = this._modifications.replacedDate.claimed.shift();
           }
