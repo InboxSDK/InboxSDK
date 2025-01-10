@@ -404,8 +404,10 @@ test('missing threads in response', async () => {
 
 describe('parseOnActivateResult', () => {
   const fakeLogger = {
+    /* eslint-disable  @typescript-eslint/no-empty-function */
     deprecationWarning: (..._) => {},
     error: (..._) => {},
+    /* eslint-enable @typescript-eslint/no-empty-function */
   } as Logger;
   test("should default to one page since arrays can't be paginated when provided with a results array", () => {
     const result = [
@@ -436,7 +438,7 @@ describe('parseOnActivateResult', () => {
     );
   });
   test('should throw if BOTH `hasMore` and `total` have values', () => {
-    let result: HandlerResult = { total: 10, hasMore: true, threads: [] };
+    const result: HandlerResult = { total: 10, hasMore: true, threads: [] };
     const expectedError =
       'handleCustomListRoute result must only contain either a "total" or a "hasMore" property, but not both. (https://www.inboxsdk.com/docs/#Router).';
 
@@ -460,7 +462,7 @@ describe('parseOnActivateResult', () => {
 
   test('should correctly parse onActivate result when only total exists', () => {
     const resultTotal = 10;
-    let result: HandlerResult = {
+    const result: HandlerResult = {
       total: resultTotal,
       threads: [
         'id1',
@@ -482,7 +484,7 @@ describe('parseOnActivateResult', () => {
   });
   test('should correctly parse and limit onActivate result when only total exists and result threads are over 50', () => {
     const resultTotal = 150;
-    let result: HandlerResult = {
+    const result: HandlerResult = {
       total: resultTotal,
       threads: [],
     };
@@ -508,7 +510,7 @@ describe('parseOnActivateResult', () => {
     expect(fnResult).toStrictEqual(expected);
   });
   test('should correctly parse onActivate result when only hasMore is true', () => {
-    let result: HandlerResult = {
+    const result: HandlerResult = {
       hasMore: true,
       threads: [],
     };
@@ -531,7 +533,7 @@ describe('parseOnActivateResult', () => {
     expect(fnResult).toStrictEqual(expected);
   });
   test('should correctly parse onActivate result when only hasMore is true and threads are > than MAX', () => {
-    let result: HandlerResult = {
+    const result: HandlerResult = {
       hasMore: true,
       threads: [],
     };
@@ -557,7 +559,7 @@ describe('parseOnActivateResult', () => {
     expect(fnResult).toStrictEqual(expected);
   });
   test('should correctly parse onActivate result when only hasMore is false', () => {
-    let result: HandlerResult = {
+    const result: HandlerResult = {
       hasMore: false,
       threads: [],
     };
@@ -580,7 +582,7 @@ describe('parseOnActivateResult', () => {
     expect(fnResult).toStrictEqual(expected);
   });
   test('should correctly parse onActivate result when only hasMore is false and threads are > than MAX', () => {
-    let result: HandlerResult = {
+    const result: HandlerResult = {
       hasMore: false,
       threads: [],
     };
