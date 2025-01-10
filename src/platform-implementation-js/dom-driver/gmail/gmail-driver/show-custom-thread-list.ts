@@ -22,7 +22,7 @@ type InitialIDPair =
 type IDPairWithRFC = { rfcId: string; gtid?: string };
 type CompletedIDPair = { rfcId: string; gtid: string };
 
-type HandlerResult = {
+export type HandlerResult = {
   total?: number;
   hasMore?: boolean;
   threads: Array<ThreadDescriptor>;
@@ -100,7 +100,7 @@ function _findIdFailure(id: string, err: Error) {
   return null;
 }
 
-function parseOnActivateResult(
+export function parseOnActivateResult(
   logger: Logger,
   start: number,
   result: HandlerResult | Array<ThreadDescriptor>,
@@ -126,7 +126,7 @@ function parseOnActivateResult(
       );
     }
 
-    if (total != null && hasMore != null) {
+    if (typeof total === 'number' && typeof hasMore === 'boolean') {
       throw new Error(
         'handleCustomListRoute result must only contain either ' +
           'a "total" or a "hasMore" property, but not both. ' +
@@ -142,7 +142,7 @@ function parseOnActivateResult(
     } else if (typeof hasMore === 'boolean') {
       const threadsWithoutExcess = copyAndOmitExcessThreads(threads, logger);
       return {
-        total: hasMore ? 'MANY' : start + threads.length,
+        total: hasMore ? 'MANY' : start + threadsWithoutExcess.length,
         threads: threadsWithoutExcess,
       };
     } else {
