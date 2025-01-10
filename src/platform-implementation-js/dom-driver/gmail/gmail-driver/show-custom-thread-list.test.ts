@@ -1,10 +1,14 @@
-import showCustomThreadList from './show-custom-thread-list';
+import showCustomThreadList, {
+  HandlerResult,
+  parseOnActivateResult,
+} from './show-custom-thread-list';
 
 import * as GSRP from '../gmail-sync-response-processor';
 
 import fs from 'fs';
 import once from 'lodash/once';
 import kefirBus from 'kefir-bus';
+import Logger from '../../../lib/logger';
 
 const readFile = fs.promises.readFile;
 
@@ -396,4 +400,245 @@ test('missing threads in response', async () => {
       GSRP.extractThreadsFromSearchResponse(await getOriginalSearchResponse()),
     ),
   );
+});
+
+describe('parseOnActivateResult', () => {
+  const fakeLogger = {
+    deprecationWarning: (..._) => {},
+    error: (..._) => {},
+  } as Logger;
+  test("should default to one page since arrays can't be paginated when provided with a results array", () => {
+    const result = [
+      'id1',
+      {
+        gmailThreadId: 'gmailThread1',
+      },
+      {
+        rfcMessageId: 'rfcMessageId',
+      },
+    ];
+    const fnResult = parseOnActivateResult(fakeLogger, 0, result);
+    const expected: ReturnType<typeof parseOnActivateResult> = {
+      // default to one page since arrays can't be paginated
+      total: result.length,
+      threads: result,
+    };
+    expect(fnResult).toStrictEqual(expected);
+  });
+  test('should throw if result.threads is not an array', () => {
+    const result = { total: 10, hasMore: false, threads: {} } as HandlerResult;
+    const expectedError =
+      'handleCustomListRoute result must contain a "threads" array ' +
+      '(https://www.inboxsdk.com/docs/#Router).';
+
+    expect(() => parseOnActivateResult(fakeLogger, 0, result)).toThrowError(
+      expectedError,
+    );
+  });
+  test('should throw if BOTH `hasMore` and `total` have values', () => {
+    let result: HandlerResult = { total: 10, hasMore: true, threads: [] };
+    const expectedError =
+      'handleCustomListRoute result must only contain either a "total" or a "hasMore" property, but not both. (https://www.inboxsdk.com/docs/#Router).';
+
+    expect(() => parseOnActivateResult(fakeLogger, 0, result)).toThrowError(
+      expectedError,
+    );
+  });
+  test('should NOT throw if only one of `hasMore` or `total` have values', () => {
+    let result: HandlerResult = { total: 10, threads: [] };
+    const unExpectedError =
+      'handleCustomListRoute result must only contain either a "total" or a "hasMore" property, but not both. (https://www.inboxsdk.com/docs/#Router).';
+
+    expect(() => parseOnActivateResult(fakeLogger, 0, result)).not.toThrowError(
+      unExpectedError,
+    );
+    result = { hasMore: true, threads: [] };
+    expect(() => parseOnActivateResult(fakeLogger, 0, result)).not.toThrowError(
+      unExpectedError,
+    );
+  });
+
+  test('should correctly parse onActivate result when only total exists', () => {
+    const resultTotal = 10;
+    let result: HandlerResult = {
+      total: resultTotal,
+      threads: [
+        'id1',
+        {
+          gmailThreadId: 'gmailThread1',
+        },
+        {
+          rfcMessageId: 'rfcMessageId',
+        },
+      ],
+    };
+
+    const fnResult = parseOnActivateResult(fakeLogger, 0, result);
+    const expected: ReturnType<typeof parseOnActivateResult> = {
+      total: resultTotal,
+      threads: result.threads,
+    };
+    expect(fnResult).toStrictEqual(expected);
+  });
+  test('should correctly parse and limit onActivate result when only total exists and result threads are over 50', () => {
+    const resultTotal = 150;
+    let result: HandlerResult = {
+      total: resultTotal,
+      threads: [],
+    };
+    // Add 3 * 50 threads
+    for (let i = 0; i < 50; i++) {
+      result.threads = [
+        ...result.threads,
+        'id1',
+        {
+          gmailThreadId: 'gmailThread1',
+        },
+        {
+          rfcMessageId: 'rfcMessageId',
+        },
+      ];
+    }
+
+    const fnResult = parseOnActivateResult(fakeLogger, 0, result);
+    const expected: ReturnType<typeof parseOnActivateResult> = {
+      total: resultTotal,
+      threads: result.threads.slice(0, 50),
+    };
+    expect(fnResult).toStrictEqual(expected);
+  });
+  test('should correctly parse onActivate result when only hasMore is true', () => {
+    let result: HandlerResult = {
+      hasMore: true,
+      threads: [],
+    };
+    // Add 2 * 25 = 50 threads (the max)
+    for (let i = 0; i < 25; i++) {
+      result.threads = [
+        ...result.threads,
+        'id1',
+        {
+          gmailThreadId: 'gmailThread1',
+        },
+      ];
+    }
+
+    const fnResult = parseOnActivateResult(fakeLogger, 0, result);
+    const expected: ReturnType<typeof parseOnActivateResult> = {
+      total: 'MANY',
+      threads: result.threads,
+    };
+    expect(fnResult).toStrictEqual(expected);
+  });
+  test('should correctly parse onActivate result when only hasMore is true and threads are > than MAX', () => {
+    let result: HandlerResult = {
+      hasMore: true,
+      threads: [],
+    };
+    // Add 3 * 25 = 75 threads (greater than the max)
+    for (let i = 0; i < 25; i++) {
+      result.threads = [
+        ...result.threads,
+        'id1',
+        {
+          gmailThreadId: 'gmailThread1',
+        },
+        {
+          rfcMessageId: 'rfcMessageId',
+        },
+      ];
+    }
+
+    const fnResult = parseOnActivateResult(fakeLogger, 0, result);
+    const expected: ReturnType<typeof parseOnActivateResult> = {
+      total: 'MANY',
+      threads: result.threads.slice(0, 50),
+    };
+    expect(fnResult).toStrictEqual(expected);
+  });
+  test('should correctly parse onActivate result when only hasMore is false', () => {
+    let result: HandlerResult = {
+      hasMore: false,
+      threads: [],
+    };
+    // Add 2 * 25 = 50 threads (the max)
+    for (let i = 0; i < 25; i++) {
+      result.threads = [
+        ...result.threads,
+        'id1',
+        {
+          gmailThreadId: 'gmailThread1',
+        },
+      ];
+    }
+
+    const fnResult = parseOnActivateResult(fakeLogger, 20, result);
+    const expected: ReturnType<typeof parseOnActivateResult> = {
+      total: 20 + 50,
+      threads: result.threads,
+    };
+    expect(fnResult).toStrictEqual(expected);
+  });
+  test('should correctly parse onActivate result when only hasMore is false and threads are > than MAX', () => {
+    let result: HandlerResult = {
+      hasMore: false,
+      threads: [],
+    };
+    // Add 3 * 25 = 75 threads (greater than the max)
+    for (let i = 0; i < 25; i++) {
+      result.threads = [
+        ...result.threads,
+        'id1',
+        {
+          gmailThreadId: 'gmailThread1',
+        },
+        {
+          rfcMessageId: 'rfcMessageId',
+        },
+      ];
+    }
+
+    const fnResult = parseOnActivateResult(fakeLogger, 10, result);
+    const expected: ReturnType<typeof parseOnActivateResult> = {
+      total: 10 + result.threads.slice(0, 50).length,
+      threads: result.threads.slice(0, 50),
+    };
+    expect(fnResult).toStrictEqual(expected);
+  });
+  test('should throw correct error when neither `total` nor `hasMore` are as expected', () => {
+    const expectedError =
+      'handleCustomListRoute result must contain either a "total" number ' +
+      'or a "hasMore" boolean (https://www.inboxsdk.com/docs/#Router).';
+    const result = {
+      total: 'MANY',
+      hasMore: 'yup',
+      threads: [],
+    } as unknown as HandlerResult;
+    expect(() => parseOnActivateResult(fakeLogger, 1000, result)).toThrowError(
+      expectedError,
+    );
+  });
+  test('should throw the correct error if result is not the correct type', () => {
+    const expectedError =
+      'handleCustomListRoute result must be an array or an object ' +
+      '(https://www.inboxsdk.com/docs/#Router).';
+    expect(() =>
+      parseOnActivateResult(fakeLogger, 1000, 20 as any),
+    ).toThrowError(expectedError);
+    // Bad object
+    const expectedErrorForBadObject =
+      'handleCustomListRoute result must contain a "threads" array (https://www.inboxsdk.com/docs/#Router).';
+    expect(() =>
+      parseOnActivateResult(
+        fakeLogger,
+        1000,
+        new Error('What is going on???') as any,
+      ),
+    ).toThrowError(expectedErrorForBadObject);
+
+    const result = { incorrect: true, name: 'Bad object' };
+    expect(() =>
+      parseOnActivateResult(fakeLogger, 1000, result as any),
+    ).toThrowError(expectedErrorForBadObject);
+  });
 });
