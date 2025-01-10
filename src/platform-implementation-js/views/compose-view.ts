@@ -34,6 +34,8 @@ const memberMap = ud.defonce(module, () => new WeakMap<ComposeView, Members>());
 export type LinkPopOver = {
   getLinkElement(): HTMLAnchorElement;
   addSection(): LinkPopOverSection;
+  getPopOverContainerElement(): HTMLElement;
+  getUrlInputElement(): HTMLInputElement | null;
 } & TypedEventEmitter<{ close(): void }>;
 
 export interface LinkPopOverSection {
