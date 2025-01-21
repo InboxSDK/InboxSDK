@@ -13,18 +13,6 @@ class LinkPopOver extends SafeEventEmitter {
     super();
     this._linkEl = linkEl;
     this._popOverEl = popOverEl;
-
-    this.labelNewGmailUI(this._popOverEl);
-  }
-
-  labelNewGmailUI(popOverEl: HTMLElement) {
-    /* 2025-1-21 version with new gmail style popover */
-    if (
-      popOverEl.classList.contains('VRezbc') &&
-      popOverEl.classList.contains('phnWcc')
-    ) {
-      popOverEl.classList.add('inboxsdk__linkPopOver_newGmailUI');
-    }
   }
 
   getLinkElement() {
