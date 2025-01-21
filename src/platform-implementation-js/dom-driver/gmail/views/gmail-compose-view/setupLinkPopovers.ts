@@ -25,7 +25,9 @@ class LinkPopOver extends SafeEventEmitter {
 
   getUrlInputElement() {
     // this is for the new gmail UI
-    const inputs = this._popOverEl.querySelectorAll<HTMLInputElement>('input.qdOxv-K0-wGMbrd',);
+    const inputs = this._popOverEl.querySelectorAll<HTMLInputElement>(
+      'input.qdOxv-K0-wGMbrd',
+    );
 
     // the url is the last or only input in the popover
     return inputs[inputs.length - 1];
@@ -33,7 +35,9 @@ class LinkPopOver extends SafeEventEmitter {
 
   getTextInputElement() {
     // this is for the new gmail UI
-    const inputs = this._popOverEl.querySelectorAll<HTMLInputElement>('input.qdOxv-K0-wGMbrd',);
+    const inputs = this._popOverEl.querySelectorAll<HTMLInputElement>(
+      'input.qdOxv-K0-wGMbrd',
+    );
 
     // if there are two inputs the text one is the first one
     if (inputs.length === 2) {
