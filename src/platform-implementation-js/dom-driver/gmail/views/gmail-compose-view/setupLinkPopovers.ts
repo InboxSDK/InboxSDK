@@ -30,6 +30,13 @@ class LinkPopOver extends SafeEventEmitter {
     );
   }
 
+  getTextInputElement() {
+    // this is for the new gmail UI
+    return this._popOverEl.querySelector<HTMLInputElement>(
+      '.qdOxv-K0-wGMbrd[aria-label="Anchor Text"]',
+    );
+  }
+
   addSection() {
     let containerEl = this._popOverEl.querySelector<HTMLElement>(
       '.inboxsdk__linkPopOver_section_container',
