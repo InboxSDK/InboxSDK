@@ -114,6 +114,11 @@ export default function setupLinkPopOvers(
     ({ el, removalStream }: ItemWithLifetime<TagTreeNode<HTMLElement>>) => {
       const popOverEl = el.getValue();
 
+      gmailComposeView
+        .getGmailDriver()
+        .getLogger()
+        .eventSite('link_popOver', popOverEl);
+
       let existingLinkPopOver: LinkPopOver | null = null;
 
       removalStream.onValue(() => {
