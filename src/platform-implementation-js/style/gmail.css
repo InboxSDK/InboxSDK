@@ -2802,6 +2802,12 @@ table[role='presentation'].inboxsdk__thread_view_with_custom_view > tr {
   width: 100%;
   left: 0;
   margin-top: 8px;
+  box-sizing: border-box;
+}
+
+/* version with new gmail style popover: match width better */
+.VRezbc.phnWcc .inboxsdk__linkPopOver_section_container {
+  padding: 0 5px;
 }
 
 .inboxsdk__linkPopOver_section {
