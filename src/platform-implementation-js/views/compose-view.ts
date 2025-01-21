@@ -36,6 +36,7 @@ export type LinkPopOver = {
   addSection(): LinkPopOverSection;
   getPopOverContainerElement(): HTMLElement;
   getUrlInputElement(): HTMLInputElement | null;
+  getTextInputElement(): HTMLInputElement | null;
 } & TypedEventEmitter<{ close(): void }>;
 
 export interface LinkPopOverSection {
