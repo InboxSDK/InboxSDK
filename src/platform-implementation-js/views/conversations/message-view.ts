@@ -139,6 +139,10 @@ export default class MessageView extends (EventEmitter as new () => TypedEventEm
     this.#messageViewImplementation.addMoreMenuItem(buttonOptions);
   }
 
+  getElement(): HTMLElement {
+    return this.#messageViewImplementation.getElement();
+  }
+
   getBodyElement(): HTMLElement {
     return this.#messageViewImplementation.getContentsElement();
   }
