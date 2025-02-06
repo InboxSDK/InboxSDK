@@ -226,6 +226,44 @@ class GmailComposeView {
             };
           }
 
+          case 'emailScheduling': {
+            return {
+              eventName: 'scheduling',
+            };
+          }
+
+          case 'emailScheduled': {
+            const syncThreadID = event.threadID;
+            const syncMessageID = event.messageID;
+            if (event.oldMessageID) this.#messageId = event.oldMessageID;
+            if (event.oldThreadID) this.#threadID = event.oldThreadID;
+            driver.removeCachedGmailMessageIdForSyncMessageId(syncMessageID);
+            driver.removeCachedOldGmailThreadIdFromSyncThreadId(syncThreadID);
+            return {
+              eventName: 'scheduled',
+              data: {
+                getThreadID: once(async (): Promise<string> => {
+                  if (event.oldThreadID) {
+                    return event.oldThreadID;
+                  }
+
+                  return await driver.getOldGmailThreadIdFromSyncThreadId(
+                    syncThreadID,
+                  );
+                }),
+                getMessageID: once(async (): Promise<string> => {
+                  if (event.oldMessageID) {
+                    return event.oldMessageID;
+                  }
+
+                  return await driver.getGmailMessageIdForSyncMessageId(
+                    syncMessageID,
+                  );
+                }),
+              },
+            };
+          }
+
           default: {
             return null;
           }

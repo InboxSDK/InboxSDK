@@ -1,5 +1,5 @@
 import intersection from 'lodash/intersection';
-import { ComposeRequest, ComposeRequestType, SEND_ACTIONS } from './constants';
+import { ComposeRequest, ComposeRequestType, SCHEDULE_ACTIONS, SEND_ACTIONS } from './constants';
 import { Contact } from '../../inboxsdk';
 
 export function getDetailsOfComposeRequest(
@@ -30,6 +30,16 @@ export function getDetailsOfComposeRequest(
           SEND_ACTIONS.length
       );
     });
+    const scheduleUpdateMatch = messageUpdates.find((update: any) => {
+      const updateWrapper =
+        update[2] && update[2][2] && (update[2][2][14] || update[2][2][2]);
+
+      return (
+        updateWrapper[1][11] &&
+        intersection(updateWrapper[1][11], SCHEDULE_ACTIONS).length ===
+          SCHEDULE_ACTIONS.length
+      );
+    });
 
     if (sendUpdateMatch) {
       const sendUpdateWrapper =
@@ -38,6 +48,13 @@ export function getDetailsOfComposeRequest(
         (sendUpdateMatch[2][2][14] || sendUpdateMatch[2][2][2]);
       const sendUpdate = sendUpdateWrapper[1];
       return getComposeRequestFromUpdate(sendUpdate, 'SEND');
+    } else if (scheduleUpdateMatch) {
+      const scheduleUpdateWrapper =
+        scheduleUpdateMatch[2] &&
+        scheduleUpdateMatch[2][2] &&
+        (scheduleUpdateMatch[2][2][14] || scheduleUpdateMatch[2][2][2]);
+      const scheduleUpdate = scheduleUpdateWrapper[1];
+      return getComposeRequestFromUpdate(scheduleUpdate, 'SCHEDULE');
     } else {
       // There's a small chance that an update list could contain the
       // draft saves for multiple drafts in some situations — we've never

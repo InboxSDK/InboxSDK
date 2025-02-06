@@ -82,7 +82,7 @@ export function setupGmailInterceptorOnFrames(
 
   threadIdentifier.setup();
   messageMetadataHolder.setup();
-  //email sending modifier/notifier
+  //email sending/scheduling modifier/notifier
   {
     const modifiers: Record<string, Array<string>> = {};
     Kefir.fromEvents<{ detail: any }, unknown>(
@@ -215,6 +215,10 @@ export function setupGmailInterceptorOnFrames(
         XHRProxyConnectionDetails,
         string
       > = new WeakMap();
+      const currentScheduleConnectionIDs: WeakMap<
+        XHRProxyConnectionDetails,
+        string
+      > = new WeakMap();
       main_wrappers.push({
         isRelevantTo(connection) {
           return /sync(?:\/u\/\d+)?\/i\/s/.test(connection.url);
@@ -248,13 +252,21 @@ export function setupGmailInterceptorOnFrames(
                   draftID,
                 });
                 break;
+
+              case 'SCHEDULE':
+                currentScheduleConnectionIDs.set(connection, draftID);
+                triggerEvent({
+                  type: 'emailScheduling',
+                  draftID,
+                });
+                break;
             }
           }
         },
 
         requestChanger: async function (connection, request) {
           const composeRequestDetails = parseComposeRequestBody(request.body);
-          if (!composeRequestDetails || composeRequestDetails.type !== 'SEND')
+          if (!composeRequestDetails || (composeRequestDetails.type !== 'SEND' && composeRequestDetails.type !== 'SCHEDULE'))
             return request;
           const { draftID } = composeRequestDetails;
           const composeModifierIds = modifiers[draftID];
@@ -301,7 +313,8 @@ export function setupGmailInterceptorOnFrames(
           if (
             currentSendConnectionIDs.has(connection) ||
             currentDraftSaveConnectionIDs.has(connection) ||
-            currentFirstDraftSaveConnectionIDs.has(connection)
+            currentFirstDraftSaveConnectionIDs.has(connection) ||
+            currentScheduleConnectionIDs.has(connection)
           ) {
             const sendFailed = () => {
               triggerEvent({
@@ -314,7 +327,8 @@ export function setupGmailInterceptorOnFrames(
             const draftID =
               currentSendConnectionIDs.get(connection) ||
               currentDraftSaveConnectionIDs.get(connection) ||
-              currentFirstDraftSaveConnectionIDs.get(connection);
+              currentFirstDraftSaveConnectionIDs.get(connection) ||
+              currentScheduleConnectionIDs.get(connection);
 
             if (connection.status !== 200 || !connection.originalResponseText) {
               sendFailed();
@@ -348,6 +362,7 @@ export function setupGmailInterceptorOnFrames(
                   currentSendConnectionIDs.delete(connection);
                   currentDraftSaveConnectionIDs.delete(connection);
                   currentFirstDraftSaveConnectionIDs.delete(connection);
+                  currentScheduleConnectionIDs.delete(connection);
                   return;
                 } else if (responseParsed.type === 'SEND') {
                   triggerEvent({
@@ -362,6 +377,22 @@ export function setupGmailInterceptorOnFrames(
                   currentSendConnectionIDs.delete(connection);
                   currentDraftSaveConnectionIDs.delete(connection);
                   currentFirstDraftSaveConnectionIDs.delete(connection);
+                  currentScheduleConnectionIDs.delete(connection);
+                  return;
+                } else if (responseParsed.type === 'SCHEDULE') {
+                  triggerEvent({
+                    draftID: draftID,
+                    type: 'emailScheduled',
+                    rfcID: responseParsed.rfcID,
+                    threadID: responseParsed.threadId,
+                    messageID: responseParsed.messageId,
+                    oldMessageID: responseParsed.oldMessageId,
+                    oldThreadID: responseParsed.oldThreadId,
+                  });
+                  currentSendConnectionIDs.delete(connection);
+                  currentDraftSaveConnectionIDs.delete(connection);
+                  currentFirstDraftSaveConnectionIDs.delete(connection);
+                  currentScheduleConnectionIDs.delete(connection);
                   return;
                 }
               }
@@ -537,6 +568,7 @@ export function setupGmailInterceptorOnFrames(
             currentSendConnectionIDs.delete(connection);
             currentDraftSaveConnectionIDs.delete(connection);
             currentFirstDraftSaveConnectionIDs.delete(connection);
+            currentScheduleConnectionIDs.delete(connection);
           }
         },
       });

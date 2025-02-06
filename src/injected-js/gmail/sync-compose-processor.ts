@@ -1,14 +1,13 @@
 import { ComposeRequest } from './constants';
 import {
-  parseComposeRequestBody_2022_09_09,
-  parseComposeResponseBody_2022_09_09,
-  replaceBodyContentInComposeSendRequestBody_2022_09_09,
-} from './sync-compose-processor-20220909';
-import {
   getDetailsOfComposeRequest,
   replaceEmailBodyForSendRequest,
 } from './sync-compose-request-processor';
 import * as logger from '../injected-logger';
+import {
+  parseComposeRequestBody_2025_02_06, parseComposeResponseBody_2025_02_06,
+  replaceBodyContentInComposeSendRequestBody_2025_02_06
+} from './sync-compose-processor-20250206';
 
 export function parseComposeRequestBody(
   request: string,
@@ -17,7 +16,7 @@ export function parseComposeRequestBody(
 
   try {
     if (Array.isArray(requestParsed)) {
-      const parsed = parseComposeRequestBody_2022_09_09(requestParsed);
+      const parsed = parseComposeRequestBody_2025_02_06(requestParsed);
       if (parsed) {
         return {
           type: parsed.type,
@@ -45,7 +44,7 @@ export function parseComposeResponseBody(response: string) {
   const responseParsed = JSON.parse(response);
 
   if (Array.isArray(responseParsed)) {
-    return parseComposeResponseBody_2022_09_09(responseParsed);
+    return parseComposeResponseBody_2025_02_06(responseParsed);
   }
 
   return [];
@@ -60,7 +59,7 @@ export function replaceBodyContentInComposeSendRequestBody(
   try {
     if (Array.isArray(requestParsed)) {
       const replacedRequestObj =
-        replaceBodyContentInComposeSendRequestBody_2022_09_09(
+        replaceBodyContentInComposeSendRequestBody_2025_02_06(
           requestParsed,
           newBodyHtmlContent,
         );
