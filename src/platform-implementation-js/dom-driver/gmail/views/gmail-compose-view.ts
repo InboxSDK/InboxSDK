@@ -397,9 +397,10 @@ class GmailComposeView {
       Kefir.combine([
         this.#removedFromDOMStopper,
         this.#eventStream.filter(({ eventName }) => eventName === 'sent'),
+        this.#eventStream.filter(({ eventName }) => eventName === 'scheduled'),
       ]),
     ])
-      .take(1) // we delay asap here so that the event stream is not destroyed before listeners here the sent event
+      .take(1) // we delay asap here so that the event stream is not destroyed before listeners hear the sent/scheduled event
       .flatMap(() => delayAsap(null))
       .onValue(() => this.#destroy());
 
