@@ -382,14 +382,14 @@ class GmailComposeView {
     });
 
     Kefir.merge([
-      // if we get a presending then we let the other stream wait for
-      // sent. But if we get a sendCanceled, then a regular destroy can
+      // if we get a presending/scheduling then we let the other stream wait for
+      // sent/scheduled. But if we get a sendCanceled, then a regular destroy can
       // pass through
       this.#removedFromDOMStopper.filterBy(
         this.#eventStream
           .filter(
             ({ eventName }) =>
-              eventName === 'presending' || eventName === 'sendCanceled',
+              eventName === 'presending' || eventName === 'scheduling' || eventName === 'sendCanceled',
           )
           .map(({ eventName }) => eventName === 'sendCanceled')
           .toProperty(() => true),
