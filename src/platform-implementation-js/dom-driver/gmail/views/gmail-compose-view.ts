@@ -389,7 +389,9 @@ class GmailComposeView {
         this.#eventStream
           .filter(
             ({ eventName }) =>
-              eventName === 'presending' || eventName === 'scheduling' || eventName === 'sendCanceled',
+              eventName === 'presending' ||
+              eventName === 'scheduling' ||
+              eventName === 'sendCanceled',
           )
           .map(({ eventName }) => eventName === 'sendCanceled')
           .toProperty(() => true),

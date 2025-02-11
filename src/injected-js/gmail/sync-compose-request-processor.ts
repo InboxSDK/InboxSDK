@@ -1,5 +1,10 @@
 import intersection from 'lodash/intersection';
-import { ComposeRequest, ComposeRequestType, SCHEDULE_ACTIONS, SEND_ACTIONS } from './constants';
+import {
+  ComposeRequest,
+  ComposeRequestType,
+  SCHEDULE_ACTIONS,
+  SEND_ACTIONS,
+} from './constants';
 import { Contact } from '../../inboxsdk';
 
 export function getDetailsOfComposeRequest(

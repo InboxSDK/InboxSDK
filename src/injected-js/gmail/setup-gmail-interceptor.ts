@@ -266,7 +266,11 @@ export function setupGmailInterceptorOnFrames(
 
         requestChanger: async function (connection, request) {
           const composeRequestDetails = parseComposeRequestBody(request.body);
-          if (!composeRequestDetails || (composeRequestDetails.type !== 'SEND' && composeRequestDetails.type !== 'SCHEDULE'))
+          if (
+            !composeRequestDetails ||
+            (composeRequestDetails.type !== 'SEND' &&
+              composeRequestDetails.type !== 'SCHEDULE')
+          )
             return request;
           const { draftID } = composeRequestDetails;
           const composeModifierIds = modifiers[draftID];

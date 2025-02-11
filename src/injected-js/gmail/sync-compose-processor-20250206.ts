@@ -4,16 +4,17 @@ import intersection from 'lodash/intersection';
 import isNotNil from '../../common/isNotNil';
 import {
   ComposeRequestType,
-  DRAFT_SAVING_ACTIONS, SCHEDULE_ACTIONS,
-  SEND_ACTIONS
+  DRAFT_SAVING_ACTIONS,
+  SCHEDULE_ACTIONS,
+  SEND_ACTIONS,
 } from './constants';
 import { Contact } from '../../inboxsdk';
 
-const ACTION_TYPE_PRIORITY_RANK: [ComposeRequestType, ComposeRequestType, ComposeRequestType] = [
-  'SEND',
-  'SCHEDULE',
-  'DRAFT_SAVE',
-];
+const ACTION_TYPE_PRIORITY_RANK: [
+  ComposeRequestType,
+  ComposeRequestType,
+  ComposeRequestType,
+] = ['SEND', 'SCHEDULE', 'DRAFT_SAVE'];
 
 export function parseComposeRequestBody_2025_02_06(request: Array<any>) {
   return parseCreateUpdateSendDraftRequestBody(request);
@@ -388,7 +389,9 @@ export function actionsToComposeRequestType(
     return 'SEND';
   }
 
-  if (intersection(actions, SCHEDULE_ACTIONS).length === SCHEDULE_ACTIONS.length) {
+  if (
+    intersection(actions, SCHEDULE_ACTIONS).length === SCHEDULE_ACTIONS.length
+  ) {
     return 'SCHEDULE';
   }
 

@@ -5,8 +5,9 @@ import {
 } from './sync-compose-request-processor';
 import * as logger from '../injected-logger';
 import {
-  parseComposeRequestBody_2025_02_06, parseComposeResponseBody_2025_02_06,
-  replaceBodyContentInComposeSendRequestBody_2025_02_06
+  parseComposeRequestBody_2025_02_06,
+  parseComposeResponseBody_2025_02_06,
+  replaceBodyContentInComposeSendRequestBody_2025_02_06,
 } from './sync-compose-processor-20250206';
 
 export function parseComposeRequestBody(

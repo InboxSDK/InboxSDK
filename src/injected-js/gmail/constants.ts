@@ -1,6 +1,10 @@
 import { Contact } from '../../inboxsdk';
 
-export type ComposeRequestType = 'FIRST_DRAFT_SAVE' | 'DRAFT_SAVE' | 'SEND' | 'SCHEDULE';
+export type ComposeRequestType =
+  | 'FIRST_DRAFT_SAVE'
+  | 'DRAFT_SAVE'
+  | 'SEND'
+  | 'SCHEDULE';
 
 export type ComposeRequest = {
   draftID: string;
