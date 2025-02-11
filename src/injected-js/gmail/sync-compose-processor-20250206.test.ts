@@ -1,4 +1,4 @@
-import * as SCRP from './sync-compose-processor-20220909';
+import * as SCRP from './sync-compose-processor-20250206';
 
 const expectedOutputByFile = {
   '2022-09-09-cvOnReplyDraftSave_request.json': {
@@ -10,7 +10,7 @@ const expectedOutputByFile = {
       actions: ['^all', '^r', '^r_bt'],
       type: 'FIRST_DRAFT_SAVE',
     },
-    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+    parseWith: SCRP.parseComposeRequestBody_2025_02_06,
   },
   '2022-09-09-cvOnReplyDraftSave_response.json': {
     expected: [
@@ -21,7 +21,7 @@ const expectedOutputByFile = {
         actions: ['^all', '^r', '^r_bt'],
       },
     ],
-    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+    parseWith: SCRP.parseComposeResponseBody_2025_02_06,
   },
   '2022-09-09-cvOnReplyDraftUpdate_request.json': {
     expected: {
@@ -31,7 +31,7 @@ const expectedOutputByFile = {
       threadId: 'thread-f:1746035685735370050',
       type: 'DRAFT_SAVE',
     },
-    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+    parseWith: SCRP.parseComposeRequestBody_2025_02_06,
   },
   '2022-09-09-cvOnReplyDraftUpdate_response.json': {
     expected: [
@@ -42,7 +42,7 @@ const expectedOutputByFile = {
         actions: ['^all', '^r', '^r_bt'],
       },
     ],
-    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+    parseWith: SCRP.parseComposeResponseBody_2025_02_06,
   },
   '2022-09-09-cvOnDraftSaveBatched_request.json': {
     expected: {
@@ -53,7 +53,7 @@ const expectedOutputByFile = {
       threadId: 'thread-a:r3299110183418933622',
       type: 'FIRST_DRAFT_SAVE',
     },
-    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+    parseWith: SCRP.parseComposeRequestBody_2025_02_06,
   },
   '2022-09-09-cvOnDraftSaveBatched_response.json': {
     expected: [
@@ -78,7 +78,7 @@ const expectedOutputByFile = {
         type: 'DRAFT_SAVE',
       },
     ],
-    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+    parseWith: SCRP.parseComposeResponseBody_2025_02_06,
   },
   '2022-09-09-cvOnDraftUpdate_2_request.json': {
     expected: {
@@ -91,7 +91,7 @@ const expectedOutputByFile = {
       body: '<div dir="ltr">test body</div>',
       type: 'DRAFT_SAVE',
     },
-    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+    parseWith: SCRP.parseComposeRequestBody_2025_02_06,
   },
   '2022-09-09-cvOnDraftUpdate_2_response.json': {
     expected: [
@@ -105,7 +105,7 @@ const expectedOutputByFile = {
         actions: ['^all', '^r', '^r_bt'],
       },
     ],
-    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+    parseWith: SCRP.parseComposeResponseBody_2025_02_06,
   },
   '2022-09-09-cvOnSend_3_request.json': {
     expected: {
@@ -118,7 +118,7 @@ const expectedOutputByFile = {
       body: '<div dir="ltr">test body</div><div hspace="test-pt-mark" style="max-height:1px;"><img alt="" style="width:0px;max-height:0px;overflow:hidden" src="https://dev.mailfoogae.appspot.com:8888/t?sender=aYm9yeXNAc3RyZWFrLmNvbQ%3D%3D&amp;type=zerocontent&amp;guid=b3b2b759-451a-4c4c-b620-27259f4a4907"><font color="#ffffff" size="1">ᐧ</font></div>',
       type: 'SEND',
     },
-    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+    parseWith: SCRP.parseComposeRequestBody_2025_02_06,
   },
   '2022-09-09-cvOnSend_3_response.json': {
     expected: [
@@ -141,7 +141,7 @@ const expectedOutputByFile = {
         type: 'SEND',
       },
     ],
-    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+    parseWith: SCRP.parseComposeResponseBody_2025_02_06,
   },
   '2022-09-09-cvOnReplyDraftUpdate_2_request.json': {
     expected: {
@@ -157,7 +157,7 @@ const expectedOutputByFile = {
       body: '<div dir="ltr">test reply body</div>',
       type: 'DRAFT_SAVE',
     },
-    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+    parseWith: SCRP.parseComposeRequestBody_2025_02_06,
   },
   '2022-09-09-cvOnReplyDraftUpdate_2_response.json': {
     expected: [
@@ -174,7 +174,7 @@ const expectedOutputByFile = {
         actions: ['^all', '^r', '^r_bt'],
       },
     ],
-    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+    parseWith: SCRP.parseComposeResponseBody_2025_02_06,
   },
   '2022-09-09-cvOnReplyDraftUpdate_3_request.json': {
     expected: {
@@ -187,7 +187,7 @@ const expectedOutputByFile = {
       body: '<div dir="ltr">b2</div>',
       type: 'DRAFT_SAVE',
     },
-    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+    parseWith: SCRP.parseComposeRequestBody_2025_02_06,
   },
   '2022-09-09-cvOnReplyDraftUpdate_3_response.json': {
     expected: [
@@ -201,7 +201,7 @@ const expectedOutputByFile = {
         actions: ['^all', '^r', '^r_bt'],
       },
     ],
-    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+    parseWith: SCRP.parseComposeResponseBody_2025_02_06,
   },
   '2022-09-09-cvOnReplySend_3_request.json': {
     expected: {
@@ -217,7 +217,7 @@ const expectedOutputByFile = {
       body: '<div dir="ltr">test reply body</div><div hspace="test-pt-mark" style="max-height:1px;"><img alt="" style="width:0px;max-height:0px;overflow:hidden" src="https://dev.mailfoogae.appspot.com:8888/t?sender=aYm9yeXNAc3RyZWFrLmNvbQ%3D%3D&amp;type=zerocontent&amp;guid=19b740a4-1742-41cb-93f7-c0b77319260c"><font color="#ffffff" size="1">ᐧ</font></div>',
       type: 'SEND',
     },
-    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+    parseWith: SCRP.parseComposeRequestBody_2025_02_06,
   },
   '2022-09-09-cvOnReplySend_3_response.json': {
     expected: [
@@ -243,7 +243,7 @@ const expectedOutputByFile = {
         type: 'SEND',
       },
     ],
-    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+    parseWith: SCRP.parseComposeResponseBody_2025_02_06,
   },
   '2022-09-09-cvOnReplySend_4_request.json': {
     expected: {
@@ -256,7 +256,7 @@ const expectedOutputByFile = {
       body: '<div dir="ltr">b2</div><div hspace="streak-pt-mark" style="max-height:1px;"><img alt="" style="width:0px;max-height:0px;overflow:hidden" src="https://mailfoogae.appspot.com/t?sender=aYm9yeXNAc3RyZWFrLmNvbQ%3D%3D&amp;type=zerocontent&amp;guid=0bffb01a-61aa-4e14-b1b5-82b115ecbad3"><font color="#ffffff" size="1">ᐧ</font></div>',
       type: 'SEND',
     },
-    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+    parseWith: SCRP.parseComposeRequestBody_2025_02_06,
   },
   '2022-09-09-cvOnReplySend_4_response.json': {
     expected: [
@@ -270,7 +270,7 @@ const expectedOutputByFile = {
         type: 'SEND',
       },
     ],
-    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+    parseWith: SCRP.parseComposeResponseBody_2025_02_06,
   },
   '2022-09-09-cvOnReplySend_5_request.json': {
     expected: {
@@ -283,7 +283,7 @@ const expectedOutputByFile = {
       body: '<div dir="ltr">b</div>',
       type: 'SEND',
     },
-    parseWith: SCRP.parseComposeRequestBody_2022_09_09,
+    parseWith: SCRP.parseComposeRequestBody_2025_02_06,
   },
   '2022-09-09-cvOnReplySend_5_response.json': {
     expected: [
@@ -316,7 +316,7 @@ const expectedOutputByFile = {
         type: 'SEND',
       },
     ],
-    parseWith: SCRP.parseComposeResponseBody_2022_09_09,
+    parseWith: SCRP.parseComposeResponseBody_2025_02_06,
   },
 };
 
@@ -337,7 +337,7 @@ it('handles onDraftSave request', () => {
     require('../../../test/data/2022-09-09-cvOnDraftSave_request.json'),
   );
 
-  const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
+  const composeRequest = SCRP.parseComposeRequestBody_2025_02_06(
     JSON.parse(request),
   );
   expect(composeRequest).toMatchObject({
@@ -355,7 +355,7 @@ it('handles onDraftSave request', () => {
     require('../../../test/data/2022-09-09-cvOnDraftUpdate_request.json'),
   );
 
-  const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
+  const composeRequest = SCRP.parseComposeRequestBody_2025_02_06(
     JSON.parse(request),
   );
   expect(composeRequest).toMatchObject({
@@ -373,7 +373,7 @@ it('handles onDraftSend request', () => {
     require('../../../test/data/2022-09-09-cvOnSend_request.json'),
   );
 
-  const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
+  const composeRequest = SCRP.parseComposeRequestBody_2025_02_06(
     JSON.parse(request),
   );
   expect(composeRequest).toMatchObject({
@@ -393,7 +393,7 @@ it('handles onDraftSend_2 request', () => {
     require('../../../test/data/2022-09-09-cvOnSend_2_request_customThreadId.json'),
   );
 
-  const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
+  const composeRequest = SCRP.parseComposeRequestBody_2025_02_06(
     JSON.parse(request),
   );
   expect(composeRequest).toMatchObject({
@@ -411,7 +411,7 @@ it('handles onReplySend request', () => {
     require('../../../test/data/2022-09-09-cvOnReplySend_request.json'),
   );
 
-  const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
+  const composeRequest = SCRP.parseComposeRequestBody_2025_02_06(
     JSON.parse(request),
   );
   expect(composeRequest).toMatchObject({
@@ -440,12 +440,12 @@ it('replaces onReplySend request body', () => {
   );
 
   const replacedRequest =
-    SCRP.replaceBodyContentInComposeSendRequestBody_2022_09_09(
+    SCRP.replaceBodyContentInComposeSendRequestBody_2025_02_06(
       JSON.parse(request),
       'replaced_content',
     );
 
-  const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
+  const parsedRequest = SCRP.parseComposeRequestBody_2025_02_06(
     replacedRequest!,
   );
 
@@ -474,7 +474,7 @@ it('handles onReplySend_2 request', () => {
     require('../../../test/data/2022-09-09-cvOnReplySend_2_request.json'),
   );
 
-  const composeRequest = SCRP.parseComposeRequestBody_2022_09_09(
+  const composeRequest = SCRP.parseComposeRequestBody_2025_02_06(
     JSON.parse(request),
   );
   expect(composeRequest).toMatchObject({
@@ -493,12 +493,12 @@ it('replaces onReplySend_2 request body', () => {
   );
 
   const replacedRequest =
-    SCRP.replaceBodyContentInComposeSendRequestBody_2022_09_09(
+    SCRP.replaceBodyContentInComposeSendRequestBody_2025_02_06(
       JSON.parse(request),
       'replaced_content',
     );
 
-  const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
+  const parsedRequest = SCRP.parseComposeRequestBody_2025_02_06(
     replacedRequest!,
   );
 
@@ -518,12 +518,12 @@ it('replaces onReplySend_3 request body', () => {
   );
 
   const replacedRequest =
-    SCRP.replaceBodyContentInComposeSendRequestBody_2022_09_09(
+    SCRP.replaceBodyContentInComposeSendRequestBody_2025_02_06(
       JSON.parse(request),
       'replaced_content',
     );
 
-  const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
+  const parsedRequest = SCRP.parseComposeRequestBody_2025_02_06(
     replacedRequest!,
   );
 
@@ -543,12 +543,12 @@ it('replaces onReplySend_4 request body', () => {
   );
 
   const replacedRequest =
-    SCRP.replaceBodyContentInComposeSendRequestBody_2022_09_09(
+    SCRP.replaceBodyContentInComposeSendRequestBody_2025_02_06(
       JSON.parse(request),
       'replaced_content',
     );
 
-  const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
+  const parsedRequest = SCRP.parseComposeRequestBody_2025_02_06(
     replacedRequest!,
   );
 
@@ -568,12 +568,12 @@ it('replaces onReplySend_5 request body', () => {
   );
 
   const replacedRequest =
-    SCRP.replaceBodyContentInComposeSendRequestBody_2022_09_09(
+    SCRP.replaceBodyContentInComposeSendRequestBody_2025_02_06(
       JSON.parse(request),
       'replaced_content',
     );
 
-  const parsedRequest = SCRP.parseComposeRequestBody_2022_09_09(
+  const parsedRequest = SCRP.parseComposeRequestBody_2025_02_06(
     replacedRequest!,
   );
 
