@@ -483,27 +483,27 @@ export default function showCustomThreadList(
     .changes()
     .take(1)
     .map(() => searchInput)
-    .filter((input: HTMLElement)  => !!Boolean(input))
-    .flatMapLatest((input: HTMLElement) => 
+    .flatMapLatest((input: HTMLElement) =>
       makeMutationObserverChunkedStream(input, {
         attributes: true,
         attributeOldValue: true,
       })
-      .filter((mutationRecords: MutationRecord[]) => {
-        // These are sort of arbitrary, they just occur after input.value has been written on the inputSearbox 
-        return mutationRecords.some(mutationRecord => 
-          mutationRecord.attributeName === 'role' && mutationRecord.oldValue === 'combobox'
-        )
-      })
-      .take(1)
+        .filter((mutationRecords: MutationRecord[]) => {
+          // These are sort of arbitrary, they just occur after input.value has been written on the inputSearbox
+          return mutationRecords.some(
+            (mutationRecord) =>
+              mutationRecord.attributeName === 'role' &&
+              mutationRecord.oldValue === 'combobox',
+          );
+        })
+        .take(1),
+    );
 
-  )
-  
   inputStream.onValue(() => {
     searchInput.value = '';
     searchInput.style.visibility = 'visible';
-  })
-  
+  });
+
   searchInput.style.visibility = 'hidden';
 
   // Change the hash *without* making a new history entry.
