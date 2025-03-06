@@ -1,5 +1,6 @@
 import find from 'lodash/find';
 import uniqBy from 'lodash/uniqBy';
+import Kefir from 'kefir';
 import GmailElementGetter from '../gmail-element-getter';
 import * as SyncGRP from '../gmail-sync-response-processor';
 import type Logger from '../../../lib/logger';
@@ -496,6 +497,8 @@ export default function showCustomThreadList(
               mutationRecord.oldValue === 'combobox',
           );
         })
+        // timeout fallback in case we never observe the above mutation
+        .merge(Kefir.later(15_000, null))
         .take(1),
     );
 
