@@ -2,8 +2,9 @@
  returns "/u/NUMBER" or "/u/NUMBER/d/DELEGATE_ID" for delegated accounts
 */
 export default function getAccountUrlPart(): string {
-  const delegatedAccountMatch =
-    document.location.pathname.match(/\/u\/(\d+)\/d\/(.+?)\//);
+  const delegatedAccountMatch = document.location.pathname.match(
+    /\/u\/(\d+)\/d\/(.+?)\//,
+  );
   if (delegatedAccountMatch) {
     const delegatedAccountId = delegatedAccountMatch[2];
     const delegatedAccountNumber = delegatedAccountMatch[1];
