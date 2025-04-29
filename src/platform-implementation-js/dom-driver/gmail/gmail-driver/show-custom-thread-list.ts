@@ -1,5 +1,6 @@
 import find from 'lodash/find';
 import uniqBy from 'lodash/uniqBy';
+import Kefir from 'kefir';
 import GmailElementGetter from '../gmail-element-getter';
 import * as SyncGRP from '../gmail-sync-response-processor';
 import type Logger from '../../../lib/logger';
@@ -7,6 +8,7 @@ import type GmailDriver from '../gmail-driver';
 import isStreakAppId from '../../../lib/isStreakAppId';
 import update from 'immutability-helper';
 import isNotNil from '../../../../common/isNotNil';
+import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 
 type ThreadDescriptor =
   | string
@@ -475,17 +477,37 @@ export default function showCustomThreadList(
   );
   const customHash = document.location.hash;
 
-  const nextMainContentElementChange =
-    GmailElementGetter.getMainContentElementChangedStream().changes().take(1);
-
   const searchInput = GmailElementGetter.getSearchInput();
   if (!searchInput) throw new Error('could not find search input');
-  searchInput.value = '';
-  searchInput.style.visibility = 'hidden';
-  nextMainContentElementChange.onValue(() => {
-    // setup-route-view-driver-stream handles clearing search again
+
+  const inputStream = GmailElementGetter.getMainContentElementChangedStream()
+    .changes()
+    .take(1)
+    .map(() => searchInput)
+    .flatMapLatest((input: HTMLElement) =>
+      makeMutationObserverChunkedStream(input, {
+        attributes: true,
+        attributeOldValue: true,
+      })
+        .filter((mutationRecords: MutationRecord[]) => {
+          // These are sort of arbitrary, they just occur after input.value has been written on the inputSearbox
+          return mutationRecords.some(
+            (mutationRecord) =>
+              mutationRecord.attributeName === 'role' &&
+              mutationRecord.oldValue === 'combobox',
+          );
+        })
+        // timeout fallback in case we never observe the above mutation
+        .merge(Kefir.later(15_000, null))
+        .take(1),
+    );
+
+  inputStream.onValue(() => {
+    searchInput.value = '';
     searchInput.style.visibility = 'visible';
   });
+
+  searchInput.style.visibility = 'hidden';
 
   // Change the hash *without* making a new history entry.
   const searchHash =
