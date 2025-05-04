@@ -7,7 +7,7 @@ if (!browser) {
   throw new Error('chrome or browser not available in current context.');
 }
 
-const getExtensionId = once((): string | null => {
+export const getExtensionId = once((): string | null => {
   try {
     if (browser?.runtime?.getURL) {
       return browser.runtime.getURL('');
