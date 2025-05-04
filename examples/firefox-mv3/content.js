@@ -1,5 +1,4 @@
-import '@inboxsdk/core/firefox'; // Required for firefox <128
-import * as InboxSDK from '@inboxsdk/core';
+import * as InboxSDK from '@inboxsdk/core/firefox';
 
 console.log('InboxSDK: content script loaded');
 

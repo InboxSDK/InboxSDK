@@ -1,6 +1,8 @@
 /** @type {import('webextension-polyfill').Browser} */
 const browser = globalThis.chrome || globalThis.browser;
 
+// Manual code injection support for firefox <128
+// As it did not support MAIN world execution
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message.type === 'inboxsdk__injectPageWorld') {
     const script = document.createElement('script');
@@ -17,3 +19,5 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     sendResponse(true);
   }
 });
+
+export * from './inboxsdk';
