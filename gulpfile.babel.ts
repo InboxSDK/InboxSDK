@@ -80,7 +80,11 @@ async function setupExamples() {
     ];
   } else if (args.integratedPageWorld) {
     dirs.push('./dist');
-    srcs = ['./packages/core/inboxsdk.js', './packages/core/pageWorld.js', './packages/core/firefox.js'];
+    srcs = [
+      './packages/core/inboxsdk.js',
+      './packages/core/pageWorld.js',
+      './packages/core/firefox.js',
+    ];
   }
 
   let stream = gulp.src(srcs);

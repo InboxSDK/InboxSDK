@@ -39,12 +39,14 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     if (isFirefox) {
       browser.runtime.getBrowserInfo().then((info) => {
         const version = parseFloat(info.version);
-  
+
         // MAIN world execution was not supported prior to v128
         // More info here: https://bugzilla.mozilla.org/show_bug.cgi?id=1736575
         // MDN compatibilty data: https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/scripting/ExecutionWorld#browser_compatibility
         if (version < 128) {
-          console.warn('InboxSDK: Firefox <128 does not support MAIN world execution. Using legacy mode.');
+          console.warn(
+            'InboxSDK: Firefox <128 does not support MAIN world execution. Using legacy mode.',
+          );
           return browser.tabs.sendMessage(sender.tab.id, { type: eventKey });
         }
 
@@ -55,6 +57,6 @@ browser.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
       return true;
     }
 
-    executeScript(); 
+    executeScript();
   }
 });
