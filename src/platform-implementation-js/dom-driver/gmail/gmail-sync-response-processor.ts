@@ -335,7 +335,7 @@ function getRecipientsFromMessageDescriptor_20220909(
 export function replaceThreadsInSearchResponse(
   response: string,
   replacementThreads: SyncThread[],
-  { start, total }: { start: number; total?: number | 'MANY' },
+  { total }: { total?: number | 'MANY' },
 ): string {
   const parsedResponse = JSON.parse(response);
 
@@ -344,7 +344,7 @@ export function replaceThreadsInSearchResponse(
       return replaceThreadsInSearchResponse_20220909(
         parsedResponse,
         replacementThreads,
-        { start, total },
+        { total },
       );
     } catch (err) {
       console.error('Caught err in replaceThreadsInSearchResponse', err);
@@ -375,7 +375,7 @@ export function replaceThreadsInSearchResponse(
 export function replaceThreadsInSearchResponse_20220909(
   parsedResponse: any[],
   replacementThreads: SyncThread[],
-  { start, total }: { start: number; total?: number | 'MANY' },
+  { total }: { total?: number | 'MANY' },
 ): string {
   if (parsedResponse[11] && parsedResponse[11][1]) {
     parsedResponse[11][1] = total;

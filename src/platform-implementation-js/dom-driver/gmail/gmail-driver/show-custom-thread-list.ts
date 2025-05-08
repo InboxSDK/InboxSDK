@@ -402,7 +402,7 @@ const setupSearchReplacing = (
           newResponse = SyncGRP.replaceThreadsInSearchResponse(
             response,
             reorderedThreads,
-            { start, total },
+            { total },
           );
 
           driver
@@ -424,7 +424,6 @@ const setupSearchReplacing = (
             driver.getPageCommunicator().setCustomListResults(
               newQuery,
               SyncGRP.replaceThreadsInSearchResponse(response, [], {
-                start,
                 total,
               }),
             );
