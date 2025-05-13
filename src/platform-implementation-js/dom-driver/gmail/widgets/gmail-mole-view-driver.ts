@@ -262,6 +262,10 @@ class GmailMoleViewDriver {
 
     if (insertBefore instanceof HTMLElement) {
       moleParent.insertBefore(this.#element, insertBefore);
+    } else if (!insertBefore) {
+      // when google chat and meet are disabled, the moleParent element has no children initially,
+      // unlike when enabled and there is a hidden mole like stub created by gmail
+      moleParent.appendChild(this.#element);
     } else {
       this.#driver.logger.error(
         new Error(
