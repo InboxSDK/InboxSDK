@@ -31,7 +31,7 @@ but basic summary:
   [npm](https://www.npmjs.com/package/@inboxsdk/core)
 - Set up the project like the
   [example extension](https://github.com/InboxSDK/hello-world).
-- [Generate](https://www.inboxsdk.com/register) an app id
+- [Generate](https://register.inboxsdk.com/) an app id
 
 # Usage
 
