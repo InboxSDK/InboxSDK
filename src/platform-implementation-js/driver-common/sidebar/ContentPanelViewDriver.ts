@@ -165,6 +165,7 @@ class ContentPanelViewDriver {
             appName,
             sidebarId: this.#sidebarId,
             instanceId: this.#instanceId,
+            isGlobal,
           },
         }),
       );
