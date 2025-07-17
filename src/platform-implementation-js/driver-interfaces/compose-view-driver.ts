@@ -46,6 +46,8 @@ export type ComposeViewDriverEvent =
         | 'minimized'
         | 'resize'
         | 'restored'
+        | 'scheduled'
+        | 'scheduling'
         | 'sendCanceled'
         | 'sending'
         | 'sent'
@@ -94,6 +96,13 @@ export type ComposeViewDriverEvent =
     }
   | {
       eventName: 'sent';
+      data: {
+        getMessageID(): Promise<string>;
+        getThreadID(): Promise<string>;
+      };
+    }
+  | {
+      eventName: 'scheduled';
       data: {
         getMessageID(): Promise<string>;
         getThreadID(): Promise<string>;
