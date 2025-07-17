@@ -1,11 +1,11 @@
 import * as InboxSDK from '@inboxsdk/core';
 
 InboxSDK.load(2, 'sidebar-example', {
-  appName: 'Twitter',
+  appName: 'Sidebar Example',
   appIconUrl:
     'http://materialdesignblog.com/wp-content/uploads/2015/04/387b93c8b66379c32e1cc2b98dcf5197.png',
   suppressAddonTitle: 'Streak',
-}).then((inboxSDK) => {
+}).then(async (inboxSDK) => {
   window._sdk = inboxSDK;
 
   inboxSDK.Conversations.registerThreadViewHandler(function (threadView) {
@@ -94,11 +94,40 @@ InboxSDK.load(2, 'sidebar-example', {
   const globalPanelEl2 = document.createElement('div');
   globalPanelEl2.innerHTML = `Panel 2.0 content here`;
 
-  inboxSDK.Global.addSidebarContentPanel({
+  let contentPanel = await inboxSDK.Global.addSidebarContentPanel({
     title: 'Panel 2.0',
     appName: 'Not Twitter 2.0',
     iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
     el: globalPanelEl2,
     orderHint: 2,
+  });
+
+  inboxSDK.Compose.registerComposeViewHandler((composeView) => {
+    composeView.addButton({
+      title: 'OPEN SIDEBAR',
+      iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+      onClick(event) {
+        contentPanel.open();
+      },
+    });
+
+    composeView.addButton({
+      title: 'CLOSE SIDEBAR',
+      iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+      onClick(event) {
+        contentPanel.close();
+      },
+    });
+
+    composeView.addButton({
+      title: 'REMOVE SIDEBAR',
+      iconUrl: chrome.runtime.getURL('monkey-face.jpg'),
+      onClick(event) {
+        if (contentPanel) {
+          contentPanel.remove();
+          contentPanel = null;
+        }
+      },
+    });
   });
 });
