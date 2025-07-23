@@ -245,7 +245,10 @@ class GmailThreadRowView {
    *  Will be null when the element is not present - this happens when the "Hover actions" setting is disabled.
    */
   #getButtonToolbar(): HTMLUListElement | null {
-    return this._elements[0]?.querySelector<HTMLUListElement>('ul[role=toolbar]') || null;
+    return (
+      this._elements[0]?.querySelector<HTMLUListElement>('ul[role=toolbar]') ||
+      null
+    );
   }
 
   _removeUnclaimedModifications() {

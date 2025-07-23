@@ -150,22 +150,29 @@ InboxSDK.load(2, 'thread-rows').then(function (inboxSDK) {
     });
 
     // adds a button that repeatedly updates, with and without a title
-    threadRowView.addButton(Kefir.repeat(() => Kefir.sequentially(3000, [
-      {
-        title: 'Cake',
-        iconUrl: 'https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/png/social/cake/materialiconsround/24dp/2x/round_cake_black_24dp.png',
-        onClick: (event) => console.log('button click cake', event),
-      },
-      {
-        title: 'Zap',
-        iconUrl: 'https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/png/home/electric_bolt/materialiconsround/24dp/2x/round_electric_bolt_black_24dp.png',
-        onClick: (event) => console.log('button click zap', event),
-      },
-      {
-        iconUrl: 'https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/png/action/pets/materialiconsround/24dp/2x/round_pets_black_24dp.png',
-        onClick: (event) => console.log('button click woof', event),
-      },
-    ])));
+    threadRowView.addButton(
+      Kefir.repeat(() =>
+        Kefir.sequentially(3000, [
+          {
+            title: 'Cake',
+            iconUrl:
+              'https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/png/social/cake/materialiconsround/24dp/2x/round_cake_black_24dp.png',
+            onClick: (event) => console.log('button click cake', event),
+          },
+          {
+            title: 'Zap',
+            iconUrl:
+              'https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/png/home/electric_bolt/materialiconsround/24dp/2x/round_electric_bolt_black_24dp.png',
+            onClick: (event) => console.log('button click zap', event),
+          },
+          {
+            iconUrl:
+              'https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/png/action/pets/materialiconsround/24dp/2x/round_pets_black_24dp.png',
+            onClick: (event) => console.log('button click woof', event),
+          },
+        ]),
+      ),
+    );
 
     var buttonBus = new Kefir.Bus();
     threadRowView.addButton(buttonBus.toProperty());
