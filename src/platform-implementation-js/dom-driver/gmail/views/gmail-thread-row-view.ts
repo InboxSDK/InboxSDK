@@ -39,7 +39,7 @@ type ActionButtonMod = {
   remove(): void;
 };
 type ButtonMod = {
-  buttonSpan: HTMLElement;
+  buttonEl: HTMLElement;
   iconSettings: IconSettings;
   remove(): void;
 };
@@ -87,39 +87,6 @@ const cachedModificationsByRow: WeakMap<HTMLElement, Mods> = defonce(
 function focusAndNoPropagation(this: HTMLElement, event: Event) {
   this.focus();
   event.stopImmediatePropagation();
-}
-
-function starGroupEventInterceptor(this: HTMLElement, event: MouseEvent) {
-  const isOnStar = this.firstElementChild!.contains(
-    event.target as Node | null,
-  );
-  const isOnSDKButton = !isOnStar && this !== event.target;
-
-  if (!isOnStar) {
-    event.stopImmediatePropagation();
-
-    if (!isOnSDKButton || event.type == 'mouseover') {
-      const newEvent = document.createEvent('MouseEvents');
-      newEvent.initMouseEvent(
-        event.type,
-        event.bubbles,
-        event.cancelable,
-        event.view!,
-        event.detail,
-        event.screenX,
-        event.screenY,
-        event.clientX,
-        event.clientY,
-        event.ctrlKey,
-        event.altKey,
-        event.shiftKey,
-        event.metaKey,
-        event.button,
-        event.relatedTarget,
-      );
-      this.parentElement!.dispatchEvent(newEvent);
-    }
-  }
 }
 
 type Counts = {
@@ -271,6 +238,14 @@ class GmailThreadRowView {
 
   getElement(): HTMLElement {
     return this._elements[0];
+  }
+
+  /**
+   *  Provides the button toolbar element.
+   *  Will be null when the element is not present - this happens when the "Hover actions" setting is disabled.
+   */
+  #getButtonToolbar(): HTMLUListElement | null {
+    return this._elements[0]?.querySelector<HTMLUListElement>('ul[role=toolbar]') || null;
   }
 
   _removeUnclaimedModifications() {
@@ -552,6 +527,10 @@ class GmailThreadRowView {
 
     if (this._elements.length != 1) return; // buttons not supported in vertical preview pane
 
+    // When gmail setting "Hover actions" is disabled, the button toolbar is gone and buttons should not be added.
+    let buttonToolbar = this.#getButtonToolbar();
+    if (!buttonToolbar) return;
+
     let activeDropdown: any = null;
     let buttonMod: any = null;
     const prop: Kefir.Observable<
@@ -570,8 +549,8 @@ class GmailThreadRowView {
     });
 
     this._stopper.onValue(() => {
-      if (buttonMod && buttonMod.buttonSpan) {
-        (buttonMod.buttonSpan as any).onclick = null;
+      if (buttonMod && buttonMod.buttonEl) {
+        (buttonMod.buttonEl as any).onclick = null;
       }
     });
 
@@ -598,60 +577,47 @@ class GmailThreadRowView {
             delete buttonDescriptor.className;
           }
 
-          let buttonSpan: HTMLElement, iconSettings;
-
-          const buttonToolbar =
-            this._elements[0].querySelector<HTMLElement>('ul[role=toolbar]');
+          let buttonEl: HTMLElement, iconSettings;
 
           if (!buttonMod) {
             buttonMod = this._modifications.button.unclaimed.shift();
 
             if (!buttonMod) {
-              if (buttonToolbar) {
-                buttonSpan = document.createElement('li');
-                buttonSpan.classList.add('bqX');
-              } else {
-                buttonSpan = document.createElement('span');
-                // T-KT is one of the class names on the star button.
-                buttonSpan.classList.add('T-KT');
-              }
-
-              buttonSpan.classList.add('inboxsdk__thread_row_button');
-
-              if (buttonDescriptor.title) {
-                buttonSpan.setAttribute('title', buttonDescriptor.title);
-                buttonSpan.setAttribute('data-tooltip', buttonDescriptor.title);
-              } else {
-                buttonSpan.removeAttribute('title');
-              }
-
-              buttonSpan.setAttribute('tabindex', '-1');
-              buttonSpan.setAttribute(
+              buttonEl = document.createElement('li');
+              buttonEl.classList.add('bqX');
+              buttonEl.classList.add('inboxsdk__thread_row_button');
+              buttonEl.setAttribute('tabindex', '-1');
+              buttonEl.setAttribute(
                 'data-order-hint',
                 String(buttonDescriptor.orderHint || 0),
               );
-              buttonSpan.addEventListener('onmousedown', focusAndNoPropagation);
+              buttonEl.addEventListener('onmousedown', focusAndNoPropagation);
               iconSettings = {};
               buttonMod = {
-                buttonSpan,
+                buttonEl,
                 iconSettings,
-                remove: buttonSpan.remove.bind(buttonSpan),
+                remove: buttonEl.remove.bind(buttonEl),
               };
             }
 
             this._modifications.button.claimed.push(buttonMod);
           }
 
-          // could also be trash icon
-          const starGroup = buttonToolbar
-            ? null
-            : querySelector(this._elements[0], 'td.apU.xY, td.aqM.xY');
-          buttonSpan = buttonMod.buttonSpan;
           iconSettings = buttonMod.iconSettings;
+          buttonEl = buttonMod.buttonEl;
+
+          // update title
+          if (buttonDescriptor.title) {
+            buttonEl.setAttribute('aria-label', buttonDescriptor.title);
+            buttonEl.setAttribute('data-tooltip', buttonDescriptor.title);
+          } else {
+            buttonEl.removeAttribute('aria-label');
+            buttonEl.removeAttribute('data-tooltip');
+          }
 
           if (buttonDescriptor.onClick) {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            buttonSpan.onclick = (event) => {
+            buttonEl.onclick = (event) => {
               const appEvent = {
                 dropdown: null as DropdownView | null | undefined,
                 threadRowView: this._userView,
@@ -675,7 +641,7 @@ class GmailThreadRowView {
 
                   appEvent.dropdown = activeDropdown = new DropdownView(
                     new GmailDropdownView(),
-                    buttonSpan,
+                    buttonEl,
                     null,
                   );
                   activeDropdown.setPlacementOptions({
@@ -703,29 +669,15 @@ class GmailThreadRowView {
 
           updateIcon(
             iconSettings,
-            buttonSpan,
+            buttonEl,
             false,
             buttonDescriptor.iconClass,
             buttonDescriptor.iconUrl,
           );
 
-          if (buttonToolbar && buttonSpan.parentElement !== buttonToolbar) {
-            insertElementInOrder(buttonToolbar, buttonSpan, undefined, true);
-          } else if (starGroup && buttonSpan.parentElement !== starGroup) {
-            insertElementInOrder(starGroup, buttonSpan);
-
-            this._expandColumn('col.y5', 26 * starGroup.children.length);
-
-            // Don't let the whole column count as the star for click and mouse over purposes.
-            // Click events that aren't directly on the star should be stopped.
-            // Mouseover events that aren't directly on the star should be stopped and
-            // re-emitted from the thread row, so the thread row still has the mouseover
-            // appearance.
-            // Click events that are on one of our buttons should be stopped. Click events
-            // that aren't on the star button or our buttons should be re-emitted from the
-            // thread row so it counts as clicking on the thread.
-            starGroup.onmouseover = starGroup.onclick =
-              starGroupEventInterceptor as typeof starGroup.onclick;
+          buttonToolbar = this.#getButtonToolbar();
+          if (buttonToolbar && buttonEl.parentElement !== buttonToolbar) {
+            insertElementInOrder(buttonToolbar, buttonEl, undefined, true);
           }
         }
       });
