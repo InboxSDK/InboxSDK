@@ -84,41 +84,23 @@ const cachedModificationsByRow: WeakMap<HTMLElement, Mods> = defonce(
   () => new WeakMap(),
 );
 
+const BUTTON_CLASS = 'inboxsdk__thread_row_button' as const;
+
 function focusAndNoPropagation(this: HTMLElement, event: Event) {
   this.focus();
   event.stopImmediatePropagation();
 }
 
-function starGroupEventInterceptor(this: HTMLElement, event: MouseEvent) {
-  const isOnStar = this.firstElementChild!.contains(
-    event.target as Node | null,
+/**
+ *  Click handler for starGroup - will stop immediate propagation if the target is one of our buttons.
+ *  If we don't do this, clicking our button here would open the thread.
+ */
+function onClickStarGroup(this: GlobalEventHandlers, event: MouseEvent) {
+  const isOnSdkButton = !!(event.target as HTMLElement)?.closest(
+    `.${BUTTON_CLASS}`,
   );
-  const isOnSDKButton = !isOnStar && this !== event.target;
-
-  if (!isOnStar) {
+  if (isOnSdkButton) {
     event.stopImmediatePropagation();
-
-    if (!isOnSDKButton || event.type == 'mouseover') {
-      const newEvent = document.createEvent('MouseEvents');
-      newEvent.initMouseEvent(
-        event.type,
-        event.bubbles,
-        event.cancelable,
-        event.view!,
-        event.detail,
-        event.screenX,
-        event.screenY,
-        event.clientX,
-        event.clientY,
-        event.ctrlKey,
-        event.altKey,
-        event.shiftKey,
-        event.metaKey,
-        event.button,
-        event.relatedTarget,
-      );
-      this.parentElement!.dispatchEvent(newEvent);
-    }
   }
 }
 
@@ -624,7 +606,7 @@ class GmailThreadRowView {
                 // T-KT is one of the class names on the star button.
                 buttonEl.classList.add('T-KT');
               }
-              buttonEl.classList.add('inboxsdk__thread_row_button');
+              buttonEl.classList.add(BUTTON_CLASS);
               buttonEl.setAttribute('tabindex', '-1');
               buttonEl.setAttribute(
                 'data-order-hint',
@@ -642,8 +624,12 @@ class GmailThreadRowView {
             this._modifications.button.claimed.push(buttonMod);
           }
 
-          iconSettings = buttonMod.iconSettings;
+          // could also be trash icon
+          const starGroup = buttonToolbar
+            ? null
+            : querySelector(this._elements[0], 'td.apU.xY, td.aqM.xY');
           buttonEl = buttonMod.buttonEl;
+          iconSettings = buttonMod.iconSettings;
 
           // update title
           if (buttonDescriptor.title) {
@@ -714,12 +700,6 @@ class GmailThreadRowView {
             buttonDescriptor.iconUrl,
           );
 
-          // buttonToolbar = this.#getButtonToolbar();
-          // could also be trash icon
-          const starGroup = buttonToolbar
-            ? null
-            : querySelector(this._elements[0], 'td.apU.xY, td.aqM.xY');
-
           if (buttonToolbar && buttonEl.parentElement !== buttonToolbar) {
             insertElementInOrder(buttonToolbar, buttonEl, undefined, true);
           } else if (starGroup && buttonEl.parentElement !== starGroup) {
@@ -727,16 +707,7 @@ class GmailThreadRowView {
 
             this._expandColumn('col.y5', 26 * starGroup.children.length);
 
-            // Don't let the whole column count as the star for click and mouse over purposes.
-            // Click events that aren't directly on the star should be stopped.
-            // Mouseover events that aren't directly on the star should be stopped and
-            // re-emitted from the thread row, so the thread row still has the mouseover
-            // appearance.
-            // Click events that are on one of our buttons should be stopped. Click events
-            // that aren't on the star button or our buttons should be re-emitted from the
-            // thread row so it counts as clicking on the thread.
-            starGroup.onmouseover = starGroup.onclick =
-              starGroupEventInterceptor as typeof starGroup.onclick;
+            starGroup.onclick = onClickStarGroup;
           }
         }
       });

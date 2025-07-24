@@ -7,6 +7,13 @@ function log() {
   );
 }
 
+// https://github.com/google/material-design-icons/tree/master/png
+const iconUrls = [
+  'https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/png/social/cake/materialiconsround/24dp/2x/round_cake_black_24dp.png',
+  'https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/png/home/electric_bolt/materialiconsround/24dp/2x/round_electric_bolt_black_24dp.png',
+  'https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/png/action/pets/materialiconsround/24dp/2x/round_pets_black_24dp.png',
+];
+
 InboxSDK.load(2, 'thread-rows').then(function (inboxSDK) {
   window._sdk = inboxSDK;
   var i = 0;
@@ -133,7 +140,7 @@ InboxSDK.load(2, 'thread-rows').then(function (inboxSDK) {
     );
     threadRowView.replaceDate(null);
 
-    threadRowView.replaceSubject('This is a new subect!');
+    threadRowView.replaceSubject('This is a new subject!');
 
     // threadRowView.addButton(Kefir.repeatedly(5000, [
     // 	{
@@ -155,21 +162,19 @@ InboxSDK.load(2, 'thread-rows').then(function (inboxSDK) {
         Kefir.sequentially(3000, [
           {
             title: 'Cake',
-            iconUrl:
-              'https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/png/social/cake/materialiconsround/24dp/2x/round_cake_black_24dp.png',
+            iconUrl: iconUrls[0],
             onClick: (event) => console.log('button click cake', event),
           },
           {
             title: 'Zap',
-            iconUrl:
-              'https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/png/home/electric_bolt/materialiconsround/24dp/2x/round_electric_bolt_black_24dp.png',
+            iconUrl: iconUrls[1],
             onClick: (event) => console.log('button click zap', event),
           },
           {
-            iconUrl:
-              'https://raw.githubusercontent.com/google/material-design-icons/refs/heads/master/png/action/pets/materialiconsround/24dp/2x/round_pets_black_24dp.png',
+            iconUrl: iconUrls[2],
             onClick: (event) => console.log('button click woof', event),
           },
+          null,
         ]),
       ),
     );
