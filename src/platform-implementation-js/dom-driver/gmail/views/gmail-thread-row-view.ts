@@ -89,6 +89,39 @@ function focusAndNoPropagation(this: HTMLElement, event: Event) {
   event.stopImmediatePropagation();
 }
 
+function starGroupEventInterceptor(this: HTMLElement, event: MouseEvent) {
+  const isOnStar = this.firstElementChild!.contains(
+    event.target as Node | null,
+  );
+  const isOnSDKButton = !isOnStar && this !== event.target;
+
+  if (!isOnStar) {
+    event.stopImmediatePropagation();
+
+    if (!isOnSDKButton || event.type == 'mouseover') {
+      const newEvent = document.createEvent('MouseEvents');
+      newEvent.initMouseEvent(
+        event.type,
+        event.bubbles,
+        event.cancelable,
+        event.view!,
+        event.detail,
+        event.screenX,
+        event.screenY,
+        event.clientX,
+        event.clientY,
+        event.ctrlKey,
+        event.altKey,
+        event.shiftKey,
+        event.metaKey,
+        event.button,
+        event.relatedTarget,
+      );
+      this.parentElement!.dispatchEvent(newEvent);
+    }
+  }
+}
+
 type Counts = {
   messageCount: number;
   draftCount: number;
@@ -530,10 +563,6 @@ class GmailThreadRowView {
 
     if (this._elements.length != 1) return; // buttons not supported in vertical preview pane
 
-    // When gmail setting "Hover actions" is disabled, the button toolbar is gone and buttons should not be added.
-    let buttonToolbar = this.#getButtonToolbar();
-    if (!buttonToolbar) return;
-
     let activeDropdown: any = null;
     let buttonMod: any = null;
     const prop: Kefir.Observable<
@@ -580,14 +609,21 @@ class GmailThreadRowView {
             delete buttonDescriptor.className;
           }
 
+          const buttonToolbar = this.#getButtonToolbar();
           let buttonEl: HTMLElement, iconSettings;
 
           if (!buttonMod) {
             buttonMod = this._modifications.button.unclaimed.shift();
 
             if (!buttonMod) {
-              buttonEl = document.createElement('li');
-              buttonEl.classList.add('bqX');
+              if (buttonToolbar) {
+                buttonEl = document.createElement('li');
+                buttonEl.classList.add('bqX');
+              } else {
+                buttonEl = document.createElement('span');
+                // T-KT is one of the class names on the star button.
+                buttonEl.classList.add('T-KT');
+              }
               buttonEl.classList.add('inboxsdk__thread_row_button');
               buttonEl.setAttribute('tabindex', '-1');
               buttonEl.setAttribute(
@@ -678,9 +714,29 @@ class GmailThreadRowView {
             buttonDescriptor.iconUrl,
           );
 
-          buttonToolbar = this.#getButtonToolbar();
+          // buttonToolbar = this.#getButtonToolbar();
+          // could also be trash icon
+          const starGroup = buttonToolbar
+            ? null
+            : querySelector(this._elements[0], 'td.apU.xY, td.aqM.xY');
+
           if (buttonToolbar && buttonEl.parentElement !== buttonToolbar) {
             insertElementInOrder(buttonToolbar, buttonEl, undefined, true);
+          } else if (starGroup && buttonEl.parentElement !== starGroup) {
+            insertElementInOrder(starGroup, buttonEl);
+
+            this._expandColumn('col.y5', 26 * starGroup.children.length);
+
+            // Don't let the whole column count as the star for click and mouse over purposes.
+            // Click events that aren't directly on the star should be stopped.
+            // Mouseover events that aren't directly on the star should be stopped and
+            // re-emitted from the thread row, so the thread row still has the mouseover
+            // appearance.
+            // Click events that are on one of our buttons should be stopped. Click events
+            // that aren't on the star button or our buttons should be re-emitted from the
+            // thread row so it counts as clicking on the thread.
+            starGroup.onmouseover = starGroup.onclick =
+              starGroupEventInterceptor as typeof starGroup.onclick;
           }
         }
       });
