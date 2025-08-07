@@ -951,10 +951,14 @@ class GmailDriver {
   }
 
   waitForGlobalSidebarReady(): Kefir.Observable<void, unknown> {
+    const delegatedAccountMatch = document.location.pathname.match(
+      /\/u\/(\d+)\/d\/(.+?)\//,
+    );
     const condition = () =>
-      GmailElementGetter.getCompanionSidebarContentContainerElement() &&
-      (GmailElementGetter.getCompanionSidebarIconContainerElement() ||
-        GmailElementGetter.getAddonSidebarContainerElement());
+      delegatedAccountMatch ||
+      (GmailElementGetter.getCompanionSidebarContentContainerElement() &&
+        (GmailElementGetter.getCompanionSidebarIconContainerElement() ||
+          GmailElementGetter.getAddonSidebarContainerElement()));
     if (condition()) {
       return Kefir.constant(undefined);
     }
