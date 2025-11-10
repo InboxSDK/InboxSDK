@@ -877,8 +877,9 @@ class GmailMessageView {
       .onValue((mutation) => {
         if (mutation !== 'END' && replyContainer.classList.contains('adB')) {
           if (!currentReplyElementRemovalStream) {
-            const replyElement =
-              replyContainer.firstElementChild as HTMLElement | null;
+            const replyElement = (replyContainer.getElementsByClassName(
+              'M9',
+            )?.[0] || replyContainer.firstElementChild) as HTMLElement | null;
             self.#replyElement = replyElement;
 
             if (replyElement) {
