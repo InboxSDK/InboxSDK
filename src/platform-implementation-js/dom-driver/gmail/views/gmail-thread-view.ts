@@ -554,9 +554,10 @@ class GmailThreadView {
     const idElement = this.#element.querySelector('[data-thread-perm-id]');
 
     if (!idElement) throw new Error('threadID element not found');
-    const syncThreadID = (this.#syncThreadID = idElement.getAttribute(
-      'data-thread-perm-id',
-    ));
+
+    // the string value can be 'undefined'
+    const attributeValue = idElement.getAttribute('data-thread-perm-id');
+    const syncThreadID = (this.#syncThreadID = (typeof attributeValue === 'string' && attributeValue !== 'undefined') ? attributeValue : null);
     if (!syncThreadID) throw new Error('syncThreadID attribute with no value');
     threadID = idElement.getAttribute('data-legacy-thread-id');
 
@@ -603,16 +604,17 @@ class GmailThreadView {
     const idElement = this.#element.querySelector('[data-thread-perm-id]');
 
     if (!idElement) throw new Error('threadID element not found');
-    const syncThreadID = (this.#syncThreadID = idElement.getAttribute(
-      'data-thread-perm-id',
-    ));
-    if (!syncThreadID) throw new Error('syncThreadID attribute with no value');
+
+    // the string value can be 'undefined'
+    const attributeValue = idElement.getAttribute('data-thread-perm-id');
+    const syncThreadID = (this.#syncThreadID = (typeof attributeValue === 'string' && attributeValue !== 'undefined') ? attributeValue : null);
+    if (!syncThreadID) console.warn('syncThreadID attribute with no value');
     this.#threadID = threadID = idElement.getAttribute('data-legacy-thread-id');
 
-    if (!threadID) {
-      this.#threadID = threadID =
-        await this.#driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
-    }
+    // if (!threadID) {
+    //   this.#threadID = threadID =
+    //     await this.#driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
+    // }
 
     if (this.#threadID) return this.#threadID;
     else throw new Error('Failed to get id for thread');
@@ -934,6 +936,8 @@ class GmailThreadView {
     }
 
     var messageContainer: HTMLElement = openMessage.parentElement as any;
+
+    console.log('==== messageContainer ====', messageContainer);
 
     this.#initializeExistingMessages(messageContainer);
 
