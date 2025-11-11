@@ -557,7 +557,10 @@ class GmailThreadView {
 
     // the string value can be 'undefined'
     const attributeValue = idElement.getAttribute('data-thread-perm-id');
-    const syncThreadID = (this.#syncThreadID = (typeof attributeValue === 'string' && attributeValue !== 'undefined') ? attributeValue : null);
+    const syncThreadID = (this.#syncThreadID =
+      typeof attributeValue === 'string' && attributeValue !== 'undefined'
+        ? attributeValue
+        : null);
     if (!syncThreadID) throw new Error('syncThreadID attribute with no value');
     threadID = idElement.getAttribute('data-legacy-thread-id');
 
@@ -607,7 +610,10 @@ class GmailThreadView {
 
     // the string value can be 'undefined'
     const attributeValue = idElement.getAttribute('data-thread-perm-id');
-    const syncThreadID = (this.#syncThreadID = (typeof attributeValue === 'string' && attributeValue !== 'undefined') ? attributeValue : null);
+    const syncThreadID = (this.#syncThreadID =
+      typeof attributeValue === 'string' && attributeValue !== 'undefined'
+        ? attributeValue
+        : null);
     if (!syncThreadID) console.warn('syncThreadID attribute with no value');
     this.#threadID = idElement.getAttribute('data-legacy-thread-id');
 
