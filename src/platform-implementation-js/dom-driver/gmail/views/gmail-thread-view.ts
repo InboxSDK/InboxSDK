@@ -599,7 +599,7 @@ class GmailThreadView {
   }
 
   async getThreadIDAsync(): Promise<string> {
-    let threadID;
+    // let threadID;
 
     const idElement = this.#element.querySelector('[data-thread-perm-id]');
 
@@ -609,7 +609,7 @@ class GmailThreadView {
     const attributeValue = idElement.getAttribute('data-thread-perm-id');
     const syncThreadID = (this.#syncThreadID = (typeof attributeValue === 'string' && attributeValue !== 'undefined') ? attributeValue : null);
     if (!syncThreadID) console.warn('syncThreadID attribute with no value');
-    this.#threadID = threadID = idElement.getAttribute('data-legacy-thread-id');
+    this.#threadID = idElement.getAttribute('data-legacy-thread-id');
 
     // if (!threadID) {
     //   this.#threadID = threadID =
