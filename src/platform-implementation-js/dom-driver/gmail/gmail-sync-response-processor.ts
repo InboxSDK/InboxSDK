@@ -319,9 +319,9 @@ function getRecipientsFromMessageDescriptor_20220909(
 ): Recipient[] | void {
   if (!messageDescriptor[1]) return;
 
-  const to = messageDescriptor[1][0] || [];
-  const cc = messageDescriptor[1][1] || [];
-  const bcc = messageDescriptor[1][2] || [];
+  const to = messageDescriptor[1][0][0] || [];
+  const cc = messageDescriptor[1][0][1] || [];
+  const bcc = messageDescriptor[1][0][2] || [];
 
   return to
     .concat(cc)
