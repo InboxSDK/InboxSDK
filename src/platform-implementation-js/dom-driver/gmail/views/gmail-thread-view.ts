@@ -849,9 +849,23 @@ class GmailThreadView {
   }
 
   #findBottomReplyToolbarElement(): HTMLElement | null {
-    var toolbarContainerElements =
-      this.#element.querySelectorAll<HTMLElement>('table .amn');
-    return toolbarContainerElements[0];
+    // Get all .amn elements
+    var allAmnElements = this.#element.querySelectorAll<HTMLElement>('.amn');
+
+    // Filter to find .amn elements that are:
+    // 1. Not inside a table
+    // 2. Not hidden (display: none)
+    for (const element of allAmnElements) {
+      const isInsideTable = element.closest('table') !== null;
+      const isHidden = window.getComputedStyle(element).display === 'none';
+
+      if (!isInsideTable && !isHidden) {
+        return element;
+      }
+    }
+
+    // Fallback to the first one if no visible non-table element found
+    return allAmnElements[0] || null;
   }
 
   #isToolbarContainerRelevant(toolbarContainerElement: HTMLElement): boolean {
