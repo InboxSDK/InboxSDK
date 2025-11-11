@@ -937,8 +937,6 @@ class GmailThreadView {
 
     var messageContainer: HTMLElement = openMessage.parentElement as any;
 
-    console.log('==== messageContainer ====', messageContainer);
-
     this.#initializeExistingMessages(messageContainer);
 
     this.#observeNewMessages(messageContainer);
