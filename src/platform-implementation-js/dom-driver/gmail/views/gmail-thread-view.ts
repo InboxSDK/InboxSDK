@@ -4,6 +4,7 @@ import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import type { Bus } from 'kefir-bus';
 import findParent from '../../../../common/find-parent';
+import isElementVisible from '../../../../common/isElementVisible';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import querySelector, {
   SelectorError,
@@ -561,7 +562,10 @@ class GmailThreadView {
       typeof attributeValue === 'string' && attributeValue !== 'undefined'
         ? attributeValue
         : null);
-    if (!syncThreadID) throw new Error('syncThreadID attribute with no value');
+    if (!syncThreadID) {
+      const err = new Error('syncThreadID attribute with no value');
+      this.#driver.getLogger().error(err);
+    }
     threadID = idElement.getAttribute('data-legacy-thread-id');
 
     if (!threadID) {
@@ -602,7 +606,7 @@ class GmailThreadView {
   }
 
   async getThreadIDAsync(): Promise<string> {
-    // let threadID;
+    let threadID;
 
     const idElement = this.#element.querySelector('[data-thread-perm-id]');
 
@@ -614,13 +618,16 @@ class GmailThreadView {
       typeof attributeValue === 'string' && attributeValue !== 'undefined'
         ? attributeValue
         : null);
-    if (!syncThreadID) console.warn('syncThreadID attribute with no value');
-    this.#threadID = idElement.getAttribute('data-legacy-thread-id');
+    if (!syncThreadID) {
+      const err = new Error('syncThreadID attribute with no value');
+      this.#driver.getLogger().error(err);
+    }
+    this.#threadID = threadID = idElement.getAttribute('data-legacy-thread-id');
 
-    // if (!threadID) {
-    //   this.#threadID = threadID =
-    //     await this.#driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
-    // }
+    if (!threadID && syncThreadID) {
+      this.#threadID = threadID =
+        await this.#driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
+    }
 
     if (this.#threadID) return this.#threadID;
     else throw new Error('Failed to get id for thread');
@@ -857,22 +864,17 @@ class GmailThreadView {
   }
 
   #findBottomReplyToolbarElement(): HTMLElement | null {
-    // Get all .amn elements
+    // Get all .amn elements (may exist in multiple locations due to A/B testing)
     var allAmnElements = this.#element.querySelectorAll<HTMLElement>('.amn');
 
-    // Filter to find .amn elements that are:
-    // 1. Not inside a table
-    // 2. Not hidden (display: none)
+    // Find the visible .amn element (handles A/B testing where one might be hidden)
     for (const element of allAmnElements) {
-      const isInsideTable = element.closest('table') !== null;
-      const isHidden = window.getComputedStyle(element).display === 'none';
-
-      if (!isInsideTable && !isHidden) {
+      if (isElementVisible(element)) {
         return element;
       }
     }
 
-    // Fallback to the first one if no visible non-table element found
+    // Fallback to the first one if no visible element found
     return allAmnElements[0] || null;
   }
 
