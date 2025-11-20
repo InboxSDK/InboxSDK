@@ -265,16 +265,23 @@ class GmailMessageView {
 
     const threadID = this.#threadViewDriver.getInternalID();
 
-    recipients = this.#recipientsFull = (await this.#driver
-      .getPageCommunicator()
-      .getMessageRecipients(threadID, this.#element)) as any;
+    recipients = this.#recipientsFull = (
+      await this.#driver
+        .getPageCommunicator()
+        .getMessageRecipients(threadID, this.#element)
+    )?.map(
+      (recipient): Contact => ({
+        name: recipient.name ?? recipient.emailAddress,
+        emailAddress: recipient.emailAddress,
+      }),
+    );
 
     if (!recipients) {
-      // this.#driver
-      //   .getLogger()
-      //   .error(new Error('Failed to find message recipients from response'), {
-      //     threadID,
-      //   });
+      this.#driver
+        .getLogger()
+        .error(new Error('Failed to find message recipients from response'), {
+          threadID,
+        });
 
       recipients = this.#recipientsFull = this.getRecipients();
     }

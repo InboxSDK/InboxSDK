@@ -596,11 +596,16 @@ export function extractMessages(
     value,
     _extractThreadsFromConversationViewResponseArrayXf,
   );
-  const messages = t.toArray(value, _extractMessagesFromResponseArrayXf);
+  const messages: Message[] = t.toArray(
+    value,
+    _extractMessagesFromResponseArrayXf,
+  );
 
   const messageMap: Record<string, Message> = {};
-  messages.forEach((message: any) => {
-    messageMap[message.messageID] = message;
+  messages.forEach((message) => {
+    if (message.messageID != null) {
+      messageMap[message.messageID] = message;
+    }
   });
 
   return threads.map(({ threadID, messageIDs }) => ({
