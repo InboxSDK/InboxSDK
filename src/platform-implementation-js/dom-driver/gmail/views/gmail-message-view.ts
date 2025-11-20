@@ -270,11 +270,11 @@ class GmailMessageView {
       .getMessageRecipients(threadID, this.#element)) as any;
 
     if (!recipients) {
-      this.#driver
-        .getLogger()
-        .error(new Error('Failed to find message recipients from response'), {
-          threadID,
-        });
+      // this.#driver
+      //   .getLogger()
+      //   .error(new Error('Failed to find message recipients from response'), {
+      //     threadID,
+      //   });
 
       recipients = this.#recipientsFull = this.getRecipients();
     }

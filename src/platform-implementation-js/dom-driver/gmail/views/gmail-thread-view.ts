@@ -557,14 +557,14 @@ class GmailThreadView {
 
     // the string value can be 'undefined'
     const attributeValue = idElement.getAttribute('data-thread-perm-id');
-    const syncThreadID = (this.#syncThreadID =
+    this.#syncThreadID =
       typeof attributeValue === 'string' && attributeValue !== 'undefined'
         ? attributeValue
-        : null);
-    if (!syncThreadID) {
-      const err = new Error('syncThreadID attribute with no value');
-      this.#driver.getLogger().error(err);
-    }
+        : null;
+    // if (!syncThreadID) {
+    //   const err = new Error('syncThreadID attribute with no value');
+    //   this.#driver.getLogger().error(err);
+    // }
     threadID = idElement.getAttribute('data-legacy-thread-id');
 
     if (!threadID) {
@@ -617,10 +617,10 @@ class GmailThreadView {
       typeof attributeValue === 'string' && attributeValue !== 'undefined'
         ? attributeValue
         : null);
-    if (!syncThreadID) {
-      const err = new Error('syncThreadID attribute with no value');
-      this.#driver.getLogger().error(err);
-    }
+    // if (!syncThreadID) {
+    //   const err = new Error('syncThreadID attribute with no value');
+    //   this.#driver.getLogger().error(err);
+    // }
     this.#threadID = threadID = idElement.getAttribute('data-legacy-thread-id');
 
     if (!threadID && syncThreadID) {
