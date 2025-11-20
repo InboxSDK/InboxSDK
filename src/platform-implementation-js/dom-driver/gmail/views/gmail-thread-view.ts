@@ -554,10 +554,14 @@ class GmailThreadView {
     const idElement = this.#element.querySelector('[data-thread-perm-id]');
 
     if (!idElement) throw new Error('threadID element not found');
-    const syncThreadID = (this.#syncThreadID = idElement.getAttribute(
-      'data-thread-perm-id',
-    ));
-    if (!syncThreadID) throw new Error('syncThreadID attribute with no value');
+
+    // the string value can be 'undefined'
+    const attributeValue = idElement.getAttribute('data-thread-perm-id');
+    this.#syncThreadID =
+      typeof attributeValue === 'string' && attributeValue !== 'undefined'
+        ? attributeValue
+        : null;
+
     threadID = idElement.getAttribute('data-legacy-thread-id');
 
     if (!threadID) {
@@ -603,13 +607,17 @@ class GmailThreadView {
     const idElement = this.#element.querySelector('[data-thread-perm-id]');
 
     if (!idElement) throw new Error('threadID element not found');
-    const syncThreadID = (this.#syncThreadID = idElement.getAttribute(
-      'data-thread-perm-id',
-    ));
-    if (!syncThreadID) throw new Error('syncThreadID attribute with no value');
+
+    // the string value can be 'undefined'
+    const attributeValue = idElement.getAttribute('data-thread-perm-id');
+    const syncThreadID = (this.#syncThreadID =
+      typeof attributeValue === 'string' && attributeValue !== 'undefined'
+        ? attributeValue
+        : null);
+
     this.#threadID = threadID = idElement.getAttribute('data-legacy-thread-id');
 
-    if (!threadID) {
+    if (!threadID && syncThreadID) {
       this.#threadID = threadID =
         await this.#driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
     }
@@ -729,19 +737,9 @@ class GmailThreadView {
     } satisfies Options;
     const buttonElement = buttonOptions.buttonView.getElement();
 
-    const spacer = document.createElement('span');
-    const spacerID = 'inboxsdk__thread_view_footer_button_spacer';
-    spacer.style.width = '8px';
-    spacer.id = spacerID;
-
     // Sometimes it is there right away
     const subjectToolbarElement = this.#findBottomReplyToolbarElement();
     if (subjectToolbarElement) {
-      const reactionButton = this.#element.querySelector('.amn .wrsVRe');
-      if (reactionButton && !this.#element.querySelector(`#${spacerID}`)) {
-        subjectToolbarElement.appendChild(spacer);
-      }
-
       subjectToolbarElement.appendChild(buttonElement);
     }
 
@@ -753,11 +751,6 @@ class GmailThreadView {
           subjectToolbarElement &&
           !subjectToolbarElement.contains(buttonElement)
         ) {
-          const reactionButton = this.#element.querySelector('.amn .wrsVRe');
-          if (reactionButton && !this.#element.querySelector(`#${spacerID}`)) {
-            subjectToolbarElement.appendChild(spacer);
-          }
-
           subjectToolbarElement.appendChild(buttonElement);
         }
       }
@@ -849,9 +842,21 @@ class GmailThreadView {
   }
 
   #findBottomReplyToolbarElement(): HTMLElement | null {
-    var toolbarContainerElements =
-      this.#element.querySelectorAll<HTMLElement>('table .amn');
-    return toolbarContainerElements[0];
+    // Get all .amn elements (may exist in multiple locations due to A/B testing)
+    var allAmnElements = this.#element.querySelectorAll<HTMLElement>('.amn');
+
+    // Find the visible .amn element (handles A/B testing where one might be hidden)
+    for (const element of allAmnElements) {
+      const isInsideTable = element.closest('table') !== null;
+      const isHidden = window.getComputedStyle(element).display === 'none';
+
+      if (!isInsideTable && !isHidden) {
+        return element;
+      }
+    }
+
+    // Fallback to the first one if no visible element found
+    return allAmnElements[0] || null;
   }
 
   #isToolbarContainerRelevant(toolbarContainerElement: HTMLElement): boolean {
