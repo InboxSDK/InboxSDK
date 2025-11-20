@@ -4,7 +4,6 @@ import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import type { Bus } from 'kefir-bus';
 import findParent from '../../../../common/find-parent';
-import isElementVisible from '../../../../common/isElementVisible';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import querySelector, {
   SelectorError,
@@ -854,7 +853,10 @@ class GmailThreadView {
 
     // Find the visible .amn element (handles A/B testing where one might be hidden)
     for (const element of allAmnElements) {
-      if (isElementVisible(element)) {
+      const isInsideTable = element.closest('table') !== null;
+      const isHidden = window.getComputedStyle(element).display === 'none';
+
+      if (!isInsideTable && !isHidden) {
         return element;
       }
     }
