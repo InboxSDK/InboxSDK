@@ -561,10 +561,7 @@ class GmailThreadView {
       typeof attributeValue === 'string' && attributeValue !== 'undefined'
         ? attributeValue
         : null;
-    // if (!syncThreadID) {
-    //   const err = new Error('syncThreadID attribute with no value');
-    //   this.#driver.getLogger().error(err);
-    // }
+
     threadID = idElement.getAttribute('data-legacy-thread-id');
 
     if (!threadID) {
@@ -617,10 +614,7 @@ class GmailThreadView {
       typeof attributeValue === 'string' && attributeValue !== 'undefined'
         ? attributeValue
         : null);
-    // if (!syncThreadID) {
-    //   const err = new Error('syncThreadID attribute with no value');
-    //   this.#driver.getLogger().error(err);
-    // }
+
     this.#threadID = threadID = idElement.getAttribute('data-legacy-thread-id');
 
     if (!threadID && syncThreadID) {
