@@ -230,7 +230,7 @@ export default class MessageView extends (EventEmitter as new () => TypedEventEm
     return this.#messageViewImplementation.getSender();
   }
 
-  getRecipients(): Array<Contact> {
+  getRecipients(): Array<ContactNameOptional> {
     this.#driver
       .getLogger()
       .deprecationWarning(
@@ -239,7 +239,7 @@ export default class MessageView extends (EventEmitter as new () => TypedEventEm
       );
     return this.getRecipientEmailAddresses().map((emailAddress) => ({
       emailAddress,
-      name: null!,
+      name: undefined,
     }));
   }
 
