@@ -583,9 +583,6 @@ const _extractMessagesFromResponseArrayXf = t.compose(
       date: item[7],
       recipients: undefined,
     };
-    //     _v13_1_3: item[13]?.slice(1, 4),
-    // _v13_9: item[13]?.[9],
-    // _v37: item[37],
 
     if (Array.isArray(item[13])) {
       m.recipients = item[13]
