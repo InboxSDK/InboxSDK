@@ -468,6 +468,11 @@ export {
   MessageViewToolbarSectionNames,
 } from './platform-implementation-js/views/conversations/message-view';
 
+export interface ContactNameOptional {
+  emailAddress: string;
+  name?: string;
+}
+
 export interface Contact {
   name: string;
   emailAddress: string;

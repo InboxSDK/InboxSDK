@@ -22,6 +22,7 @@ import type GmailDriver from '../gmail-driver';
 import type GmailThreadView from './gmail-thread-view';
 import type {
   Contact,
+  ContactNameOptional,
   MessageAttachmentIconDescriptor,
   MessageView,
   ThreadView,
@@ -80,9 +81,9 @@ class GmailMessageView {
   #messageLoaded: boolean = false;
   #openMoreMenu: HTMLElement | null | undefined;
   #sender: Contact | null | undefined = null;
-  #recipients: Contact[] | null | undefined = null;
+  #recipients: ContactNameOptional[] | null | undefined = null;
   #recipientEmailAddresses: string[] | null | undefined = null;
-  #recipientsFull: Contact[] | null | undefined = null;
+  #recipientsFull: ContactNameOptional[] | null | undefined = null;
 
   constructor(
     element: HTMLElement,
@@ -232,7 +233,7 @@ class GmailMessageView {
     return sender;
   }
 
-  getRecipients(): Array<Contact> {
+  getRecipients(): Array<ContactNameOptional> {
     let recipients = this.#recipients;
     if (recipients) return recipients;
     const receipientSpans = Array.from(
@@ -259,22 +260,29 @@ class GmailMessageView {
     return recipients;
   }
 
-  async getRecipientsFull(): Promise<Array<Contact>> {
+  async getRecipientsFull(): Promise<Array<ContactNameOptional>> {
     let recipients = this.#recipientsFull;
     if (recipients) return recipients;
 
     const threadID = this.#threadViewDriver.getInternalID();
 
-    recipients = this.#recipientsFull = (await this.#driver
-      .getPageCommunicator()
-      .getMessageRecipients(threadID, this.#element)) as any;
+    recipients = this.#recipientsFull = (
+      await this.#driver
+        .getPageCommunicator()
+        .getMessageRecipients(threadID, this.#element)
+    )?.map(
+      (recipient): ContactNameOptional => ({
+        name: recipient.name ?? undefined,
+        emailAddress: recipient.emailAddress,
+      }),
+    );
 
     if (!recipients) {
-      // this.#driver
-      //   .getLogger()
-      //   .error(new Error('Failed to find message recipients from response'), {
-      //     threadID,
-      //   });
+      this.#driver
+        .getLogger()
+        .error(new Error('Failed to find message recipients from response'), {
+          threadID,
+        });
 
       recipients = this.#recipientsFull = this.getRecipients();
     }
@@ -979,7 +987,7 @@ class GmailMessageView {
     return gmailAttachmentAreaView;
   }
 
-  #getUpdatedContact(inContact: Contact): Contact {
+  #getUpdatedContact(inContact: ContactNameOptional): ContactNameOptional {
     return getUpdatedContact(inContact, this.#element);
   }
 

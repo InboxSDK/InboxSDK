@@ -1,10 +1,10 @@
-import { Contact } from '../../inboxsdk';
+import { ContactNameOptional } from '../../inboxsdk';
 import isValidEmail from './is-valid-email';
 
 export default function extractContactFromEmailContactString(
   contactInfoString: string,
-): Contact {
-  let name: string = null!;
+): ContactNameOptional {
+  let name: string | undefined;
   let emailAddress = null;
 
   const contactInfoParts = contactInfoString.split('<');

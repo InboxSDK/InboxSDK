@@ -1,7 +1,7 @@
 import extractContactFromEmailContactString from './extract-contact-from-email-contact-string';
 it('should work with just an email address', () => {
   expect(extractContactFromEmailContactString('monkeys@monkeys.com')).toEqual({
-    name: null,
+    name: undefined,
     emailAddress: 'monkeys@monkeys.com',
   });
 });
@@ -17,7 +17,7 @@ it('should work spaces around an email address', () => {
   expect(
     extractContactFromEmailContactString('  monkeys@monkeys.com  '),
   ).toEqual({
-    name: null,
+    name: undefined,
     emailAddress: 'monkeys@monkeys.com',
   });
 });

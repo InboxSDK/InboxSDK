@@ -1,9 +1,12 @@
 import flatten from 'lodash/flatten';
 import last from 'lodash/last';
+import uniqBy from 'lodash/uniqBy';
 import t from 'transducers.js';
 import mapIndexed from 'map-indexed-xf';
 import htmlToText from '../../../common/html-to-text';
 import { assert } from '../../../common/assert';
+import extractContactFromEmailContactString from '../../lib/extract-contact-from-email-contact-string';
+import { ContactNameOptional } from '../../../inboxsdk';
 
 export function extractGmailThreadIdFromMessageIdSearch(
   responseString: string,
@@ -559,10 +562,7 @@ function _extractThreadArraysFromResponseArray(
 export interface Message {
   date: number;
   messageID?: string;
-  recipients?: Array<{
-    emailAddress: string;
-    name: string | null | undefined;
-  }>;
+  recipients?: ContactNameOptional[];
 }
 
 const _extractThreadsFromConversationViewResponseArrayXf = t.compose(
@@ -577,10 +577,33 @@ const _extractThreadsFromConversationViewResponseArrayXf = t.compose(
 const _extractMessagesFromResponseArrayXf = t.compose(
   t.cat,
   t.filter((item: any) => item[0] === 'ms'),
-  t.map((item: any) => ({
-    messageID: item[1],
-    date: item[7],
-  })),
+  t.map((item: any): Message => {
+    const m: Message = {
+      messageID: item[1],
+      date: item[7],
+      recipients: undefined,
+    };
+
+    if (Array.isArray(item[13])) {
+      m.recipients = item[13]
+        .slice(1, 4)
+        .filter((b: any) => b != null)
+        .flat()
+        .map(extractContactFromEmailContactString);
+    } else if (Array.isArray(item[37])) {
+      m.recipients = uniqBy(
+        item[37]
+          .slice(0, 5)
+          .filter((b) => Array.isArray(b))
+          .flat(),
+        (b: any) => b[1],
+      ).map((b: any) => ({
+        emailAddress: b[1],
+        name: b[0] ?? undefined,
+      }));
+    }
+    return m;
+  }),
 );
 
 export function extractMessages(
@@ -596,11 +619,16 @@ export function extractMessages(
     value,
     _extractThreadsFromConversationViewResponseArrayXf,
   );
-  const messages = t.toArray(value, _extractMessagesFromResponseArrayXf);
+  const messages: Message[] = t.toArray(
+    value,
+    _extractMessagesFromResponseArrayXf,
+  );
 
   const messageMap: Record<string, Message> = {};
-  messages.forEach((message: any) => {
-    messageMap[message.messageID] = message;
+  messages.forEach((message) => {
+    if (message.messageID != null) {
+      messageMap[message.messageID] = message;
+    }
   });
 
   return threads.map(({ threadID, messageIDs }) => ({

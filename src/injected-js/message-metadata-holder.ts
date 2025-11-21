@@ -9,13 +9,13 @@ export function setup() {
   document.addEventListener(
     'inboxSDKtellMeThisMessageDate',
     function (event: Record<string, any>) {
-      exposeMetadata(event, 'data-inboxsdk-sortdate', (m: any) => m.date);
+      exposeMetadata(event, 'data-inboxsdk-sortdate', (m) => m.date);
     },
   );
   document.addEventListener(
     'inboxSDKtellMeThisMessageRecipients',
     function (event: Record<string, any>) {
-      exposeMetadata(event, 'data-inboxsdk-recipients', (m: any) => {
+      exposeMetadata(event, 'data-inboxsdk-recipients', (m) => {
         if (m.recipients) return m.recipients;
         else return null;
       });
@@ -23,7 +23,11 @@ export function setup() {
   );
 }
 
-function exposeMetadata(event: any, attribute: string, processor: any) {
+function exposeMetadata(
+  event: any,
+  attribute: string,
+  processor: (m: Message) => unknown,
+) {
   const {
     target,
     detail: { threadId, ikValue, btaiHeader, xsrfToken },
@@ -84,11 +88,15 @@ function getMessage(
 
 export function add(
   groupedMessages: Array<{
+    syncThreadID?: string;
     threadID: string;
     messages: Message[];
   }>,
 ) {
   groupedMessages.forEach((group) => {
+    if (group.syncThreadID != null) {
+      threadIdToMessages.set(group.syncThreadID, group.messages);
+    }
     threadIdToMessages.set(group.threadID, group.messages);
   });
 }
@@ -125,7 +133,8 @@ function addDataForThread(
         if (syncThread) {
           add([
             {
-              threadID: syncThread.syncThreadID,
+              syncThreadID: syncThread.syncThreadID,
+              threadID: syncThread.oldGmailThreadID,
               messages: syncThread.extraMetaData.syncMessageData.map(
                 (syncMessage) => ({
                   date: syncMessage.date,
