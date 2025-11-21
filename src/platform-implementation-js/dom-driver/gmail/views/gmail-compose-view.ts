@@ -79,7 +79,7 @@ import type {
   StatusBar,
 } from '../../../driver-interfaces/compose-view-driver';
 import type GmailDriver from '../gmail-driver';
-import { Contact } from '../../../../inboxsdk';
+import { ContactNameOptional } from '../../../../inboxsdk';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 import { type PublicOnly } from '../../../../types/public-only';
 import isNotNil from '../../../../common/isNotNil';
@@ -1141,15 +1141,15 @@ class GmailComposeView {
     return querySelector(container, 'form.bAs');
   }
 
-  getToRecipients(): Contact[] {
+  getToRecipients(): ContactNameOptional[] {
     return getRecipients(this, 'to');
   }
 
-  getCcRecipients(): Contact[] {
+  getCcRecipients(): ContactNameOptional[] {
     return getRecipients(this, 'cc');
   }
 
-  getBccRecipients(): Contact[] {
+  getBccRecipients(): ContactNameOptional[] {
     return getRecipients(this, 'bcc');
   }
 
