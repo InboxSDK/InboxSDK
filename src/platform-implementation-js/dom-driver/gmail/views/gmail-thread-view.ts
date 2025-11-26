@@ -551,16 +551,17 @@ class GmailThreadView {
     if (this.#threadID) return this.#threadID;
 
     const idElement = this.#element.querySelector('[data-legacy-thread-id]');
-
     if (!idElement) throw new Error('threadID element not found');
 
     // the string value can be 'undefined'
     const syncAttributeValue = idElement.getAttribute('data-thread-perm-id');
-    this.#syncThreadID =
-      typeof syncAttributeValue === 'string' &&
+    if (
+      !this.#syncThreadID &&
+      syncAttributeValue &&
       syncAttributeValue !== 'undefined'
-        ? syncAttributeValue
-        : null;
+    ) {
+      this.#syncThreadID = syncAttributeValue;
+    }
 
     let threadID = idElement.getAttribute('data-legacy-thread-id');
 
@@ -602,23 +603,27 @@ class GmailThreadView {
   }
 
   async getThreadIDAsync(): Promise<string> {
-    const idElement = this.#element.querySelector('[data-legacy-thread-id]');
+    if (this.#threadID) return this.#threadID;
 
+    const idElement = this.#element.querySelector('[data-legacy-thread-id]');
     if (!idElement) throw new Error('threadID element not found');
 
     // the string value can be 'undefined'
     const syncAttributeValue = idElement.getAttribute('data-thread-perm-id');
-    const syncThreadID = (this.#syncThreadID =
-      typeof syncAttributeValue === 'string' &&
+    if (
+      !this.#syncThreadID &&
+      syncAttributeValue &&
       syncAttributeValue !== 'undefined'
-        ? syncAttributeValue
-        : null);
+    ) {
+      this.#syncThreadID = syncAttributeValue;
+    }
 
     this.#threadID = idElement.getAttribute('data-legacy-thread-id');
 
-    if (!this.#threadID && syncThreadID) {
-      this.#threadID =
-        await this.#driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
+    if (!this.#threadID && this.#syncThreadID) {
+      this.#threadID = await this.#driver.getOldGmailThreadIdFromSyncThreadId(
+        this.#syncThreadID,
+      );
     }
 
     if (this.#threadID) return this.#threadID;
