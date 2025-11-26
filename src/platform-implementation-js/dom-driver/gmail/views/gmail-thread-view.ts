@@ -549,20 +549,20 @@ class GmailThreadView {
   // Follows a similar structure to getThreadIDAsync, but gives up if async work is needed
   getThreadID(): string {
     if (this.#threadID) return this.#threadID;
-    let threadID;
 
-    const idElement = this.#element.querySelector('[data-thread-perm-id]');
+    const idElement = this.#element.querySelector('[data-legacy-thread-id]');
 
     if (!idElement) throw new Error('threadID element not found');
 
     // the string value can be 'undefined'
-    const attributeValue = idElement.getAttribute('data-thread-perm-id');
+    const syncAttributeValue = idElement.getAttribute('data-thread-perm-id');
     this.#syncThreadID =
-      typeof attributeValue === 'string' && attributeValue !== 'undefined'
-        ? attributeValue
+      typeof syncAttributeValue === 'string' &&
+      syncAttributeValue !== 'undefined'
+        ? syncAttributeValue
         : null;
 
-    threadID = idElement.getAttribute('data-legacy-thread-id');
+    let threadID = idElement.getAttribute('data-legacy-thread-id');
 
     if (!threadID) {
       const err = new Error(
@@ -585,8 +585,8 @@ class GmailThreadView {
           ? this.#routeViewDriver.getParams()
           : null;
 
-        if (params && params.threadID) {
-          threadID = params.threadID;
+        if (params && typeof params.threadID === 'string') {
+          threadID = params.threadID as string;
         } else {
           const err = new Error('Failed to get id for thread');
 
@@ -602,23 +602,22 @@ class GmailThreadView {
   }
 
   async getThreadIDAsync(): Promise<string> {
-    let threadID;
-
-    const idElement = this.#element.querySelector('[data-thread-perm-id]');
+    const idElement = this.#element.querySelector('[data-legacy-thread-id]');
 
     if (!idElement) throw new Error('threadID element not found');
 
     // the string value can be 'undefined'
-    const attributeValue = idElement.getAttribute('data-thread-perm-id');
+    const syncAttributeValue = idElement.getAttribute('data-thread-perm-id');
     const syncThreadID = (this.#syncThreadID =
-      typeof attributeValue === 'string' && attributeValue !== 'undefined'
-        ? attributeValue
+      typeof syncAttributeValue === 'string' &&
+      syncAttributeValue !== 'undefined'
+        ? syncAttributeValue
         : null);
 
-    this.#threadID = threadID = idElement.getAttribute('data-legacy-thread-id');
+    this.#threadID = idElement.getAttribute('data-legacy-thread-id');
 
-    if (!threadID && syncThreadID) {
-      this.#threadID = threadID =
+    if (!this.#threadID && syncThreadID) {
+      this.#threadID =
         await this.#driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
     }
 
