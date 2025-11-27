@@ -28,8 +28,9 @@ async function getOriginalMessagePage(
   }
 
   let url;
-  const delegatedAccountMatch =
-    document.location.pathname.match(/\/b\/(.+?)\/u\/(\d+)/);
+  const delegatedAccountMatch = document.location.pathname.match(
+    /\/u\/(\d+)\/d\/(.+?)\//,
+  );
   if (delegatedAccountMatch) {
     url = document.location.origin + document.location.pathname;
   } else {
