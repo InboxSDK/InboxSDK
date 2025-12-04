@@ -43,15 +43,18 @@ class ModalView extends EventEmitter {
     ]);
     document.body.appendChild(modalViewDriver.getModalContainerElement());
     modalViewDriver.getModalContainerElement().focus();
-    Kefir.fromEvents<KeyboardEvent, unknown>(document.body, 'keydown')
-      .filter((domEvent) => domEvent.keyCode === 27)
-      .takeUntilBy(hideAndDestroyStream)
-      .onValue((domEvent) => {
-        domEvent.stopImmediatePropagation();
-        domEvent.stopPropagation();
-        domEvent.preventDefault();
-        this.close();
-      });
+
+    if (modalViewDriver.getCloseOnEscape()) {
+      Kefir.fromEvents<KeyboardEvent, unknown>(document.body, 'keydown')
+        .filter((domEvent) => domEvent.key === 'Escape')
+        .takeUntilBy(hideAndDestroyStream)
+        .onValue((domEvent) => {
+          domEvent.stopImmediatePropagation();
+          domEvent.stopPropagation();
+          domEvent.preventDefault();
+          this.close();
+        });
+    }
 
     _replaceCurrentlyShowingModal(this, modalViewDriver);
   }

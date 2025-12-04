@@ -371,6 +371,11 @@ export interface ModalDescriptor {
   showCloseButton?: boolean;
   title?: string;
   buttons?: Array<ModalButtonDescriptor>;
+  /**
+   * Whether the modal should close when the user presses the Escape key.
+   * @default true
+   */
+  closeOnEscape?: boolean;
 }
 
 export interface ModalButtonDescriptor {
