@@ -226,6 +226,44 @@ class GmailComposeView {
             };
           }
 
+          case 'emailScheduling': {
+            return {
+              eventName: 'scheduling',
+            };
+          }
+
+          case 'emailScheduled': {
+            const syncThreadID = event.threadID;
+            const syncMessageID = event.messageID;
+            if (event.oldMessageID) this.#messageId = event.oldMessageID;
+            if (event.oldThreadID) this.#threadID = event.oldThreadID;
+            driver.removeCachedGmailMessageIdForSyncMessageId(syncMessageID);
+            driver.removeCachedOldGmailThreadIdFromSyncThreadId(syncThreadID);
+            return {
+              eventName: 'scheduled',
+              data: {
+                getThreadID: once(async (): Promise<string> => {
+                  if (event.oldThreadID) {
+                    return event.oldThreadID;
+                  }
+
+                  return await driver.getOldGmailThreadIdFromSyncThreadId(
+                    syncThreadID,
+                  );
+                }),
+                getMessageID: once(async (): Promise<string> => {
+                  if (event.oldMessageID) {
+                    return event.oldMessageID;
+                  }
+
+                  return await driver.getGmailMessageIdForSyncMessageId(
+                    syncMessageID,
+                  );
+                }),
+              },
+            };
+          }
+
           default: {
             return null;
           }
@@ -344,14 +382,16 @@ class GmailComposeView {
     });
 
     Kefir.merge([
-      // if we get a presending then we let the other stream wait for
-      // sent. But if we get a sendCanceled, then a regular destroy can
+      // if we get a presending/scheduling then we let the other stream wait for
+      // sent/scheduled. But if we get a sendCanceled, then a regular destroy can
       // pass through
       this.#removedFromDOMStopper.filterBy(
         this.#eventStream
           .filter(
             ({ eventName }) =>
-              eventName === 'presending' || eventName === 'sendCanceled',
+              eventName === 'presending' ||
+              eventName === 'scheduling' ||
+              eventName === 'sendCanceled',
           )
           .map(({ eventName }) => eventName === 'sendCanceled')
           .toProperty(() => true),
@@ -359,9 +399,10 @@ class GmailComposeView {
       Kefir.combine([
         this.#removedFromDOMStopper,
         this.#eventStream.filter(({ eventName }) => eventName === 'sent'),
+        this.#eventStream.filter(({ eventName }) => eventName === 'scheduled'),
       ]),
     ])
-      .take(1) // we delay asap here so that the event stream is not destroyed before listeners here the sent event
+      .take(1) // we delay asap here so that the event stream is not destroyed before listeners hear the sent/scheduled event
       .flatMap(() => delayAsap(null))
       .onValue(() => this.#destroy());
 
