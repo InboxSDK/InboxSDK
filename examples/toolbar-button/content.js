@@ -8,6 +8,7 @@ InboxSDK.load(1, 'toolbar-example', {
   var shortcutHandle = inboxSDK.Keyboard.createShortcutHandle({
     chord: 'w b',
     description: 'have fun',
+    orderHint: 2,
   });
 
   inboxSDK.Toolbars.registerThreadButton({
@@ -47,6 +48,13 @@ InboxSDK.load(1, 'toolbar-example', {
   var shortcutHandle2 = inboxSDK.Keyboard.createShortcutHandle({
     chord: 'ctrl+shift+x',
     description: 'Live large',
+    orderHint: 1,
+  });
+
+  // Shortcut without orderHint - will appear at the bottom
+  var shortcutHandle3 = inboxSDK.Keyboard.createShortcutHandle({
+    chord: 'g m',
+    description: 'Go to monkeys',
   });
 
   inboxSDK.Toolbars.registerToolbarButtonForList({
