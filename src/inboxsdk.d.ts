@@ -494,6 +494,7 @@ export interface MessageViewLinkDescriptor {
 export interface KeyboardShortcutDescriptor {
   chord: string;
   description: string;
+  orderHint?: number;
 }
 
 export interface KeyboardShortcutHandle {

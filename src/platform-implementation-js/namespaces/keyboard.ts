@@ -23,10 +23,11 @@ class Keyboard {
   createShortcutHandle(shortcutDescriptor: {
     chord: string;
     description: string;
+    orderHint?: number;
   }) {
     const members = get(memberMap, this);
     // eslint-disable-next-line prefer-const
-    let { chord, description } = shortcutDescriptor;
+    let { chord, description, orderHint } = shortcutDescriptor;
     if (!chord) throw new Error('Keyboard.createShortcutHandle chord missing');
 
     if (description == null) {
@@ -37,6 +38,7 @@ class Keyboard {
     const keyboardShortcutHandle = new KeyboardShortcutHandle(
       chord,
       description,
+      orderHint,
     );
     members.driver.activateShortcut(
       keyboardShortcutHandle,

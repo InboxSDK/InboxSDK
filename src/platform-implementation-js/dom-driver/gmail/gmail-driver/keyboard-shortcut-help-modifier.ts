@@ -83,17 +83,17 @@ export default class KeyboardShortcutHelpModifier {
       return;
     }
 
-    this._shortcuts.keys();
+    const sortedShortcuts = Array.from(this._shortcuts).sort(
+      sortByOrderHintAsc,
+    );
 
     var header = this._renderHeader();
     var table = this._renderTable();
 
     var bodies = table.querySelectorAll<HTMLElement>('tbody tbody');
 
-    var index = 0;
-    this._shortcuts.forEach((keyboardShortcutHandle) => {
+    sortedShortcuts.forEach((keyboardShortcutHandle, index) => {
       this._renderShortcut(bodies[index % 2], keyboardShortcutHandle);
-      index++;
     });
 
     const firstHeader = querySelector(node, '.aov');
@@ -224,4 +224,21 @@ function _getSeparatorHTML(separator: string): string {
     default:
       return '';
   }
+}
+
+// Sort: items with orderHint first (ascending), then items without
+function sortByOrderHintAsc(
+  a: KeyboardShortcutHandle,
+  b: KeyboardShortcutHandle,
+): number {
+  if (a.orderHint == null && b.orderHint == null) {
+    return 0;
+  }
+  if (a.orderHint == null) {
+    return 1;
+  }
+  if (b.orderHint == null) {
+    return -1;
+  }
+  return a.orderHint - b.orderHint;
 }
