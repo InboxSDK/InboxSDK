@@ -634,7 +634,8 @@ export function setupGmailInterceptorOnFrames(
               );
             messageMetadataHolder.add(
               threads.map((syncThread) => ({
-                threadID: syncThread.syncThreadID,
+                syncThreadID: syncThread.syncThreadID,
+                threadID: syncThread.oldGmailThreadID,
                 messages: syncThread.extraMetaData.syncMessageData.map(
                   (syncMessage) => ({
                     date: syncMessage.date,
@@ -660,7 +661,8 @@ export function setupGmailInterceptorOnFrames(
               );
             messageMetadataHolder.add(
               threads.map((syncThread) => ({
-                threadID: syncThread.syncThreadID,
+                syncThreadID: syncThread.syncThreadID,
+                threadID: syncThread.oldGmailThreadID,
                 messages: syncThread.extraMetaData.syncMessageData.map(
                   (syncMessage) => ({
                     date: syncMessage.date,
