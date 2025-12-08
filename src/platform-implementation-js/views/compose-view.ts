@@ -13,7 +13,7 @@ import type {
   StatusBar,
   ComposeButtonDescriptor,
 } from '../driver-interfaces/compose-view-driver';
-import type { Contact } from '../../inboxsdk';
+import type { Contact, ContactNameOptional } from '../../inboxsdk';
 import type TypedEventEmitter from 'typed-emitter';
 import type {
   AddressChangeEventName,
@@ -334,15 +334,15 @@ export default class ComposeView extends (EventEmitter as new () => TypedEventEm
     return get(memberMap, this).composeViewImplementation.getTextContent();
   }
 
-  getToRecipients(): Contact[] {
+  getToRecipients(): ContactNameOptional[] {
     return get(memberMap, this).composeViewImplementation.getToRecipients();
   }
 
-  getCcRecipients(): Contact[] {
+  getCcRecipients(): ContactNameOptional[] {
     return get(memberMap, this).composeViewImplementation.getCcRecipients();
   }
 
-  getBccRecipients(): Contact[] {
+  getBccRecipients(): ContactNameOptional[] {
     return get(memberMap, this).composeViewImplementation.getBccRecipients();
   }
 

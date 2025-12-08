@@ -9,11 +9,13 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 class GmailModalViewDriver {
   _eventStream: Bus<any, unknown>;
   _modalContainerElement!: HTMLElement;
+  _closeOnEscape: boolean;
 
-  constructor(options: Object) {
+  constructor(options: Object & { closeOnEscape?: boolean }) {
     this._setupModalContainerElement(options);
 
     this._processOptions(options);
+    this._closeOnEscape = options.closeOnEscape ?? true;
     this._eventStream = kefirBus();
     this._setupEventStream();
   }
@@ -26,8 +28,13 @@ class GmailModalViewDriver {
   getModalContainerElement(): HTMLElement {
     return this._modalContainerElement;
   }
+
   getEventStream(): Kefir.Observable<any, unknown> {
     return this._eventStream;
+  }
+
+  getCloseOnEscape(): boolean {
+    return this._closeOnEscape;
   }
 
   _processOptions(options: any) {

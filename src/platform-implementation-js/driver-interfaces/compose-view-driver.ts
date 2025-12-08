@@ -1,5 +1,8 @@
 import type EventEmitter from 'events';
-import type { ComposeViewButtonOnClickEvent, Contact } from '../../inboxsdk';
+import type {
+  ComposeViewButtonOnClickEvent,
+  ContactNameOptional,
+} from '../../inboxsdk';
 import type {
   AddressChangeEventName,
   RecipientsChangedEvent,
@@ -112,6 +115,6 @@ export type ComposeViewDriverEvent =
   | {
       eventName: AddressChangeEventName;
       data: {
-        contact: Contact;
+        contact: ContactNameOptional;
       };
     };
