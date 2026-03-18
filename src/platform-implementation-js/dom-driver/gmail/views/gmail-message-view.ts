@@ -885,12 +885,17 @@ class GmailMessageView {
       .onValue((mutation) => {
         if (mutation !== 'END' && replyContainer.classList.contains('adB')) {
           if (!currentReplyElementRemovalStream) {
-            const replyElement = (replyContainer.getElementsByClassName(
-              'M9',
-            )?.[0] || replyContainer.firstElementChild) as HTMLElement | null;
-            self.#replyElement = replyElement;
+            const findReplyElement = (): HTMLElement | null => {
+              return (replyContainer.getElementsByClassName('M9')?.[0] ||
+                replyContainer.querySelector<HTMLElement>('[role="dialog"]') ||
+                replyContainer.querySelector<HTMLElement>('form') ||
+                replyContainer.firstElementChild) as HTMLElement | null;
+            };
+
+            let replyElement = findReplyElement();
 
             if (replyElement) {
+              self.#replyElement = replyElement;
               currentReplyElementRemovalStream = kefirBus();
 
               self.#eventStream.emit({
@@ -901,6 +906,26 @@ class GmailMessageView {
                   removalStream: currentReplyElementRemovalStream,
                 },
               });
+            } else {
+              // Retry after a short delay - the compose element may not
+              // be in the DOM yet when the adB class is first added
+              setTimeout(() => {
+                if (currentReplyElementRemovalStream) return; // Already found
+                const retryElement = findReplyElement();
+                if (retryElement) {
+                  self.#replyElement = retryElement;
+                  currentReplyElementRemovalStream = kefirBus();
+
+                  self.#eventStream.emit({
+                    type: 'internal',
+                    eventName: 'replyElement',
+                    change: {
+                      el: retryElement,
+                      removalStream: currentReplyElementRemovalStream,
+                    },
+                  });
+                }
+              }, 100);
             }
           }
         } else {
