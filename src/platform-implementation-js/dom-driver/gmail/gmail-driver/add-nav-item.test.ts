@@ -35,8 +35,7 @@ describe('addNavItem DOM readiness', () => {
   });
 
   test('waitFor rejects if container never appears', async () => {
-    const getContainer = () =>
-      document.querySelector<HTMLElement>('.aeN .n3');
+    const getContainer = () => document.querySelector<HTMLElement>('.aeN .n3');
 
     await expect(waitFor(getContainer, 100, 10)).rejects.toThrowError(
       'waitFor timeout',
