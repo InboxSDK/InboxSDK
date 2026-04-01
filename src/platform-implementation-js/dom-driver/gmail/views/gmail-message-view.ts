@@ -892,7 +892,7 @@ class GmailMessageView {
                 replyContainer.firstElementChild) as HTMLElement | null;
             };
 
-            let replyElement = findReplyElement();
+            const replyElement = findReplyElement();
 
             if (replyElement) {
               self.#replyElement = replyElement;
