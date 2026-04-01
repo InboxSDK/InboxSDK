@@ -911,6 +911,8 @@ class GmailMessageView {
               // be in the DOM yet when the adB class is first added
               setTimeout(() => {
                 if (currentReplyElementRemovalStream) return; // Already found
+                if (self.#stopper.stopped) return; // View was destroyed
+                if (!replyContainer.classList.contains('adB')) return; // Reply closed
                 const retryElement = findReplyElement();
                 if (retryElement) {
                   self.#replyElement = retryElement;
