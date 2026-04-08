@@ -64,6 +64,11 @@ export type ComposeViewEvent = {
   recipientsChanged(data: RecipientsChangedEvent): void;
   resize(): void;
   restored(): void;
+  scheduled(data: {
+    getMessageID(): Promise<string>;
+    getThreadID(): Promise<string>;
+  }): void;
+  scheduling(): void;
   sendCanceled(): void;
   sending(): void;
   sent(data: {
