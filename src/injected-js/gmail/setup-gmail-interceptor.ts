@@ -1149,7 +1149,10 @@ export function setupGmailInterceptorOnFrames(
       isRelevantTo(connection) {
         return (
           /sync(?:\/u\/\d+)?\//.test(connection.url) &&
-          !(document.head as any).hasAttribute('data-inboxsdk-xsrf-token')
+          (!(document.head as any).hasAttribute('data-inboxsdk-xsrf-token') ||
+            (!!connection.headers['X-Framework-Xsrf-Token'] &&
+              connection.headers['X-Framework-Xsrf-Token'] ===
+                (document.head as any)['data-inboxsdk-xsrf-token']))
         );
       },
 
