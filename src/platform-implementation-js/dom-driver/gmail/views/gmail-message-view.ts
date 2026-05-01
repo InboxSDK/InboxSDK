@@ -12,6 +12,7 @@ import getUpdatedContact from './gmail-message-view/get-updated-contact';
 import AttachmentIcon from './gmail-message-view/attachment-icon';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
+import waitFor from '../../../lib/wait-for';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import type { ElementWithLifetime } from '../../../lib/dom/make-element-child-stream';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
@@ -885,12 +886,17 @@ class GmailMessageView {
       .onValue((mutation) => {
         if (mutation !== 'END' && replyContainer.classList.contains('adB')) {
           if (!currentReplyElementRemovalStream) {
-            const replyElement = (replyContainer.getElementsByClassName(
-              'M9',
-            )?.[0] || replyContainer.firstElementChild) as HTMLElement | null;
-            self.#replyElement = replyElement;
+            const findReplyElement = (): HTMLElement | null => {
+              return (replyContainer.getElementsByClassName('M9')?.[0] ||
+                replyContainer.querySelector<HTMLElement>('[role="dialog"]') ||
+                replyContainer.querySelector<HTMLElement>('form') ||
+                replyContainer.firstElementChild) as HTMLElement | null;
+            };
+
+            const replyElement = findReplyElement();
 
             if (replyElement) {
+              self.#replyElement = replyElement;
               currentReplyElementRemovalStream = kefirBus();
 
               self.#eventStream.emit({
@@ -901,6 +907,29 @@ class GmailMessageView {
                   removalStream: currentReplyElementRemovalStream,
                 },
               });
+            } else {
+              // The compose element may not be in the DOM yet when the adB
+              // class is first added. Poll until it appears (up to 1s).
+              waitFor(findReplyElement, 1000, 50)
+                .then((retryElement) => {
+                  if (currentReplyElementRemovalStream) return; // Already found
+                  if (self.#stopper.stopped) return; // View was destroyed
+                  if (!replyContainer.classList.contains('adB')) return; // Reply closed
+                  self.#replyElement = retryElement;
+                  currentReplyElementRemovalStream = kefirBus();
+
+                  self.#eventStream.emit({
+                    type: 'internal',
+                    eventName: 'replyElement',
+                    change: {
+                      el: retryElement,
+                      removalStream: currentReplyElementRemovalStream,
+                    },
+                  });
+                })
+                .catch(() => {
+                  // Element never appeared within 1s; give up silently.
+                });
             }
           }
         } else {
