@@ -16,14 +16,14 @@ import {
   getPanelSectionNavItemContainerElement,
 } from './nav-item-section';
 
-function attachGmailNavItemView(
+async function attachGmailNavItemView(
   gmailNavItemView: GmailNavItemView,
   injectionContainer?: HTMLElement,
 ) {
   try {
     const attacher = _attachNavItemView(gmailNavItemView, injectionContainer);
 
-    attacher();
+    await attacher();
 
     gmailNavItemView
       .getEventStream()
@@ -138,13 +138,14 @@ function _attachNavItemView(
   } else {
     // If we're in the old classic-hangouts-compatible leftnav, then
     // inject our added nav items among Gmail's own nav items.
-    return function () {
-      insertElementInOrder(_getNavItemsHolder(), gmailNavItemView.getElement());
+    return async function () {
+      const holder = await _getNavItemsHolder();
+      insertElementInOrder(holder, gmailNavItemView.getElement());
     };
   }
 }
 
-function _getNavItemsHolder(): HTMLElement {
+async function _getNavItemsHolder(): Promise<HTMLElement> {
   const holder = document.querySelector('.inboxsdk__navMenu');
   if (!holder) {
     return _createNavItemsHolder();
@@ -153,14 +154,15 @@ function _getNavItemsHolder(): HTMLElement {
   }
 }
 
-function _createNavItemsHolder(): HTMLElement {
+async function _createNavItemsHolder(): Promise<HTMLElement> {
   const holder = document.createElement('div');
   holder.setAttribute('class', 'LrBjie inboxsdk__navMenu');
   holder.innerHTML = '<div class="TK"></div>';
 
-  const navMenuInjectionContainer =
-    GmailElementGetter.getSameSectionNavItemMenuInjectionContainer();
-  if (!navMenuInjectionContainer) throw new Error('should not happen');
+  const navMenuInjectionContainer = await waitFor(() =>
+    GmailElementGetter.getSameSectionNavItemMenuInjectionContainer(),
+  );
+
   navMenuInjectionContainer.insertBefore(
     holder,
     navMenuInjectionContainer.children[2],
