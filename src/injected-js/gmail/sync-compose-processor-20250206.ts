@@ -5,24 +5,26 @@ import isNotNil from '../../common/isNotNil';
 import {
   ComposeRequestType,
   DRAFT_SAVING_ACTIONS,
+  SCHEDULE_ACTIONS,
   SEND_ACTIONS,
 } from './constants';
 import { Contact } from '../../inboxsdk';
 
-const ACTION_TYPE_PRIORITY_RANK: [ComposeRequestType, ComposeRequestType] = [
-  'SEND',
-  'DRAFT_SAVE',
-];
+const ACTION_TYPE_PRIORITY_RANK: [
+  ComposeRequestType,
+  ComposeRequestType,
+  ComposeRequestType,
+] = ['SEND', 'SCHEDULE', 'DRAFT_SAVE'];
 
-export function parseComposeRequestBody_2022_09_09(request: Array<any>) {
+export function parseComposeRequestBody_2025_02_06(request: Array<any>) {
   return parseCreateUpdateSendDraftRequestBody(request);
 }
 
-export function parseComposeResponseBody_2022_09_09(response: Array<any>) {
+export function parseComposeResponseBody_2025_02_06(response: Array<any>) {
   return parseCreateUpdateSendDraftResponseBody(response);
 }
 
-export function replaceBodyContentInComposeSendRequestBody_2022_09_09(
+export function replaceBodyContentInComposeSendRequestBody_2025_02_06(
   request: Array<any>,
   newBodyHtmlContent: string,
 ): Array<any> | null {
@@ -31,9 +33,9 @@ export function replaceBodyContentInComposeSendRequestBody_2022_09_09(
 
 /**
  * Parses request body when compose window either saves a draft for the first time,
- * updates the draft or sends the draft.
+ * updates the draft, sends the draft or schedules the draft.
  * NOTE: request could contain multiple threads and messages within it,
- * prioritize SEND to DRAFT_SAVE message.
+ * prioritize SEND and SCHEDULE to DRAFT_SAVE message.
  */
 function parseCreateUpdateSendDraftRequestBody(request: any[]) {
   const updateList = request[1]?.[0];
@@ -142,7 +144,7 @@ function replaceBodyContentInSendRequestBody(
         parseResult.parsedMsg.actions,
       );
 
-      if (actionType === 'SEND') {
+      if (actionType === 'SEND' || actionType === 'SCHEDULE') {
         // find first message with needed messageId and 'SEND' action and replace the body content
         replaceBodyInRequestMsg(parseResult.originalMsg, newBodyHtmlContent);
         return request;
@@ -385,6 +387,12 @@ export function actionsToComposeRequestType(
 
   if (intersection(actions, SEND_ACTIONS).length === SEND_ACTIONS.length) {
     return 'SEND';
+  }
+
+  if (
+    intersection(actions, SCHEDULE_ACTIONS).length === SCHEDULE_ACTIONS.length
+  ) {
+    return 'SCHEDULE';
   }
 
   return null;
