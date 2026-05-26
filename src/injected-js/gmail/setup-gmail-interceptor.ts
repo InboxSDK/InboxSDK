@@ -598,7 +598,8 @@ export function setupGmailInterceptorOnFrames(
               );
             messageMetadataHolder.add(
               threads.map((syncThread) => ({
-                threadID: syncThread.syncThreadID,
+                syncThreadID: syncThread.syncThreadID,
+                threadID: syncThread.oldGmailThreadID,
                 messages: syncThread.extraMetaData.syncMessageData.map(
                   (syncMessage) => ({
                     date: syncMessage.date,
@@ -624,7 +625,8 @@ export function setupGmailInterceptorOnFrames(
               );
             messageMetadataHolder.add(
               threads.map((syncThread) => ({
-                threadID: syncThread.syncThreadID,
+                syncThreadID: syncThread.syncThreadID,
+                threadID: syncThread.oldGmailThreadID,
                 messages: syncThread.extraMetaData.syncMessageData.map(
                   (syncMessage) => ({
                     date: syncMessage.date,
@@ -1139,18 +1141,17 @@ export function setupGmailInterceptorOnFrames(
     });
 
     const saveXsrfTokenHeader = (header: string) => {
-      document.head.setAttribute('data-inboxsdk-xsrf-token', header);
-      triggerEvent({
-        type: 'xsrfTokenHeaderReceived',
-      });
+      if (header !== document.head.getAttribute('data-inboxsdk-xsrf-token')) {
+        document.head.setAttribute('data-inboxsdk-xsrf-token', header);
+        triggerEvent({
+          type: 'xsrfTokenHeaderReceived',
+        });
+      }
     };
 
     main_wrappers.push({
       isRelevantTo(connection) {
-        return (
-          /sync(?:\/u\/\d+)?\//.test(connection.url) &&
-          !(document.head as any).hasAttribute('data-inboxsdk-xsrf-token')
-        );
+        return /sync(?:\/u\/\d+)?\//.test(connection.url);
       },
 
       originalSendBodyLogger(connection) {

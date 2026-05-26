@@ -122,7 +122,7 @@
     "examples",
     "packages/*"
   ],
-  "packageManager": "yarn@4.0.1",
+  "packageManager": "yarn@4.13.0",
   "devDependencies": {
     "babel-loader": "^9.1.2",
     "css-loader": "^6.7.3",

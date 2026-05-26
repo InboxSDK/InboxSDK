@@ -371,6 +371,11 @@ export interface ModalDescriptor {
   showCloseButton?: boolean;
   title?: string;
   buttons?: Array<ModalButtonDescriptor>;
+  /**
+   * Whether the modal should close when the user presses the Escape key.
+   * @default true
+   */
+  closeOnEscape?: boolean;
 }
 
 export interface ModalButtonDescriptor {
@@ -468,6 +473,11 @@ export {
   MessageViewToolbarSectionNames,
 } from './platform-implementation-js/views/conversations/message-view';
 
+export interface ContactNameOptional {
+  emailAddress: string;
+  name?: string;
+}
+
 export interface Contact {
   name: string;
   emailAddress: string;
@@ -484,6 +494,7 @@ export interface MessageViewLinkDescriptor {
 export interface KeyboardShortcutDescriptor {
   chord: string;
   description: string;
+  orderHint?: number;
 }
 
 export interface KeyboardShortcutHandle {

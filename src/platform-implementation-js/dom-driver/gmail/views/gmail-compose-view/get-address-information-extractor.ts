@@ -4,13 +4,13 @@ import extractContactFromEmailContactString from '../../../../lib/extract-contac
 import censorHTMLstring from '../../../../../common/censorHTMLstring';
 
 import GmailComposeView from '../gmail-compose-view';
-import { Contact } from '../../../../../inboxsdk';
+import { ContactNameOptional } from '../../../../../inboxsdk';
 
 export default function getAddressInformationExtractor(
   addressType: string,
   composeView: GmailComposeView,
-): (node: HTMLElement) => Contact | null {
-  return function (node: HTMLElement): Contact | null {
+): (node: HTMLElement) => ContactNameOptional | null {
+  return function (node: HTMLElement): ContactNameOptional | null {
     const contactNode =
       node instanceof HTMLInputElement &&
       node.getAttribute('name') === addressType

@@ -25,6 +25,7 @@ export interface SyncThread {
 
 export interface MinimalSyncThread {
   syncThreadID: string;
+  oldGmailThreadID: string;
   extraMetaData: {
     syncMessageData: Array<{
       syncMessageID: string;

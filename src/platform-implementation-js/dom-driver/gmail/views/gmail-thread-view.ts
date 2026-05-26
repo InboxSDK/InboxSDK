@@ -549,16 +549,21 @@ class GmailThreadView {
   // Follows a similar structure to getThreadIDAsync, but gives up if async work is needed
   getThreadID(): string {
     if (this.#threadID) return this.#threadID;
-    let threadID;
 
-    const idElement = this.#element.querySelector('[data-thread-perm-id]');
-
+    const idElement = this.#element.querySelector('[data-legacy-thread-id]');
     if (!idElement) throw new Error('threadID element not found');
-    const syncThreadID = (this.#syncThreadID = idElement.getAttribute(
-      'data-thread-perm-id',
-    ));
-    if (!syncThreadID) throw new Error('syncThreadID attribute with no value');
-    threadID = idElement.getAttribute('data-legacy-thread-id');
+
+    // the string value can be 'undefined'
+    const syncAttributeValue = idElement.getAttribute('data-thread-perm-id');
+    if (
+      !this.#syncThreadID &&
+      syncAttributeValue &&
+      syncAttributeValue !== 'undefined'
+    ) {
+      this.#syncThreadID = syncAttributeValue;
+    }
+
+    let threadID = idElement.getAttribute('data-legacy-thread-id');
 
     if (!threadID) {
       const err = new Error(
@@ -581,8 +586,8 @@ class GmailThreadView {
           ? this.#routeViewDriver.getParams()
           : null;
 
-        if (params && params.threadID) {
-          threadID = params.threadID;
+        if (params && typeof params.threadID === 'string') {
+          threadID = params.threadID as string;
         } else {
           const err = new Error('Failed to get id for thread');
 
@@ -598,20 +603,27 @@ class GmailThreadView {
   }
 
   async getThreadIDAsync(): Promise<string> {
-    let threadID;
+    if (this.#threadID) return this.#threadID;
 
-    const idElement = this.#element.querySelector('[data-thread-perm-id]');
-
+    const idElement = this.#element.querySelector('[data-legacy-thread-id]');
     if (!idElement) throw new Error('threadID element not found');
-    const syncThreadID = (this.#syncThreadID = idElement.getAttribute(
-      'data-thread-perm-id',
-    ));
-    if (!syncThreadID) throw new Error('syncThreadID attribute with no value');
-    this.#threadID = threadID = idElement.getAttribute('data-legacy-thread-id');
 
-    if (!threadID) {
-      this.#threadID = threadID =
-        await this.#driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID);
+    // the string value can be 'undefined'
+    const syncAttributeValue = idElement.getAttribute('data-thread-perm-id');
+    if (
+      !this.#syncThreadID &&
+      syncAttributeValue &&
+      syncAttributeValue !== 'undefined'
+    ) {
+      this.#syncThreadID = syncAttributeValue;
+    }
+
+    this.#threadID = idElement.getAttribute('data-legacy-thread-id');
+
+    if (!this.#threadID && this.#syncThreadID) {
+      this.#threadID = await this.#driver.getOldGmailThreadIdFromSyncThreadId(
+        this.#syncThreadID,
+      );
     }
 
     if (this.#threadID) return this.#threadID;
@@ -729,19 +741,9 @@ class GmailThreadView {
     } satisfies Options;
     const buttonElement = buttonOptions.buttonView.getElement();
 
-    const spacer = document.createElement('span');
-    const spacerID = 'inboxsdk__thread_view_footer_button_spacer';
-    spacer.style.width = '8px';
-    spacer.id = spacerID;
-
     // Sometimes it is there right away
     const subjectToolbarElement = this.#findBottomReplyToolbarElement();
     if (subjectToolbarElement) {
-      const reactionButton = this.#element.querySelector('.amn .wrsVRe');
-      if (reactionButton && !this.#element.querySelector(`#${spacerID}`)) {
-        subjectToolbarElement.appendChild(spacer);
-      }
-
       subjectToolbarElement.appendChild(buttonElement);
     }
 
@@ -753,11 +755,6 @@ class GmailThreadView {
           subjectToolbarElement &&
           !subjectToolbarElement.contains(buttonElement)
         ) {
-          const reactionButton = this.#element.querySelector('.amn .wrsVRe');
-          if (reactionButton && !this.#element.querySelector(`#${spacerID}`)) {
-            subjectToolbarElement.appendChild(spacer);
-          }
-
           subjectToolbarElement.appendChild(buttonElement);
         }
       }
@@ -849,9 +846,21 @@ class GmailThreadView {
   }
 
   #findBottomReplyToolbarElement(): HTMLElement | null {
-    var toolbarContainerElements =
-      this.#element.querySelectorAll<HTMLElement>('table .amn');
-    return toolbarContainerElements[0];
+    // Get all .amn elements (may exist in multiple locations due to A/B testing)
+    var allAmnElements = this.#element.querySelectorAll<HTMLElement>('.amn');
+
+    // Find the visible .amn element (handles A/B testing where one might be hidden)
+    for (const element of allAmnElements) {
+      const isInsideTable = element.closest('table') !== null;
+      const isHidden = window.getComputedStyle(element).display === 'none';
+
+      if (!isInsideTable && !isHidden) {
+        return element;
+      }
+    }
+
+    // Fallback to the first one if no visible element found
+    return allAmnElements[0] || null;
   }
 
   #isToolbarContainerRelevant(toolbarContainerElement: HTMLElement): boolean {

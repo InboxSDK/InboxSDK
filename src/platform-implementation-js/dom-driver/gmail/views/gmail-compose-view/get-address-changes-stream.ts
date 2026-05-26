@@ -5,7 +5,7 @@ import { getRecipientRowElements } from './page-parser';
 import type GmailComposeView from '../gmail-compose-view';
 import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
 import { ReceiverType } from './set-recipients';
-import { Contact } from '../../../../../inboxsdk';
+import { Contact, ContactNameOptional } from '../../../../../inboxsdk';
 
 export type AddressChangeEventName =
   | `${'to' | 'cc' | 'bcc'}Contact${'Added' | 'Removed'}`
@@ -36,7 +36,7 @@ export default function getAddressChangesStream(
     | {
         eventName: AddressChangeEventName;
         data: {
-          contact: Contact;
+          contact: ContactNameOptional;
         };
       },
     unknown
@@ -51,7 +51,7 @@ function readContactFromElement(
   contactNode: HTMLElement,
   addressType: ReceiverType,
   gmailComposeView: GmailComposeView,
-): Contact | null {
+): ContactNameOptional | null {
   if (contactNode.getAttribute('role') === 'option') {
     // Handling updated compose recipients
     // https://workspaceupdates.googleblog.com/2021/10/visual-updates-for-composing-email-in-gmail.html
@@ -105,7 +105,7 @@ function _makeSubAddressStream(
 
 export type RecipientsChangedEvent = Record<
   'to' | 'cc' | 'bcc',
-  { added: Contact[]; removed: Contact[] }
+  { added: ContactNameOptional[]; removed: ContactNameOptional[] }
 >;
 
 function _groupChangeEvents(event: any) {

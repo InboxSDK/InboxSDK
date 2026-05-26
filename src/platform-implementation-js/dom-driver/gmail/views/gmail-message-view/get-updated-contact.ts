@@ -1,20 +1,20 @@
 import Logger from '../../../../lib/logger';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import extractContactFromEmailContactString from '../../../../lib/extract-contact-from-email-contact-string';
-import type { Contact } from '../../../../../inboxsdk';
+import type { ContactNameOptional } from '../../../../../inboxsdk';
 const cache: Record<
   string,
   | {
-      headerContact: Contact;
-      modalContact: Contact;
+      headerContact: ContactNameOptional;
+      modalContact: ContactNameOptional;
     }
   | null
   | undefined
 > = {};
 export default function getUpdatedContact(
-  headerContact: Contact,
+  headerContact: ContactNameOptional,
   element: HTMLElement,
-): Contact {
+): ContactNameOptional {
   let cacheEntry = cache[headerContact.emailAddress];
 
   if (cacheEntry) {
@@ -66,7 +66,7 @@ export default function getUpdatedContact(
   return headerContact;
 }
 
-function updateContactCacheFromModal(headerContact: Contact) {
+function updateContactCacheFromModal(headerContact: ContactNameOptional) {
   const spans = document.querySelectorAll('.ajC [email]');
 
   for (let ii = 0; ii < spans.length; ii++) {
@@ -74,9 +74,9 @@ function updateContactCacheFromModal(headerContact: Contact) {
     const emailAddress = span.getAttribute('email');
     if (!emailAddress) continue;
     if (cache[emailAddress]) continue;
-    let modalContact: Contact = {
+    let modalContact: ContactNameOptional = {
       emailAddress,
-      name: null!,
+      name: undefined,
     };
     const name = span.getAttribute('name');
     if (name) {

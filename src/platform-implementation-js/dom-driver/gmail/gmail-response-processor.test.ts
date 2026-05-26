@@ -3,6 +3,7 @@ import fs from 'fs';
 const readFile = fs.promises.readFile;
 
 import * as GmailResponseProcessor from './gmail-response-processor';
+import { ContactNameOptional } from '../../../inboxsdk';
 
 function readJSONnullToUndefined(filename: string) {
   return JSON.parse(fs.readFileSync(filename, 'utf8'), (k, v) =>
@@ -642,5 +643,65 @@ describe('extractMessage', () => {
     expect(response[0].messages.length).toBe(18);
     expect(response[0].messages[0].messageID).toBe('1619be4d87a1bfe5');
     expect(response[0].messages[17].messageID).toBe('161d49f1cce83d66');
+  });
+
+  it('can get recipients', async () => {
+    const rawResponse = await readFile(
+      __dirname +
+        '/../../../../__tests__/gmail-response-processor/extract-message-response-4.txt',
+      'utf8',
+    );
+    const response = GmailResponseProcessor.extractMessages(rawResponse);
+
+    expect(response.length).toBe(1);
+    expect(response[0].threadID).toBe('19a9e15b7a82dc3c');
+    expect(response[0].messages.length).toBe(5);
+    expect(response[0].messages[0].messageID).toBe('19a9e15b7a82dc3c');
+    expect(response[0].messages[4].messageID).toBe('19aa36463ba805f6');
+    console.log(JSON.stringify(response[0], null, 2));
+    expect(
+      response[0].messages.map((m) => ({
+        messageID: m.messageID,
+        recipients: m.recipients,
+      })),
+    ).toEqual([
+      {
+        messageID: '19a9e15b7a82dc3c',
+        recipients: [{ name: 'eng', emailAddress: 'eng@streak.com' }],
+      },
+      {
+        messageID: '19a9e1baf44eb33c',
+        recipients: [{ name: 'eng', emailAddress: 'eng@streak.com' }],
+      },
+      {
+        messageID: '19aa2e84fafbb6c5',
+        recipients: [
+          { name: 'Blake Kadatz', emailAddress: 'blake@streak.com' },
+          { name: 'eng', emailAddress: 'eng@streak.com' },
+        ],
+      },
+      {
+        messageID: '19aa3624d7c4584d',
+        recipients: [
+          { name: 'Chris Cowan', emailAddress: 'cowan@streak.com' },
+          { name: 'Nikola Tesla', emailAddress: 'tesla@streak.com' },
+          { name: 'Jonny Ive', emailAddress: 'streakwebtest1@gmail.com' },
+        ],
+      },
+      {
+        messageID: '19aa36463ba805f6',
+        recipients: [
+          { name: 'Chris Cowan', emailAddress: 'cowan@streak.com' },
+          { name: undefined, emailAddress: 'cowan+1@streak.com' },
+          { name: 'Nikola Tesla', emailAddress: 'tesla@streak.com' },
+          { name: 'Nikola Tesla', emailAddress: 'tesla@inboxsdk.com' },
+          { name: 'Jonny Ive', emailAddress: 'streakwebtest1@gmail.com' },
+          { name: 'Jonny Ive', emailAddress: 'streak.web.test.1@gmail.com' },
+        ],
+      },
+    ] satisfies Array<{
+      messageID: string;
+      recipients?: ContactNameOptional[];
+    }>);
   });
 });

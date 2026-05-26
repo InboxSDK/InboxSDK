@@ -4,12 +4,12 @@ import { getRecipientChips } from './page-parser';
 import getAddressInformationExtractor from './get-address-information-extractor';
 import { ReceiverType } from './set-recipients';
 import isNotNil from '../../../../../common/isNotNil';
-import { Contact } from '../../../../../inboxsdk';
+import { ContactNameOptional } from '../../../../../inboxsdk';
 
 export default function getRecipients(
   gmailComposeView: GmailComposeView,
   addressType: ReceiverType,
-): Contact[] {
+): ContactNameOptional[] {
   const contactNodes = getRecipientChips(
     gmailComposeView.getElement(),
     addressType,

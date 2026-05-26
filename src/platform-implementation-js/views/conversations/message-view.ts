@@ -9,6 +9,7 @@ import {
 import type { Driver } from '../../driver-interfaces/driver';
 import type {
   Contact,
+  ContactNameOptional,
   MessageAttachmentIconDescriptor,
 } from '../../../inboxsdk';
 import type { Observable } from 'kefir';
@@ -229,7 +230,7 @@ export default class MessageView extends (EventEmitter as new () => TypedEventEm
     return this.#messageViewImplementation.getSender();
   }
 
-  getRecipients(): Array<Contact> {
+  getRecipients(): Array<ContactNameOptional> {
     this.#driver
       .getLogger()
       .deprecationWarning(
@@ -238,7 +239,7 @@ export default class MessageView extends (EventEmitter as new () => TypedEventEm
       );
     return this.getRecipientEmailAddresses().map((emailAddress) => ({
       emailAddress,
-      name: null!,
+      name: undefined,
     }));
   }
 
@@ -246,7 +247,7 @@ export default class MessageView extends (EventEmitter as new () => TypedEventEm
     return this.#messageViewImplementation.getRecipientEmailAddresses();
   }
 
-  getRecipientsFull(): Promise<Array<Contact>> {
+  getRecipientsFull(): Promise<Array<ContactNameOptional>> {
     return this.#messageViewImplementation.getRecipientsFull();
   }
 
