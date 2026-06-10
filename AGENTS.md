@@ -43,7 +43,6 @@ Chrome must be launched with `--allow-running-insecure-content` because Gmail (H
 
 ### Gotchas
 
-- `yarn puppeteer` references `test/chrome/` which does not exist in the repo (legacy).
 - Peer dependency warnings from Yarn on install are expected and non-blocking.
 - After `yarn gulp`, verify outputs: `packages/core/inboxsdk.js`, `examples/*/dist/content.js`.
 - Browserslist "caniuse-lite is outdated" warnings during build are harmless.
