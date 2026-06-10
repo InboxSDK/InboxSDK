@@ -429,6 +429,7 @@ function getTitleHTMLString(options: MoleOptions) {
   } else {
     const originalView = !isComposeTitleBarLightColor();
     return `
+      <!-- Ht lets Gmail's compose titlebar rules provide icons for Hl/Hk/Ha. -->
       <div class="inboxsdk__mole_view_titlebar Ht${
         originalView ? ' inboxsdk__original_view' : ''
       }">

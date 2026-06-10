@@ -1427,14 +1427,18 @@ isn't visible behind it. */
   right: 5px;
   font-size: 14px;
   font-weight: 500;
-  border-collapse: separate;
   box-sizing: border-box;
   height: 40px;
-  width: auto;
   cursor: pointer;
   padding: 10px 12px 10px 16px;
   color: #041e49;
   background: #f2f6fc;
+}
+
+/* Ht lets Gmail supply Hl/Hk/Ha icons, but its table styles should not resize the SDK titlebar. */
+.inboxsdk__mole_view_titlebar.Ht {
+  border-collapse: separate;
+  width: auto;
 }
 
 .inboxsdk__mole_view_titlebar.inboxsdk__original_view {
