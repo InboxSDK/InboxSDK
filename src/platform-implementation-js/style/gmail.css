@@ -1486,16 +1486,8 @@ isn't visible behind it. */
 }
 
 .inboxsdk__mole_title_buttons > img.inboxsdk__mole_close_button {
-  background: url(https://www.gstatic.com/images/icons/material/system/1x/close_black_24dp.png)
-    center / 16px no-repeat;
   border-radius: 50%;
   opacity: 0.7;
-}
-
-@media (min-resolution: 192dpi) {
-  .inboxsdk__mole_title_buttons > img.inboxsdk__mole_close_button {
-    background-image: url(https://www.gstatic.com/images/icons/material/system/2x/close_black_24dp.png);
-  }
 }
 
 .inboxsdk__mole_title_buttons.inboxsdk__original_view
