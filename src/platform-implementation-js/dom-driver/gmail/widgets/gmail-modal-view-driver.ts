@@ -132,7 +132,7 @@ class GmailModalViewDriver {
     <div class="Kj-JD inboxsdk__modal_container" tabindex="0" role="alertdialog">
       <div class="Kj-JD-K7 Kj-JD-K7-GIHV4 inboxsdk__modal_toprow ${constrainTitleWidthTopRowClass}">
         <span class="Kj-JD-K7-K0" role="heading"></span>
-        <span class="Kj-JD-K7-Jq inboxsdk__modal_close" tabindex="0" role="button"></span>
+        <span class="Kj-JD-K7-Jq inboxsdk__modal_close inboxsdk__close_button" tabindex="0" role="button" aria-label="Close"></span>
       </div>
       <div class="Kj-JD-Jz inboxsdk__modal_content">
       </div>
