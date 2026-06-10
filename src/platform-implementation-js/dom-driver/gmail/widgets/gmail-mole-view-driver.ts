@@ -429,7 +429,7 @@ function getTitleHTMLString(options: MoleOptions) {
   } else {
     const originalView = !isComposeTitleBarLightColor();
     return `
-      <div class="inboxsdk__mole_view_titlebar${
+      <div class="inboxsdk__mole_view_titlebar Ht${
         originalView ? ' inboxsdk__original_view' : ''
       }">
         <div class="inboxsdk__mole_title_buttons${

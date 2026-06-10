@@ -1427,8 +1427,10 @@ isn't visible behind it. */
   right: 5px;
   font-size: 14px;
   font-weight: 500;
+  border-collapse: separate;
   box-sizing: border-box;
   height: 40px;
+  width: auto;
   cursor: pointer;
   padding: 10px 12px 10px 16px;
   color: #041e49;
