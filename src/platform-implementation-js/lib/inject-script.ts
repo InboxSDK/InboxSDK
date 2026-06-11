@@ -1,6 +1,7 @@
 import once from 'lodash/once';
 import Kefir from 'kefir';
 import makeMutationObserverChunkedStream from './dom/make-mutation-observer-chunked-stream';
+import { browser } from '../../common/extension-apis';
 
 declare global {
   /** Set by webpack.DefinePlugin to remove a code block potentially flagged by Chrome Web Store reviews. */
@@ -8,26 +9,26 @@ declare global {
 }
 
 let injectScriptImplementation: () => void = () => {
-  (window as any).chrome.runtime.sendMessage(
-    { type: 'inboxsdk__injectPageWorld' },
-    (didExecute: boolean) => {
-      if (!didExecute) {
-        if (NPM_MV2_SUPPORT) {
-          // MV2 support.
-          // Removed from regular MV3 NPM builds to not falsely set off Chrome Web Store
-          // about dynamically-loaded code.
-          const scr = document.createElement('script');
-          scr.type = 'text/javascript';
-          scr.src = (window as any).chrome.runtime.getURL('pageWorld.js');
-          document.documentElement.appendChild(scr);
-        } else {
-          throw new Error(
-            "Couldn't inject pageWorld.js. Check that the extension is using MV3 and has the correct permissions and host_permissions in its manifest.",
-          );
-        }
+  browser.runtime
+    .sendMessage({ type: 'inboxsdk__injectPageWorld' })
+    .then((didExecute: boolean) => {
+      /** pageWorld was injected successfully */
+      if (didExecute) return;
+
+      if (NPM_MV2_SUPPORT) {
+        // MV2 support.
+        // Removed from regular MV3 NPM builds to not falsely set off Chrome Web Store
+        // about dynamically-loaded code.
+        const scr = document.createElement('script');
+        scr.type = 'text/javascript';
+        scr.src = browser.runtime.getURL('pageWorld.js');
+        document.documentElement.appendChild(scr);
+      } else {
+        throw new Error(
+          "Couldn't inject pageWorld.js. Check that the extension is using MV3 and has the correct permissions and host_permissions in its manifest.",
+        );
       }
-    },
-  );
+    });
 };
 
 // Returns a promise that resolves once the injected script has been injected
