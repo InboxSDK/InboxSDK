@@ -1,5 +1,6 @@
 import { defn } from 'ud';
 import type Logger from '../../../../../lib/logger';
+import waitFor from '../../../../../lib/wait-for';
 
 /*
 As of Feb 6th, 2018.
@@ -9,15 +10,19 @@ As of Feb 6th, 2018.
 */
 const TAB_LIST_SELECTOR = '[role=tablist],.J-KU-Jg';
 
-function addCompanionThreadIconArea(
+async function addCompanionThreadIconArea(
   logger: Logger,
   iconArea: HTMLElement,
   companionSidebarIconContainerEl: HTMLElement,
 ) {
-  const tabList =
-    companionSidebarIconContainerEl.querySelector(TAB_LIST_SELECTOR);
+  let tabList: Element | null;
 
-  if (!tabList) {
+  try {
+    tabList = await waitFor(
+      () => companionSidebarIconContainerEl.querySelector(TAB_LIST_SELECTOR),
+      5000,
+    );
+  } catch (e) {
     logger.error(new Error('addCompanionThreadIconArea: no tablist'));
     return;
   }
