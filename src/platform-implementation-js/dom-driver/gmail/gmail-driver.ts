@@ -109,6 +109,7 @@ import type {
   SearchQueryRewriter,
 } from '../../namespaces/search';
 import isNotNil from '../../../common/isNotNil';
+import censorHTMLtree from '../../../common/censorHTMLtree';
 
 /**
  * @internal
@@ -958,7 +959,16 @@ class GmailDriver {
     if (condition()) {
       return Kefir.constant(undefined);
     }
-    return waitFor(condition).map(() => undefined);
+    return waitFor(condition)
+      .map(() => undefined)
+      .mapErrors((err) => {
+        const el = document.querySelector<HTMLElement>('div.aUx');
+        this.#logger.error(err, {
+          reason: 'waitForGlobalSidebarReady timed out',
+          aUxHtml: el ? censorHTMLtree(el) : null,
+        });
+        return err;
+      });
   }
 
   getGlobalSidebar(): GmailAppSidebarView {
