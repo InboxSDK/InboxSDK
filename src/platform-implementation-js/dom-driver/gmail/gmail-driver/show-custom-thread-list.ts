@@ -398,13 +398,17 @@ const setupSearchReplacing = (
           } else {
             reorderedThreads = extractedThreads;
           }
-          const effectiveTotal = completedIDPairs.length < initialIDPairs.length && typeof total === 'number' ? start + reorderedThreads.length : total;
+          const effectiveTotal =
+            completedIDPairs.length < initialIDPairs.length &&
+            typeof total === 'number'
+              ? start + reorderedThreads.length
+              : total;
 
           newResponse = SyncGRP.replaceThreadsInSearchResponse(
             response,
             reorderedThreads,
             {
-              total: effectiveTotal
+              total: effectiveTotal,
             },
           );
 
