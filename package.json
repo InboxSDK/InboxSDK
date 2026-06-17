@@ -110,7 +110,6 @@
     "lint:stylelint": "stylelint \"**/*.css\"",
     "prettier:check": "prettier --check .",
     "prettier:fix": "prettier --write .",
-    "puppeteer": "jest -c test/chrome/jest.config.js --runInBand",
     "start": "gulp default -w --reloader",
     "test": "jest"
   },
