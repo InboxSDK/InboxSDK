@@ -16,7 +16,9 @@ import type { Stopper } from 'kefir-stopper';
 import delayAsap from '../../../lib/delay-asap';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 import simulateKey from '../../../lib/dom/simulate-key';
-import querySelector from '../../../lib/dom/querySelectorOrFail';
+import querySelector, {
+  SelectorError,
+} from '../../../lib/dom/querySelectorOrFail';
 import isElementVisible from '../../../../common/isElementVisible';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import {
@@ -927,11 +929,34 @@ class GmailComposeView {
     if (this.#isFullscreen) {
       this.#eventStream
         .filter(({ eventName }) => eventName === 'fullscreenChanged')
-        .onValue(() => simulateClick(this.getCloseButton()));
+        .onValue(() => {
+          const closeButton = this.getCloseButton();
+          if (closeButton) {
+            simulateClick(closeButton);
+          } else {
+            this.#driver
+              .getLogger()
+              .errorSite(new Error('Failed to find close button'));
+          }
+        });
 
-      simulateClick(this.getMoleSwitchButton());
+      const moleSwitchButton = this.getMoleSwitchButton();
+      if (moleSwitchButton) {
+        simulateClick(moleSwitchButton);
+      } else {
+        this.#driver
+          .getLogger()
+          .errorSite(new Error('Failed to find mole switch button'));
+      }
     } else {
-      simulateClick(this.getCloseButton());
+      const closeButton = this.getCloseButton();
+      if (closeButton) {
+        simulateClick(closeButton);
+      } else {
+        this.#driver
+          .getLogger()
+          .errorSite(new Error('Failed to find close button'));
+      }
     }
   }
 
@@ -1307,12 +1332,12 @@ class GmailComposeView {
     return result;
   }
 
-  getCloseButton(): HTMLElement {
-    return this.#element.querySelectorAll<HTMLElement>('.Hm > img')[2];
+  getCloseButton(): HTMLElement | null {
+    return this.#element.querySelectorAll<HTMLElement>('.Hm > img')[2] ?? null;
   }
 
-  getMoleSwitchButton(): HTMLElement {
-    return this.#element.querySelectorAll<HTMLElement>('.Hm > img')[1];
+  getMoleSwitchButton(): HTMLElement | null {
+    return this.#element.querySelectorAll<HTMLElement>('.Hm > img')[1] ?? null;
   }
 
   getBottomBarTable(): HTMLElement {
@@ -1496,8 +1521,16 @@ class GmailComposeView {
     if (minimized !== this.isMinimized()) {
       if (this.#isInlineReplyForm)
         throw new Error('Not implemented for inline compose views');
-      const minimizeButton = querySelector(this.#element, '.Hm > img');
-      simulateClick(minimizeButton);
+      try {
+        const minimizeButton = querySelector(this.#element, '.Hm > img');
+        simulateClick(minimizeButton);
+      } catch (err) {
+        if (err instanceof SelectorError) {
+          this.#driver.getLogger().errorSite(err);
+          return;
+        }
+        throw err;
+      }
     }
   }
 
@@ -1505,34 +1538,51 @@ class GmailComposeView {
     if (fullscreen !== this.isFullscreen()) {
       if (this.#isInlineReplyForm)
         throw new Error('Not implemented for inline compose views');
-      const fullscreenButton = querySelector(
-        this.#element,
-        '.Hm > img:nth-of-type(2)',
-      );
-      simulateClick(fullscreenButton);
+      try {
+        const fullscreenButton = querySelector(
+          this.#element,
+          '.Hm > img:nth-of-type(2)',
+        );
+        simulateClick(fullscreenButton);
+      } catch (err) {
+        if (err instanceof SelectorError) {
+          this.#driver.getLogger().errorSite(err);
+          return;
+        }
+        throw err;
+      }
     }
   }
 
   setTitleBarColor(color: string): () => void {
-    const buttonParent = querySelector(
-      this.#element,
-      '.nH.Hy.aXJ table.cf.Ht td.Hm',
-    );
-    const elementsToModify = [
-      querySelector(this.#element, '.nH.Hy.aXJ .pi > .l.o'),
-      querySelector(this.#element, '.nH.Hy.aXJ .l.m'),
-      querySelector(this.#element, '.nH.Hy.aXJ .l.m > .l.n'),
-    ];
-    buttonParent.classList.add('inboxsdk__compose_customTitleBarColor');
-    elementsToModify.forEach((el) => {
-      el.style.backgroundColor = color;
-    });
-    return () => {
-      buttonParent.classList.remove('inboxsdk__compose_customTitleBarColor');
+    try {
+      const buttonParent = querySelector(
+        this.#element,
+        '.nH.Hy.aXJ table.cf.Ht td.Hm',
+      );
+      const elementsToModify = [
+        querySelector(this.#element, '.nH.Hy.aXJ .pi > .l.o'),
+        querySelector(this.#element, '.nH.Hy.aXJ .l.m'),
+        querySelector(this.#element, '.nH.Hy.aXJ .l.m > .l.n'),
+      ];
+      buttonParent.classList.add('inboxsdk__compose_customTitleBarColor');
       elementsToModify.forEach((el) => {
-        el.style.backgroundColor = '';
+        el.style.backgroundColor = color;
       });
-    };
+      return () => {
+        buttonParent.classList.remove('inboxsdk__compose_customTitleBarColor');
+        elementsToModify.forEach((el) => {
+          el.style.backgroundColor = '';
+        });
+      };
+    } catch (err) {
+      if (err instanceof SelectorError) {
+        this.#driver.getLogger().errorSite(err);
+        // eslint-disable-next-line @typescript-eslint/no-empty-function -- graceful fallback
+        return () => {};
+      }
+      throw err;
+    }
   }
 
   setTitleBarText(text: string): () => void {
@@ -1542,47 +1592,60 @@ class GmailComposeView {
       );
     }
 
-    const titleBarTable = querySelector(
-      this.#element,
-      '.nH.Hy.aXJ table.cf.Ht',
-    );
-
-    if (
-      titleBarTable.classList.contains(
-        'inboxsdk__compose_hasCustomTitleBarText',
-      )
-    ) {
-      throw new Error(
-        'Custom title bar text is already registered for this compose view',
+    try {
+      const titleBarTable = querySelector(
+        this.#element,
+        '.nH.Hy.aXJ table.cf.Ht',
       );
+
+      if (
+        titleBarTable.classList.contains(
+          'inboxsdk__compose_hasCustomTitleBarText',
+        )
+      ) {
+        throw new Error(
+          'Custom title bar text is already registered for this compose view',
+        );
+      }
+
+      const titleTextParent = querySelector(
+        titleBarTable,
+        'div.Hp',
+      ).parentElement;
+
+      if (!(titleTextParent instanceof HTMLElement)) {
+        throw new Error('Could not locate title bar text parent');
+      }
+
+      titleBarTable.classList.add('inboxsdk__compose_hasCustomTitleBarText');
+      titleTextParent.classList.add('inboxsdk__compose_nativeTitleBarText');
+      const customTitleText = document.createElement('td');
+      customTitleText.classList.add('inboxsdk__compose_customTitleBarText');
+      customTitleText.innerHTML = autoHtml`
+        <div class="Hp">
+          <h2 class="a3E">
+            <div class="aYF">${text}</div>
+          </h2>
+        </div>
+      `;
+      titleTextParent.insertAdjacentElement('afterend', customTitleText);
+      return () => {
+        customTitleText.remove();
+        titleBarTable.classList.remove(
+          'inboxsdk__compose_hasCustomTitleBarText',
+        );
+        titleTextParent.classList.remove(
+          'inboxsdk__compose_nativeTitleBarText',
+        );
+      };
+    } catch (err) {
+      if (err instanceof SelectorError) {
+        this.#driver.getLogger().errorSite(err);
+        // eslint-disable-next-line @typescript-eslint/no-empty-function -- graceful fallback
+        return () => {};
+      }
+      throw err;
     }
-
-    const titleTextParent = querySelector(
-      titleBarTable,
-      'div.Hp',
-    ).parentElement;
-
-    if (!(titleTextParent instanceof HTMLElement)) {
-      throw new Error('Could not locate title bar text parent');
-    }
-
-    titleBarTable.classList.add('inboxsdk__compose_hasCustomTitleBarText');
-    titleTextParent.classList.add('inboxsdk__compose_nativeTitleBarText');
-    const customTitleText = document.createElement('td');
-    customTitleText.classList.add('inboxsdk__compose_customTitleBarText');
-    customTitleText.innerHTML = autoHtml`
-      <div class="Hp">
-        <h2 class="a3E">
-          <div class="aYF">${text}</div>
-        </h2>
-      </div>
-    `;
-    titleTextParent.insertAdjacentElement('afterend', customTitleText);
-    return () => {
-      customTitleText.remove();
-      titleBarTable.classList.remove('inboxsdk__compose_hasCustomTitleBarText');
-      titleTextParent.classList.remove('inboxsdk__compose_nativeTitleBarText');
-    };
   }
 
   #triggerDraftSave() {
