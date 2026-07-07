@@ -1515,15 +1515,12 @@ class GmailComposeView {
   }
 
   setTitleBarColor(color: string): () => void {
-    // Gmail A/B-tests a variant that renames the title-bar `Ht` class token to a
-    // generated `Ht-<hash>` token, so `table.cf.Ht` no longer matches. `td.Hm`
-    // survives in both DOMs; fall back to a token-agnostic structural selector.
+    // Gmail A/B-renames the `Ht` token; fall back to a structural selector.
     const buttonParent =
       this.#element.querySelector('.nH.Hy.aXJ table.cf.Ht td.Hm') ||
       this.#element.querySelector('.nH.Hy.aXJ table.cf td.Hm');
     if (!buttonParent) {
-      // Coloring the title bar is cosmetic; log and degrade rather than throw
-      // and unwind the caller's compose setup.
+      // cosmetic; log and skip rather than throw
       this.#driver
         .getLogger()
         .error(new Error('setTitleBarColor: could not find compose title bar'));
@@ -1553,14 +1550,12 @@ class GmailComposeView {
       );
     }
 
-    // See setTitleBarColor: the `Ht` token is renamed on the Gmail variant, so
-    // fall back to a token-agnostic structural selector for the title-bar table.
+    // Gmail A/B-renames the `Ht` token; fall back to a structural selector.
     const titleBarTable =
       this.#element.querySelector('.nH.Hy.aXJ table.cf.Ht') ||
       this.#element.querySelector('.nH.Hy.aXJ table.cf');
     if (!titleBarTable) {
-      // Setting the title text is cosmetic; log and degrade rather than throw
-      // and unwind the caller's compose setup.
+      // cosmetic; log and skip rather than throw
       this.#driver
         .getLogger()
         .error(new Error('setTitleBarText: could not find compose title bar'));
@@ -1581,7 +1576,7 @@ class GmailComposeView {
       titleBarTable.querySelector('div.Hp')?.parentElement;
 
     if (!(titleTextParent instanceof HTMLElement)) {
-      // Unexpected DOM shape; log and degrade rather than throw.
+      // cosmetic; log and skip rather than throw
       this.#driver
         .getLogger()
         .error(
