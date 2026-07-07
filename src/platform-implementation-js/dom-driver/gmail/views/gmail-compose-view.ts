@@ -17,6 +17,7 @@ import delayAsap from '../../../lib/delay-asap';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 import simulateKey from '../../../lib/dom/simulate-key';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
+import querySelectorWithFallbacks from '../../../lib/dom/querySelectorWithFallbacks';
 import isElementVisible from '../../../../common/isElementVisible';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import {
@@ -1514,10 +1515,13 @@ class GmailComposeView {
   }
 
   setTitleBarColor(color: string): () => void {
-    const buttonParent = querySelector(
-      this.#element,
+    // Gmail A/B-tests a variant that renames the title-bar `Ht` class token to a
+    // generated `Ht-<hash>` token, so `table.cf.Ht` no longer matches. `td.Hm`
+    // survives in both DOMs; fall back to a token-agnostic structural selector.
+    const buttonParent = querySelectorWithFallbacks(this.#element, [
       '.nH.Hy.aXJ table.cf.Ht td.Hm',
-    );
+      '.nH.Hy.aXJ table.cf td.Hm',
+    ]);
     const elementsToModify = [
       querySelector(this.#element, '.nH.Hy.aXJ .pi > .l.o'),
       querySelector(this.#element, '.nH.Hy.aXJ .l.m'),
@@ -1542,10 +1546,12 @@ class GmailComposeView {
       );
     }
 
-    const titleBarTable = querySelector(
-      this.#element,
+    // See setTitleBarColor: the `Ht` token is renamed on the Gmail variant, so
+    // fall back to a token-agnostic structural selector for the title-bar table.
+    const titleBarTable = querySelectorWithFallbacks(this.#element, [
       '.nH.Hy.aXJ table.cf.Ht',
-    );
+      '.nH.Hy.aXJ table.cf',
+    ]);
 
     if (
       titleBarTable.classList.contains(
