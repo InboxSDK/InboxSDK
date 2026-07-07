@@ -6,6 +6,7 @@ import once from 'lodash/once';
 import escape from 'lodash/escape';
 import constant from 'lodash/constant';
 import find from 'lodash/find';
+import noop from 'lodash/noop';
 import asap from 'asap';
 import delay from 'pdelay';
 import * as Kefir from 'kefir';
@@ -1514,15 +1515,22 @@ class GmailComposeView {
   }
 
   setTitleBarColor(color: string): () => void {
-    const buttonParent = querySelector(
-      this.#element,
-      '.nH.Hy.aXJ table.cf.Ht td.Hm',
-    );
+    // Gmail A/B-renames the `Ht` token; fall back to a structural selector.
+    const buttonParent =
+      this.#element.querySelector('.nH.Hy.aXJ table.cf.Ht td.Hm') ||
+      this.#element.querySelector('.nH.Hy.aXJ table.cf td.Hm');
+    if (!buttonParent) {
+      // cosmetic; log and skip rather than throw
+      this.#driver
+        .getLogger()
+        .error(new Error('setTitleBarColor: could not find compose title bar'));
+      return noop;
+    }
     const elementsToModify = [
-      querySelector(this.#element, '.nH.Hy.aXJ .pi > .l.o'),
-      querySelector(this.#element, '.nH.Hy.aXJ .l.m'),
-      querySelector(this.#element, '.nH.Hy.aXJ .l.m > .l.n'),
-    ];
+      this.#element.querySelector<HTMLElement>('.nH.Hy.aXJ .pi > .l.o'),
+      this.#element.querySelector<HTMLElement>('.nH.Hy.aXJ .l.m'),
+      this.#element.querySelector<HTMLElement>('.nH.Hy.aXJ .l.m > .l.n'),
+    ].filter((el): el is HTMLElement => el != null);
     buttonParent.classList.add('inboxsdk__compose_customTitleBarColor');
     elementsToModify.forEach((el) => {
       el.style.backgroundColor = color;
@@ -1542,10 +1550,17 @@ class GmailComposeView {
       );
     }
 
-    const titleBarTable = querySelector(
-      this.#element,
-      '.nH.Hy.aXJ table.cf.Ht',
-    );
+    // Gmail A/B-renames the `Ht` token; fall back to a structural selector.
+    const titleBarTable =
+      this.#element.querySelector('.nH.Hy.aXJ table.cf.Ht') ||
+      this.#element.querySelector('.nH.Hy.aXJ table.cf');
+    if (!titleBarTable) {
+      // cosmetic; log and skip rather than throw
+      this.#driver
+        .getLogger()
+        .error(new Error('setTitleBarText: could not find compose title bar'));
+      return noop;
+    }
 
     if (
       titleBarTable.classList.contains(
@@ -1557,13 +1572,17 @@ class GmailComposeView {
       );
     }
 
-    const titleTextParent = querySelector(
-      titleBarTable,
-      'div.Hp',
-    ).parentElement;
+    const titleTextParent =
+      titleBarTable.querySelector('div.Hp')?.parentElement;
 
     if (!(titleTextParent instanceof HTMLElement)) {
-      throw new Error('Could not locate title bar text parent');
+      // cosmetic; log and skip rather than throw
+      this.#driver
+        .getLogger()
+        .error(
+          new Error('setTitleBarText: could not locate title bar text parent'),
+        );
+      return noop;
     }
 
     titleBarTable.classList.add('inboxsdk__compose_hasCustomTitleBarText');
