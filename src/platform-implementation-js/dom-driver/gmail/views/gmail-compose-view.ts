@@ -1309,11 +1309,19 @@ class GmailComposeView {
   }
 
   getCloseButton(): HTMLElement {
-    return this.#element.querySelectorAll<HTMLElement>('.Hm > img')[2];
+    // Prefer legacy <img> titlebar controls; fall back to newer <button class="Ha">.
+    return (
+      this.#element.querySelectorAll<HTMLElement>('.Hm > img')[2] ||
+      querySelector(this.#element, '.Hm .Ha')
+    );
   }
 
   getMoleSwitchButton(): HTMLElement {
-    return this.#element.querySelectorAll<HTMLElement>('.Hm > img')[1];
+    // Prefer legacy <img> titlebar controls; fall back to newer <button class="Hq">.
+    return (
+      this.#element.querySelectorAll<HTMLElement>('.Hm > img')[1] ||
+      querySelector(this.#element, '.Hm .Hq')
+    );
   }
 
   getBottomBarTable(): HTMLElement {
@@ -1497,7 +1505,10 @@ class GmailComposeView {
     if (minimized !== this.isMinimized()) {
       if (this.#isInlineReplyForm)
         throw new Error('Not implemented for inline compose views');
-      const minimizeButton = querySelector(this.#element, '.Hm > img');
+      // Prefer legacy <img>; fall back to newer <button class="Hl">.
+      const minimizeButton =
+        this.#element.querySelector<HTMLElement>('.Hm > img') ||
+        querySelector(this.#element, '.Hm .Hl');
       simulateClick(minimizeButton);
     }
   }
@@ -1506,10 +1517,10 @@ class GmailComposeView {
     if (fullscreen !== this.isFullscreen()) {
       if (this.#isInlineReplyForm)
         throw new Error('Not implemented for inline compose views');
-      const fullscreenButton = querySelector(
-        this.#element,
-        '.Hm > img:nth-of-type(2)',
-      );
+      // Prefer legacy <img>; fall back to newer <button class="Hq">.
+      const fullscreenButton =
+        this.#element.querySelector<HTMLElement>('.Hm > img:nth-of-type(2)') ||
+        querySelector(this.#element, '.Hm .Hq');
       simulateClick(fullscreenButton);
     }
   }
