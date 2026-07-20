@@ -36,6 +36,7 @@ import trackGmailStyles, {
   stylesStream,
 } from './gmail-driver/track-gmail-styles';
 import temporaryTrackDownloadUrlValidity from './gmail-driver/temporary-track-download-url-validity';
+import syncMoleSpacerWithRightColumn from './gmail-driver/sync-mole-spacer-with-right-column';
 import getGmailThreadIdForRfcMessageId from '../../driver-common/getGmailThreadIdForRfcMessageId';
 import getRfcMessageIdForGmailThreadId from './gmail-driver/get-rfc-message-id-for-gmail-thread-id';
 import getGmailMessageIdForSyncMessageId from '../../driver-common/getGmailMessageIdForSyncMessageId';
@@ -271,6 +272,7 @@ class GmailDriver {
         gmailLoadEvent(this);
         overrideGmailBackButton(this, this.#gmailRouteProcessor);
         trackGmailStyles();
+        syncMoleSpacerWithRightColumn(this);
         temporaryTrackDownloadUrlValidity(this);
         if (opts.suppressAddonTitle != null) {
           suppressAddon(this, opts.suppressAddonTitle);

@@ -10,6 +10,7 @@ import cx from 'classnames';
 import PageParserTree from 'page-parser-tree';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
 import isNotNil from '../../../../common/isNotNil';
+import { MOLE_SPACER_REFRESH_EVENT } from '../gmail-driver/sync-mole-spacer-with-right-column';
 
 export type MoleButtonDescriptor = {
   title: string;
@@ -143,6 +144,12 @@ class GmailMoleViewDriver {
             if (el.matches(Selector.ComposeMole)) {
               this.#maybeMoveMole(el);
             }
+
+            // A new mole must clear whatever panel is open in the right column.
+            // The spacer that does that lives outside the mole parent (and is
+            // itself created alongside the first mole), so poke the sync that
+            // sizes it — adding a mole doesn't resize the column on its own.
+            document.dispatchEvent(new CustomEvent(MOLE_SPACER_REFRESH_EVENT));
 
             break;
           }
