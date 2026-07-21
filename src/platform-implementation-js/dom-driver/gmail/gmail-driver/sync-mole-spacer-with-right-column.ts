@@ -7,39 +7,35 @@ import type GmailDriver from '../gmail-driver';
  * spacer at `.dw > .jAmAWb`.
  *
  * Gmail drives that spacer for its OWN companion panels (Calendar, Keep, Tasks,
- * Contacts) but not for anything else that lives in the same right column
- *
- * We mirror the *occupied width* of the right column onto the spacer: whenever
- * the column is showing more than its ~56px icon rail, some panel is open (whoever owns it)
- * and the spacer is set to match; otherwise we leave the spacer alone so Gmail
- * keeps managing its own companions.
+ * Contacts) but not for InboxSDK content panels, which sit in the same column
+ * (`.WN9Ejb`). So whenever the column resizes (or the first mole appears) we
+ * match the spacer using Gmail's own formula — companion content width + rail
+ * inset
  */
 
+/** This includes the panel and the tab rail. */
 const RIGHT_COLUMN_SELECTOR = 'div.aUx';
+
+/** Google companions and SDK panels both render their body here. */
+const COMPANION_PANEL_SELECTOR = '.WN9Ejb';
+
 const MOLE_SPACER_SELECTOR = 'div.dw > .jAmAWb';
 
 /**
  * Dispatched by the mole driver whenever a mole is added. Creating a mole
- * doesn't resize the right column, so our `.aUx` observers wouldn't otherwise fire
+ * doesn't resize the right column, so our `.aUx` observer wouldn't otherwise fire.
  */
 export const MOLE_SPACER_REFRESH_EVENT = 'inboxsdk__refreshMoleSpacer';
-
-/** Marks a spacer whose width was set by us, so we only ever clear our own. */
-const MANAGED_ATTR = 'data-inboxsdk-mole-spacer-managed';
-
-/** Stores the spacer's original inline width so we can restore it exactly. */
-const ORIGINAL_WIDTH_ATTR = 'data-inboxsdk-mole-spacer-original-width';
 
 /** Prevents multiple InboxSDK instances from each installing the observer. */
 const INSTALLED_ATTR = 'data-inboxsdk-mole-spacer-sync';
 
 /**
- * The right column shows only a ~56px icon rail when no panel is open. Anything
- * wider than this means a panel is present. The headroom above 56px keeps
- * icon-rail-only states (including the rail collapsing, which Gmail also ignores)
- * from being mistaken for an open panel.
+ * The rail-inset width Gmail keeps on the spacer when only the icon rail is
+ * showing. We hardcode it because there are cases where we
+ * wouldn't be able to grab it from the DOM.
  */
-const ICON_RAIL_MAX_WIDTH = 80;
+const RAIL_INSET_WIDTH = 66;
 
 export default function syncMoleSpacerWithRightColumn(driver: GmailDriver) {
   const ResizeObserver = global.ResizeObserver;
@@ -69,13 +65,7 @@ export default function syncMoleSpacerWithRightColumn(driver: GmailDriver) {
 
       // Width changes when a panel opens/closes/resizes.
       new ResizeObserver(update).observe(rightColumn);
-      // A panel can also toggle via `display`/`class` changes on the column
-      // itself without a resize notification, so watch those too.
-      new MutationObserver(update).observe(rightColumn, {
-        attributes: true,
-        attributeFilter: ['style', 'class'],
-        childList: true,
-      });
+
       // A mole appearing (which also creates the spacer on the very first one)
       // doesn't touch the right column, so the mole driver signals us directly.
       document.addEventListener(MOLE_SPACER_REFRESH_EVENT, update);
@@ -97,42 +87,26 @@ function updateSpacer(rightColumn: HTMLElement) {
   // compose/thread view has been used. Until it exists there is nothing to size.
   if (!spacer) return;
 
-  const occupiedWidth = rightColumn.getBoundingClientRect().width;
-  const panelOpen = occupiedWidth > ICON_RAIL_MAX_WIDTH;
-  const managed = spacer.hasAttribute(MANAGED_ATTR);
+  const companion = rightColumn.querySelector<HTMLElement>(
+    COMPANION_PANEL_SELECTOR,
+  );
+  // `.WN9Ejb` stays in the DOM when collapsed (`display: none`); only count it
+  // when a companion/SDK panel is actually showing.
+  const companionWidth =
+    companion && getComputedStyle(companion).display !== 'none'
+      ? companion.getBoundingClientRect().width
+      : 0;
 
-  if (managed) {
-    if (panelOpen) {
-      // Keep our spacer matched to the occupied width (panel opened/resized).
-      const targetWidth = `${occupiedWidth}px`;
-      if (spacer.style.width !== targetWidth) {
-        spacer.style.width = targetWidth;
-        refreshComposeToolbars();
-      }
-    } else {
-      // Restore what was there before we took over
-      // and hand management back to Gmail.
-      spacer.style.width = spacer.getAttribute(ORIGINAL_WIDTH_ATTR) ?? '';
-      spacer.removeAttribute(ORIGINAL_WIDTH_ATTR);
-      spacer.removeAttribute(MANAGED_ATTR);
-      refreshComposeToolbars();
-    }
-    return;
+  // Match Gmail: content width + rail inset.
+  // When no panel is open, companionWidth is 0 and we restore the rail inset
+  const targetWidth =
+    companionWidth > 0 ? companionWidth + RAIL_INSET_WIDTH : RAIL_INSET_WIDTH;
+
+  const target = `${targetWidth}px`;
+  if (spacer.style.width !== target) {
+    spacer.style.width = target;
+    refreshComposeToolbars();
   }
-
-  // Only act when a panel is open but Gmail hasn't already widened the
-  // spacer for it. When Gmail HAS widened it (its own companion — Calendar, Keep,
-  // etc.), the spacer is already wider than the rail, so we leave it entirely
-  // alone and let Gmail run the whole open/close lifecycle.
-  if (!panelOpen) return;
-  if (spacer.getBoundingClientRect().width > ICON_RAIL_MAX_WIDTH) return;
-
-  // A panel Gmail isn't accounting for. Take the spacer over,
-  // remembering the original width so we can restore it.
-  spacer.setAttribute(ORIGINAL_WIDTH_ATTR, spacer.style.width);
-  spacer.setAttribute(MANAGED_ATTR, 'true');
-  spacer.style.width = `${occupiedWidth}px`;
-  refreshComposeToolbars();
 }
 
 /**
