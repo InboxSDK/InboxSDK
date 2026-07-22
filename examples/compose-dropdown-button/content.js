@@ -123,6 +123,15 @@ InboxSDK.load(1, 'simple-example', {
       },
     });
 
+    composeView.addButton({
+      title: 'Close',
+      iconUrl: chrome.runtime.getURL('monkey.png'),
+      onClick: function () {
+        console.log('close');
+        composeView.close();
+      },
+    });
+
     composeView.on('presending', function (event) {
       console.log('presending', event);
       event.cancel();
