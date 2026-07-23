@@ -2,7 +2,10 @@ import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
-import GmailElementGetter from '../gmail-element-getter';
+import GmailElementGetter, {
+  MOLE_CONTAINER_SELECTOR,
+  MOLE_PARENT_SELECTOR,
+} from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
 import isComposeTitleBarLightColor from '../is-compose-titlebar-light-color';
 import * as styles from './mole-view.module.css';
@@ -31,23 +34,24 @@ export type MoleOptions = {
 
 const INBOXSDK_CLASS = 'inboxsdk__mole_view' as const;
 
-const enum Selector {
-  MoleParent = '.dw .nH > .nH > .no',
-  /**
-   * Compose and SDK mole selector.
-   *
-   * @note 2023-10-11 on :not selectors:
-   *
-   * style*="order: 2147483647;" is the left mole spacer.
-   *
-   * style*="order: 0;" is the right mole spacer.
-   *
-   * .aJl is the chat placeholder.
-   */
-  Mole = `${Selector.MoleParent} > *:not([style*="order: 0;"], [style*="order: 2147483647;"], .aJl)`,
-  ComposeMole = `${Selector.Mole}.nn.nH`,
-  ChatMolePlaceholder = `${Selector.MoleParent} > .aJl`,
-}
+/**
+ * Compose and SDK mole selector.
+ *
+ * @note 2023-10-11 on :not selectors:
+ *
+ * style*="order: 2147483647;" is the left mole spacer.
+ *
+ * style*="order: 0;" is the right mole spacer.
+ *
+ * .aJl is the chat placeholder.
+ */
+const MOLE_SELECTOR = `${MOLE_PARENT_SELECTOR} > *:not([style*="order: 0;"], [style*="order: 2147483647;"], .aJl)`;
+
+const Selector = {
+  Mole: MOLE_SELECTOR,
+  ComposeMole: `${MOLE_SELECTOR}.nn.nH`,
+  ChatMolePlaceholder: `${MOLE_PARENT_SELECTOR} > .aJl`,
+} as const;
 
 const enum Tag {
   Mole = 'mole',
@@ -88,14 +92,14 @@ class GmailMoleViewDriver {
         },
         {
           tag: Tag.MoleParent,
-          selectors: [Selector.MoleParent],
+          selectors: [MOLE_PARENT_SELECTOR],
           sources: [null],
         },
       ],
       finders: {
         [Tag.MoleParent]: {
           fn: (root) =>
-            [root.querySelector<HTMLElement>(Selector.MoleParent)].filter(
+            [root.querySelector<HTMLElement>(MOLE_PARENT_SELECTOR)].filter(
               isNotNil,
             ),
           interval(elementCount, timeRunning) {
@@ -282,7 +286,7 @@ class GmailMoleViewDriver {
       return;
     }
 
-    const dw = moleParent.closest('div.dw');
+    const dw = moleParent.closest(MOLE_CONTAINER_SELECTOR);
 
     if (dw) {
       dw.classList.add('inboxsdk__moles_in_use', styles.inboxsdkMolesInUse);

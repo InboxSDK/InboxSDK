@@ -10,7 +10,9 @@ import ReactDOM from 'react-dom';
 import AppSidebar from '../../../../../driver-common/sidebar/AppSidebar';
 import type { PanelDescriptor } from '../../../../../driver-common/sidebar/AppSidebar';
 import type GmailDriver from '../../../gmail-driver';
-import GmailElementGetter from '../../../gmail-element-getter';
+import GmailElementGetter, {
+  COMPANION_SIDEBAR_PANEL_WRAPPER_CLASS,
+} from '../../../gmail-element-getter';
 import idMap from '../../../../../lib/idMap';
 import incrementName from '../../../../../lib/incrementName';
 import querySelector from '../../../../../lib/dom/querySelectorOrFail';
@@ -691,22 +693,26 @@ class GmailAppSidebarPrimary {
       this.#instanceId,
     );
 
-    // TODO: Once the changes to the GMail DOM have been entirely ramped, drop the ternary here and
-    // always get the parentElement. (Jun 20, 2018)
-    this.#companionSidebarOuterWrapper =
-      this.#companionSidebarContentContainerEl.classList.contains('bq9')
-        ? this.#companionSidebarContentContainerEl
-        : (this.#companionSidebarContentContainerEl.parentElement as any);
+    const companionSidebarOuterWrapper =
+      GmailElementGetter.getCompanionSidebarOuterWrapperElement(
+        this.#companionSidebarContentContainerEl,
+      );
 
-    if (!this.#companionSidebarOuterWrapper) {
+    if (!companionSidebarOuterWrapper) {
       throw new Error(
         'should not happen: failed to find companionSidebarOuterWrapper',
       );
     }
 
+    this.#companionSidebarOuterWrapper = companionSidebarOuterWrapper;
+
     // detect 2024-11-07 gmail update that moved sidebar icons to the right of
     // the sidebar
-    if (this.#companionSidebarOuterWrapper.classList.contains('WN9Ejb')) {
+    if (
+      this.#companionSidebarOuterWrapper.classList.contains(
+        COMPANION_SIDEBAR_PANEL_WRAPPER_CLASS,
+      )
+    ) {
       document.body.classList.add('inboxsdk__sidebar_icons_right');
       this.#driver.getLogger().eventSite('sidebar_icons_right');
     }

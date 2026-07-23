@@ -1,29 +1,26 @@
 import waitFor from '../../../lib/wait-for';
 import fakeWindowResize from '../../../lib/fake-window-resize';
+import GmailElementGetter, {
+  MOLE_CONTAINER_SELECTOR,
+} from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
 
 /**
  * Gmail keeps compose/SDK moles clear of the right side panel by widening a flex
- * spacer at `.dw > .jAmAWb`.
+ * spacer at the end of the mole container.
  *
  * Gmail drives that spacer for its OWN companion panels (Calendar, Keep, Tasks,
- * Contacts) but not for InboxSDK content panels, which sit in the same column
- * (`.WN9Ejb`). So whenever the column resizes (or the first mole appears) we
- * match the spacer using Gmail's own formula — companion content width + rail
- * inset
+ * Contacts) but not for InboxSDK content panels, which render in the same
+ * companion sidebar wrapper. So whenever the sidebar column resizes (or the
+ * first mole appears) we match the spacer using Gmail's own formula — companion
+ * content width + rail inset
  */
 
-/** This includes the panel and the tab rail. */
-const RIGHT_COLUMN_SELECTOR = 'div.aUx';
-
-/** Google companions and SDK panels both render their body here. */
-const COMPANION_PANEL_SELECTOR = '.WN9Ejb';
-
-const MOLE_SPACER_SELECTOR = 'div.dw > .jAmAWb';
+const MOLE_SPACER_SELECTOR = `${MOLE_CONTAINER_SELECTOR} > .jAmAWb`;
 
 /**
  * Dispatched by the mole driver whenever a mole is added. Creating a mole
- * doesn't resize the right column, so our `.aUx` observer wouldn't otherwise fire.
+ * doesn't resize the sidebar column, so our observer wouldn't otherwise fire.
  */
 export const MOLE_SPACER_REFRESH_EVENT = 'inboxsdk__refreshMoleSpacer';
 
@@ -45,7 +42,7 @@ export default function syncMoleSpacerWithRightColumn(driver: GmailDriver) {
   if (root.hasAttribute(INSTALLED_ATTR)) return;
   root.setAttribute(INSTALLED_ATTR, 'true');
 
-  waitFor(() => document.querySelector<HTMLElement>(RIGHT_COLUMN_SELECTOR))
+  waitFor(() => GmailElementGetter.getCompanionSidebarColumnElement())
     .then((rightColumn) => {
       let scheduled = false;
       // Coalesce bursts of mutations into a single read+write per frame so we
@@ -56,7 +53,7 @@ export default function syncMoleSpacerWithRightColumn(driver: GmailDriver) {
         requestAnimationFrame(() => {
           scheduled = false;
           try {
-            updateSpacer(rightColumn);
+            updateSpacer();
           } catch (err) {
             driver.getLogger().error(err as Error);
           }
@@ -78,20 +75,18 @@ export default function syncMoleSpacerWithRightColumn(driver: GmailDriver) {
     });
 }
 
-function updateSpacer(rightColumn: HTMLElement) {
-  // `.dw` has two `.jAmAWb` flex spacers: the left one (index 0) and the right
-  // one (last).
+function updateSpacer() {
+  // The mole container has two `.jAmAWb` flex spacers: the left one (index 0)
+  // and the right one (last).
   const spacers = document.querySelectorAll<HTMLElement>(MOLE_SPACER_SELECTOR);
   const spacer = spacers[spacers.length - 1];
   // The spacer is part of the mole container, which Gmail loads lazily once a
   // compose/thread view has been used. Until it exists there is nothing to size.
   if (!spacer) return;
 
-  const companion = rightColumn.querySelector<HTMLElement>(
-    COMPANION_PANEL_SELECTOR,
-  );
-  // `.WN9Ejb` stays in the DOM when collapsed (`display: none`); only count it
-  // when a companion/SDK panel is actually showing.
+  const companion = GmailElementGetter.getCompanionSidebarOuterWrapperElement();
+  // The wrapper stays in the DOM when collapsed (`display: none`); only count
+  // it when a companion/SDK panel is actually showing.
   const companionWidth =
     companion && getComputedStyle(companion).display !== 'none'
       ? companion.getBoundingClientRect().width

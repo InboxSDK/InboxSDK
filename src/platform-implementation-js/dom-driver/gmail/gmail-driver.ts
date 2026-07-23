@@ -964,7 +964,7 @@ class GmailDriver {
     return waitFor(condition)
       .map(() => undefined)
       .mapErrors((err) => {
-        const el = document.querySelector<HTMLElement>('div.aUx');
+        const el = GmailElementGetter.getCompanionSidebarColumnElement();
         this.#logger.error(err, {
           reason: 'waitForGlobalSidebarReady timed out',
           aUxHtml: el ? censorHTMLtree(el) : null,
