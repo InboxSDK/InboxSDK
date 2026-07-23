@@ -20,6 +20,31 @@ const APP_MENU = '.aeN.WR.a6o.anZ.nH.oy8Mbf[role=navigation]';
  */
 const NAV_MENU = '.aeN.WR.nH.oy8Mbf[role=navigation]';
 
+/**
+ * The right-hand column holding the companion sidebar. Both the panel and the
+ * icon rail live inside it.
+ */
+const COMPANION_SIDEBAR_COLUMN = 'div.aUx';
+
+/**
+ * Class on the companion sidebar's outer wrapper before the 2024-11-07 Gmail
+ * update, when the wrapper and the content container were the same element.
+ */
+const COMPANION_SIDEBAR_LEGACY_WRAPPER_CLASS = 'bq9';
+
+/**
+ * Class on the companion sidebar's outer wrapper in the layout Gmail shipped
+ * 2024-11-07, which moved the sidebar icons to the right of the panel. Absent
+ * on older layouts, which use {@link COMPANION_SIDEBAR_LEGACY_WRAPPER_CLASS}.
+ */
+export const COMPANION_SIDEBAR_PANEL_WRAPPER_CLASS = 'WN9Ejb';
+
+/** Outer flex container for the mole strip (spacers + mole area). Lazily created by Gmail. */
+export const MOLE_CONTAINER_SELECTOR = 'div.dw';
+
+/** The element compose windows and moles are appended to. */
+export const MOLE_PARENT_SELECTOR = `${MOLE_CONTAINER_SELECTOR} .nH > .nH > .no`;
+
 // TODO Figure out if these functions can and should be able to return null
 const GmailElementGetter = {
   getActiveMoreMenu(): HTMLElement | null {
@@ -41,6 +66,10 @@ const GmailElementGetter = {
     return document.querySelector('.no > .nn.bnl');
   },
 
+  getCompanionSidebarColumnElement(): HTMLElement | null {
+    return document.querySelector(COMPANION_SIDEBAR_COLUMN);
+  },
+
   getCompanionSidebarContentContainerElement(): HTMLElement | null {
     return document.querySelector('.brC-brG');
   },
@@ -48,6 +77,30 @@ const GmailElementGetter = {
   // <div class="brC-aT5-aOt-Jw" role="complementary" aria-label="Side panel">
   getCompanionSidebarIconContainerElement(): HTMLElement | null {
     return document.querySelector('.brC-aT5-aOt-Jw');
+  },
+
+  /**
+   * The wrapper Google's own companions (Calendar, Keep, Tasks, Contacts) and
+   * SDK content panels both render their body inside. Gmail hides it with
+   * `display: none` rather than removing it when nothing is open.
+   *
+   * @param contentContainerEl pass this when you already hold the content
+   * container, so the wrapper is derived from that same element.
+   */
+  getCompanionSidebarOuterWrapperElement(
+    contentContainerEl?: HTMLElement | null,
+  ): HTMLElement | null {
+    const companionSidebarContentContainerEl =
+      contentContainerEl ??
+      GmailElementGetter.getCompanionSidebarContentContainerElement();
+    if (!companionSidebarContentContainerEl) return null;
+    // TODO: Once the changes to the GMail DOM have been entirely ramped, drop
+    // the ternary here and always get the parentElement. (Jun 20, 2018)
+    return companionSidebarContentContainerEl.classList.contains(
+      COMPANION_SIDEBAR_LEGACY_WRAPPER_CLASS,
+    )
+      ? companionSidebarContentContainerEl
+      : companionSidebarContentContainerEl.parentElement;
   },
 
   getComposeButton(): HTMLElement | null {
@@ -58,7 +111,7 @@ const GmailElementGetter = {
   },
 
   getComposeWindowContainer(): HTMLElement | null {
-    return document.querySelector('.dw .nH > .nH > .no');
+    return document.querySelector(MOLE_PARENT_SELECTOR);
   },
 
   getContentSectionElement(): HTMLElement | undefined | null {
