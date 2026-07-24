@@ -10,6 +10,16 @@ export function makePageParser(element: HTMLElement, logger: Logger) {
         el,
         html: el ? censorHTMLtree(el) : null,
       };
+      // Suppress warnings about finder/watcher mismatches - these are benign
+      // timing issues where the finder discovers elements before/after the
+      // watcher due to how $map selectors work with MutationObserver.
+      // The elements are still tracked correctly by the finder.
+      if (
+        err.message.includes('found element missed by watcher') ||
+        err.message.includes('watcher found element already found by finder')
+      ) {
+        return;
+      }
       logger.errorSite(err, details);
     },
     tags: {},

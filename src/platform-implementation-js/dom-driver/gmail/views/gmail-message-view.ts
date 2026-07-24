@@ -127,13 +127,16 @@ class GmailMessageView {
       if (!syncMessageId)
         throw new Error('data-message-id attribute has no value');
 
-      // Only respect data-legacy-message-id if data-message-id is not the id
-      // of a draft we've seen recently, in order to work around a Gmail bug.
-      // https://github.com/StreakYC/GmailSDK/issues/515#issuecomment-457420619
-      if (
-        messageIdElement.hasAttribute('data-legacy-message-id') &&
-        !this.#driver.isRecentSyncDraftId(syncMessageId.replace('#', ''))
-      ) {
+      // If data-legacy-message-id is already present, trust it. Only poll for
+      // the ID when it's missing. This is more conservative than the previous
+      // approach which would overwrite the attribute for "recent sync drafts".
+      //
+      // Previously, we would not trust data-legacy-message-id for recent sync
+      // drafts to work around a Gmail bug (see issue #515). However, this
+      // caused problems with Gmail's "Show your draft here" functionality,
+      // which appears to rely on the original attribute value to link the
+      // notification to the compose mole.
+      if (messageIdElement.hasAttribute('data-legacy-message-id')) {
         partialReadyStream = Kefir.constant(null);
       } else {
         // we have a data message id, but not the legacy message id. So now we have to poll for the gmail message id
