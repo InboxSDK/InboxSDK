@@ -804,7 +804,9 @@ class GmailAppSidebarPrimary {
               this.#driver.getLogger(),
               threadIconArea,
               companionSidebarIconContainerEl,
-            );
+            ).catch(() => {
+              // Error already logged inside addCompanionThreadIconArea
+            });
           }
 
           this.#addButton(threadIconArea, event, false);
