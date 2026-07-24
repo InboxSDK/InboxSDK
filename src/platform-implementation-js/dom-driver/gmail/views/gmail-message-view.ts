@@ -373,22 +373,46 @@ class GmailMessageView {
   }
 
   #getOpenMoreMenu(): HTMLElement | null | undefined {
+    // Existing selectors for backward compatibility
     const selector_2022_11_23 =
       'td > div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]';
     const selector_2023_11_16 =
       'div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]';
+    const selector_legacy =
+      'td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]';
 
     const maybeMoreMenu =
       document.body.querySelector<HTMLElement>(selector_2023_11_16) ||
-      document.body.querySelector<HTMLElement>(selector_2022_11_23);
-    // This will find any message's open more menu! The caller needs to make
-    // sure it belongs to this message!
-    return (
-      maybeMoreMenu ||
-      document.body.querySelector<HTMLElement>(
-        'td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]',
-      )
+      document.body.querySelector<HTMLElement>(selector_2022_11_23) ||
+      document.body.querySelector<HTMLElement>(selector_legacy);
+
+    if (maybeMoreMenu) return maybeMoreMenu;
+
+    // Fallback: find visible J-M menu containers with aria-haspopup
+    const allMenus = document.body.querySelectorAll<HTMLElement>(
+      '.J-M[aria-haspopup=true]',
     );
+    for (const menu of allMenus) {
+      if (menu.offsetHeight > 0 && menu.offsetWidth > 0) {
+        return menu;
+      }
+    }
+
+    // Fallback: broader search for any visible popup menu near the more button
+    const moreButton = this.#getMoreButton();
+    if (moreButton && moreButton.getAttribute('aria-expanded') === 'true') {
+      // Search for any visible menu container in the document
+      const allPopupMenus = document.body.querySelectorAll<HTMLElement>(
+        'div[role=menu], .J-M',
+      );
+      for (const menu of allPopupMenus) {
+        if (menu.offsetHeight > 0 && menu.offsetWidth > 0) {
+          return menu;
+        }
+      }
+    }
+
+    return null;
   }
 
   #closeActiveEmailMenu() {
