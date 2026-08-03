@@ -5643,16 +5643,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ext-corb-workaround@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "ext-corb-workaround@npm:2.0.0"
-  dependencies:
-    "@babel/runtime": "npm:^7.8.4"
-    lodash: "npm:^4.17.15"
-  checksum: 10/d34d6ab742a6080723e59f43f25d5f9b615db1fe2e806836af0d2d5a3f07c064e060e2e34d29db58801973b9e8bb4c07d479d36f41cae641c4803e8c5453610d
-  languageName: node
-  linkType: hard
-
 "ext@npm:^1.1.2":
   version: 1.4.0
   resolution: "ext@npm:1.4.0"
@@ -6969,7 +6959,6 @@ __metadata:
     eslint: "npm:^8.41.0"
     eslint-plugin-deprecate: "npm:^0.7.0"
     eslint-plugin-react: "npm:^7.32.2"
-    ext-corb-workaround: "npm:^2.0.0"
     fast-deep-equal: "npm:^3.1.3"
     fast-glob: "npm:^3.2.5"
     gulp: "npm:^4.0.2"
@@ -8650,7 +8639,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.0.0, lodash@npm:^4.14.0, lodash@npm:^4.16.6, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.4, lodash@npm:^4.6.1":
+"lodash@npm:^4.0.0, lodash@npm:^4.14.0, lodash@npm:^4.16.6, lodash@npm:^4.17.14, lodash@npm:^4.17.4, lodash@npm:^4.6.1":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: 10/c08619c038846ea6ac754abd6dd29d2568aa705feb69339e836dfa8d8b09abbb2f859371e86863eda41848221f9af43714491467b5b0299122431e202bb0c532

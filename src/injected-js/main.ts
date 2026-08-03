@@ -46,8 +46,6 @@ if (!(global as any).__InboxSDKInjected) {
       define = null;
     }
 
-    const extCorbWorkaroundPageWorld = require('ext-corb-workaround/dist/src/pageWorld');
-
     const xhrHelper = require('./xhr-helper').default;
 
     const setupDataExposer = require('./setup-data-exposer').default;
@@ -72,7 +70,6 @@ if (!(global as any).__InboxSDKInjected) {
     gmailInterceptor();
     setupGmonkeyHandler();
 
-    extCorbWorkaroundPageWorld.init();
     xhrHelper();
     setupDataExposer();
     setupEventReemitter();
