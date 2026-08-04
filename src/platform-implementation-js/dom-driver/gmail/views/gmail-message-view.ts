@@ -12,6 +12,7 @@ import getUpdatedContact from './gmail-message-view/get-updated-contact';
 import AttachmentIcon from './gmail-message-view/attachment-icon';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
+import waitFor from '../../../lib/wait-for';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import type { ElementWithLifetime } from '../../../lib/dom/make-element-child-stream';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
@@ -870,6 +871,7 @@ class GmailMessageView {
 
     var self = this;
     var currentReplyElementRemovalStream: any = null;
+    let pendingReplyElementSearch = false;
     // hold off on emitting the mutation for a millisecond so
     // that compose-view-driver-stream is listening to reply stream
     Kefir.combine([
@@ -885,12 +887,10 @@ class GmailMessageView {
       .onValue((mutation) => {
         if (mutation !== 'END' && replyContainer.classList.contains('adB')) {
           if (!currentReplyElementRemovalStream) {
-            const replyElement = (replyContainer.getElementsByClassName(
-              'M9',
-            )?.[0] || replyContainer.firstElementChild) as HTMLElement | null;
-            self.#replyElement = replyElement;
+            const replyElement = findReplyElement(replyContainer);
 
             if (replyElement) {
+              self.#replyElement = replyElement;
               currentReplyElementRemovalStream = kefirBus();
 
               self.#eventStream.emit({
@@ -900,6 +900,34 @@ class GmailMessageView {
                   el: replyElement,
                   removalStream: currentReplyElementRemovalStream,
                 },
+              });
+            } else if (!pendingReplyElementSearch) {
+              pendingReplyElementSearch = true;
+              waitForReplyElement({
+                replyContainer,
+                isStopped: () => self.#stopper.stopped,
+                isAlreadyFound: () => currentReplyElementRemovalStream != null,
+                onFound: (retryElement) => {
+                  self.#replyElement = retryElement;
+                  currentReplyElementRemovalStream = kefirBus();
+
+                  self.#eventStream.emit({
+                    type: 'internal',
+                    eventName: 'replyElement',
+                    change: {
+                      el: retryElement,
+                      removalStream: currentReplyElementRemovalStream,
+                    },
+                  });
+                },
+                onTimeout: (err) => {
+                  self.#driver.getLogger().error(err, {
+                    reason: 'Reply element not found in reply container',
+                    replyContainerHtml: censorHTMLtree(replyContainer),
+                  });
+                },
+              }).finally(() => {
+                pendingReplyElementSearch = false;
               });
             }
           }
@@ -1002,6 +1030,56 @@ function _extractContactInformation(span: HTMLElement) {
     name: span.getAttribute('name')!,
     emailAddress: span.getAttribute('email')!,
   };
+}
+
+export function findReplyElement(container: HTMLElement): HTMLElement | null {
+  return (container.getElementsByClassName('M9')[0] ||
+    container.querySelector<HTMLElement>('form') ||
+    container.firstElementChild) as HTMLElement | null;
+}
+
+/**
+ * Gmail may add the adB class to the reply container before inserting the
+ * reply compose element, and #setupReplyStream's mutation observer only
+ * watches class attributes, so it never re-fires on the later child
+ * insertion. This polls for the element to cover that gap.
+ */
+export async function waitForReplyElement({
+  replyContainer,
+  isStopped,
+  isAlreadyFound,
+  onFound,
+  onTimeout,
+  timeout = 10 * 1000,
+  steptime,
+}: {
+  replyContainer: HTMLElement;
+  isStopped: () => boolean;
+  isAlreadyFound: () => boolean;
+  onFound: (el: HTMLElement) => void;
+  onTimeout: (err: unknown) => void;
+  timeout?: number;
+  steptime?: number;
+}): Promise<void> {
+  let replyElement;
+  try {
+    replyElement = await waitFor(
+      () => {
+        if (isStopped()) throw 'skip';
+        return findReplyElement(replyContainer);
+      },
+      timeout,
+      steptime,
+    );
+  } catch (err) {
+    if (err !== 'skip') {
+      onTimeout(err);
+    }
+    return;
+  }
+  if (isAlreadyFound()) return;
+  if (!replyContainer.classList.contains('adB')) return;
+  onFound(replyElement);
 }
 
 export default GmailMessageView;
