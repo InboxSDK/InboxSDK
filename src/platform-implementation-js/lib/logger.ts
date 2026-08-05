@@ -5,7 +5,6 @@ import getSessionId from '../../common/get-session-id';
 import logError from '../../common/log-error';
 import PersistentQueue from './persistent-queue';
 import makeMutationObserverStream from './dom/make-mutation-observer-stream';
-import { getXMLHttpRequest } from 'ext-corb-workaround';
 import isStreakAppId from './isStreakAppId';
 import type { PiOpts } from '../platform-implementation';
 
@@ -495,8 +494,6 @@ async function retrieveNewEventsAccessToken(): Promise<{
 }> {
   const { text } = await ajax({
     url: 'https://api.inboxsdk.com/api/v2/events/oauth',
-    // Work around CORB for extensions that have permissions to inboxsdk.com
-    XMLHttpRequest: getXMLHttpRequest(),
   });
   const accessToken: any = JSON.parse(text);
   if (isTimestampExpired(accessToken.expirationDate)) {
