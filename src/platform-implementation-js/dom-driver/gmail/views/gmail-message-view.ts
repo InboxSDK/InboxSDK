@@ -11,7 +11,9 @@ import GmailAttachmentCardView from './gmail-attachment-card-view';
 import getUpdatedContact from './gmail-message-view/get-updated-contact';
 import AttachmentIcon from './gmail-message-view/attachment-icon';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
-import querySelector from '../../../lib/dom/querySelectorOrFail';
+import querySelector, {
+  SelectorError,
+} from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import type { ElementWithLifetime } from '../../../lib/dom/make-element-child-stream';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
@@ -206,14 +208,16 @@ class GmailMessageView {
       throw new Error('tried to get message contents before message is loaded');
     }
 
-    try {
-      return querySelector(this.#element, 'div.ii.gt');
-    } catch (err) {
-      // Keep old fallback selector until we're confident of the new one.
-      this.#driver.getLogger().error(err);
-
-      return querySelector(this.#element, '.adP');
+    // Prefer current Gmail body markup. `.adP` is gone in modern Gmail (including
+    // reading/split pane), so treat both as one lookup instead of logging a
+    // primary-selector miss and then failing on a dead fallback.
+    const contentsElement =
+      this.#element.querySelector<HTMLElement>('div.ii.gt') ??
+      this.#element.querySelector<HTMLElement>('.adP');
+    if (!contentsElement) {
+      throw new SelectorError('div.ii.gt, .adP');
     }
+    return contentsElement;
   }
 
   isElementInQuotedArea(element: HTMLElement): boolean {

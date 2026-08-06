@@ -26,6 +26,7 @@ import BasicButtonViewController, {
 } from '../../../widgets/buttons/basic-button-view-controller';
 import { type ButtonDescriptor } from '../../../../inboxsdk';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
+import waitFor, { WaitForError } from '../../../lib/wait-for';
 
 let hasLoggedAddonInfo = false;
 
@@ -605,29 +606,87 @@ class GmailThreadView {
   async getThreadIDAsync(): Promise<string> {
     if (this.#threadID) return this.#threadID;
 
-    const idElement = this.#element.querySelector('[data-legacy-thread-id]');
+    const resolveFromIdElement = async (
+      idElement: Element,
+    ): Promise<string | null | undefined> => {
+      // the string value can be 'undefined'
+      const syncAttributeValue = idElement.getAttribute('data-thread-perm-id');
+      if (
+        !this.#syncThreadID &&
+        syncAttributeValue &&
+        syncAttributeValue !== 'undefined'
+      ) {
+        this.#syncThreadID = syncAttributeValue;
+      }
+
+      let threadID = idElement.getAttribute('data-legacy-thread-id');
+      if (!threadID && this.#syncThreadID) {
+        threadID = await this.#driver.getOldGmailThreadIdFromSyncThreadId(
+          this.#syncThreadID,
+        );
+      }
+      return threadID;
+    };
+
+    // In preview/split pane, ThreadView is created as soon as `.a98.iY` appears,
+    // which can be before Gmail paints data-legacy-thread-id on the subject.
+    let idElement = this.#element.querySelector('[data-legacy-thread-id]');
+    if (idElement) {
+      this.#threadID = await resolveFromIdElement(idElement);
+      if (this.#threadID) return this.#threadID;
+    }
+
+    // Preview pane stays on a list route, so use the selected thread row when
+    // the preview thread root does not have the id yet.
+    if (this.#isPreviewedThread) {
+      const rowLegacyThreadId = document
+        .querySelector('[gh=tl] tr.aps [data-legacy-thread-id]')
+        ?.getAttribute('data-legacy-thread-id');
+      if (rowLegacyThreadId) {
+        this.#threadID = rowLegacyThreadId;
+        return rowLegacyThreadId;
+      }
+    }
+
+    if (!idElement) {
+      try {
+        idElement = await waitFor(
+          () => this.#element.querySelector('[data-legacy-thread-id]'),
+          5_000,
+          100,
+        );
+      } catch (err) {
+        if (!(err instanceof WaitForError)) {
+          throw err;
+        }
+      }
+
+      if (idElement) {
+        this.#threadID = await resolveFromIdElement(idElement);
+        if (this.#threadID) return this.#threadID;
+      }
+    }
+
+    if (this.#isPreviewedThread) {
+      try {
+        const syncThreadID = this.#driver
+          .getPageCommunicator()
+          .getCurrentThreadID(this.#element, true);
+        if (syncThreadID && syncThreadID !== 'undefined') {
+          this.#syncThreadID = syncThreadID;
+          this.#threadID =
+            await this.#driver.getOldGmailThreadIdFromSyncThreadId(
+              syncThreadID,
+            );
+          if (this.#threadID) return this.#threadID;
+        }
+      } catch (err) {
+        this.#driver.getLogger().error(err);
+      }
+    }
+
     if (!idElement) throw new Error('threadID element not found');
-
-    // the string value can be 'undefined'
-    const syncAttributeValue = idElement.getAttribute('data-thread-perm-id');
-    if (
-      !this.#syncThreadID &&
-      syncAttributeValue &&
-      syncAttributeValue !== 'undefined'
-    ) {
-      this.#syncThreadID = syncAttributeValue;
-    }
-
-    this.#threadID = idElement.getAttribute('data-legacy-thread-id');
-
-    if (!this.#threadID && this.#syncThreadID) {
-      this.#threadID = await this.#driver.getOldGmailThreadIdFromSyncThreadId(
-        this.#syncThreadID,
-      );
-    }
-
-    if (this.#threadID) return this.#threadID;
-    else throw new Error('Failed to get id for thread');
+    throw new Error('Failed to get id for thread');
   }
 
   addLabel(): SimpleElementView {
