@@ -66,7 +66,10 @@ export const GMAIL_SELECTORS = {
    * Element carrying the thread's id attributes.
    * Root: thread element.
    */
-  'threadView.idElement': ['[data-legacy-thread-id]'],
+  'threadView.idElement': [
+    '[data-legacy-thread-id]',
+    '[data-thread-perm-id]',
+  ],
 
   /**
    * A message's open "more actions" menu. Gmail renders it outside

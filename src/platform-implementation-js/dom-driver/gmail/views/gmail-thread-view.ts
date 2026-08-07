@@ -26,8 +26,66 @@ import BasicButtonViewController, {
 } from '../../../widgets/buttons/basic-button-view-controller';
 import { type ButtonDescriptor } from '../../../../inboxsdk';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
+import waitFor from '../../../lib/wait-for';
 
 let hasLoggedAddonInfo = false;
+
+const THREAD_ID_WAIT_TIMEOUT = 15_000;
+
+export function normalizeThreadID(threadID: unknown): string | null {
+  return typeof threadID === 'string' &&
+    threadID.length > 0 &&
+    threadID !== 'undefined'
+    ? threadID
+    : null;
+}
+
+export async function waitForThreadIdSource(
+  getIdElement: () => HTMLElement | null,
+  getFallbackThreadID: () => string | null,
+  isDestroyed: () => boolean,
+  timeout = THREAD_ID_WAIT_TIMEOUT,
+  steptime = 50,
+): Promise<HTMLElement | string> {
+  try {
+    return await waitFor(
+      () => {
+        if (isDestroyed()) {
+          throw new Error('thread view destroyed while waiting for threadID');
+        }
+
+        const idElement = getIdElement();
+        if (
+          idElement &&
+          (normalizeThreadID(idElement.getAttribute('data-legacy-thread-id')) ||
+            normalizeThreadID(idElement.getAttribute('data-thread-perm-id')))
+        ) {
+          return idElement;
+        }
+
+        try {
+          const fallbackThreadID = normalizeThreadID(getFallbackThreadID());
+          if (fallbackThreadID) return fallbackThreadID;
+        } catch {
+          // The page communicator can be unavailable while Gmail builds the view.
+        }
+
+        return null;
+      },
+      timeout,
+      steptime,
+    );
+  } catch (err) {
+    if (
+      err instanceof Error &&
+      err.message === 'thread view destroyed while waiting for threadID'
+    ) {
+      throw err;
+    }
+
+    throw new Error('threadID element not found', { cause: err });
+  }
+}
 
 class GmailThreadView {
   #element: HTMLElement;
@@ -549,6 +607,20 @@ class GmailThreadView {
     return this.#syncThreadID || this.getThreadID();
   }
 
+  #getPreviewPaneThreadID(): string | null {
+    if (!this.#isPreviewedThread) return null;
+
+    try {
+      return normalizeThreadID(
+        this.#driver
+          .getPageCommunicator()
+          .getCurrentThreadID(this.#element, true),
+      );
+    } catch {
+      return null;
+    }
+  }
+
   // Follows a similar structure to getThreadIDAsync, but gives up if async work is needed
   getThreadID(): string {
     if (this.#threadID) return this.#threadID;
@@ -560,16 +632,16 @@ class GmailThreadView {
     if (!idElement) throw new Error('threadID element not found');
 
     // the string value can be 'undefined'
-    const syncAttributeValue = idElement.getAttribute('data-thread-perm-id');
-    if (
-      !this.#syncThreadID &&
-      syncAttributeValue &&
-      syncAttributeValue !== 'undefined'
-    ) {
+    const syncAttributeValue = normalizeThreadID(
+      idElement.getAttribute('data-thread-perm-id'),
+    );
+    if (!this.#syncThreadID && syncAttributeValue) {
       this.#syncThreadID = syncAttributeValue;
     }
 
-    let threadID = idElement.getAttribute('data-legacy-thread-id');
+    let threadID = normalizeThreadID(
+      idElement.getAttribute('data-legacy-thread-id'),
+    );
 
     if (!threadID) {
       const err = new Error(
@@ -584,16 +656,19 @@ class GmailThreadView {
 
     if (!threadID) {
       if (this.#isPreviewedThread) {
-        threadID = this.#driver
-          .getPageCommunicator()
-          .getCurrentThreadID(this.#element, true);
+        threadID = normalizeThreadID(
+          this.#driver
+            .getPageCommunicator()
+            .getCurrentThreadID(this.#element, true),
+        );
       } else {
         const params = this.#routeViewDriver
           ? this.#routeViewDriver.getParams()
           : null;
+        const routeThreadID = normalizeThreadID(params?.threadID);
 
-        if (params && typeof params.threadID === 'string') {
-          threadID = params.threadID as string;
+        if (routeThreadID) {
+          threadID = routeThreadID;
         } else {
           const err = new Error('Failed to get id for thread');
 
@@ -604,6 +679,8 @@ class GmailThreadView {
       }
     }
 
+    if (!threadID) throw new Error('Failed to get id for thread');
+
     this.#threadID = threadID;
     return threadID;
   }
@@ -611,23 +688,35 @@ class GmailThreadView {
   async getThreadIDAsync(): Promise<string> {
     if (this.#threadID) return this.#threadID;
 
-    const idElement = this.#driver.selectors.querySelectorByKey(
-      this.#element,
-      'threadView.idElement',
+    const threadIdSource = await waitForThreadIdSource(
+      () =>
+        this.#driver.selectors.querySelectorByKey(
+          this.#element,
+          'threadView.idElement',
+        ),
+      () => this.#getPreviewPaneThreadID(),
+      () => this.#stopper.stopped,
     );
-    if (!idElement) throw new Error('threadID element not found');
+
+    if (typeof threadIdSource === 'string') {
+      this.#threadID = threadIdSource;
+      return threadIdSource;
+    }
+
+    const idElement = threadIdSource;
 
     // the string value can be 'undefined'
-    const syncAttributeValue = idElement.getAttribute('data-thread-perm-id');
-    if (
-      !this.#syncThreadID &&
-      syncAttributeValue &&
-      syncAttributeValue !== 'undefined'
-    ) {
+    const syncAttributeValue = normalizeThreadID(
+      idElement.getAttribute('data-thread-perm-id'),
+    );
+    if (!this.#syncThreadID && syncAttributeValue) {
       this.#syncThreadID = syncAttributeValue;
     }
 
-    this.#threadID = idElement.getAttribute('data-legacy-thread-id');
+    const legacyThreadID = normalizeThreadID(
+      idElement.getAttribute('data-legacy-thread-id'),
+    );
+    this.#threadID = legacyThreadID || this.#getPreviewPaneThreadID();
 
     if (!this.#threadID && this.#syncThreadID) {
       this.#threadID = await this.#driver.getOldGmailThreadIdFromSyncThreadId(
