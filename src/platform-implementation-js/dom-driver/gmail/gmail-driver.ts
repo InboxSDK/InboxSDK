@@ -29,7 +29,9 @@ import GmailMoleViewDriver, {
 import InboxDrawerView from '../inbox/views/inbox-drawer-view';
 import GmailRouteProcessor from './views/gmail-route-view/gmail-route-processor';
 import KeyboardShortcutHelpModifier from './gmail-driver/keyboard-shortcut-help-modifier';
-import openDraftByMessageID from './gmail-driver/open-draft-by-message-id';
+import openDraftByMessageID, {
+  type OpenDraftOptions,
+} from './gmail-driver/open-draft-by-message-id';
 import UserInfo from './gmail-driver/user-info';
 import GmailButterBarDriver from './gmail-butter-bar-driver';
 import trackGmailStyles, {
@@ -593,6 +595,17 @@ class GmailDriver {
     return createLink(this.#gmailRouteProcessor, routeID, params);
   }
 
+  /**
+   * Whether the route currently showing belongs to an extension rather than to
+   * Gmail. Gmail's own router ignores hash params on these routes.
+   */
+  isCurrentRouteCustom(): boolean {
+    return (
+      this.#currentRouteViewDriver?.getRouteType() ===
+      this.#gmailRouteProcessor.RouteTypes.CUSTOM
+    );
+  }
+
   goto(
     routeID: string,
     params: RouteParams | string | null | undefined,
@@ -655,8 +668,11 @@ class GmailDriver {
       .toPromise();
   }
 
-  openDraftByMessageID(messageID: string): Promise<void> {
-    return openDraftByMessageID(this, messageID);
+  openDraftByMessageID(
+    messageID: string,
+    opts?: OpenDraftOptions,
+  ): Promise<void> {
+    return openDraftByMessageID(this, messageID, opts);
   }
 
   createModalViewDriver(options: any): GmailModalViewDriver {

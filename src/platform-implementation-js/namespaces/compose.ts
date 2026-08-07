@@ -6,6 +6,7 @@ import HandlerRegistry from '../lib/handler-registry';
 import type Membrane from '../lib/Membrane';
 import type { Handler } from '../lib/handler-registry';
 import type { Driver } from '../driver-interfaces/driver';
+import { type OpenDraftOptions } from '../dom-driver/gmail/gmail-driver/open-draft-by-message-id';
 interface Members {
   driver: Driver;
   membrane: Membrane;
@@ -53,10 +54,13 @@ export default class Compose {
     return members.membrane.get(composeViewDriver);
   }
 
-  async openDraftByMessageID(messageID: string): Promise<ComposeView> {
+  async openDraftByMessageID(
+    messageID: string,
+    opts?: OpenDraftOptions,
+  ): Promise<ComposeView> {
     const members = get(memberMap, this);
     const newComposePromise = members.composeViewStream.take(1).toPromise();
-    await members.driver.openDraftByMessageID(messageID);
+    await members.driver.openDraftByMessageID(messageID, opts);
     return Kefir.fromPromise(newComposePromise)
       .merge(
         Kefir.later(15 * 1000, null).flatMap(() =>

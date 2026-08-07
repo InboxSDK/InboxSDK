@@ -13,14 +13,37 @@ InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
   const dataUri =
     'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAPCAIAAABr+ngCAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAHVJREFUeNpidNnZwkAuYGKgAFCm2VVKjwxtQF1AxARnkaQTwmBBE9r97BIx2iCAmSFAW5lXHM4HsoHo3ueXmNqQlUGsYYHbhmwqsiswfQR3HQuaEKYRWLWha8ZlBFZt2DVjGoEnCFnwhC3+kB/Y5EmJZoAAAwDdxywx4cg7qwAAAABJRU5ErkJggg==';
 
-  window.openDraftByMessageID = function (messageID) {
-    return inboxSDK.Compose.openDraftByMessageID(messageID);
+  window.openDraftByMessageID = function (messageID, opts) {
+    return inboxSDK.Compose.openDraftByMessageID(messageID, opts);
   };
+
+  // Gmail only parses `?compose=` on its own routes, so the SDK moves to a
+  // native one to open the draft. Going back afterwards is the app's job — the
+  // mole survives the navigation. Pass `routeID` to choose where it lands.
+  async function openDraftFromCustomRoute(messageID) {
+    const routeView = inboxSDK.Router.getCurrentRouteView();
+    const previousRouteID = routeView.getRouteID();
+    const previousParams = routeView.getParams();
+
+    const composeView = await inboxSDK.Compose.openDraftByMessageID(messageID);
+
+    inboxSDK.Router.goto(previousRouteID, previousParams);
+    return composeView;
+  }
+  window.openDraftFromCustomRoute = openDraftFromCustomRoute;
 
   inboxSDK.Compose.registerComposeViewHandler(function (composeView) {
     console.log('thread id', composeView.getThreadID());
 
     window._lastComposeView = composeView;
+
+    // Null for a brand new compose; set when an existing draft is opened, which
+    // is the id openDraftFromCustomRoute needs to reopen it.
+    const initialMessageID = composeView.getInitialMessageID();
+    if (initialMessageID) {
+      window._lastDraftMessageID = initialMessageID;
+      console.log('initial message id', initialMessageID);
+    }
 
     const monkeyImages = [
       chrome.runtime.getURL('monkey.png'),
@@ -272,6 +295,35 @@ InboxSDK.load(2, 'compose-stream-example').then((inboxSDK) => {
     );
     composeView.on('minimized', console.log.bind(console, 'minimized'));
     composeView.on('restored', console.log.bind(console, 'restored'));
+  });
+
+  const OPEN_DRAFT_ROUTE_ID = 'compose-stream-example/open-draft';
+
+  inboxSDK.NavMenu.addNavItem({
+    name: 'Open draft from custom route',
+    iconUrl: dataUri,
+    routeID: OPEN_DRAFT_ROUTE_ID,
+  });
+
+  inboxSDK.Router.handleCustomRoute(OPEN_DRAFT_ROUTE_ID, (customRouteView) => {
+    const input = document.createElement('input');
+    input.size = 40;
+    input.placeholder = 'draft message id';
+    input.value = window._lastDraftMessageID || '';
+
+    const openButton = document.createElement('button');
+    openButton.textContent = 'Open draft';
+    openButton.addEventListener('click', () => {
+      openDraftFromCustomRoute(input.value.trim()).catch((err) => {
+        console.error('failed to open draft', err);
+      });
+    });
+
+    const container = document.createElement('div');
+    container.appendChild(input);
+    container.appendChild(openButton);
+
+    customRouteView.getElement().appendChild(container);
   });
 
   var button = inboxSDK.Toolbars.addToolbarButtonForApp({
