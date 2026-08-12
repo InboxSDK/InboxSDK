@@ -111,6 +111,7 @@ import type {
 } from '../../namespaces/search';
 import isNotNil from '../../../common/isNotNil';
 import censorHTMLtree from '../../../common/censorHTMLtree';
+import SelectorRegistry from '../../lib/dom/selectorRegistry';
 
 /**
  * @internal
@@ -126,6 +127,8 @@ class GmailDriver {
   #logger: Logger;
   #opts: PiOpts;
   #envData: EnvData;
+  /** Resolves selector keys against the bundled defaults plus any overrides. */
+  readonly selectors: SelectorRegistry;
   #customRouteIDs: Set<string> = new Set();
   #customListRouteIDs: Map<string, Function> = new Map();
   #customListSearchStringsToRouteIds: Map<string, string> = new Map();
@@ -183,6 +186,10 @@ class GmailDriver {
     this.#logger = logger;
     this.#opts = opts;
     this.#envData = envData;
+    this.selectors = new SelectorRegistry({
+      overrides: opts.selectorOverrides,
+      onInvalidSelector: opts.onInvalidSelector,
+    });
     this.#page = makePageParserTree(this, document);
     this.#stopper.onValue(() => this.#page.dump());
 

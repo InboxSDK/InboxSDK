@@ -1526,10 +1526,10 @@ class GmailComposeView {
   }
 
   setTitleBarColor(color: string): () => void {
-    // Gmail A/B-renames the `Ht` token; fall back to a structural selector.
-    const buttonParent =
-      this.#element.querySelector('.nH.Hy.aXJ table.cf.Ht td.Hm') ||
-      this.#element.querySelector('.nH.Hy.aXJ table.cf td.Hm');
+    const buttonParent = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'composeView.titleBarTd',
+    );
     if (!buttonParent) {
       // cosmetic; log and skip rather than throw
       this.#driver
@@ -1561,10 +1561,10 @@ class GmailComposeView {
       );
     }
 
-    // Gmail A/B-renames the `Ht` token; fall back to a structural selector.
-    const titleBarTable =
-      this.#element.querySelector('.nH.Hy.aXJ table.cf.Ht') ||
-      this.#element.querySelector('.nH.Hy.aXJ table.cf');
+    const titleBarTable = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'composeView.titleBarTable',
+    );
     if (!titleBarTable) {
       // cosmetic; log and skip rather than throw
       this.#driver
