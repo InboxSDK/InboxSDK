@@ -15,6 +15,7 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import type { ElementWithLifetime } from '../../../lib/dom/make-element-child-stream';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
+import isElementVisible from '../../../../common/isElementVisible';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
 import findParent from '../../../../common/find-parent';
 import reemitClickEvent from '../../../lib/dom/reemitClickEventForReact';
@@ -80,6 +81,7 @@ class GmailMessageView {
   #gmailAttachmentAreaView: GmailAttachmentAreaView | null | undefined;
   #messageLoaded: boolean = false;
   #openMoreMenu: HTMLElement | null | undefined;
+  #loggedMoreMenuFallback: boolean = false;
   #sender: Contact | null | undefined = null;
   #recipients: ContactNameOptional[] | null | undefined = null;
   #recipientEmailAddresses: string[] | null | undefined = null;
@@ -373,22 +375,25 @@ class GmailMessageView {
   }
 
   #getOpenMoreMenu(): HTMLElement | null | undefined {
-    const selector_2022_11_23 =
-      'td > div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]';
-    const selector_2023_11_16 =
-      'div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]';
-
-    const maybeMoreMenu =
-      document.body.querySelector<HTMLElement>(selector_2023_11_16) ||
-      document.body.querySelector<HTMLElement>(selector_2022_11_23);
-    // This will find any message's open more menu! The caller needs to make
-    // sure it belongs to this message!
-    return (
-      maybeMoreMenu ||
-      document.body.querySelector<HTMLElement>(
-        'td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]',
-      )
+    const match = findOpenMoreMenu(
+      this.#element,
+      this.#getMoreButton() ?? null,
     );
+    if (!match) return null;
+
+    if (match.usedFallback && !this.#loggedMoreMenuFallback) {
+      // Log once per view so maintainers learn the dated selectors no longer
+      // match Gmail's markup and can capture a new one.
+      this.#loggedMoreMenuFallback = true;
+      this.#driver
+        .getLogger()
+        .error(new Error('GmailMessageView: More menu found via fallback'), {
+          fallbackSelector: match.selector,
+          menuHtml: censorHTMLtree(match.element),
+        });
+    }
+
+    return match.element;
   }
 
   #closeActiveEmailMenu() {
@@ -995,6 +1000,86 @@ class GmailMessageView {
   getReadyStream() {
     return this.#readyStream;
   }
+}
+
+/**
+ * Finds the currently-open per-message More menu.
+ *
+ * This can still find another message's open More menu! The dated selectors
+ * search the whole document (they match any conversation's menu), and the
+ * fallback tiers are scoped only as narrowly as the `.aHU` conversation
+ * container the message lives in — which also holds the thread's other
+ * messages. The caller needs to make sure the menu belongs to this message;
+ * in practice callers only use the result while this message's More button
+ * reports `aria-expanded=true`, and Gmail keeps at most one of these menus
+ * open at a time.
+ *
+ * Exported for tests; GmailMessageView#getOpenMoreMenu is the production
+ * call site.
+ */
+export function findOpenMoreMenu(
+  messageElement: HTMLElement,
+  moreButton: HTMLElement | null,
+): { element: HTMLElement; usedFallback: boolean; selector: string } | null {
+  const selector_2022_11_23 =
+    'td > div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]';
+  const selector_2023_11_16 =
+    'div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]';
+  const selector_pre_2022 =
+    'td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]';
+
+  // The menu is not a descendant of the message element: Gmail renders it as
+  // an absolutely-positioned element elsewhere in the `.aHU` conversation
+  // container (every dated selector above anchors on `.aHU`). Constrain the
+  // fallback tiers to that ancestor so a visible but unrelated menu elsewhere
+  // in the document (a label picker, the thread-toolbar More menu, a compose
+  // window's menus) can never be returned — misidentifying the menu makes
+  // #updateMoreMenu append the developer's items into the wrong menu and
+  // rewrite that menu's inline position. If the `.aHU` ancestor is missing,
+  // the fallback tiers don't run: failing to find the menu is safer than
+  // guessing.
+  const fallbackScope = messageElement.closest('.aHU');
+
+  const tiers: Array<{
+    root: ParentNode | null;
+    selector: string;
+    usedFallback?: boolean;
+    requireVisible?: boolean;
+  }> = [
+    { root: document.body, selector: selector_2023_11_16 },
+    { root: document.body, selector: selector_2022_11_23 },
+    { root: document.body, selector: selector_pre_2022 },
+    {
+      root: fallbackScope,
+      selector: '.J-M[aria-haspopup=true]',
+      usedFallback: true,
+      requireVisible: true,
+    },
+  ];
+  // Broadest tier: any visible menu-like element in the conversation
+  // container, consulted only while this message's More button reports
+  // itself expanded.
+  if (moreButton?.getAttribute('aria-expanded') === 'true') {
+    tiers.push({
+      root: fallbackScope,
+      selector: 'div[role=menu], .J-M',
+      usedFallback: true,
+      requireVisible: true,
+    });
+  }
+
+  // A later tier is only consulted after every earlier tier has failed to
+  // match, so the exact dated selectors are never shadowed by the broader
+  // fallbacks.
+  for (const { root, selector, usedFallback, requireVisible } of tiers) {
+    if (!root) continue;
+    for (const element of root.querySelectorAll<HTMLElement>(selector)) {
+      if (!requireVisible || isElementVisible(element)) {
+        return { element, usedFallback: !!usedFallback, selector };
+      }
+    }
+  }
+  return null;
 }
 
 function _extractContactInformation(span: HTMLElement) {
