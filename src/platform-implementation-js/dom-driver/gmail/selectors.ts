@@ -13,10 +13,11 @@
  */
 export const GMAIL_SELECTORS = {
   /**
-   * The compose title-bar table, resolved against the compose root.
+   * The compose title-bar table.
    *
    * The `Ht`-less rung matches a superset of the `Ht` one, so it must stay BELOW it:
    * above, it would win always and the specific rung would never run.
+   * Root: compose root.
    */
   'composeView.titleBarTable': [
     '.nH.Hy.aXJ table.cf.Ht',
@@ -24,13 +25,29 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
-   * The title-bar cell holding the compose window buttons — inside the table above,
-   * but resolved against the same compose root.
+   * The title-bar cell holding the compose window buttons; inside the table above,
+   * but resolved independently of it.
+   * Root: compose root.
    */
   'composeView.titleBarTd': [
     '.nH.Hy.aXJ table.cf.Ht td.Hm',
     '.nH.Hy.aXJ table.cf td.Hm',
   ],
+
+  /**
+   * The native title element. Stay at this depth: the code anchors on its PARENT
+   * cell, not on the element itself.
+   * Root: `composeView.titleBarTable`
+   */
+  'composeView.titleBarText': ['div.Hp'],
+
+  /**
+   * The three layers `setTitleBarColor()` paints.
+   * Root: compose root.
+   */
+  'composeView.titleBarColorOuter': ['.nH.Hy.aXJ .pi > .l.o'],
+  'composeView.titleBarColorBody': ['.nH.Hy.aXJ .l.m'],
+  'composeView.titleBarColorBodyInner': ['.nH.Hy.aXJ .l.m > .l.n'],
 
   /**
    * Body of an open message.
