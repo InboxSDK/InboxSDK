@@ -73,6 +73,13 @@ export const GMAIL_SELECTORS = {
   'messageView.moreButton': [
     'tr.acZ div.T-I.J-J5-Ji.aap.L3[role=button][aria-haspopup]',
   ],
+
+  /**
+   * The sender's span in a message header; carries the `email` and `name`
+   * attributes the contact is built from.
+   * Root: message element.
+   */
+  'messageView.senderSpan': ['td.gF span[email]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
