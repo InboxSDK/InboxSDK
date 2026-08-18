@@ -50,6 +50,20 @@ export const GMAIL_SELECTORS = {
    * Root: thread element.
    */
   'threadView.idElement': ['[data-legacy-thread-id]'],
+
+  /**
+   * A message's open "more actions" menu. Gmail renders it outside
+   * the message, so a match may belong to another message.
+   * Root: `document.body`.
+   */
+  'messageView.openMoreMenu': [
+    // 2023-11-16 thread-view redesign
+    'div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]',
+    // 2022-11-23, same shape under an extra `td >`
+    'td > div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]',
+    // pre-2023 `.if` layout
+    'td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]',
+  ],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
