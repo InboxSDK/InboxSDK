@@ -80,6 +80,13 @@ export const GMAIL_SELECTORS = {
    * Root: message element.
    */
   'messageView.senderSpan': ['td.gF span[email]'],
+
+  /**
+   * The message's date element; the full date is read from its `title`,
+   * not its text.
+   * Root: message element.
+   */
+  'messageView.dateElement': ['.ads .gK .g3'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

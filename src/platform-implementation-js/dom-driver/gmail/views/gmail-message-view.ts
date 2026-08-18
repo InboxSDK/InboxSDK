@@ -296,7 +296,10 @@ class GmailMessageView {
   }
 
   getDateString(): string {
-    return querySelector(this.#element, '.ads .gK .g3').title;
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'messageView.dateElement',
+    ).title;
   }
 
   async getDate(): Promise<number | null | undefined> {
