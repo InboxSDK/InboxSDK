@@ -369,8 +369,9 @@ class GmailMessageView {
       return null;
     }
 
-    return this.#element.querySelector<HTMLElement>(
-      'tr.acZ div.T-I.J-J5-Ji.aap.L3[role=button][aria-haspopup]',
+    return this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'messageView.moreButton',
     );
   }
 

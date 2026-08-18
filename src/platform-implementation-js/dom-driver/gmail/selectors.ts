@@ -64,6 +64,15 @@ export const GMAIL_SELECTORS = {
     // pre-2023 `.if` layout
     'td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]',
   ],
+
+  /**
+   * The "more actions" button that opens `messageView.openMoreMenu`.
+   * Only present while the message is expanded.
+   * Root: message element.
+   */
+  'messageView.moreButton': [
+    'tr.acZ div.T-I.J-J5-Ji.aap.L3[role=button][aria-haspopup]',
+  ],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
