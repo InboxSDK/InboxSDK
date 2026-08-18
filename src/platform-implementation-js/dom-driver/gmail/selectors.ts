@@ -87,6 +87,13 @@ export const GMAIL_SELECTORS = {
    * Root: message element.
    */
   'messageView.dateElement': ['.ads .gK .g3'],
+
+  /**
+   * The thread's subject heading. Read for its text, or walked child by child
+   * when it contains emoji images.
+   * Root: thread element.
+   */
+  'threadView.subject': ['.ha h2'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

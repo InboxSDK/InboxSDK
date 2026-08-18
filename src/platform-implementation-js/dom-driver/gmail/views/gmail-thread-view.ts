@@ -517,7 +517,10 @@ class GmailThreadView {
   }
 
   getSubject(): string {
-    var subjectElement = this.#element.querySelector('.ha h2');
+    const subjectElement = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.subject',
+    );
 
     if (!subjectElement) {
       return '';
