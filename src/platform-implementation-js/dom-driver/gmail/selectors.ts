@@ -37,6 +37,13 @@ export const GMAIL_SELECTORS = {
    * Root: message element.
    */
   'messageView.body': ['div.ii.gt', '.adP'],
+
+  /**
+   * Message body carrying the legacy `m<hex>` id class. Narrower than
+   * `messageView.body` on purpose — the `.adP` rung does not carry that class.
+   * Root: message element.
+   */
+  'messageView.legacyIdBody': ['div.ii.gt'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

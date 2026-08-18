@@ -491,7 +491,10 @@ class GmailMessageView {
       return messageId;
     }
 
-    const messageEl = this.#element.querySelector<HTMLElement>('div.ii.gt');
+    const messageEl = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'messageView.legacyIdBody',
+    );
 
     if (!messageEl) {
       const err = new Error('Could not find message id element');
