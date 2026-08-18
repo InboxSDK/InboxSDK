@@ -207,12 +207,14 @@ class GmailMessageView {
     }
 
     try {
-      return querySelector(this.#element, 'div.ii.gt');
+      return this.#driver.selectors.querySelectorByKeyOrFail(
+        this.#element,
+        'messageView.body',
+      );
     } catch (err) {
-      // Keep old fallback selector until we're confident of the new one.
+      // The registry does not report its own misses yet, so keep logging here.
       this.#driver.getLogger().error(err);
-
-      return querySelector(this.#element, '.adP');
+      throw err;
     }
   }
 

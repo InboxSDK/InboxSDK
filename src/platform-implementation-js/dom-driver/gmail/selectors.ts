@@ -31,6 +31,12 @@ export const GMAIL_SELECTORS = {
     '.nH.Hy.aXJ table.cf.Ht td.Hm',
     '.nH.Hy.aXJ table.cf td.Hm',
   ],
+
+  /**
+   * Body of an open message.
+   * Root: message element.
+   */
+  'messageView.body': ['div.ii.gt', '.adP'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
