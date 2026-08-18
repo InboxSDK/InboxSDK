@@ -44,6 +44,12 @@ export const GMAIL_SELECTORS = {
    * Root: message element.
    */
   'messageView.legacyIdBody': ['div.ii.gt'],
+
+  /**
+   * Element carrying the thread's id attributes.
+   * Root: thread element.
+   */
+  'threadView.idElement': ['[data-legacy-thread-id]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
