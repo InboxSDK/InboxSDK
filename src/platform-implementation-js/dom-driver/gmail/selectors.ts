@@ -31,6 +31,69 @@ export const GMAIL_SELECTORS = {
     '.nH.Hy.aXJ table.cf.Ht td.Hm',
     '.nH.Hy.aXJ table.cf td.Hm',
   ],
+
+  /**
+   * Body of an open message.
+   * Root: message element.
+   */
+  'messageView.body': ['div.ii.gt', '.adP'],
+
+  /**
+   * Message body carrying the legacy `m<hex>` id class. Narrower than
+   * `messageView.body` on purpose — the `.adP` rung does not carry that class.
+   * Root: message element.
+   */
+  'messageView.legacyIdBody': ['div.ii.gt'],
+
+  /**
+   * Element carrying the thread's id attributes.
+   * Root: thread element.
+   */
+  'threadView.idElement': ['[data-legacy-thread-id]'],
+
+  /**
+   * A message's open "more actions" menu. Gmail renders it outside
+   * the message, so a match may belong to another message.
+   * Root: `document.body`.
+   */
+  'messageView.openMoreMenu': [
+    // 2023-11-16 thread-view redesign
+    'div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]',
+    // 2022-11-23, same shape under an extra `td >`
+    'td > div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]',
+    // pre-2023 `.if` layout
+    'td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]',
+  ],
+
+  /**
+   * The "more actions" button that opens `messageView.openMoreMenu`.
+   * Only present while the message is expanded.
+   * Root: message element.
+   */
+  'messageView.moreButton': [
+    'tr.acZ div.T-I.J-J5-Ji.aap.L3[role=button][aria-haspopup]',
+  ],
+
+  /**
+   * The sender's span in a message header; carries the `email` and `name`
+   * attributes the contact is built from.
+   * Root: message element.
+   */
+  'messageView.senderSpan': ['td.gF span[email]'],
+
+  /**
+   * The message's date element; the full date is read from its `title`,
+   * not its text.
+   * Root: message element.
+   */
+  'messageView.dateElement': ['.ads .gK .g3'],
+
+  /**
+   * The thread's subject heading. Read for its text, or walked child by child
+   * when it contains emoji images.
+   * Root: thread element.
+   */
+  'threadView.subject': ['.ha h2'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

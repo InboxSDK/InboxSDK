@@ -207,12 +207,14 @@ class GmailMessageView {
     }
 
     try {
-      return querySelector(this.#element, 'div.ii.gt');
+      return this.#driver.selectors.querySelectorByKeyOrFail(
+        this.#element,
+        'messageView.body',
+      );
     } catch (err) {
-      // Keep old fallback selector until we're confident of the new one.
+      // The registry does not report its own misses yet, so keep logging here.
       this.#driver.getLogger().error(err);
-
-      return querySelector(this.#element, '.adP');
+      throw err;
     }
   }
 
@@ -223,7 +225,10 @@ class GmailMessageView {
   getSender(): Contact {
     let sender = this.#sender;
     if (sender) return sender;
-    const senderSpan = querySelector(this.#element, 'td.gF span[email]');
+    const senderSpan = this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'messageView.senderSpan',
+    );
     const emailAddress = senderSpan.getAttribute('email');
     if (!emailAddress) throw new Error('Could not find email address');
     sender = this.#sender = {
@@ -291,7 +296,10 @@ class GmailMessageView {
   }
 
   getDateString(): string {
-    return querySelector(this.#element, '.ads .gK .g3').title;
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'messageView.dateElement',
+    ).title;
   }
 
   async getDate(): Promise<number | null | undefined> {
@@ -367,27 +375,18 @@ class GmailMessageView {
       return null;
     }
 
-    return this.#element.querySelector<HTMLElement>(
-      'tr.acZ div.T-I.J-J5-Ji.aap.L3[role=button][aria-haspopup]',
+    return this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'messageView.moreButton',
     );
   }
 
   #getOpenMoreMenu(): HTMLElement | null | undefined {
-    const selector_2022_11_23 =
-      'td > div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]';
-    const selector_2023_11_16 =
-      'div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]';
-
-    const maybeMoreMenu =
-      document.body.querySelector<HTMLElement>(selector_2023_11_16) ||
-      document.body.querySelector<HTMLElement>(selector_2022_11_23);
     // This will find any message's open more menu! The caller needs to make
     // sure it belongs to this message!
-    return (
-      maybeMoreMenu ||
-      document.body.querySelector<HTMLElement>(
-        'td > div.nH.if > div.nH.aHU div.b7.J-M[aria-haspopup=true]',
-      )
+    return this.#driver.selectors.querySelectorByKey(
+      document.body,
+      'messageView.openMoreMenu',
     );
   }
 
@@ -489,7 +488,10 @@ class GmailMessageView {
       return messageId;
     }
 
-    const messageEl = this.#element.querySelector<HTMLElement>('div.ii.gt');
+    const messageEl = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'messageView.legacyIdBody',
+    );
 
     if (!messageEl) {
       const err = new Error('Could not find message id element');
