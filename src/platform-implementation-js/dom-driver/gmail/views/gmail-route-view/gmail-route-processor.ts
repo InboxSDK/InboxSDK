@@ -75,6 +75,9 @@ export default class GmailRouteProcessor {
       category: this.NativeRouteIDs.LABEL,
       search: this.NativeRouteIDs.SEARCH,
       'advanced-search': this.NativeRouteIDs.SEARCH,
+      // Gmail's filter builder renders a search result list, and threads
+      // opened from it stay under this route name.
+      'create-filter': this.NativeRouteIDs.SEARCH,
       trash: this.NativeRouteIDs.TRASH,
       spam: this.NativeRouteIDs.SPAM,
       apps: this.NativeRouteIDs.SEARCH,
