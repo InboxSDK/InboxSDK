@@ -2,8 +2,6 @@ import autoHtml from 'auto-html';
 import * as Kefir from 'kefir';
 import kefirBus, { Bus } from 'kefir-bus';
 
-import GmailElementGetter from '../gmail-element-getter';
-
 import getInsertBeforeElement from '../../../lib/dom/get-insert-before-element';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
@@ -130,7 +128,8 @@ export default class GmailNavItemView {
     this._orderGroup = orderGroup;
 
     this._isNewLeftNavParent =
-      !GmailElementGetter.shouldAddNavItemsInline() && this._level === 1;
+      !this._driver.elementGetter.shouldAddNavItemsInline() &&
+      this._level === 1;
 
     this._element = this.#setupElement();
   }
@@ -320,7 +319,7 @@ export default class GmailNavItemView {
 
     const element = gmailNavItemView.getElement();
 
-    if (!GmailElementGetter.shouldAddNavItemsInline()) {
+    if (!this._driver.elementGetter.shouldAddNavItemsInline()) {
       querySelector(element, '.TN').style.marginLeft =
         6 * indentationFactor + 'px';
     } else {
@@ -435,7 +434,7 @@ export default class GmailNavItemView {
       vAlign: 'top',
     };
 
-    const container = GmailElementGetter.getLeftNavContainerElement();
+    const container = this._driver.elementGetter.getLeftNavContainerElement();
     if (!container) throw new Error('leftNavContainer not found');
 
     buttonOptions.dropdownShowFunction = (event: any) => {

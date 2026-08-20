@@ -25,7 +25,6 @@ import {
   simulateDrop,
   simulateDragEnd,
 } from '../../../lib/dom/simulate-drag-and-drop';
-import GmailElementGetter from '../gmail-element-getter';
 import setCss from '../../../lib/dom/set-css';
 import waitFor from '../../../lib/wait-for';
 import streamWaitFor from '../../../lib/stream-wait-for';
@@ -566,7 +565,7 @@ class GmailComposeView {
         this.#isFullscreen = true;
       } else {
         const fullScreenContainer =
-          GmailElementGetter.getFullscreenComposeWindowContainer();
+          this.#driver.elementGetter.getFullscreenComposeWindowContainer();
 
         if (!fullScreenContainer) {
           this.#isFullscreen = false;

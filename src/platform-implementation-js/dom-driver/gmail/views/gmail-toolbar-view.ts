@@ -7,7 +7,6 @@ import streamWaitFor from '../../../lib/stream-wait-for';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import insertElementInOrder from '../../../lib/dom/insert-element-in-order';
 import isElementVisible from '../../../../common/isElementVisible';
-import GmailElementGetter from '../gmail-element-getter';
 import ButtonView from '../widgets/buttons/button-view';
 import GmailDropdownView from '../widgets/gmail-dropdown-view';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
@@ -536,7 +535,7 @@ class GmailToolbarView {
   }
 
   _addToOpenMoreMenu(buttonDescriptor: Record<string, any>) {
-    const moreMenu = GmailElementGetter.getActiveMoreMenu();
+    const moreMenu = this._driver.elementGetter.getActiveMoreMenu();
 
     if (!moreMenu) {
       return;

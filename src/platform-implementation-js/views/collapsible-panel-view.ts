@@ -7,7 +7,6 @@ import EventEmitter from '../lib/safe-event-emitter';
 import { AppMenuItemPanelDescriptor } from '../namespaces/app-menu';
 import autoHtml from 'auto-html';
 import querySelector from '../lib/dom/querySelectorOrFail';
-import GmailElementGetter from '../dom-driver/gmail/gmail-element-getter';
 import GmailDriver from '../dom-driver/gmail/gmail-driver';
 import { NavItemDescriptor } from '../dom-driver/gmail/views/gmail-nav-item-view';
 import NavItemView from './nav-item-view';
@@ -176,7 +175,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       return;
     }
 
-    const theme = GmailElementGetter.isDarkTheme()
+    const theme = this.#driver.elementGetter.isDarkTheme()
       ? iconUrl.darkTheme
       : iconUrl.lightTheme;
 

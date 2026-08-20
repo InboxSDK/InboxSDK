@@ -3,7 +3,6 @@ import get from '../../../../common/get-or-fail';
 
 import type GmailDriver from '../gmail-driver';
 import type GmailRouteProcessor from '../views/gmail-route-view/gmail-route-processor';
-import GmailElementGetter from '../gmail-element-getter';
 import GmailRouteView from '../views/gmail-route-view/gmail-route-view';
 import getURLObject from './get-url-object';
 
@@ -90,7 +89,8 @@ export default function setupRouteViewDriverStream(
     // getMainContentElementChangedStream doesn't respect custom views so filter
     // out events from it. This filter is needed if the user is already at a custom
     // view of another InboxSDK instance while this starts up.
-    GmailElementGetter.getMainContentElementChangedStream()
+    driver.elementGetter
+      .getMainContentElementChangedStream()
       .map((_event) => ({
         urlObject: getURLObject(document.location.href),
         type: 'NATIVE',
@@ -106,7 +106,7 @@ export default function setupRouteViewDriverStream(
           urlObject.params[0],
         );
         if (customListRouteId) {
-          const searchInput = GmailElementGetter.getSearchInput();
+          const searchInput = driver.elementGetter.getSearchInput();
           if (!searchInput) throw new Error('Should not happen');
           searchInput.value = '';
 
