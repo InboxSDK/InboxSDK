@@ -20,7 +20,6 @@ import {
 } from './collapsible-panel-view';
 import GmailDriver from '../dom-driver/gmail/gmail-driver';
 import { addCollapsiblePanel } from '../dom-driver/gmail/gmail-driver/add-collapsible-panel';
-import GmailElementGetter from '../dom-driver/gmail/gmail-element-getter';
 import defer from '../../common/defer';
 
 type MessageEvents = {
@@ -88,11 +87,19 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
   static #routeViewDriverStream: ReturnType<
     GmailDriver['getRouteViewDriverStream']
   >;
+  /**
+   * The class-level machinery below runs once per page, not once per app, so it
+   * borrows the first driver it sees. Only use it for page chrome, which is the
+   * same for every app. The setup that starts at module load has no driver yet,
+   * so it waits on {@link AppMenuItemView.#sharedDriverReady} instead.
+   */
+  static #sharedDriver: GmailDriver | undefined;
+  static #sharedDriverReady = defer<GmailDriver>();
   static #menuItemToPanelMap = new Map<HTMLElement, HTMLElement | undefined>();
   static #appMenuItemViews = new Set<AppMenuItemView>();
 
-  static getAllPanels() {
-    const appMenuElement = GmailElementGetter.getAppMenuContainer();
+  static getAllPanels(driver: GmailDriver) {
+    const appMenuElement = driver.elementGetter.getAppMenuContainer();
 
     const nativePanels = appMenuElement?.querySelectorAll<HTMLElement>(
       `.${PANEL_NATIVE_CLASS}`,
@@ -101,8 +108,8 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     return Array.from(nativePanels ?? []);
   }
 
-  static getActivePanel(useSdkActiveSelector = true) {
-    const appMenuElement = GmailElementGetter.getAppMenuContainer();
+  static getActivePanel(driver: GmailDriver, useSdkActiveSelector = true) {
+    const appMenuElement = driver.elementGetter.getAppMenuContainer();
     const { ACTIVE, SDK_ACTIVE } = CollapsiblePanelView.elementCss;
 
     const nativePanel = appMenuElement?.querySelector<HTMLElement>(
@@ -133,15 +140,15 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     return element.classList.contains(NATIVE_CLASS);
   }
 
-  static getAllMenuItems() {
-    const appMenuElement = GmailElementGetter.getAppMenuContainer();
+  static getAllMenuItems(driver: GmailDriver) {
+    const appMenuElement = driver.elementGetter.getAppMenuContainer();
     return Array.from(
       appMenuElement?.querySelectorAll<HTMLElement>(`.${NATIVE_CLASS}`) ?? [],
     );
   }
 
-  static getActiveMenuItem() {
-    const appMenuElement = GmailElementGetter.getAppMenuContainer();
+  static getActiveMenuItem(driver: GmailDriver) {
+    const appMenuElement = driver.elementGetter.getAppMenuContainer();
     const { ACTIVE, SDK_ACTIVE } = GmailAppMenuItemView.elementCss;
 
     const button = appMenuElement?.querySelector<HTMLElement>(
@@ -165,13 +172,13 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
     }
   }
 
-  static #isPanelLess() {
-    const activePanel = AppMenuItemView.getActivePanel(false);
+  static #isPanelLess(driver: GmailDriver) {
+    const activePanel = AppMenuItemView.getActivePanel(driver, false);
     return !activePanel;
   }
-  static #adjustTooltipNub() {
+  static #adjustTooltipNub(driver: GmailDriver) {
     // adjust all menu items' collapsible panel's tooltip nub position
-    const appMenuElement = GmailElementGetter.getAppMenu();
+    const appMenuElement = driver.elementGetter.getAppMenu();
     for (const menuItem of appMenuElement?.querySelectorAll<HTMLElement>(
       `.${NATIVE_CLASS}`,
     ) ?? []) {
@@ -270,7 +277,8 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
   }
   static {
     (async function init() {
-      const gmailAppMenu = await GmailElementGetter.getAppMenuAsync();
+      const driver = await AppMenuItemView.#sharedDriverReady.promise;
+      const gmailAppMenu = await driver.elementGetter.getAppMenuAsync();
       if (!gmailAppMenu) {
         return;
       }
@@ -301,10 +309,12 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
   }
   static {
     AppMenuItemView.#menuItemAddedDeferred.promise.then(() => {
+      const driver = AppMenuItemView.#sharedDriver;
+      if (!driver) return;
       // Set up event listeners we use to control menu UI
       // We intercept some events emitted on Gmail (native) menu items to gain full control of the menu (menu items and panels).
       // Thus, some native event handlers won't be invoked so we replicate the Gmail's behavior by ourselves.
-      const appMenuElement = GmailElementGetter.getAppMenuContainer();
+      const appMenuElement = driver.elementGetter.getAppMenuContainer();
       for (const nativeMenuItem of appMenuElement?.querySelectorAll<HTMLElement>(
         `.${NATIVE_CLASS}:not(.${INBOXSDK_CLASS})`,
       ) ?? []) {
@@ -358,11 +368,13 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
   }
   static {
     AppMenuItemView.#menuItemChangeStream.onValue(async (v) => {
+      const driver = AppMenuItemView.#sharedDriver;
+      if (!driver) return;
       const [type, menuItem, mouseEvent] = v;
       const { HOVER } = GmailAppMenuItemView.elementCss;
 
-      function handleActivate() {
-        const appMenuElement = GmailElementGetter.getAppMenuContainer();
+      const handleActivate = () => {
+        const appMenuElement = driver.elementGetter.getAppMenuContainer();
 
         // deactivate menu items and handle keyboard accessibility
         for (const menuItem_ of appMenuElement?.querySelectorAll<HTMLElement>(
@@ -383,7 +395,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
         // activate panel
         const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
         if (panel) {
-          const otherPanels = AppMenuItemView.getAllPanels().filter(
+          const otherPanels = AppMenuItemView.getAllPanels(driver).filter(
             (p) => p !== panel,
           );
 
@@ -393,14 +405,14 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
           activatePanel(panel);
         }
-      }
+      };
 
       switch (type) {
         case 'mouseenter': {
           const panel = AppMenuItemView.#menuItemToPanelMap.get(menuItem);
-          const activeMenuItem = AppMenuItemView.getActiveMenuItem();
-          const activePanel = AppMenuItemView.getActivePanel();
-          const burgerMenuOpen = GmailElementGetter.isAppBurgerMenuOpen();
+          const activeMenuItem = AppMenuItemView.getActiveMenuItem(driver);
+          const activePanel = AppMenuItemView.getActivePanel(driver);
+          const burgerMenuOpen = driver.elementGetter.isAppBurgerMenuOpen();
 
           // hover-styled panel is displayed for collapsed burger menu
           if (
@@ -453,8 +465,8 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           const isPanelDropdownShown = AppMenuItemView.#isPanelDropdownShown();
           if (isPanelDropdownShown) return;
 
-          const activeMenuItem = AppMenuItemView.getActiveMenuItem();
-          const activePanel = AppMenuItemView.getActivePanel();
+          const activeMenuItem = AppMenuItemView.getActiveMenuItem(driver);
+          const activePanel = AppMenuItemView.getActivePanel(driver);
           const activeMenuItemPanel =
             activeMenuItem &&
             AppMenuItemView.#menuItemToPanelMap.get(activeMenuItem);
@@ -466,7 +478,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           )
             return;
 
-          const burgerMenuOpen = GmailElementGetter.isAppBurgerMenuOpen();
+          const burgerMenuOpen = driver.elementGetter.isAppBurgerMenuOpen();
 
           if (activePanel === activeMenuItemPanel && burgerMenuOpen) return;
 
@@ -500,7 +512,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
           handleActivate();
 
           // handle panel-less mode
-          const isPanelLess = AppMenuItemView.#isPanelLess();
+          const isPanelLess = AppMenuItemView.#isPanelLess(driver);
 
           for (const panel of document.querySelectorAll(
             CollapsiblePanelView.elementSelectors.NATIVE,
@@ -510,11 +522,12 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
               isPanelLess,
             );
           }
-          GmailElementGetter.getAppMenu()?.classList.toggle('aTO', isPanelLess);
-          GmailElementGetter.getAppHeader()?.classList.toggle(
-            'aTO',
-            isPanelLess,
-          );
+          driver.elementGetter
+            .getAppMenu()
+            ?.classList.toggle('aTO', isPanelLess);
+          driver.elementGetter
+            .getAppHeader()
+            ?.classList.toggle('aTO', isPanelLess);
           break;
         }
 
@@ -554,7 +567,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
       if (gmailElement) {
         AppMenuItemView.#menuItemToPanelMap.set(gmailElement, undefined);
-        AppMenuItemView.#adjustTooltipNub();
+        AppMenuItemView.#adjustTooltipNub(this.#driver);
       }
 
       gmailView.on('destroy', () => {
@@ -585,6 +598,10 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       });
     });
 
+    if (!AppMenuItemView.#sharedDriver) {
+      AppMenuItemView.#sharedDriver = driver;
+      AppMenuItemView.#sharedDriverReady.resolve(driver);
+    }
     AppMenuItemView.#setUpRouteViewDriverStream(driver);
     AppMenuItemView.#menuItemAddedDeferred.resolve(undefined);
     AppMenuItemView.#appMenuItemViews.add(this);
@@ -602,9 +619,9 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       ...panelDescriptor,
       className: cx(panelDescriptor.className, {
         [CollapsiblePanelView.elementCss.COLLAPSED]:
-          !GmailElementGetter.isAppBurgerMenuOpen(),
+          !this.#driver.elementGetter.isAppBurgerMenuOpen(),
         [CollapsiblePanelView.elementCss.PANEL_LESS]:
-          AppMenuItemView.#isPanelLess(),
+          AppMenuItemView.#isPanelLess(this.#driver),
       }),
     };
 
@@ -631,7 +648,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
             gmailElement,
             collapsiblePanel.element,
           );
-          AppMenuItemView.#adjustTooltipNub();
+          AppMenuItemView.#adjustTooltipNub(this.#driver);
         }
       });
     }
@@ -663,7 +680,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       gmailView.element &&
         AppMenuItemView.#menuItemToPanelMap.delete(gmailView.element);
       gmailView.remove();
-      AppMenuItemView.#adjustTooltipNub();
+      AppMenuItemView.#adjustTooltipNub(this.#driver);
     });
     AppMenuItemView.#appMenuItemViews.delete(this);
   }

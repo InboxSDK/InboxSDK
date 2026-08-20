@@ -1,8 +1,6 @@
 import waitFor from '../../../lib/wait-for';
 import fakeWindowResize from '../../../lib/fake-window-resize';
-import GmailElementGetter, {
-  MOLE_CONTAINER_SELECTOR,
-} from '../gmail-element-getter';
+import { MOLE_CONTAINER_SELECTOR } from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
 
 /**
@@ -42,7 +40,7 @@ export default function syncMoleSpacerWithRightColumn(driver: GmailDriver) {
   if (root.hasAttribute(INSTALLED_ATTR)) return;
   root.setAttribute(INSTALLED_ATTR, 'true');
 
-  waitFor(() => GmailElementGetter.getCompanionSidebarColumnElement())
+  waitFor(() => driver.elementGetter.getCompanionSidebarColumnElement())
     .then((rightColumn) => {
       let scheduled = false;
       // Coalesce bursts of mutations into a single read+write per frame so we
@@ -53,7 +51,7 @@ export default function syncMoleSpacerWithRightColumn(driver: GmailDriver) {
         requestAnimationFrame(() => {
           scheduled = false;
           try {
-            updateSpacer();
+            updateSpacer(driver);
           } catch (err) {
             driver.getLogger().error(err as Error);
           }
@@ -75,7 +73,7 @@ export default function syncMoleSpacerWithRightColumn(driver: GmailDriver) {
     });
 }
 
-function updateSpacer() {
+function updateSpacer(driver: GmailDriver) {
   // The mole container has two `.jAmAWb` flex spacers: the left one (index 0)
   // and the right one (last).
   const spacers = document.querySelectorAll<HTMLElement>(MOLE_SPACER_SELECTOR);
@@ -84,7 +82,8 @@ function updateSpacer() {
   // compose/thread view has been used. Until it exists there is nothing to size.
   if (!spacer) return;
 
-  const companion = GmailElementGetter.getCompanionSidebarOuterWrapperElement();
+  const companion =
+    driver.elementGetter.getCompanionSidebarOuterWrapperElement();
   // The wrapper stays in the DOM when collapsed (`display: none`); only count
   // it when a companion/SDK panel is actually showing.
   const companionWidth =

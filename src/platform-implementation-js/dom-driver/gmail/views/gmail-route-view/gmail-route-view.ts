@@ -14,7 +14,6 @@ import getInsertBeforeElement from '../../../../lib/dom/get-insert-before-elemen
 import GmailRowListView from '../gmail-row-list-view';
 import GmailThreadView from '../gmail-thread-view';
 import GmailCollapsibleSectionView from '../gmail-collapsible-section-view';
-import GmailElementGetter from '../../gmail-element-getter';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import type GmailDriver from '../../gmail-driver';
 import type GmailRouteProcessor from '../gmail-route-view/gmail-route-processor';
@@ -296,7 +295,7 @@ class GmailRouteView implements RouteViewDriver {
   }
 
   _monitorLeftNavHeight() {
-    var leftNav = GmailElementGetter.getLeftNavHeightElement();
+    var leftNav = this.#driver.elementGetter.getLeftNavHeightElement();
 
     if (!leftNav) {
       return;
@@ -313,11 +312,12 @@ class GmailRouteView implements RouteViewDriver {
   }
 
   _setCustomViewElementHeight() {
-    const leftNav = GmailElementGetter.getLeftNavHeightElement();
-    const gtalkButtons = GmailElementGetter.getGtalkButtons();
+    const leftNav = this.#driver.elementGetter.getLeftNavHeightElement();
+    const gtalkButtons = this.#driver.elementGetter.getGtalkButtons();
     const customViewEl = this._customViewElement;
     if (!leftNav || !customViewEl) throw new Error('Should not happen');
-    const contentSectionElement = GmailElementGetter.getContentSectionElement();
+    const contentSectionElement =
+      this.#driver.elementGetter.getContentSectionElement();
     const contentSectionElementBottomMargin = contentSectionElement
       ? parseInt(getComputedStyle(contentSectionElement).marginBottom, 10)
       : 0;
@@ -425,7 +425,7 @@ class GmailRouteView implements RouteViewDriver {
         }
 
         const previewPaneContainerElement =
-          GmailElementGetter.getPreviewPaneContainerElement();
+          this.#driver.elementGetter.getPreviewPaneContainerElement();
         if (previewPaneContainerElement) {
           return { previewPaneContainerElement };
         }
@@ -463,7 +463,7 @@ class GmailRouteView implements RouteViewDriver {
 
   _setupScrollStream() {
     const SCROLL_DEBOUNCE_MS = 100;
-    const scrollContainer = GmailElementGetter.getScrollContainer();
+    const scrollContainer = this.#driver.elementGetter.getScrollContainer();
     const { scrollTop: cachedScrollTop } = this._cachedRouteData;
 
     if (scrollContainer && this._hasAddedCollapsibleSection) {
@@ -813,10 +813,9 @@ class GmailRouteView implements RouteViewDriver {
 
   // Used to click gmail refresh button in thread lists
   refresh() {
-    var el =
-      GmailElementGetter.getToolbarElement().querySelector<HTMLElement>(
-        'div.T-I.nu',
-      );
+    var el = this.#driver.elementGetter
+      .getToolbarElement()
+      .querySelector<HTMLElement>('div.T-I.nu');
 
     if (el) {
       var prevActive = document.activeElement as HTMLElement;
@@ -845,7 +844,7 @@ class GmailRouteView implements RouteViewDriver {
   }
 
   _getThreadContainerElement() {
-    return GmailElementGetter.getThreadContainerElement();
+    return this.#driver.elementGetter.getThreadContainerElement();
   }
 }
 

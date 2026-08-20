@@ -12,7 +12,6 @@ import idMap from '../../../lib/idMap';
 import SimpleElementView from '../../../views/SimpleElementView';
 import CustomMessageView from '../../../views/conversations/custom-message-view';
 import type GmailDriver from '../gmail-driver';
-import GmailElementGetter from '../gmail-element-getter';
 import GmailMessageView from './gmail-message-view';
 import GmailToolbarView from './gmail-toolbar-view';
 import type { CustomMessageDescriptor } from '../../../views/conversations/custom-message-view';
@@ -993,8 +992,9 @@ class GmailThreadView {
   async #logAddonElementInfo() {
     if (hasLoggedAddonInfo) return;
 
-    function readInfo() {
-      const container = GmailElementGetter.getAddonSidebarContainerElement();
+    const readInfo = () => {
+      const container =
+        this.#driver.elementGetter.getAddonSidebarContainerElement();
       if (!container) return null;
       const isDisplayNone = {
         parent: container.parentElement
@@ -1016,7 +1016,7 @@ class GmailThreadView {
         isDisplayNone,
         size,
       };
-    }
+    };
 
     const eventData = {
       time: {} as any,

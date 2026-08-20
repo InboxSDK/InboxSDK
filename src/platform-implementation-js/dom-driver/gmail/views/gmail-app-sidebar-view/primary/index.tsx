@@ -10,9 +10,7 @@ import ReactDOM from 'react-dom';
 import AppSidebar from '../../../../../driver-common/sidebar/AppSidebar';
 import type { PanelDescriptor } from '../../../../../driver-common/sidebar/AppSidebar';
 import type GmailDriver from '../../../gmail-driver';
-import GmailElementGetter, {
-  COMPANION_SIDEBAR_PANEL_WRAPPER_CLASS,
-} from '../../../gmail-element-getter';
+import { COMPANION_SIDEBAR_PANEL_WRAPPER_CLASS } from '../../../gmail-element-getter';
 import idMap from '../../../../../lib/idMap';
 import incrementName from '../../../../../lib/incrementName';
 import querySelector from '../../../../../lib/dom/querySelectorOrFail';
@@ -44,9 +42,13 @@ class GmailAppSidebarPrimary {
    * There could be multiple InboxSDK instances (and therefore GmailDrivers)
    * talking to this Primary, so we shouldn't privilege the specific GmailDriver
    * that happened to create the Primary. Only use this GmailDriver for
-   * logging-related functionality!
+   * logging-related functionality and for page-chrome lookups, which are the
+   * same for every app!
    */
-  #driver: { getLogger: GmailDriver['getLogger'] };
+  #driver: {
+    getLogger: GmailDriver['getLogger'];
+    elementGetter: GmailDriver['elementGetter'];
+  };
   /**
    * This Primary has an identifier used by the DOM events to specify they're
    * talking to this Primary. This leaves us some room for having multiple
@@ -633,7 +635,7 @@ class GmailAppSidebarPrimary {
     isGlobal: boolean,
   ) {
     const companionSidebarIconContainerEl =
-      GmailElementGetter.getCompanionSidebarIconContainerElement();
+      this.#driver.elementGetter.getCompanionSidebarIconContainerElement();
     if (!companionSidebarIconContainerEl)
       throw new Error(
         'Could not find companion sidebar icon container element',
@@ -682,7 +684,7 @@ class GmailAppSidebarPrimary {
 
   #setupElement() {
     const companionSidebarIconContainerEl =
-      GmailElementGetter.getCompanionSidebarIconContainerElement();
+      this.#driver.elementGetter.getCompanionSidebarIconContainerElement();
     if (!companionSidebarIconContainerEl)
       throw new Error(
         'Could not find companion sidebar icon container element',
@@ -694,7 +696,7 @@ class GmailAppSidebarPrimary {
     );
 
     const companionSidebarOuterWrapper =
-      GmailElementGetter.getCompanionSidebarOuterWrapperElement(
+      this.#driver.elementGetter.getCompanionSidebarOuterWrapperElement(
         this.#companionSidebarContentContainerEl,
       );
 
