@@ -179,7 +179,8 @@ function applyIcon(
   // The clone still holds Gmail's own glyph, which would paint under ours.
   iconEl.replaceChildren();
   iconEl.className = cx(ICON_BASE_CLASS, ICON_CLASS, options.iconClass);
-  iconEl.style.backgroundImage = options.iconUrl
-    ? `url(${JSON.stringify(options.iconUrl)})`
+  // Scale to the 16px box; a consumer icon is rarely already that size.
+  iconEl.style.background = options.iconUrl
+    ? `url(${JSON.stringify(options.iconUrl)}) center / contain no-repeat`
     : '';
 }

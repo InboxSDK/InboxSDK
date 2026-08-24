@@ -149,23 +149,17 @@ InboxSDK.load(1, 'toolbar-example', {
     messageView.addToolbarButton({
       section: 'MORE',
       iconUrl: chrome.runtime.getURL('monkey.png'),
-      title: 'Foo bar',
+      title: 'Save to CRM',
       onClick() {
-        console.log(
-          'message more button click on message from',
-          messageView.getSender().name,
-        );
+        console.log('save to CRM:', messageView.getSender().name);
       },
     });
     messageView.addToolbarButton({
       section: inboxSDK.Conversations.MessageViewToolbarSectionNames.MORE,
       iconUrl: chrome.runtime.getURL('monkey.png'),
-      title: 'Foo bar 2 long title text text text',
+      title: 'Create a task from this message',
       onClick() {
-        console.log(
-          '2 message more button click on message from',
-          messageView.getSender().name,
-        );
+        console.log('create task from:', messageView.getSender().name);
       },
     });
   });
