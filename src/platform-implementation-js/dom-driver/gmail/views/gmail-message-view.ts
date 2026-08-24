@@ -13,6 +13,7 @@ import AttachmentIcon from './gmail-message-view/attachment-icon';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
+import streamWaitFor from '../../../lib/stream-wait-for';
 import type { ElementWithLifetime } from '../../../lib/dom/make-element-child-stream';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
@@ -30,6 +31,9 @@ import type {
 import type { VIEW_STATE } from '../../../views/conversations/message-view';
 
 let hasSeenOldElement = false;
+
+const MORE_MENU_WAIT_TIMEOUT = 5 * 1000;
+const MORE_MENU_WAIT_STEP = 16;
 
 export type MessageViewDriverEventByName = {
   viewStateChange: {
@@ -356,10 +360,10 @@ class GmailMessageView {
         return makeMutationObserverChunkedStream(moreButton, {
           attributes: true,
           attributeFilter: ['aria-expanded'],
-        }).map(() =>
+        }).flatMapLatest(() =>
           moreButton.getAttribute('aria-expanded') === 'true'
-            ? this.#getOpenMoreMenu()
-            : null,
+            ? this.#streamOpenMoreMenu()
+            : Kefir.constant(null),
         );
       })
       .takeUntilBy(this.#stopper)
@@ -379,6 +383,24 @@ class GmailMessageView {
       this.#element,
       'messageView.moreButton',
     );
+  }
+
+  /**
+   * Gmail renders the menu a frame after flipping `aria-expanded`, so a
+   * synchronous lookup misses it. Older layouts keep the synchronous path.
+   */
+  #streamOpenMoreMenu(): Kefir.Observable<HTMLElement | null, unknown> {
+    const openMoreMenu = this.#getOpenMoreMenu();
+
+    if (openMoreMenu) {
+      return Kefir.constant(openMoreMenu);
+    }
+
+    return streamWaitFor(
+      () => this.#getOpenMoreMenu(),
+      MORE_MENU_WAIT_TIMEOUT,
+      MORE_MENU_WAIT_STEP,
+    ).flatMapErrors(() => Kefir.constant(null));
   }
 
   #getOpenMoreMenu(): HTMLElement | null | undefined {
