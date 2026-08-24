@@ -1,6 +1,5 @@
 import sortBy from 'lodash/sortBy';
 import once from 'lodash/once';
-import autoHtml from 'auto-html';
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import type { Bus } from 'kefir-bus';
@@ -10,6 +9,10 @@ import GmailAttachmentAreaView from './gmail-attachment-area-view';
 import GmailAttachmentCardView from './gmail-attachment-card-view';
 import getUpdatedContact from './gmail-message-view/get-updated-contact';
 import AttachmentIcon from './gmail-message-view/attachment-icon';
+import {
+  createMoreMenuDivider,
+  createMoreMenuItem,
+} from './gmail-message-view/more-menu-item';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
@@ -28,7 +31,10 @@ import type {
   MessageView,
   ThreadView,
 } from '../../../../inboxsdk';
-import type { VIEW_STATE } from '../../../views/conversations/message-view';
+import type {
+  MessageViewToolbarButtonDescriptor,
+  VIEW_STATE,
+} from '../../../views/conversations/message-view';
 
 let hasSeenOldElement = false;
 
@@ -76,7 +82,7 @@ class GmailMessageView {
   #eventStream: Bus<MessageViewDriverEvents, unknown> = kefirBus();
   #stopper = kefirStopper();
   #threadViewDriver: GmailThreadView;
-  #moreMenuItemDescriptors: Array<Record<string, any>>;
+  #moreMenuItemDescriptors: Array<MessageViewToolbarButtonDescriptor>;
   #moreMenuAddedElements: Array<HTMLElement>;
   #replyElementStream: Kefir.Observable<ElementWithLifetime, unknown>;
   #readyStream: Kefir.Observable<null, unknown>;
@@ -332,7 +338,7 @@ class GmailMessageView {
     gmailAttachmentAreaView.addButtonToDownloadAllArea(options);
   }
 
-  addMoreMenuItem(options: Record<string, any>) {
+  addMoreMenuItem(options: MessageViewToolbarButtonDescriptor) {
     this.#moreMenuItemDescriptors = sortBy(
       this.#moreMenuItemDescriptors.concat([options]),
       (o) => o.orderHint,
@@ -431,39 +437,26 @@ class GmailMessageView {
     if (openMoreMenu && this.#moreMenuItemDescriptors.length) {
       const originalHeight = openMoreMenu.offsetHeight;
       const originalWidth = openMoreMenu.offsetWidth;
-      const dividerEl = document.createElement('div');
-      dividerEl.className = 'J-Kh';
+      const dividerEl = createMoreMenuDivider(openMoreMenu);
 
       this.#moreMenuAddedElements.push(dividerEl);
 
       openMoreMenu.appendChild(dividerEl);
 
       this.#moreMenuItemDescriptors.forEach((options) => {
-        const itemEl = document.createElement('div');
-        itemEl.className = 'J-N';
-        itemEl.setAttribute('role', 'menuitem');
-        itemEl.innerHTML = autoHtml`<div class="J-N-Jz">${options.title}</div>`;
-        itemEl.addEventListener('mouseenter', () =>
-          itemEl.classList.add('J-N-JT'),
-        );
-        itemEl.addEventListener('mouseleave', () =>
-          itemEl.classList.remove('J-N-JT'),
-        );
-        itemEl.addEventListener('click', () => {
+        const itemEl = createMoreMenuItem(openMoreMenu, options);
+
+        itemEl.addEventListener('click', (event) => {
           this.#closeActiveEmailMenu();
 
-          options.onClick();
+          options.onClick(event);
         });
+        itemEl.addEventListener('keydown', (event) => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
 
-        if (options.iconUrl || options.iconClass) {
-          const iconEl = document.createElement('img');
-          iconEl.className = `f4 J-N-JX inboxsdk__message_more_icon ${
-            options.iconClass || ''
-          }`;
-          iconEl.src = options.iconUrl || 'images/cleardot.gif';
-          const insertionPoint = itemEl.firstElementChild;
-          if (insertionPoint) insertionPoint.appendChild(iconEl);
-        }
+          event.preventDefault();
+          itemEl.click();
+        });
 
         this.#moreMenuAddedElements.push(itemEl);
 
