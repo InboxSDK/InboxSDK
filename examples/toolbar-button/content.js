@@ -1,7 +1,20 @@
 import * as InboxSDK from '@inboxsdk/core';
 
+// Gmail's bundled rungs for the message more menu no longer match, so this
+// example supplies its own rather than waiting for an SDK release. Measured
+// 2026-08-24; aria-expanded is deliberately absent from the button rung,
+// because Gmail only adds it once the menu has been opened.
+var selectorOverrides = {
+  'messageView.moreButton': ['button.Wsq5Cf'],
+  'messageView.openMoreMenu': ['div.tB5Jxf-M-X-ql-Kq ul.aqdrmf-Kf'],
+};
+
 InboxSDK.load(1, 'toolbar-example', {
   appIconUrl: chrome.runtime.getURL('monkey.png'),
+  selectorOverrides: selectorOverrides,
+  onInvalidSelector: function (key, selector, err) {
+    console.warn('dropped an invalid override', key, selector, err);
+  },
 }).then(function (inboxSDK) {
   window._sdk = inboxSDK;
 
