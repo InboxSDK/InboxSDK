@@ -10,6 +10,7 @@ import delay from 'pdelay';
 import setupRouteViewDriverStream from './setup-route-view-driver-stream';
 
 import GmailRouteProcessor from '../views/gmail-route-view/gmail-route-processor';
+import GmailElementGetter from '../gmail-element-getter';
 import makeMutationEventInjector from '../../../../../test/lib/makeElementIntoEventEmitter';
 import MockMutationObserver from '../../../../../test/lib/mock-mutation-observer';
 
@@ -36,7 +37,7 @@ afterEach(() => {
 });
 
 function makeMockDriver(): any {
-  return {
+  const driver: any = {
     getStopper: _.constant(stopper),
     getCustomRouteIDs: _.constant(new Set()),
     getCustomListRouteIDs: _.constant(new Map()),
@@ -45,6 +46,8 @@ function makeMockDriver(): any {
     showNativeRouteView: jest.fn(),
     showCustomThreadList: jest.fn(),
   };
+  driver.elementGetter = new GmailElementGetter(driver);
+  return driver;
 }
 
 test('role=main changes are seen', async () => {

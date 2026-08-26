@@ -1,9 +1,9 @@
-import GmailElementGetter from '../gmail-element-getter';
 import fakeWindowResize from '../../../lib/fake-window-resize';
 import GmailDriver from '../gmail-driver';
 
-export default function showNativeRouteView(_gmailDriver: GmailDriver) {
-  const contentSectionElement = GmailElementGetter.getContentSectionElement();
+export default function showNativeRouteView(gmailDriver: GmailDriver) {
+  const contentSectionElement =
+    gmailDriver.elementGetter.getContentSectionElement();
   if (!contentSectionElement) {
     return;
   }

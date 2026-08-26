@@ -1,4 +1,5 @@
 import showCustomThreadList from './show-custom-thread-list';
+import GmailElementGetter from '../gmail-element-getter';
 
 import * as GSRP from '../gmail-sync-response-processor';
 
@@ -76,6 +77,7 @@ class ShowCustomThreadListTester {
     start: number;
     getOriginalSearchResponse: () => Promise<string>;
   }) {
+    this._driver.elementGetter = new GmailElementGetter(this._driver);
     this._onActivate = options.onActivate;
 
     this._threadIdsToRfcIds = new Map(options.threadAndRfcIds);

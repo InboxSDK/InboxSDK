@@ -1,14 +1,14 @@
 import { AppMenuItemDescriptor } from '../../../namespaces/app-menu';
 import { GmailAppMenuItemView } from '../views/gmail-app-menu-item-view';
 import GmailDriver from '../gmail-driver';
-import GmailElementGetter from '../gmail-element-getter';
 import Logger from '../../../lib/logger';
 
 export async function addAppMenuItem(
   driver: GmailDriver,
   menuItemDescriptor: AppMenuItemDescriptor,
 ) {
-  const appMenuInjectionContainer = await GmailElementGetter.getAppMenuAsync();
+  const appMenuInjectionContainer =
+    await driver.elementGetter.getAppMenuAsync();
 
   const gmailAppMenuItemView = new GmailAppMenuItemView(
     driver,
