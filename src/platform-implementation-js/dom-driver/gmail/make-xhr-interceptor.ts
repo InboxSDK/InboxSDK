@@ -52,6 +52,42 @@ export default function makeXhrInterceptor(): {
       }),
     rawInterceptStream
       .filter(function (detail) {
+        return detail.type === 'emailScheduling';
+      })
+      .map(function (detail) {
+        if (detail.draftID) {
+          return detail;
+        } else {
+          // TODO is this block dead code?
+          var body = parse(detail.body);
+          return {
+            type: 'emailScheduling',
+            composeId: body.composeid,
+            draft: body.draft,
+          };
+        }
+      }),
+    rawInterceptStream
+      .filter(function (detail) {
+        return detail.type === 'emailScheduled';
+      })
+      .map(function (detail) {
+        if (detail.draftID) {
+          return detail;
+        } else {
+          // TODO is this block dead code?
+          var body = parse(detail.originalSendBody);
+          var response = detail.responseText;
+          return {
+            type: 'emailScheduled',
+            composeId: body.composeid,
+            draft: body.draft,
+            response: response,
+          };
+        }
+      }),
+    rawInterceptStream
+      .filter(function (detail) {
         return detail.type === 'emailDraftSaveSending';
       })
       .map(function (detail) {
