@@ -60,6 +60,12 @@ class GmailAppSidebarPrimary {
   #instanceIdsToDescriptors = new Map<string, SidebarPanelEvent>();
   #threadSidebarComponent: AppSidebar | null | undefined = null;
   #threadIconArea: HTMLElement | null | undefined = null;
+  /**
+   * Set while addCompanionThreadIconArea is still waiting for Gmail's tablist,
+   * during which the icon area isn't in the DOM yet. Lets later panels reuse
+   * the pending icon area instead of creating a duplicate.
+   */
+  #pendingThreadIconArea: HTMLElement | null = null;
   #globalIconArea: HTMLElement | null | undefined = null;
   #globalButtonContainers: Map<string, HTMLElement> = new Map();
   #threadButtonContainers: Map<string, HTMLElement> = new Map();
@@ -793,18 +799,30 @@ class GmailAppSidebarPrimary {
           let threadIconArea = (this.#threadIconArea =
             companionSidebarIconContainerEl.querySelector<HTMLElement>(
               '.sidebar_thread_iconArea',
-            ));
+            ) ?? this.#pendingThreadIconArea);
 
           if (!threadIconArea) {
-            threadIconArea = this.#threadIconArea =
-              document.createElement('div');
-            threadIconArea.className = idMap('sidebar_iconArea');
-            threadIconArea.classList.add('sidebar_thread_iconArea');
+            const newIconArea =
+              (threadIconArea =
+              this.#threadIconArea =
+                document.createElement('div'));
+            newIconArea.className = idMap('sidebar_iconArea');
+            newIconArea.classList.add('sidebar_thread_iconArea');
+            this.#pendingThreadIconArea = newIconArea;
             addCompanionThreadIconArea(
               this.#driver.getLogger(),
-              threadIconArea,
+              newIconArea,
               companionSidebarIconContainerEl,
-            );
+              () => this.#stopper.stopped,
+            )
+              .catch((err) => {
+                this.#driver.getLogger().error(err);
+              })
+              .finally(() => {
+                if (this.#pendingThreadIconArea === newIconArea) {
+                  this.#pendingThreadIconArea = null;
+                }
+              });
           }
 
           this.#addButton(threadIconArea, event, false);
