@@ -26,7 +26,6 @@ import BasicButtonViewController, {
 } from '../../../widgets/buttons/basic-button-view-controller';
 import { type ButtonDescriptor } from '../../../../inboxsdk';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
-import waitFor from '../../../lib/wait-for';
 
 let hasLoggedAddonInfo = false;
 
@@ -40,51 +39,172 @@ export function normalizeThreadID(threadID: unknown): string | null {
     : null;
 }
 
-export async function waitForThreadIdSource(
-  getIdElement: () => HTMLElement | null,
+type ElementThreadIDs = {
+  legacyThreadID: unknown;
+  permanentThreadID: unknown;
+};
+
+type ThreadIDResult = {
+  threadID: string;
+  permanentThreadID: string | null;
+};
+
+type PermanentIDConversionState =
+  | { status: 'not-started' }
+  | { status: 'pending'; permanentThreadID: string }
+  | {
+      status: 'fulfilled';
+      permanentThreadID: string;
+      threadID: string | null;
+    }
+  | { status: 'rejected'; permanentThreadID: string; error: unknown };
+
+export function waitForThreadID(
+  getElementThreadIDs: () => ElementThreadIDs,
   getFallbackThreadID: () => string | null,
+  convertPermanentThreadID: (threadID: string) => Promise<string | null>,
   isDestroyed: () => boolean,
   timeout = THREAD_ID_WAIT_TIMEOUT,
   steptime = 50,
-): Promise<HTMLElement | string> {
-  try {
-    return await waitFor(
-      () => {
+): Promise<ThreadIDResult> {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    let timeoutTimer: ReturnType<typeof setTimeout> | undefined;
+    let conversionState: PermanentIDConversionState = {
+      status: 'not-started',
+    };
+
+    const cleanup = () => {
+      if (timeoutTimer) clearTimeout(timeoutTimer);
+      if (retryTimer) clearTimeout(retryTimer);
+    };
+    const resolveOnce = (result: ThreadIDResult) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve(result);
+    };
+    const rejectOnce = (error: unknown) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(error);
+    };
+    timeoutTimer = setTimeout(
+      () => rejectOnce(new Error('threadID element not found')),
+      timeout,
+    );
+
+    const startPermanentIDConversion = (permanentThreadID: string) => {
+      conversionState = { status: 'pending', permanentThreadID };
+
+      let conversionPromise: Promise<string | null>;
+      try {
+        conversionPromise = convertPermanentThreadID(permanentThreadID);
+      } catch (error) {
+        conversionState = {
+          status: 'rejected',
+          permanentThreadID,
+          error,
+        };
+        return;
+      }
+
+      void conversionPromise.then(
+        (threadID) => {
+          if (settled) return;
+          conversionState = {
+            status: 'fulfilled',
+            permanentThreadID,
+            threadID: normalizeThreadID(threadID),
+          };
+        },
+        (error) => {
+          if (settled) return;
+          conversionState = {
+            status: 'rejected',
+            permanentThreadID,
+            error,
+          };
+        },
+      );
+    };
+
+    const check = () => {
+      if (settled) return;
+
+      try {
         if (isDestroyed()) {
           throw new Error('thread view destroyed while waiting for threadID');
         }
 
-        const idElement = getIdElement();
-        if (
-          idElement &&
-          (normalizeThreadID(idElement.getAttribute('data-legacy-thread-id')) ||
-            normalizeThreadID(idElement.getAttribute('data-thread-perm-id')))
-        ) {
-          return idElement;
+        const elementThreadIDs = getElementThreadIDs();
+        const legacyThreadID = normalizeThreadID(
+          elementThreadIDs.legacyThreadID,
+        );
+        const permanentThreadID = normalizeThreadID(
+          elementThreadIDs.permanentThreadID,
+        );
+        const conversionPermanentThreadID =
+          conversionState.status === 'not-started'
+            ? null
+            : conversionState.permanentThreadID;
+        const knownPermanentThreadID =
+          permanentThreadID || conversionPermanentThreadID;
+
+        if (legacyThreadID) {
+          resolveOnce({
+            threadID: legacyThreadID,
+            permanentThreadID: knownPermanentThreadID,
+          });
+          return;
         }
 
         try {
           const fallbackThreadID = normalizeThreadID(getFallbackThreadID());
-          if (fallbackThreadID) return fallbackThreadID;
+          if (fallbackThreadID) {
+            resolveOnce({
+              threadID: fallbackThreadID,
+              permanentThreadID: knownPermanentThreadID,
+            });
+            return;
+          }
         } catch {
           // The page communicator can be unavailable while Gmail builds the view.
         }
 
-        return null;
-      },
-      timeout,
-      steptime,
-    );
-  } catch (err) {
-    if (
-      err instanceof Error &&
-      err.message === 'thread view destroyed while waiting for threadID'
-    ) {
-      throw err;
-    }
+        if (
+          permanentThreadID &&
+          conversionState.status === 'not-started'
+        ) {
+          startPermanentIDConversion(permanentThreadID);
+        }
 
-    throw new Error('threadID element not found', { cause: err });
-  }
+        if (conversionState.status === 'fulfilled') {
+          if (!conversionState.threadID) {
+            throw new Error('Failed to get id for thread');
+          }
+          resolveOnce({
+            threadID: conversionState.threadID,
+            permanentThreadID: conversionState.permanentThreadID,
+          });
+          return;
+        }
+
+        if (conversionState.status === 'rejected') {
+          throw conversionState.error;
+        }
+      } catch (error) {
+        rejectOnce(error);
+        return;
+      }
+
+      retryTimer = setTimeout(check, steptime);
+    };
+
+    retryTimer = setTimeout(check, 1);
+  });
 }
 
 class GmailThreadView {
@@ -688,44 +808,40 @@ class GmailThreadView {
   async getThreadIDAsync(): Promise<string> {
     if (this.#threadID) return this.#threadID;
 
-    const threadIdSource = await waitForThreadIdSource(
-      () =>
-        this.#driver.selectors.querySelectorByKey(
-          this.#element,
-          'threadView.idElement',
-        ),
+    const { threadID, permanentThreadID } = await waitForThreadID(
+      () => {
+        const legacyIdElement =
+          this.#driver.selectors.querySelectorByKey(
+            this.#element,
+            'threadView.idElement',
+          );
+        const permanentIdElement =
+          this.#driver.selectors.querySelectorByKey(
+            this.#element,
+            'threadView.permanentIdElement',
+          );
+
+        return {
+          legacyThreadID: legacyIdElement?.getAttribute(
+            'data-legacy-thread-id',
+          ),
+          permanentThreadID: permanentIdElement?.getAttribute(
+            'data-thread-perm-id',
+          ),
+        };
+      },
       () => this.#getPreviewPaneThreadID(),
+      (syncThreadID) =>
+        this.#driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID),
       () => this.#stopper.stopped,
     );
 
-    if (typeof threadIdSource === 'string') {
-      this.#threadID = threadIdSource;
-      return threadIdSource;
+    if (!this.#syncThreadID && permanentThreadID) {
+      this.#syncThreadID = permanentThreadID;
     }
 
-    const idElement = threadIdSource;
-
-    // the string value can be 'undefined'
-    const syncAttributeValue = normalizeThreadID(
-      idElement.getAttribute('data-thread-perm-id'),
-    );
-    if (!this.#syncThreadID && syncAttributeValue) {
-      this.#syncThreadID = syncAttributeValue;
-    }
-
-    const legacyThreadID = normalizeThreadID(
-      idElement.getAttribute('data-legacy-thread-id'),
-    );
-    this.#threadID = legacyThreadID || this.#getPreviewPaneThreadID();
-
-    if (!this.#threadID && this.#syncThreadID) {
-      this.#threadID = await this.#driver.getOldGmailThreadIdFromSyncThreadId(
-        this.#syncThreadID,
-      );
-    }
-
-    if (this.#threadID) return this.#threadID;
-    else throw new Error('Failed to get id for thread');
+    this.#threadID = threadID;
+    return threadID;
   }
 
   addLabel(): SimpleElementView {
