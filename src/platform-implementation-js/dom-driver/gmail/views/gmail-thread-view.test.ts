@@ -220,7 +220,7 @@ describe('waitForThreadID', () => {
       waitForThreadID(
         getIDs,
         () => null,
-        () => new Promise<string>(() => {}),
+        () => new Promise<string>(() => undefined),
         () => isDestroyed,
         50,
         1,
@@ -254,7 +254,7 @@ describe('waitForThreadID', () => {
       waitForThreadID(
         () => getElementThreadIDs(root),
         () => null,
-        () => new Promise<string>(() => {}),
+        () => new Promise<string>(() => undefined),
         () => false,
         5,
         1,

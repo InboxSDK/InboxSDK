@@ -698,7 +698,7 @@ describe('thread response diagnostics', () => {
       'data-inboxsdk-thread-diagnostics',
       'true',
     );
-    jest.mocked(injectedLogger.error).mockImplementationOnce(() => {});
+    jest.mocked(injectedLogger.error).mockImplementationOnce(() => undefined);
 
     await ajax(mainFrame, {
       method: 'POST',

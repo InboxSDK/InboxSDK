@@ -86,7 +86,6 @@ export function waitForThreadID(
   return new Promise((resolve, reject) => {
     let settled = false;
     let retryTimer: ReturnType<typeof setTimeout> | undefined;
-    let timeoutTimer: ReturnType<typeof setTimeout> | undefined;
     let conversionState: PermanentIDConversionState = {
       status: 'not-started',
     };
@@ -107,7 +106,7 @@ export function waitForThreadID(
       cleanup();
       reject(error);
     };
-    timeoutTimer = setTimeout(
+    const timeoutTimer = setTimeout(
       () => rejectOnce(new Error('threadID element not found')),
       timeout,
     );
