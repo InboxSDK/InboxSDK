@@ -56,9 +56,7 @@ afterEach(() => {
   ajaxInterceptEvents.length = 0;
   jest.mocked(injectedLogger.error).mockClear();
   jest.mocked(injectedLogger.eventSdkPassive).mockClear();
-  document.documentElement.removeAttribute(
-    'data-inboxsdk-thread-diagnostics',
-  );
+  document.documentElement.removeAttribute('data-inboxsdk-thread-diagnostics');
 });
 
 describe('sync api', () => {
@@ -603,8 +601,7 @@ test('cv:2022-09-09 reply draft 2 sent', async () => {
 });
 
 describe('thread response diagnostics', () => {
-  const path =
-    'https://mail.google.com/sync/u/0/i/fd?diagnostics-test=true';
+  const path = 'https://mail.google.com/sync/u/0/i/fd?diagnostics-test=true';
   const responseMarker = 'response-marker-\u2603';
   const headerMarker = 'header-marker';
   const malformedPath =
@@ -728,9 +725,7 @@ describe('thread response diagnostics', () => {
       parsedMessageCount: 0,
     });
     expect((error as Error).message).not.toContain(malformedResponseMarker);
-    expect((error as Error).stack || '').not.toContain(
-      malformedResponseMarker,
-    );
+    expect((error as Error).stack || '').not.toContain(malformedResponseMarker);
     expect(JSON.stringify(error)).not.toContain(malformedResponseMarker);
     expect(JSON.stringify(error)).not.toContain(headerMarker);
   });

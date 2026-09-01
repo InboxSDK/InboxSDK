@@ -191,10 +191,7 @@ export function waitForThreadID(
           // The page communicator can be unavailable while Gmail builds the view.
         }
 
-        if (
-          permanentThreadID &&
-          conversionState.status === 'not-started'
-        ) {
+        if (permanentThreadID && conversionState.status === 'not-started') {
           startPermanentIDConversion(permanentThreadID);
         }
 
@@ -902,16 +899,14 @@ class GmailThreadView {
     try {
       const { threadID, permanentThreadID, source } = await waitForThreadID(
         () => {
-          const legacyIdElement =
-            this.#driver.selectors.querySelectorByKey(
-              this.#element,
-              'threadView.idElement',
-            );
-          const permanentIdElement =
-            this.#driver.selectors.querySelectorByKey(
-              this.#element,
-              'threadView.permanentIdElement',
-            );
+          const legacyIdElement = this.#driver.selectors.querySelectorByKey(
+            this.#element,
+            'threadView.idElement',
+          );
+          const permanentIdElement = this.#driver.selectors.querySelectorByKey(
+            this.#element,
+            'threadView.permanentIdElement',
+          );
 
           return {
             legacyThreadID: legacyIdElement?.getAttribute(

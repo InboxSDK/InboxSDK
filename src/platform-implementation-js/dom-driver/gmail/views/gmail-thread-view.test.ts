@@ -60,9 +60,7 @@ function makeThreadView(
 }
 
 afterEach(() => {
-  document.documentElement.removeAttribute(
-    'data-inboxsdk-thread-diagnostics',
-  );
+  document.documentElement.removeAttribute('data-inboxsdk-thread-diagnostics');
 });
 
 describe('normalizeThreadID', () => {
@@ -269,9 +267,7 @@ describe('waitForThreadID', () => {
     const permanentIdElement = document.createElement('div');
     permanentIdElement.dataset.threadPermId = 'thread-f:123';
     root.append(legacyIdElement, permanentIdElement);
-    const convertPermanentThreadID = jest.fn(
-      async () => '0123456789abcdef',
-    );
+    const convertPermanentThreadID = jest.fn(async () => '0123456789abcdef');
 
     await expect(
       waitForThreadID(
@@ -297,9 +293,7 @@ describe('GmailThreadView thread IDs', () => {
     const idElement = document.createElement('h2');
     idElement.dataset.threadPermId = 'thread-f:123';
     root.append(idElement);
-    const convertPermanentThreadID = jest.fn(
-      async () => '0123456789abcdef',
-    );
+    const convertPermanentThreadID = jest.fn(async () => '0123456789abcdef');
     const { view } = makeThreadView(root, convertPermanentThreadID);
 
     await expect(view.getThreadIDAsync()).resolves.toBe('0123456789abcdef');
@@ -313,10 +307,7 @@ describe('GmailThreadView thread IDs', () => {
     const idElement = document.createElement('h2');
     idElement.dataset.threadPermId = 'thread-f:123';
     root.append(idElement);
-    const { view } = makeThreadView(
-      root,
-      async () => '0123456789abcdef',
-    );
+    const { view } = makeThreadView(root, async () => '0123456789abcdef');
 
     expect(() => view.getThreadID()).toThrow('threadID element not found');
 
