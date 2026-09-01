@@ -618,11 +618,24 @@ export function setupGmailInterceptorOnFrames(
         },
 
         originalResponseTextLogger(connection) {
-          if (connection.status === 200) {
+          let parserSucceeded = false;
+          let parsedThreadCount = 0;
+          let parsedMessageCount = 0;
+
+          try {
+            if (connection.status !== 200) return;
+
             const threads =
               GmailSyncResponseProcessor.extractThreadsFromThreadResponse(
                 connection.originalResponseText,
               );
+            parserSucceeded = true;
+            parsedThreadCount = threads.length;
+            parsedMessageCount = threads.reduce(
+              (count, thread) =>
+                count + thread.extraMetaData.syncMessageData.length,
+              0,
+            );
             messageMetadataHolder.add(
               threads.map((syncThread) => ({
                 syncThreadID: syncThread.syncThreadID,
@@ -635,6 +648,26 @@ export function setupGmailInterceptorOnFrames(
                 ),
               })) as any,
             );
+          } finally {
+            if (
+              document.documentElement?.getAttribute(
+                'data-inboxsdk-thread-diagnostics',
+              ) === 'true'
+            ) {
+              logger.eventSdkPassive(
+                'gmailSync.threadResponse',
+                {
+                  httpStatus: connection.status,
+                  responseByteLength: new TextEncoder().encode(
+                    connection.originalResponseText || '',
+                  ).byteLength,
+                  parserSucceeded,
+                  parsedThreadCount,
+                  parsedMessageCount,
+                },
+                true,
+              );
+            }
           }
         },
       });

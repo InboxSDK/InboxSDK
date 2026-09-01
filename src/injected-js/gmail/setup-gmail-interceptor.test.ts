@@ -7,11 +7,11 @@ jest.mock('../injected-logger', () => {
       console.error(err, details);
       throw err;
     },
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    eventSdkPassive() {},
+    eventSdkPassive: jest.fn(),
   };
 });
 
+import * as injectedLogger from '../injected-logger';
 import _ajax from '../../common/ajax';
 import type { AjaxOpts, AjaxResponse } from '../../common/ajax';
 
@@ -54,6 +54,10 @@ Kefir.fromEvents<{ detail: any }, unknown>(
 
 afterEach(() => {
   ajaxInterceptEvents.length = 0;
+  jest.mocked(injectedLogger.eventSdkPassive).mockClear();
+  document.documentElement.removeAttribute(
+    'data-inboxsdk-thread-diagnostics',
+  );
 });
 
 describe('sync api', () => {
@@ -595,6 +599,76 @@ test('cv:2022-09-09 reply draft 2 sent', async () => {
       type: 'emailSent',
     },
   ]);
+});
+
+describe('thread response diagnostics', () => {
+  const path =
+    'https://mail.google.com/sync/u/0/i/fd?diagnostics-test=true';
+  const responseMarker = 'response-marker-\u2603';
+  const headerMarker = 'header-marker';
+  const responseBody = JSON.stringify({
+    2: [
+      [
+        null,
+        'thread-placeholder',
+        null,
+        [
+          [null, 'message-placeholder-1', { 17: '1' }],
+          [null, 'message-placeholder-2', { 17: '2' }],
+        ],
+      ],
+    ],
+    ignored: responseMarker,
+  });
+
+  mainServer.respondWith(
+    { method: 'POST', path },
+    {
+      status: 200,
+      response: responseBody,
+      headers: { 'X-Test-Marker': headerMarker },
+    },
+  );
+
+  test('does not emit diagnostics by default', async () => {
+    await ajax(mainFrame, {
+      method: 'POST',
+      url: path,
+      headers: { 'X-Test-Marker': headerMarker },
+    });
+
+    expect(injectedLogger.eventSdkPassive).not.toHaveBeenCalled();
+  });
+
+  test('emits only aggregate diagnostics when enabled', async () => {
+    document.documentElement.setAttribute(
+      'data-inboxsdk-thread-diagnostics',
+      'true',
+    );
+
+    await ajax(mainFrame, {
+      method: 'POST',
+      url: path,
+      headers: { 'X-Test-Marker': headerMarker },
+    });
+
+    expect(injectedLogger.eventSdkPassive).toHaveBeenCalledTimes(1);
+    expect(injectedLogger.eventSdkPassive).toHaveBeenCalledWith(
+      'gmailSync.threadResponse',
+      {
+        httpStatus: 200,
+        responseByteLength: new TextEncoder().encode(responseBody).byteLength,
+        parserSucceeded: true,
+        parsedThreadCount: 1,
+        parsedMessageCount: 2,
+      },
+      true,
+    );
+    const details = jest.mocked(injectedLogger.eventSdkPassive).mock
+      .calls[0][1];
+    expect(JSON.stringify(details)).not.toContain(responseMarker);
+    expect(JSON.stringify(details)).not.toContain(headerMarker);
+  });
 });
 
 {
