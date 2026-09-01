@@ -657,7 +657,7 @@ describe('thread response diagnostics', () => {
       'gmailSync.threadResponse',
       {
         httpStatus: 200,
-        responseByteLength: new TextEncoder().encode(responseBody).byteLength,
+        responseByteLength: new Blob([responseBody]).size,
         parserSucceeded: true,
         parsedThreadCount: 1,
         parsedMessageCount: 2,

@@ -658,9 +658,9 @@ export function setupGmailInterceptorOnFrames(
                 'gmailSync.threadResponse',
                 {
                   httpStatus: connection.status,
-                  responseByteLength: new TextEncoder().encode(
+                  responseByteLength: new Blob([
                     connection.originalResponseText || '',
-                  ).byteLength,
+                  ]).size,
                   parserSucceeded,
                   parsedThreadCount,
                   parsedMessageCount,
