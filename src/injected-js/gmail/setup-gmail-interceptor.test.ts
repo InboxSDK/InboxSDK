@@ -720,12 +720,17 @@ describe('thread response diagnostics', () => {
       ].sort(),
     );
     expect(error).toMatchObject({
+      message: 'Failed to parse sync thread response',
       httpStatus: 200,
       responseByteLength: new Blob([malformedResponseMarker]).size,
       parserSucceeded: false,
       parsedThreadCount: 0,
       parsedMessageCount: 0,
     });
+    expect((error as Error).message).not.toContain(malformedResponseMarker);
+    expect((error as Error).stack || '').not.toContain(
+      malformedResponseMarker,
+    );
     expect(JSON.stringify(error)).not.toContain(malformedResponseMarker);
     expect(JSON.stringify(error)).not.toContain(headerMarker);
   });

@@ -863,17 +863,6 @@ class GmailThreadView {
     );
 
     if (!threadID) {
-      const err = new Error(
-        'Failed to get id for thread: data-legacy-thread-id attribute missing',
-      );
-
-      this.#driver.getLogger().error(err); // throw err;
-      // Fall back to old behavior instead of throwing. Probably not super sensible, but
-      // this is a deprecated method and preserving the current behavior is
-      // probably an okay choice.
-    }
-
-    if (!threadID) {
       if (this.#isPreviewedThread) {
         threadID = normalizeThreadID(
           this.#driver

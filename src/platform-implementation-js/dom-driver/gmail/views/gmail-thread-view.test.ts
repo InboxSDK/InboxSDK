@@ -52,7 +52,7 @@ function makeThreadView(
     logger,
     view: new GmailThreadView(
       element,
-      {} as GmailRouteView,
+      { getParams: () => ({}) } as GmailRouteView,
       driver,
       isPreviewedThread,
     ),
@@ -320,6 +320,38 @@ describe('GmailThreadView thread IDs', () => {
 
     expect(() => view.getThreadID()).toThrow('threadID element not found');
 
+    view.destroy();
+  });
+
+  test('reports a terminal synchronous ID failure only through the thrown error', () => {
+    document.documentElement.setAttribute(
+      'data-inboxsdk-thread-diagnostics',
+      'true',
+    );
+    const root = document.createElement('div');
+    const idElement = document.createElement('h2');
+    idElement.dataset.legacyThreadId = 'undefined';
+    root.append(idElement);
+    const { logger, view } = makeThreadView(root, async () => null);
+
+    let error: unknown;
+    try {
+      view.getThreadID();
+    } catch (err) {
+      error = err;
+    }
+
+    expect(error).toBeInstanceOf(Error);
+    expect(error).toMatchObject({
+      message: 'Failed to get id for thread',
+      preview: false,
+      rootConnected: false,
+      legacyAttributePresent: true,
+      legacyAttributeValid: false,
+      permanentAttributePresent: false,
+      permanentAttributeValid: false,
+    });
+    expect(logger.error).not.toHaveBeenCalled();
     view.destroy();
   });
 

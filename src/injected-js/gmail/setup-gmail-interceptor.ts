@@ -661,10 +661,9 @@ export function setupGmailInterceptorOnFrames(
                 count + thread.extraMetaData.syncMessageData.length,
               0,
             );
-          } catch (error) {
-            if (diagnosticsEnabled && error instanceof Error) {
-              Object.assign(error, getDiagnostics());
-            }
+          } catch {
+            const error = new Error('Failed to parse sync thread response');
+            if (diagnosticsEnabled) Object.assign(error, getDiagnostics());
             throw error;
           }
 
