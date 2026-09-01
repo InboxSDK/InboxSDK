@@ -621,11 +621,36 @@ export function setupGmailInterceptorOnFrames(
           let parserSucceeded = false;
           let parsedThreadCount = 0;
           let parsedMessageCount = 0;
+          const diagnosticsEnabled =
+            document.documentElement?.getAttribute(
+              'data-inboxsdk-thread-diagnostics',
+            ) === 'true';
+          const getDiagnostics = () => ({
+            httpStatus: connection.status,
+            responseByteLength: new Blob([
+              connection.originalResponseText || '',
+            ]).size,
+            parserSucceeded,
+            parsedThreadCount,
+            parsedMessageCount,
+          });
 
+          if (connection.status !== 200) {
+            if (diagnosticsEnabled) {
+              logger.eventSdkPassive(
+                'gmailSync.threadResponse',
+                getDiagnostics(),
+                true,
+              );
+            }
+            return;
+          }
+
+          let threads: ReturnType<
+            typeof GmailSyncResponseProcessor.extractThreadsFromThreadResponse
+          >;
           try {
-            if (connection.status !== 200) return;
-
-            const threads =
+            threads =
               GmailSyncResponseProcessor.extractThreadsFromThreadResponse(
                 connection.originalResponseText,
               );
@@ -636,38 +661,31 @@ export function setupGmailInterceptorOnFrames(
                 count + thread.extraMetaData.syncMessageData.length,
               0,
             );
-            messageMetadataHolder.add(
-              threads.map((syncThread) => ({
-                syncThreadID: syncThread.syncThreadID,
-                threadID: syncThread.oldGmailThreadID,
-                messages: syncThread.extraMetaData.syncMessageData.map(
-                  (syncMessage) => ({
-                    date: syncMessage.date,
-                    recipients: syncMessage.recipients,
-                  }),
-                ),
-              })) as any,
-            );
-          } finally {
-            if (
-              document.documentElement?.getAttribute(
-                'data-inboxsdk-thread-diagnostics',
-              ) === 'true'
-            ) {
-              logger.eventSdkPassive(
-                'gmailSync.threadResponse',
-                {
-                  httpStatus: connection.status,
-                  responseByteLength: new Blob([
-                    connection.originalResponseText || '',
-                  ]).size,
-                  parserSucceeded,
-                  parsedThreadCount,
-                  parsedMessageCount,
-                },
-                true,
-              );
+          } catch (error) {
+            if (diagnosticsEnabled && error instanceof Error) {
+              Object.assign(error, getDiagnostics());
             }
+            throw error;
+          }
+
+          messageMetadataHolder.add(
+            threads.map((syncThread) => ({
+              syncThreadID: syncThread.syncThreadID,
+              threadID: syncThread.oldGmailThreadID,
+              messages: syncThread.extraMetaData.syncMessageData.map(
+                (syncMessage) => ({
+                  date: syncMessage.date,
+                  recipients: syncMessage.recipients,
+                }),
+              ),
+            })) as any,
+          );
+          if (diagnosticsEnabled) {
+            logger.eventSdkPassive(
+              'gmailSync.threadResponse',
+              getDiagnostics(),
+              true,
+            );
           }
         },
       });

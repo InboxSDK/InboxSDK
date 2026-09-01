@@ -54,14 +54,15 @@ type ThreadIDResult = {
 type ThreadIDResolutionSource =
   | 'legacy-attribute'
   | 'preview-pane'
-  | 'permanent-attribute'
-  | 'none';
+  | 'permanent-attribute';
 
 type ThreadViewDiagnostics = {
   preview: boolean;
   rootConnected: boolean;
   legacyAttributePresent: boolean;
+  legacyAttributeValid: boolean;
   permanentAttributePresent: boolean;
+  permanentAttributeValid: boolean;
 };
 
 type PermanentIDConversionState =
@@ -335,6 +336,12 @@ class GmailThreadView {
       this.#element,
       'threadView.permanentIdElement',
     );
+    const legacyAttribute = legacyIdElement?.getAttribute(
+      'data-legacy-thread-id',
+    );
+    const permanentAttribute = permanentIdElement?.getAttribute(
+      'data-thread-perm-id',
+    );
 
     return {
       preview: this.#isPreviewedThread,
@@ -342,36 +349,44 @@ class GmailThreadView {
       legacyAttributePresent: Boolean(
         legacyIdElement?.hasAttribute('data-legacy-thread-id'),
       ),
+      legacyAttributeValid: normalizeThreadID(legacyAttribute) != null,
       permanentAttributePresent: Boolean(
         permanentIdElement?.hasAttribute('data-thread-perm-id'),
       ),
+      permanentAttributeValid: normalizeThreadID(permanentAttribute) != null,
     };
   }
 
-  #addThreadViewDiagnostics(error: Error): Error {
+  #addThreadViewDiagnostics(
+    error: Error,
+    additionalDiagnostics?: Record<string, boolean | number | string>,
+  ): Error {
     if (!this.#threadDiagnosticsEnabled()) return error;
 
-    return Object.assign(error, this.#getThreadViewDiagnostics());
+    return Object.assign(
+      error,
+      this.#getThreadViewDiagnostics(),
+      additionalDiagnostics,
+    );
   }
 
   #recordThreadIDResolution(
     startedAt: number,
     source: ThreadIDResolutionSource,
-    outcome: 'success' | 'failure',
-    error?: unknown,
-    diagnostics?: ThreadViewDiagnostics,
   ) {
     if (!this.#threadDiagnosticsEnabled()) return;
 
-    const safeDiagnostics = diagnostics || this.#getThreadViewDiagnostics();
-    if (error instanceof Error) Object.assign(error, safeDiagnostics);
+    const diagnostics = this.#getThreadViewDiagnostics();
     this.#driver.getLogger().eventSdkPassive(
       'threadView.threadIDResolution',
       {
         source,
         elapsedMilliseconds: Math.max(0, Date.now() - startedAt),
-        ...safeDiagnostics,
-        outcome,
+        preview: diagnostics.preview,
+        rootConnected: diagnostics.rootConnected,
+        legacyAttributePresent: diagnostics.legacyAttributePresent,
+        permanentAttributePresent: diagnostics.permanentAttributePresent,
+        outcome: 'success',
       },
       true,
     );
@@ -930,26 +945,14 @@ class GmailThreadView {
       }
 
       this.#threadID = threadID;
-      this.#recordThreadIDResolution(startedAt, source, 'success');
+      this.#recordThreadIDResolution(startedAt, source);
       return threadID;
     } catch (error) {
-      if (this.#threadDiagnosticsEnabled()) {
-        const diagnostics = this.#getThreadViewDiagnostics();
-        let source: ThreadIDResolutionSource = 'none';
-        if (diagnostics.permanentAttributePresent) {
-          source = 'permanent-attribute';
-        } else if (diagnostics.legacyAttributePresent) {
-          source = 'legacy-attribute';
-        } else if (diagnostics.preview) {
-          source = 'preview-pane';
-        }
-        this.#recordThreadIDResolution(
-          startedAt,
-          source,
-          'failure',
-          error,
-          diagnostics,
-        );
+      if (error instanceof Error) {
+        this.#addThreadViewDiagnostics(error, {
+          outcome: 'failure',
+          elapsedMilliseconds: Math.max(0, Date.now() - startedAt),
+        });
       }
       throw error;
     }
@@ -959,7 +962,9 @@ class GmailThreadView {
     const labelContainer = this.#element.querySelector('.ha .J-J5-Ji');
 
     if (!labelContainer) {
-      throw new Error('Thread view label container not found');
+      throw this.#addThreadViewDiagnostics(
+        new Error('Thread view label container not found'),
+      );
     }
 
     const el = document.createElement('span');

@@ -373,9 +373,11 @@ describe('GmailThreadView thread IDs', () => {
       'true',
     );
     const root = document.createElement('div');
+    const legacyIdElement = document.createElement('h2');
+    legacyIdElement.dataset.legacyThreadId = 'undefined';
     const idElement = document.createElement('h2');
     idElement.dataset.threadPermId = 'thread-f:123';
-    root.append(idElement);
+    root.append(legacyIdElement, idElement);
     const { logger, view } = makeThreadView(root, async () => null);
 
     let error: unknown;
@@ -388,8 +390,12 @@ describe('GmailThreadView thread IDs', () => {
     expect(error).toBeInstanceOf(Error);
     expect(Object.keys(error as Error).sort()).toEqual(
       [
+        'elapsedMilliseconds',
         'legacyAttributePresent',
+        'legacyAttributeValid',
+        'outcome',
         'permanentAttributePresent',
+        'permanentAttributeValid',
         'preview',
         'rootConnected',
       ].sort(),
@@ -397,22 +403,14 @@ describe('GmailThreadView thread IDs', () => {
     expect(error).toMatchObject({
       preview: false,
       rootConnected: false,
-      legacyAttributePresent: false,
+      legacyAttributePresent: true,
+      legacyAttributeValid: false,
       permanentAttributePresent: true,
+      permanentAttributeValid: true,
+      outcome: 'failure',
+      elapsedMilliseconds: expect.any(Number),
     });
-    expect(logger.eventSdkPassive).toHaveBeenCalledWith(
-      'threadView.threadIDResolution',
-      {
-        source: 'permanent-attribute',
-        elapsedMilliseconds: expect.any(Number),
-        preview: false,
-        rootConnected: false,
-        legacyAttributePresent: false,
-        permanentAttributePresent: true,
-        outcome: 'failure',
-      },
-      true,
-    );
+    expect(logger.eventSdkPassive).not.toHaveBeenCalled();
     view.destroy();
   });
 
@@ -435,7 +433,9 @@ describe('GmailThreadView thread IDs', () => {
     expect(Object.keys(error as Error).sort()).toEqual(
       [
         'legacyAttributePresent',
+        'legacyAttributeValid',
         'permanentAttributePresent',
+        'permanentAttributeValid',
         'preview',
         'rootConnected',
       ].sort(),
@@ -444,7 +444,46 @@ describe('GmailThreadView thread IDs', () => {
       preview: true,
       rootConnected: false,
       legacyAttributePresent: false,
+      legacyAttributeValid: false,
       permanentAttributePresent: false,
+      permanentAttributeValid: false,
+    });
+    view.destroy();
+  });
+
+  test('adds safe enumerable diagnostics to a missing label container error', () => {
+    document.documentElement.setAttribute(
+      'data-inboxsdk-thread-diagnostics',
+      'true',
+    );
+    const root = document.createElement('div');
+    const { view } = makeThreadView(root, async () => null);
+
+    let error: unknown;
+    try {
+      view.addLabel();
+    } catch (err) {
+      error = err;
+    }
+
+    expect(error).toBeInstanceOf(Error);
+    expect(Object.keys(error as Error).sort()).toEqual(
+      [
+        'legacyAttributePresent',
+        'legacyAttributeValid',
+        'permanentAttributePresent',
+        'permanentAttributeValid',
+        'preview',
+        'rootConnected',
+      ].sort(),
+    );
+    expect(error).toMatchObject({
+      preview: false,
+      rootConnected: false,
+      legacyAttributePresent: false,
+      legacyAttributeValid: false,
+      permanentAttributePresent: false,
+      permanentAttributeValid: false,
     });
     view.destroy();
   });
