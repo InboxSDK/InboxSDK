@@ -50,6 +50,39 @@ export const GMAIL_SELECTORS = {
   'composeView.titleBarColorBodyInner': ['.nH.Hy.aXJ .l.m > .l.n'],
 
   /**
+   * Native button used to identify the Inbox-state toolbar section.
+   * Root: one `.G-Ni` section.
+   */
+  'toolbar.archiveSectionButton': [
+    '.ar9',
+    '.aFh',
+    '.aFj',
+    '.lR',
+    '.nN',
+    '.nX',
+    '.aFk',
+  ],
+
+  /**
+   * Native checkbox used to identify the selection toolbar section.
+   * Root: one `.G-Ni` section.
+   */
+  'toolbar.checkboxSectionButton': ['.T-Jo-auh'],
+
+  /**
+   * Primary native buttons or icon descendants in Gmail's Move/Label section.
+   * Root: one `.G-Ni` section.
+   */
+  'toolbar.moveSectionButton': ['.asb', '.ase', '.ns', '.mw', '.bq5'],
+
+  /**
+   * Gmail search threads retain `.aFj` around "Move to Inbox" when Material
+   * SVG icons replace the legacy `.bq5` descendant.
+   * Root: one `.G-Ni` section. Kept separate so a real Move section wins.
+   */
+  'toolbar.moveSectionFallbackButton': ['.aFj'],
+
+  /**
    * Body of an open message.
    * Root: message element.
    */
