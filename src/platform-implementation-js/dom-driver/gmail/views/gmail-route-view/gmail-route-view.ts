@@ -328,6 +328,24 @@ class GmailRouteView implements RouteViewDriver {
     asap(async () => {
       if (!this._eventStream) return;
 
+      const ignoreRouteIDs: string[] = [
+        this._gmailRouteProcessor.NativeRouteIDs.MEET,
+        this._gmailRouteProcessor.NativeRouteIDs.CHAT_WELCOME,
+        this._gmailRouteProcessor.NativeRouteIDs.CHATS,
+        this._gmailRouteProcessor.NativeRouteIDs.CHAT,
+        this._gmailRouteProcessor.NativeRouteIDs.CHAT_DM,
+        this._gmailRouteProcessor.NativeRouteIDs.SPACES_WELCOME,
+        this._gmailRouteProcessor.NativeRouteIDs.SPACE,
+        this._gmailRouteProcessor.NativeRouteIDs.SETTINGS,
+      ];
+
+      const routeId = this._gmailRouteProcessor.getRouteID(this._name);
+
+      if (routeId && ignoreRouteIDs.includes(routeId)) {
+        // route is ignored because it wont contain thread list or view
+        return;
+      }
+
       await this.#waitForMainElementSafe();
 
       this.#monitorRowListElements();
