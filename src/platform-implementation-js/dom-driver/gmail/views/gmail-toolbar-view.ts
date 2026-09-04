@@ -16,6 +16,7 @@ import GmailThreadView from './gmail-thread-view';
 import GmailRowListView from './gmail-row-list-view';
 import { SECTION_NAMES } from '../../../constants/toolbars';
 import type GmailDriver from '../gmail-driver';
+import type { SelectorKey } from '../selectors';
 import type { RouteViewDriver } from '../../../driver-interfaces/route-view-driver';
 import Logger from '../../../lib/logger';
 import GmailThreadRowView from './gmail-thread-row-view';
@@ -413,29 +414,41 @@ class GmailToolbarView {
   }
 
   _getArchiveSectionElement(): HTMLElement | null | undefined {
-    return this._getSectionElementForButtonSelector(
-      '.ar9, .aFh, .aFj, .lR, .nN, .nX, .aFk',
+    return this._getSectionElementForButtonSelectorKey(
+      'toolbar.archiveSectionButton',
     );
   }
 
   _getCheckboxSectionElement(): HTMLElement | null | undefined {
-    return this._getSectionElementForButtonSelector('.T-Jo-auh');
-  }
-
-  _getMoveSectionElement(): HTMLElement | null | undefined {
-    return this._getSectionElementForButtonSelector(
-      '.asb, .ase, .ns, .mw, .bq5',
+    return this._getSectionElementForButtonSelectorKey(
+      'toolbar.checkboxSectionButton',
     );
   }
 
-  _getSectionElementForButtonSelector(
-    buttonSelector: string,
+  _getMoveSectionElement(): HTMLElement | null | undefined {
+    return (
+      this._getSectionElementForButtonSelectorKey(
+        'toolbar.moveSectionButton',
+      ) ??
+      this._getSectionElementForButtonSelectorKey(
+        'toolbar.moveSectionFallbackButton',
+      )
+    );
+  }
+
+  _getSectionElementForButtonSelectorKey(
+    selectorKey: SelectorKey,
   ): HTMLElement | null | undefined {
     const sectionElements =
       this._element.querySelectorAll<HTMLElement>('.G-Ni');
 
     for (let ii = 0; ii < sectionElements.length; ii++) {
-      if (sectionElements[ii].querySelector(buttonSelector)) {
+      if (
+        this._driver.selectors.querySelectorByKey(
+          sectionElements[ii],
+          selectorKey,
+        )
+      ) {
         return sectionElements[ii];
       }
     }
