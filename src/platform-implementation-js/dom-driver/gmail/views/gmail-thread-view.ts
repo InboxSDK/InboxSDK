@@ -29,6 +29,199 @@ import censorHTMLtree from '../../../../common/censorHTMLtree';
 
 let hasLoggedAddonInfo = false;
 
+const THREAD_ID_WAIT_TIMEOUT = 15_000;
+const THREAD_DIAGNOSTICS_ATTRIBUTE = 'data-inboxsdk-thread-diagnostics';
+
+export function normalizeThreadID(threadID: unknown): string | null {
+  return typeof threadID === 'string' &&
+    threadID.length > 0 &&
+    threadID !== 'undefined'
+    ? threadID
+    : null;
+}
+
+type ElementThreadIDs = {
+  legacyThreadID: unknown;
+  permanentThreadID: unknown;
+};
+
+type ThreadIDResult = {
+  threadID: string;
+  permanentThreadID: string | null;
+  source: ThreadIDResolutionSource;
+};
+
+type ThreadIDResolutionSource =
+  | 'legacy-attribute'
+  | 'preview-pane'
+  | 'permanent-attribute';
+
+type ThreadViewDiagnostics = {
+  preview: boolean;
+  rootConnected: boolean;
+  legacyAttributePresent: boolean;
+  legacyAttributeValid: boolean;
+  permanentAttributePresent: boolean;
+  permanentAttributeValid: boolean;
+};
+
+type PermanentIDConversionState =
+  | { status: 'not-started' }
+  | { status: 'pending'; permanentThreadID: string }
+  | {
+      status: 'fulfilled';
+      permanentThreadID: string;
+      threadID: string | null;
+    }
+  | { status: 'rejected'; permanentThreadID: string; error: unknown };
+
+export function waitForThreadID(
+  getElementThreadIDs: () => ElementThreadIDs,
+  getFallbackThreadID: () => string | null,
+  convertPermanentThreadID: (threadID: string) => Promise<string | null>,
+  isDestroyed: () => boolean,
+  timeout = THREAD_ID_WAIT_TIMEOUT,
+  steptime = 50,
+): Promise<ThreadIDResult> {
+  return new Promise((resolve, reject) => {
+    let settled = false;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    let conversionState: PermanentIDConversionState = {
+      status: 'not-started',
+    };
+
+    const cleanup = () => {
+      if (timeoutTimer) clearTimeout(timeoutTimer);
+      if (retryTimer) clearTimeout(retryTimer);
+    };
+    const resolveOnce = (result: ThreadIDResult) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      resolve(result);
+    };
+    const rejectOnce = (error: unknown) => {
+      if (settled) return;
+      settled = true;
+      cleanup();
+      reject(error);
+    };
+    const timeoutTimer = setTimeout(
+      () => rejectOnce(new Error('threadID element not found')),
+      timeout,
+    );
+
+    const startPermanentIDConversion = (permanentThreadID: string) => {
+      conversionState = { status: 'pending', permanentThreadID };
+
+      let conversionPromise: Promise<string | null>;
+      try {
+        conversionPromise = convertPermanentThreadID(permanentThreadID);
+      } catch (error) {
+        conversionState = {
+          status: 'rejected',
+          permanentThreadID,
+          error,
+        };
+        return;
+      }
+
+      void conversionPromise.then(
+        (threadID) => {
+          if (settled) return;
+          conversionState = {
+            status: 'fulfilled',
+            permanentThreadID,
+            threadID: normalizeThreadID(threadID),
+          };
+        },
+        (error) => {
+          if (settled) return;
+          conversionState = {
+            status: 'rejected',
+            permanentThreadID,
+            error,
+          };
+        },
+      );
+    };
+
+    const check = () => {
+      if (settled) return;
+
+      try {
+        if (isDestroyed()) {
+          throw new Error('thread view destroyed while waiting for threadID');
+        }
+
+        const elementThreadIDs = getElementThreadIDs();
+        const legacyThreadID = normalizeThreadID(
+          elementThreadIDs.legacyThreadID,
+        );
+        const permanentThreadID = normalizeThreadID(
+          elementThreadIDs.permanentThreadID,
+        );
+        const conversionPermanentThreadID =
+          conversionState.status === 'not-started'
+            ? null
+            : conversionState.permanentThreadID;
+        const knownPermanentThreadID =
+          permanentThreadID || conversionPermanentThreadID;
+
+        if (legacyThreadID) {
+          resolveOnce({
+            threadID: legacyThreadID,
+            permanentThreadID: knownPermanentThreadID,
+            source: 'legacy-attribute',
+          });
+          return;
+        }
+
+        try {
+          const fallbackThreadID = normalizeThreadID(getFallbackThreadID());
+          if (fallbackThreadID) {
+            resolveOnce({
+              threadID: fallbackThreadID,
+              permanentThreadID: knownPermanentThreadID,
+              source: 'preview-pane',
+            });
+            return;
+          }
+        } catch {
+          // The page communicator can be unavailable while Gmail builds the view.
+        }
+
+        if (permanentThreadID && conversionState.status === 'not-started') {
+          startPermanentIDConversion(permanentThreadID);
+        }
+
+        if (conversionState.status === 'fulfilled') {
+          if (!conversionState.threadID) {
+            throw new Error('Failed to get id for thread');
+          }
+          resolveOnce({
+            threadID: conversionState.threadID,
+            permanentThreadID: conversionState.permanentThreadID,
+            source: 'permanent-attribute',
+          });
+          return;
+        }
+
+        if (conversionState.status === 'rejected') {
+          throw conversionState.error;
+        }
+      } catch (error) {
+        rejectOnce(error);
+        return;
+      }
+
+      retryTimer = setTimeout(check, steptime);
+    };
+
+    retryTimer = setTimeout(check, 1);
+  });
+}
+
 class GmailThreadView {
   #element: HTMLElement;
   #routeViewDriver: any;
@@ -121,6 +314,78 @@ class GmailThreadView {
         this.#resolveUnmountHiddenNoticePromise();
       }
     });
+  }
+
+  #threadDiagnosticsEnabled(): boolean {
+    return (
+      document.documentElement?.getAttribute(THREAD_DIAGNOSTICS_ATTRIBUTE) ===
+      'true'
+    );
+  }
+
+  #getThreadViewDiagnostics(): ThreadViewDiagnostics {
+    const legacyIdElement = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.idElement',
+    );
+    const permanentIdElement = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.permanentIdElement',
+    );
+    const legacyAttribute = legacyIdElement?.getAttribute(
+      'data-legacy-thread-id',
+    );
+    const permanentAttribute = permanentIdElement?.getAttribute(
+      'data-thread-perm-id',
+    );
+
+    return {
+      preview: this.#isPreviewedThread,
+      rootConnected: this.#element.isConnected,
+      legacyAttributePresent: Boolean(
+        legacyIdElement?.hasAttribute('data-legacy-thread-id'),
+      ),
+      legacyAttributeValid: normalizeThreadID(legacyAttribute) != null,
+      permanentAttributePresent: Boolean(
+        permanentIdElement?.hasAttribute('data-thread-perm-id'),
+      ),
+      permanentAttributeValid: normalizeThreadID(permanentAttribute) != null,
+    };
+  }
+
+  #addThreadViewDiagnostics(
+    error: Error,
+    additionalDiagnostics?: Record<string, boolean | number | string>,
+  ): Error {
+    if (!this.#threadDiagnosticsEnabled()) return error;
+
+    return Object.assign(
+      error,
+      this.#getThreadViewDiagnostics(),
+      additionalDiagnostics,
+    );
+  }
+
+  #recordThreadIDResolution(
+    startedAt: number,
+    source: ThreadIDResolutionSource,
+  ) {
+    if (!this.#threadDiagnosticsEnabled()) return;
+
+    const diagnostics = this.#getThreadViewDiagnostics();
+    this.#driver.getLogger().eventSdkPassive(
+      'threadView.threadIDResolution',
+      {
+        source,
+        elapsedMilliseconds: Math.max(0, Date.now() - startedAt),
+        preview: diagnostics.preview,
+        rootConnected: diagnostics.rootConnected,
+        legacyAttributePresent: diagnostics.legacyAttributePresent,
+        permanentAttributePresent: diagnostics.permanentAttributePresent,
+        outcome: 'success',
+      },
+      true,
+    );
   }
 
   // TODO use livesets eventually
@@ -293,7 +558,9 @@ class GmailThreadView {
     descriptorStream: Kefir.Observable<CustomMessageDescriptor, unknown>,
   ): CustomMessageView {
     const parentElement = this.#element.parentElement;
-    if (!parentElement) throw new Error('missing parent element');
+    if (!parentElement) {
+      throw this.#addThreadViewDiagnostics(new Error('missing parent element'));
+    }
     const customMessageView = new CustomMessageView(descriptorStream, () => {
       this.#readyStream.onValue(async () => {
         const messageContainer = this.#element.querySelector('[role=list]');
@@ -479,8 +746,10 @@ class GmailThreadView {
       );
 
       if (isNaN(numberNativeHiddenMessages)) {
-        throw new Error(
-          "Couldn't find number of native hidden messages in dom structure",
+        throw this.#addThreadViewDiagnostics(
+          new Error(
+            "Couldn't find number of native hidden messages in dom structure",
+          ),
         );
       }
     }
@@ -549,6 +818,20 @@ class GmailThreadView {
     return this.#syncThreadID || this.getThreadID();
   }
 
+  #getPreviewPaneThreadID(): string | null {
+    if (!this.#isPreviewedThread) return null;
+
+    try {
+      return normalizeThreadID(
+        this.#driver
+          .getPageCommunicator()
+          .getCurrentThreadID(this.#element, true),
+      );
+    } catch {
+      return null;
+    }
+  }
+
   // Follows a similar structure to getThreadIDAsync, but gives up if async work is needed
   getThreadID(): string {
     if (this.#threadID) return this.#threadID;
@@ -557,51 +840,51 @@ class GmailThreadView {
       this.#element,
       'threadView.idElement',
     );
-    if (!idElement) throw new Error('threadID element not found');
+    if (!idElement) {
+      throw this.#addThreadViewDiagnostics(
+        new Error('threadID element not found'),
+      );
+    }
 
     // the string value can be 'undefined'
-    const syncAttributeValue = idElement.getAttribute('data-thread-perm-id');
-    if (
-      !this.#syncThreadID &&
-      syncAttributeValue &&
-      syncAttributeValue !== 'undefined'
-    ) {
+    const syncAttributeValue = normalizeThreadID(
+      idElement.getAttribute('data-thread-perm-id'),
+    );
+    if (!this.#syncThreadID && syncAttributeValue) {
       this.#syncThreadID = syncAttributeValue;
     }
 
-    let threadID = idElement.getAttribute('data-legacy-thread-id');
-
-    if (!threadID) {
-      const err = new Error(
-        'Failed to get id for thread: data-legacy-thread-id attribute missing',
-      );
-
-      this.#driver.getLogger().error(err); // throw err;
-      // Fall back to old behavior instead of throwing. Probably not super sensible, but
-      // this is a deprecated method and preserving the current behavior is
-      // probably an okay choice.
-    }
+    let threadID = normalizeThreadID(
+      idElement.getAttribute('data-legacy-thread-id'),
+    );
 
     if (!threadID) {
       if (this.#isPreviewedThread) {
-        threadID = this.#driver
-          .getPageCommunicator()
-          .getCurrentThreadID(this.#element, true);
+        threadID = normalizeThreadID(
+          this.#driver
+            .getPageCommunicator()
+            .getCurrentThreadID(this.#element, true),
+        );
       } else {
         const params = this.#routeViewDriver
           ? this.#routeViewDriver.getParams()
           : null;
+        const routeThreadID = normalizeThreadID(params?.threadID);
 
-        if (params && typeof params.threadID === 'string') {
-          threadID = params.threadID as string;
+        if (routeThreadID) {
+          threadID = routeThreadID;
         } else {
-          const err = new Error('Failed to get id for thread');
-
-          this.#driver.getLogger().error(err);
-
-          throw err;
+          throw this.#addThreadViewDiagnostics(
+            new Error('Failed to get id for thread'),
+          );
         }
       }
+    }
+
+    if (!threadID) {
+      throw this.#addThreadViewDiagnostics(
+        new Error('Failed to get id for thread'),
+      );
     }
 
     this.#threadID = threadID;
@@ -611,39 +894,60 @@ class GmailThreadView {
   async getThreadIDAsync(): Promise<string> {
     if (this.#threadID) return this.#threadID;
 
-    const idElement = this.#driver.selectors.querySelectorByKey(
-      this.#element,
-      'threadView.idElement',
-    );
-    if (!idElement) throw new Error('threadID element not found');
+    const startedAt = Date.now();
 
-    // the string value can be 'undefined'
-    const syncAttributeValue = idElement.getAttribute('data-thread-perm-id');
-    if (
-      !this.#syncThreadID &&
-      syncAttributeValue &&
-      syncAttributeValue !== 'undefined'
-    ) {
-      this.#syncThreadID = syncAttributeValue;
-    }
+    try {
+      const { threadID, permanentThreadID, source } = await waitForThreadID(
+        () => {
+          const legacyIdElement = this.#driver.selectors.querySelectorByKey(
+            this.#element,
+            'threadView.idElement',
+          );
+          const permanentIdElement = this.#driver.selectors.querySelectorByKey(
+            this.#element,
+            'threadView.permanentIdElement',
+          );
 
-    this.#threadID = idElement.getAttribute('data-legacy-thread-id');
-
-    if (!this.#threadID && this.#syncThreadID) {
-      this.#threadID = await this.#driver.getOldGmailThreadIdFromSyncThreadId(
-        this.#syncThreadID,
+          return {
+            legacyThreadID: legacyIdElement?.getAttribute(
+              'data-legacy-thread-id',
+            ),
+            permanentThreadID: permanentIdElement?.getAttribute(
+              'data-thread-perm-id',
+            ),
+          };
+        },
+        () => this.#getPreviewPaneThreadID(),
+        (syncThreadID) =>
+          this.#driver.getOldGmailThreadIdFromSyncThreadId(syncThreadID),
+        () => this.#stopper.stopped,
       );
-    }
 
-    if (this.#threadID) return this.#threadID;
-    else throw new Error('Failed to get id for thread');
+      if (!this.#syncThreadID && permanentThreadID) {
+        this.#syncThreadID = permanentThreadID;
+      }
+
+      this.#threadID = threadID;
+      this.#recordThreadIDResolution(startedAt, source);
+      return threadID;
+    } catch (error) {
+      if (error instanceof Error) {
+        this.#addThreadViewDiagnostics(error, {
+          outcome: 'failure',
+          elapsedMilliseconds: Math.max(0, Date.now() - startedAt),
+        });
+      }
+      throw error;
+    }
   }
 
   addLabel(): SimpleElementView {
     const labelContainer = this.#element.querySelector('.ha .J-J5-Ji');
 
     if (!labelContainer) {
-      throw new Error('Thread view label container not found');
+      throw this.#addThreadViewDiagnostics(
+        new Error('Thread view label container not found'),
+      );
     }
 
     const el = document.createElement('span');
