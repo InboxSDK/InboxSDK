@@ -144,6 +144,18 @@ export const GMAIL_SELECTORS = {
    * Root: thread element.
    */
   'threadView.subject': ['.ha h2'],
+
+  /**
+   * The element holding the list toolbar and the thread list.
+   * Root: the row list element container.
+   */
+  'routeView.rowListWrapper': ['.bGI.nH'],
+
+  /**
+   * The toolbar above the thread list.
+   * Root: `routeView.rowListWrapper`.
+   */
+  'routeView.listToolbar': ['[gh=tm]', '.G-atb'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
