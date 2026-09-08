@@ -558,7 +558,7 @@ class GmailRouteView implements RouteViewDriver {
         if (!sectionsContainer) {
           sectionsContainer = document.createElement('div');
           sectionsContainer.classList.add('inboxsdk__custom_sections');
-          main.insertBefore(sectionsContainer, main.firstChild);
+          this.#insertSectionsContainer(main, sectionsContainer);
         } else if (
           sectionsContainer.classList.contains('Wc') &&
           !this._isSearchRoute()
@@ -568,6 +568,33 @@ class GmailRouteView implements RouteViewDriver {
         return sectionsContainer;
       })
       .toProperty();
+  }
+
+  /**
+   * Gmail nests the list toolbar inside the row list wrapper, so the top of
+   * the container is above it.
+   */
+  #insertSectionsContainer(main: HTMLElement, sectionsContainer: HTMLElement) {
+    const rowListWrapper = this.#driver.selectors.querySelectorByKey(
+      main,
+      'routeView.rowListWrapper',
+    );
+    const listToolbar =
+      rowListWrapper &&
+      this.#driver.selectors.querySelectorByKey(
+        rowListWrapper,
+        'routeView.listToolbar',
+      );
+
+    if (listToolbar?.parentElement) {
+      listToolbar.parentElement.insertBefore(
+        sectionsContainer,
+        listToolbar.nextSibling,
+      );
+      return;
+    }
+
+    main.insertBefore(sectionsContainer, main.firstChild);
   }
 
   _getCustomParams(): Record<string, any> {
