@@ -70,7 +70,11 @@ class GmailRouteView implements RouteViewDriver {
     this.#driver = driver;
     this._eventStream = kefirBus();
     this._hasAddedCollapsibleSection = false;
-    this.#page = makePageParser(document.body, driver.getLogger());
+    this.#page = makePageParser(
+      document.body,
+      driver.getLogger(),
+      driver.selectors,
+    );
 
     if (this._type === 'CUSTOM') {
       this._setupCustomViewElement();
