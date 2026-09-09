@@ -84,6 +84,7 @@ import { ContactNameOptional } from '../../../../inboxsdk';
 import BasicButtonViewController from '../../../widgets/buttons/basic-button-view-controller';
 import { type PublicOnly } from '../../../../types/public-only';
 import isNotNil from '../../../../common/isNotNil';
+import { type SelectorKey } from '../selectors';
 
 let hasReportedMissingBody = false;
 
@@ -1567,10 +1568,10 @@ class GmailComposeView {
   }
 
   setTitleBarColor(color: string): () => void {
-    // Gmail A/B-renames the `Ht` token; fall back to a structural selector.
-    const buttonParent =
-      this.#element.querySelector('.nH.Hy.aXJ table.cf.Ht td.Hm') ||
-      this.#element.querySelector('.nH.Hy.aXJ table.cf td.Hm');
+    const buttonParent = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'composeView.titleBarTd',
+    );
     if (!buttonParent) {
       // cosmetic; log and skip rather than throw
       this.#driver
@@ -1578,20 +1579,25 @@ class GmailComposeView {
         .error(new Error('setTitleBarColor: could not find compose title bar'));
       return noop;
     }
-    const elementsToModify = [
-      this.#element.querySelector<HTMLElement>('.nH.Hy.aXJ .pi > .l.o'),
-      this.#element.querySelector<HTMLElement>('.nH.Hy.aXJ .l.m'),
-      this.#element.querySelector<HTMLElement>('.nH.Hy.aXJ .l.m > .l.n'),
-    ].filter((el): el is HTMLElement => el != null);
+
+    // The color lands on these layers, NOT on buttonParent.
+    const colorKeys: SelectorKey[] = [
+      'composeView.titleBarColorOuter',
+      'composeView.titleBarColorBody',
+      'composeView.titleBarColorBodyInner',
+    ];
+    const elementsToModify = colorKeys
+      .map((key) =>
+        this.#driver.selectors.querySelectorByKey(this.#element, key),
+      )
+      .filter(isNotNil);
+
     buttonParent.classList.add('inboxsdk__compose_customTitleBarColor');
-    elementsToModify.forEach((el) => {
-      el.style.backgroundColor = color;
-    });
+    elementsToModify.forEach((el) => setBgColor(el, color));
+
     return () => {
       buttonParent.classList.remove('inboxsdk__compose_customTitleBarColor');
-      elementsToModify.forEach((el) => {
-        el.style.backgroundColor = '';
-      });
+      elementsToModify.forEach((el) => setBgColor(el, ''));
     };
   }
 
@@ -1602,10 +1608,10 @@ class GmailComposeView {
       );
     }
 
-    // Gmail A/B-renames the `Ht` token; fall back to a structural selector.
-    const titleBarTable =
-      this.#element.querySelector('.nH.Hy.aXJ table.cf.Ht') ||
-      this.#element.querySelector('.nH.Hy.aXJ table.cf');
+    const titleBarTable = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'composeView.titleBarTable',
+    );
     if (!titleBarTable) {
       // cosmetic; log and skip rather than throw
       this.#driver
@@ -1624,8 +1630,13 @@ class GmailComposeView {
       );
     }
 
-    const titleTextParent =
-      titleBarTable.querySelector('div.Hp')?.parentElement;
+    // The custom title is inserted after this element's parent cell, so the key
+    // resolves the text element and the code walks up — an override that points
+    // straight at the cell would insert one level too high.
+    const titleTextParent = this.#driver.selectors.querySelectorByKey(
+      titleBarTable,
+      'composeView.titleBarText',
+    )?.parentElement;
 
     if (!(titleTextParent instanceof HTMLElement)) {
       // cosmetic; log and skip rather than throw
@@ -1829,6 +1840,10 @@ export type InboxSdkModifyComposeRequest = {
     isPlainText?: boolean;
   };
 };
+
+function setBgColor(el: HTMLElement, color: string) {
+  el.style.backgroundColor = color;
+}
 
 export default GmailComposeView;
 export type ComposeViewDriver = PublicOnly<GmailComposeView>;

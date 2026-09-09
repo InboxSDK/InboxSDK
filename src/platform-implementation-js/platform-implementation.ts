@@ -33,7 +33,10 @@ import Logger from './lib/logger';
 import isValidAppId from './lib/is-valid-app-id';
 // Some types
 import type { AppLogger } from './lib/logger';
+import type { SelectorOverrides } from './dom-driver/gmail/selectors';
+import type { InvalidSelectorReporter } from './lib/dom/mergeSelectorOverrides';
 const loadedAppIds: Set<string> = new Set();
+
 export type PiOpts = {
   appName?: string | null;
   appIconUrl?: string | null;
@@ -48,6 +51,10 @@ export type PiOpts = {
   REQUESTED_API_VERSION: number;
   primaryColor?: string;
   secondaryColor?: string;
+  /** Additional selector candidates to PREPEND to the selectors bundled with the SDK. */
+  selectorOverrides?: SelectorOverrides;
+  /** Fires for each override candidate dropped as invalid CSS in THIS browser. */
+  onInvalidSelector?: InvalidSelectorReporter;
 };
 export class PlatformImplementation extends SafeEventEmitter {
   destroyed: boolean;
