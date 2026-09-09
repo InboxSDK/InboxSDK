@@ -16,22 +16,28 @@ import {
   getPanelSectionNavItemContainerElement,
 } from './nav-item-section';
 
-function attachGmailNavItemView(
+async function attachGmailNavItemView(
   gmailNavItemView: GmailNavItemView,
   injectionContainer?: HTMLElement,
 ) {
-  try {
-    const attacher = _attachNavItemView(gmailNavItemView, injectionContainer);
+  const attacher = _attachNavItemView(gmailNavItemView, injectionContainer);
 
-    attacher();
+  // The attacher may be invoked again on each orderChanged event, so every
+  // invocation needs its rejections handled, not just the first.
+  const attach = async () => {
+    try {
+      await attacher();
+    } catch (err) {
+      Logger.error(err);
+    }
+  };
 
-    gmailNavItemView
-      .getEventStream()
-      .filter((event) => event.eventName === 'orderChanged')
-      .onValue(attacher);
-  } catch (err) {
-    Logger.error(err);
-  }
+  await attach();
+
+  gmailNavItemView
+    .getEventStream()
+    .filter((event) => event.eventName === 'orderChanged')
+    .onValue(attach);
 }
 
 export default async function addNavItem(
@@ -138,29 +144,45 @@ function _attachNavItemView(
   } else {
     // If we're in the old classic-hangouts-compatible leftnav, then
     // inject our added nav items among Gmail's own nav items.
-    return function () {
-      insertElementInOrder(_getNavItemsHolder(), gmailNavItemView.getElement());
+    return async function () {
+      const holder = await _getNavItemsHolder();
+      // The wait for the holder can outlive the nav item: don't insert the
+      // element of a view that was destroyed in the meantime.
+      if (gmailNavItemView.isDestroyed()) return;
+      insertElementInOrder(holder, gmailNavItemView.getElement());
     };
   }
 }
 
-function _getNavItemsHolder(): HTMLElement {
+let navItemsHolderCreationPromise: Promise<HTMLElement> | null = null;
+
+function _getNavItemsHolder(): HTMLElement | Promise<HTMLElement> {
   const holder = document.querySelector('.inboxsdk__navMenu');
-  if (!holder) {
-    return _createNavItemsHolder();
-  } else {
+  if (holder) {
     return querySelector(holder, '.TK');
   }
+  // Share one creation between concurrent callers: waitFor always defers at
+  // least one macrotask, so two callers could otherwise both see no holder in
+  // the DOM and insert duplicate holders. The cache is cleared once creation
+  // settles: on success the holder is found in the DOM above, and on failure
+  // a later call gets to retry.
+  if (!navItemsHolderCreationPromise) {
+    navItemsHolderCreationPromise = _createNavItemsHolder().finally(() => {
+      navItemsHolderCreationPromise = null;
+    });
+  }
+  return navItemsHolderCreationPromise;
 }
 
-function _createNavItemsHolder(): HTMLElement {
+async function _createNavItemsHolder(): Promise<HTMLElement> {
   const holder = document.createElement('div');
   holder.setAttribute('class', 'LrBjie inboxsdk__navMenu');
   holder.innerHTML = '<div class="TK"></div>';
 
-  const navMenuInjectionContainer =
-    GmailElementGetter.getSameSectionNavItemMenuInjectionContainer();
-  if (!navMenuInjectionContainer) throw new Error('should not happen');
+  const navMenuInjectionContainer = await waitFor(() =>
+    GmailElementGetter.getSameSectionNavItemMenuInjectionContainer(),
+  );
+
   navMenuInjectionContainer.insertBefore(
     holder,
     navMenuInjectionContainer.children[2],

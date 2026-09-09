@@ -99,6 +99,7 @@ export default class GmailNavItemView {
   private _accessoryViewController: any = null;
   private _driver: GmailDriver;
   private _element: HTMLElement;
+  #destroyed: boolean = false;
   #eventStream: Bus<NavItemEvent, any>;
   private _expandoElement: HTMLElement | null = null;
   private _iconSettings: IconSettings = {};
@@ -183,6 +184,7 @@ export default class GmailNavItemView {
   }
 
   destroy() {
+    this.#destroyed = true;
     this._element.remove();
     if (this.#eventStream) this.#eventStream.end();
     this.#cleanupDOMElements();
@@ -214,6 +216,10 @@ export default class GmailNavItemView {
 
   isCollapsed(): boolean {
     return this._isCollapsed;
+  }
+
+  isDestroyed(): boolean {
+    return this.#destroyed;
   }
 
   isSection() {
