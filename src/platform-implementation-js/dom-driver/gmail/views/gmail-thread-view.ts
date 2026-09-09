@@ -517,7 +517,10 @@ class GmailThreadView {
   }
 
   getSubject(): string {
-    var subjectElement = this.#element.querySelector('.ha h2');
+    const subjectElement = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.subject',
+    );
 
     if (!subjectElement) {
       return '';
@@ -550,7 +553,10 @@ class GmailThreadView {
   getThreadID(): string {
     if (this.#threadID) return this.#threadID;
 
-    const idElement = this.#element.querySelector('[data-legacy-thread-id]');
+    const idElement = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.idElement',
+    );
     if (!idElement) throw new Error('threadID element not found');
 
     // the string value can be 'undefined'
@@ -605,7 +611,10 @@ class GmailThreadView {
   async getThreadIDAsync(): Promise<string> {
     if (this.#threadID) return this.#threadID;
 
-    const idElement = this.#element.querySelector('[data-legacy-thread-id]');
+    const idElement = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.idElement',
+    );
     if (!idElement) throw new Error('threadID element not found');
 
     // the string value can be 'undefined'

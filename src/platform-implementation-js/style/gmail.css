@@ -482,6 +482,19 @@ div.bHJ .inboxsdk__button {
   width: 16px;
 }
 
+/* The clone inherits Gmail's icon box, which scales the consumer's image up. */
+.inboxsdk__message_more_item .inboxsdk__message_more_icon {
+  height: 16px;
+  width: 16px;
+}
+
+/* Gmail paints hover through a jsaction the clone drops, so paint it here.
+   Tints from the text color so it reads on light and dark themes. */
+.inboxsdk__message_more_item:hover,
+.inboxsdk__message_more_item:focus {
+  background-color: color-mix(in srgb, currentcolor 8%, transparent);
+}
+
 /* end */
 
 /* compose buttons */
