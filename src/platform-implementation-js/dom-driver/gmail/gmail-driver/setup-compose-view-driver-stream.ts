@@ -7,7 +7,6 @@ import makeElementChildStream, {
 } from '../../../lib/dom/make-element-child-stream';
 import elementViewMapper from '../../../lib/dom/element-view-mapper';
 import makeElementStreamMerger from '../../../lib/dom/make-element-stream-merger';
-import GmailElementGetter from '../gmail-element-getter';
 import GmailComposeView from '../views/gmail-compose-view';
 import type GmailMessageView from '../views/gmail-message-view';
 import type GmailDriver from '../gmail-driver';
@@ -30,18 +29,18 @@ function imp(
   messageViewDriverStream: Kefir.Observable<GmailMessageView, unknown>,
   xhrInterceptorStream: Kefir.Observable<any, unknown>,
 ): Kefir.Observable<GmailComposeView, unknown> {
-  return Kefir.fromPromise(GmailElementGetter.waitForGmailModeToSettle())
+  return Kefir.fromPromise(gmailDriver.elementGetter.waitForGmailModeToSettle())
     .flatMap(() => {
       let elementStream: Kefir.Observable<ElementWithLifetime, never>;
       let isStandalone = false;
 
-      if (GmailElementGetter.isStandaloneComposeWindow()) {
-        elementStream = _setupStandaloneComposeElementStream();
+      if (gmailDriver.elementGetter.isStandaloneComposeWindow()) {
+        elementStream = _setupStandaloneComposeElementStream(gmailDriver);
         isStandalone = true;
-      } else if (GmailElementGetter.isStandaloneThreadWindow()) {
+      } else if (gmailDriver.elementGetter.isStandaloneThreadWindow()) {
         elementStream = Kefir.never();
       } else {
-        elementStream = _setupStandardComposeElementStream();
+        elementStream = _setupStandardComposeElementStream(gmailDriver);
       }
 
       return elementStream.map(
@@ -70,9 +69,9 @@ function imp(
     .flatMap((composeViewDriver) => composeViewDriver.ready());
 }
 
-function _setupStandardComposeElementStream() {
+function _setupStandardComposeElementStream(gmailDriver: GmailDriver) {
   return _waitForContainerAndMonitorChildrenStream(() =>
-    GmailElementGetter.getComposeWindowContainer(),
+    gmailDriver.elementGetter.getComposeWindowContainer(),
   )
     .flatMap((composeGrandParent) => {
       const composeParentEl =
@@ -86,7 +85,8 @@ function _setupStandardComposeElementStream() {
       }
     })
     .merge(
-      GmailElementGetter.getFullscreenComposeWindowContainerStream()
+      gmailDriver.elementGetter
+        .getFullscreenComposeWindowContainerStream()
         .flatMap(({ el, removalStream }) =>
           makeElementChildStream(el).takeUntilBy(removalStream),
         )
@@ -125,12 +125,11 @@ function _setupStandardComposeElementStream() {
     .flatMap(makeElementStreamMerger());
 }
 
-function _setupStandaloneComposeElementStream(): Kefir.Observable<
-  ElementWithLifetime,
-  never
-> {
+function _setupStandaloneComposeElementStream(
+  gmailDriver: GmailDriver,
+): Kefir.Observable<ElementWithLifetime, never> {
   return _waitForContainerAndMonitorChildrenStream(() =>
-    GmailElementGetter.StandaloneCompose.getComposeWindowContainer(),
+    gmailDriver.elementGetter.getStandaloneComposeWindowContainer(),
   );
 }
 

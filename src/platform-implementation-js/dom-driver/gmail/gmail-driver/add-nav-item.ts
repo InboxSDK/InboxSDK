@@ -1,5 +1,4 @@
 import * as Kefir from 'kefir';
-import GmailElementGetter from '../gmail-element-getter';
 import GmailNavItemView, {
   type NavItemDescriptor,
 } from '../views/gmail-nav-item-view';
@@ -17,11 +16,16 @@ import {
 } from './nav-item-section';
 
 function attachGmailNavItemView(
+  driver: GmailDriver,
   gmailNavItemView: GmailNavItemView,
   injectionContainer?: HTMLElement,
 ) {
   try {
-    const attacher = _attachNavItemView(gmailNavItemView, injectionContainer);
+    const attacher = _attachNavItemView(
+      driver,
+      gmailNavItemView,
+      injectionContainer,
+    );
 
     attacher();
 
@@ -40,13 +44,13 @@ export default async function addNavItem(
   navItemDescriptor: Kefir.Observable<NavItemDescriptor, unknown>,
   navMenuInjectionContainer?: HTMLElement,
 ): Promise<GmailNavItemView> {
-  await waitForMenuReady();
+  await waitForMenuReady(driver);
 
   const gmailNavItemView = new GmailNavItemView(driver, orderGroup, 1);
   gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
-  if (!GmailElementGetter.isStandalone()) {
-    attachGmailNavItemView(gmailNavItemView, navMenuInjectionContainer);
+  if (!driver.elementGetter.isStandalone()) {
+    attachGmailNavItemView(driver, gmailNavItemView, navMenuInjectionContainer);
   }
 
   return gmailNavItemView;
@@ -58,37 +62,39 @@ export async function addNavItemToPanel(
   navItemDescriptor: Kefir.Observable<NavItemDescriptor, unknown>,
   panelElement: HTMLElement,
 ): Promise<GmailNavItemView> {
-  await waitForMenuReady();
+  await waitForMenuReady(driver);
 
   const gmailNavItemView = new GmailNavItemView(driver, orderGroup, 1);
   gmailNavItemView.setNavItemDescriptor(navItemDescriptor);
 
-  if (!GmailElementGetter.isStandalone()) {
+  if (!driver.elementGetter.isStandalone()) {
     if (gmailNavItemView.isSection()) {
       const container = getPanelSectionNavItemContainerElement(panelElement);
-      attachGmailNavItemView(gmailNavItemView, container);
+      attachGmailNavItemView(driver, gmailNavItemView, container);
     } else {
       const container = getPanelNavItemContainerElement(
         panelElement,
         gmailNavItemView.sectionKey,
       );
-      attachGmailNavItemView(gmailNavItemView, container);
+      attachGmailNavItemView(driver, gmailNavItemView, container);
     }
   }
 
   return gmailNavItemView;
 }
 
-export const waitForMenuReady = once(async (): Promise<void> => {
-  const appMenu = await GmailElementGetter.getAppMenuAsync();
-  if (!appMenu) {
-    await waitForNavMenuReady();
-  }
-});
+export const waitForMenuReady = once(
+  async (driver: GmailDriver): Promise<void> => {
+    const appMenu = await driver.elementGetter.getAppMenuAsync();
+    if (!appMenu) {
+      await waitForNavMenuReady(driver);
+    }
+  },
+);
 
-const waitForNavMenuReady = once(async (): Promise<void> => {
-  if (!GmailElementGetter.isStandalone()) {
-    await GmailElementGetter.waitForGmailModeToSettle();
+const waitForNavMenuReady = once(async (driver: GmailDriver): Promise<void> => {
+  if (!driver.elementGetter.isStandalone()) {
+    await driver.elementGetter.waitForGmailModeToSettle();
     await waitFor(() =>
       document.querySelector('.aeN[role=navigation], .aeN [role=navigation]'),
     );
@@ -98,6 +104,7 @@ const waitForNavMenuReady = once(async (): Promise<void> => {
 });
 
 function _attachNavItemView(
+  driver: GmailDriver,
   gmailNavItemView: GmailNavItemView,
   navMenuInjectionContainer?: HTMLElement,
 ) {
@@ -110,13 +117,13 @@ function _attachNavItemView(
     };
   }
 
-  if (!GmailElementGetter.shouldAddNavItemsInline()) {
+  if (!driver.elementGetter.shouldAddNavItemsInline()) {
     // If we're in the modern (non-classic-hangouts) leftnav, then put
     // the added nav items in a floating section at the bottom separate
     // from the Mail section.
     return function () {
       const navMenuInjectionContainer =
-        GmailElementGetter.getSeparateSectionNavItemMenuInjectionContainer();
+        driver.elementGetter.getSeparateSectionNavItemMenuInjectionContainer();
       if (!navMenuInjectionContainer) {
         throw new Error('should not happen');
       }
@@ -139,27 +146,30 @@ function _attachNavItemView(
     // If we're in the old classic-hangouts-compatible leftnav, then
     // inject our added nav items among Gmail's own nav items.
     return function () {
-      insertElementInOrder(_getNavItemsHolder(), gmailNavItemView.getElement());
+      insertElementInOrder(
+        _getNavItemsHolder(driver),
+        gmailNavItemView.getElement(),
+      );
     };
   }
 }
 
-function _getNavItemsHolder(): HTMLElement {
+function _getNavItemsHolder(driver: GmailDriver): HTMLElement {
   const holder = document.querySelector('.inboxsdk__navMenu');
   if (!holder) {
-    return _createNavItemsHolder();
+    return _createNavItemsHolder(driver);
   } else {
     return querySelector(holder, '.TK');
   }
 }
 
-function _createNavItemsHolder(): HTMLElement {
+function _createNavItemsHolder(driver: GmailDriver): HTMLElement {
   const holder = document.createElement('div');
   holder.setAttribute('class', 'LrBjie inboxsdk__navMenu');
   holder.innerHTML = '<div class="TK"></div>';
 
   const navMenuInjectionContainer =
-    GmailElementGetter.getSameSectionNavItemMenuInjectionContainer();
+    driver.elementGetter.getSameSectionNavItemMenuInjectionContainer();
   if (!navMenuInjectionContainer) throw new Error('should not happen');
   navMenuInjectionContainer.insertBefore(
     holder,

@@ -1,7 +1,6 @@
 import once from 'lodash/once';
 
 import { AppMenuItemPanelDescriptor } from '../../../namespaces/app-menu';
-import GmailElementGetter from '../gmail-element-getter';
 import waitFor from '../../../lib/wait-for';
 import Logger from '../../../lib/logger';
 import { CollapsiblePanelView } from '../../../views/collapsible-panel-view';
@@ -12,7 +11,7 @@ export async function addCollapsiblePanel(
   panelDescriptor: AppMenuItemPanelDescriptor,
   insertIndex?: number,
 ) {
-  const injectionContainer = await waitForAppMenuParentReady();
+  const injectionContainer = await waitForAppMenuParentReady(driver);
 
   const collapsiblePanelView = new CollapsiblePanelView(
     driver,
@@ -21,7 +20,7 @@ export async function addCollapsiblePanel(
 
   if (!injectionContainer || !collapsiblePanelView.element) return;
 
-  const appMenu = await GmailElementGetter.getAppMenuAsync();
+  const appMenu = await driver.elementGetter.getAppMenuAsync();
 
   if (!appMenu) return;
 
@@ -47,11 +46,11 @@ export async function addCollapsiblePanel(
   return collapsiblePanelView;
 }
 
-const waitForAppMenuParentReady = once(async () => {
-  if (!GmailElementGetter.isStandalone()) {
+const waitForAppMenuParentReady = once(async (driver: GmailDriver) => {
+  if (!driver.elementGetter.isStandalone()) {
     try {
       const menuParentElement = await waitFor(() =>
-        GmailElementGetter.getAppMenuContainer(),
+        driver.elementGetter.getAppMenuContainer(),
       );
 
       return menuParentElement;

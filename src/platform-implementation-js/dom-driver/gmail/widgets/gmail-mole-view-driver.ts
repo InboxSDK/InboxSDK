@@ -2,7 +2,7 @@ import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
-import GmailElementGetter, {
+import {
   MOLE_CONTAINER_SELECTOR,
   MOLE_PARENT_SELECTOR,
 } from '../gmail-element-getter';
@@ -310,7 +310,7 @@ class GmailMoleViewDriver {
     // If the gmail mode has settled, we've been loaded for 10 seconds, and
     // we don't have the mole parent yet, then force the mole parent to load
     // by opening a compose view and then closing it.
-    Kefir.fromPromise(GmailElementGetter.waitForGmailModeToSettle())
+    Kefir.fromPromise(this.#driver.elementGetter.waitForGmailModeToSettle())
       .flatMap(() => {
         // delay until we've passed TimestampOnReady + 5 seconds
         return this.#driver.delayToTimeAfterReady(5_000);

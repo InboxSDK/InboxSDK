@@ -4,7 +4,6 @@ import querySelector from '../../../lib/dom/querySelectorOrFail';
 import TypedEventEmitter from 'typed-emitter';
 import { EventEmitter } from 'events';
 import cx from 'classnames';
-import GmailElementGetter from '../gmail-element-getter';
 import { stylesStream } from '../gmail-driver/track-gmail-styles';
 import isEqual from 'fast-deep-equal';
 
@@ -121,7 +120,7 @@ export class GmailAppMenuItemView extends (EventEmitter as new () => TypedEventE
     const { iconUrl, iconClassName } = this.#menuItemDescriptor ?? {};
 
     if (iconUrl) {
-      const rawTheme = GmailElementGetter.isDarkTheme()
+      const rawTheme = this.#driver.elementGetter.isDarkTheme()
         ? iconUrl.darkTheme
         : iconUrl.lightTheme;
 
