@@ -45,6 +45,26 @@ describe('with no config loaded', () => {
     );
   });
 
+  test('querySelectorAllByKey returns every match of the first rung that hits', () => {
+    const registry = new SelectorRegistry();
+    const root = document.createElement('div');
+    root.append(composeRoot(true), composeRoot(true), composeRoot(false));
+
+    // Both `Ht` tables come from the first rung; the `Ht`-less one is left out.
+    expect(
+      registry.querySelectorAllByKey(root, 'composeView.titleBarTable'),
+    ).toEqual(Array.from(root.querySelectorAll('table.Ht')));
+    expect(
+      registry.querySelectorAllByKey(root, 'composeView.titleBarTd'),
+    ).toHaveLength(2);
+    expect(
+      registry.querySelectorAllByKey(
+        document.createElement('div'),
+        'composeView.titleBarTable',
+      ),
+    ).toEqual([]);
+  });
+
   test('candidates are tried in LIST order, not document order', () => {
     const registry = new SelectorRegistry();
     const root = document.createElement('div');

@@ -73,6 +73,23 @@ export default class SelectorRegistry {
   }
 
   /**
+   * Every match of the first candidate that matches, not of every candidate.
+   */
+  querySelectorAllByKey(
+    el: Document | DocumentFragment | Element,
+    key: SelectorKey,
+  ): HTMLElement[] {
+    for (const candidateSelector of this.#candidates[key]) {
+      const found = el.querySelectorAll<HTMLElement>(candidateSelector);
+      if (found.length > 0) {
+        return Array.from(found);
+      }
+    }
+
+    return [];
+  }
+
+  /**
    * Resolve a registry key against `el`, but throws if no candidate matches.
    */
   querySelectorByKeyOrFail(

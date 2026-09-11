@@ -19,6 +19,7 @@ import type GmailDriver from '../../gmail-driver';
 import type GmailRouteProcessor from '../gmail-route-view/gmail-route-processor';
 import PageParserTree from 'page-parser-tree';
 import { makePageParser } from './page-parser';
+import placeSectionsContainer from './place-sections-container';
 import toItemWithLifetimeStream from '../../../../lib/toItemWithLifetimeStream';
 import waitFor from '../../../../lib/wait-for';
 import { SelectorError } from '../../../../lib/dom/querySelectorOrFail';
@@ -51,6 +52,7 @@ class GmailRouteView implements RouteViewDriver {
   _cachedRouteData: Record<string, any>;
   #page: PageParserTree;
   #destroyed = false;
+  #isKeepingSectionsContainerPlaced = false;
 
   constructor(
     { urlObject, type, routeID, cachedRouteData }: Record<string, any>,
@@ -562,43 +564,42 @@ class GmailRouteView implements RouteViewDriver {
         if (!sectionsContainer) {
           sectionsContainer = document.createElement('div');
           sectionsContainer.classList.add('inboxsdk__custom_sections');
-          this.#insertSectionsContainer(main, sectionsContainer);
         } else if (
           sectionsContainer.classList.contains('Wc') &&
           !this._isSearchRoute()
         ) {
           sectionsContainer.classList.remove('Wc');
         }
+        this.#placeSectionsContainer(main, sectionsContainer);
         return sectionsContainer;
       })
       .toProperty();
   }
 
-  /**
-   * Gmail nests the list toolbar inside the row list wrapper, so the top of
-   * the container is above it.
-   */
-  #insertSectionsContainer(main: HTMLElement, sectionsContainer: HTMLElement) {
-    const rowListWrapper = this.#driver.selectors.querySelectorByKey(
-      main,
-      'routeView.rowListWrapper',
-    );
-    const listToolbar =
-      rowListWrapper &&
-      this.#driver.selectors.querySelectorByKey(
-        rowListWrapper,
-        'routeView.listToolbar',
-      );
-
-    if (listToolbar?.parentElement) {
-      listToolbar.parentElement.insertBefore(
-        sectionsContainer,
-        listToolbar.nextSibling,
-      );
+  #placeSectionsContainer(main: HTMLElement, sectionsContainer: HTMLElement) {
+    const { selectors } = this.#driver;
+    placeSectionsContainer(main, sectionsContainer, selectors);
+    if (this.#isKeepingSectionsContainerPlaced) {
       return;
     }
+    this.#isKeepingSectionsContainerPlaced = true;
 
-    main.insertBefore(sectionsContainer, main.firstChild);
+    // Gmail can switch wrappers or draw the toolbar after sections are added.
+    makeMutationObserverChunkedStream(main, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['style', 'class'],
+    })
+      .filter((mutations) =>
+        mutations.some(
+          (mutation) => !sectionsContainer.contains(mutation.target),
+        ),
+      )
+      .takeUntilBy(this._stopper)
+      .onValue(() => {
+        placeSectionsContainer(main, sectionsContainer, selectors);
+      });
   }
 
   _getCustomParams(): Record<string, any> {
