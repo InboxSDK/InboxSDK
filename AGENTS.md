@@ -28,8 +28,8 @@ before handing off: `yarn test`, `yarn lint` (ESLint + Prettier), and
 
 ### Node version
 
-CI (CircleCI) uses **Node 20.9.0**. `.nvmrc` specifies `lts/*`. Node 22 also
-works for build/test in this environment.
+`.nvmrc` selects the latest Node LTS release. CI (CircleCI) uses **Node
+24.20.0**.
 
 ### Manual E2E testing (requires local Chrome + Gmail)
 
