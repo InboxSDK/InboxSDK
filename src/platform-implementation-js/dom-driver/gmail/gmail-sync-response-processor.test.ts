@@ -211,7 +211,7 @@ it('replaceThreadsInSearchResponse works', () => {
   const newResponse = GSRP.replaceThreadsInSearchResponse(
     originalSearchResponse,
     replacementThreads,
-    { start: 0 },
+    {},
   );
   expect(JSON.parse(newResponse)).toEqual(responesShouldLookLike);
 });
