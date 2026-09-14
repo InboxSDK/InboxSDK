@@ -1,5 +1,6 @@
 import showCustomThreadList from './show-custom-thread-list';
 import GmailElementGetter from '../gmail-element-getter';
+import SelectorRegistry from '../../../lib/dom/selectorRegistry';
 
 import * as GSRP from '../gmail-sync-response-processor';
 
@@ -25,6 +26,7 @@ class ShowCustomThreadListTester {
   _customListResultsBus = kefirBus();
   _allowGmailThreadIdLookup = kefirBus();
   _driver: any = {
+    selectors: new SelectorRegistry(),
     getLogger: once(() => ({
       error(e: any) {
         console.error(e);

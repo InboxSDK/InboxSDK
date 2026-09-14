@@ -21,6 +21,7 @@ import GmailAppSidebarView from './index';
 import MockWebStorage from 'mock-webstorage';
 import GmailThreadView from '../gmail-thread-view';
 import GmailElementGetter from '../../gmail-element-getter';
+import SelectorRegistry from '../../../../lib/dom/selectorRegistry';
 import { type ContentPanelDescriptor } from '../../../../driver-common/sidebar/ContentPanelViewDriver';
 
 jest.mock('../../../../lib/dom/make-element-child-stream', () => {
@@ -111,6 +112,7 @@ describe('GmailAppSidebarView Primary', function () {
 
 function makeDriver(appId?: string, opts?: any): any {
   const driver: any = {
+    selectors: new SelectorRegistry(),
     getAppId: () => appId || 'test',
     getOpts: () =>
       opts || {
