@@ -58,7 +58,6 @@ function createElement(orderHint: number, addAboveNativeStatusBar: boolean) {
 class StatusBar extends SimpleElementView implements IStatusBar {
   private _addAboveNativeStatusBar: boolean;
   private _gmailComposeView: GmailComposeView;
-  private _nativeStatusContainer: HTMLElement;
   private _prependContainer: null | undefined | HTMLElement = null;
   private _stopper = kefirStopper();
 
@@ -71,10 +70,6 @@ class StatusBar extends SimpleElementView implements IStatusBar {
     super(createElement(orderHint, addAboveNativeStatusBar));
     this._addAboveNativeStatusBar = addAboveNativeStatusBar;
     this._gmailComposeView = gmailComposeView;
-    this._nativeStatusContainer = querySelector(
-      gmailComposeView.getElement(),
-      '.iN > tbody .aDj',
-    );
 
     this._setStatusBar();
     this.setHeight(height);
