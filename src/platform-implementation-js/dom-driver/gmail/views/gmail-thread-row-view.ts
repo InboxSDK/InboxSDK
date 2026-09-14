@@ -944,7 +944,7 @@ class GmailThreadRowView {
       .combine(this._getRefresher(), (value, _ignored) => value)
       .takeUntilBy(this._stopper)
       .onValue((opts) => {
-        const originalLabel = querySelector(this._elements[0], 'td div.yW');
+        const originalLabel = querySelector(this._elements[0], 'td > div.yW');
         const recipientsContainer = originalLabel.parentElement;
         if (!recipientsContainer) throw new Error('Should not happen');
 
