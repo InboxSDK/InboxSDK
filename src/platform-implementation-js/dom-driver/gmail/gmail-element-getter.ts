@@ -134,7 +134,7 @@ export default class GmailElementGetter {
     // Otherwise, use the old method, but log a warning if the old method
     // finds something different than the old method, so that way we can
     // figure out if it's okay to swap over.
-    const el = document.querySelector<HTMLElement>('div.nH.bkK > .nH');
+    const el = document.querySelector<HTMLElement>('.bkK > .nH');
 
     if (isIntegratedViewGmail()) {
       return el;

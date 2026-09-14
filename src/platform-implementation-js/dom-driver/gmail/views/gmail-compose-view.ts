@@ -1509,11 +1509,7 @@ class GmailComposeView {
     if (fullscreen !== this.isFullscreen()) {
       if (this.#isInlineReplyForm)
         throw new Error('Not implemented for inline compose views');
-      // Prefer legacy <img>; fall back to newer <button class="Hq">.
-      const fullscreenButton =
-        this.#element.querySelector<HTMLElement>('.Hm > img:nth-of-type(2)') ||
-        querySelector(this.#element, '.Hm .Hq');
-      simulateClick(fullscreenButton);
+      simulateClick(this.getMoleSwitchButton());
     }
   }
 

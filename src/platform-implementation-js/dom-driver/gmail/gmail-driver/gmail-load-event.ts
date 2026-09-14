@@ -8,7 +8,7 @@ import { checkForDarkThemeSafe } from './track-gmail-styles';
 import waitFor, { WaitForError } from '../../../lib/wait-for';
 
 async function isSidePanelCollapsed() {
-  const sidePanelSelector = '.brC-aT5-aOt-Jw[role=complementary]';
+  const sidePanelSelector = '.brC-aT5-aOt-Jw';
 
   try {
     await waitFor(() => document.querySelector(sidePanelSelector), 10_000);
