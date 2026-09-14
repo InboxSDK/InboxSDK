@@ -211,10 +211,6 @@ class GmailAttachmentCardView {
     }
   }
 
-  _extractFileNameFromElement(): string {
-    return querySelector(this._element, '.aQA > span').textContent!;
-  }
-
   _createNewElement(options: Record<string, any>) {
     this._element = document.createElement('span');
 
@@ -424,20 +420,6 @@ class GmailAttachmentCardView {
     buttonView.addClass('aQv');
 
     this._getButtonContainerElement().appendChild(buttonView.getElement());
-  }
-
-  _getPreviewImageUrl(): string | null | undefined {
-    var previewImage = this._getPreviewImage();
-
-    if (!previewImage) {
-      return null;
-    }
-
-    return previewImage.src;
-  }
-
-  _getPreviewImage(): HTMLImageElement {
-    return this._element.querySelector('img.aQG') as any;
   }
 
   _getButtonContainerElement(): HTMLElement {

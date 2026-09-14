@@ -1225,10 +1225,6 @@ class GmailComposeView {
     return querySelector(this.#element, '.eq');
   }
 
-  getInsertLinkButton(): HTMLElement {
-    return querySelector(this.#element, '.e5.aaA.aMZ');
-  }
-
   getSendButton(): HTMLElement {
     return querySelector(
       this.#element,
@@ -1326,10 +1322,6 @@ class GmailComposeView {
 
   getBottomBarTable(): HTMLElement {
     return querySelector(this.#element, '.aoP .aDh > table');
-  }
-
-  getBottomToolbarContainer(): HTMLElement {
-    return querySelector(this.#element, '.aoP .aDj');
   }
 
   getDiscardButton(): HTMLElement {
