@@ -598,7 +598,11 @@ class GmailRouteView implements RouteViewDriver {
       )
       .takeUntilBy(this._stopper)
       .onValue(() => {
-        placeSectionsContainer(main, sectionsContainer, selectors);
+        // Placement reads computed style. Waiting for the next frame keeps that read
+        // out of Gmail's row hover handling, where it makes the hover toolbar flicker.
+        requestAnimationFrame(() => {
+          placeSectionsContainer(main, sectionsContainer, selectors);
+        });
       });
   }
 
