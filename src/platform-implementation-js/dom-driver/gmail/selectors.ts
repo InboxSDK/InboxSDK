@@ -174,6 +174,14 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'appMenu.container': ['.aqk.aql.bkL'],
+
+  /**
+   * The main menu button in the Gmail header; its `aria-expanded` is read.
+   * Root: `document`.
+   */
+  'appMenu.burgerButton': [
+    'header[role="banner"] > div > div > div[aria-expanded]',
+  ],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

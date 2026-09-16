@@ -268,8 +268,9 @@ export default class GmailElementGetter {
   }
 
   getAppBurgerMenu() {
-    return document.querySelector<HTMLElement>(
-      'header[role="banner"] > div > div > div[aria-expanded]',
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'appMenu.burgerButton',
     );
   }
 
