@@ -305,20 +305,6 @@ export default class GmailElementGetter {
     }
   }
 
-  getRowListElementsContainer(): HTMLElement | null {
-    // This selector can find multiple elements but they should all be siblings
-    // so it's fine because we get the common parent.
-    return document.querySelector('.bGI.nH')?.parentElement ?? null;
-  }
-
-  getRowListElements(): HTMLElement[] | null {
-    const rowListElements = document.querySelectorAll<HTMLElement>('[gh=tl]');
-    if (rowListElements.length === 0) {
-      return null;
-    }
-    return Array.from(rowListElements);
-  }
-
   getScrollContainer(): HTMLElement | null {
     return document.querySelector('div.Tm.aeJ');
   }
@@ -331,10 +317,6 @@ export default class GmailElementGetter {
 
   getSearchSuggestionsBoxParent(): HTMLElement | null {
     return document.querySelector('table.gstl_50 > tbody > tr > td.gssb_e');
-  }
-
-  getSidebarContainerElement(): HTMLElement | null {
-    return document.querySelector('[role=main] table.Bs > tr .y3');
   }
 
   getThreadBackButton(): HTMLElement | null {
@@ -395,10 +377,6 @@ export default class GmailElementGetter {
   /** @deprecated this doesn't include Gmail themes where the frame is dark and the body is not. Use Global.gmailTheme instead */
   isDarkTheme(): boolean {
     return document.body.classList.contains('inboxsdk__gmail_dark_theme');
-  }
-
-  isPreviewPane(): boolean {
-    return !!document.querySelector('.aia');
   }
 
   isStandalone(): boolean {

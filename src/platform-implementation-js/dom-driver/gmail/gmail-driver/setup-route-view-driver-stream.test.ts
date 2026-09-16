@@ -11,6 +11,7 @@ import setupRouteViewDriverStream from './setup-route-view-driver-stream';
 
 import GmailRouteProcessor from '../views/gmail-route-view/gmail-route-processor';
 import GmailElementGetter from '../gmail-element-getter';
+import SelectorRegistry from '../../../lib/dom/selectorRegistry';
 import makeMutationEventInjector from '../../../../../test/lib/makeElementIntoEventEmitter';
 import MockMutationObserver from '../../../../../test/lib/mock-mutation-observer';
 
@@ -45,6 +46,7 @@ function makeMockDriver(): any {
     hashChangeNoViewChange: jest.fn(),
     showNativeRouteView: jest.fn(),
     showCustomThreadList: jest.fn(),
+    selectors: new SelectorRegistry(),
   };
   driver.elementGetter = new GmailElementGetter(driver);
   return driver;
