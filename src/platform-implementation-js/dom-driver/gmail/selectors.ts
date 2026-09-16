@@ -162,6 +162,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'leftNav.root': ['.aeN'],
+
+  /**
+   * The left nav when Gmail shows the app menu.
+   * Root: `document`.
+   */
+  'leftNav.appMenu': ['.aeN.WR.a6o.anZ.nH.oy8Mbf[role=navigation]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

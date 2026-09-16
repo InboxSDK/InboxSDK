@@ -12,10 +12,6 @@ import waitFor from '../../lib/wait-for';
 import type GmailDriver from './gmail-driver';
 
 /**
- * The selector for the new app menu https://support.google.com/mail/answer/11555490 -- FEB 2023
- */
-const APP_MENU = '.aeN.WR.a6o.anZ.nH.oy8Mbf[role=navigation]';
-/**
  * The left nav, present with or without the app menu.
  */
 const NAV_MENU = '.aeN.WR.nH.oy8Mbf[role=navigation]';
@@ -260,7 +256,7 @@ export default class GmailElementGetter {
           document.querySelector<HTMLElement>(NAV_MENU),
         );
 
-        if (!document.querySelector(APP_MENU)) {
+        if (!this.getAppMenu()) {
           return;
         }
 
@@ -286,7 +282,10 @@ export default class GmailElementGetter {
   }
 
   getAppMenu() {
-    return document.querySelector<HTMLElement>(APP_MENU);
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'leftNav.appMenu',
+    );
   }
 
   getAppHeader() {
