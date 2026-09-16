@@ -182,6 +182,12 @@ export const GMAIL_SELECTORS = {
   'appMenu.burgerButton': [
     'header[role="banner"] > div > div > div[aria-expanded]',
   ],
+
+  /**
+   * The app header, which toggles into panel-less mode with the app menu.
+   * Root: `document`.
+   */
+  'appMenu.header': ['.oy8Mbf.qp'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

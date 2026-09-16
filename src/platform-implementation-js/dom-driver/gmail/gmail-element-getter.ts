@@ -293,7 +293,10 @@ export default class GmailElementGetter {
   }
 
   getAppHeader() {
-    return document.querySelector<HTMLElement>('.oy8Mbf.qp');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'appMenu.header',
+    );
   }
 
   getSeparateSectionNavItemMenuInjectionContainer(): HTMLElement | null {
