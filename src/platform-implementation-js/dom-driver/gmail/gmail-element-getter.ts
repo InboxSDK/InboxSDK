@@ -178,7 +178,10 @@ export default class GmailElementGetter {
   }
 
   getGtalkButtons(): HTMLElement | null {
-    return document.querySelector('.aeN .aj5.J-KU-Jg');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'leftNav.gtalkButtons',
+    );
   }
 
   getLeftNavContainerElement(): HTMLElement | null {

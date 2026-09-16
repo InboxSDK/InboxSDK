@@ -188,6 +188,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'appMenu.header': ['.oy8Mbf.qp'],
+
+  /**
+   * The Hangouts buttons at the bottom of the left nav.
+   * Root: `document`.
+   */
+  'leftNav.gtalkButtons': ['.aeN .aj5.J-KU-Jg'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
