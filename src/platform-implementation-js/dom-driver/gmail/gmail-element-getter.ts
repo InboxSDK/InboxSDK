@@ -12,11 +12,6 @@ import waitFor from '../../lib/wait-for';
 import type GmailDriver from './gmail-driver';
 
 /**
- * The left nav, present with or without the app menu.
- */
-const NAV_MENU = '.aeN.WR.nH.oy8Mbf[role=navigation]';
-
-/**
  * The right-hand column holding the companion sidebar. Both the panel and the
  * icon rail live inside it.
  */
@@ -256,7 +251,10 @@ export default class GmailElementGetter {
 
       try {
         const element = await waitFor(() =>
-          document.querySelector<HTMLElement>(NAV_MENU),
+          this.#driver.selectors.querySelectorByKey(
+            document,
+            'leftNav.navMenu',
+          ),
         );
 
         if (!this.getAppMenu()) {

@@ -194,6 +194,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'leftNav.gtalkButtons': ['.aeN .aj5.J-KU-Jg'],
+
+  /**
+   * The left nav, present with or without the app menu.
+   * Root: `document`.
+   */
+  'leftNav.navMenu': ['.aeN.WR.nH.oy8Mbf[role=navigation]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
