@@ -168,6 +168,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'leftNav.appMenu': ['.aeN.WR.a6o.anZ.nH.oy8Mbf[role=navigation]'],
+
+  /**
+   * The app menu container, which holds the menu items and their panels.
+   * Root: `document`.
+   */
+  'appMenu.container': ['.aqk.aql.bkL'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

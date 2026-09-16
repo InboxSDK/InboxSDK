@@ -278,7 +278,10 @@ export default class GmailElementGetter {
   }
 
   getAppMenuContainer() {
-    return document.querySelector<HTMLElement>('.aqk.aql.bkL');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'appMenu.container',
+    );
   }
 
   getAppMenu() {
