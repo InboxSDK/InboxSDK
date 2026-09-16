@@ -16,7 +16,7 @@ import type GmailDriver from './gmail-driver';
  */
 const APP_MENU = '.aeN.WR.a6o.anZ.nH.oy8Mbf[role=navigation]';
 /**
- * If the APP_MENU selector is not found, NAV_MENU _might_ be present.
+ * The left nav, present with or without the app menu.
  */
 const NAV_MENU = '.aeN.WR.nH.oy8Mbf[role=navigation]';
 
@@ -257,7 +257,7 @@ export default class GmailElementGetter {
 
       try {
         const element = await waitFor(() =>
-          document.querySelector<HTMLElement>(`${APP_MENU}, ${NAV_MENU}`),
+          document.querySelector<HTMLElement>(NAV_MENU),
         );
 
         if (!document.querySelector(APP_MENU)) {
