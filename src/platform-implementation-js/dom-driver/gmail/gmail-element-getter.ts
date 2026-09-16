@@ -52,7 +52,7 @@ export const MOLE_PARENT_SELECTOR = `${MOLE_CONTAINER_SELECTOR} .nH > .nH > .no`
  * registry.
  */
 export default class GmailElementGetter {
-  /** Held for the selector registry migration; see the class docs. */
+  /** Supplies the selector registry the lookups resolve through. */
   readonly #driver: GmailDriver;
 
   #appMenuAsync?: Promise<HTMLElement | undefined>;
@@ -192,11 +192,11 @@ export default class GmailElementGetter {
     if (isIntegratedViewGmail()) {
       return document.querySelector('div[role=navigation] + div.aqn');
     }
-    return document.querySelector('.aeN');
+    return this.#driver.selectors.querySelectorByKey(document, 'leftNav.root');
   }
 
   getLeftNavHeightElement(): HTMLElement | null {
-    return document.querySelector('.aeN');
+    return this.#driver.selectors.querySelectorByKey(document, 'leftNav.root');
   }
 
   getMainContentBodyContainerElement(): HTMLElement | null {
@@ -294,7 +294,7 @@ export default class GmailElementGetter {
   }
 
   getSeparateSectionNavItemMenuInjectionContainer(): HTMLElement | null {
-    return document.querySelector('.aeN');
+    return this.#driver.selectors.querySelectorByKey(document, 'leftNav.root');
   }
 
   getSameSectionNavItemMenuInjectionContainer(): HTMLElement | null {

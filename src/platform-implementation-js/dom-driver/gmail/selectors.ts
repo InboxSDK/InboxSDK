@@ -156,6 +156,12 @@ export const GMAIL_SELECTORS = {
    * Root: `routeView.rowListWrapper`.
    */
   'routeView.listToolbar': ['[gh=tm]', '.G-atb'],
+
+  /**
+   * The left nav column.
+   * Root: `document`.
+   */
+  'leftNav.root': ['.aeN'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
