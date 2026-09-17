@@ -203,6 +203,13 @@ export const GMAIL_SELECTORS = {
   'threadView.openMessage': ['.h7'],
 
   /**
+   * The expand-all icon. The code walks up to its `role=button` ancestor, so
+   * stay at the image.
+   * Root: thread element.
+   */
+  'threadView.expandAllButton': ['img.gx'],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */

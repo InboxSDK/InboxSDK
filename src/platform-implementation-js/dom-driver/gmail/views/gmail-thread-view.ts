@@ -1061,8 +1061,10 @@ class GmailThreadView {
 
   #listenToExpandCollapseAll() {
     //expand all
-    const expandAllElementImg =
-      this.#element.querySelector<HTMLElement>('img.gx');
+    const expandAllElementImg = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.expandAllButton',
+    );
 
     if (expandAllElementImg) {
       const expandAllElement = findParent(
