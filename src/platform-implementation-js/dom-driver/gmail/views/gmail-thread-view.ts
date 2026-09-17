@@ -198,16 +198,6 @@ class GmailThreadView {
     return sidebar.addThreadSidebarContentPanel(descriptor, this);
   }
 
-  #subjectContainerSelectors = {
-    '2022_10_21': '.a98.iY > .nH',
-    '2022_10_12': '.PeIF1d > .nH',
-    [2018]: '.if > .nH',
-  };
-
-  #subjectContainerSelectorsAfterNov162023 = {
-    '2023_11_16': '* > .nH',
-  };
-
   #subjectAISuggestionsContainerSelectors = {
     '2024_04_26': '.nH > .einvLd',
   };
@@ -215,33 +205,21 @@ class GmailThreadView {
   addNoticeBar(): SimpleElementView {
     const el = document.createElement('div');
     el.className = idMap('thread_noticeBar');
-    let version;
-    let subjectContainer;
 
-    let selectorsToTry: Record<string, string> =
-      this.#subjectContainerSelectors;
+    // `.a98.iY` is the thread view gmail update Nov 16, 2023
+    const subjectContainerKey = this.#element.matches('.a98.iY')
+      ? 'threadView.subjectContainer'
+      : 'threadView.subjectContainerLegacy';
 
-    if (this.#element.matches('.a98.iY')) {
-      // thread view gmail update Nov 16, 2023
-      selectorsToTry = this.#subjectContainerSelectorsAfterNov162023;
-    }
-
-    for (const [currentVersion, selector] of Object.entries(selectorsToTry)) {
-      const el = this.#element.querySelector(selector);
-
-      if (!el) {
-        continue;
-      }
-
-      version = currentVersion;
-      subjectContainer = el;
-      break;
-    }
+    const subjectContainer = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      subjectContainerKey,
+    );
 
     if (!subjectContainer) throw new Error('Failed to find subject container');
 
     this.#driver.getLogger().eventSdkPassive('addNoticeBar subjectContainer', {
-      version,
+      version: subjectContainerKey,
     });
 
     // AI suggestions container could be rendered after the subject container so
@@ -295,7 +273,10 @@ class GmailThreadView {
     if (!parentElement) throw new Error('missing parent element');
     const customMessageView = new CustomMessageView(descriptorStream, () => {
       this.#readyStream.onValue(async () => {
-        const messageContainer = this.#element.querySelector('[role=list]');
+        const messageContainer = this.#driver.selectors.querySelectorByKey(
+          this.#element,
+          'threadView.messageList',
+        );
 
         if (!messageContainer) return;
         let mostRecentDate = Number.MIN_SAFE_INTEGER;
@@ -387,8 +368,10 @@ class GmailThreadView {
       .classList.add('inboxsdk__custom_message_view_hidden');
 
     // get the message element that contains the hidden messages notice
-    let hiddenNoticeMessageElement =
-      this.#element.querySelector<HTMLElement>('.adv');
+    let hiddenNoticeMessageElement = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.hiddenNoticeMessage',
+    );
 
     let nativeHiddenNoticePresent = true;
 
@@ -469,10 +452,11 @@ class GmailThreadView {
     let numberNativeHiddenMessages = null;
 
     if (nativeHiddenNoticePresent) {
-      const nativeHiddenNoticeCountSpan = querySelector(
-        hiddenNoticeMessageElement,
-        '.adx span',
-      );
+      const nativeHiddenNoticeCountSpan =
+        this.#driver.selectors.querySelectorByKeyOrFail(
+          hiddenNoticeMessageElement,
+          'threadView.hiddenNoticeCount',
+        );
       numberNativeHiddenMessages = Number(
         nativeHiddenNoticeCountSpan.innerHTML,
       );
@@ -501,7 +485,10 @@ class GmailThreadView {
     if (!nativeHiddenNoticePresent) {
       const fakeAppNoticeElement = document.createElement('span');
       fakeAppNoticeElement.classList.add('adx');
-      const insertionPoint = querySelector(hiddenNoticeMessageElement, '.G3');
+      const insertionPoint = this.#driver.selectors.querySelectorByKeyOrFail(
+        hiddenNoticeMessageElement,
+        'threadView.hiddenNoticeSlot',
+      );
       insertionPoint.appendChild(fakeAppNoticeElement);
     }
 
@@ -639,7 +626,10 @@ class GmailThreadView {
   }
 
   addLabel(): SimpleElementView {
-    const labelContainer = this.#element.querySelector('.ha .J-J5-Ji');
+    const labelContainer = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.labelContainer',
+    );
 
     if (!labelContainer) {
       throw new Error('Thread view label container not found');
@@ -680,9 +670,12 @@ class GmailThreadView {
   }
 
   addSubjectButton(button: ButtonDescriptor) {
-    const subjectParent = this.#element.querySelector('.V8djrc.byY');
+    const subjectParent = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.subjectParent',
+    );
     if (!subjectParent) {
-      throw new SelectorError('.V8djrc.byY', {
+      throw new SelectorError('threadView.subjectParent', {
         cause: 'Subject wrapper element not found',
       });
     }
@@ -731,13 +724,15 @@ class GmailThreadView {
   }
 
   addFooterButton(button: ButtonDescriptor) {
-    const messagesSelector = 'div.nH .aHU';
-    const messagesContainer = this.#element.querySelector(messagesSelector);
+    const messagesContainer = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.messagesContainer',
+    );
     if (!messagesContainer) {
       this.#driver.getLogger().eventSdkPassive('Footer button selector fail', {
         html: censorHTMLtree(this.#element),
       });
-      throw new SelectorError(messagesSelector, {
+      throw new SelectorError('threadView.messagesContainer', {
         cause: 'Last message footer element not found',
       });
     }
@@ -848,9 +843,10 @@ class GmailThreadView {
   }
 
   #findSubjectToolbarElement(): HTMLElement | null {
-    var toolbarContainerElement =
-      this.#element.querySelector<HTMLElement>('.bHJ');
-    return toolbarContainerElement;
+    return this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.subjectToolbar',
+    );
   }
 
   #findBottomReplyToolbarElement(): HTMLElement | null {
@@ -924,7 +920,10 @@ class GmailThreadView {
   }
 
   #setupMessageViewStream() {
-    var openMessage = this.#element.querySelector('.h7');
+    var openMessage = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.openMessage',
+    );
 
     if (!openMessage) {
       var self = this;
@@ -1040,8 +1039,10 @@ class GmailThreadView {
 
   #listenToExpandCollapseAll() {
     //expand all
-    const expandAllElementImg =
-      this.#element.querySelector<HTMLElement>('img.gx');
+    const expandAllElementImg = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.expandAllButton',
+    );
 
     if (expandAllElementImg) {
       const expandAllElement = findParent(
@@ -1070,8 +1071,10 @@ class GmailThreadView {
     }
 
     //collapse all
-    const collapseAllElementImg =
-      this.#element.querySelector<HTMLElement>('img.gq');
+    const collapseAllElementImg = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.collapseAllButton',
+    );
 
     if (collapseAllElementImg) {
       const collapseAllElement = findParent(
