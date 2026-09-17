@@ -178,6 +178,12 @@ export const GMAIL_SELECTORS = {
   'threadView.labelContainer': ['.ha .J-J5-Ji'],
 
   /**
+   * The subject wrapper that subject buttons are added to.
+   * Root: thread element.
+   */
+  'threadView.subjectParent': ['.V8djrc.byY'],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */

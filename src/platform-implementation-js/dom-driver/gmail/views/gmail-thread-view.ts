@@ -692,9 +692,12 @@ class GmailThreadView {
   }
 
   addSubjectButton(button: ButtonDescriptor) {
-    const subjectParent = this.#element.querySelector('.V8djrc.byY');
+    const subjectParent = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.subjectParent',
+    );
     if (!subjectParent) {
-      throw new SelectorError('.V8djrc.byY', {
+      throw new SelectorError('threadView.subjectParent', {
         cause: 'Subject wrapper element not found',
       });
     }
