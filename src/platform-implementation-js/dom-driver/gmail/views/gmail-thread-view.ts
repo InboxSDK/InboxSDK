@@ -507,7 +507,10 @@ class GmailThreadView {
     if (!nativeHiddenNoticePresent) {
       const fakeAppNoticeElement = document.createElement('span');
       fakeAppNoticeElement.classList.add('adx');
-      const insertionPoint = querySelector(hiddenNoticeMessageElement, '.G3');
+      const insertionPoint = this.#driver.selectors.querySelectorByKeyOrFail(
+        hiddenNoticeMessageElement,
+        'threadView.hiddenNoticeSlot',
+      );
       insertionPoint.appendChild(fakeAppNoticeElement);
     }
 

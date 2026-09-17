@@ -165,6 +165,12 @@ export const GMAIL_SELECTORS = {
   'threadView.hiddenNoticeCount': ['.adx span'],
 
   /**
+   * Where a stand-in notice is inserted when Gmail renders no native one.
+   * Root: `threadView.hiddenNoticeMessage`.
+   */
+  'threadView.hiddenNoticeSlot': ['.G3'],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */
