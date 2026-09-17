@@ -648,7 +648,10 @@ class GmailThreadView {
   }
 
   addLabel(): SimpleElementView {
-    const labelContainer = this.#element.querySelector('.ha .J-J5-Ji');
+    const labelContainer = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.labelContainer',
+    );
 
     if (!labelContainer) {
       throw new Error('Thread view label container not found');

@@ -171,6 +171,13 @@ export const GMAIL_SELECTORS = {
   'threadView.hiddenNoticeSlot': ['.G3'],
 
   /**
+   * The container an app's thread label is appended to, and re-appended to
+   * whenever Gmail removes it.
+   * Root: thread element.
+   */
+  'threadView.labelContainer': ['.ha .J-J5-Ji'],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */
