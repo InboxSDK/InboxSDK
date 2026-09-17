@@ -190,6 +190,12 @@ export const GMAIL_SELECTORS = {
   'threadView.messagesContainer': ['div.nH .aHU'],
 
   /**
+   * The toolbar beside the thread subject, which subject buttons are put in.
+   * Root: thread element.
+   */
+  'threadView.subjectToolbar': ['.bHJ'],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */

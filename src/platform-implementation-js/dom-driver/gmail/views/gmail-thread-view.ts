@@ -865,9 +865,10 @@ class GmailThreadView {
   }
 
   #findSubjectToolbarElement(): HTMLElement | null {
-    var toolbarContainerElement =
-      this.#element.querySelector<HTMLElement>('.bHJ');
-    return toolbarContainerElement;
+    return this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.subjectToolbar',
+    );
   }
 
   #findBottomReplyToolbarElement(): HTMLElement | null {
