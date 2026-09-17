@@ -146,6 +146,13 @@ export const GMAIL_SELECTORS = {
   'threadView.subject': ['.ha h2'],
 
   /**
+   * The list holding the thread's messages, which custom messages are
+   * inserted into.
+   * Root: thread element.
+   */
+  'threadView.messageList': ['[role=list]'],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */

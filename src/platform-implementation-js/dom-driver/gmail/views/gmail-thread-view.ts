@@ -295,7 +295,10 @@ class GmailThreadView {
     if (!parentElement) throw new Error('missing parent element');
     const customMessageView = new CustomMessageView(descriptorStream, () => {
       this.#readyStream.onValue(async () => {
-        const messageContainer = this.#element.querySelector('[role=list]');
+        const messageContainer = this.#driver.selectors.querySelectorByKey(
+          this.#element,
+          'threadView.messageList',
+        );
 
         if (!messageContainer) return;
         let mostRecentDate = Number.MIN_SAFE_INTEGER;
