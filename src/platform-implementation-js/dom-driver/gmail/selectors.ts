@@ -184,6 +184,12 @@ export const GMAIL_SELECTORS = {
   'threadView.subjectParent': ['.V8djrc.byY'],
 
   /**
+   * The messages container, whose last message footer holds footer buttons.
+   * Root: thread element.
+   */
+  'threadView.messagesContainer': ['div.nH .aHU'],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */

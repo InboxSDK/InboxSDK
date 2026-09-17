@@ -746,13 +746,15 @@ class GmailThreadView {
   }
 
   addFooterButton(button: ButtonDescriptor) {
-    const messagesSelector = 'div.nH .aHU';
-    const messagesContainer = this.#element.querySelector(messagesSelector);
+    const messagesContainer = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.messagesContainer',
+    );
     if (!messagesContainer) {
       this.#driver.getLogger().eventSdkPassive('Footer button selector fail', {
         html: censorHTMLtree(this.#element),
       });
-      throw new SelectorError(messagesSelector, {
+      throw new SelectorError('threadView.messagesContainer', {
         cause: 'Last message footer element not found',
       });
     }
