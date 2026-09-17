@@ -390,8 +390,10 @@ class GmailThreadView {
       .classList.add('inboxsdk__custom_message_view_hidden');
 
     // get the message element that contains the hidden messages notice
-    let hiddenNoticeMessageElement =
-      this.#element.querySelector<HTMLElement>('.adv');
+    let hiddenNoticeMessageElement = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.hiddenNoticeMessage',
+    );
 
     let nativeHiddenNoticePresent = true;
 

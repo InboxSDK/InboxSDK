@@ -153,6 +153,12 @@ export const GMAIL_SELECTORS = {
   'threadView.messageList': ['[role=list]'],
 
   /**
+   * The message element that contains the hidden messages notice.
+   * Root: thread element.
+   */
+  'threadView.hiddenNoticeMessage': ['.adv'],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */
