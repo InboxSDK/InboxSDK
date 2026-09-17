@@ -156,6 +156,54 @@ export const GMAIL_SELECTORS = {
    * Root: `routeView.rowListWrapper`.
    */
   'routeView.listToolbar': ['[gh=tm]', '.G-atb'],
+
+  /**
+   * The left nav column.
+   * Root: `document`.
+   */
+  'leftNav.root': ['.aeN'],
+
+  /**
+   * The left nav when Gmail shows the app menu
+   * https://support.google.com/mail/answer/11555490
+   * Root: `document`.
+   */
+  'leftNav.appMenu': ['.aeN.WR.a6o.anZ.nH.oy8Mbf[role=navigation]'],
+
+  /**
+   * The app menu container, which holds the menu items and their panels.
+   * Root: `document`.
+   */
+  'appMenu.container': ['.aqk.aql.bkL'],
+
+  /**
+   * The main menu button in the Gmail header; its `aria-expanded` is read.
+   * Root: `document`.
+   */
+  'appMenu.burgerButton': [
+    'header[role="banner"] > div > div > div[aria-expanded]',
+  ],
+
+  /**
+   * The app header, which toggles into panel-less mode with the app menu.
+   * Root: `document`.
+   */
+  'appMenu.header': ['.oy8Mbf.qp'],
+
+  /**
+   * The Hangouts buttons at the bottom of the left nav.
+   * Root: `document`.
+   */
+  'leftNav.gtalkButtons': ['.aeN .aj5.J-KU-Jg'],
+
+  /**
+   * This selector matches the app menu if it is or will be present, otherwise if
+   * we're in a mode of Gmail without the app menu, then this might match the
+   * collapsible panel left nav menu instead. We wait for this selector so we can
+   * know when the app menu is ready or if it will never be ready.
+   * Root: `document`.
+   */
+  'leftNav.appMenuOrNavMenuFallback': ['.aeN.WR.nH.oy8Mbf[role=navigation]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

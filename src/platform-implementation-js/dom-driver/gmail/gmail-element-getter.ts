@@ -12,15 +12,6 @@ import waitFor from '../../lib/wait-for';
 import type GmailDriver from './gmail-driver';
 
 /**
- * The selector for the new app menu https://support.google.com/mail/answer/11555490 -- FEB 2023
- */
-const APP_MENU = '.aeN.WR.a6o.anZ.nH.oy8Mbf[role=navigation]';
-/**
- * If the APP_MENU selector is not found, NAV_MENU _might_ be present.
- */
-const NAV_MENU = '.aeN.WR.nH.oy8Mbf[role=navigation]';
-
-/**
  * The right-hand column holding the companion sidebar. Both the panel and the
  * icon rail live inside it.
  */
@@ -52,7 +43,7 @@ export const MOLE_PARENT_SELECTOR = `${MOLE_CONTAINER_SELECTOR} .nH > .nH > .no`
  * registry.
  */
 export default class GmailElementGetter {
-  /** Held for the selector registry migration; see the class docs. */
+  /** Supplies the selector registry the lookups resolve through. */
   readonly #driver: GmailDriver;
 
   #appMenuAsync?: Promise<HTMLElement | undefined>;
@@ -182,7 +173,10 @@ export default class GmailElementGetter {
   }
 
   getGtalkButtons(): HTMLElement | null {
-    return document.querySelector('.aeN .aj5.J-KU-Jg');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'leftNav.gtalkButtons',
+    );
   }
 
   getLeftNavContainerElement(): HTMLElement | null {
@@ -192,11 +186,11 @@ export default class GmailElementGetter {
     if (isIntegratedViewGmail()) {
       return document.querySelector('div[role=navigation] + div.aqn');
     }
-    return document.querySelector('.aeN');
+    return this.#driver.selectors.querySelectorByKey(document, 'leftNav.root');
   }
 
   getLeftNavHeightElement(): HTMLElement | null {
-    return document.querySelector('.aeN');
+    return this.#driver.selectors.querySelectorByKey(document, 'leftNav.root');
   }
 
   getMainContentBodyContainerElement(): HTMLElement | null {
@@ -257,10 +251,13 @@ export default class GmailElementGetter {
 
       try {
         const element = await waitFor(() =>
-          document.querySelector<HTMLElement>(`${APP_MENU}, ${NAV_MENU}`),
+          this.#driver.selectors.querySelectorByKey(
+            document,
+            'leftNav.appMenuOrNavMenuFallback',
+          ),
         );
 
-        if (!document.querySelector(APP_MENU)) {
+        if (!this.getAppMenu()) {
           return;
         }
 
@@ -272,8 +269,9 @@ export default class GmailElementGetter {
   }
 
   getAppBurgerMenu() {
-    return document.querySelector<HTMLElement>(
-      'header[role="banner"] > div > div > div[aria-expanded]',
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'appMenu.burgerButton',
     );
   }
 
@@ -282,19 +280,28 @@ export default class GmailElementGetter {
   }
 
   getAppMenuContainer() {
-    return document.querySelector<HTMLElement>('.aqk.aql.bkL');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'appMenu.container',
+    );
   }
 
   getAppMenu() {
-    return document.querySelector<HTMLElement>(APP_MENU);
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'leftNav.appMenu',
+    );
   }
 
   getAppHeader() {
-    return document.querySelector<HTMLElement>('.oy8Mbf.qp');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'appMenu.header',
+    );
   }
 
   getSeparateSectionNavItemMenuInjectionContainer(): HTMLElement | null {
-    return document.querySelector('.aeN');
+    return this.#driver.selectors.querySelectorByKey(document, 'leftNav.root');
   }
 
   getSameSectionNavItemMenuInjectionContainer(): HTMLElement | null {
