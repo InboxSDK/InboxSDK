@@ -196,6 +196,13 @@ export const GMAIL_SELECTORS = {
   'threadView.subjectToolbar': ['.bHJ'],
 
   /**
+   * An expanded message. Its PARENT is the container the message view stream
+   * watches, so stay at this depth.
+   * Root: thread element.
+   */
+  'threadView.openMessage': ['.h7'],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */

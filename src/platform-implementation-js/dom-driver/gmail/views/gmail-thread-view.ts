@@ -942,7 +942,10 @@ class GmailThreadView {
   }
 
   #setupMessageViewStream() {
-    var openMessage = this.#element.querySelector('.h7');
+    var openMessage = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.openMessage',
+    );
 
     if (!openMessage) {
       var self = this;
