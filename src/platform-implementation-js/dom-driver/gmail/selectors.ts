@@ -210,6 +210,13 @@ export const GMAIL_SELECTORS = {
   'threadView.expandAllButton': ['img.gx'],
 
   /**
+   * The collapse-all icon. The code walks up to its `role=button` ancestor, so
+   * stay at the image.
+   * Root: thread element.
+   */
+  'threadView.collapseAllButton': ['img.gq'],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */

@@ -1093,8 +1093,10 @@ class GmailThreadView {
     }
 
     //collapse all
-    const collapseAllElementImg =
-      this.#element.querySelector<HTMLElement>('img.gq');
+    const collapseAllElementImg = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'threadView.collapseAllButton',
+    );
 
     if (collapseAllElementImg) {
       const collapseAllElement = findParent(
