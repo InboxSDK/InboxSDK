@@ -217,6 +217,30 @@ export const GMAIL_SELECTORS = {
   'threadView.collapseAllButton': ['img.gq'],
 
   /**
+   * The subject container the notice bar is inserted into, in the current
+   * thread view.
+   * Root: thread element.
+   */
+  'threadView.subjectContainer': [
+    // 2023-11-16 thread-view redesign
+    '* > .nH',
+  ],
+
+  /**
+   * The subject container the notice bar is inserted into, in the thread
+   * views that predate the redesign.
+   * Root: thread element.
+   */
+  'threadView.subjectContainerLegacy': [
+    // 2018 layout
+    '.if > .nH',
+    // 2022-10-21 layout
+    '.a98.iY > .nH',
+    // 2022-10-12 layout
+    '.PeIF1d > .nH',
+  ],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */

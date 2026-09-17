@@ -198,16 +198,6 @@ class GmailThreadView {
     return sidebar.addThreadSidebarContentPanel(descriptor, this);
   }
 
-  #subjectContainerSelectors = {
-    '2022_10_21': '.a98.iY > .nH',
-    '2022_10_12': '.PeIF1d > .nH',
-    [2018]: '.if > .nH',
-  };
-
-  #subjectContainerSelectorsAfterNov162023 = {
-    '2023_11_16': '* > .nH',
-  };
-
   #subjectAISuggestionsContainerSelectors = {
     '2024_04_26': '.nH > .einvLd',
   };
@@ -215,33 +205,21 @@ class GmailThreadView {
   addNoticeBar(): SimpleElementView {
     const el = document.createElement('div');
     el.className = idMap('thread_noticeBar');
-    let version;
-    let subjectContainer;
 
-    let selectorsToTry: Record<string, string> =
-      this.#subjectContainerSelectors;
+    // `.a98.iY` is the thread view gmail update Nov 16, 2023
+    const subjectContainerKey = this.#element.matches('.a98.iY')
+      ? 'threadView.subjectContainer'
+      : 'threadView.subjectContainerLegacy';
 
-    if (this.#element.matches('.a98.iY')) {
-      // thread view gmail update Nov 16, 2023
-      selectorsToTry = this.#subjectContainerSelectorsAfterNov162023;
-    }
-
-    for (const [currentVersion, selector] of Object.entries(selectorsToTry)) {
-      const el = this.#element.querySelector(selector);
-
-      if (!el) {
-        continue;
-      }
-
-      version = currentVersion;
-      subjectContainer = el;
-      break;
-    }
+    const subjectContainer = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      subjectContainerKey,
+    );
 
     if (!subjectContainer) throw new Error('Failed to find subject container');
 
     this.#driver.getLogger().eventSdkPassive('addNoticeBar subjectContainer', {
-      version,
+      version: subjectContainerKey,
     });
 
     // AI suggestions container could be rendered after the subject container so
