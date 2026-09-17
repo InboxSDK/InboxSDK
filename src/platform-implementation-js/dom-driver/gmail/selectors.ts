@@ -159,6 +159,12 @@ export const GMAIL_SELECTORS = {
   'threadView.hiddenNoticeMessage': ['.adv'],
 
   /**
+   * The span holding the number of messages Gmail has hidden; read as a number.
+   * Root: `threadView.hiddenNoticeMessage`.
+   */
+  'threadView.hiddenNoticeCount': ['.adx span'],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */

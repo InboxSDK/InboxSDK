@@ -474,10 +474,11 @@ class GmailThreadView {
     let numberNativeHiddenMessages = null;
 
     if (nativeHiddenNoticePresent) {
-      const nativeHiddenNoticeCountSpan = querySelector(
-        hiddenNoticeMessageElement,
-        '.adx span',
-      );
+      const nativeHiddenNoticeCountSpan =
+        this.#driver.selectors.querySelectorByKeyOrFail(
+          hiddenNoticeMessageElement,
+          'threadView.hiddenNoticeCount',
+        );
       numberNativeHiddenMessages = Number(
         nativeHiddenNoticeCountSpan.innerHTML,
       );
