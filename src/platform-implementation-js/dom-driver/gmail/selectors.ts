@@ -164,7 +164,8 @@ export const GMAIL_SELECTORS = {
   'leftNav.root': ['.aeN'],
 
   /**
-   * The left nav when Gmail shows the app menu.
+   * The left nav when Gmail shows the app menu
+   * https://support.google.com/mail/answer/11555490
    * Root: `document`.
    */
   'leftNav.appMenu': ['.aeN.WR.a6o.anZ.nH.oy8Mbf[role=navigation]'],
@@ -196,10 +197,13 @@ export const GMAIL_SELECTORS = {
   'leftNav.gtalkButtons': ['.aeN .aj5.J-KU-Jg'],
 
   /**
-   * The left nav, present with or without the app menu.
+   * This selector matches the app menu if it is or will be present, otherwise if
+   * we're in a mode of Gmail without the app menu, then this might match the
+   * collapsible panel left nav menu instead. We wait for this selector so we can
+   * know when the app menu is ready or if it will never be ready.
    * Root: `document`.
    */
-  'leftNav.navMenu': ['.aeN.WR.nH.oy8Mbf[role=navigation]'],
+  'leftNav.appMenuOrNavMenuFallback': ['.aeN.WR.nH.oy8Mbf[role=navigation]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

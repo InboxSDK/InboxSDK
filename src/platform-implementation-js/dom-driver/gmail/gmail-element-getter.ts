@@ -253,7 +253,7 @@ export default class GmailElementGetter {
         const element = await waitFor(() =>
           this.#driver.selectors.querySelectorByKey(
             document,
-            'leftNav.navMenu',
+            'leftNav.appMenuOrNavMenuFallback',
           ),
         );
 
