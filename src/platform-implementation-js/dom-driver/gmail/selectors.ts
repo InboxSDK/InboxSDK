@@ -177,6 +177,13 @@ export const GMAIL_SELECTORS = {
   'messageView.senderHeading': ['h3.iw'],
 
   /**
+   * Gmail's attachment area. The area the SDK builds carries the same class,
+   * so this can also match that one.
+   * Root: message element.
+   */
+  'messageView.attachmentArea': ['.hq'],
+
+  /**
    * The thread's subject heading. Read for its text, or walked child by child
    * when it contains emoji images.
    * Root: thread element.

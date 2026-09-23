@@ -995,12 +995,12 @@ class GmailMessageView {
   }
 
   #getAttachmentArea(): GmailAttachmentAreaView | null | undefined {
-    if (this.#element.querySelector('.hq')) {
-      return new GmailAttachmentAreaView(
-        this.#element.querySelector<HTMLElement>('.hq'),
-        this.#driver,
-        this,
-      );
+    const attachmentArea = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'messageView.attachmentArea',
+    );
+    if (attachmentArea) {
+      return new GmailAttachmentAreaView(attachmentArea, this.#driver, this);
     }
 
     return null;
