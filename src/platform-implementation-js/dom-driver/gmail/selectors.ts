@@ -184,6 +184,12 @@ export const GMAIL_SELECTORS = {
   'messageView.attachmentArea': ['.hq'],
 
   /**
+   * The element the SDK's own attachment area is inserted before.
+   * Root: message element.
+   */
+  'messageView.attachmentAreaAnchor': ['.hi'],
+
+  /**
    * The thread's subject heading. Read for its text, or walked child by child
    * when it contains emoji images.
    * Root: thread element.

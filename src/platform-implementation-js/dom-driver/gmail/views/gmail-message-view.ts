@@ -14,7 +14,6 @@ import {
   createMoreMenuItem,
 } from './gmail-message-view/more-menu-item';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
-import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import streamWaitFor from '../../../lib/stream-wait-for';
 import type { ElementWithLifetime } from '../../../lib/dom/make-element-child-stream';
@@ -1012,7 +1011,10 @@ class GmailMessageView {
       this.#driver,
       this,
     );
-    const beforeElement = querySelector(this.#element, '.hi');
+    const beforeElement = this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'messageView.attachmentAreaAnchor',
+    );
     const parentNode = beforeElement.parentNode;
     if (!parentNode) throw new Error('parentNode not found');
     parentNode.insertBefore(
