@@ -164,6 +164,12 @@ export const GMAIL_SELECTORS = {
   'messageView.attachmentIconSlotCollapsed': ['.adf.ads td.gH span'],
 
   /**
+   * The container that holds an inline reply; watched for its class change.
+   * Root: message element.
+   */
+  'messageView.replyContainer': ['.ip'],
+
+  /**
    * The thread's subject heading. Read for its text, or walked child by child
    * when it contains emoji images.
    * Root: thread element.

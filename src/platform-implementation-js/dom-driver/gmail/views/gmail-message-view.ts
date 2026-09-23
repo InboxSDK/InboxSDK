@@ -889,7 +889,10 @@ class GmailMessageView {
   }
 
   #setupReplyStream() {
-    const replyContainer = this.#element.querySelector<HTMLElement>('.ip');
+    const replyContainer = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'messageView.replyContainer',
+    );
 
     if (!replyContainer) {
       return;
