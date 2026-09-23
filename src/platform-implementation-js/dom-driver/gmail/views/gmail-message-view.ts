@@ -495,8 +495,9 @@ class GmailMessageView {
       throw new Error('tried to get message id before message is loaded');
     }
 
-    const messageIdElement = this.#element.querySelector(
-      '[data-legacy-message-id]',
+    const messageIdElement = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'messageView.legacyIdElement',
     );
 
     if (messageIdElement) {

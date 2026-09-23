@@ -145,6 +145,13 @@ export const GMAIL_SELECTORS = {
   'messageView.syncIdElement': ['[data-message-id]'],
 
   /**
+   * The element carrying `data-legacy-message-id`. The SDK also writes that
+   * attribute onto `messageView.syncIdElement`, so a rung must match both.
+   * Root: message element.
+   */
+  'messageView.legacyIdElement': ['[data-legacy-message-id]'],
+
+  /**
    * The thread's subject heading. Read for its text, or walked child by child
    * when it contains emoji images.
    * Root: thread element.
