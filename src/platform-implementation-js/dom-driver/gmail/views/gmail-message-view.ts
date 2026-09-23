@@ -253,8 +253,9 @@ class GmailMessageView {
   getRecipients(): Array<ContactNameOptional> {
     let recipients = this.#recipients;
     if (recipients) return recipients;
-    const receipientSpans = Array.from(
-      this.#element.querySelectorAll('.hb span[email]'),
+    const receipientSpans = this.#driver.selectors.querySelectorAllByKey(
+      this.#element,
+      'messageView.recipientSpans',
     );
     recipients = this.#recipients = receipientSpans.map((span) => {
       return this.#getUpdatedContact({
@@ -268,8 +269,9 @@ class GmailMessageView {
   getRecipientEmailAddresses(): Array<string> {
     let recipients = this.#recipientEmailAddresses;
     if (recipients) return recipients;
-    const receipientSpans = Array.from(
-      this.#element.querySelectorAll('.hb span[email]'),
+    const receipientSpans = this.#driver.selectors.querySelectorAllByKey(
+      this.#element,
+      'messageView.recipientSpans',
     );
     recipients = this.#recipientEmailAddresses = receipientSpans.map(
       (span) => span.getAttribute('email') || '',

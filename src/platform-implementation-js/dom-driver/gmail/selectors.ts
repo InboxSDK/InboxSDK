@@ -190,6 +190,12 @@ export const GMAIL_SELECTORS = {
   'messageView.attachmentAreaAnchor': ['.hi'],
 
   /**
+   * The recipients' spans in a message header; each carries `email` and `name`.
+   * Root: message element.
+   */
+  'messageView.recipientSpans': ['.hb span[email]'],
+
+  /**
    * The thread's subject heading. Read for its text, or walked child by child
    * when it contains emoji images.
    * Root: thread element.
