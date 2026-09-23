@@ -633,9 +633,15 @@ class GmailMessageView {
           let attachmentDiv;
 
           if (this.getViewState() === 'COLLAPSED') {
-            attachmentDiv = querySelector(this.#element, '.adf.ads td.gH span');
+            attachmentDiv = this.#driver.selectors.querySelectorByKeyOrFail(
+              this.#element,
+              'messageView.attachmentIconSlotCollapsed',
+            );
           } else {
-            attachmentDiv = querySelector(this.#element, 'td.gH div.gK span');
+            attachmentDiv = this.#driver.selectors.querySelectorByKeyOrFail(
+              this.#element,
+              'messageView.attachmentIconSlot',
+            );
           }
 
           const img =

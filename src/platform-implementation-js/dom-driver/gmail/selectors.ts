@@ -152,6 +152,18 @@ export const GMAIL_SELECTORS = {
   'messageView.legacyIdElement': ['[data-legacy-message-id]'],
 
   /**
+   * The header span attachment icons are added to, in an expanded message.
+   * Root: message element.
+   */
+  'messageView.attachmentIconSlot': ['td.gH div.gK span'],
+
+  /**
+   * The header span attachment icons are added to, in a collapsed message.
+   * Root: message element.
+   */
+  'messageView.attachmentIconSlotCollapsed': ['.adf.ads td.gH span'],
+
+  /**
    * The thread's subject heading. Read for its text, or walked child by child
    * when it contains emoji images.
    * Root: thread element.
