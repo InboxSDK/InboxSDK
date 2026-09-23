@@ -146,6 +146,101 @@ export const GMAIL_SELECTORS = {
   'threadView.subject': ['.ha h2'],
 
   /**
+   * The list holding the thread's messages, which custom messages are
+   * inserted into.
+   * Root: thread element.
+   */
+  'threadView.messageList': ['[role=list]'],
+
+  /**
+   * The message element that contains the hidden messages notice.
+   * Root: thread element.
+   */
+  'threadView.hiddenNoticeMessage': ['.adv'],
+
+  /**
+   * The span holding the number of messages Gmail has hidden; read as a number.
+   * Root: `threadView.hiddenNoticeMessage`.
+   */
+  'threadView.hiddenNoticeCount': ['.adx span'],
+
+  /**
+   * Where a stand-in notice is inserted when Gmail renders no native one.
+   * Root: `threadView.hiddenNoticeMessage`.
+   */
+  'threadView.hiddenNoticeSlot': ['.G3'],
+
+  /**
+   * The container an app's thread label is appended to, and re-appended to
+   * whenever Gmail removes it.
+   * Root: thread element.
+   */
+  'threadView.labelContainer': ['.ha .J-J5-Ji'],
+
+  /**
+   * The subject wrapper that subject buttons are added to.
+   * Root: thread element.
+   */
+  'threadView.subjectParent': ['.V8djrc.byY'],
+
+  /**
+   * The messages container, whose last message footer holds footer buttons.
+   * Root: thread element.
+   */
+  'threadView.messagesContainer': ['div.nH .aHU'],
+
+  /**
+   * The toolbar beside the thread subject, which subject buttons are put in.
+   * Root: thread element.
+   */
+  'threadView.subjectToolbar': ['.bHJ'],
+
+  /**
+   * An expanded message. Its PARENT is the container the message view stream
+   * watches, so stay at this depth.
+   * Root: thread element.
+   */
+  'threadView.openMessage': ['.h7'],
+
+  /**
+   * The expand-all icon. The code walks up to its `role=button` ancestor, so
+   * stay at the image.
+   * Root: thread element.
+   */
+  'threadView.expandAllButton': ['img.gx'],
+
+  /**
+   * The collapse-all icon. The code walks up to its `role=button` ancestor, so
+   * stay at the image.
+   * Root: thread element.
+   */
+  'threadView.collapseAllButton': ['img.gq'],
+
+  /**
+   * The subject container the notice bar is inserted into, in the current
+   * thread view.
+   * Root: thread element.
+   */
+  'threadView.subjectContainer': [
+    // 2023-11-16 thread-view redesign
+    '* > .nH',
+  ],
+
+  /**
+   * The subject container the notice bar is inserted into, in the thread
+   * views that predate the redesign.
+   * Root: thread element.
+   */
+  'threadView.subjectContainerLegacy': [
+    // 2018 layout
+    '.if > .nH',
+    // 2022-10-21 layout
+    '.a98.iY > .nH',
+    // 2022-10-12 layout
+    '.PeIF1d > .nH',
+  ],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */
