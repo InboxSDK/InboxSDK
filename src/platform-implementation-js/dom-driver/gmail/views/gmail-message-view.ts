@@ -966,7 +966,12 @@ class GmailMessageView {
             contactType = 'sender';
           } else {
             if (
-              (self.#element.querySelector('h3.iw') as any).contains(element)
+              self.#driver.selectors
+                .querySelectorByKeyOrFail(
+                  self.#element,
+                  'messageView.senderHeading',
+                )
+                .contains(element)
             ) {
               contactType = 'sender';
             } else {

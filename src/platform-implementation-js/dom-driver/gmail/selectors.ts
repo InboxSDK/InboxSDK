@@ -170,6 +170,13 @@ export const GMAIL_SELECTORS = {
   'messageView.replyContainer': ['.ip'],
 
   /**
+   * The sender heading of an expanded message; a hovered contact inside it is
+   * the sender, and one outside it a recipient.
+   * Root: message element.
+   */
+  'messageView.senderHeading': ['h3.iw'],
+
+  /**
    * The thread's subject heading. Read for its text, or walked child by child
    * when it contains emoji images.
    * Root: thread element.
