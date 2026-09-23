@@ -130,7 +130,10 @@ class GmailMessageView {
     // client side, so the new message added (from your reply) shows up in the UI right away and has a data-message-id but
     // because it hasn't been synced to the server it does not have a data-legacy-messag-id
     // so we wait until the message has been synced to the server before saying this is ready
-    const messageIdElement = this.#element.querySelector('[data-message-id]');
+    const messageIdElement = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'messageView.syncIdElement',
+    );
 
     if (messageIdElement) {
       const syncMessageId = messageIdElement.getAttribute('data-message-id');

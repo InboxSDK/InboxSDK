@@ -139,6 +139,12 @@ export const GMAIL_SELECTORS = {
   'messageView.dateElement': ['.ads .gK .g3'],
 
   /**
+   * The element carrying the message's sync id in `data-message-id`.
+   * Root: message element.
+   */
+  'messageView.syncIdElement': ['[data-message-id]'],
+
+  /**
    * The thread's subject heading. Read for its text, or walked child by child
    * when it contains emoji images.
    * Root: thread element.
