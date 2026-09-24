@@ -139,6 +139,63 @@ export const GMAIL_SELECTORS = {
   'messageView.dateElement': ['.ads .gK .g3'],
 
   /**
+   * The element carrying the message's sync id in `data-message-id`.
+   * Root: message element.
+   */
+  'messageView.syncIdElement': ['[data-message-id]'],
+
+  /**
+   * The element carrying `data-legacy-message-id`. The SDK also writes that
+   * attribute onto `messageView.syncIdElement`, so a rung must match both.
+   * Root: message element.
+   */
+  'messageView.legacyIdElement': ['[data-legacy-message-id]'],
+
+  /**
+   * The header span attachment icons are added to, in an expanded message.
+   * Root: message element.
+   */
+  'messageView.attachmentIconSlot': ['td.gH div.gK span'],
+
+  /**
+   * The header span attachment icons are added to, in a collapsed message.
+   * Root: message element.
+   */
+  'messageView.attachmentIconSlotCollapsed': ['.adf.ads td.gH span'],
+
+  /**
+   * The container that holds an inline reply; watched for its class change.
+   * Root: message element.
+   */
+  'messageView.replyContainer': ['.ip'],
+
+  /**
+   * The sender heading of an expanded message; a hovered contact inside it is
+   * the sender, and one outside it a recipient.
+   * Root: message element.
+   */
+  'messageView.senderHeading': ['h3.iw'],
+
+  /**
+   * Gmail's attachment area. The area the SDK builds carries the same class,
+   * so this can also match that one.
+   * Root: message element.
+   */
+  'messageView.attachmentArea': ['.hq'],
+
+  /**
+   * The element the SDK's own attachment area is inserted before.
+   * Root: message element.
+   */
+  'messageView.attachmentAreaAnchor': ['.hi'],
+
+  /**
+   * The recipients' spans in a message header; each carries `email` and `name`.
+   * Root: message element.
+   */
+  'messageView.recipientSpans': ['.hb span[email]'],
+
+  /**
    * The thread's subject heading. Read for its text, or walked child by child
    * when it contains emoji images.
    * Root: thread element.
