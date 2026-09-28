@@ -363,6 +363,13 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'companionSidebar.column': ['div.aUx'],
+
+  /**
+   * The companion sidebar panel, where a companion's content opens: Calendar,
+   * Keep and add-on panels.
+   * Root: `document`.
+   */
+  'companionSidebar.panel': ['.brC-brG'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

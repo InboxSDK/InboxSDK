@@ -74,7 +74,10 @@ export default class GmailElementGetter {
   }
 
   getCompanionSidebarContentContainerElement(): HTMLElement | null {
-    return document.querySelector('.brC-brG');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'companionSidebar.panel',
+    );
   }
 
   // <div class="brC-aT5-aOt-Jw" role="complementary" aria-label="Side panel">
