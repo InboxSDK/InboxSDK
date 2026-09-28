@@ -356,6 +356,13 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'leftNav.appMenuOrNavMenuFallback': ['.aeN.WR.nH.oy8Mbf[role=navigation]'],
+
+  /**
+   * The right-hand column holding the companion sidebar. Both the panel and the
+   * icon rail live inside it.
+   * Root: `document`.
+   */
+  'companionSidebar.column': ['div.aUx'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

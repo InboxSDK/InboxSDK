@@ -12,12 +12,6 @@ import waitFor from '../../lib/wait-for';
 import type GmailDriver from './gmail-driver';
 
 /**
- * The right-hand column holding the companion sidebar. Both the panel and the
- * icon rail live inside it.
- */
-const COMPANION_SIDEBAR_COLUMN = 'div.aUx';
-
-/**
  * Class on the companion sidebar's outer wrapper before the 2024-11-07 Gmail
  * update, when the wrapper and the content container were the same element.
  */
@@ -73,7 +67,10 @@ export default class GmailElementGetter {
   }
 
   getCompanionSidebarColumnElement(): HTMLElement | null {
-    return document.querySelector(COMPANION_SIDEBAR_COLUMN);
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'companionSidebar.column',
+    );
   }
 
   getCompanionSidebarContentContainerElement(): HTMLElement | null {
