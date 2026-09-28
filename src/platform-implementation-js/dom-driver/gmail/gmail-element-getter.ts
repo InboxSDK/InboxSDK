@@ -325,7 +325,10 @@ export default class GmailElementGetter {
 
   getSameSectionNavItemMenuInjectionContainer(): HTMLElement | null {
     if (isIntegratedViewGmail()) {
-      return document.querySelector('.yJ .wT > .n3');
+      return this.#driver.selectors.querySelectorByKey(
+        document,
+        'leftNav.nativeItemListIntegrated',
+      );
     } else {
       return document.querySelector('.aeN .n3');
     }

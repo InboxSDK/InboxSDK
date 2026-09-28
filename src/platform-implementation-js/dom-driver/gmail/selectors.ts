@@ -409,6 +409,13 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'leftNav.collapsiblePanelIntegrated': ['div[role=navigation] + div.aqn'],
+
+  /**
+   * The list of Gmail's own nav items (Inbox, Starred, Sent) in the integrated
+   * view. Nav items added inline go here.
+   * Root: `document`.
+   */
+  'leftNav.nativeItemListIntegrated': ['.yJ .wT > .n3'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
