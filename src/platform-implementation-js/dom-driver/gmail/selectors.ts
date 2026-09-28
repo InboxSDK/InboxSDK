@@ -378,6 +378,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'companionSidebar.iconRail': ['.brC-aT5-aOt-Jw'],
+
+  /**
+   * The add-on sidebar. Only for Gmailv1 + Gmailv2-before-2018-07-30?
+   * Root: `document`.
+   */
+  'companionSidebar.legacyAddonSidebar': ['.no > .nn.bnl'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
