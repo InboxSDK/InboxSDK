@@ -403,6 +403,12 @@ export const GMAIL_SELECTORS = {
    * Root: `appMenu.container`.
    */
   'leftNav.collapsiblePanelInAppMenu': ['.aqn.aIH'],
+
+  /**
+   * The collapsible left panel in Gmail's integrated view, with no app menu.
+   * Root: `document`.
+   */
+  'leftNav.collapsiblePanelIntegrated': ['div[role=navigation] + div.aqn'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

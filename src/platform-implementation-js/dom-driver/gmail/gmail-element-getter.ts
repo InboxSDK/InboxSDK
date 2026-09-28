@@ -200,7 +200,10 @@ export default class GmailElementGetter {
         : null;
     }
     if (isIntegratedViewGmail()) {
-      return document.querySelector('div[role=navigation] + div.aqn');
+      return this.#driver.selectors.querySelectorByKey(
+        document,
+        'leftNav.collapsiblePanelIntegrated',
+      );
     }
     return this.#driver.selectors.querySelectorByKey(document, 'leftNav.root');
   }
