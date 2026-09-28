@@ -330,7 +330,10 @@ export default class GmailElementGetter {
         'leftNav.nativeItemListIntegrated',
       );
     } else {
-      return document.querySelector('.aeN .n3');
+      return this.#driver.selectors.querySelectorByKey(
+        document,
+        'leftNav.nativeItemList',
+      );
     }
   }
 

@@ -416,6 +416,13 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'leftNav.nativeItemListIntegrated': ['.yJ .wT > .n3'],
+
+  /**
+   * The list of Gmail's own nav items (Inbox, Starred, Sent). Nav items added
+   * inline go here.
+   * Root: `document`.
+   */
+  'leftNav.nativeItemList': ['.aeN .n3'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
