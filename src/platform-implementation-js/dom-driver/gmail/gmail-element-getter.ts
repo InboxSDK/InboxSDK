@@ -119,7 +119,10 @@ export default class GmailElementGetter {
         'leftNav.composeButtonIntegrated',
       );
     }
-    return document.querySelector('[gh=cm]');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'leftNav.composeButton',
+    );
   }
 
   getComposeWindowContainer(): HTMLElement | null {

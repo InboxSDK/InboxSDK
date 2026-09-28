@@ -390,6 +390,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'leftNav.composeButtonIntegrated': ['.aIH .aic div[role=button].L3'],
+
+  /**
+   * The compose button at the top of the left nav.
+   * Root: `document`.
+   */
+  'leftNav.composeButton': ['[gh=cm]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
