@@ -80,9 +80,11 @@ export default class GmailElementGetter {
     );
   }
 
-  // <div class="brC-aT5-aOt-Jw" role="complementary" aria-label="Side panel">
   getCompanionSidebarIconContainerElement(): HTMLElement | null {
-    return document.querySelector('.brC-aT5-aOt-Jw');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'companionSidebar.iconRail',
+    );
   }
 
   /**

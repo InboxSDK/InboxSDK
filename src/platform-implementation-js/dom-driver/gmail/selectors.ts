@@ -370,6 +370,14 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'companionSidebar.panel': ['.brC-brG'],
+
+  /**
+   * The strip of icons on the right edge, holding Gmail's global icons and the
+   * SDK's sidebar icons.
+   * <div class="brC-aT5-aOt-Jw" role="complementary" aria-label="Side panel">
+   * Root: `document`.
+   */
+  'companionSidebar.iconRail': ['.brC-aT5-aOt-Jw'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
