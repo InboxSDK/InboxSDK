@@ -114,7 +114,10 @@ export default class GmailElementGetter {
 
   getComposeButton(): HTMLElement | null {
     if (isIntegratedViewGmail()) {
-      return document.querySelector('.aIH .aic div[role=button].L3');
+      return this.#driver.selectors.querySelectorByKey(
+        document,
+        'leftNav.composeButtonIntegrated',
+      );
     }
     return document.querySelector('[gh=cm]');
   }

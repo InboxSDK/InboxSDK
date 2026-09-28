@@ -384,6 +384,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'companionSidebar.legacyAddonSidebar': ['.no > .nn.bnl'],
+
+  /**
+   * The compose button in Gmail's integrated view.
+   * Root: `document`.
+   */
+  'leftNav.composeButtonIntegrated': ['.aIH .aic div[role=button].L3'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
