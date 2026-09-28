@@ -396,6 +396,13 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'leftNav.composeButton': ['[gh=cm]'],
+
+  /**
+   * The collapsible left panel with Compose and the labels, next to the app
+   * menu.
+   * Root: `appMenu.container`.
+   */
+  'leftNav.collapsiblePanelInAppMenu': ['.aqn.aIH'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

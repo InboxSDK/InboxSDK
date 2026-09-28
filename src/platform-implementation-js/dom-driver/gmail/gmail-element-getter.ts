@@ -191,7 +191,13 @@ export default class GmailElementGetter {
 
   getLeftNavContainerElement(): HTMLElement | null {
     if (this.getAppMenu()) {
-      return this.getAppMenuContainer()?.querySelector('.aqn.aIH') ?? null;
+      const appMenuContainer = this.getAppMenuContainer();
+      return appMenuContainer
+        ? this.#driver.selectors.querySelectorByKey(
+            appMenuContainer,
+            'leftNav.collapsiblePanelInAppMenu',
+          )
+        : null;
     }
     if (isIntegratedViewGmail()) {
       return document.querySelector('div[role=navigation] + div.aqn');
