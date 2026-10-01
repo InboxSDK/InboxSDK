@@ -226,6 +226,9 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
     // Activate menu items on route changes. Used for deep-links, browser history navigation etc.
     AppMenuItemView.#routeViewDriverStream.onValue(async (routeView) => {
+      // The route stream replays the current route on subscribe, before init
+      // has plugged the bus, so an unawaited emit would be dropped.
+      await AppMenuItemView.#menuReady;
       const routeViewID = routeView.getRouteID();
       const routeType = routeView.getRouteType();
 
@@ -275,8 +278,9 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       }
     });
   }
+  static #menuReady: Promise<void>;
   static {
-    (async function init() {
+    AppMenuItemView.#menuReady = (async function init() {
       const driver = await AppMenuItemView.#sharedDriverReady.promise;
       const gmailAppMenu = await driver.elementGetter.getAppMenuAsync();
       if (!gmailAppMenu) {
