@@ -378,7 +378,10 @@ export default class GmailElementGetter {
       return null;
     }
 
-    return toolbarElement.querySelector('.lS');
+    return this.#driver.selectors.querySelectorByKey(
+      toolbarElement,
+      'toolbar.backButton',
+    );
   }
 
   getThreadContainerElement(): HTMLElement | null {
