@@ -488,6 +488,12 @@ export const GMAIL_SELECTORS = {
   'header.accountContainer': [
     'header[role="banner"] > div:nth-child(2) > div:nth-child(2)',
   ],
+
+  /**
+   * The back button in a thread's toolbar.
+   * Root: page toolbar.
+   */
+  'toolbar.backButton': ['.lS'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
