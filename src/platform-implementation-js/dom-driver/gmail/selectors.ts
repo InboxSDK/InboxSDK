@@ -473,6 +473,13 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'compose.fullscreenContainer': ['.aSs .aSt'],
+
+  /**
+   * The page's main element. Gmail sets it only once the page has loaded, and
+   * standalone compose windows render inside it.
+   * Root: `document`.
+   */
+  'page.main': ['[role=main]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
