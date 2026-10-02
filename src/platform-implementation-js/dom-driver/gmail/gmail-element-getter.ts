@@ -392,7 +392,10 @@ export default class GmailElementGetter {
     // This element is always present in thread lists, but it only has contents
     // when in preview pane mode. We want to monitor it in either case
     // because the user could switch into preview pane mode.
-    return document.querySelector<HTMLElement>('div[role=main] .aia');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'routeView.previewPaneContainer',
+    );
   }
 
   getToolbarElement(): HTMLElement {

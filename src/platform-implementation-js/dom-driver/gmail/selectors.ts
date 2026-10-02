@@ -448,6 +448,13 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'page.scrollContainer': ['div.Tm.aeJ'],
+
+  /**
+   * The preview pane container in thread lists. Always present, but it has
+   * content only in preview pane mode.
+   * Root: `document`.
+   */
+  'routeView.previewPaneContainer': ['div[role=main] .aia'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
