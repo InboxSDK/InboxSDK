@@ -347,7 +347,10 @@ export default class GmailElementGetter {
   }
 
   getScrollContainer(): HTMLElement | null {
-    return document.querySelector('div.Tm.aeJ');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'page.scrollContainer',
+    );
   }
 
   getSearchInput(): HTMLInputElement | null {
