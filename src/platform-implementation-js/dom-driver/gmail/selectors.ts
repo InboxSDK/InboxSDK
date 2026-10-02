@@ -442,6 +442,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'page.mainContentContainer': ['div.aeF > div.nH'],
+
+  /**
+   * The element that scrolls the main content.
+   * Root: `document`.
+   */
+  'page.scrollContainer': ['div.Tm.aeJ'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
