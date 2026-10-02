@@ -467,6 +467,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'search.suggestionsBoxParent': ['table.gstl_50 > tbody > tr > td.gssb_e'],
+
+  /**
+   * The container fullscreen compose windows are put in.
+   * Root: `document`.
+   */
+  'compose.fullscreenContainer': ['.aSs .aSt'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
