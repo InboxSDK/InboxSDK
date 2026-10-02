@@ -821,9 +821,10 @@ class GmailRouteView implements RouteViewDriver {
 
   // Used to click gmail refresh button in thread lists
   refresh() {
-    var el = this.#driver.elementGetter
-      .getToolbarElement()
-      .querySelector<HTMLElement>('div.T-I.nu');
+    var el = this.#driver.selectors.querySelectorByKey(
+      this.#driver.elementGetter.getToolbarElement(),
+      'routeView.refreshButton',
+    );
 
     if (el) {
       var prevActive = document.activeElement as HTMLElement;

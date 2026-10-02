@@ -723,6 +723,12 @@ export const GMAIL_SELECTORS = {
   'routeView.listToolbar': ['[gh=tm]', '.G-atb'],
 
   /**
+   * Gmail's refresh button in thread lists.
+   * Root: `toolbar.pageToolbar`.
+   */
+  'routeView.refreshButton': ['div.T-I.nu'],
+
+  /**
    * The containers Gmail adds each thread list table to.
    * Root: the row list element container.
    */
