@@ -385,17 +385,10 @@ export default class GmailElementGetter {
   }
 
   getThreadContainerElement(): HTMLElement | null {
-    const selector = '[role=main] .g.id table.Bs > tr';
-    const selector_2023_11_16 = '[role=main] .g.id .a98.iY';
-
-    const threadContainerElement =
-      document.querySelector<HTMLElement>(selector);
-
-    if (threadContainerElement) {
-      return threadContainerElement;
-    }
-
-    return document.querySelector(selector_2023_11_16);
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'threadView.container',
+    );
   }
 
   getPreviewPaneContainerElement(): HTMLElement | null {

@@ -494,6 +494,16 @@ export const GMAIL_SELECTORS = {
    * Root: page toolbar.
    */
   'toolbar.backButton': ['.lS'],
+
+  /**
+   * The open thread's container in the main content.
+   * Root: `document`.
+   */
+  'threadView.container': [
+    '[role=main] .g.id table.Bs > tr',
+    // 2023-11-16 thread-view redesign
+    '[role=main] .g.id .a98.iY',
+  ],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
