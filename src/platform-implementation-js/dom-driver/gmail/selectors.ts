@@ -510,6 +510,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'toolbar.pageToolbar': ['[gh=tm]'],
+
+  /**
+   * Gmail's refresh button in thread lists.
+   * Root: `toolbar.pageToolbar`.
+   */
+  'routeView.refreshButton': ['div.T-I.nu'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
