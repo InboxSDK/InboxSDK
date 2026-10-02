@@ -461,6 +461,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'search.input': ['form[role=search] input'],
+
+  /**
+   * The cell that holds the search suggestions box.
+   * Root: `document`.
+   */
+  'search.suggestionsBoxParent': ['table.gstl_50 > tbody > tr > td.gssb_e'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
