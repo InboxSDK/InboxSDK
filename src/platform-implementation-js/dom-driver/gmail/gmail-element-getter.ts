@@ -12,12 +12,6 @@ import waitFor from '../../lib/wait-for';
 import type GmailDriver from './gmail-driver';
 
 /**
- * The right-hand column holding the companion sidebar. Both the panel and the
- * icon rail live inside it.
- */
-const COMPANION_SIDEBAR_COLUMN = 'div.aUx';
-
-/**
  * Class on the companion sidebar's outer wrapper before the 2024-11-07 Gmail
  * update, when the wrapper and the content container were the same element.
  */
@@ -68,21 +62,31 @@ export default class GmailElementGetter {
   }
 
   getAddonSidebarContainerElement(): HTMLElement | null {
-    // only for Gmailv1 + Gmailv2-before-2018-07-30?
-    return document.querySelector('.no > .nn.bnl');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'companionSidebar.legacyAddonSidebar',
+    );
   }
 
   getCompanionSidebarColumnElement(): HTMLElement | null {
-    return document.querySelector(COMPANION_SIDEBAR_COLUMN);
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'companionSidebar.column',
+    );
   }
 
   getCompanionSidebarContentContainerElement(): HTMLElement | null {
-    return document.querySelector('.brC-brG');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'companionSidebar.panel',
+    );
   }
 
-  // <div class="brC-aT5-aOt-Jw" role="complementary" aria-label="Side panel">
   getCompanionSidebarIconContainerElement(): HTMLElement | null {
-    return document.querySelector('.brC-aT5-aOt-Jw');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'companionSidebar.iconRail',
+    );
   }
 
   /**
@@ -110,9 +114,15 @@ export default class GmailElementGetter {
 
   getComposeButton(): HTMLElement | null {
     if (isIntegratedViewGmail()) {
-      return document.querySelector('.aIH .aic div[role=button].L3');
+      return this.#driver.selectors.querySelectorByKey(
+        document,
+        'leftNav.composeButtonIntegrated',
+      );
     }
-    return document.querySelector('[gh=cm]');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'leftNav.composeButton',
+    );
   }
 
   getComposeWindowContainer(): HTMLElement | null {
@@ -181,10 +191,19 @@ export default class GmailElementGetter {
 
   getLeftNavContainerElement(): HTMLElement | null {
     if (this.getAppMenu()) {
-      return this.getAppMenuContainer()?.querySelector('.aqn.aIH') ?? null;
+      const appMenuContainer = this.getAppMenuContainer();
+      return appMenuContainer
+        ? this.#driver.selectors.querySelectorByKey(
+            appMenuContainer,
+            'leftNav.collapsiblePanelInAppMenu',
+          )
+        : null;
     }
     if (isIntegratedViewGmail()) {
-      return document.querySelector('div[role=navigation] + div.aqn');
+      return this.#driver.selectors.querySelectorByKey(
+        document,
+        'leftNav.collapsiblePanelIntegrated',
+      );
     }
     return this.#driver.selectors.querySelectorByKey(document, 'leftNav.root');
   }
@@ -306,9 +325,15 @@ export default class GmailElementGetter {
 
   getSameSectionNavItemMenuInjectionContainer(): HTMLElement | null {
     if (isIntegratedViewGmail()) {
-      return document.querySelector('.yJ .wT > .n3');
+      return this.#driver.selectors.querySelectorByKey(
+        document,
+        'leftNav.nativeItemListIntegrated',
+      );
     } else {
-      return document.querySelector('.aeN .n3');
+      return this.#driver.selectors.querySelectorByKey(
+        document,
+        'leftNav.nativeItemList',
+      );
     }
   }
 

@@ -356,6 +356,73 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'leftNav.appMenuOrNavMenuFallback': ['.aeN.WR.nH.oy8Mbf[role=navigation]'],
+
+  /**
+   * The right-hand column holding the companion sidebar. Both the panel and the
+   * icon rail live inside it.
+   * Root: `document`.
+   */
+  'companionSidebar.column': ['div.aUx'],
+
+  /**
+   * The companion sidebar panel, where a companion's content opens: Calendar,
+   * Keep and add-on panels.
+   * Root: `document`.
+   */
+  'companionSidebar.panel': ['.brC-brG'],
+
+  /**
+   * The strip of icons on the right edge, holding Gmail's global icons and the
+   * SDK's sidebar icons.
+   * <div class="brC-aT5-aOt-Jw" role="complementary" aria-label="Side panel">
+   * Root: `document`.
+   */
+  'companionSidebar.iconRail': ['.brC-aT5-aOt-Jw'],
+
+  /**
+   * The add-on sidebar. Only for Gmailv1 + Gmailv2-before-2018-07-30?
+   * Root: `document`.
+   */
+  'companionSidebar.legacyAddonSidebar': ['.no > .nn.bnl'],
+
+  /**
+   * The compose button in Gmail's integrated view.
+   * Root: `document`.
+   */
+  'leftNav.composeButtonIntegrated': ['.aIH .aic div[role=button].L3'],
+
+  /**
+   * The compose button at the top of the left nav.
+   * Root: `document`.
+   */
+  'leftNav.composeButton': ['[gh=cm]'],
+
+  /**
+   * The collapsible left panel with Compose and the labels, next to the app
+   * menu.
+   * Root: `appMenu.container`.
+   */
+  'leftNav.collapsiblePanelInAppMenu': ['.aqn.aIH'],
+
+  /**
+   * The collapsible left panel in Gmail's integrated view, with no app menu.
+   * Root: `document`.
+   */
+  'leftNav.collapsiblePanelIntegrated': ['div[role=navigation] + div.aqn'],
+
+  /**
+   * The list of Gmail's own nav items (Inbox, Starred, Sent) in the integrated
+   * view. Nav items added inline go here.
+   * Root: `document`.
+   */
+  'leftNav.nativeItemListIntegrated': ['.yJ .wT > .n3'],
+
+  /**
+   * The list of Gmail's own nav items (Inbox, Starred, Sent). Nav items added
+   * inline go here.
+   * Root: `document`.
+   */
+  'leftNav.nativeItemList': ['.aeN .n3'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
