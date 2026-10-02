@@ -361,7 +361,10 @@ export default class GmailElementGetter {
   }
 
   getSearchSuggestionsBoxParent(): HTMLElement | null {
-    return document.querySelector('table.gstl_50 > tbody > tr > td.gssb_e');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'search.suggestionsBoxParent',
+    );
   }
 
   getThreadBackButton(): HTMLElement | null {
