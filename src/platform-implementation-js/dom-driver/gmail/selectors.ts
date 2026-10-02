@@ -435,6 +435,13 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'page.mainContentBody': ['.no > .nn.bkK'],
+
+  /**
+   * The container of the current route's content. Present on routes without
+   * `[role=main]`, such as Contacts.
+   * Root: `document`.
+   */
+  'page.mainContentContainer': ['div.aeF > div.nH'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
