@@ -835,8 +835,9 @@ class GmailThreadView {
 
     for (var ii = 0; ii < toolbarContainerElements.length; ii++) {
       if (this.#isToolbarContainerRelevant(toolbarContainerElements[ii])) {
-        return toolbarContainerElements[ii].querySelector<HTMLElement>(
-          '[gh=mtb]',
+        return this.#driver.selectors.querySelectorByKey(
+          toolbarContainerElements[ii],
+          'toolbar.mainToolbar',
         );
       }
     }
