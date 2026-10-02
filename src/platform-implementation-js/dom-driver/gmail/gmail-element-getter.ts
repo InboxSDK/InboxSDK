@@ -454,7 +454,7 @@ export default class GmailElementGetter {
 
   /** Was `StandaloneCompose.getComposeWindowContainer` before this became a class. */
   getStandaloneComposeWindowContainer(): HTMLElement | null {
-    return document.querySelector('[role=main]');
+    return this.#driver.selectors.querySelectorByKey(document, 'page.main');
   }
 
   waitForGmailModeToSettle(): Promise<void> {
