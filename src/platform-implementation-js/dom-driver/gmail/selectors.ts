@@ -526,6 +526,12 @@ export const GMAIL_SELECTORS = {
     // 2023-11-30 thread-view redesign
     '.ao9:has(.a98.iY, .apa)',
   ],
+
+  /**
+   * The toolbar's "more" button, which opens the more menu.
+   * Root: toolbar element.
+   */
+  'toolbar.moreButton': ['.nf[role=button]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
