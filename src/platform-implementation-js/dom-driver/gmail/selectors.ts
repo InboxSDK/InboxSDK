@@ -423,6 +423,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'leftNav.nativeItemList': ['.aeN .n3'],
+
+  /**
+   * The section beside the left nav that holds the current route.
+   * Root: `document`.
+   */
+  'page.contentSection': ['div.nH.bkK > .nH'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
