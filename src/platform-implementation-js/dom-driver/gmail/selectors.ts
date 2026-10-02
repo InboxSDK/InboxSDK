@@ -504,6 +504,12 @@ export const GMAIL_SELECTORS = {
     // 2023-11-16 thread-view redesign
     '[role=main] .g.id .a98.iY',
   ],
+
+  /**
+   * The toolbar above the main content, for both thread lists and threads.
+   * Root: `document`.
+   */
+  'toolbar.pageToolbar': ['[gh=tm]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

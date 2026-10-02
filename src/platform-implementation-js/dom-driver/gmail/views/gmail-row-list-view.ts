@@ -156,7 +156,10 @@ class GmailRowListView {
     }
 
     const el = find(
-      document.querySelectorAll<HTMLElement>('[gh=tm]'),
+      this._gmailDriver.selectors.querySelectorAllByKey(
+        document,
+        'toolbar.pageToolbar',
+      ),
       (toolbarContainerElement) =>
         toolbarContainerElement.parentElement!.parentElement ===
           (this._element as any).parentElement.parentElement.parentElement

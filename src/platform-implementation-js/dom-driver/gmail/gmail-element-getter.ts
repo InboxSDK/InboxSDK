@@ -2,7 +2,6 @@ import * as Kefir from 'kefir';
 import makeElementChildStream, {
   ElementWithLifetime,
 } from '../../lib/dom/make-element-child-stream';
-import querySelector from '../../lib/dom/querySelectorOrFail';
 import waitForGmailModeToSettle from './gmail-element-getter/wait-for-gmail-mode-to-settle';
 
 import getMainContentElementChangedStream from './gmail-element-getter/get-main-content-element-changed-stream';
@@ -402,7 +401,10 @@ export default class GmailElementGetter {
   }
 
   getToolbarElement(): HTMLElement {
-    return querySelector(document, '[gh=tm]');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      document,
+      'toolbar.pageToolbar',
+    );
   }
 
   getTopAccountContainer(): HTMLElement | null {
