@@ -226,7 +226,10 @@ export default class GmailElementGetter {
     // This method used to just look for the div[role=main] element and then
     // return its parent, but it turns out the Contacts page does not set
     // role=main.
-    return document.querySelector('div.aeF > div.nH');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'page.mainContentContainer',
+    );
   }
 
   getMainContentElementChangedStream(): Kefir.Observable<HTMLElement, never> {
