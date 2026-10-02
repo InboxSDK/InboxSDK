@@ -491,29 +491,20 @@ class GmailRouteView implements RouteViewDriver {
   ) {
     let threadContainerElement: HTMLElement | 'destroyed';
 
-    const selector = 'table.Bs > tr';
-    const selector_2023_11_30 = '.ao9:has(.a98.iY, .apa)';
-
     try {
       threadContainerElement = await waitFor(() => {
         if (this.#destroyed) {
           return 'destroyed';
         }
 
-        const threadContainerElement =
-          previewPaneContainer.querySelector<HTMLElement>(selector);
-
-        if (threadContainerElement) {
-          return threadContainerElement;
-        }
-
-        return previewPaneContainer.querySelector<HTMLElement>(
-          selector_2023_11_30,
+        return this.#driver.selectors.querySelectorByKey(
+          previewPaneContainer,
+          'routeView.previewPaneThreadContainer',
         );
       }, 15_000);
     } catch {
       const selectorError = new SelectorError(
-        `${selector}, ${selector_2023_11_30}`,
+        'table.Bs > tr, .ao9:has(.a98.iY, .apa)',
         {
           cause: new Error("Thread container for preview pane wasn't found"),
         },

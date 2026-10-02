@@ -516,6 +516,16 @@ export const GMAIL_SELECTORS = {
    * Root: `toolbar.pageToolbar`.
    */
   'routeView.refreshButton': ['div.T-I.nu'],
+
+  /**
+   * The open thread's container inside the preview pane.
+   * Root: `routeView.previewPaneContainer`.
+   */
+  'routeView.previewPaneThreadContainer': [
+    'table.Bs > tr',
+    // 2023-11-30 thread-view redesign
+    '.ao9:has(.a98.iY, .apa)',
+  ],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
