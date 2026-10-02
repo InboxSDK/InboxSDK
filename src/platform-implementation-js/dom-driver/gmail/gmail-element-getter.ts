@@ -354,8 +354,9 @@ export default class GmailElementGetter {
   }
 
   getSearchInput(): HTMLInputElement | null {
-    return document.querySelector(
-      'form[role=search] input',
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'search.input',
     ) as HTMLInputElement | null;
   }
 

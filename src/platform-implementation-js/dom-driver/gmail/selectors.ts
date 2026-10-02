@@ -455,6 +455,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'routeView.previewPaneContainer': ['div[role=main] .aia'],
+
+  /**
+   * The search box input in the Gmail header.
+   * Root: `document`.
+   */
+  'search.input': ['form[role=search] input'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
