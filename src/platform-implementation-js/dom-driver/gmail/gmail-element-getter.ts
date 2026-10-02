@@ -163,7 +163,10 @@ export default class GmailElementGetter {
   }
 
   getFullscreenComposeWindowContainer(): HTMLElement | null {
-    return document.querySelector('.aSs .aSt');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'compose.fullscreenContainer',
+    );
   }
 
   getFullscreenComposeWindowContainerStream(): Kefir.Observable<
