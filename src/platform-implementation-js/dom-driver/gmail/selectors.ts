@@ -947,6 +947,12 @@ export const GMAIL_SELECTORS = {
    * Root: `toolbar.pageToolbar`, or a row list element.
    */
   'toolbar.mainToolbar': ['[gh=mtb]'],
+
+  /**
+   * The toolbar's "more" button, which opens the more menu.
+   * Root: toolbar element.
+   */
+  'toolbar.moreButton': ['.nf[role=button]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

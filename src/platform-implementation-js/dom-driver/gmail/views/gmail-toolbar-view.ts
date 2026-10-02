@@ -316,8 +316,10 @@ class GmailToolbarView {
   }
 
   _startMonitoringMoreMenu() {
-    const moreButtonElement =
-      this._element.querySelector<HTMLElement>('.nf[role=button]');
+    const moreButtonElement = this._driver.selectors.querySelectorByKey(
+      this._element,
+      'toolbar.moreButton',
+    );
 
     if (!moreButtonElement) {
       return;
