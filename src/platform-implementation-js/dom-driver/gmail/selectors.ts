@@ -429,6 +429,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'page.contentSection': ['div.nH.bkK > .nH'],
+
+  /**
+   * The container around the main content body.
+   * Root: `document`.
+   */
+  'page.mainContentBody': ['.no > .nn.bkK'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

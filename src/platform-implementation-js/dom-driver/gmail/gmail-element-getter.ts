@@ -216,7 +216,10 @@ export default class GmailElementGetter {
   }
 
   getMainContentBodyContainerElement(): HTMLElement | null {
-    return document.querySelector('.no > .nn.bkK');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'page.mainContentBody',
+    );
   }
 
   getMainContentContainer(): HTMLElement | null {
