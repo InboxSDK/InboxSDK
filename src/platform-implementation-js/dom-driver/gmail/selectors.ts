@@ -480,6 +480,14 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'page.main': ['[role=main]'],
+
+  /**
+   * The account area on the right of the Gmail header.
+   * Root: `document`.
+   */
+  'header.accountContainer': [
+    'header[role="banner"] > div:nth-child(2) > div:nth-child(2)',
+  ],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

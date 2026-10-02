@@ -410,8 +410,9 @@ export default class GmailElementGetter {
   }
 
   getTopAccountContainer(): HTMLElement | null {
-    return document.querySelector(
-      'header[role="banner"] > div:nth-child(2) > div:nth-child(2)',
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'header.accountContainer',
     );
   }
 
