@@ -4,6 +4,7 @@ import includes from 'lodash/includes';
 import intersection from 'lodash/intersection';
 import uniqBy from 'lodash/uniqBy';
 import flatMap from 'lodash/flatMap';
+import isNull from 'lodash/isNull';
 import { defonce } from 'ud';
 import * as Kefir from 'kefir';
 import asap from 'asap';
@@ -949,6 +950,10 @@ class GmailThreadRowView {
         if (!recipientsContainer) throw new Error('Should not happen');
 
         if (!opts) {
+          if (isNull(opts) && !labelMod) {
+            labelMod = this._modifications.replacedDraftLabel.claimed.shift();
+          }
+
           if (labelMod) {
             labelMod.remove();
 
@@ -968,7 +973,9 @@ class GmailThreadRowView {
           );
 
           if (!labelMod) {
-            labelMod = this._modifications.replacedDraftLabel.unclaimed.shift();
+            labelMod = this._modifications.replacedDraftLabel.unclaimed.length
+              ? this._modifications.replacedDraftLabel.unclaimed.shift()
+              : this._modifications.replacedDraftLabel.claimed.shift();
 
             if (!labelMod) {
               labelMod = {
@@ -1063,6 +1070,10 @@ class GmailThreadRowView {
         const originalDateSpan = dateContainer.firstElementChild;
 
         if (!opts) {
+          if (isNull(opts) && !dateMod) {
+            dateMod = this._modifications.replacedDate.claimed.shift();
+          }
+
           if (dateMod) {
             dateMod.remove();
 
@@ -1075,7 +1086,9 @@ class GmailThreadRowView {
           }
         } else {
           if (!dateMod) {
-            dateMod = this._modifications.replacedDate.unclaimed.shift();
+            dateMod = this._modifications.replacedDate.unclaimed.length
+              ? this._modifications.replacedDate.unclaimed.shift()
+              : this._modifications.replacedDate.claimed.shift();
 
             if (!dateMod) {
               dateMod = {
