@@ -3,15 +3,15 @@ import MockServer from '../../../test/lib/MockServer';
 
 jest.mock('../injected-logger', () => {
   return {
-    error(err: Error, details?: any) {
+    error: jest.fn((err: Error, details?: any) => {
       console.error(err, details);
       throw err;
-    },
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    eventSdkPassive() {},
+    }),
+    eventSdkPassive: jest.fn(),
   };
 });
 
+import * as injectedLogger from '../injected-logger';
 import _ajax from '../../common/ajax';
 import type { AjaxOpts, AjaxResponse } from '../../common/ajax';
 
@@ -54,6 +54,9 @@ Kefir.fromEvents<{ detail: any }, unknown>(
 
 afterEach(() => {
   ajaxInterceptEvents.length = 0;
+  jest.mocked(injectedLogger.error).mockClear();
+  jest.mocked(injectedLogger.eventSdkPassive).mockClear();
+  document.documentElement.removeAttribute('data-inboxsdk-thread-diagnostics');
 });
 
 describe('sync api', () => {
@@ -595,6 +598,169 @@ test('cv:2022-09-09 reply draft 2 sent', async () => {
       type: 'emailSent',
     },
   ]);
+});
+
+describe('thread response diagnostics', () => {
+  const path = 'https://mail.google.com/sync/u/0/i/fd?diagnostics-test=true';
+  const responseMarker = 'response-marker-\u2603';
+  const headerMarker = 'header-marker';
+  const malformedPath =
+    'https://mail.google.com/sync/i/fd?diagnostics-test=malformed';
+  const malformedResponseMarker = 'malformed-response-marker';
+  const nonSuccessPath =
+    'https://mail.google.com/sync/i/fd?diagnostics-test=non-success';
+  const nonSuccessResponseMarker = 'non-success-response-marker';
+  const responseBody = JSON.stringify({
+    2: [
+      [
+        null,
+        'thread-placeholder',
+        null,
+        [
+          [null, 'message-placeholder-1', { 17: '1' }],
+          [null, 'message-placeholder-2', { 17: '2' }],
+        ],
+      ],
+    ],
+    ignored: responseMarker,
+  });
+
+  mainServer.respondWith(
+    { method: 'POST', path },
+    {
+      status: 200,
+      response: responseBody,
+      headers: { 'X-Test-Marker': headerMarker },
+    },
+  );
+  mainServer.respondWith(
+    { method: 'POST', path: malformedPath },
+    {
+      status: 200,
+      response: malformedResponseMarker,
+      headers: { 'X-Test-Marker': headerMarker },
+    },
+  );
+  mainServer.respondWith(
+    { method: 'POST', path: nonSuccessPath },
+    {
+      status: 503,
+      response: nonSuccessResponseMarker,
+      headers: { 'X-Test-Marker': headerMarker },
+    },
+  );
+
+  test('does not emit diagnostics by default', async () => {
+    await ajax(mainFrame, {
+      method: 'POST',
+      url: path,
+      headers: { 'X-Test-Marker': headerMarker },
+    });
+
+    expect(injectedLogger.eventSdkPassive).not.toHaveBeenCalled();
+  });
+
+  test('emits only aggregate diagnostics when enabled', async () => {
+    document.documentElement.setAttribute(
+      'data-inboxsdk-thread-diagnostics',
+      'true',
+    );
+
+    await ajax(mainFrame, {
+      method: 'POST',
+      url: path,
+      headers: { 'X-Test-Marker': headerMarker },
+    });
+
+    expect(injectedLogger.eventSdkPassive).toHaveBeenCalledTimes(1);
+    expect(injectedLogger.eventSdkPassive).toHaveBeenCalledWith(
+      'gmailSync.threadResponse',
+      {
+        httpStatus: 200,
+        responseByteLength: new Blob([responseBody]).size,
+        parserSucceeded: true,
+        parsedThreadCount: 1,
+        parsedMessageCount: 2,
+      },
+      true,
+    );
+    const details = jest.mocked(injectedLogger.eventSdkPassive).mock
+      .calls[0][1];
+    expect(JSON.stringify(details)).not.toContain(responseMarker);
+    expect(JSON.stringify(details)).not.toContain(headerMarker);
+  });
+
+  test('attaches aggregate diagnostics to a malformed response error without emitting an event', async () => {
+    document.documentElement.setAttribute(
+      'data-inboxsdk-thread-diagnostics',
+      'true',
+    );
+    jest.mocked(injectedLogger.error).mockImplementationOnce(() => undefined);
+
+    await ajax(mainFrame, {
+      method: 'POST',
+      url: malformedPath,
+      headers: { 'X-Test-Marker': headerMarker },
+    });
+
+    expect(injectedLogger.eventSdkPassive).not.toHaveBeenCalled();
+    expect(injectedLogger.error).toHaveBeenCalledTimes(1);
+    const error = jest.mocked(injectedLogger.error).mock.calls[0][0];
+    expect(error).toBeInstanceOf(Error);
+    expect(Object.keys(error as Error).sort()).toEqual(
+      [
+        'httpStatus',
+        'parsedMessageCount',
+        'parsedThreadCount',
+        'parserSucceeded',
+        'responseByteLength',
+      ].sort(),
+    );
+    expect(error).toMatchObject({
+      message: 'Failed to parse sync thread response',
+      httpStatus: 200,
+      responseByteLength: new Blob([malformedResponseMarker]).size,
+      parserSucceeded: false,
+      parsedThreadCount: 0,
+      parsedMessageCount: 0,
+    });
+    expect((error as Error).message).not.toContain(malformedResponseMarker);
+    expect((error as Error).stack || '').not.toContain(malformedResponseMarker);
+    expect(JSON.stringify(error)).not.toContain(malformedResponseMarker);
+    expect(JSON.stringify(error)).not.toContain(headerMarker);
+  });
+
+  test('emits aggregate diagnostics for a non-success response', async () => {
+    document.documentElement.setAttribute(
+      'data-inboxsdk-thread-diagnostics',
+      'true',
+    );
+
+    await expect(
+      ajax(mainFrame, {
+        method: 'POST',
+        url: nonSuccessPath,
+        headers: { 'X-Test-Marker': headerMarker },
+      }),
+    ).rejects.toBeDefined();
+
+    expect(injectedLogger.eventSdkPassive).toHaveBeenCalledTimes(1);
+    expect(injectedLogger.eventSdkPassive).toHaveBeenCalledWith(
+      'gmailSync.threadResponse',
+      {
+        httpStatus: 503,
+        responseByteLength: new Blob([nonSuccessResponseMarker]).size,
+        parserSucceeded: false,
+        parsedThreadCount: 0,
+        parsedMessageCount: 0,
+      },
+      true,
+    );
+    const details = jest.mocked(injectedLogger.eventSdkPassive).mock
+      .calls[0][1];
+    expect(JSON.stringify(details)).not.toContain(nonSuccessResponseMarker);
+    expect(JSON.stringify(details)).not.toContain(headerMarker);
+  });
 });
 
 {
