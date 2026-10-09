@@ -135,7 +135,10 @@ export default class GmailElementGetter {
     // Otherwise, use the old method, but log a warning if the old method
     // finds something different than the old method, so that way we can
     // figure out if it's okay to swap over.
-    const el = document.querySelector<HTMLElement>('div.nH.bkK > .nH');
+    const el = this.#driver.selectors.querySelectorByKey(
+      document,
+      'page.contentSection',
+    );
 
     if (isIntegratedViewGmail()) {
       return el;
@@ -160,7 +163,10 @@ export default class GmailElementGetter {
   }
 
   getFullscreenComposeWindowContainer(): HTMLElement | null {
-    return document.querySelector('.aSs .aSt');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'compose.fullscreenContainer',
+    );
   }
 
   getFullscreenComposeWindowContainerStream(): Kefir.Observable<
@@ -213,14 +219,20 @@ export default class GmailElementGetter {
   }
 
   getMainContentBodyContainerElement(): HTMLElement | null {
-    return document.querySelector('.no > .nn.bkK');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'page.mainContentBody',
+    );
   }
 
   getMainContentContainer(): HTMLElement | null {
     // This method used to just look for the div[role=main] element and then
     // return its parent, but it turns out the Contacts page does not set
     // role=main.
-    return document.querySelector('div.aeF > div.nH');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'page.mainContentContainer',
+    );
   }
 
   getMainContentElementChangedStream(): Kefir.Observable<HTMLElement, never> {
@@ -338,17 +350,24 @@ export default class GmailElementGetter {
   }
 
   getScrollContainer(): HTMLElement | null {
-    return document.querySelector('div.Tm.aeJ');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'page.scrollContainer',
+    );
   }
 
   getSearchInput(): HTMLInputElement | null {
-    return document.querySelector(
-      'form[role=search] input',
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'search.input',
     ) as HTMLInputElement | null;
   }
 
   getSearchSuggestionsBoxParent(): HTMLElement | null {
-    return document.querySelector('table.gstl_50 > tbody > tr > td.gssb_e');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'search.suggestionsBoxParent',
+    );
   }
 
   getThreadBackButton(): HTMLElement | null {
@@ -359,7 +378,10 @@ export default class GmailElementGetter {
       return null;
     }
 
-    return toolbarElement.querySelector('.lS');
+    return this.#driver.selectors.querySelectorByKey(
+      toolbarElement,
+      'toolbar.backButton',
+    );
   }
 
   getThreadContainerElement(): HTMLElement | null {
@@ -380,7 +402,10 @@ export default class GmailElementGetter {
     // This element is always present in thread lists, but it only has contents
     // when in preview pane mode. We want to monitor it in either case
     // because the user could switch into preview pane mode.
-    return document.querySelector<HTMLElement>('div[role=main] .aia');
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'routeView.previewPaneContainer',
+    );
   }
 
   getToolbarElement(): HTMLElement {
@@ -388,8 +413,9 @@ export default class GmailElementGetter {
   }
 
   getTopAccountContainer(): HTMLElement | null {
-    return document.querySelector(
-      'header[role="banner"] > div:nth-child(2) > div:nth-child(2)',
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'header.accountContainer',
     );
   }
 
@@ -432,7 +458,7 @@ export default class GmailElementGetter {
 
   /** Was `StandaloneCompose.getComposeWindowContainer` before this became a class. */
   getStandaloneComposeWindowContainer(): HTMLElement | null {
-    return document.querySelector('[role=main]');
+    return this.#driver.selectors.querySelectorByKey(document, 'page.main');
   }
 
   waitForGmailModeToSettle(): Promise<void> {
