@@ -345,7 +345,10 @@ class GmailRouteView implements RouteViewDriver {
   async #waitForMainElementSafe() {
     try {
       // role=main attribute is not set while page in a loading state
-      await waitFor(() => document.querySelector('[role=main]'), 15_000);
+      await waitFor(
+        () => this.#driver.selectors.querySelectorByKey(document, 'page.main'),
+        15_000,
+      );
     } catch {
       this.#driver.getLogger().error(new SelectorError('[role=main]'), {
         html: extractDocumentHtmlAndCss(),

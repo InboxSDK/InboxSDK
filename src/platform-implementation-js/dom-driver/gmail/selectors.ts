@@ -423,6 +423,77 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'leftNav.nativeItemList': ['.aeN .n3'],
+
+  /**
+   * The section beside the left nav that holds the current route.
+   * Root: `document`.
+   */
+  'page.contentSection': ['div.nH.bkK > .nH'],
+
+  /**
+   * The container around the main content body.
+   * Root: `document`.
+   */
+  'page.mainContentBody': ['.no > .nn.bkK'],
+
+  /**
+   * The container of the current route's content. Present on routes without
+   * `[role=main]`, such as Contacts.
+   * Root: `document`.
+   */
+  'page.mainContentContainer': ['div.aeF > div.nH'],
+
+  /**
+   * The element that scrolls the main content.
+   * Root: `document`.
+   */
+  'page.scrollContainer': ['div.Tm.aeJ'],
+
+  /**
+   * The preview pane container in thread lists. Always present, but it has
+   * content only in preview pane mode.
+   * Root: `document`.
+   */
+  'routeView.previewPaneContainer': ['div[role=main] .aia'],
+
+  /**
+   * The search box input in the Gmail header.
+   * Root: `document`.
+   */
+  'search.input': ['form[role=search] input'],
+
+  /**
+   * The cell that holds the search suggestions box.
+   * Root: `document`.
+   */
+  'search.suggestionsBoxParent': ['table.gstl_50 > tbody > tr > td.gssb_e'],
+
+  /**
+   * The container fullscreen compose windows are put in.
+   * Root: `document`.
+   */
+  'compose.fullscreenContainer': ['.aSs .aSt'],
+
+  /**
+   * The page's main element. Gmail sets it only once the page has loaded, and
+   * standalone compose windows render inside it.
+   * Root: `document`.
+   */
+  'page.main': ['[role=main]'],
+
+  /**
+   * The account area on the right of the Gmail header.
+   * Root: `document`.
+   */
+  'header.accountContainer': [
+    'header[role="banner"] > div:nth-child(2) > div:nth-child(2)',
+  ],
+
+  /**
+   * The back button in a thread's toolbar.
+   * Root: page toolbar.
+   */
+  'toolbar.backButton': ['.lS'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
