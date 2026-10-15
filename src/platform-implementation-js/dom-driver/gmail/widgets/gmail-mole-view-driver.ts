@@ -166,11 +166,31 @@ class GmailMoleViewDriver {
    * This method, among other things, DOES NOT
    * - preseve initial load order with moles.
    * - preserve mole order after a mole has been maximized.
+   *
+   * Moving a mole re-parents it, which reloads (or blanks) any iframe inside
+   * it — e.g. Google Chat moles. So we only move a native mole when an SDK
+   * mole actually sits to its right, and never move one containing an iframe.
    */
   static #maybeMoveMole(mole: HTMLElement) {
     const rightSpacer = mole.parentElement?.lastElementChild;
 
-    if (!(rightSpacer instanceof HTMLElement)) {
+    if (!(rightSpacer instanceof HTMLElement) || rightSpacer === mole) {
+      return;
+    }
+
+    let hasSdkMoleToRight = false;
+    for (
+      let sibling = mole.nextElementSibling;
+      sibling && sibling !== rightSpacer;
+      sibling = sibling.nextElementSibling
+    ) {
+      if (sibling.classList.contains(INBOXSDK_CLASS)) {
+        hasSdkMoleToRight = true;
+        break;
+      }
+    }
+
+    if (!hasSdkMoleToRight || mole.querySelector('iframe')) {
       return;
     }
 
