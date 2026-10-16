@@ -15,8 +15,8 @@ export const GMAIL_SELECTORS = {
   /**
    * The compose title-bar table.
    *
-   * The `Ht`-less rung matches a superset of the `Ht` one, so it must stay BELOW it:
-   * above, it would win always and the specific rung would never run.
+   * The selector without `Ht` matches everything the `Ht` one does, so it must
+   * come second. Listed first, it would always win and `Ht` would never be tried.
    * Root: compose root.
    */
   'composeView.titleBarTable': [
@@ -90,7 +90,7 @@ export const GMAIL_SELECTORS = {
 
   /**
    * Message body carrying the legacy `m<hex>` id class. Narrower than
-   * `messageView.body` on purpose — the `.adP` rung does not carry that class.
+   * `messageView.body` on purpose — the `.adP` element does not carry that class.
    * Root: message element.
    */
   'messageView.legacyIdBody': ['div.ii.gt'],
@@ -107,6 +107,9 @@ export const GMAIL_SELECTORS = {
    * Root: `document.body`.
    */
   'messageView.openMoreMenu': [
+    // 2026 message header. Gmail keeps a closed copy of the menu in `<body>`
+    // for every expanded message, so match a class only the open menu has
+    'div.tB5Jxf-M-X-ql-Kq ul.aqdrmf-Kf',
     // 2023-11-16 thread-view redesign
     'div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]',
     // 2022-11-23, same shape under an extra `td >`
@@ -121,6 +124,9 @@ export const GMAIL_SELECTORS = {
    * Root: message element.
    */
   'messageView.moreButton': [
+    // 2026 message header. Gmail adds `aria-expanded` only once the menu has
+    // been opened, so the selector must not require it
+    'button.Wsq5Cf',
     'tr.acZ div.T-I.J-J5-Ji.aap.L3[role=button][aria-haspopup]',
   ],
 
@@ -146,7 +152,7 @@ export const GMAIL_SELECTORS = {
 
   /**
    * The element carrying `data-legacy-message-id`. The SDK also writes that
-   * attribute onto `messageView.syncIdElement`, so a rung must match both.
+   * attribute onto `messageView.syncIdElement`, so a selector must match both.
    * Root: message element.
    */
   'messageView.legacyIdElement': ['[data-legacy-message-id]'],
