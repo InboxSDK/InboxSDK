@@ -107,6 +107,9 @@ export const GMAIL_SELECTORS = {
    * Root: `document.body`.
    */
   'messageView.openMoreMenu': [
+    // 2026 message header. Every expanded message keeps a closed copy of
+    // its menu hoisted to `<body>`, so only the open-state class is safe
+    'div.tB5Jxf-M-X-ql-Kq ul.aqdrmf-Kf',
     // 2023-11-16 thread-view redesign
     'div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]',
     // 2022-11-23, same shape under an extra `td >`
@@ -121,6 +124,9 @@ export const GMAIL_SELECTORS = {
    * Root: message element.
    */
   'messageView.moreButton': [
+    // 2026 message header; Gmail adds `aria-expanded` only after the first
+    // open, so the rung must not require it
+    'button.Wsq5Cf',
     'tr.acZ div.T-I.J-J5-Ji.aap.L3[role=button][aria-haspopup]',
   ],
 
