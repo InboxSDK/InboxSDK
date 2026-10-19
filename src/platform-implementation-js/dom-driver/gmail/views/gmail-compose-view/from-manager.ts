@@ -69,9 +69,10 @@ export function setFromEmail(
     return;
   }
 
-  const choiceParent = gmailComposeView
-    .getElement()
-    .querySelector('div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX');
+  const choiceParent = driver.selectors.querySelectorByKey(
+    gmailComposeView.getElement(),
+    'composeView.fromChoiceMenu',
+  );
 
   if (!choiceParent) {
     if (driver.getUserContact().emailAddress != email) {

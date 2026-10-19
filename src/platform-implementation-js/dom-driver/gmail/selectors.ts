@@ -270,6 +270,14 @@ export const GMAIL_SELECTORS = {
   'composeView.showTrimmedContentButton': ['.ajR'],
 
   /**
+   * The from address menu, whose children are the address choices.
+   * Root: compose root.
+   */
+  'composeView.fromChoiceMenu': [
+    'div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX',
+  ],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
