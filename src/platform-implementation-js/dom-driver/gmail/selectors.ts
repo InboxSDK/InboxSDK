@@ -242,6 +242,12 @@ export const GMAIL_SELECTORS = {
   'composeView.inlineReplyStatusBar': ['.iN > tbody .aDj .aDh .IZ'],
 
   /**
+   * The compose table that SDK compose notices are inserted into.
+   * Root: compose root.
+   */
+  'composeView.noticeContainer': ['.iN'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
