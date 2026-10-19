@@ -1099,7 +1099,10 @@ class GmailComposeView {
   }
 
   getTopFormElement(): HTMLElement {
-    return querySelector(this.#element, 'td > form');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.topForm',
+    );
   }
 
   getHTMLContent(): string {
