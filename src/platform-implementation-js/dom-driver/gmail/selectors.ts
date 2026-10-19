@@ -152,6 +152,12 @@ export const GMAIL_SELECTORS = {
   'composeView.discardButton': ['.gU .oh'],
 
   /**
+   * The editable message body.
+   * Root: compose root.
+   */
+  'composeView.body': ['.Ap [g_editable=true]'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
