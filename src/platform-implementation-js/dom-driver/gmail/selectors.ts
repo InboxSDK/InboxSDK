@@ -324,6 +324,12 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The text area of a To, Cc or Bcc row in the old recipient fields.
+   * Root: the row's `tr`.
+   */
+  'composeView.legacyRecipientTextarea': ['textarea.vO'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */

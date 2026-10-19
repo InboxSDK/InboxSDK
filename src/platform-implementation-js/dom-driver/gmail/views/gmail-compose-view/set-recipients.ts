@@ -159,8 +159,10 @@ export default function setRecipients(
       return;
     }
 
-    const emailAddressEntry =
-      contactRow.querySelector<HTMLElement>('textarea.vO');
+    const emailAddressEntry = selectors.querySelectorByKey(
+      contactRow,
+      'composeView.legacyRecipientTextarea',
+    );
 
     if (
       !emailAddressEntry ||
