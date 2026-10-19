@@ -256,6 +256,14 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The edit subject item in a reply's response type menu.
+   * Root: compose root.
+   */
+  'composeView.editSubjectMenuItem': [
+    'div.J-M.jQjAxd.HX[role=menu] > div.SK.AX > [role=menuitem]:nth-last-child(2)',
+  ],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
