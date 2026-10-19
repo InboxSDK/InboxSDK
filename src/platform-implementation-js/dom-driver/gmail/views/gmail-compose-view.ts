@@ -278,8 +278,8 @@ class GmailComposeView {
         .takeUntilBy(this.#stopper)
         .map((bodyElement) => {
           this.#seenBodyElement = bodyElement;
-          this.#composeID = this.#element.querySelector<HTMLInputElement>(
-            'input[name="composeid"]',
+          this.#composeID = this.#getInputByKey(
+            'composeView.composeIdInput',
           )!.value;
           this.#messageIDElement = this.#element.querySelector(
             'input[name="draft"]',
@@ -1638,6 +1638,11 @@ class GmailComposeView {
           }
         });
     }
+  }
+
+  #getInputByKey(key: SelectorKey): HTMLInputElement | null {
+    const input = this.#driver.selectors.querySelectorByKey(this.#element, key);
+    return input instanceof HTMLInputElement ? input : null;
   }
 
   // If this compose is a reply, then this gets the message ID of the message
