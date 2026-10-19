@@ -1235,8 +1235,10 @@ class GmailComposeView {
   }
 
   getStatusArea(): HTMLElement {
-    const statusArea =
-      this.#element.querySelector<HTMLElement>('.aDg .aDj > .aDh');
+    const statusArea = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'composeView.statusArea',
+    );
 
     if (!statusArea) throw new Error('Failed to find status area');
     return statusArea;

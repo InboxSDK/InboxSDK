@@ -228,6 +228,13 @@ export const GMAIL_SELECTORS = {
   'composeView.bottomBarTable': ['.aoP .aDh > table'],
 
   /**
+   * The status area at the bottom of the compose window, which status bars are
+   * added to.
+   * Root: compose root.
+   */
+  'composeView.statusArea': ['.aDg .aDj > .aDh'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
