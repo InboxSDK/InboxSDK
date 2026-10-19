@@ -71,6 +71,16 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The title-bar button that closes the compose window.
+   * Root: compose root.
+   */
+  'composeView.closeButton': [
+    // Prefer legacy <img> titlebar controls; fall back to newer <button class="Ha">.
+    '.Hm > img:nth-of-type(3)',
+    '.Hm .Ha',
+  ],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
