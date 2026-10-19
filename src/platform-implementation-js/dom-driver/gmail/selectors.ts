@@ -146,6 +146,12 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The discard draft button in the bottom toolbar.
+   * Root: compose root.
+   */
+  'composeView.discardButton': ['.gU .oh'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
