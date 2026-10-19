@@ -1085,7 +1085,13 @@ class GmailComposeView {
   }
 
   isReply(): boolean {
-    return this.#isInlineReplyForm || !!this.#element.querySelector('.HQ');
+    return (
+      this.#isInlineReplyForm ||
+      !!this.#driver.selectors.querySelectorByKey(
+        this.#element,
+        'composeView.replyMarker',
+      )
+    );
   }
 
   isInlineReplyForm(): boolean {
