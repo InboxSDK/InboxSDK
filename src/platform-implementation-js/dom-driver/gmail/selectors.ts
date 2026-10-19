@@ -170,6 +170,12 @@ export const GMAIL_SELECTORS = {
   'composeView.metadataForm': ['form.bAs'],
 
   /**
+   * The scrolling area around the message body.
+   * Root: compose root.
+   */
+  'composeView.scrollBody': ['table .GP'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
