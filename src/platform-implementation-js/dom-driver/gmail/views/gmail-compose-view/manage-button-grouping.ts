@@ -162,7 +162,7 @@ function _doButtonsNeedToGroup(gmailComposeView: GmailComposeView): boolean {
   )
     return false;
 
-  if (areNativeToolbarButtonsGrouped(composeEl)) {
+  if (areNativeToolbarButtonsGrouped(gmailComposeView)) {
     return true;
   }
 
@@ -171,8 +171,13 @@ function _doButtonsNeedToGroup(gmailComposeView: GmailComposeView): boolean {
 
 const toolbarButtonStyles = new WeakMap<HTMLElement, CSSStyleDeclaration>();
 
-function areNativeToolbarButtonsGrouped(composeEl: HTMLElement) {
-  const nativeButtonsContainer = composeEl.querySelector<HTMLElement>('.bAK');
+function areNativeToolbarButtonsGrouped(gmailComposeView: GmailComposeView) {
+  const nativeButtonsContainer = gmailComposeView
+    .getGmailDriver()
+    .selectors.querySelectorByKey(
+      gmailComposeView.getElement(),
+      'composeView.nativeToolbarButtonsContainer',
+    );
   const containerWidth = nativeButtonsContainer?.offsetWidth ?? 0;
   const nativeButtons = Array.from(
     nativeButtonsContainer?.querySelectorAll<HTMLElement>('.wG') ?? [],
