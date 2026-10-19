@@ -235,6 +235,13 @@ export const GMAIL_SELECTORS = {
   'composeView.statusArea': ['.aDg .aDj > .aDh'],
 
   /**
+   * The native status bar of an inline reply, which SDK status bars are
+   * inserted into.
+   * Root: compose root.
+   */
+  'composeView.inlineReplyStatusBar': ['.iN > tbody .aDj .aDh .IZ'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
