@@ -1313,10 +1313,9 @@ class GmailComposeView {
   }
 
   getMoleSwitchButton(): HTMLElement {
-    // Prefer legacy <img> titlebar controls; fall back to newer <button class="Hq">.
-    return (
-      this.#element.querySelectorAll<HTMLElement>('.Hm > img')[1] ||
-      querySelector(this.#element, '.Hm .Hq')
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.fullscreenButton',
     );
   }
 
