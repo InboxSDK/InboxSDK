@@ -1305,10 +1305,9 @@ class GmailComposeView {
   }
 
   getCloseButton(): HTMLElement {
-    // Prefer legacy <img> titlebar controls; fall back to newer <button class="Ha">.
-    return (
-      this.#element.querySelectorAll<HTMLElement>('.Hm > img')[2] ||
-      querySelector(this.#element, '.Hm .Ha')
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.closeButton',
     );
   }
 
