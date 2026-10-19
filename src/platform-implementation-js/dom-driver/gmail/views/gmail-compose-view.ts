@@ -1237,7 +1237,10 @@ class GmailComposeView {
   }
 
   getMoreSendOptionsButton(): HTMLElement {
-    return querySelector(this.#element, '.hG');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.moreSendOptionsButton',
+    );
   }
 
   // When schedule send is available, this returns the element that contains both buttons.
