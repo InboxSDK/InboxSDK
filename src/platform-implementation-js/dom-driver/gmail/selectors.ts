@@ -202,6 +202,13 @@ export const GMAIL_SELECTORS = {
   'composeView.formattingToolbarToggleIcon': ['[role=button] .dv'],
 
   /**
+   * The insert more area, which is shifted when SDK buttons move the
+   * formatting area.
+   * Root: compose root.
+   */
+  'composeView.insertMoreArea': ['.eq'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
