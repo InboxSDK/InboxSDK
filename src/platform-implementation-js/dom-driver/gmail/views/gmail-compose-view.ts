@@ -281,8 +281,8 @@ class GmailComposeView {
           this.#composeID = this.#getInputByKey(
             'composeView.composeIdInput',
           )!.value;
-          this.#messageIDElement = this.#element.querySelector(
-            'input[name="draft"]',
+          this.#messageIDElement = this.#getInputByKey(
+            'composeView.draftIdInput',
           )!;
 
           if (!this.#messageIDElement) {
