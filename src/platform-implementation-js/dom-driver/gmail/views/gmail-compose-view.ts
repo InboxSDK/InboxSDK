@@ -17,7 +17,6 @@ import type { Stopper } from 'kefir-stopper';
 import delayAsap from '../../../lib/delay-asap';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 import simulateKey from '../../../lib/dom/simulate-key';
-import querySelector from '../../../lib/dom/querySelectorOrFail';
 import isElementVisible from '../../../../common/isElementVisible';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import {
@@ -811,7 +810,10 @@ class GmailComposeView {
 
   hideNativeStatusBar(): () => void {
     const statusArea = this.getStatusArea();
-    const nativeStatusBar = querySelector(statusArea, 'table');
+    const nativeStatusBar = this.#driver.selectors.querySelectorByKeyOrFail(
+      statusArea,
+      'composeView.nativeStatusBar',
+    );
     const formattingToolbar = this.getFormattingToolbar();
     const isFormattingToolbarOpen =
       formattingToolbar && formattingToolbar.style.display !== 'none';

@@ -242,6 +242,12 @@ export const GMAIL_SELECTORS = {
   'composeView.inlineReplyStatusBar': ['.iN > tbody .aDj .aDh .IZ'],
 
   /**
+   * Gmail's own status bar, hidden while an SDK status bar replaces it.
+   * Root: `composeView.statusArea`.
+   */
+  'composeView.nativeStatusBar': ['table'],
+
+  /**
    * The compose table that SDK compose notices are inserted into.
    * Root: compose root.
    */
