@@ -291,6 +291,12 @@ export const GMAIL_SELECTORS = {
   'composeView.responseTypeIcon': ['.J-J5-Ji .J-JN-M-I-Jm > img'],
 
   /**
+   * The forward icon in the response type button; present only on forwards.
+   * Root: compose root.
+   */
+  'composeView.forwardIcon': ['.Un.J-JN-M-I .mI'],
+
+  /**
    * The first column of the table holding `composeView.formattingArea`; the
    * SDK action toolbar's columns are inserted after it.
    * Root: that table.

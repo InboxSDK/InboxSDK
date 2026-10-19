@@ -1076,7 +1076,12 @@ class GmailComposeView {
   }
 
   isForward(): boolean {
-    return Boolean(this.#element.querySelector('.Un.J-JN-M-I .mI'));
+    return Boolean(
+      this.#driver.selectors.querySelectorByKey(
+        this.#element,
+        'composeView.forwardIcon',
+      ),
+    );
   }
 
   isReply(): boolean {
