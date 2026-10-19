@@ -222,6 +222,12 @@ export const GMAIL_SELECTORS = {
   'composeView.nativeToolbarButtonsContainer': ['.bAK'],
 
   /**
+   * The table that lays out the bottom toolbar.
+   * Root: compose root.
+   */
+  'composeView.bottomBarTable': ['.aoP .aDh > table'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
