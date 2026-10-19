@@ -278,6 +278,13 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The icon of a reply's response type button; its class changes between
+   * reply and forward.
+   * Root: compose root.
+   */
+  'composeView.responseTypeIcon': ['.J-J5-Ji .J-JN-M-I-Jm > img'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
