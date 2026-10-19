@@ -7,10 +7,12 @@ export function getFromContact(
   driver: GmailDriver,
   gmailComposeView: GmailComposeView,
 ): Contact {
-  const nameInput: HTMLInputElement | null | undefined = gmailComposeView
-    .getElement()
-    .querySelector('input[name="from"]') as any;
-  const emailAddress = nameInput ? nameInput.value : null;
+  const nameInput = driver.selectors.querySelectorByKey(
+    gmailComposeView.getElement(),
+    'composeView.fromInput',
+  );
+  const emailAddress =
+    nameInput instanceof HTMLInputElement ? nameInput.value : null;
 
   if (!emailAddress) {
     return driver.getUserContact();

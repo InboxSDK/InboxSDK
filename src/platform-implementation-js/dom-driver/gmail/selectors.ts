@@ -105,6 +105,12 @@ export const GMAIL_SELECTORS = {
   'composeView.subjectInput': ['input[name=subjectbox]'],
 
   /**
+   * The input holding the from address.
+   * Root: compose root.
+   */
+  'composeView.fromInput': ['input[name="from"]'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
