@@ -548,8 +548,9 @@ class GmailComposeView {
         .error(new Error('Draft is missing sync draft id'));
     }
 
-    const legacyThreadIdElement =
-      this.#element.querySelector<HTMLInputElement>('input[name="lts"]');
+    const legacyThreadIdElement = this.#getInputByKey(
+      'composeView.legacyThreadIdInput',
+    );
     if (
       legacyThreadIdElement &&
       typeof legacyThreadIdElement.value === 'string'
