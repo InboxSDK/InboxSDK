@@ -81,6 +81,12 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The input holding the compose id.
+   * Root: compose root.
+   */
+  'composeView.composeIdInput': ['input[name="composeid"]'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
