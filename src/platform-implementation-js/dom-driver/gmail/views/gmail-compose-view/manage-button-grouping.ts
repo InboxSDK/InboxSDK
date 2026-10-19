@@ -345,8 +345,11 @@ function _collapseGroupButtonToolbar(
   // toolbar and the content. We "jiggle" the scroll position by 1px to trigger Gmails
   // logic to show/hide the shadow border
   const bodyScrollContainer = gmailComposeView
-    .getElement()
-    .querySelector('.qz');
+    .getGmailDriver()
+    .selectors.querySelectorByKey(
+      gmailComposeView.getElement(),
+      'composeView.bodyScrollContainer',
+    );
 
   if (bodyScrollContainer) {
     bodyScrollContainer.scrollTop = bodyScrollContainer.scrollTop - 1;
@@ -380,8 +383,11 @@ function _expandGroupButtonToolbar(
   // toolbar and the content. We "jiggle" the scroll position by 1px to trigger Gmails
   // logic to show/hide the shadow border
   const bodyScrollContainer = gmailComposeView
-    .getElement()
-    .querySelector('.qz');
+    .getGmailDriver()
+    .selectors.querySelectorByKey(
+      gmailComposeView.getElement(),
+      'composeView.bodyScrollContainer',
+    );
 
   if (bodyScrollContainer) {
     bodyScrollContainer.scrollTop = bodyScrollContainer.scrollTop + 1;
