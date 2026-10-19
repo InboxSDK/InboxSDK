@@ -297,6 +297,12 @@ export const GMAIL_SELECTORS = {
   'composeView.forwardIcon': ['.Un.J-JN-M-I .mI'],
 
   /**
+   * An element whose presence marks the compose as a reply.
+   * Root: compose root.
+   */
+  'composeView.replyMarker': ['.HQ'],
+
+  /**
    * The first column of the table holding `composeView.formattingArea`; the
    * SDK action toolbar's columns are inserted after it.
    * Root: that table.
