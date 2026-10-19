@@ -189,6 +189,12 @@ export const GMAIL_SELECTORS = {
   'composeView.formattingToolbar': ['.aX'],
 
   /**
+   * The arrow under the formatting toolbar.
+   * Root: `composeView.formattingToolbar`.
+   */
+  'composeView.formattingToolbarArrow': ['.aA4'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
