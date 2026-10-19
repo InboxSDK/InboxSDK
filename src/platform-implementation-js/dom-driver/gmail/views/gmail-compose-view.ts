@@ -1645,8 +1645,7 @@ class GmailComposeView {
   // If this compose is a reply, then this gets the message ID of the message
   // we're replying to.
   #getTargetMessageID(): string | null | undefined {
-    const input =
-      this.#element.querySelector<HTMLInputElement>('input[name="rm"]');
+    const input = this.#getInputByKey('composeView.replyTargetMessageIdInput');
     return input &&
       typeof input.value === 'string' &&
       input.value != 'undefined'

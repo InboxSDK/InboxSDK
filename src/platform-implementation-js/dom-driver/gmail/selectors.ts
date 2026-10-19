@@ -111,6 +111,12 @@ export const GMAIL_SELECTORS = {
   'composeView.fromInput': ['input[name="from"]'],
 
   /**
+   * The input holding the id of the message a reply answers.
+   * Root: compose root.
+   */
+  'composeView.replyTargetMessageIdInput': ['input[name="rm"]'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
