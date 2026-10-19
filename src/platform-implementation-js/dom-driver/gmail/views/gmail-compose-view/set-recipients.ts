@@ -192,9 +192,9 @@ export default function setRecipients(
       );
       simulateClick(ccButton);
     } else if (addressType === 'bcc') {
-      const bccButton = querySelector(
+      const bccButton = selectors.querySelectorByKeyOrFail(
         gmailComposeView.getElement(),
-        'span.aB.gQ.pB',
+        'composeView.legacyBccLink',
       );
       simulateClick(bccButton);
     }
