@@ -125,6 +125,12 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The button beside Send that opens the schedule send menu.
+   * Root: compose root.
+   */
+  'composeView.scheduleSendButton': ['[selector="scheduledSend"]'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */

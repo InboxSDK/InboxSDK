@@ -1230,7 +1230,10 @@ class GmailComposeView {
   }
 
   getScheduleSendButton(): HTMLElement {
-    return querySelector(this.#element, '[selector="scheduledSend"]');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.scheduleSendButton',
+    );
   }
 
   getMoreSendOptionsButton(): HTMLElement {
