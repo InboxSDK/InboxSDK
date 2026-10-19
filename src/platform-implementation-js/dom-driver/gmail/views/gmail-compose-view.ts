@@ -1206,7 +1206,10 @@ class GmailComposeView {
   }
 
   getFormattingToolbarToggleButton(): HTMLElement {
-    const innerElement = querySelector(this.#element, '[role=button] .dv');
+    const innerElement = this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.formattingToolbarToggleIcon',
+    );
     const btn = innerElement.closest('[role=button]') as HTMLElement;
     if (!btn) throw new Error('failed to find button');
     return btn;
