@@ -1199,7 +1199,10 @@ class GmailComposeView {
   getFormattingToolbarArrow(): HTMLElement {
     const el = this.getFormattingToolbar();
     if (!el) throw new Error('Failed to find formatting toolbar');
-    return querySelector(el, '.aA4');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      el,
+      'composeView.formattingToolbarArrow',
+    );
   }
 
   getFormattingToolbarToggleButton(): HTMLElement {
