@@ -82,7 +82,10 @@ function _cloneContentToNewCompose(
 function _ensureExtraContentIsVisible(gmailComposeView: GmailComposeView) {
   if (gmailComposeView.getBodyElement().querySelector('.gmail_extra')) return;
   const quoteDotsElement = gmailComposeView
-    .getElement()
-    .querySelector<HTMLElement>('.ajR');
+    .getGmailDriver()
+    .selectors.querySelectorByKey(
+      gmailComposeView.getElement(),
+      'composeView.showTrimmedContentButton',
+    );
   if (quoteDotsElement) simulateClick(quoteDotsElement);
 }

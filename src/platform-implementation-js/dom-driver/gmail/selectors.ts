@@ -264,6 +264,12 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The dots button that shows the trimmed quoted content of a reply.
+   * Root: compose root.
+   */
+  'composeView.showTrimmedContentButton': ['.ajR'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
