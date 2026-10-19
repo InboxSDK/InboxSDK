@@ -164,6 +164,12 @@ export const GMAIL_SELECTORS = {
   'composeView.topForm': ['td > form'],
 
   /**
+   * The form holding the compose window's metadata inputs.
+   * Root: the `.aoP` ancestor of `composeView.body`.
+   */
+  'composeView.metadataForm': ['form.bAs'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
