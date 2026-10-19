@@ -624,9 +624,7 @@ class GmailComposeView {
   }
 
   setSubject(text: string) {
-    this.#element.querySelector<HTMLInputElement>(
-      'input[name=subjectbox]',
-    )!.value = text;
+    this.#getInputByKey('composeView.subjectInput')!.value = text;
 
     this.#triggerDraftSave();
   }
@@ -1128,9 +1126,7 @@ class GmailComposeView {
   }
 
   getSubjectInput(): HTMLInputElement {
-    return this.#element.querySelector<HTMLInputElement>(
-      'input[name=subjectbox]',
-    )!;
+    return this.#getInputByKey('composeView.subjectInput')!;
   }
 
   getMetadataFormElement(): HTMLElement {

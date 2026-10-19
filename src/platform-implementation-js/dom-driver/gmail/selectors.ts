@@ -99,6 +99,12 @@ export const GMAIL_SELECTORS = {
   'composeView.legacyThreadIdInput': ['input[name="lts"]'],
 
   /**
+   * The subject input.
+   * Root: compose root.
+   */
+  'composeView.subjectInput': ['input[name=subjectbox]'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
