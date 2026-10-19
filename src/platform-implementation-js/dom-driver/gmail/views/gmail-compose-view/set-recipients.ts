@@ -50,9 +50,10 @@ export default function setRecipients(
       );
     }
   } else if (addressType === 'bcc') {
-    const bccButton = gmailComposeView
-      .getElement()
-      .querySelector<HTMLElement>('span.pB[role=link]');
+    const bccButton = selectors.querySelectorByKey(
+      gmailComposeView.getElement(),
+      'composeView.bccLink',
+    );
     if (bccButton) {
       openRecipientsSectionIfNeeded(bccButton);
       bccButton.click();
