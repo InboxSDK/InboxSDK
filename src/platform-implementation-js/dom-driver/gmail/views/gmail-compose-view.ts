@@ -1243,7 +1243,10 @@ class GmailComposeView {
   }
 
   getInsertMoreArea(): HTMLElement {
-    return querySelector(this.#element, '.eq');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.insertMoreArea',
+    );
   }
 
   getSendButton(): HTMLElement {
