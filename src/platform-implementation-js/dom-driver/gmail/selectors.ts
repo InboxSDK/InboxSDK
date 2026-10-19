@@ -248,6 +248,14 @@ export const GMAIL_SELECTORS = {
   'composeView.noticeContainer': ['.iN'],
 
   /**
+   * The pop out item in an inline reply's response type menu.
+   * Root: compose root.
+   */
+  'composeView.popOutMenuItem': [
+    '.M9 > [role=menu]:first-child > .SK > [role=menuitem]:last-child',
+  ],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */

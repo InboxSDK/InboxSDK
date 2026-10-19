@@ -967,9 +967,9 @@ class GmailComposeView {
       throw new Error('Can only pop out inline reply compose views');
     }
 
-    const popOutBtn = querySelector(
+    const popOutBtn = this.#driver.selectors.querySelectorByKeyOrFail(
       this.#element,
-      '.M9 > [role=menu]:first-child > .SK > [role=menuitem]:last-child',
+      'composeView.popOutMenuItem',
     );
     simulateClick(popOutBtn);
   }
