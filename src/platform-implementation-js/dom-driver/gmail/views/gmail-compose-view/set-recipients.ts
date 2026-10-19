@@ -21,6 +21,7 @@ export default function setRecipients(
   }
 
   const oldRange = gmailComposeView.getLastSelectionRange();
+  const { selectors } = gmailComposeView.getGmailDriver();
 
   let _contactRow = getRecipientRowForType(
     gmailComposeView.getElement(),
@@ -36,9 +37,10 @@ export default function setRecipients(
   }
 
   if (addressType === 'cc') {
-    const ccButton = gmailComposeView
-      .getElement()
-      .querySelector<HTMLElement>('span.pE[role=link]');
+    const ccButton = selectors.querySelectorByKey(
+      gmailComposeView.getElement(),
+      'composeView.ccLink',
+    );
     if (ccButton) {
       openRecipientsSectionIfNeeded(ccButton);
       ccButton.click();

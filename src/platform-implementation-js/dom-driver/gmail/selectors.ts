@@ -292,6 +292,12 @@ export const GMAIL_SELECTORS = {
   'composeView.formattingAreaColumn': ['colgroup col'],
 
   /**
+   * The Cc link that opens the Cc row.
+   * Root: compose root.
+   */
+  'composeView.ccLink': ['span.pE[role=link]'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
