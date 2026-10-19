@@ -93,6 +93,12 @@ export const GMAIL_SELECTORS = {
   'composeView.draftIdInput': ['input[name="draft"]'],
 
   /**
+   * The input holding the legacy id of the thread a reply belongs to.
+   * Root: compose root.
+   */
+  'composeView.legacyThreadIdInput': ['input[name="lts"]'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
