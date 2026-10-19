@@ -285,6 +285,13 @@ export const GMAIL_SELECTORS = {
   'composeView.responseTypeIcon': ['.J-J5-Ji .J-JN-M-I-Jm > img'],
 
   /**
+   * The first column of the table holding `composeView.formattingArea`; the
+   * SDK action toolbar's columns are inserted after it.
+   * Root: that table.
+   */
+  'composeView.formattingAreaColumn': ['colgroup col'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
