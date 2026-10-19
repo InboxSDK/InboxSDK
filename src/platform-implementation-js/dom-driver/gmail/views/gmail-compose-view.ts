@@ -1092,7 +1092,10 @@ class GmailComposeView {
   }
 
   getMaybeBodyElement(): HTMLElement | null | undefined {
-    return this.#element.querySelector<HTMLElement>('.Ap [g_editable=true]');
+    return this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'composeView.body',
+    );
   }
 
   getTopFormElement(): HTMLElement {
