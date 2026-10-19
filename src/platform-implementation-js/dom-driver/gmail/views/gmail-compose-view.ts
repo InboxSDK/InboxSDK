@@ -1210,7 +1210,10 @@ class GmailComposeView {
   }
 
   getScrollBody(): HTMLElement {
-    var scrollBody = this.#element.querySelector<HTMLElement>('table .GP');
+    var scrollBody = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'composeView.scrollBody',
+    );
 
     if (!scrollBody) {
       throw new Error('Failed to find scroll body');
