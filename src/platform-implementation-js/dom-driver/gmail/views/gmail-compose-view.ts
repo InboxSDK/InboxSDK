@@ -1223,9 +1223,9 @@ class GmailComposeView {
   }
 
   getSendButton(): HTMLElement {
-    return querySelector(
+    return this.#driver.selectors.querySelectorByKeyOrFail(
       this.#element,
-      '.IZ .Up div > div[role=button]:not(.Uo):not([aria-haspopup=true]):not([class^=inboxsdk_])',
+      'composeView.sendButton',
     );
   }
 
