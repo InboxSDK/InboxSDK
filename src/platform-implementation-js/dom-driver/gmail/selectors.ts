@@ -158,6 +158,12 @@ export const GMAIL_SELECTORS = {
   'composeView.body': ['.Ap [g_editable=true]'],
 
   /**
+   * The form at the top of the compose window, which holds the recipients.
+   * Root: compose root.
+   */
+  'composeView.topForm': ['td > form'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
