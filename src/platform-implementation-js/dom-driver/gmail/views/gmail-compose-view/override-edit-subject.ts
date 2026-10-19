@@ -9,11 +9,10 @@ export default function overrideEditSubject(
   gmailComposeView: GmailComposeView,
 ) {
   if (!gmailComposeView.isReply()) return;
-  const menuItem = gmailComposeView
-    .getElement()
-    .querySelector<HTMLElement>(
-      'div.J-M.jQjAxd.HX[role=menu] > div.SK.AX > [role=menuitem]:nth-last-child(2)',
-    );
+  const menuItem = gmailDriver.selectors.querySelectorByKey(
+    gmailComposeView.getElement(),
+    'composeView.editSubjectMenuItem',
+  );
 
   if (!menuItem) {
     if (!hasLoggedError) {
