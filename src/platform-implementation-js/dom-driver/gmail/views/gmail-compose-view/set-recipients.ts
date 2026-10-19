@@ -186,9 +186,9 @@ export default function setRecipients(
     cover.dispatchEvent(new FocusEvent('focus'));
 
     if (addressType === 'cc') {
-      const ccButton = querySelector(
+      const ccButton = selectors.querySelectorByKeyOrFail(
         gmailComposeView.getElement(),
-        'span.aB.gQ.pE',
+        'composeView.legacyCcLink',
       );
       simulateClick(ccButton);
     } else if (addressType === 'bcc') {

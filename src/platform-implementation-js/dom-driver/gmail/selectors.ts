@@ -304,6 +304,12 @@ export const GMAIL_SELECTORS = {
   'composeView.bccLink': ['span.pB[role=link]'],
 
   /**
+   * The Cc link in the old recipient fields.
+   * Root: compose root.
+   */
+  'composeView.legacyCcLink': ['span.aB.gQ.pE'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
