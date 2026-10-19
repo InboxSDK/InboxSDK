@@ -1190,7 +1190,10 @@ class GmailComposeView {
   }
 
   getFormattingToolbar(): HTMLElement | null | undefined {
-    return this.#element.querySelector<HTMLElement>('.aX');
+    return this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'composeView.formattingToolbar',
+    );
   }
 
   getFormattingToolbarArrow(): HTMLElement {

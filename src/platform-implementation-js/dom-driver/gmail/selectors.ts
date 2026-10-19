@@ -183,6 +183,12 @@ export const GMAIL_SELECTORS = {
   'composeView.formattingArea': ['.oc'],
 
   /**
+   * The formatting toolbar that opens above the bottom toolbar.
+   * Root: compose root.
+   */
+  'composeView.formattingToolbar': ['.aX'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
