@@ -1,6 +1,5 @@
 import GmailComposeView from '../gmail-compose-view';
 import Logger from '../../../../lib/logger';
-import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import getRecipients from './get-recipients';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import simulateKey from '../../../../lib/dom/simulate-key';
@@ -31,7 +30,10 @@ export default function setRecipients(
   function openRecipientsSectionIfNeeded(button: HTMLElement) {
     const signalElement = button.closest<HTMLElement>('.fX.aiL');
     if (signalElement && signalElement.style.display === 'none') {
-      const cover = querySelector(gmailComposeView.getElement(), 'div.aoD.hl');
+      const cover = selectors.querySelectorByKeyOrFail(
+        gmailComposeView.getElement(),
+        'composeView.recipientsSummary',
+      );
       cover.dispatchEvent(new FocusEvent('focus'));
     }
   }
@@ -184,7 +186,10 @@ export default function setRecipients(
     simulateKey(emailAddressEntry, 13, 0);
 
     // Focus the recipients preview label so Gmail re-renders it.
-    const cover = querySelector(gmailComposeView.getElement(), 'div.aoD.hl');
+    const cover = selectors.querySelectorByKeyOrFail(
+      gmailComposeView.getElement(),
+      'composeView.recipientsSummary',
+    );
     cover.dispatchEvent(new FocusEvent('focus'));
 
     if (addressType === 'cc') {

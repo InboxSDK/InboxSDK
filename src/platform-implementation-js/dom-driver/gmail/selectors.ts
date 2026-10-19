@@ -330,6 +330,12 @@ export const GMAIL_SELECTORS = {
   'composeView.legacyRecipientTextarea': ['textarea.vO'],
 
   /**
+   * The collapsed recipients summary; focusing it opens the recipient rows.
+   * Root: compose root.
+   */
+  'composeView.recipientsSummary': ['div.aoD.hl'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
