@@ -117,6 +117,14 @@ export const GMAIL_SELECTORS = {
   'composeView.replyTargetMessageIdInput': ['input[name="rm"]'],
 
   /**
+   * The native Send button, not Send and Archive or an SDK button.
+   * Root: compose root.
+   */
+  'composeView.sendButton': [
+    '.IZ .Up div > div[role=button]:not(.Uo):not([aria-haspopup=true]):not([class^=inboxsdk_])',
+  ],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
