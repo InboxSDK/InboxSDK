@@ -195,6 +195,13 @@ export const GMAIL_SELECTORS = {
   'composeView.formattingToolbarArrow': ['.aA4'],
 
   /**
+   * The icon of the button that shows and hides the formatting toolbar. The
+   * code walks up to its `role=button` ancestor, so stay at the icon.
+   * Root: compose root.
+   */
+  'composeView.formattingToolbarToggleIcon': ['[role=button] .dv'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
