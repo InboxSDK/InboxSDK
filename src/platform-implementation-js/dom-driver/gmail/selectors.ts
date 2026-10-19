@@ -298,6 +298,12 @@ export const GMAIL_SELECTORS = {
   'composeView.ccLink': ['span.pE[role=link]'],
 
   /**
+   * The Bcc link that opens the Bcc row.
+   * Root: compose root.
+   */
+  'composeView.bccLink': ['span.pB[role=link]'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
