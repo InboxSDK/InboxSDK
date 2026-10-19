@@ -209,6 +209,12 @@ export const GMAIL_SELECTORS = {
   'composeView.insertMoreArea': ['.eq'],
 
   /**
+   * The element inside `composeView.scrollBody` that scrolls the message body.
+   * Root: compose root or `composeView.scrollBody`.
+   */
+  'composeView.bodyScrollContainer': ['.qz'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
