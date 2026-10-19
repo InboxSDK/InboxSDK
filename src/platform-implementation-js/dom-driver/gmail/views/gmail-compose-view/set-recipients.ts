@@ -70,9 +70,9 @@ export default function setRecipients(
     // new recipient fields
     // https://workspaceupdates.googleblog.com/2021/10/visual-updates-for-composing-email-in-gmail.html
 
-    const emailAddressEntry = querySelector(
+    const emailAddressEntry = selectors.querySelectorByKeyOrFail(
       contactRow,
-      'input[role=combobox][aria-autocomplete=list]',
+      'composeView.recipientInput',
     );
     if (!(emailAddressEntry instanceof HTMLInputElement)) {
       throw new Error();

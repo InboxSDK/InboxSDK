@@ -316,6 +316,14 @@ export const GMAIL_SELECTORS = {
   'composeView.legacyBccLink': ['span.aB.gQ.pB'],
 
   /**
+   * The text input of a To, Cc or Bcc row, which addresses are pasted into.
+   * Root: the row's `[role=listbox]`.
+   */
+  'composeView.recipientInput': [
+    'input[role=combobox][aria-autocomplete=list]',
+  ],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
