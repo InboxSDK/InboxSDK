@@ -176,6 +176,13 @@ export const GMAIL_SELECTORS = {
   'composeView.scrollBody': ['table .GP'],
 
   /**
+   * The formatting cell in the bottom toolbar; the SDK action toolbar goes
+   * before it.
+   * Root: compose root.
+   */
+  'composeView.formattingArea': ['.oc'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */

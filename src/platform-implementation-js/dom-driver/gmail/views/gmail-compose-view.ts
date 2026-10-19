@@ -1180,7 +1180,10 @@ class GmailComposeView {
 
     if (!formattingArea) {
       formattingArea = this.#formattingArea =
-        this.#element.querySelector<HTMLElement>('.oc');
+        this.#driver.selectors.querySelectorByKey(
+          this.#element,
+          'composeView.formattingArea',
+        );
     }
 
     return formattingArea;
