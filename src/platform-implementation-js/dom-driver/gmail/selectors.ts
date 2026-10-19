@@ -138,6 +138,14 @@ export const GMAIL_SELECTORS = {
   'composeView.moreSendOptionsButton': ['.hG'],
 
   /**
+   * The native Send and Archive button, present in replies.
+   * Root: compose root.
+   */
+  'composeView.sendAndArchiveButton': [
+    '.IZ .Up div > div[role=button].Uo:not([aria-haspopup=true]):not([class^=inboxsdk_])',
+  ],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
