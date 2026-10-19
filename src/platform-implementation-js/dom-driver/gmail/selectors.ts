@@ -60,6 +60,17 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The title-bar button that switches the compose window between the mole
+   * and fullscreen.
+   * Root: compose root.
+   */
+  'composeView.fullscreenButton': [
+    // Prefer legacy <img> titlebar controls; fall back to newer <button class="Hq">.
+    '.Hm > img:nth-of-type(2)',
+    '.Hm .Hq',
+  ],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
