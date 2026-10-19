@@ -1142,7 +1142,10 @@ class GmailComposeView {
       throw new Error('Could not find compose container');
     }
 
-    return querySelector(container, 'form.bAs');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      container,
+      'composeView.metadataForm',
+    );
   }
 
   getToRecipients(): ContactNameOptional[] {
