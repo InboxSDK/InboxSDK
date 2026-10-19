@@ -1350,7 +1350,10 @@ class GmailComposeView {
   }
 
   getBottomBarTable(): HTMLElement {
-    return querySelector(this.#element, '.aoP .aDh > table');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.bottomBarTable',
+    );
   }
 
   getDiscardButton(): HTMLElement {
