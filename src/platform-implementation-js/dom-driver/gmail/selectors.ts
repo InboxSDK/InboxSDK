@@ -215,6 +215,13 @@ export const GMAIL_SELECTORS = {
   'composeView.bodyScrollContainer': ['.qz'],
 
   /**
+   * The bottom toolbar container holding Gmail's own buttons, measured to tell
+   * whether Gmail has grouped them.
+   * Root: compose root.
+   */
+  'composeView.nativeToolbarButtonsContainer': ['.bAK'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
