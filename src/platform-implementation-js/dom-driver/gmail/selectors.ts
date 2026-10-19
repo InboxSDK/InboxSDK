@@ -50,6 +50,16 @@ export const GMAIL_SELECTORS = {
   'composeView.titleBarColorBodyInner': ['.nH.Hy.aXJ .l.m > .l.n'],
 
   /**
+   * The title-bar button that minimizes the compose window.
+   * Root: compose root.
+   */
+  'composeView.minimizeButton': [
+    // Prefer legacy <img>; fall back to newer <button class="Hl">.
+    '.Hm > img',
+    '.Hm .Hl',
+  ],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */

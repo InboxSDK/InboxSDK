@@ -1497,10 +1497,10 @@ class GmailComposeView {
     if (minimized !== this.isMinimized()) {
       if (this.#isInlineReplyForm)
         throw new Error('Not implemented for inline compose views');
-      // Prefer legacy <img>; fall back to newer <button class="Hl">.
-      const minimizeButton =
-        this.#element.querySelector<HTMLElement>('.Hm > img') ||
-        querySelector(this.#element, '.Hm .Hl');
+      const minimizeButton = this.#driver.selectors.querySelectorByKeyOrFail(
+        this.#element,
+        'composeView.minimizeButton',
+      );
       simulateClick(minimizeButton);
     }
   }
