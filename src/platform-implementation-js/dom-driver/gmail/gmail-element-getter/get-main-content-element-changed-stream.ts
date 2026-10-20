@@ -5,12 +5,12 @@ import streamWaitFor from '../../../lib/stream-wait-for';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 
-import _GmailElementGetter from '../gmail-element-getter';
+import type GmailElementGetter from '../gmail-element-getter';
 
 export default function getMainContentElementChangedStream(
-  GmailElementGetter: typeof _GmailElementGetter,
+  elementGetter: GmailElementGetter,
 ): Kefir.Observable<HTMLElement, never> {
-  const s = waitForMainContentContainer(GmailElementGetter)
+  const s = waitForMainContentContainer(elementGetter)
     .flatMap((mainContentContainer) =>
       makeElementChildStream(mainContentContainer)
         .filter(({ el }) => el.classList.contains('nH'))
@@ -39,13 +39,11 @@ export default function getMainContentElementChangedStream(
   return s as Kefir.Observable<HTMLElement, never>;
 }
 
-function waitForMainContentContainer(
-  GmailElementGetter: typeof _GmailElementGetter,
-) {
-  if (GmailElementGetter.isStandaloneComposeWindow()) {
+function waitForMainContentContainer(elementGetter: GmailElementGetter) {
+  if (elementGetter.isStandaloneComposeWindow()) {
     return Kefir.never();
   }
-  return streamWaitFor(() => GmailElementGetter.getMainContentContainer());
+  return streamWaitFor(() => elementGetter.getMainContentContainer());
 }
 
 function _isNowVisible(mutation: { target: HTMLElement } | MutationRecord) {

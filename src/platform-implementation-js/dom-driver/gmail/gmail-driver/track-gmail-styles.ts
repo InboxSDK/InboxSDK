@@ -1,7 +1,7 @@
 import kefirBus from 'kefir-bus';
 import Logger from '../../../lib/logger';
 import waitFor, { WaitForError } from '../../../lib/wait-for';
-import GmailElementGetter from '../gmail-element-getter';
+import type GmailDriver from '../gmail-driver';
 
 /** should handle rgb and rgba */
 const RGB_REGEX = /^rgba?\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*(,\s*(0\.)?\d+)?\)/;
@@ -101,10 +101,10 @@ const enum ClassName {
   darkBodyTheme = 'inboxsdk__gmail_dark_body_theme',
 }
 
-export default async function trackGmailStyles() {
+export default async function trackGmailStyles(driver: GmailDriver) {
   if (
     document.head.hasAttribute('data-inboxsdk-gmail-style-tracker') ||
-    GmailElementGetter.isStandalone()
+    driver.elementGetter.isStandalone()
   ) {
     return;
   }

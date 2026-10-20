@@ -4,7 +4,6 @@ import * as Kefir from 'kefir';
 import fromEventTargetCapture from '../../../lib/from-event-target-capture';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
-import gmailElementGetter from '../gmail-element-getter';
 import copyAndValidateAutocompleteResults from '../../../lib/copyAndValidateAutocompleteResults';
 
 import type GmailDriver from '../gmail-driver';
@@ -75,7 +74,7 @@ export default function registerSearchSuggestionsProvider(
   const searchBoxStream: Kefir.Observable<HTMLInputElement, unknown> = driver
     .getRouteViewDriverStream()
     .toProperty(() => null)
-    .map(() => gmailElementGetter.getSearchInput())
+    .map(() => driver.elementGetter.getSearchInput())
     .filter(isNotNil)
     .take(1);
 
@@ -83,7 +82,7 @@ export default function registerSearchSuggestionsProvider(
   const suggestionsBoxTbodyStream: Kefir.Observable<HTMLElement, unknown> =
     searchBoxStream
       .flatMapLatest((searchBox) => Kefir.fromEvents(searchBox, 'focus'))
-      .map(() => gmailElementGetter.getSearchSuggestionsBoxParent())
+      .map(() => driver.elementGetter.getSearchSuggestionsBoxParent())
       .filter(isNotNil)
       .flatMapLatest(makeElementChildStream)
       .map((x) => x.el.firstElementChild as HTMLElement)

@@ -15,8 +15,8 @@ export const GMAIL_SELECTORS = {
   /**
    * The compose title-bar table.
    *
-   * The `Ht`-less rung matches a superset of the `Ht` one, so it must stay BELOW it:
-   * above, it would win always and the specific rung would never run.
+   * The selector without `Ht` matches everything the `Ht` one does, so it must
+   * come second. Listed first, it would always win and `Ht` would never be tried.
    * Root: compose root.
    */
   'composeView.titleBarTable': [
@@ -90,7 +90,7 @@ export const GMAIL_SELECTORS = {
 
   /**
    * Message body carrying the legacy `m<hex>` id class. Narrower than
-   * `messageView.body` on purpose — the `.adP` rung does not carry that class.
+   * `messageView.body` on purpose — the `.adP` element does not carry that class.
    * Root: message element.
    */
   'messageView.legacyIdBody': ['div.ii.gt'],
@@ -107,6 +107,9 @@ export const GMAIL_SELECTORS = {
    * Root: `document.body`.
    */
   'messageView.openMoreMenu': [
+    // 2026 message header. Gmail keeps a closed copy of the menu in `<body>`
+    // for every expanded message, so match a class only the open menu has
+    'div.tB5Jxf-M-X-ql-Kq ul.aqdrmf-Kf',
     // 2023-11-16 thread-view redesign
     'div.nH.a98.iY > div.nH .aHU .b7.J-M[aria-haspopup=true]',
     // 2022-11-23, same shape under an extra `td >`
@@ -121,6 +124,9 @@ export const GMAIL_SELECTORS = {
    * Root: message element.
    */
   'messageView.moreButton': [
+    // 2026 message header. Gmail adds `aria-expanded` only once the menu has
+    // been opened, so the selector must not require it
+    'button.Wsq5Cf',
     'tr.acZ div.T-I.J-J5-Ji.aap.L3[role=button][aria-haspopup]',
   ],
 
@@ -139,11 +145,163 @@ export const GMAIL_SELECTORS = {
   'messageView.dateElement': ['.ads .gK .g3'],
 
   /**
+   * The element carrying the message's sync id in `data-message-id`.
+   * Root: message element.
+   */
+  'messageView.syncIdElement': ['[data-message-id]'],
+
+  /**
+   * The element carrying `data-legacy-message-id`. The SDK also writes that
+   * attribute onto `messageView.syncIdElement`, so a selector must match both.
+   * Root: message element.
+   */
+  'messageView.legacyIdElement': ['[data-legacy-message-id]'],
+
+  /**
+   * The header span attachment icons are added to, in an expanded message.
+   * Root: message element.
+   */
+  'messageView.attachmentIconSlot': ['td.gH div.gK span'],
+
+  /**
+   * The header span attachment icons are added to, in a collapsed message.
+   * Root: message element.
+   */
+  'messageView.attachmentIconSlotCollapsed': ['.adf.ads td.gH span'],
+
+  /**
+   * The container that holds an inline reply; watched for its class change.
+   * Root: message element.
+   */
+  'messageView.replyContainer': ['.ip'],
+
+  /**
+   * The sender heading of an expanded message; a hovered contact inside it is
+   * the sender, and one outside it a recipient.
+   * Root: message element.
+   */
+  'messageView.senderHeading': ['h3.iw'],
+
+  /**
+   * Gmail's attachment area. The area the SDK builds carries the same class,
+   * so this can also match that one.
+   * Root: message element.
+   */
+  'messageView.attachmentArea': ['.hq'],
+
+  /**
+   * The element the SDK's own attachment area is inserted before.
+   * Root: message element.
+   */
+  'messageView.attachmentAreaAnchor': ['.hi'],
+
+  /**
+   * The recipients' spans in a message header; each carries `email` and `name`.
+   * Root: message element.
+   */
+  'messageView.recipientSpans': ['.hb span[email]'],
+
+  /**
    * The thread's subject heading. Read for its text, or walked child by child
    * when it contains emoji images.
    * Root: thread element.
    */
   'threadView.subject': ['.ha h2'],
+
+  /**
+   * The list holding the thread's messages, which custom messages are
+   * inserted into.
+   * Root: thread element.
+   */
+  'threadView.messageList': ['[role=list]'],
+
+  /**
+   * The message element that contains the hidden messages notice.
+   * Root: thread element.
+   */
+  'threadView.hiddenNoticeMessage': ['.adv'],
+
+  /**
+   * The span holding the number of messages Gmail has hidden; read as a number.
+   * Root: `threadView.hiddenNoticeMessage`.
+   */
+  'threadView.hiddenNoticeCount': ['.adx span'],
+
+  /**
+   * Where a stand-in notice is inserted when Gmail renders no native one.
+   * Root: `threadView.hiddenNoticeMessage`.
+   */
+  'threadView.hiddenNoticeSlot': ['.G3'],
+
+  /**
+   * The container an app's thread label is appended to, and re-appended to
+   * whenever Gmail removes it.
+   * Root: thread element.
+   */
+  'threadView.labelContainer': ['.ha .J-J5-Ji'],
+
+  /**
+   * The subject wrapper that subject buttons are added to.
+   * Root: thread element.
+   */
+  'threadView.subjectParent': ['.V8djrc.byY'],
+
+  /**
+   * The messages container, whose last message footer holds footer buttons.
+   * Root: thread element.
+   */
+  'threadView.messagesContainer': ['div.nH .aHU'],
+
+  /**
+   * The toolbar beside the thread subject, which subject buttons are put in.
+   * Root: thread element.
+   */
+  'threadView.subjectToolbar': ['.bHJ'],
+
+  /**
+   * An expanded message. Its PARENT is the container the message view stream
+   * watches, so stay at this depth.
+   * Root: thread element.
+   */
+  'threadView.openMessage': ['.h7'],
+
+  /**
+   * The expand-all icon. The code walks up to its `role=button` ancestor, so
+   * stay at the image.
+   * Root: thread element.
+   */
+  'threadView.expandAllButton': ['img.gx'],
+
+  /**
+   * The collapse-all icon. The code walks up to its `role=button` ancestor, so
+   * stay at the image.
+   * Root: thread element.
+   */
+  'threadView.collapseAllButton': ['img.gq'],
+
+  /**
+   * The subject container the notice bar is inserted into, in the current
+   * thread view.
+   * Root: thread element.
+   */
+  'threadView.subjectContainer': [
+    // 2023-11-16 thread-view redesign
+    '* > .nH',
+  ],
+
+  /**
+   * The subject container the notice bar is inserted into, in the thread
+   * views that predate the redesign.
+   * Root: thread element.
+   */
+  'threadView.subjectContainerLegacy': [
+    // 2018 layout
+    '.if > .nH',
+    // 2022-10-21 layout
+    '.a98.iY > .nH',
+    // 2022-10-12 layout
+    '.PeIF1d > .nH',
+  ],
 
   /**
    * The element holding the list toolbar and the thread list.
@@ -156,6 +314,192 @@ export const GMAIL_SELECTORS = {
    * Root: `routeView.rowListWrapper`.
    */
   'routeView.listToolbar': ['[gh=tm]', '.G-atb'],
+
+  /**
+   * The left nav column.
+   * Root: `document`.
+   */
+  'leftNav.root': ['.aeN'],
+
+  /**
+   * The left nav when Gmail shows the app menu
+   * https://support.google.com/mail/answer/11555490
+   * Root: `document`.
+   */
+  'leftNav.appMenu': ['.aeN.WR.a6o.anZ.nH.oy8Mbf[role=navigation]'],
+
+  /**
+   * The app menu container, which holds the menu items and their panels.
+   * Root: `document`.
+   */
+  'appMenu.container': ['.aqk.aql.bkL'],
+
+  /**
+   * The main menu button in the Gmail header; its `aria-expanded` is read.
+   * Root: `document`.
+   */
+  'appMenu.burgerButton': [
+    'header[role="banner"] > div > div > div[aria-expanded]',
+  ],
+
+  /**
+   * The app header, which toggles into panel-less mode with the app menu.
+   * Root: `document`.
+   */
+  'appMenu.header': ['.oy8Mbf.qp'],
+
+  /**
+   * The Hangouts buttons at the bottom of the left nav.
+   * Root: `document`.
+   */
+  'leftNav.gtalkButtons': ['.aeN .aj5.J-KU-Jg'],
+
+  /**
+   * This selector matches the app menu if it is or will be present, otherwise if
+   * we're in a mode of Gmail without the app menu, then this might match the
+   * collapsible panel left nav menu instead. We wait for this selector so we can
+   * know when the app menu is ready or if it will never be ready.
+   * Root: `document`.
+   */
+  'leftNav.appMenuOrNavMenuFallback': ['.aeN.WR.nH.oy8Mbf[role=navigation]'],
+
+  /**
+   * The right-hand column holding the companion sidebar. Both the panel and the
+   * icon rail live inside it.
+   * Root: `document`.
+   */
+  'companionSidebar.column': ['div.aUx'],
+
+  /**
+   * The companion sidebar panel, where a companion's content opens: Calendar,
+   * Keep and add-on panels.
+   * Root: `document`.
+   */
+  'companionSidebar.panel': ['.brC-brG'],
+
+  /**
+   * The strip of icons on the right edge, holding Gmail's global icons and the
+   * SDK's sidebar icons.
+   * <div class="brC-aT5-aOt-Jw" role="complementary" aria-label="Side panel">
+   * Root: `document`.
+   */
+  'companionSidebar.iconRail': ['.brC-aT5-aOt-Jw'],
+
+  /**
+   * The add-on sidebar. Only for Gmailv1 + Gmailv2-before-2018-07-30?
+   * Root: `document`.
+   */
+  'companionSidebar.legacyAddonSidebar': ['.no > .nn.bnl'],
+
+  /**
+   * The compose button in Gmail's integrated view.
+   * Root: `document`.
+   */
+  'leftNav.composeButtonIntegrated': ['.aIH .aic div[role=button].L3'],
+
+  /**
+   * The compose button at the top of the left nav.
+   * Root: `document`.
+   */
+  'leftNav.composeButton': ['[gh=cm]'],
+
+  /**
+   * The collapsible left panel with Compose and the labels, next to the app
+   * menu.
+   * Root: `appMenu.container`.
+   */
+  'leftNav.collapsiblePanelInAppMenu': ['.aqn.aIH'],
+
+  /**
+   * The collapsible left panel in Gmail's integrated view, with no app menu.
+   * Root: `document`.
+   */
+  'leftNav.collapsiblePanelIntegrated': ['div[role=navigation] + div.aqn'],
+
+  /**
+   * The list of Gmail's own nav items (Inbox, Starred, Sent) in the integrated
+   * view. Nav items added inline go here.
+   * Root: `document`.
+   */
+  'leftNav.nativeItemListIntegrated': ['.yJ .wT > .n3'],
+
+  /**
+   * The list of Gmail's own nav items (Inbox, Starred, Sent). Nav items added
+   * inline go here.
+   * Root: `document`.
+   */
+  'leftNav.nativeItemList': ['.aeN .n3'],
+
+  /**
+   * The section beside the left nav that holds the current route.
+   * Root: `document`.
+   */
+  'page.contentSection': ['div.nH.bkK > .nH'],
+
+  /**
+   * The container around the main content body.
+   * Root: `document`.
+   */
+  'page.mainContentBody': ['.no > .nn.bkK'],
+
+  /**
+   * The container of the current route's content. Present on routes without
+   * `[role=main]`, such as Contacts.
+   * Root: `document`.
+   */
+  'page.mainContentContainer': ['div.aeF > div.nH'],
+
+  /**
+   * The element that scrolls the main content.
+   * Root: `document`.
+   */
+  'page.scrollContainer': ['div.Tm.aeJ'],
+
+  /**
+   * The preview pane container in thread lists. Always present, but it has
+   * content only in preview pane mode.
+   * Root: `document`.
+   */
+  'routeView.previewPaneContainer': ['div[role=main] .aia'],
+
+  /**
+   * The search box input in the Gmail header.
+   * Root: `document`.
+   */
+  'search.input': ['form[role=search] input'],
+
+  /**
+   * The cell that holds the search suggestions box.
+   * Root: `document`.
+   */
+  'search.suggestionsBoxParent': ['table.gstl_50 > tbody > tr > td.gssb_e'],
+
+  /**
+   * The container fullscreen compose windows are put in.
+   * Root: `document`.
+   */
+  'compose.fullscreenContainer': ['.aSs .aSt'],
+
+  /**
+   * The page's main element. Gmail sets it only once the page has loaded, and
+   * standalone compose windows render inside it.
+   * Root: `document`.
+   */
+  'page.main': ['[role=main]'],
+
+  /**
+   * The account area on the right of the Gmail header.
+   * Root: `document`.
+   */
+  'header.accountContainer': [
+    'header[role="banner"] > div:nth-child(2) > div:nth-child(2)',
+  ],
+
+  /**
+   * The back button in a thread's toolbar.
+   * Root: page toolbar.
+   */
+  'toolbar.backButton': ['.lS'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

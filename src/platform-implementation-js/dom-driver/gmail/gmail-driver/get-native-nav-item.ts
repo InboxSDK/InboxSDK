@@ -1,5 +1,4 @@
 import NativeGmailNavItemView from '../views/native-gmail-nav-item-view';
-import GmailElementGetter from '../gmail-element-getter';
 import findParent from '../../../../common/find-parent';
 import waitFor from '../../../lib/wait-for';
 
@@ -10,7 +9,7 @@ export default function getNativeNavItem(
   label: string,
 ): Promise<NativeGmailNavItemView> {
   return waitFor(() => {
-    const navContainer = GmailElementGetter.getLeftNavContainerElement();
+    const navContainer = driver.elementGetter.getLeftNavContainerElement();
     if (!navContainer) return null;
     return navContainer.querySelector<HTMLElement>(`.aim a[href*="#${label}"]`);
   }, 300 * 1000)
@@ -31,7 +30,7 @@ export default function getNativeNavItem(
       return (labelElement as any).__nativeGmailNavItemView;
     })
     .catch((err) => {
-      if (GmailElementGetter.isStandalone()) {
+      if (driver.elementGetter.isStandalone()) {
         // never resolve
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         return new Promise((_resolve, _reject) => {});
