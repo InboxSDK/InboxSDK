@@ -1,0 +1,22 @@
+{
+  "name": "InboxSDK — New menu demo",
+  "description": "Try a primary-button dropdown in the Gmail app menu.",
+  "version": "1.0",
+  "manifest_version": 3,
+  "permissions": ["scripting"],
+  "host_permissions": ["https://mail.google.com/"],
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["dist/content.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "background": { "service_worker": "background.js" },
+  "web_accessible_resources": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "resources": ["pageWorld.js", "icon.svg"]
+    }
+  ]
+}

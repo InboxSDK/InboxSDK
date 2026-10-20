@@ -22,7 +22,7 @@ import renderCustomIcon from '../../../driver-common/render-custom-icon';
 import NAV_ITEM_TYPES from '../../../constants/nav-item-types';
 
 import GmailDriver from '../gmail-driver';
-import DropdownView from '../../../widgets/buttons/dropdown-view';
+import type { DropdownView } from '../../../../inboxsdk';
 import {
   NAV_ITEM_SECTION_CLASS_NAME,
   getSectionNavItemsContainerElement,
@@ -34,7 +34,8 @@ const GMAIL_V2_LEFT_INDENTATION_PADDING = 12;
 
 type CreateAccessoryDescriptor = {
   type: 'CREATE';
-  onClick: () => void;
+  hasDropdown?: boolean;
+  onClick: (event: { dropdown?: DropdownView }) => void;
 };
 
 type IconButtonAccessoryDescriptor = {
@@ -383,13 +384,20 @@ export default class GmailNavItemView {
   }
 
   private _createCreateAccessory(accessoryDescriptor: any) {
-    this._createPlusButtonAccessory(accessoryDescriptor);
+    if (accessoryDescriptor.hasDropdown) {
+      this._createDropdownButtonAccessory(accessoryDescriptor);
+    } else {
+      this._createPlusButtonAccessory(accessoryDescriptor);
+    }
   }
 
   private _createDropdownButtonAccessory(accessoryDescriptor: any) {
     if (this._isNewLeftNavParent) {
       const buttonOptions: any = { ...accessoryDescriptor };
-      buttonOptions.buttonView = new MoreParentDropdownButtonView();
+      buttonOptions.buttonView =
+        accessoryDescriptor.type === 'CREATE'
+          ? new CreateParentAccessoryButtonView()
+          : new MoreParentDropdownButtonView();
       buttonOptions.dropdownViewDriverClass = GmailDropdownView;
       buttonOptions.dropdownPositionOptions = {
         position: 'right',
@@ -426,7 +434,10 @@ export default class GmailNavItemView {
 
     // child dropdown button accessory
     const buttonOptions: any = { ...accessoryDescriptor };
-    buttonOptions.buttonView = new MoreDropdownButtonView();
+    buttonOptions.buttonView =
+      accessoryDescriptor.type === 'CREATE'
+        ? new CreateAccessoryButtonView()
+        : new MoreDropdownButtonView();
     buttonOptions.dropdownViewDriverClass = GmailDropdownView;
     buttonOptions.dropdownPositionOptions = {
       position: 'bottom',
@@ -596,21 +607,6 @@ export default class GmailNavItemView {
     if (this._isNewLeftNavParent) {
       const buttonOptions: any = { ...accessoryDescriptor };
       buttonOptions.buttonView = new CreateParentAccessoryButtonView();
-
-      // TODO: new Gmail left nav parent accessory opens a dropdown which would be a breaking
-      // change if we were to also create a dropdown view bc existing users would have to manually
-      // close the dropdown if they only wanted a click callback. We could have a "hasDropdown"
-      // prop to conditionally render the dropdown, but when is enough enough?
-      // buttonOptions.dropdownViewDriverClass = GmailDropdownView;
-      // buttonOptions.dropdownPositionOptions = {
-      //   position: 'right',
-      //   hAlign: 'left',
-      //   vAlign: 'top'
-      // };
-      // buttonOptions.dropdownShowFunction = ({ dropdown }) => {
-      //   dropdown.el.style.marginLeft = '24px';
-      //   buttonOptions.onClick({ dropdown });
-      // };
 
       this._accessoryViewController = new BasicButtonViewController(
         buttonOptions,

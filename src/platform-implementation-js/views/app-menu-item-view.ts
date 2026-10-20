@@ -201,10 +201,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
       }
     }
   }
-  static #isPanelDropdownShown(panel?: HTMLElement) {
-    if (panel && CollapsiblePanelView.isPrimaryButtonDropdownOpen(panel)) {
-      return true;
-    }
+  static #isPanelDropdownShown() {
     const sdkDropdown = document.querySelector<HTMLElement>('.inboxsdk__menu');
     if (sdkDropdown) {
       return true;
@@ -469,9 +466,7 @@ export class AppMenuItemView extends (EventEmitter as new () => TypedEmitter<Mes
 
         case 'mouseleave': {
           // Do not handle blur event when we're in one of the panel's dropdowns
-          const isPanelDropdownShown = AppMenuItemView.#isPanelDropdownShown(
-            AppMenuItemView.#menuItemToPanelMap.get(menuItem),
-          );
+          const isPanelDropdownShown = AppMenuItemView.#isPanelDropdownShown();
           if (isPanelDropdownShown) return;
 
           const activeMenuItem = AppMenuItemView.getActiveMenuItem(driver);

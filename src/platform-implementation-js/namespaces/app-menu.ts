@@ -1,5 +1,5 @@
 import kefir, { stream } from 'kefir';
-import { RouteView } from '../../inboxsdk';
+import type { DropdownView, RouteView } from '../../inboxsdk';
 import GmailDriver from '../dom-driver/gmail/gmail-driver';
 import { AppMenuItemView } from '../views/app-menu-item-view';
 import { CollapsiblePanelView } from '../views/collapsible-panel-view';
@@ -84,7 +84,7 @@ export type AppMenuItemPanelDescriptor = {
    */
   primaryButton?: {
     name: string;
-    onClick: (e: MouseEvent) => void;
+    onClick: (e: MouseEvent & { dropdown?: DropdownView }) => void;
     hasDropdown?: boolean;
     /**
      *  Icon URLs to display based on the button being hovered or not.
