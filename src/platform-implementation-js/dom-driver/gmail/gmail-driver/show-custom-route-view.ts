@@ -1,13 +1,14 @@
 import { defn } from 'ud';
-import GmailElementGetter from '../gmail-element-getter';
+import type GmailDriver from '../gmail-driver';
 
 const ACTIVE_ADD_ON_ICON_SELECTOR = '.J-KU-KO';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 
 const showCustomRouteView = defn(
   module,
-  function showCustomRouteView(gmailDriver: any, element: HTMLElement) {
-    const contentSectionElement = GmailElementGetter.getContentSectionElement();
+  function showCustomRouteView(gmailDriver: GmailDriver, element: HTMLElement) {
+    const contentSectionElement =
+      gmailDriver.elementGetter.getContentSectionElement();
     if (!contentSectionElement) {
       return;
     }
@@ -40,7 +41,7 @@ const showCustomRouteView = defn(
 
     //if any thread sidebar addons are enabled then we need to turn them off
     const companionSidebarIconContainerEl =
-      GmailElementGetter.getCompanionSidebarIconContainerElement();
+      gmailDriver.elementGetter.getCompanionSidebarIconContainerElement();
     if (companionSidebarIconContainerEl) {
       const activeThreadAddOnIcon =
         companionSidebarIconContainerEl.querySelector<HTMLElement>(

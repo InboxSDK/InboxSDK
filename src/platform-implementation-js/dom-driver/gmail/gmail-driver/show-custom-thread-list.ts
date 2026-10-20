@@ -1,7 +1,6 @@
 import find from 'lodash/find';
 import uniqBy from 'lodash/uniqBy';
 import Kefir from 'kefir';
-import GmailElementGetter from '../gmail-element-getter';
 import * as SyncGRP from '../gmail-sync-response-processor';
 import type Logger from '../../../lib/logger';
 import type GmailDriver from '../gmail-driver';
@@ -477,10 +476,11 @@ export default function showCustomThreadList(
   );
   const customHash = document.location.hash;
 
-  const searchInput = GmailElementGetter.getSearchInput();
+  const searchInput = driver.elementGetter.getSearchInput();
   if (!searchInput) throw new Error('could not find search input');
 
-  const inputStream = GmailElementGetter.getMainContentElementChangedStream()
+  const inputStream = driver.elementGetter
+    .getMainContentElementChangedStream()
     .changes()
     .take(1)
     .map(() => searchInput)

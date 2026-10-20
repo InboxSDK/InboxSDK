@@ -129,6 +129,7 @@ class GmailDriver {
   #envData: EnvData;
   /** Resolves selector keys against the bundled defaults plus any overrides. */
   readonly selectors: SelectorRegistry;
+  readonly elementGetter: GmailElementGetter;
   #customRouteIDs: Set<string> = new Set();
   #customListRouteIDs: Map<string, Function> = new Map();
   #customListSearchStringsToRouteIds: Map<string, string> = new Map();
@@ -190,6 +191,7 @@ class GmailDriver {
       overrides: opts.selectorOverrides,
       onInvalidSelector: opts.onInvalidSelector,
     });
+    this.elementGetter = new GmailElementGetter(this);
     this.#page = makePageParserTree(this, document);
     this.#stopper.onValue(() => this.#page.dump());
 
@@ -278,7 +280,7 @@ class GmailDriver {
         trackEvents(this);
         gmailLoadEvent(this);
         overrideGmailBackButton(this, this.#gmailRouteProcessor);
-        trackGmailStyles();
+        trackGmailStyles(this);
         syncMoleSpacerWithRightColumn(this);
         temporaryTrackDownloadUrlValidity(this);
         if (opts.suppressAddonTitle != null) {
@@ -726,7 +728,7 @@ class GmailDriver {
   setShowNativeNavMarker(isNative: boolean) {
     this.#navMarkerHiddenChanged.emit(null);
     const leftNavContainerElement =
-      GmailElementGetter.getLeftNavContainerElement();
+      this.elementGetter.getLeftNavContainerElement();
     if (leftNavContainerElement) {
       if (isNative) {
         leftNavContainerElement.classList.remove(
@@ -746,9 +748,9 @@ class GmailDriver {
   setShowNativeAddonSidebar(isNative: boolean) {
     this.#addonSidebarHiddenChanged.emit(null);
     const addonContainerElement =
-      GmailElementGetter.getAddonSidebarContainerElement();
+      this.elementGetter.getAddonSidebarContainerElement();
     const mainContentBodyContainerElement =
-      GmailElementGetter.getMainContentBodyContainerElement();
+      this.elementGetter.getMainContentBodyContainerElement();
 
     if (addonContainerElement && mainContentBodyContainerElement) {
       const parent = mainContentBodyContainerElement.parentElement;
@@ -962,16 +964,16 @@ class GmailDriver {
 
   waitForGlobalSidebarReady(): Kefir.Observable<void, unknown> {
     const condition = () =>
-      GmailElementGetter.getCompanionSidebarContentContainerElement() &&
-      (GmailElementGetter.getCompanionSidebarIconContainerElement() ||
-        GmailElementGetter.getAddonSidebarContainerElement());
+      this.elementGetter.getCompanionSidebarContentContainerElement() &&
+      (this.elementGetter.getCompanionSidebarIconContainerElement() ||
+        this.elementGetter.getAddonSidebarContainerElement());
     if (condition()) {
       return Kefir.constant(undefined);
     }
     return waitFor(condition)
       .map(() => undefined)
       .mapErrors((err) => {
-        const el = GmailElementGetter.getCompanionSidebarColumnElement();
+        const el = this.elementGetter.getCompanionSidebarColumnElement();
         this.#logger.error(err, {
           reason: 'waitForGlobalSidebarReady timed out',
           aUxHtml: el ? censorHTMLtree(el) : null,
@@ -984,7 +986,7 @@ class GmailDriver {
     let appSidebarView = this.#appSidebarView;
     if (!appSidebarView) {
       const companionSidebarContentContainerEl =
-        GmailElementGetter.getCompanionSidebarContentContainerElement();
+        this.elementGetter.getCompanionSidebarContentContainerElement();
       if (!companionSidebarContentContainerEl)
         throw new Error('did not find companionSidebarContentContainerEl');
       appSidebarView = this.#appSidebarView = new GmailAppSidebarView(

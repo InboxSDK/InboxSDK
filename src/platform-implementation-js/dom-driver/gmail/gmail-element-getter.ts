@@ -1,4 +1,3 @@
-import once from 'lodash/once';
 import * as Kefir from 'kefir';
 import makeElementChildStream, {
   ElementWithLifetime,
@@ -10,21 +9,7 @@ import getMainContentElementChangedStream from './gmail-element-getter/get-main-
 import isIntegratedViewGmail from './gmail-driver/isIntegratedViewGmail';
 import Logger from '../../lib/logger';
 import waitFor from '../../lib/wait-for';
-
-/**
- * The selector for the new app menu https://support.google.com/mail/answer/11555490 -- FEB 2023
- */
-const APP_MENU = '.aeN.WR.a6o.anZ.nH.oy8Mbf[role=navigation]';
-/**
- * If the APP_MENU selector is not found, NAV_MENU _might_ be present.
- */
-const NAV_MENU = '.aeN.WR.nH.oy8Mbf[role=navigation]';
-
-/**
- * The right-hand column holding the companion sidebar. Both the panel and the
- * icon rail live inside it.
- */
-const COMPANION_SIDEBAR_COLUMN = 'div.aUx';
+import type GmailDriver from './gmail-driver';
 
 /**
  * Class on the companion sidebar's outer wrapper before the 2024-11-07 Gmail
@@ -46,7 +31,22 @@ export const MOLE_CONTAINER_SELECTOR = 'div.dw';
 export const MOLE_PARENT_SELECTOR = `${MOLE_CONTAINER_SELECTOR} .nH > .nH > .no`;
 
 // TODO Figure out if these functions can and should be able to return null
-const GmailElementGetter = {
+/**
+ * Reads Gmail's page-level chrome. Owned by {@link GmailDriver} as
+ * `driver.elementGetter`, so its lookups can move onto the driver's selector
+ * registry.
+ */
+export default class GmailElementGetter {
+  /** Supplies the selector registry the lookups resolve through. */
+  readonly #driver: GmailDriver;
+
+  #appMenuAsync?: Promise<HTMLElement | undefined>;
+  #mainContentElementChangedStream?: Kefir.Observable<HTMLElement, never>;
+
+  constructor(driver: GmailDriver) {
+    this.#driver = driver;
+  }
+
   getActiveMoreMenu(): HTMLElement | null {
     const elements = document.querySelectorAll<HTMLElement>(
       '.J-M.aX0.aYO.jQjAxd',
@@ -59,25 +59,35 @@ const GmailElementGetter = {
     }
 
     return null;
-  },
+  }
 
   getAddonSidebarContainerElement(): HTMLElement | null {
-    // only for Gmailv1 + Gmailv2-before-2018-07-30?
-    return document.querySelector('.no > .nn.bnl');
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'companionSidebar.legacyAddonSidebar',
+    );
+  }
 
   getCompanionSidebarColumnElement(): HTMLElement | null {
-    return document.querySelector(COMPANION_SIDEBAR_COLUMN);
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'companionSidebar.column',
+    );
+  }
 
   getCompanionSidebarContentContainerElement(): HTMLElement | null {
-    return document.querySelector('.brC-brG');
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'companionSidebar.panel',
+    );
+  }
 
-  // <div class="brC-aT5-aOt-Jw" role="complementary" aria-label="Side panel">
   getCompanionSidebarIconContainerElement(): HTMLElement | null {
-    return document.querySelector('.brC-aT5-aOt-Jw');
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'companionSidebar.iconRail',
+    );
+  }
 
   /**
    * The wrapper Google's own companions (Calendar, Keep, Tasks, Contacts) and
@@ -91,8 +101,7 @@ const GmailElementGetter = {
     contentContainerEl?: HTMLElement | null,
   ): HTMLElement | null {
     const companionSidebarContentContainerEl =
-      contentContainerEl ??
-      GmailElementGetter.getCompanionSidebarContentContainerElement();
+      contentContainerEl ?? this.getCompanionSidebarContentContainerElement();
     if (!companionSidebarContentContainerEl) return null;
     // TODO: Once the changes to the GMail DOM have been entirely ramped, drop
     // the ternary here and always get the parentElement. (Jun 20, 2018)
@@ -101,18 +110,24 @@ const GmailElementGetter = {
     )
       ? companionSidebarContentContainerEl
       : companionSidebarContentContainerEl.parentElement;
-  },
+  }
 
   getComposeButton(): HTMLElement | null {
     if (isIntegratedViewGmail()) {
-      return document.querySelector('.aIH .aic div[role=button].L3');
+      return this.#driver.selectors.querySelectorByKey(
+        document,
+        'leftNav.composeButtonIntegrated',
+      );
     }
-    return document.querySelector('[gh=cm]');
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'leftNav.composeButton',
+    );
+  }
 
   getComposeWindowContainer(): HTMLElement | null {
     return document.querySelector(MOLE_PARENT_SELECTOR);
-  },
+  }
 
   getContentSectionElement(): HTMLElement | undefined | null {
     // New method for finding the content section element that also supports
@@ -120,12 +135,15 @@ const GmailElementGetter = {
     // Otherwise, use the old method, but log a warning if the old method
     // finds something different than the old method, so that way we can
     // figure out if it's okay to swap over.
-    const el = document.querySelector<HTMLElement>('div.nH.bkK > .nH');
+    const el = this.#driver.selectors.querySelectorByKey(
+      document,
+      'page.contentSection',
+    );
 
     if (isIntegratedViewGmail()) {
       return el;
     } else {
-      const leftNavContainer = GmailElementGetter.getLeftNavContainerElement();
+      const leftNavContainer = this.getLeftNavContainerElement();
       const oldMethodEl = leftNavContainer
         ? (leftNavContainer.nextElementSibling!.children[0] as HTMLElement)
         : null;
@@ -142,11 +160,14 @@ const GmailElementGetter = {
       }
       return oldMethodEl;
     }
-  },
+  }
 
   getFullscreenComposeWindowContainer(): HTMLElement | null {
-    return document.querySelector('.aSs .aSt');
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'compose.fullscreenContainer',
+    );
+  }
 
   getFullscreenComposeWindowContainerStream(): Kefir.Observable<
     ElementWithLifetime,
@@ -165,42 +186,59 @@ const GmailElementGetter = {
         .map(({ el }) => ({ el, removalStream: Kefir.never() }))
         .toProperty()
     );
-  },
+  }
 
   getGtalkButtons(): HTMLElement | null {
-    return document.querySelector('.aeN .aj5.J-KU-Jg');
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'leftNav.gtalkButtons',
+    );
+  }
 
   getLeftNavContainerElement(): HTMLElement | null {
     if (this.getAppMenu()) {
-      return this.getAppMenuContainer()?.querySelector('.aqn.aIH') ?? null;
+      const appMenuContainer = this.getAppMenuContainer();
+      return appMenuContainer
+        ? this.#driver.selectors.querySelectorByKey(
+            appMenuContainer,
+            'leftNav.collapsiblePanelInAppMenu',
+          )
+        : null;
     }
     if (isIntegratedViewGmail()) {
-      return document.querySelector('div[role=navigation] + div.aqn');
+      return this.#driver.selectors.querySelectorByKey(
+        document,
+        'leftNav.collapsiblePanelIntegrated',
+      );
     }
-    return document.querySelector('.aeN');
-  },
+    return this.#driver.selectors.querySelectorByKey(document, 'leftNav.root');
+  }
 
   getLeftNavHeightElement(): HTMLElement | null {
-    return document.querySelector('.aeN');
-  },
+    return this.#driver.selectors.querySelectorByKey(document, 'leftNav.root');
+  }
 
   getMainContentBodyContainerElement(): HTMLElement | null {
-    return document.querySelector('.no > .nn.bkK');
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'page.mainContentBody',
+    );
+  }
 
   getMainContentContainer(): HTMLElement | null {
     // This method used to just look for the div[role=main] element and then
     // return its parent, but it turns out the Contacts page does not set
     // role=main.
-    return document.querySelector('div.aeF > div.nH');
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'page.mainContentContainer',
+    );
+  }
 
-  getMainContentElementChangedStream: once(function (
-    this: any,
-  ): Kefir.Observable<HTMLElement, never> {
-    return getMainContentElementChangedStream(this);
-  }),
+  getMainContentElementChangedStream(): Kefir.Observable<HTMLElement, never> {
+    return (this.#mainContentElementChangedStream ??=
+      getMainContentElementChangedStream(this));
+  }
 
   /**
    * This method checks whether we should use the old InboxSDK style of adding nav items
@@ -232,18 +270,25 @@ const GmailElementGetter = {
     } else {
       return false;
     }
-  },
+  }
 
-  getAppMenuAsync: once(async () => {
-    if (!GmailElementGetter.isStandalone()) {
-      await GmailElementGetter.waitForGmailModeToSettle();
+  getAppMenuAsync(): Promise<HTMLElement | undefined> {
+    return (this.#appMenuAsync ??= this.#findAppMenuAsync());
+  }
+
+  async #findAppMenuAsync(): Promise<HTMLElement | undefined> {
+    if (!this.isStandalone()) {
+      await this.waitForGmailModeToSettle();
 
       try {
         const element = await waitFor(() =>
-          document.querySelector<HTMLElement>(`${APP_MENU}, ${NAV_MENU}`),
+          this.#driver.selectors.querySelectorByKey(
+            document,
+            'leftNav.appMenuOrNavMenuFallback',
+          ),
         );
 
-        if (!document.querySelector(APP_MENU)) {
+        if (!this.getAppMenu()) {
           return;
         }
 
@@ -252,84 +297,92 @@ const GmailElementGetter = {
         Logger.error(e);
       }
     }
-  }),
+  }
 
   getAppBurgerMenu() {
-    return document.querySelector<HTMLElement>(
-      'header[role="banner"] > div > div > div[aria-expanded]',
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'appMenu.burgerButton',
     );
-  },
+  }
 
   isAppBurgerMenuOpen() {
     return this.getAppBurgerMenu()?.getAttribute('aria-expanded') === 'true';
-  },
+  }
 
   getAppMenuContainer() {
-    return document.querySelector<HTMLElement>('.aqk.aql.bkL');
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'appMenu.container',
+    );
+  }
 
   getAppMenu() {
-    return document.querySelector<HTMLElement>(APP_MENU);
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'leftNav.appMenu',
+    );
+  }
 
   getAppHeader() {
-    return document.querySelector<HTMLElement>('.oy8Mbf.qp');
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'appMenu.header',
+    );
+  }
 
   getSeparateSectionNavItemMenuInjectionContainer(): HTMLElement | null {
-    return document.querySelector('.aeN');
-  },
+    return this.#driver.selectors.querySelectorByKey(document, 'leftNav.root');
+  }
 
   getSameSectionNavItemMenuInjectionContainer(): HTMLElement | null {
     if (isIntegratedViewGmail()) {
-      return document.querySelector('.yJ .wT > .n3');
+      return this.#driver.selectors.querySelectorByKey(
+        document,
+        'leftNav.nativeItemListIntegrated',
+      );
     } else {
-      return document.querySelector('.aeN .n3');
+      return this.#driver.selectors.querySelectorByKey(
+        document,
+        'leftNav.nativeItemList',
+      );
     }
-  },
-
-  getRowListElementsContainer(): HTMLElement | null {
-    // This selector can find multiple elements but they should all be siblings
-    // so it's fine because we get the common parent.
-    return document.querySelector('.bGI.nH')?.parentElement ?? null;
-  },
-
-  getRowListElements(): HTMLElement[] | null {
-    const rowListElements = document.querySelectorAll<HTMLElement>('[gh=tl]');
-    if (rowListElements.length === 0) {
-      return null;
-    }
-    return Array.from(rowListElements);
-  },
+  }
 
   getScrollContainer(): HTMLElement | null {
-    return document.querySelector('div.Tm.aeJ');
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'page.scrollContainer',
+    );
+  }
 
   getSearchInput(): HTMLInputElement | null {
-    return document.querySelector(
-      'form[role=search] input',
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'search.input',
     ) as HTMLInputElement | null;
-  },
+  }
 
   getSearchSuggestionsBoxParent(): HTMLElement | null {
-    return document.querySelector('table.gstl_50 > tbody > tr > td.gssb_e');
-  },
-
-  getSidebarContainerElement(): HTMLElement | null {
-    return document.querySelector('[role=main] table.Bs > tr .y3');
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'search.suggestionsBoxParent',
+    );
+  }
 
   getThreadBackButton(): HTMLElement | null {
     let toolbarElement;
     try {
-      toolbarElement = GmailElementGetter.getToolbarElement();
+      toolbarElement = this.getToolbarElement();
     } catch (err) {
       return null;
     }
 
-    return toolbarElement.querySelector('.lS');
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      toolbarElement,
+      'toolbar.backButton',
+    );
+  }
 
   getThreadContainerElement(): HTMLElement | null {
     const selector = '[role=main] .g.id table.Bs > tr';
@@ -343,27 +396,31 @@ const GmailElementGetter = {
     }
 
     return document.querySelector(selector_2023_11_16);
-  },
+  }
 
   getPreviewPaneContainerElement(): HTMLElement | null {
     // This element is always present in thread lists, but it only has contents
     // when in preview pane mode. We want to monitor it in either case
     // because the user could switch into preview pane mode.
-    return document.querySelector<HTMLElement>('div[role=main] .aia');
-  },
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'routeView.previewPaneContainer',
+    );
+  }
 
   getToolbarElement(): HTMLElement {
     return querySelector(document, '[gh=tm]');
-  },
+  }
 
   getTopAccountContainer(): HTMLElement | null {
-    return document.querySelector(
-      'header[role="banner"] > div:nth-child(2) > div:nth-child(2)',
+    return this.#driver.selectors.querySelectorByKey(
+      document,
+      'header.accountContainer',
     );
-  },
+  }
 
   isGplusEnabled(): boolean {
-    const topAccountContainer = GmailElementGetter.getTopAccountContainer();
+    const topAccountContainer = this.getTopAccountContainer();
     if (!topAccountContainer) {
       return false;
     }
@@ -373,27 +430,23 @@ const GmailElementGetter = {
         'a[href*="https://plus"][href*="upgrade"]',
       ).length === 0
     );
-  },
+  }
 
   /** @deprecated this doesn't include Gmail themes where the frame is dark and the body is not. Use Global.gmailTheme instead */
   isDarkTheme(): boolean {
     return document.body.classList.contains('inboxsdk__gmail_dark_theme');
-  },
-
-  isPreviewPane(): boolean {
-    return !!document.querySelector('.aia');
-  },
+  }
 
   isStandalone(): boolean {
     return this.isStandaloneComposeWindow() || this.isStandaloneThreadWindow();
-  },
+  }
 
   isStandaloneComposeWindow(): boolean {
     return (
       document.body.classList.contains('xE') &&
       document.body.classList.contains('xp')
     );
-  },
+  }
 
   isStandaloneThreadWindow(): boolean {
     return (
@@ -401,17 +454,14 @@ const GmailElementGetter = {
       document.body.classList.contains('xE') &&
       document.body.classList.contains('Su')
     );
-  },
+  }
 
-  StandaloneCompose: {
-    getComposeWindowContainer(): HTMLElement | null {
-      return document.querySelector('[role=main]');
-    },
-  },
+  /** Was `StandaloneCompose.getComposeWindowContainer` before this became a class. */
+  getStandaloneComposeWindowContainer(): HTMLElement | null {
+    return this.#driver.selectors.querySelectorByKey(document, 'page.main');
+  }
 
   waitForGmailModeToSettle(): Promise<void> {
     return waitForGmailModeToSettle().toPromise();
-  },
-};
-
-export default GmailElementGetter;
+  }
+}

@@ -1,7 +1,6 @@
 import kefir, { stream } from 'kefir';
 import { RouteView } from '../../inboxsdk';
 import GmailDriver from '../dom-driver/gmail/gmail-driver';
-import GmailElementGetter from '../dom-driver/gmail/gmail-element-getter';
 import { AppMenuItemView } from '../views/app-menu-item-view';
 import { CollapsiblePanelView } from '../views/collapsible-panel-view';
 import isNotNil from '../../common/isNotNil';
@@ -124,7 +123,7 @@ export default class AppMenu {
         return;
       }
 
-      const appMenu = await GmailElementGetter.getAppMenuAsync();
+      const appMenu = await this.#driver.elementGetter.getAppMenuAsync();
 
       if (!appMenu) {
         return;
@@ -166,7 +165,7 @@ export default class AppMenu {
   constructor(driver: GmailDriver) {
     this.#driver = driver;
 
-    AppMenu.#monitorAppMenuState();
+    AppMenu.#monitorAppMenuState(driver);
   }
 
   /**
@@ -182,7 +181,7 @@ export default class AppMenu {
    * @returns whether or not the AppMenu Burger is uncollapsed or not.
    */
   isMenuOpen() {
-    return GmailElementGetter.isAppBurgerMenuOpen();
+    return this.#driver.elementGetter.isAppBurgerMenuOpen();
   }
 
   /**
@@ -201,12 +200,12 @@ export default class AppMenu {
    * @returns true if the app menu is visible. At time of writing, this typically means they have chose to enable Chat, Meet, or both.
    */
   async isShown() {
-    const result = await GmailElementGetter.getAppMenuAsync();
+    const result = await this.#driver.elementGetter.getAppMenuAsync();
     return !!result;
   }
 
   static #monitorInitialized = false;
-  static async #monitorAppMenuState() {
+  static async #monitorAppMenuState(driver: GmailDriver) {
     /**
      * Gmail could set menu item to active asynchronously, monitor changes to the menu DOM and
      * deactivate all other menu items that don't have the SDK specific active class name.
@@ -222,7 +221,7 @@ export default class AppMenu {
 
     kefir
       .fromPromise<HTMLElement | undefined, unknown>(
-        GmailElementGetter.getAppMenuAsync(),
+        driver.elementGetter.getAppMenuAsync(),
       )
       .filter(isNotNil)
       .flatMap((appMenu) =>
@@ -242,10 +241,10 @@ export default class AppMenu {
       )
       .throttle(10, { leading: true, trailing: true })
       .map(() => {
-        const activeMenuItem = AppMenuItemView.getActiveMenuItem();
+        const activeMenuItem = AppMenuItemView.getActiveMenuItem(driver);
 
         if (activeMenuItem) {
-          const otherMenuItems = AppMenuItemView.getAllMenuItems().filter(
+          const otherMenuItems = AppMenuItemView.getAllMenuItems(driver).filter(
             (menuItem) => menuItem !== activeMenuItem,
           );
 
@@ -254,9 +253,9 @@ export default class AppMenu {
           );
         }
 
-        const activePanel = AppMenuItemView.getActivePanel();
+        const activePanel = AppMenuItemView.getActivePanel(driver);
         if (activePanel) {
-          const otherPanels = AppMenuItemView.getAllPanels().filter(
+          const otherPanels = AppMenuItemView.getAllPanels(driver).filter(
             (panel) => panel !== activePanel,
           );
 

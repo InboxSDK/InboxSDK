@@ -25,7 +25,6 @@ import {
   simulateDrop,
   simulateDragEnd,
 } from '../../../lib/dom/simulate-drag-and-drop';
-import GmailElementGetter from '../gmail-element-getter';
 import setCss from '../../../lib/dom/set-css';
 import waitFor from '../../../lib/wait-for';
 import streamWaitFor from '../../../lib/stream-wait-for';
@@ -607,7 +606,7 @@ class GmailComposeView {
         this.#isFullscreen = true;
       } else {
         const fullScreenContainer =
-          GmailElementGetter.getFullscreenComposeWindowContainer();
+          this.#driver.elementGetter.getFullscreenComposeWindowContainer();
 
         if (!fullScreenContainer) {
           this.#isFullscreen = false;
@@ -1267,10 +1266,6 @@ class GmailComposeView {
     return querySelector(this.#element, '.eq');
   }
 
-  getInsertLinkButton(): HTMLElement {
-    return querySelector(this.#element, '.e5.aaA.aMZ');
-  }
-
   getSendButton(): HTMLElement {
     return querySelector(
       this.#element,
@@ -1368,10 +1363,6 @@ class GmailComposeView {
 
   getBottomBarTable(): HTMLElement {
     return querySelector(this.#element, '.aoP .aDh > table');
-  }
-
-  getBottomToolbarContainer(): HTMLElement {
-    return querySelector(this.#element, '.aoP .aDj');
   }
 
   getDiscardButton(): HTMLElement {
@@ -1559,11 +1550,7 @@ class GmailComposeView {
     if (fullscreen !== this.isFullscreen()) {
       if (this.#isInlineReplyForm)
         throw new Error('Not implemented for inline compose views');
-      // Prefer legacy <img>; fall back to newer <button class="Hq">.
-      const fullscreenButton =
-        this.#element.querySelector<HTMLElement>('.Hm > img:nth-of-type(2)') ||
-        querySelector(this.#element, '.Hm .Hq');
-      simulateClick(fullscreenButton);
+      simulateClick(this.getMoleSwitchButton());
     }
   }
 

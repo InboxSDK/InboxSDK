@@ -1,5 +1,4 @@
 import { defn } from 'ud';
-import GmailElementGetter from '../gmail-element-getter';
 import onMouseDownAndUp from '../../../lib/dom/on-mouse-down-and-up';
 import type GmailDriver from '../gmail-driver';
 import type GmailRouteView from '../views/gmail-route-view/gmail-route-view';
@@ -9,8 +8,8 @@ export default function overrideGmailBackButton(
   gmailDriver: GmailDriver,
   gmailRouteProcessor: GmailRouteProcessor,
 ) {
-  GmailElementGetter.waitForGmailModeToSettle().then(function () {
-    if (GmailElementGetter.isStandalone()) {
+  gmailDriver.elementGetter.waitForGmailModeToSettle().then(function () {
+    if (gmailDriver.elementGetter.isStandalone()) {
       return;
     }
     _setupManagement(gmailDriver, gmailRouteProcessor);
@@ -77,7 +76,7 @@ function _bindToBackButton(
   gmailDriver: GmailDriver,
   gmailRouteView: GmailRouteView,
 ) {
-  const backButton = GmailElementGetter.getThreadBackButton();
+  const backButton = gmailDriver.elementGetter.getThreadBackButton();
 
   if (!backButton) {
     return;

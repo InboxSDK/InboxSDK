@@ -14,7 +14,6 @@ import {
   createMoreMenuItem,
 } from './gmail-message-view/more-menu-item';
 import makeMutationObserverStream from '../../../lib/dom/make-mutation-observer-stream';
-import querySelector from '../../../lib/dom/querySelectorOrFail';
 import makeMutationObserverChunkedStream from '../../../lib/dom/make-mutation-observer-chunked-stream';
 import streamWaitFor from '../../../lib/stream-wait-for';
 import type { ElementWithLifetime } from '../../../lib/dom/make-element-child-stream';
@@ -130,7 +129,10 @@ class GmailMessageView {
     // client side, so the new message added (from your reply) shows up in the UI right away and has a data-message-id but
     // because it hasn't been synced to the server it does not have a data-legacy-messag-id
     // so we wait until the message has been synced to the server before saying this is ready
-    const messageIdElement = this.#element.querySelector('[data-message-id]');
+    const messageIdElement = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'messageView.syncIdElement',
+    );
 
     if (messageIdElement) {
       const syncMessageId = messageIdElement.getAttribute('data-message-id');
@@ -251,8 +253,9 @@ class GmailMessageView {
   getRecipients(): Array<ContactNameOptional> {
     let recipients = this.#recipients;
     if (recipients) return recipients;
-    const receipientSpans = Array.from(
-      this.#element.querySelectorAll('.hb span[email]'),
+    const receipientSpans = this.#driver.selectors.querySelectorAllByKey(
+      this.#element,
+      'messageView.recipientSpans',
     );
     recipients = this.#recipients = receipientSpans.map((span) => {
       return this.#getUpdatedContact({
@@ -266,8 +269,9 @@ class GmailMessageView {
   getRecipientEmailAddresses(): Array<string> {
     let recipients = this.#recipientEmailAddresses;
     if (recipients) return recipients;
-    const receipientSpans = Array.from(
-      this.#element.querySelectorAll('.hb span[email]'),
+    const receipientSpans = this.#driver.selectors.querySelectorAllByKey(
+      this.#element,
+      'messageView.recipientSpans',
     );
     recipients = this.#recipientEmailAddresses = receipientSpans.map(
       (span) => span.getAttribute('email') || '',
@@ -492,8 +496,9 @@ class GmailMessageView {
       throw new Error('tried to get message id before message is loaded');
     }
 
-    const messageIdElement = this.#element.querySelector(
-      '[data-legacy-message-id]',
+    const messageIdElement = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'messageView.legacyIdElement',
     );
 
     if (messageIdElement) {
@@ -629,9 +634,15 @@ class GmailMessageView {
           let attachmentDiv;
 
           if (this.getViewState() === 'COLLAPSED') {
-            attachmentDiv = querySelector(this.#element, '.adf.ads td.gH span');
+            attachmentDiv = this.#driver.selectors.querySelectorByKeyOrFail(
+              this.#element,
+              'messageView.attachmentIconSlotCollapsed',
+            );
           } else {
-            attachmentDiv = querySelector(this.#element, 'td.gH div.gK span');
+            attachmentDiv = this.#driver.selectors.querySelectorByKeyOrFail(
+              this.#element,
+              'messageView.attachmentIconSlot',
+            );
           }
 
           const img =
@@ -879,7 +890,10 @@ class GmailMessageView {
   }
 
   #setupReplyStream() {
-    const replyContainer = this.#element.querySelector<HTMLElement>('.ip');
+    const replyContainer = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'messageView.replyContainer',
+    );
 
     if (!replyContainer) {
       return;
@@ -953,7 +967,12 @@ class GmailMessageView {
             contactType = 'sender';
           } else {
             if (
-              (self.#element.querySelector('h3.iw') as any).contains(element)
+              self.#driver.selectors
+                .querySelectorByKeyOrFail(
+                  self.#element,
+                  'messageView.senderHeading',
+                )
+                .contains(element)
             ) {
               contactType = 'sender';
             } else {
@@ -977,12 +996,12 @@ class GmailMessageView {
   }
 
   #getAttachmentArea(): GmailAttachmentAreaView | null | undefined {
-    if (this.#element.querySelector('.hq')) {
-      return new GmailAttachmentAreaView(
-        this.#element.querySelector<HTMLElement>('.hq'),
-        this.#driver,
-        this,
-      );
+    const attachmentArea = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'messageView.attachmentArea',
+    );
+    if (attachmentArea) {
+      return new GmailAttachmentAreaView(attachmentArea, this.#driver, this);
     }
 
     return null;
@@ -994,7 +1013,10 @@ class GmailMessageView {
       this.#driver,
       this,
     );
-    const beforeElement = querySelector(this.#element, '.hi');
+    const beforeElement = this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'messageView.attachmentAreaAnchor',
+    );
     const parentNode = beforeElement.parentNode;
     if (!parentNode) throw new Error('parentNode not found');
     parentNode.insertBefore(

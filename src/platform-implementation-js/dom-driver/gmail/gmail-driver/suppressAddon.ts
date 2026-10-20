@@ -2,10 +2,9 @@ import type GmailDriver from '../gmail-driver';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import waitFor from '../../../lib/stream-wait-for';
-import GmailElementGetter from '../gmail-element-getter';
 
 export default function suppressAddon(driver: GmailDriver, addonTitle: string) {
-  waitFor(() => GmailElementGetter.getCompanionSidebarIconContainerElement())
+  waitFor(() => driver.elementGetter.getCompanionSidebarIconContainerElement())
     .map((iconContainerElement) => {
       // .J-KU-Jg is pre-2018-07-30 element?
       const elementToWatch = iconContainerElement.querySelector(

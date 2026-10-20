@@ -4,7 +4,6 @@ import * as Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import type { Stopper } from 'kefir-stopper';
 import updateIcon from '../../../driver-common/update-icon';
-import GmailElementGetter from '../gmail-element-getter';
 import GmailTooltipView from '../widgets/gmail-tooltip-view';
 import DropdownView from '../../../widgets/buttons/dropdown-view';
 import monitorTopBannerSizeAndReact from './gmail-app-toolbar-button-view/monitor-top-banner-size-and-react';
@@ -176,7 +175,7 @@ function _createAppButtonElement(
     event.preventDefault();
     onclick(event);
   });
-  const topAccountContainer = GmailElementGetter.getTopAccountContainer();
+  const topAccountContainer = driver.elementGetter.getTopAccountContainer();
 
   if (!topAccountContainer) {
     const err = new Error('Could not make button');
@@ -201,7 +200,7 @@ function _createAppButtonElement(
   }
 
   try {
-    if (!GmailElementGetter.isGplusEnabled()) {
+    if (!driver.elementGetter.isGplusEnabled()) {
       element.classList.add('inboxsdk__appButton_noGPlus');
     }
 

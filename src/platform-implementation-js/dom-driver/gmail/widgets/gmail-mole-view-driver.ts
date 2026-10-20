@@ -2,7 +2,7 @@ import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
 import querySelector from '../../../lib/dom/querySelectorOrFail';
-import GmailElementGetter, {
+import {
   MOLE_CONTAINER_SELECTOR,
   MOLE_PARENT_SELECTOR,
 } from '../gmail-element-getter';
@@ -166,11 +166,31 @@ class GmailMoleViewDriver {
    * This method, among other things, DOES NOT
    * - preseve initial load order with moles.
    * - preserve mole order after a mole has been maximized.
+   *
+   * Moving a mole re-parents it, which reloads (or blanks) any iframe inside
+   * it — e.g. Google Chat moles. So we only move a native mole when an SDK
+   * mole actually sits to its right, and never move one containing an iframe.
    */
   static #maybeMoveMole(mole: HTMLElement) {
     const rightSpacer = mole.parentElement?.lastElementChild;
 
-    if (!(rightSpacer instanceof HTMLElement)) {
+    if (!(rightSpacer instanceof HTMLElement) || rightSpacer === mole) {
+      return;
+    }
+
+    let hasSdkMoleToRight = false;
+    for (
+      let sibling = mole.nextElementSibling;
+      sibling && sibling !== rightSpacer;
+      sibling = sibling.nextElementSibling
+    ) {
+      if (sibling.classList.contains(INBOXSDK_CLASS)) {
+        hasSdkMoleToRight = true;
+        break;
+      }
+    }
+
+    if (!hasSdkMoleToRight || mole.querySelector('iframe')) {
       return;
     }
 
@@ -310,7 +330,7 @@ class GmailMoleViewDriver {
     // If the gmail mode has settled, we've been loaded for 10 seconds, and
     // we don't have the mole parent yet, then force the mole parent to load
     // by opening a compose view and then closing it.
-    Kefir.fromPromise(GmailElementGetter.waitForGmailModeToSettle())
+    Kefir.fromPromise(this.#driver.elementGetter.waitForGmailModeToSettle())
       .flatMap(() => {
         // delay until we've passed TimestampOnReady + 5 seconds
         return this.#driver.delayToTimeAfterReady(5_000);
