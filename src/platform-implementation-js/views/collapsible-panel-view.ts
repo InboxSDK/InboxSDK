@@ -62,6 +62,12 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     TOGGLE_OPEN_STATE: 'aak',
     SDK_ACTIVE: 'inboxsdk__collapsiblePanel_active',
   } as const;
+  static #panelsWithOpenDropdowns = new WeakSet<HTMLElement>();
+
+  static isPrimaryButtonDropdownOpen(panel: HTMLElement) {
+    return this.#panelsWithOpenDropdowns.has(panel);
+  }
+
   #panelDescriptor: AppMenuItemPanelDescriptor;
   #element: HTMLElement;
   #destroyed = false;
@@ -99,6 +105,23 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     return this.#element;
   }
 
+  get primaryButtonElement() {
+    return querySelector(this.element, PRIMARY_BUTTON_ELEMENT_SELECTOR);
+  }
+
+  setPrimaryButtonDropdownOpen(open: boolean) {
+    if (
+      open &&
+      !this.#destroyed &&
+      this.panelDescriptor.primaryButton?.hasDropdown
+    ) {
+      CollapsiblePanelView.#panelsWithOpenDropdowns.add(this.element);
+    } else {
+      CollapsiblePanelView.#panelsWithOpenDropdowns.delete(this.element);
+    }
+    this.#updatePrimaryButtonAccessibility();
+  }
+
   get scrollablePaneElement() {
     return this.element.querySelector(scrollablePanelSelector);
   }
@@ -112,6 +135,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     this.#panelDescriptor = panelDescriptor;
     this.#loading = panelDescriptor.loadingIcon != null;
     this.#element = this.#setupElement();
+    this.#updatePrimaryButtonAccessibility();
     this.#element.addEventListener('mouseleave', (e: MouseEvent) => {
       this.emit('blur', e);
     });
@@ -130,6 +154,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   remove() {
     if (this.#destroyed) return;
     this.#destroyed = true;
+    this.setPrimaryButtonDropdownOpen(false);
     this.element.remove();
     this.emit('destroy');
   }
@@ -250,6 +275,17 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     );
 
     primaryBtnEl.addEventListener('click', this.#onPrimaryButtonClick);
+    primaryBtnEl.addEventListener('keydown', (event) => {
+      if (
+        event.key === 'Enter' ||
+        event.key === ' ' ||
+        (event.key === 'ArrowDown' &&
+          this.panelDescriptor.primaryButton?.hasDropdown)
+      ) {
+        event.preventDefault();
+        primaryBtnEl.click();
+      }
+    });
 
     return element;
   }
@@ -271,9 +307,25 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       ...existingClassNames,
     );
 
+    this.#updatePrimaryButtonAccessibility();
     this.#updateName(element);
     this.#updateIcon(element);
     this.#updateScrollablePanelLoading(element);
+  }
+
+  #updatePrimaryButtonAccessibility() {
+    const button = this.primaryButtonElement;
+    if (this.panelDescriptor.primaryButton?.hasDropdown) {
+      button.setAttribute('aria-haspopup', 'menu');
+      button.setAttribute(
+        'aria-expanded',
+        String(CollapsiblePanelView.isPrimaryButtonDropdownOpen(this.element)),
+      );
+    } else {
+      CollapsiblePanelView.#panelsWithOpenDropdowns.delete(this.element);
+      button.removeAttribute('aria-haspopup');
+      button.removeAttribute('aria-expanded');
+    }
   }
 
   static #preloadedIcons = new Set<string>();

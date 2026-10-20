@@ -85,6 +85,7 @@ export type AppMenuItemPanelDescriptor = {
   primaryButton?: {
     name: string;
     onClick: (e: MouseEvent) => void;
+    hasDropdown?: boolean;
     /**
      *  Icon URLs to display based on the button being hovered or not.
      */
