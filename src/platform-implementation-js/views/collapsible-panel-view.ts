@@ -1,3 +1,5 @@
+import DropdownView from '../widgets/buttons/dropdown-view';
+import GmailDropdownView from '../dom-driver/gmail/widgets/gmail-dropdown-view';
 import TypedEmitter from 'typed-emitter';
 import cx from 'classnames';
 import * as Kefir from 'kefir';
@@ -65,6 +67,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   #panelDescriptor: AppMenuItemPanelDescriptor;
   #element: HTMLElement;
   #destroyed = false;
+  #primaryButtonDropdown: DropdownView | undefined;
   #id = Math.random().toFixed(3);
   #driver;
   #loading;
@@ -99,6 +102,10 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     return this.#element;
   }
 
+  get #primaryButtonElement() {
+    return querySelector(this.element, PRIMARY_BUTTON_ELEMENT_SELECTOR);
+  }
+
   get scrollablePaneElement() {
     return this.element.querySelector(scrollablePanelSelector);
   }
@@ -112,6 +119,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     this.#panelDescriptor = panelDescriptor;
     this.#loading = panelDescriptor.loadingIcon != null;
     this.#element = this.#setupElement();
+    this.#updatePrimaryButtonAccessibility();
     this.#element.addEventListener('mouseleave', (e: MouseEvent) => {
       this.emit('blur', e);
     });
@@ -130,6 +138,7 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
   remove() {
     if (this.#destroyed) return;
     this.#destroyed = true;
+    this.#primaryButtonDropdown?.close();
     this.element.remove();
     this.emit('destroy');
   }
@@ -250,12 +259,46 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
     );
 
     primaryBtnEl.addEventListener('click', this.#onPrimaryButtonClick);
+    primaryBtnEl.addEventListener('keydown', (event) => {
+      if (
+        event.key === 'Enter' ||
+        event.key === ' ' ||
+        (event.key === 'ArrowDown' &&
+          this.panelDescriptor.primaryButton?.hasDropdown)
+      ) {
+        event.preventDefault();
+        primaryBtnEl.click();
+      }
+    });
 
     return element;
   }
 
   #onPrimaryButtonClick = (e: MouseEvent) => {
-    this.panelDescriptor.primaryButton?.onClick?.(e);
+    const primaryButton = this.panelDescriptor.primaryButton;
+    if (!primaryButton || this.#destroyed) return;
+    if (this.#primaryButtonDropdown) {
+      this.#primaryButtonDropdown.close();
+      return;
+    }
+    if (!primaryButton.hasDropdown) {
+      primaryButton.onClick(e);
+      return;
+    }
+
+    const button = this.#primaryButtonElement;
+    const dropdown = new DropdownView(
+      new GmailDropdownView(),
+      button,
+      undefined,
+    );
+    this.#primaryButtonDropdown = dropdown;
+    dropdown.on('destroy', () => {
+      this.#primaryButtonDropdown = undefined;
+      this.#updatePrimaryButtonAccessibility();
+    });
+    this.#updatePrimaryButtonAccessibility();
+    primaryButton.onClick(Object.assign(e, { dropdown }));
   };
 
   #update() {
@@ -271,9 +314,25 @@ export class CollapsiblePanelView extends (EventEmitter as new () => TypedEmitte
       ...existingClassNames,
     );
 
+    this.#updatePrimaryButtonAccessibility();
     this.#updateName(element);
     this.#updateIcon(element);
     this.#updateScrollablePanelLoading(element);
+  }
+
+  #updatePrimaryButtonAccessibility() {
+    const button = this.#primaryButtonElement;
+    if (this.panelDescriptor.primaryButton?.hasDropdown) {
+      button.setAttribute('aria-haspopup', 'menu');
+      button.setAttribute(
+        'aria-expanded',
+        String(!!this.#primaryButtonDropdown),
+      );
+    } else {
+      this.#primaryButtonDropdown?.close();
+      button.removeAttribute('aria-haspopup');
+      button.removeAttribute('aria-expanded');
+    }
   }
 
   static #preloadedIcons = new Set<string>();
