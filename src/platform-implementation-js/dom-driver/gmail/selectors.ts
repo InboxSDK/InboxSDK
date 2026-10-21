@@ -50,6 +50,310 @@ export const GMAIL_SELECTORS = {
   'composeView.titleBarColorBodyInner': ['.nH.Hy.aXJ .l.m > .l.n'],
 
   /**
+   * The title-bar button that minimizes the compose window.
+   * Root: compose root.
+   */
+  'composeView.minimizeButton': [
+    // Prefer legacy <img>; fall back to newer <button class="Hl">.
+    '.Hm > img',
+    '.Hm .Hl',
+  ],
+
+  /**
+   * The title-bar button that switches the compose window between the mole
+   * and fullscreen.
+   * Root: compose root.
+   */
+  'composeView.fullscreenButton': [
+    // Prefer legacy <img> titlebar controls; fall back to newer <button class="Hq">.
+    '.Hm > img:nth-of-type(2)',
+    '.Hm .Hq',
+  ],
+
+  /**
+   * The title-bar button that closes the compose window.
+   * Root: compose root.
+   */
+  'composeView.closeButton': [
+    // Prefer legacy <img> titlebar controls; fall back to newer <button class="Ha">.
+    '.Hm > img:nth-of-type(3)',
+    '.Hm .Ha',
+  ],
+
+  /**
+   * The input holding the compose id.
+   * Root: compose root.
+   */
+  'composeView.composeIdInput': ['input[name="composeid"]'],
+
+  /**
+   * The input holding the draft's message id.
+   * Root: compose root.
+   */
+  'composeView.draftIdInput': ['input[name="draft"]'],
+
+  /**
+   * The input holding the legacy id of the thread a reply belongs to.
+   * Root: compose root.
+   */
+  'composeView.legacyThreadIdInput': ['input[name="lts"]'],
+
+  /**
+   * The subject input.
+   * Root: compose root.
+   */
+  'composeView.subjectInput': ['input[name=subjectbox]'],
+
+  /**
+   * The input holding the from address.
+   * Root: compose root.
+   */
+  'composeView.fromInput': ['input[name="from"]'],
+
+  /**
+   * The input holding the id of the message a reply answers.
+   * Root: compose root.
+   */
+  'composeView.replyTargetMessageIdInput': ['input[name="rm"]'],
+
+  /**
+   * The native Send button, not Send and Archive or an SDK button.
+   * Root: compose root.
+   */
+  'composeView.sendButton': [
+    '.IZ .Up div > div[role=button]:not(.Uo):not([aria-haspopup=true]):not([class^=inboxsdk_])',
+  ],
+
+  /**
+   * The button beside Send that opens the schedule send menu.
+   * Root: compose root.
+   */
+  'composeView.scheduleSendButton': ['[selector="scheduledSend"]'],
+
+  /**
+   * The more send options button beside Send; Enter on it opens the schedule
+   * send menu.
+   * Root: compose root.
+   */
+  'composeView.moreSendOptionsButton': ['.hG'],
+
+  /**
+   * The native Send and Archive button, present in replies.
+   * Root: compose root.
+   */
+  'composeView.sendAndArchiveButton': [
+    '.IZ .Up div > div[role=button].Uo:not([aria-haspopup=true]):not([class^=inboxsdk_])',
+  ],
+
+  /**
+   * The discard draft button in the bottom toolbar.
+   * Root: compose root.
+   */
+  'composeView.discardButton': ['.gU .oh'],
+
+  /**
+   * The editable message body.
+   * Root: compose root.
+   */
+  'composeView.body': ['.Ap [g_editable=true]'],
+
+  /**
+   * The form at the top of the compose window, which holds the recipients.
+   * Root: compose root.
+   */
+  'composeView.topForm': ['td > form'],
+
+  /**
+   * The form holding the compose window's metadata inputs.
+   * Root: the `.aoP` ancestor of `composeView.body`.
+   */
+  'composeView.metadataForm': ['form.bAs'],
+
+  /**
+   * The scrolling area around the message body.
+   * Root: compose root.
+   */
+  'composeView.scrollBody': ['table .GP'],
+
+  /**
+   * The formatting cell in the bottom toolbar; the SDK action toolbar goes
+   * before it.
+   * Root: compose root.
+   */
+  'composeView.formattingArea': ['.oc'],
+
+  /**
+   * The formatting toolbar that opens above the bottom toolbar.
+   * Root: compose root.
+   */
+  'composeView.formattingToolbar': ['.aX'],
+
+  /**
+   * The arrow under the formatting toolbar.
+   * Root: `composeView.formattingToolbar`.
+   */
+  'composeView.formattingToolbarArrow': ['.aA4'],
+
+  /**
+   * The icon of the button that shows and hides the formatting toolbar. The
+   * code walks up to its `role=button` ancestor, so stay at the icon.
+   * Root: compose root.
+   */
+  'composeView.formattingToolbarToggleIcon': ['[role=button] .dv'],
+
+  /**
+   * The insert more area, which is shifted when SDK buttons move the
+   * formatting area.
+   * Root: compose root.
+   */
+  'composeView.insertMoreArea': ['.eq'],
+
+  /**
+   * The element inside `composeView.scrollBody` that scrolls the message body.
+   * Root: compose root or `composeView.scrollBody`.
+   */
+  'composeView.bodyScrollContainer': ['.qz'],
+
+  /**
+   * The bottom toolbar container holding Gmail's own buttons, measured to tell
+   * whether Gmail has grouped them.
+   * Root: compose root.
+   */
+  'composeView.nativeToolbarButtonsContainer': ['.bAK'],
+
+  /**
+   * The table that lays out the bottom toolbar.
+   * Root: compose root.
+   */
+  'composeView.bottomBarTable': ['.aoP .aDh > table'],
+
+  /**
+   * The status area at the bottom of the compose window, which status bars are
+   * added to.
+   * Root: compose root.
+   */
+  'composeView.statusArea': ['.aDg .aDj > .aDh'],
+
+  /**
+   * The native status bar of an inline reply, which SDK status bars are
+   * inserted into.
+   * Root: compose root.
+   */
+  'composeView.inlineReplyStatusBar': ['.iN > tbody .aDj .aDh .IZ'],
+
+  /**
+   * Gmail's own status bar, hidden while an SDK status bar replaces it.
+   * Root: `composeView.statusArea`.
+   */
+  'composeView.nativeStatusBar': ['table'],
+
+  /**
+   * The compose table that SDK compose notices are inserted into.
+   * Root: compose root.
+   */
+  'composeView.noticeContainer': ['.iN'],
+
+  /**
+   * The pop out item in an inline reply's response type menu.
+   * Root: compose root.
+   */
+  'composeView.popOutMenuItem': [
+    '.M9 > [role=menu]:first-child > .SK > [role=menuitem]:last-child',
+  ],
+
+  /**
+   * The edit subject item in a reply's response type menu.
+   * Root: compose root.
+   */
+  'composeView.editSubjectMenuItem': [
+    'div.J-M.jQjAxd.HX[role=menu] > div.SK.AX > [role=menuitem]:nth-last-child(2)',
+  ],
+
+  /**
+   * The dots button that shows the trimmed quoted content of a reply.
+   * Root: compose root.
+   */
+  'composeView.showTrimmedContentButton': ['.ajR'],
+
+  /**
+   * The from address menu, whose children are the address choices.
+   * Root: compose root.
+   */
+  'composeView.fromChoiceMenu': [
+    'div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX',
+  ],
+
+  /**
+   * The icon of a reply's response type button; its class changes between
+   * reply and forward.
+   * Root: compose root.
+   */
+  'composeView.responseTypeIcon': ['.J-J5-Ji .J-JN-M-I-Jm > img'],
+
+  /**
+   * The forward icon in the response type button; present only on forwards.
+   * Root: compose root.
+   */
+  'composeView.forwardIcon': ['.Un.J-JN-M-I .mI'],
+
+  /**
+   * An element whose presence marks the compose as a reply.
+   * Root: compose root.
+   */
+  'composeView.replyMarker': ['.HQ'],
+
+  /**
+   * The first column of the table holding `composeView.formattingArea`; the
+   * SDK action toolbar's columns are inserted after it.
+   * Root: that table.
+   */
+  'composeView.formattingAreaColumn': ['colgroup col'],
+
+  /**
+   * The Cc link that opens the Cc row.
+   * Root: compose root.
+   */
+  'composeView.ccLink': ['span.pE[role=link]'],
+
+  /**
+   * The Bcc link that opens the Bcc row.
+   * Root: compose root.
+   */
+  'composeView.bccLink': ['span.pB[role=link]'],
+
+  /**
+   * The Cc link in the old recipient fields.
+   * Root: compose root.
+   */
+  'composeView.legacyCcLink': ['span.aB.gQ.pE'],
+
+  /**
+   * The Bcc link in the old recipient fields.
+   * Root: compose root.
+   */
+  'composeView.legacyBccLink': ['span.aB.gQ.pB'],
+
+  /**
+   * The text input of a To, Cc or Bcc row, which addresses are pasted into.
+   * Root: the row's `[role=listbox]`.
+   */
+  'composeView.recipientInput': [
+    'input[role=combobox][aria-autocomplete=list]',
+  ],
+
+  /**
+   * The text area of a To, Cc or Bcc row in the old recipient fields.
+   * Root: the row's `tr`.
+   */
+  'composeView.legacyRecipientTextarea': ['textarea.vO'],
+
+  /**
+   * The collapsed recipients summary; focusing it opens the recipient rows.
+   * Root: compose root.
+   */
+  'composeView.recipientsSummary': ['div.aoD.hl'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */

@@ -2,7 +2,6 @@ import Kefir from 'kefir';
 import kefirStopper from 'kefir-stopper';
 import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 import Logger from '../../../../lib/logger';
-import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import SimpleElementView from '../../../../views/SimpleElementView';
 import type GmailComposeView from '../gmail-compose-view';
 export default function addComposeNotice(
@@ -53,10 +52,12 @@ class ComposeNotice extends SimpleElementView {
 
   _setComposeNotice() {
     try {
-      const composeTable = querySelector(
-        this._gmailComposeView.getElement(),
-        '.iN',
-      );
+      const composeTable = this._gmailComposeView
+        .getGmailDriver()
+        .selectors.querySelectorByKeyOrFail(
+          this._gmailComposeView.getElement(),
+          'composeView.noticeContainer',
+        );
       insertElementInOrder(composeTable, this.el, ['data-order-hint'], true);
     } catch (err) {
       Logger.error(err);

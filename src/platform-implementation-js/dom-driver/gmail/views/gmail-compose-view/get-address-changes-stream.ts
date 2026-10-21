@@ -135,8 +135,11 @@ function _groupChangeEvents(event: any) {
 function getFromAddressChangeStream(gmailComposeView: GmailComposeView) {
   return Kefir.later(0, null).flatMap(() => {
     const fromInput = gmailComposeView
-      .getElement()
-      .querySelector<HTMLElement>('input[name="from"]');
+      .getGmailDriver()
+      .selectors.querySelectorByKey(
+        gmailComposeView.getElement(),
+        'composeView.fromInput',
+      );
     return Kefir.constant(
       _convertToEvent('fromContactChanged', gmailComposeView.getFromContact()),
     ).merge(
