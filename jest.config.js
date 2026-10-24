@@ -4,6 +4,7 @@ module.exports = {
   globals: {
     SDK_VERSION: 'beep',
   },
+  setupFiles: ['./jest.setup.js'],
   moduleNameMapper: {
     '\\.css$': require.resolve('jest-css-modules'),
   },
