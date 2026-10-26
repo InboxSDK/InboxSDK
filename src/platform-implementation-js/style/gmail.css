@@ -1391,8 +1391,31 @@ isn't visible behind it. */
   position: static;
 }
 
-.inboxsdk__drawers_in_use .aDj.ahe {
+.inboxsdk__drawers_in_use .aDj.ahe:not(.aaZ.rT5Apb .aDj) {
   position: static !important;
+}
+
+/* Rounded compose bodies clip a static toolbar when recipient rows expand.
+ * Anchor the unfocused toolbar to the compose body instead of the viewport:
+ * drawers can move the compose without Gmail updating its fixed left offset. */
+.inboxsdk__moles_in_use .aaZ.rT5Apb,
+.inboxsdk__drawers_in_use .aaZ.rT5Apb {
+  position: relative;
+}
+
+/* The zero-height toolbar wrapper must not become the containing block. */
+.inboxsdk__moles_in_use .aaZ.rT5Apb .aDg:has(> .aDj.ahe),
+.inboxsdk__drawers_in_use .aaZ.rT5Apb .aDg:has(> .aDj.ahe) {
+  position: static;
+}
+
+.inboxsdk__moles_in_use .aaZ.rT5Apb .aDj.ahe,
+.inboxsdk__drawers_in_use .aaZ.rT5Apb .aDj.ahe {
+  position: absolute !important;
+  bottom: 0 !important;
+  left: 16px !important;
+  right: 16px !important;
+  width: auto !important;
 }
 
 /* Make it so the compose/mole layer doesn't wrap, so we don't have to do a lot
@@ -1450,12 +1473,6 @@ isn't visible behind it. */
   padding: 10px 12px 10px 16px;
   color: #041e49;
   background: #f2f6fc;
-}
-
-/* Ht lets Gmail supply Hl/Hk/Ha icons, but its table styles should not resize the SDK titlebar. */
-.inboxsdk__mole_view_titlebar.Ht {
-  border-collapse: separate;
-  width: auto;
 }
 
 .inboxsdk__mole_view_titlebar.inboxsdk__original_view {
@@ -1544,6 +1561,106 @@ isn't visible behind it. */
 .inboxsdk__mole_view_chromeless .inboxsdk__mole_view_content {
   margin-top: 0px;
   min-width: 0px;
+}
+
+/* Own the action icons: Gmail's new titlebar uses SVG buttons instead of
+ * the Hl/Hk/Ha image sprites. Keep custom title-button images supported. */
+.inboxsdk__mole_title_buttons > .inboxsdk__mole_action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: top;
+  position: relative;
+  top: 2px;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  margin: 0 0 0 4px;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.inboxsdk__mole_action > svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+}
+
+.inboxsdk__mole_title_buttons.inboxsdk__original_view > .inboxsdk__mole_action {
+  width: 24px;
+  height: 24px;
+  margin-left: 0;
+}
+
+.inboxsdk__mole_title_buttons > .inboxsdk__mole_action:hover {
+  background-color: rgb(68 71 70 / 7.8%);
+  opacity: 1;
+}
+
+.inboxsdk__mole_action:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
+/* Native compose or Chat shells determine whether this rollout is active. */
+.inboxsdk__rounded_moles
+  .inboxsdk__mole_view:not(.inboxsdk__mole_view_chromeless)
+  .inboxsdk__mole_view_inner {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border-radius: 20px;
+  box-shadow:
+    rgb(0 0 0 / 14%) 0 8px 10px 1px,
+    rgb(0 0 0 / 12%) 0 3px 14px 2px,
+    rgb(0 0 0 / 20%) 0 5px 5px -3px;
+}
+
+.inboxsdk__rounded_moles .inboxsdk__mole_view_titlebar {
+  top: 0;
+  right: 0;
+  border-radius: 20px 20px 0 0;
+  padding: 0 12px 0 16px;
+}
+
+.inboxsdk__rounded_moles .inboxsdk__minimized .inboxsdk__mole_view_titlebar {
+  border-radius: 20px;
+}
+
+.inboxsdk__rounded_moles .inboxsdk__mole_view_titlebar h2 {
+  margin: 0;
+  line-height: 40px;
+}
+
+.inboxsdk__rounded_moles .inboxsdk__mole_title_buttons {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  margin-top: 0;
+  padding-right: 0;
+}
+
+.inboxsdk__rounded_moles .inboxsdk__mole_title_buttons > .inboxsdk__mole_action,
+.inboxsdk__rounded_moles .inboxsdk__mole_title_buttons > img {
+  top: 0;
+  width: 24px;
+  height: 24px;
+  margin-left: 4px;
+}
+
+.inboxsdk__rounded_moles
+  .inboxsdk__mole_view:not(.inboxsdk__mole_view_chromeless)
+  .inboxsdk__mole_view_content {
+  border-radius: 0 0 20px 20px;
+}
+
+/* These must win over the action button's display rule above. */
+.inboxsdk__mole_view.inboxsdk__minimized .inboxsdk__mole_action.Hl,
+.inboxsdk__mole_view:not(.inboxsdk__minimized) .inboxsdk__mole_action.Hk {
+  display: none;
 }
 
 /* end mole */

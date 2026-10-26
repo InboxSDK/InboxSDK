@@ -4,47 +4,46 @@ InboxSDK.load(2, 'simple-example').then(function (inboxSDK) {
   let i = 0;
 
   inboxSDK.Compose.registerComposeViewHandler((composeView) => {
+    const statusBar = composeView.addStatusBar({ height: 24 });
+    statusBar.el.textContent = 'Mole example: compose status bar';
+
     composeView.addButton({
-      title: 'My Button',
-      iconUrl: 'https://mailfoogae.appspot.com/build/images/snoozeIcon.png',
-      onClick: (event) => {
-        console.log('button clicked');
+      title: 'Open Drawer',
+      iconUrl:
+        'data:image/svg+xml,' +
+        encodeURIComponent(
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#444746" d="M3 3h18v18H3V3zm2 2v14h9V5H5zm11 0v14h3V5h-3z"/></svg>',
+        ),
+      onClick() {
+        const el = document.createElement('div');
+        el.style.padding = '16px';
+        el.textContent =
+          'Focus To, Cc, or Bcc and check that the compose toolbar and status bar stay visible. Close the drawer and check again.';
+        inboxSDK.Widgets.showDrawerView({
+          composeView,
+          closeWithCompose: true,
+          el,
+          title: 'Mole Example Drawer',
+        });
       },
     });
   });
 
   window.makeMoleWidget = function () {
     const div = document.createElement('div');
-    // div.style.width = '200px';
-    // div.style.height = '400px';
-    // div.style.backgroundColor = 'red';
-    div.innerHTML =
-      '<div class="streak__tasklist_mole"><div data-reactid=".0"><div class="streak__tasklist_mole_items" data-reactid=".0.0"></div><div class="streak__tasklist_mole_newItem" data-reactid=".0.$newTaskInput"><div class="streak__task_body" data-reactid=".0.$newTaskInput.0"><div class="streak__task_prefix" data-reactid=".0.$newTaskInput.0.0">+</div><div class="streak__task_title" style="display:inline-block;" data-reactid=".0.$newTaskInput.0.1"><div class="streak__gmailTextarea streak__gmailTextarea_textOnly streak__inputDecorator_gmailBorder"><div class="R5 streak__placeholder streak__gmailTextarea_multiLine" contenteditable="true" data-placeholder="New task (e.g. Follow up with ...)"></div></div></div><div class="streak__task_setdate_wrapper" style="display:inline-block;" data-reactid=".0.$newTaskInput.0.2"><div class="streak__taskListMoleButtonType" ><div class="reactMountPoint"><div><div data-reactid=".1"><div class="streak__task_setdate_outline" data-reactid=".1.0"><div class="streak__task_setdate" data-reactid=".1.0.0"></div></div></div></div></div></div></div></div></div><div class="streak__hide" data-reactid=".0.2"><div class="streak__collapsibleSection_header bbHand" data-reactid=".0.2.0"><span class="streak__collapsibleSection_header_arrow" data-reactid=".0.2.0.0">▾ </span><span data-reactid=".0.2.0.1">Completed Tasks</span></div><div class="" data-reactid=".0.2.1"></div></div></div></div>';
+    div.style.width = '300px';
+    div.style.padding = '16px';
+    div.style.minHeight = '160px';
+    div.textContent =
+      'Open a Gmail compose beside this window. Check the corners, spacing, and minimize/restore buttons. Use Open Drawer in the compose toolbar to check the drawer layout.';
 
-    const titleEl = document.createElement('div');
-    titleEl.innerHTML = '<em>Foo</em> Bar';
     const minimizedTitleEl = document.createElement('div');
-    minimizedTitleEl.innerHTML = '<em>Bar</em> Foo';
+    minimizedTitleEl.textContent = 'Mole Example (minimized)';
     const mole = inboxSDK.Widgets.showMoleView({
       el: div,
-      className: 'foobartest',
       title: 'Mole Example ' + ++i,
-      //titleEl: titleEl,
       minimizedTitleEl: minimizedTitleEl,
-      titleButtons: [
-        // {
-        //   title: 'a1',
-        //   iconUrl: 'https://mailfoogae.appspot.com/build/images/snoozeIcon.png',
-        //   onClick: function () {
-        //     console.log('click a1');
-        //   },
-        // },
-      ],
     });
-
-    // div.onclick = function() {
-    // 	mole.close();
-    // };
 
     mole.on('destroy', console.log.bind(console, 'mole destroy'));
     mole.on('minimize', console.log.bind(console, 'mole minimize'));
@@ -53,11 +52,11 @@ InboxSDK.load(2, 'simple-example').then(function (inboxSDK) {
     return mole;
   };
 
-  window._mole = makeMoleWidget();
+  window._mole = window.makeMoleWidget();
 
   window.makeChromelessMoleWidget = function () {
     const div = document.createElement('div');
-    div.innerHTML = 'hello world';
+    div.textContent = 'Mole example without a title bar';
     div.style.height = '500px';
 
     const mole = inboxSDK.Widgets.showMoleView({
