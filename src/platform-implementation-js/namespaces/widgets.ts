@@ -7,7 +7,6 @@ import TopMessageBarView from '../widgets/top-message-bar-view';
 import ComposeView from '../views/compose-view';
 import type { Driver, DrawerViewOptions } from '../driver-interfaces/driver';
 import get from '../../common/get-or-fail';
-import isComposeTitleBarLightColor from '../dom-driver/gmail/is-compose-titlebar-light-color';
 import { type MoleOptions } from '../dom-driver/gmail/widgets/gmail-mole-view-driver';
 import type { Widgets as IWidgets, ModalDescriptor } from '../../inboxsdk';
 
@@ -85,7 +84,7 @@ class Widgets implements IWidgets {
   }
 
   isMoleViewTitleBarLightColor(): boolean {
-    return isComposeTitleBarLightColor();
+    return true;
   }
 }
 
