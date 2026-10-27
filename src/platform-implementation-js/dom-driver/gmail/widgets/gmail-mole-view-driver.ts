@@ -1,3 +1,4 @@
+import autoHtml from 'auto-html';
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
@@ -7,9 +8,7 @@ import {
   MOLE_PARENT_SELECTOR,
 } from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
-import isComposeTitleBarLightColor from '../is-compose-titlebar-light-color';
 import * as styles from './mole-view.module.css';
-import trackMoleStyle from './track-mole-style';
 import cx from 'classnames';
 import PageParserTree from 'page-parser-tree';
 import censorHTMLtree from '../../../../common/censorHTMLtree';
@@ -130,7 +129,6 @@ class GmailMoleViewDriver {
             const el = change.value.getValue();
 
             this.#moleParent = el;
-            trackMoleStyle(el);
             this.#moleParentReadyEvent.emit(el);
 
             moleParentLiveSet.unsubscribe();
@@ -443,15 +441,10 @@ class GmailMoleViewDriver {
 export default GmailMoleViewDriver;
 
 function getHTMLString(options: MoleOptions) {
-  const originalView = !isComposeTitleBarLightColor();
   return `
-    <div class="inboxsdk__mole_view_inner ${
-      originalView ? 'inboxsdk__original_view' : ''
-    }">
+    <div class="inboxsdk__mole_view_inner">
       ${getTitleHTMLString(options)}
-      <div class="inboxsdk__mole_view_content ${
-        originalView ? 'inboxsdk__original_view' : ''
-      }"></div>
+      <div class="inboxsdk__mole_view_content"></div>
     </div>
   `;
 }
@@ -460,14 +453,9 @@ function getTitleHTMLString(options: MoleOptions) {
   if (options.chrome === false) {
     return '';
   } else {
-    const originalView = !isComposeTitleBarLightColor();
     return `
-      <div class="inboxsdk__mole_view_titlebar${
-        originalView ? ' inboxsdk__original_view' : ''
-      }">
-        <div class="inboxsdk__mole_title_buttons${
-          originalView ? ' inboxsdk__original_view' : ''
-        }">
+      <div class="inboxsdk__mole_view_titlebar">
+        <div class="inboxsdk__mole_title_buttons">
           ${getMoleButtonHTML('Hl', 'Minimize', 'M288-144v-72H672v72H288Z')}
           ${getMoleButtonHTML('Hk', 'Maximize', 'M192-744v-72H768v72H192Z')}
           ${getMoleButtonHTML(
@@ -483,7 +471,7 @@ function getTitleHTMLString(options: MoleOptions) {
 }
 
 function getMoleButtonHTML(className: string, label: string, path: string) {
-  return `<button type="button" class="inboxsdk__mole_action ${className}"
+  return autoHtml`<button type="button" class="inboxsdk__mole_action ${className}"
     aria-label="${label}" data-tooltip-delay="800" data-tooltip="${label}">
     <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="${path}"></path></svg>
   </button>`;
