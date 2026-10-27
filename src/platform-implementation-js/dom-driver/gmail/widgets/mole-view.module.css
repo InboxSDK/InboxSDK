@@ -2,10 +2,12 @@
   order: 1;
 }
 
-/* .aDj.ahe are the `position: fixed` are elements that contain ComposeView toolbars when the ComposeView body isn't focused.
- * This selector may have been the equivalent of `.aDj.aDi` before 2023-08-30.
- */
-.inboxsdkMolesInUse :global(.aDj.ahe) {
+/*
+`.aDj.ahe:not(.aaZ.rT5Apb .aDj)` matches the toolbar of pre-rounded corner
+composes. (Gmail introduced this change in Oct 2026.) We have to adjust it
+slightly for our custom mole/drawer CSS.
+*/
+.inboxsdkMolesInUse :global(.aDj.ahe:not(.aaZ.rT5Apb .aDj)) {
   position: static !important;
 }
 

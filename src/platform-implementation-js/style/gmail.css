@@ -1391,8 +1391,22 @@ isn't visible behind it. */
   position: static;
 }
 
-.inboxsdk__drawers_in_use .aDj.ahe {
+/*
+`.aDj.ahe:not(.aaZ.rT5Apb .aDj)` matches the toolbar of pre-rounded corner
+composes. (Gmail introduced this change in Oct 2026.) We have to adjust it
+slightly for our custom mole/drawer CSS.
+*/
+.inboxsdk__drawers_in_use .aDj.ahe:not(.aaZ.rT5Apb .aDj) {
   position: static !important;
+}
+
+/* Gmail can leave a fixed toolbar's horizontal offset stale when a drawer moves
+ * the compose. Use its normal horizontal position while preserving Gmail's
+ * fixed positioning, width, and bottom offset. */
+.inboxsdk__moles_in_use .aaZ.rT5Apb .aDj.ahe,
+.inboxsdk__drawers_in_use .aaZ.rT5Apb .aDj.ahe {
+  left: auto !important;
+  right: auto !important;
 }
 
 /* Make it so the compose/mole layer doesn't wrap, so we don't have to do a lot
