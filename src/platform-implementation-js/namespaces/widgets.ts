@@ -7,7 +7,6 @@ import TopMessageBarView from '../widgets/top-message-bar-view';
 import ComposeView from '../views/compose-view';
 import type { Driver, DrawerViewOptions } from '../driver-interfaces/driver';
 import get from '../../common/get-or-fail';
-import isComposeTitleBarLightColor from '../dom-driver/gmail/is-compose-titlebar-light-color';
 import { type MoleOptions } from '../dom-driver/gmail/widgets/gmail-mole-view-driver';
 import type { Widgets as IWidgets, ModalDescriptor } from '../../inboxsdk';
 
@@ -84,8 +83,12 @@ class Widgets implements IWidgets {
     return new DrawerView(drawerViewDriver);
   }
 
+  /**
+   * Always returns true. Retained for compatibility with existing extensions.
+   * @deprecated SDK moles always have a light title bar; callers no longer need this check.
+   */
   isMoleViewTitleBarLightColor(): boolean {
-    return isComposeTitleBarLightColor();
+    return true;
   }
 }
 

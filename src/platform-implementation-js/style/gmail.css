@@ -1433,103 +1433,105 @@ slightly for our custom mole/drawer CSS.
   align-items: flex-end;
 }
 
+/* A chromeless mole keeps its content's own shape and placement. */
 .inboxsdk__mole_view_inner {
   visibility: visible;
   box-sizing: border-box;
   margin-right: 5px;
   box-shadow: rgb(0 0 0 / 20%) 0 2px 6px;
   min-width: 260px;
-  min-height: 36px;
-}
-
-/* stylelint-disable-next-line no-duplicate-selectors */
-.inboxsdk__mole_view_inner {
   min-height: 40px;
 }
 
-.inboxsdk__mole_view_titlebar:not(.inboxsdk__original_view),
-.inboxsdk__mole_view_inner:not(.inboxsdk__original_view) {
-  border-radius: 8px 8px 0 0;
+.inboxsdk__mole_view:not(.inboxsdk__mole_view_chromeless)
+  .inboxsdk__mole_view_inner {
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border-radius: 20px;
+  box-shadow:
+    rgb(0 0 0 / 14%) 0 8px 10px 1px,
+    rgb(0 0 0 / 12%) 0 3px 14px 2px,
+    rgb(0 0 0 / 20%) 0 5px 5px -3px;
 }
 
 .inboxsdk__mole_view_titlebar {
   position: absolute;
+  top: 0;
   left: 0;
-  right: 5px;
+  right: 0;
   font-size: 14px;
   font-weight: 500;
   box-sizing: border-box;
   height: 40px;
   cursor: pointer;
-  padding: 10px 12px 10px 16px;
+  padding: 0 12px 0 16px;
   color: #041e49;
   background: #f2f6fc;
+  border-radius: 20px 20px 0 0;
 }
 
-/* Ht lets Gmail supply Hl/Hk/Ha icons, but its table styles should not resize the SDK titlebar. */
-.inboxsdk__mole_view_titlebar.Ht {
-  border-collapse: separate;
-  width: auto;
-}
-
-.inboxsdk__mole_view_titlebar.inboxsdk__original_view {
-  color: white;
-  font-size: 12.8px;
-  font-weight: 400;
-  background: #404040;
-  padding: 9px 0 0 11px;
-  border-radius: 4px 4px 0 0;
+.inboxsdk__minimized .inboxsdk__mole_view_titlebar {
+  border-radius: 20px;
 }
 
 .inboxsdk__mole_view_titlebar h2 {
   font-size: inherit;
   font-weight: inherit;
-  margin: 4px 0 0 0;
+  margin: 0;
+  line-height: 40px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .inboxsdk__mole_title_buttons {
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  height: 40px;
   float: right;
-  padding-right: 5px;
-  margin-top: 1px;
 }
 
-.inboxsdk__mole_title_buttons.inboxsdk__original_view {
-  margin-top: -3px;
-}
-
+.inboxsdk__mole_title_buttons > .inboxsdk__mole_action,
 .inboxsdk__mole_title_buttons > img {
-  height: 24px;
   width: 24px;
-  position: relative;
-  top: 2px;
-}
-
-.inboxsdk__mole_title_buttons:not(.inboxsdk__original_view) > img {
-  height: 16px;
-  width: 16px;
+  height: 24px;
   margin-left: 4px;
+  opacity: 0.7;
 }
 
-.inboxsdk__mole_title_buttons:not(.inboxsdk__original_view) > img:hover {
-  background-color: rgb(68 71 70 / 7.8%);
+.inboxsdk__mole_title_buttons > .inboxsdk__mole_action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
 }
 
-.inboxsdk__mole_title_buttons.inboxsdk__original_view > img:hover {
-  background-color: #737373;
+.inboxsdk__mole_action > svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
 }
 
+.inboxsdk__mole_title_buttons > .inboxsdk__mole_action:hover,
 .inboxsdk__mole_title_buttons > img:hover {
+  background-color: rgb(68 71 70 / 7.8%);
   opacity: 1;
+}
+
+.inboxsdk__mole_action:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
 }
 
 .inboxsdk__mole_view.inboxsdk__minimized .inboxsdk__mole_view_content,
 .inboxsdk__mole_view.inboxsdk__minimized.inboxsdk__mole_use_minimize_title
   h2.inboxsdk__mole_default,
-.inboxsdk__mole_view:not(.inboxsdk__minimized) h2.inboxsdk__mole_minimized,
+.inboxsdk__mole_view:not(.inboxsdk__minimized) .inboxsdk__mole_minimized,
 .inboxsdk__mole_view:not(.inboxsdk__mole_use_minimize_title)
   h2.inboxsdk__mole_minimized,
 .inboxsdk__mole_view.inboxsdk__minimized .Hl,
@@ -1537,14 +1539,8 @@ slightly for our custom mole/drawer CSS.
   display: none;
 }
 
-.inboxsdk__mole_view_content:not(.inboxsdk__original_view) {
-  margin-top: 40px;
-  border: none;
-}
-
 .inboxsdk__mole_view_content {
-  margin-top: 36px;
-  border: 1px solid #cfcfcf;
+  margin-top: 40px;
   background: white;
   min-width: 260px;
   min-height: 20px;

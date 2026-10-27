@@ -1,3 +1,4 @@
+import autoHtml from 'auto-html';
 import * as Kefir from 'kefir';
 import kefirBus from 'kefir-bus';
 import kefirStopper from 'kefir-stopper';
@@ -7,7 +8,6 @@ import {
   MOLE_PARENT_SELECTOR,
 } from '../gmail-element-getter';
 import type GmailDriver from '../gmail-driver';
-import isComposeTitleBarLightColor from '../is-compose-titlebar-light-color';
 import * as styles from './mole-view.module.css';
 import cx from 'classnames';
 import PageParserTree from 'page-parser-tree';
@@ -441,15 +441,10 @@ class GmailMoleViewDriver {
 export default GmailMoleViewDriver;
 
 function getHTMLString(options: MoleOptions) {
-  const originalView = !isComposeTitleBarLightColor();
   return `
-    <div class="inboxsdk__mole_view_inner ${
-      originalView ? 'inboxsdk__original_view' : ''
-    }">
+    <div class="inboxsdk__mole_view_inner">
       ${getTitleHTMLString(options)}
-      <div class="inboxsdk__mole_view_content ${
-        originalView ? 'inboxsdk__original_view' : ''
-      }"></div>
+      <div class="inboxsdk__mole_view_content"></div>
     </div>
   `;
 }
@@ -458,19 +453,26 @@ function getTitleHTMLString(options: MoleOptions) {
   if (options.chrome === false) {
     return '';
   } else {
-    const originalView = !isComposeTitleBarLightColor();
     return `
-      <!-- Ht lets Gmail's compose titlebar rules provide icons for Hl/Hk/Ha. -->
-      <div class="inboxsdk__mole_view_titlebar Ht${
-        originalView ? ' inboxsdk__original_view' : ''
-      }">
-        <div class="inboxsdk__mole_title_buttons${
-          originalView ? ' inboxsdk__original_view' : ''
-        }">
-          <img class="Hl" src="images/cleardot.gif" alt="Minimize" aria-label="Minimize" data-tooltip-delay="800" data-tooltip="Minimize"><img class="Hk" id=":rp" src="images/cleardot.gif" alt="Minimize" aria-label="Maximize" data-tooltip-delay="800" data-tooltip="Maximize"><!--<img class="Hq aUG" src="images/cleardot.gif" alt="Pop-out" aria-label="Full-screen (Shift for Pop-out)" data-tooltip-delay="800" data-tooltip="Full-screen (Shift for Pop-out)">--><img class="Ha" src="images/cleardot.gif" alt="Close" aria-label="Close" data-tooltip-delay="800" data-tooltip="Close">
+      <div class="inboxsdk__mole_view_titlebar">
+        <div class="inboxsdk__mole_title_buttons">
+          ${getMoleButtonHTML('Hl', 'Minimize', 'M288-144v-72H672v72H288Z')}
+          ${getMoleButtonHTML('Hk', 'Maximize', 'M192-744v-72H768v72H192Z')}
+          ${getMoleButtonHTML(
+            'Ha',
+            'Close',
+            'M291-240l-51-51L429-480L240-669l51-51L480-531L669-720l51,51L531-480L720-291l-51,51L480-429L291-240Z',
+          )}
         </div>
         <h2 class="inboxsdk__mole_default"></h2>
         <h2 class="inboxsdk__mole_minimized"></h2>
       </div>`;
   }
+}
+
+function getMoleButtonHTML(className: string, label: string, path: string) {
+  return autoHtml`<button type="button" class="inboxsdk__mole_action ${className}"
+    aria-label="${label}" data-tooltip-delay="800" data-tooltip="${label}">
+    <svg viewBox="0 -960 960 960" aria-hidden="true" focusable="false"><path d="${path}"></path></svg>
+  </button>`;
 }
