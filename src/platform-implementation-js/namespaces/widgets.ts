@@ -83,6 +83,10 @@ class Widgets implements IWidgets {
     return new DrawerView(drawerViewDriver);
   }
 
+  /**
+   * Always returns true. Retained for compatibility with existing extensions.
+   * @deprecated SDK moles always have a light title bar; callers no longer need this check.
+   */
   isMoleViewTitleBarLightColor(): boolean {
     return true;
   }

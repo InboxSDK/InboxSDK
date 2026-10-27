@@ -111,7 +111,10 @@ export interface NativeNavItemView extends EventEmitter {
 export { Router };
 
 export interface Widgets {
-  /** check whether mole view has light title bar as part of gmail new view / original view  */
+  /**
+   * Always returns true. Retained for compatibility with existing extensions.
+   * @deprecated SDK moles always have a light title bar; callers no longer need this check.
+   */
   isMoleViewTitleBarLightColor(): boolean;
   showModalView(descriptor: ModalDescriptor): ModalView;
   showMoleView(descriptor: MoleOptions): MoleView;
