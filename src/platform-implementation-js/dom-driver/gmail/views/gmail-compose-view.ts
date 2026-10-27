@@ -17,7 +17,6 @@ import type { Stopper } from 'kefir-stopper';
 import delayAsap from '../../../lib/delay-asap';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 import simulateKey from '../../../lib/dom/simulate-key';
-import querySelector from '../../../lib/dom/querySelectorOrFail';
 import isElementVisible from '../../../../common/isElementVisible';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import {
@@ -278,11 +277,11 @@ class GmailComposeView {
         .takeUntilBy(this.#stopper)
         .map((bodyElement) => {
           this.#seenBodyElement = bodyElement;
-          this.#composeID = this.#element.querySelector<HTMLInputElement>(
-            'input[name="composeid"]',
+          this.#composeID = this.#getInputByKey(
+            'composeView.composeIdInput',
           )!.value;
-          this.#messageIDElement = this.#element.querySelector(
-            'input[name="draft"]',
+          this.#messageIDElement = this.#getInputByKey(
+            'composeView.draftIdInput',
           )!;
 
           if (!this.#messageIDElement) {
@@ -548,8 +547,9 @@ class GmailComposeView {
         .error(new Error('Draft is missing sync draft id'));
     }
 
-    const legacyThreadIdElement =
-      this.#element.querySelector<HTMLInputElement>('input[name="lts"]');
+    const legacyThreadIdElement = this.#getInputByKey(
+      'composeView.legacyThreadIdInput',
+    );
     if (
       legacyThreadIdElement &&
       typeof legacyThreadIdElement.value === 'string'
@@ -623,9 +623,7 @@ class GmailComposeView {
   }
 
   setSubject(text: string) {
-    this.#element.querySelector<HTMLInputElement>(
-      'input[name=subjectbox]',
-    )!.value = text;
+    this.#getInputByKey('composeView.subjectInput')!.value = text;
 
     this.#triggerDraftSave();
   }
@@ -812,7 +810,10 @@ class GmailComposeView {
 
   hideNativeStatusBar(): () => void {
     const statusArea = this.getStatusArea();
-    const nativeStatusBar = querySelector(statusArea, 'table');
+    const nativeStatusBar = this.#driver.selectors.querySelectorByKeyOrFail(
+      statusArea,
+      'composeView.nativeStatusBar',
+    );
     const formattingToolbar = this.getFormattingToolbar();
     const isFormattingToolbarOpen =
       formattingToolbar && formattingToolbar.style.display !== 'none';
@@ -968,9 +969,9 @@ class GmailComposeView {
       throw new Error('Can only pop out inline reply compose views');
     }
 
-    const popOutBtn = querySelector(
+    const popOutBtn = this.#driver.selectors.querySelectorByKeyOrFail(
       this.#element,
-      '.M9 > [role=menu]:first-child > .SK > [role=menuitem]:last-child',
+      'composeView.popOutMenuItem',
     );
     simulateClick(popOutBtn);
   }
@@ -1075,11 +1076,22 @@ class GmailComposeView {
   }
 
   isForward(): boolean {
-    return Boolean(this.#element.querySelector('.Un.J-JN-M-I .mI'));
+    return Boolean(
+      this.#driver.selectors.querySelectorByKey(
+        this.#element,
+        'composeView.forwardIcon',
+      ),
+    );
   }
 
   isReply(): boolean {
-    return this.#isInlineReplyForm || !!this.#element.querySelector('.HQ');
+    return (
+      this.#isInlineReplyForm ||
+      !!this.#driver.selectors.querySelectorByKey(
+        this.#element,
+        'composeView.replyMarker',
+      )
+    );
   }
 
   isInlineReplyForm(): boolean {
@@ -1093,11 +1105,17 @@ class GmailComposeView {
   }
 
   getMaybeBodyElement(): HTMLElement | null | undefined {
-    return this.#element.querySelector<HTMLElement>('.Ap [g_editable=true]');
+    return this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'composeView.body',
+    );
   }
 
   getTopFormElement(): HTMLElement {
-    return querySelector(this.#element, 'td > form');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.topForm',
+    );
   }
 
   getHTMLContent(): string {
@@ -1127,9 +1145,7 @@ class GmailComposeView {
   }
 
   getSubjectInput(): HTMLInputElement {
-    return this.#element.querySelector<HTMLInputElement>(
-      'input[name=subjectbox]',
-    )!;
+    return this.#getInputByKey('composeView.subjectInput')!;
   }
 
   getMetadataFormElement(): HTMLElement {
@@ -1139,7 +1155,10 @@ class GmailComposeView {
       throw new Error('Could not find compose container');
     }
 
-    return querySelector(container, 'form.bAs');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      container,
+      'composeView.metadataForm',
+    );
   }
 
   getToRecipients(): ContactNameOptional[] {
@@ -1174,24 +1193,36 @@ class GmailComposeView {
 
     if (!formattingArea) {
       formattingArea = this.#formattingArea =
-        this.#element.querySelector<HTMLElement>('.oc');
+        this.#driver.selectors.querySelectorByKey(
+          this.#element,
+          'composeView.formattingArea',
+        );
     }
 
     return formattingArea;
   }
 
   getFormattingToolbar(): HTMLElement | null | undefined {
-    return this.#element.querySelector<HTMLElement>('.aX');
+    return this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'composeView.formattingToolbar',
+    );
   }
 
   getFormattingToolbarArrow(): HTMLElement {
     const el = this.getFormattingToolbar();
     if (!el) throw new Error('Failed to find formatting toolbar');
-    return querySelector(el, '.aA4');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      el,
+      'composeView.formattingToolbarArrow',
+    );
   }
 
   getFormattingToolbarToggleButton(): HTMLElement {
-    const innerElement = querySelector(this.#element, '[role=button] .dv');
+    const innerElement = this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.formattingToolbarToggleIcon',
+    );
     const btn = innerElement.closest('[role=button]') as HTMLElement;
     if (!btn) throw new Error('failed to find button');
     return btn;
@@ -1204,7 +1235,10 @@ class GmailComposeView {
   }
 
   getScrollBody(): HTMLElement {
-    var scrollBody = this.#element.querySelector<HTMLElement>('table .GP');
+    var scrollBody = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'composeView.scrollBody',
+    );
 
     if (!scrollBody) {
       throw new Error('Failed to find scroll body');
@@ -1214,30 +1248,41 @@ class GmailComposeView {
   }
 
   getStatusArea(): HTMLElement {
-    const statusArea =
-      this.#element.querySelector<HTMLElement>('.aDg .aDj > .aDh');
+    const statusArea = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'composeView.statusArea',
+    );
 
     if (!statusArea) throw new Error('Failed to find status area');
     return statusArea;
   }
 
   getInsertMoreArea(): HTMLElement {
-    return querySelector(this.#element, '.eq');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.insertMoreArea',
+    );
   }
 
   getSendButton(): HTMLElement {
-    return querySelector(
+    return this.#driver.selectors.querySelectorByKeyOrFail(
       this.#element,
-      '.IZ .Up div > div[role=button]:not(.Uo):not([aria-haspopup=true]):not([class^=inboxsdk_])',
+      'composeView.sendButton',
     );
   }
 
   getScheduleSendButton(): HTMLElement {
-    return querySelector(this.#element, '[selector="scheduledSend"]');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.scheduleSendButton',
+    );
   }
 
   getMoreSendOptionsButton(): HTMLElement {
-    return querySelector(this.#element, '.hG');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.moreSendOptionsButton',
+    );
   }
 
   // When schedule send is available, this returns the element that contains both buttons.
@@ -1258,8 +1303,9 @@ class GmailComposeView {
       return null;
     }
 
-    const sendAndArchiveButton = this.#element.querySelector<HTMLElement>(
-      '.IZ .Up div > div[role=button].Uo:not([aria-haspopup=true]):not([class^=inboxsdk_])',
+    const sendAndArchiveButton = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'composeView.sendAndArchiveButton',
     );
 
     if (sendAndArchiveButton) {
@@ -1305,27 +1351,31 @@ class GmailComposeView {
   }
 
   getCloseButton(): HTMLElement {
-    // Prefer legacy <img> titlebar controls; fall back to newer <button class="Ha">.
-    return (
-      this.#element.querySelectorAll<HTMLElement>('.Hm > img')[2] ||
-      querySelector(this.#element, '.Hm .Ha')
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.closeButton',
     );
   }
 
   getMoleSwitchButton(): HTMLElement {
-    // Prefer legacy <img> titlebar controls; fall back to newer <button class="Hq">.
-    return (
-      this.#element.querySelectorAll<HTMLElement>('.Hm > img')[1] ||
-      querySelector(this.#element, '.Hm .Hq')
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.fullscreenButton',
     );
   }
 
   getBottomBarTable(): HTMLElement {
-    return querySelector(this.#element, '.aoP .aDh > table');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.bottomBarTable',
+    );
   }
 
   getDiscardButton(): HTMLElement {
-    return querySelector(this.#element, '.gU .oh');
+    return this.#driver.selectors.querySelectorByKeyOrFail(
+      this.#element,
+      'composeView.discardButton',
+    );
   }
 
   getComposeID(): string {
@@ -1497,10 +1547,10 @@ class GmailComposeView {
     if (minimized !== this.isMinimized()) {
       if (this.#isInlineReplyForm)
         throw new Error('Not implemented for inline compose views');
-      // Prefer legacy <img>; fall back to newer <button class="Hl">.
-      const minimizeButton =
-        this.#element.querySelector<HTMLElement>('.Hm > img') ||
-        querySelector(this.#element, '.Hm .Hl');
+      const minimizeButton = this.#driver.selectors.querySelectorByKeyOrFail(
+        this.#element,
+        'composeView.minimizeButton',
+      );
       simulateClick(minimizeButton);
     }
   }
@@ -1642,11 +1692,15 @@ class GmailComposeView {
     }
   }
 
+  #getInputByKey(key: SelectorKey): HTMLInputElement | null {
+    const input = this.#driver.selectors.querySelectorByKey(this.#element, key);
+    return input instanceof HTMLInputElement ? input : null;
+  }
+
   // If this compose is a reply, then this gets the message ID of the message
   // we're replying to.
   #getTargetMessageID(): string | null | undefined {
-    const input =
-      this.#element.querySelector<HTMLInputElement>('input[name="rm"]');
+    const input = this.#getInputByKey('composeView.replyTargetMessageIdInput');
     return input &&
       typeof input.value === 'string' &&
       input.value != 'undefined'
