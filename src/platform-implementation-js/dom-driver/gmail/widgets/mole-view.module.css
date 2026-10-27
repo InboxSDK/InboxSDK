@@ -2,7 +2,8 @@
   order: 1;
 }
 
-/* Gmail fixes this toolbar to the viewport while recipients have focus.
+/* .aDj.ahe matches Gmail's compose-toolbar containers when the body isn't focused.
+ * Gmail positions these containers relative to the viewport.
  * Keep it in the compose flow when SDK moles move the compose horizontally.
  * Rounded compose windows use the absolute-positioning rule in gmail.css
  * because their overflow clips a toolbar left in normal flow.
