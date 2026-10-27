@@ -2,10 +2,12 @@
   order: 1;
 }
 
-/* .aDj.ahe are the `position: fixed` are elements that contain ComposeView toolbars when the ComposeView body isn't focused.
- * This selector may have been the equivalent of `.aDj.aDi` before 2023-08-30.
+/* Gmail fixes this toolbar to the viewport while recipients have focus.
+ * Keep it in the compose flow when SDK moles move the compose horizontally.
+ * Rounded compose windows use the absolute-positioning rule in gmail.css
+ * because their overflow clips a toolbar left in normal flow.
  */
-.inboxsdkMolesInUse :global(.aDj.ahe) {
+.inboxsdkMolesInUse :global(.aDj.ahe:not(.aaZ.rT5Apb .aDj)) {
   position: static !important;
 }
 
