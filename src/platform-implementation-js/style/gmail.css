@@ -1400,27 +1400,13 @@ slightly for our custom mole/drawer CSS.
   position: static !important;
 }
 
-/* Rounded compose bodies clip a static toolbar when recipient rows expand.
- * Anchor the unfocused toolbar to the compose body instead of the viewport:
- * drawers can move the compose without Gmail updating its fixed left offset. */
-.inboxsdk__moles_in_use .aaZ.rT5Apb,
-.inboxsdk__drawers_in_use .aaZ.rT5Apb {
-  position: relative;
-}
-
-/* The zero-height toolbar wrapper must not become the containing block. */
-.inboxsdk__moles_in_use .aaZ.rT5Apb .aDg:has(> .aDj.ahe),
-.inboxsdk__drawers_in_use .aaZ.rT5Apb .aDg:has(> .aDj.ahe) {
-  position: static;
-}
-
+/* Gmail can leave a fixed toolbar's horizontal offset stale when a drawer moves
+ * the compose. Use its normal horizontal position while preserving Gmail's
+ * fixed positioning, width, and bottom offset. */
 .inboxsdk__moles_in_use .aaZ.rT5Apb .aDj.ahe,
 .inboxsdk__drawers_in_use .aaZ.rT5Apb .aDj.ahe {
-  position: absolute !important;
-  bottom: 0 !important;
-  left: 16px !important;
-  right: 16px !important;
-  width: auto !important;
+  left: auto !important;
+  right: auto !important;
 }
 
 /* Make it so the compose/mole layer doesn't wrap, so we don't have to do a lot
