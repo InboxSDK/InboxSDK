@@ -1391,6 +1391,11 @@ isn't visible behind it. */
   position: static;
 }
 
+/*
+`.aDj.ahe:not(.aaZ.rT5Apb .aDj)` matches the toolbar of pre-rounded corner
+composes. (Gmail introduced this change in Oct 2026.) We have to adjust it
+slightly for our custom mole/drawer CSS.
+*/
 .inboxsdk__drawers_in_use .aDj.ahe:not(.aaZ.rT5Apb .aDj) {
   position: static !important;
 }
