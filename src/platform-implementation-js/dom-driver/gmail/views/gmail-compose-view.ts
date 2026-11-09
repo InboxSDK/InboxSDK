@@ -1287,8 +1287,9 @@ class GmailComposeView {
 
   // When schedule send is available, this returns the element that contains both buttons.
   getSendButtonGroup(): HTMLElement {
-    const scheduleSend = this.#element.querySelector(
-      '.IZ .Up div > [role=button][aria-haspopup=true]:not([class^=inboxsdk_])',
+    const scheduleSend = this.#driver.selectors.querySelectorByKey(
+      this.#element,
+      'composeView.sendButtonGroupMenuButton',
     );
 
     if (scheduleSend) {

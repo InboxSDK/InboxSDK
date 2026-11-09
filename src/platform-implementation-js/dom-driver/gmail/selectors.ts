@@ -138,6 +138,15 @@ export const GMAIL_SELECTORS = {
   'composeView.moreSendOptionsButton': ['.hG'],
 
   /**
+   * The menu button in the send button group, matched the way
+   * `composeView.sendButton` is. Its parent holds both Send and this button.
+   * Root: compose root.
+   */
+  'composeView.sendButtonGroupMenuButton': [
+    '.IZ .Up div > [role=button][aria-haspopup=true]:not([class^=inboxsdk_])',
+  ],
+
+  /**
    * The native Send and Archive button, present in replies.
    * Root: compose root.
    */
