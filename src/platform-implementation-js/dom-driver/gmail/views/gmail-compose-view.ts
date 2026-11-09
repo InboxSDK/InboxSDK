@@ -17,6 +17,7 @@ import type { Stopper } from 'kefir-stopper';
 import delayAsap from '../../../lib/delay-asap';
 import { simulateClick } from '../../../lib/dom/simulate-mouse-event';
 import simulateKey from '../../../lib/dom/simulate-key';
+import { SelectorError } from '../../../lib/dom/querySelectorOrFail';
 import isElementVisible from '../../../../common/isElementVisible';
 import makeElementChildStream from '../../../lib/dom/make-element-child-stream';
 import {
@@ -277,9 +278,9 @@ class GmailComposeView {
         .takeUntilBy(this.#stopper)
         .map((bodyElement) => {
           this.#seenBodyElement = bodyElement;
-          this.#composeID = this.#getInputByKey(
+          this.#composeID = this.#getInputByKeyOrFail(
             'composeView.composeIdInput',
-          )!.value;
+          ).value;
           this.#messageIDElement = this.#getInputByKey(
             'composeView.draftIdInput',
           )!;
@@ -416,7 +417,9 @@ class GmailComposeView {
   }
 
   #getSubjectChangesStream() {
-    const subjectElement = this.getSubjectInput();
+    const subjectElement = this.#getInputByKeyOrFail(
+      'composeView.subjectInput',
+    );
     return Kefir.fromEvents(subjectElement, 'input').map(() => {
       return {
         eventName: 'subjectChanged' as const,
@@ -623,7 +626,7 @@ class GmailComposeView {
   }
 
   setSubject(text: string) {
-    this.#getInputByKey('composeView.subjectInput')!.value = text;
+    this.#getInputByKeyOrFail('composeView.subjectInput').value = text;
 
     this.#triggerDraftSave();
   }
@@ -1141,7 +1144,7 @@ class GmailComposeView {
   }
 
   getSubject(): string {
-    return this.getSubjectInput().value;
+    return this.#getInputByKeyOrFail('composeView.subjectInput').value;
   }
 
   getSubjectInput(): HTMLInputElement {
@@ -1696,6 +1699,14 @@ class GmailComposeView {
   #getInputByKey(key: SelectorKey): HTMLInputElement | null {
     const input = this.#driver.selectors.querySelectorByKey(this.#element, key);
     return input instanceof HTMLInputElement ? input : null;
+  }
+
+  #getInputByKeyOrFail(key: SelectorKey): HTMLInputElement {
+    const input = this.#getInputByKey(key);
+    if (!input) {
+      throw new SelectorError(key);
+    }
+    return input;
   }
 
   // If this compose is a reply, then this gets the message ID of the message
