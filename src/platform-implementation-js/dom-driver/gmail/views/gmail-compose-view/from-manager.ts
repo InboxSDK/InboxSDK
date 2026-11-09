@@ -43,11 +43,12 @@ export function getFromContactChoices(
   driver: GmailDriver,
   gmailComposeView: GmailComposeView,
 ): Contact[] {
-  const choiceEls = gmailComposeView
-    .getElement()
-    .querySelectorAll(
-      'div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX > div[value][role=menuitem]',
-    );
+  const choiceMenu = driver.selectors.querySelectorByKey(
+    gmailComposeView.getElement(),
+    'composeView.fromChoiceMenu',
+  );
+  const choiceEls =
+    choiceMenu?.querySelectorAll(':scope > div[value][role=menuitem]') ?? [];
 
   if (choiceEls.length == 0) {
     // From field isn't present
