@@ -48,7 +48,9 @@ function _addActionToolbar(gmailComposeView: GmailComposeView) {
   }
 
   if (parent) {
-    const col = parent.querySelector('colgroup col');
+    const col = gmailComposeView
+      .getGmailDriver()
+      .selectors.querySelectorByKey(parent, 'composeView.formattingAreaColumn');
 
     if (col) {
       const newCol1 = document.createElement('col');

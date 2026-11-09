@@ -114,7 +114,12 @@ export default function sizeFixer(
        * this way we still can override height values of scrollBody,
        * but recalculate them based on actual height of an inner child
        */
-      const scrollBodyInner = scrollBody.querySelector<HTMLElement>('.qz');
+      const scrollBodyInner = gmailComposeView
+        .getGmailDriver()
+        .selectors.querySelectorByKey(
+          scrollBody,
+          'composeView.bodyScrollContainer',
+        );
       const height = scrollBodyInner?.offsetHeight || scrollBody.offsetHeight;
       const maxHeight = parseInt(
         scrollBody.style.getPropertyValue('max-height'),

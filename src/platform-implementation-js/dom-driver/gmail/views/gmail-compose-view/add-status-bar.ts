@@ -5,7 +5,6 @@ import cx from 'classnames';
 
 import insertElementInOrder from '../../../../lib/dom/insert-element-in-order';
 import Logger from '../../../../lib/logger';
-import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import SimpleElementView from '../../../../views/SimpleElementView';
 
 import GmailComposeView from '../gmail-compose-view';
@@ -134,10 +133,12 @@ class StatusBar extends SimpleElementView implements IStatusBar {
         insertElementInOrder(prependContainer, this.el);
       } else {
         if (this._gmailComposeView.isInlineReplyForm()) {
-          const nativeStatusBar = querySelector(
-            this._gmailComposeView.getElement(),
-            '.iN > tbody .aDj .aDh .IZ',
-          );
+          const nativeStatusBar = this._gmailComposeView
+            .getGmailDriver()
+            .selectors.querySelectorByKeyOrFail(
+              this._gmailComposeView.getElement(),
+              'composeView.inlineReplyStatusBar',
+            );
           insertElementInOrder(nativeStatusBar, this.el);
         } else {
           insertElementInOrder(statusArea, this.el);

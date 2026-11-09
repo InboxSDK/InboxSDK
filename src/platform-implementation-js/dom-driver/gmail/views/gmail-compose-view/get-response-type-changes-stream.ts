@@ -1,17 +1,18 @@
 import * as Kefir from 'kefir';
 import Logger from '../../../../lib/logger';
 import makeMutationObserverChunkedStream from '../../../../lib/dom/make-mutation-observer-chunked-stream';
-import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import type GmailComposeView from '../gmail-compose-view';
 
 export default function (gmailComposeView: GmailComposeView) {
   let responseTypeEl;
 
   try {
-    responseTypeEl = querySelector(
-      gmailComposeView.getElement(),
-      '.J-J5-Ji .J-JN-M-I-Jm > img',
-    );
+    responseTypeEl = gmailComposeView
+      .getGmailDriver()
+      .selectors.querySelectorByKeyOrFail(
+        gmailComposeView.getElement(),
+        'composeView.responseTypeIcon',
+      );
     return makeMutationObserverChunkedStream(responseTypeEl, {
       attributeFilter: ['class'],
       attributes: true,

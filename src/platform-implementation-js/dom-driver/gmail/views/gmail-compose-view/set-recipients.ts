@@ -1,6 +1,5 @@
 import GmailComposeView from '../gmail-compose-view';
 import Logger from '../../../../lib/logger';
-import querySelector from '../../../../lib/dom/querySelectorOrFail';
 import getRecipients from './get-recipients';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import simulateKey from '../../../../lib/dom/simulate-key';
@@ -21,6 +20,7 @@ export default function setRecipients(
   }
 
   const oldRange = gmailComposeView.getLastSelectionRange();
+  const { selectors } = gmailComposeView.getGmailDriver();
 
   let _contactRow = getRecipientRowForType(
     gmailComposeView.getElement(),
@@ -30,15 +30,19 @@ export default function setRecipients(
   function openRecipientsSectionIfNeeded(button: HTMLElement) {
     const signalElement = button.closest<HTMLElement>('.fX.aiL');
     if (signalElement && signalElement.style.display === 'none') {
-      const cover = querySelector(gmailComposeView.getElement(), 'div.aoD.hl');
+      const cover = selectors.querySelectorByKeyOrFail(
+        gmailComposeView.getElement(),
+        'composeView.recipientsSummary',
+      );
       cover.dispatchEvent(new FocusEvent('focus'));
     }
   }
 
   if (addressType === 'cc') {
-    const ccButton = gmailComposeView
-      .getElement()
-      .querySelector<HTMLElement>('span.pE[role=link]');
+    const ccButton = selectors.querySelectorByKey(
+      gmailComposeView.getElement(),
+      'composeView.ccLink',
+    );
     if (ccButton) {
       openRecipientsSectionIfNeeded(ccButton);
       ccButton.click();
@@ -48,9 +52,10 @@ export default function setRecipients(
       );
     }
   } else if (addressType === 'bcc') {
-    const bccButton = gmailComposeView
-      .getElement()
-      .querySelector<HTMLElement>('span.pB[role=link]');
+    const bccButton = selectors.querySelectorByKey(
+      gmailComposeView.getElement(),
+      'composeView.bccLink',
+    );
     if (bccButton) {
       openRecipientsSectionIfNeeded(bccButton);
       bccButton.click();
@@ -67,9 +72,9 @@ export default function setRecipients(
     // new recipient fields
     // https://workspaceupdates.googleblog.com/2021/10/visual-updates-for-composing-email-in-gmail.html
 
-    const emailAddressEntry = querySelector(
+    const emailAddressEntry = selectors.querySelectorByKeyOrFail(
       contactRow,
-      'input[role=combobox][aria-autocomplete=list]',
+      'composeView.recipientInput',
     );
     if (!(emailAddressEntry instanceof HTMLInputElement)) {
       throw new Error();
@@ -156,8 +161,10 @@ export default function setRecipients(
       return;
     }
 
-    const emailAddressEntry =
-      contactRow.querySelector<HTMLElement>('textarea.vO');
+    const emailAddressEntry = selectors.querySelectorByKey(
+      contactRow,
+      'composeView.legacyRecipientTextarea',
+    );
 
     if (
       !emailAddressEntry ||
@@ -179,19 +186,22 @@ export default function setRecipients(
     simulateKey(emailAddressEntry, 13, 0);
 
     // Focus the recipients preview label so Gmail re-renders it.
-    const cover = querySelector(gmailComposeView.getElement(), 'div.aoD.hl');
+    const cover = selectors.querySelectorByKeyOrFail(
+      gmailComposeView.getElement(),
+      'composeView.recipientsSummary',
+    );
     cover.dispatchEvent(new FocusEvent('focus'));
 
     if (addressType === 'cc') {
-      const ccButton = querySelector(
+      const ccButton = selectors.querySelectorByKeyOrFail(
         gmailComposeView.getElement(),
-        'span.aB.gQ.pE',
+        'composeView.legacyCcLink',
       );
       simulateClick(ccButton);
     } else if (addressType === 'bcc') {
-      const bccButton = querySelector(
+      const bccButton = selectors.querySelectorByKeyOrFail(
         gmailComposeView.getElement(),
-        'span.aB.gQ.pB',
+        'composeView.legacyBccLink',
       );
       simulateClick(bccButton);
     }

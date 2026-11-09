@@ -7,10 +7,12 @@ export function getFromContact(
   driver: GmailDriver,
   gmailComposeView: GmailComposeView,
 ): Contact {
-  const nameInput: HTMLInputElement | null | undefined = gmailComposeView
-    .getElement()
-    .querySelector('input[name="from"]') as any;
-  const emailAddress = nameInput ? nameInput.value : null;
+  const nameInput = driver.selectors.querySelectorByKey(
+    gmailComposeView.getElement(),
+    'composeView.fromInput',
+  );
+  const emailAddress =
+    nameInput instanceof HTMLInputElement ? nameInput.value : null;
 
   if (!emailAddress) {
     return driver.getUserContact();
@@ -41,11 +43,12 @@ export function getFromContactChoices(
   driver: GmailDriver,
   gmailComposeView: GmailComposeView,
 ): Contact[] {
-  const choiceEls = gmailComposeView
-    .getElement()
-    .querySelectorAll(
-      'div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX > div[value][role=menuitem]',
-    );
+  const choiceMenu = driver.selectors.querySelectorByKey(
+    gmailComposeView.getElement(),
+    'composeView.fromChoiceMenu',
+  );
+  const choiceEls =
+    choiceMenu?.querySelectorAll(':scope > div[value][role=menuitem]') ?? [];
 
   if (choiceEls.length == 0) {
     // From field isn't present
@@ -67,9 +70,10 @@ export function setFromEmail(
     return;
   }
 
-  const choiceParent = gmailComposeView
-    .getElement()
-    .querySelector('div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX');
+  const choiceParent = driver.selectors.querySelectorByKey(
+    gmailComposeView.getElement(),
+    'composeView.fromChoiceMenu',
+  );
 
   if (!choiceParent) {
     if (driver.getUserContact().emailAddress != email) {
