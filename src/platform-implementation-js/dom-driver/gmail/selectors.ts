@@ -366,6 +366,18 @@ export const GMAIL_SELECTORS = {
   'composeView.recipientsSummary': ['div.aoD.hl'],
 
   /**
+   * The file drop zones over inline replies while a file is dragged.
+   * Root: `document`.
+   */
+  'composeView.inlineReplyDropzones': ['body > .aC7:not(.aWP)'],
+
+  /**
+   * The file drop zones over compose windows while a file is dragged.
+   * Root: `document`.
+   */
+  'composeView.windowDropzones': ['body > .aC7.aWP'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */

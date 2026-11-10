@@ -994,7 +994,10 @@ class GmailComposeView {
   #dropzonesVisible(): boolean {
     return (
       find(
-        document.querySelectorAll('body > .aC7:not(.aWP)'),
+        this.#driver.selectors.querySelectorAllByKey(
+          document,
+          'composeView.inlineReplyDropzones',
+        ),
         isElementVisible,
       ) != null
     );
@@ -1005,12 +1008,13 @@ class GmailComposeView {
     // this compose.
     const rect = this.#element.getBoundingClientRect();
 
-    const dropzoneSelector = inline
-      ? 'body > .aC7:not(.aWP)'
-      : 'body > .aC7.aWP';
-    const el = [
-      ...document.querySelectorAll<HTMLElement>(dropzoneSelector),
-    ].find((dropzone) => {
+    const dropzones = this.#driver.selectors.querySelectorAllByKey(
+      document,
+      inline
+        ? 'composeView.inlineReplyDropzones'
+        : 'composeView.windowDropzones',
+    );
+    const el = dropzones.find((dropzone) => {
       if (!isElementVisible(dropzone)) {
         return false;
       }
