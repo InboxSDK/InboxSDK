@@ -81,13 +81,14 @@ export default function setRecipients(
     }
 
     // Remove existing recipients
-    Array.from(
-      contactRow.querySelectorAll<HTMLElement>(
-        'div[role=option][data-name] div.afX[aria-label]',
-      ),
-    ).forEach((el) => {
-      el.click();
-    });
+    selectors
+      .querySelectorAllByKey(
+        contactRow,
+        'composeView.recipientChipRemoveButtons',
+      )
+      .forEach((el) => {
+        el.click();
+      });
 
     emailAddressEntry.value = '';
 
@@ -130,8 +131,9 @@ export default function setRecipients(
 
           // Does it look like our contact chips have all been removed?
           if (
-            contactRow.querySelectorAll<HTMLElement>(
-              'div[role=option][data-name] div.afX[aria-label]',
+            selectors.querySelectorAllByKey(
+              contactRow,
+              'composeView.recipientChipRemoveButtons',
             ).length === 0
           ) {
             // put a mark in the DOM to be absolutely sure we can't

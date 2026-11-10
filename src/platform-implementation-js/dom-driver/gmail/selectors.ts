@@ -372,6 +372,14 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The remove buttons on the address chips of a To, Cc or Bcc row.
+   * Root: the row's `[role=listbox]`.
+   */
+  'composeView.recipientChipRemoveButtons': [
+    'div[role=option][data-name] div.afX[aria-label]',
+  ],
+
+  /**
    * The text area of a To, Cc or Bcc row in the old recipient fields.
    * Root: the row's `tr`.
    */
