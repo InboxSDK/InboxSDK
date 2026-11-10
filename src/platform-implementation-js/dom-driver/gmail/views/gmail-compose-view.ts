@@ -868,8 +868,10 @@ class GmailComposeView {
         // so we have replicate this behavior when the native send button isn't
         // visible.
         const statusArea = this.getStatusArea();
-        const focusableEls =
-          statusArea.querySelectorAll<HTMLElement>('[tabindex]');
+        const focusableEls = this.#driver.selectors.querySelectorAllByKey(
+          statusArea,
+          'composeView.statusAreaTabbables',
+        );
         if (focusableEls.length === 0) return;
         const firstVisibleEl = Array.from(focusableEls).find(
           (el) => el.offsetParent !== null,

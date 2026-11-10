@@ -260,6 +260,12 @@ export const GMAIL_SELECTORS = {
   'composeView.nativeStatusBar': ['table'],
 
   /**
+   * The focusable elements in the status area, including SDK status bars.
+   * Root: `composeView.statusArea`.
+   */
+  'composeView.statusAreaTabbables': ['[tabindex]'],
+
+  /**
    * The compose table that SDK compose notices are inserted into.
    * Root: compose root.
    */
