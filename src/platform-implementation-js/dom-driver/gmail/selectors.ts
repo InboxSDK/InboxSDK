@@ -888,6 +888,16 @@ export const GMAIL_SELECTORS = {
   'routeView.previewPaneContainer': ['div[role=main] .aia'],
 
   /**
+   * The open thread's container inside the preview pane.
+   * Root: `routeView.previewPaneContainer`.
+   */
+  'routeView.previewPaneThreadContainer': [
+    'table.Bs > tr',
+    // 2023-11-30 thread-view redesign
+    '.ao9:has(.a98.iY, .apa)',
+  ],
+
+  /**
    * The search box input in the Gmail header.
    * Root: `document`.
    */
