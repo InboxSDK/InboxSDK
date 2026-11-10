@@ -377,9 +377,11 @@ class GmailThreadView {
 
     if (!hiddenNoticeMessageElement) {
       nativeHiddenNoticePresent = false;
-      const superCollapsedMessageElements = Array.from(
-        this.#element.querySelectorAll<HTMLElement>('.kQ'),
-      );
+      const superCollapsedMessageElements =
+        this.#driver.selectors.querySelectorAllByKey(
+          this.#element,
+          'threadView.superCollapsedMessages',
+        );
       if (superCollapsedMessageElements.length < 2) return;
       hiddenNoticeMessageElement = superCollapsedMessageElements[1];
     }
@@ -828,13 +830,16 @@ class GmailThreadView {
   }
 
   #findToolbarElement(): HTMLElement | null | undefined {
-    var toolbarContainerElements =
-      document.querySelectorAll<HTMLElement>('[gh=tm]');
+    var toolbarContainerElements = this.#driver.selectors.querySelectorAllByKey(
+      document,
+      'toolbar.pageToolbar',
+    );
 
     for (var ii = 0; ii < toolbarContainerElements.length; ii++) {
       if (this.#isToolbarContainerRelevant(toolbarContainerElements[ii])) {
-        return toolbarContainerElements[ii].querySelector<HTMLElement>(
-          '[gh=mtb]',
+        return this.#driver.selectors.querySelectorByKey(
+          toolbarContainerElements[ii],
+          'toolbar.mainToolbar',
         );
       }
     }
@@ -851,7 +856,10 @@ class GmailThreadView {
 
   #findBottomReplyToolbarElement(): HTMLElement | null {
     // Get all .amn elements (may exist in multiple locations due to A/B testing)
-    var allAmnElements = this.#element.querySelectorAll<HTMLElement>('.amn');
+    var allAmnElements = this.#driver.selectors.querySelectorAllByKey(
+      this.#element,
+      'threadView.bottomReplyToolbars',
+    );
 
     // Find the visible .amn element (handles A/B testing where one might be hidden)
     for (const element of allAmnElements) {

@@ -620,6 +620,19 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The collapsed messages folded behind a "N older messages" row.
+   * Root: thread element.
+   */
+  'threadView.superCollapsedMessages': ['.kQ'],
+
+  /**
+   * The bars under the last message that hold Reply and Forward; one can be
+   * hidden.
+   * Root: thread element.
+   */
+  'threadView.bottomReplyToolbars': ['.amn'],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */
@@ -816,6 +829,18 @@ export const GMAIL_SELECTORS = {
    * Root: page toolbar.
    */
   'toolbar.backButton': ['.lS'],
+
+  /**
+   * The toolbar above the main content, for both thread lists and threads.
+   * Root: `document`.
+   */
+  'toolbar.pageToolbar': ['[gh=tm]'],
+
+  /**
+   * The main toolbar, where the SDK adds its toolbar buttons.
+   * Root: `toolbar.pageToolbar`, or a row list element.
+   */
+  'toolbar.mainToolbar': ['[gh=mtb]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
