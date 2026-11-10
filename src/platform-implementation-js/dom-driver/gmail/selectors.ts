@@ -620,6 +620,12 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The collapsed messages folded behind a "N older messages" row.
+   * Root: thread element.
+   */
+  'threadView.superCollapsedMessages': ['.kQ'],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */

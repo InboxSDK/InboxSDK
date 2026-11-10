@@ -377,9 +377,11 @@ class GmailThreadView {
 
     if (!hiddenNoticeMessageElement) {
       nativeHiddenNoticePresent = false;
-      const superCollapsedMessageElements = Array.from(
-        this.#element.querySelectorAll<HTMLElement>('.kQ'),
-      );
+      const superCollapsedMessageElements =
+        this.#driver.selectors.querySelectorAllByKey(
+          this.#element,
+          'threadView.superCollapsedMessages',
+        );
       if (superCollapsedMessageElements.length < 2) return;
       hiddenNoticeMessageElement = superCollapsedMessageElements[1];
     }
