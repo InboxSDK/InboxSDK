@@ -386,6 +386,12 @@ export const GMAIL_SELECTORS = {
   'composeView.legacyRecipientTextarea': ['textarea.vO'],
 
   /**
+   * The remove buttons on the address chips in the old recipient fields.
+   * Root: the row's `tr`.
+   */
+  'composeView.legacyRecipientChipRemoveButtons': ['.vR .vM'],
+
+  /**
    * The collapsed recipients summary; focusing it opens the recipient rows.
    * Root: compose root.
    */

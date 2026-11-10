@@ -176,11 +176,14 @@ export default function setRecipients(
     }
 
     // Remove existing recipients
-    Array.from(contactRow.querySelectorAll<HTMLElement>('.vR .vM')).forEach(
-      (el) => {
+    selectors
+      .querySelectorAllByKey(
+        contactRow,
+        'composeView.legacyRecipientChipRemoveButtons',
+      )
+      .forEach((el) => {
         simulateClick(el);
-      },
-    );
+      });
 
     emailAddressEntry.value = emailAddresses.join(',');
 
