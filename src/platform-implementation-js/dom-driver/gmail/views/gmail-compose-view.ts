@@ -868,8 +868,10 @@ class GmailComposeView {
         // so we have replicate this behavior when the native send button isn't
         // visible.
         const statusArea = this.getStatusArea();
-        const focusableEls =
-          statusArea.querySelectorAll<HTMLElement>('[tabindex]');
+        const focusableEls = this.#driver.selectors.querySelectorAllByKey(
+          statusArea,
+          'composeView.statusAreaTabbables',
+        );
         if (focusableEls.length === 0) return;
         const firstVisibleEl = Array.from(focusableEls).find(
           (el) => el.offsetParent !== null,
@@ -994,7 +996,10 @@ class GmailComposeView {
   #dropzonesVisible(): boolean {
     return (
       find(
-        document.querySelectorAll('body > .aC7:not(.aWP)'),
+        this.#driver.selectors.querySelectorAllByKey(
+          document,
+          'composeView.inlineReplyDropzones',
+        ),
         isElementVisible,
       ) != null
     );
@@ -1005,12 +1010,13 @@ class GmailComposeView {
     // this compose.
     const rect = this.#element.getBoundingClientRect();
 
-    const dropzoneSelector = inline
-      ? 'body > .aC7:not(.aWP)'
-      : 'body > .aC7.aWP';
-    const el = [
-      ...document.querySelectorAll<HTMLElement>(dropzoneSelector),
-    ].find((dropzone) => {
+    const dropzones = this.#driver.selectors.querySelectorAllByKey(
+      document,
+      inline
+        ? 'composeView.inlineReplyDropzones'
+        : 'composeView.windowDropzones',
+    );
+    const el = dropzones.find((dropzone) => {
       if (!isElementVisible(dropzone)) {
         return false;
       }

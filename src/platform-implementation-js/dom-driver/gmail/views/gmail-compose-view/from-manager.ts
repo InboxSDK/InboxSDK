@@ -47,8 +47,12 @@ export function getFromContactChoices(
     gmailComposeView.getElement(),
     'composeView.fromChoiceMenu',
   );
-  const choiceEls =
-    choiceMenu?.querySelectorAll(':scope > div[value][role=menuitem]') ?? [];
+  const choiceEls = choiceMenu
+    ? driver.selectors.querySelectorAllByKey(
+        choiceMenu,
+        'composeView.fromChoiceItems',
+      )
+    : [];
 
   if (choiceEls.length == 0) {
     // From field isn't present

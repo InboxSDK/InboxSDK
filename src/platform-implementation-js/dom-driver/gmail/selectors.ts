@@ -234,6 +234,12 @@ export const GMAIL_SELECTORS = {
   'composeView.nativeToolbarButtonsContainer': ['.bAK'],
 
   /**
+   * Gmail's own bottom toolbar buttons, measured against their container.
+   * Root: `composeView.nativeToolbarButtonsContainer`.
+   */
+  'composeView.nativeToolbarButtons': ['.wG'],
+
+  /**
    * The table that lays out the bottom toolbar.
    * Root: compose root.
    */
@@ -258,6 +264,12 @@ export const GMAIL_SELECTORS = {
    * Root: `composeView.statusArea`.
    */
   'composeView.nativeStatusBar': ['table'],
+
+  /**
+   * The focusable elements in the status area, including SDK status bars.
+   * Root: `composeView.statusArea`.
+   */
+  'composeView.statusAreaTabbables': ['[tabindex]'],
 
   /**
    * The compose table that SDK compose notices are inserted into.
@@ -294,6 +306,12 @@ export const GMAIL_SELECTORS = {
   'composeView.fromChoiceMenu': [
     'div.J-M.jQjAxd.J-M-awS[role=menu] > div.SK.AX',
   ],
+
+  /**
+   * The from address choices; each one's `value` is the address.
+   * Root: `composeView.fromChoiceMenu`.
+   */
+  'composeView.fromChoiceItems': [':scope > div[value][role=menuitem]'],
 
   /**
    * The icon of a reply's response type button; its class changes between
@@ -354,16 +372,42 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The remove buttons on the address chips of a To, Cc or Bcc row.
+   * Root: the row's `[role=listbox]`.
+   */
+  'composeView.recipientChipRemoveButtons': [
+    'div[role=option][data-name] div.afX[aria-label]',
+  ],
+
+  /**
    * The text area of a To, Cc or Bcc row in the old recipient fields.
    * Root: the row's `tr`.
    */
   'composeView.legacyRecipientTextarea': ['textarea.vO'],
 
   /**
+   * The remove buttons on the address chips in the old recipient fields.
+   * Root: the row's `tr`.
+   */
+  'composeView.legacyRecipientChipRemoveButtons': ['.vR .vM'],
+
+  /**
    * The collapsed recipients summary; focusing it opens the recipient rows.
    * Root: compose root.
    */
   'composeView.recipientsSummary': ['div.aoD.hl'],
+
+  /**
+   * The file drop zones over inline replies while a file is dragged.
+   * Root: `document`.
+   */
+  'composeView.inlineReplyDropzones': ['body > .aC7:not(.aWP)'],
+
+  /**
+   * The file drop zones over compose windows while a file is dragged.
+   * Root: `document`.
+   */
+  'composeView.windowDropzones': ['body > .aC7.aWP'],
 
   /**
    * Native button used to identify the Inbox-state toolbar section.
