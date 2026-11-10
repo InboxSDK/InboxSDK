@@ -302,6 +302,12 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The from address choices; each one's `value` is the address.
+   * Root: `composeView.fromChoiceMenu`.
+   */
+  'composeView.fromChoiceItems': [':scope > div[value][role=menuitem]'],
+
+  /**
    * The icon of a reply's response type button; its class changes between
    * reply and forward.
    * Root: compose root.
