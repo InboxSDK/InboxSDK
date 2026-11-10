@@ -828,8 +828,10 @@ class GmailThreadView {
   }
 
   #findToolbarElement(): HTMLElement | null | undefined {
-    var toolbarContainerElements =
-      document.querySelectorAll<HTMLElement>('[gh=tm]');
+    var toolbarContainerElements = this.#driver.selectors.querySelectorAllByKey(
+      document,
+      'toolbar.pageToolbar',
+    );
 
     for (var ii = 0; ii < toolbarContainerElements.length; ii++) {
       if (this.#isToolbarContainerRelevant(toolbarContainerElements[ii])) {

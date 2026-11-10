@@ -816,6 +816,12 @@ export const GMAIL_SELECTORS = {
    * Root: page toolbar.
    */
   'toolbar.backButton': ['.lS'],
+
+  /**
+   * The toolbar above the main content, for both thread lists and threads.
+   * Root: `document`.
+   */
+  'toolbar.pageToolbar': ['[gh=tm]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;
