@@ -189,11 +189,13 @@ class GmailRowListView {
     const firstTableParent = newTableParent.parentElement.firstElementChild;
 
     if (firstTableParent !== newTableParent && firstTableParent) {
-      const firstCols = firstTableParent.querySelectorAll<HTMLElement>(
-        'table.cf > colgroup > col',
+      const firstCols = this._gmailDriver.selectors.querySelectorAllByKey(
+        firstTableParent,
+        'rowListView.columns',
       );
-      const newCols = newTableParent.querySelectorAll<HTMLElement>(
-        'table.cf > colgroup > col',
+      const newCols = this._gmailDriver.selectors.querySelectorAllByKey(
+        newTableParent,
+        'rowListView.columns',
       );
       assert(Object.is(firstCols.length, newCols.length));
       zip(firstCols, newCols).forEach(([firstCol, newCol]) => {
@@ -247,8 +249,9 @@ class GmailRowListView {
   }
 
   _startWatchingForRowViews() {
-    const tableDivParents = Array.from(
-      this._element.querySelectorAll<HTMLElement>('div.Cp'),
+    const tableDivParents = this._gmailDriver.selectors.querySelectorAllByKey(
+      this._element,
+      'rowListView.tableParents',
     );
     const elementStream = Kefir.merge(
       tableDivParents.map(makeElementChildStream),

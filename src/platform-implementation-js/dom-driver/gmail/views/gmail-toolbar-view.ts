@@ -438,8 +438,10 @@ class GmailToolbarView {
   _getSectionElementForButtonSelectorKey(
     selectorKey: SelectorKey,
   ): HTMLElement | null | undefined {
-    const sectionElements =
-      this._element.querySelectorAll<HTMLElement>('.G-Ni');
+    const sectionElements = this._driver.selectors.querySelectorAllByKey(
+      this._element,
+      'toolbar.sections',
+    );
 
     for (let ii = 0; ii < sectionElements.length; ii++) {
       if (
@@ -465,7 +467,10 @@ class GmailToolbarView {
         element.setAttribute('data-toolbar-expanded', 'false');
       }
 
-      const buttons = element.querySelectorAll('.G-Ni > [role=button]');
+      const buttons = this._driver.selectors.querySelectorAllByKey(
+        element,
+        'toolbar.sectionButtons',
+      );
       Array.prototype.forEach.call(buttons, (button) => {
         let current = button;
 

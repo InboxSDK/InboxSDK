@@ -410,6 +410,18 @@ export const GMAIL_SELECTORS = {
   'composeView.windowDropzones': ['body > .aC7.aWP'],
 
   /**
+   * The button groups of the main toolbar.
+   * Root: `toolbar.mainToolbar`.
+   */
+  'toolbar.sections': ['.G-Ni'],
+
+  /**
+   * The buttons directly inside the main toolbar's sections.
+   * Root: `toolbar.mainToolbar`.
+   */
+  'toolbar.sectionButtons': ['.G-Ni > [role=button]'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
@@ -441,6 +453,12 @@ export const GMAIL_SELECTORS = {
    * Root: one `.G-Ni` section. Kept separate so a real Move section wins.
    */
   'toolbar.moveSectionFallbackButton': ['.aFj'],
+
+  /**
+   * The toolbar's More menus; the open one is the one not hidden.
+   * Root: `document`.
+   */
+  'toolbar.moreMenus': ['.J-M.aX0.aYO.jQjAxd'],
 
   /**
    * Body of an open message.
@@ -554,6 +572,12 @@ export const GMAIL_SELECTORS = {
    * Root: message element.
    */
   'messageView.attachmentAreaAnchor': ['.hi'],
+
+  /**
+   * The attachment cards in an attachment area.
+   * Root: `messageView.attachmentArea`.
+   */
+  'messageView.attachmentCards': ['.aQH > span'],
 
   /**
    * The recipients' spans in a message header; each carries `email` and `name`.
@@ -687,6 +711,18 @@ export const GMAIL_SELECTORS = {
    * Root: `routeView.rowListWrapper`.
    */
   'routeView.listToolbar': ['[gh=tm]', '.G-atb'],
+
+  /**
+   * The containers Gmail adds each thread list table to.
+   * Root: the row list element container.
+   */
+  'rowListView.tableParents': ['div.Cp'],
+
+  /**
+   * The column elements of a thread list table, whose widths are kept in sync.
+   * Root: a child of `rowListView.tableParents`.
+   */
+  'rowListView.columns': ['table.cf > colgroup > col'],
 
   /**
    * The left nav column.
