@@ -410,6 +410,12 @@ export const GMAIL_SELECTORS = {
   'composeView.windowDropzones': ['body > .aC7.aWP'],
 
   /**
+   * The button groups of the main toolbar.
+   * Root: `toolbar.mainToolbar`.
+   */
+  'toolbar.sections': ['.G-Ni'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */
