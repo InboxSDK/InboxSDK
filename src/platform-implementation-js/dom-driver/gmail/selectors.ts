@@ -234,6 +234,12 @@ export const GMAIL_SELECTORS = {
   'composeView.nativeToolbarButtonsContainer': ['.bAK'],
 
   /**
+   * Gmail's own bottom toolbar buttons, measured against their container.
+   * Root: `composeView.nativeToolbarButtonsContainer`.
+   */
+  'composeView.nativeToolbarButtons': ['.wG'],
+
+  /**
    * The table that lays out the bottom toolbar.
    * Root: compose root.
    */
