@@ -701,6 +701,16 @@ export const GMAIL_SELECTORS = {
   'threadView.bottomReplyToolbars': ['.amn'],
 
   /**
+   * The open thread's container in the main content.
+   * Root: `document`.
+   */
+  'threadView.container': [
+    '[role=main] .g.id table.Bs > tr',
+    // 2023-11-16 thread-view redesign
+    '[role=main] .g.id .a98.iY',
+  ],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */
@@ -711,6 +721,12 @@ export const GMAIL_SELECTORS = {
    * Root: `routeView.rowListWrapper`.
    */
   'routeView.listToolbar': ['[gh=tm]', '.G-atb'],
+
+  /**
+   * Gmail's refresh button in thread lists.
+   * Root: `toolbar.pageToolbar`.
+   */
+  'routeView.refreshButton': ['div.T-I.nu'],
 
   /**
    * The containers Gmail adds each thread list table to.
@@ -872,6 +888,16 @@ export const GMAIL_SELECTORS = {
   'routeView.previewPaneContainer': ['div[role=main] .aia'],
 
   /**
+   * The open thread's container inside the preview pane.
+   * Root: `routeView.previewPaneContainer`.
+   */
+  'routeView.previewPaneThreadContainer': [
+    'table.Bs > tr',
+    // 2023-11-30 thread-view redesign
+    '.ao9:has(.a98.iY, .apa)',
+  ],
+
+  /**
    * The search box input in the Gmail header.
    * Root: `document`.
    */
@@ -921,6 +947,12 @@ export const GMAIL_SELECTORS = {
    * Root: `toolbar.pageToolbar`, or a row list element.
    */
   'toolbar.mainToolbar': ['[gh=mtb]'],
+
+  /**
+   * The toolbar's "more" button, which opens the more menu.
+   * Root: toolbar element.
+   */
+  'toolbar.moreButton': ['.nf[role=button]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

@@ -90,6 +90,15 @@ export default class SelectorRegistry {
   }
 
   /**
+   * The key and the candidates it resolves through, overrides first, for
+   * error messages.
+   */
+  describeKey(key: SelectorKey): string {
+    const separator = ' || ';
+    return `${key} (${this.#candidates[key].join(separator)})`;
+  }
+
+  /**
    * Resolve a registry key against `el`, but throws if no candidate matches.
    */
   querySelectorByKeyOrFail(
@@ -98,7 +107,7 @@ export default class SelectorRegistry {
   ): HTMLElement {
     const found = this.querySelectorByKey(el, key);
     if (!found) {
-      throw new SelectorError(`${key} (${this.#candidates[key].join(' || ')})`);
+      throw new SelectorError(this.describeKey(key));
     }
     return found;
   }
