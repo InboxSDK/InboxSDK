@@ -37,8 +37,10 @@ class GmailAttachmentAreaView {
   }
 
   getAttachmentCardViews() {
-    const attachments =
-      this._element.querySelectorAll<HTMLElement>('.aQH > span');
+    const attachments = this._driver.selectors.querySelectorAllByKey(
+      this._element,
+      'messageView.attachmentCards',
+    );
 
     return Array.from(attachments).map((attachment) => {
       let cardView = this._elsToCardViews.get(attachment);

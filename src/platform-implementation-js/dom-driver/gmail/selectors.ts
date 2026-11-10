@@ -562,6 +562,12 @@ export const GMAIL_SELECTORS = {
   'messageView.attachmentAreaAnchor': ['.hi'],
 
   /**
+   * The attachment cards in an attachment area.
+   * Root: `messageView.attachmentArea`.
+   */
+  'messageView.attachmentCards': ['.aQH > span'],
+
+  /**
    * The recipients' spans in a message header; each carries `email` and `name`.
    * Root: message element.
    */
