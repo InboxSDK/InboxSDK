@@ -707,6 +707,12 @@ export const GMAIL_SELECTORS = {
   'rowListView.tableParents': ['div.Cp'],
 
   /**
+   * The column elements of a thread list table, whose widths are kept in sync.
+   * Root: a child of `rowListView.tableParents`.
+   */
+  'rowListView.columns': ['table.cf > colgroup > col'],
+
+  /**
    * The left nav column.
    * Root: `document`.
    */
