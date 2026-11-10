@@ -416,6 +416,12 @@ export const GMAIL_SELECTORS = {
   'toolbar.sections': ['.G-Ni'],
 
   /**
+   * The buttons directly inside the main toolbar's sections.
+   * Root: `toolbar.mainToolbar`.
+   */
+  'toolbar.sectionButtons': ['.G-Ni > [role=button]'],
+
+  /**
    * Native button used to identify the Inbox-state toolbar section.
    * Root: one `.G-Ni` section.
    */

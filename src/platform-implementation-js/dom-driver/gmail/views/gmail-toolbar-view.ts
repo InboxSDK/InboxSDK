@@ -467,7 +467,10 @@ class GmailToolbarView {
         element.setAttribute('data-toolbar-expanded', 'false');
       }
 
-      const buttons = element.querySelectorAll('.G-Ni > [role=button]');
+      const buttons = this._driver.selectors.querySelectorAllByKey(
+        element,
+        'toolbar.sectionButtons',
+      );
       Array.prototype.forEach.call(buttons, (button) => {
         let current = button;
 
