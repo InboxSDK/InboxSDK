@@ -87,9 +87,25 @@ describe('with no config loaded', () => {
       registry.querySelectorByKeyOrFail(empty, 'composeView.titleBarTable'),
     ).toThrow('composeView.titleBarTable');
   });
+
+  test('a key is described by its bundled candidates', () => {
+    expect(new SelectorRegistry().describeKey('threadView.idElement')).toBe(
+      'threadView.idElement ([data-legacy-thread-id])',
+    );
+  });
 });
 
 describe('with a config loaded', () => {
+  test('a key is described with its override candidates first', () => {
+    const registry = new SelectorRegistry({
+      overrides: { 'threadView.idElement': ['.hotfix'] },
+    });
+
+    expect(registry.describeKey('threadView.idElement')).toBe(
+      'threadView.idElement (.hotfix || [data-legacy-thread-id])',
+    );
+  });
+
   test('an empty config is indistinguishable from no config', () => {
     const registry = new SelectorRegistry({ overrides: {} });
     const root = composeRoot(true);
