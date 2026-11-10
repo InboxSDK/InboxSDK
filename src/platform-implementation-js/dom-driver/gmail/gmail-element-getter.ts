@@ -47,8 +47,9 @@ export default class GmailElementGetter {
   }
 
   getActiveMoreMenu(): HTMLElement | null {
-    const elements = document.querySelectorAll<HTMLElement>(
-      '.J-M.aX0.aYO.jQjAxd',
+    const elements = this.#driver.selectors.querySelectorAllByKey(
+      document,
+      'toolbar.moreMenus',
     );
 
     for (let ii = 0; ii < elements.length; ii++) {

@@ -443,6 +443,12 @@ export const GMAIL_SELECTORS = {
   'toolbar.moveSectionFallbackButton': ['.aFj'],
 
   /**
+   * The toolbar's More menus; the open one is the one not hidden.
+   * Root: `document`.
+   */
+  'toolbar.moreMenus': ['.J-M.aX0.aYO.jQjAxd'],
+
+  /**
    * Body of an open message.
    * Root: message element.
    */
