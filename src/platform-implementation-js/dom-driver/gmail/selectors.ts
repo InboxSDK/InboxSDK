@@ -701,6 +701,12 @@ export const GMAIL_SELECTORS = {
   'routeView.listToolbar': ['[gh=tm]', '.G-atb'],
 
   /**
+   * The containers Gmail adds each thread list table to.
+   * Root: the row list element container.
+   */
+  'rowListView.tableParents': ['div.Cp'],
+
+  /**
    * The left nav column.
    * Root: `document`.
    */

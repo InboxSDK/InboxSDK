@@ -247,8 +247,9 @@ class GmailRowListView {
   }
 
   _startWatchingForRowViews() {
-    const tableDivParents = Array.from(
-      this._element.querySelectorAll<HTMLElement>('div.Cp'),
+    const tableDivParents = this._gmailDriver.selectors.querySelectorAllByKey(
+      this._element,
+      'rowListView.tableParents',
     );
     const elementStream = Kefir.merge(
       tableDivParents.map(makeElementChildStream),
