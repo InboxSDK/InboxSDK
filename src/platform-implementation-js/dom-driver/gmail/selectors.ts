@@ -626,6 +626,13 @@ export const GMAIL_SELECTORS = {
   'threadView.superCollapsedMessages': ['.kQ'],
 
   /**
+   * The bars under the last message that hold Reply and Forward; one can be
+   * hidden.
+   * Root: thread element.
+   */
+  'threadView.bottomReplyToolbars': ['.amn'],
+
+  /**
    * The element holding the list toolbar and the thread list.
    * Root: the row list element container.
    */

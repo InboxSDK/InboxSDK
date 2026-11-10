@@ -856,7 +856,10 @@ class GmailThreadView {
 
   #findBottomReplyToolbarElement(): HTMLElement | null {
     // Get all .amn elements (may exist in multiple locations due to A/B testing)
-    var allAmnElements = this.#element.querySelectorAll<HTMLElement>('.amn');
+    var allAmnElements = this.#driver.selectors.querySelectorAllByKey(
+      this.#element,
+      'threadView.bottomReplyToolbars',
+    );
 
     // Find the visible .amn element (handles A/B testing where one might be hidden)
     for (const element of allAmnElements) {
