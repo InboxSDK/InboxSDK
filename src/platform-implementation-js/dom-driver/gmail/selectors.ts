@@ -822,6 +822,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'toolbar.pageToolbar': ['[gh=tm]'],
+
+  /**
+   * The main toolbar, where the SDK adds its toolbar buttons.
+   * Root: `toolbar.pageToolbar`, or a row list element.
+   */
+  'toolbar.mainToolbar': ['[gh=mtb]'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type SelectorKey = keyof typeof GMAIL_SELECTORS;

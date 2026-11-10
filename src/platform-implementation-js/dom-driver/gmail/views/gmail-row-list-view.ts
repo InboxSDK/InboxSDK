@@ -149,7 +149,10 @@ class GmailRowListView {
 
   _findToolbarElement() {
     /* multiple inbox extra section */
-    const firstTry = this._element.querySelector<HTMLElement>('[gh=mtb]');
+    const firstTry = this._gmailDriver.selectors.querySelectorByKey(
+      this._element,
+      'toolbar.mainToolbar',
+    );
 
     if (firstTry) {
       return firstTry;
@@ -167,7 +170,12 @@ class GmailRowListView {
         toolbarContainerElement.parentElement!.parentElement ===
           this._element.parentElement,
     );
-    return el ? el.querySelector<HTMLElement>('[gh=mtb]') : null;
+    return el
+      ? this._gmailDriver.selectors.querySelectorByKey(
+          el,
+          'toolbar.mainToolbar',
+        )
+      : null;
   }
 
   // When a new table is added to a row list, if an existing table has had its
