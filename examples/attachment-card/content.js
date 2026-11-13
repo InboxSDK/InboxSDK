@@ -135,8 +135,7 @@ InboxSDK.load(2, 'attachment-card-exmaple').then(function (sdk) {
 
     messageView.addAttachmentsToolbarButton({
       tooltip: 'Tooltip here',
-      iconUrl:
-        'https://www.streak.com/build/images/circle_exclamation_mark.png',
+      iconUrl: chrome.runtime.getURL('zipicon.png'),
       onClick(event) {
         const attachmentCardViews = event.attachmentCardViews;
         console.log('attachment cards', attachmentCardViews);
