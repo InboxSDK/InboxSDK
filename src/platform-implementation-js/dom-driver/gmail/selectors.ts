@@ -571,7 +571,13 @@ export const GMAIL_SELECTORS = {
    * The element the SDK's own attachment area is inserted before.
    * Root: message element.
    */
-  'messageView.attachmentAreaAnchor': ['.hi'],
+  'messageView.attachmentAreaAnchor': [
+    // 2026 message layout: Gmail puts its own attachment area before this
+    'div.WhmR8e',
+    // the element after the message body, in case that class changes
+    '.ii.gt + div',
+    '.hi',
+  ],
 
   /**
    * The attachment cards in an attachment area.
