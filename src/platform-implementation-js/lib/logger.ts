@@ -1,6 +1,6 @@
 import Sha256 from 'sha.js/sha256';
 import ajax from '../../common/ajax';
-import getExtensionId from '../../common/get-extension-id';
+import { getExtensionId } from '../../common/extension-apis';
 import getSessionId from '../../common/get-session-id';
 import logError from '../../common/log-error';
 import PersistentQueue from './persistent-queue';

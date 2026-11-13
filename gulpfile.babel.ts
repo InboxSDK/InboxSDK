@@ -76,10 +76,15 @@ async function setupExamples() {
       './packages/core/inboxsdk.js*',
       './packages/core/platform-implementation.js*',
       './packages/core/pageWorld.js*',
+      './packages/core/firefox.js*',
     ];
   } else if (args.integratedPageWorld) {
     dirs.push('./dist');
-    srcs = ['./packages/core/inboxsdk.js', './packages/core/pageWorld.js'];
+    srcs = [
+      './packages/core/inboxsdk.js',
+      './packages/core/pageWorld.js',
+      './packages/core/firefox.js',
+    ];
   }
 
   let stream = gulp.src(srcs);
@@ -324,6 +329,7 @@ gulp.task('clean', async () => {
     './packages/core/inboxsdk.js',
     './packages/core/platform-implementation.js',
     './packages/core/pageWorld.js',
+    './packages/core/firefox.js',
   ];
 
   outputFiles.flatMap((filename) => [
