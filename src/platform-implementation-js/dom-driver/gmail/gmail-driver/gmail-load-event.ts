@@ -49,11 +49,11 @@ export default async function gmailLoadEvent(driver: GmailDriver) {
      * Whether or not Google Chat, Google Meet, or both enabled. If they are, the SDK's
      * AppMenu is available for the left nav.
      */
-    isGmailIntegratedView: isIntegratedViewGmail(),
+    isGmailIntegratedView: isIntegratedViewGmail(driver.selectors),
     /**
      * This is the panel on the left side of the screen. If the top left burger of Gmail is collapsed, then this is true.
      */
-    isCollapsiblePanelHidden: isCollapsiblePanelHidden(),
+    isCollapsiblePanelHidden: isCollapsiblePanelHidden(driver.selectors),
     isGoogleChatEnabled: isGoogleChatEnabled(),
     /**
      * This is the sidePanel on the right side of the screen. The collapse button is at the bottom right corner of the screen.

@@ -800,6 +800,13 @@ export const GMAIL_SELECTORS = {
   'appMenu.header': ['.oy8Mbf.qp'],
 
   /**
+   * The first item in the app menu, which Gmail shows only when Chat or Meet is
+   * on.
+   * Root: `document`.
+   */
+  'appMenu.firstItem': ['div[role=navigation] > :nth-child(1).Xa'],
+
+  /**
    * The Hangouts buttons at the bottom of the left nav.
    * Root: `document`.
    */
