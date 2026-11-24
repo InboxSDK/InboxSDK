@@ -807,6 +807,13 @@ export const GMAIL_SELECTORS = {
   'appMenu.firstItem': ['div[role=navigation] > :nth-child(1).Xa'],
 
   /**
+   * The app menu nav while the main menu button has hidden its collapsible
+   * panel.
+   * Root: `document`.
+   */
+  'appMenu.collapsedNav': ['div[role=navigation].aBA'],
+
+  /**
    * The Hangouts buttons at the bottom of the left nav.
    * Root: `document`.
    */

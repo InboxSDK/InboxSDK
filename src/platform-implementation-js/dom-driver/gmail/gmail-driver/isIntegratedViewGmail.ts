@@ -19,7 +19,7 @@ export function isCollapsiblePanelHidden(
     return null;
   }
 
-  return document.querySelector('div[role=navigation].aBA') != null;
+  return selectors.querySelectorByKey(document, 'appMenu.collapsedNav') != null;
 }
 
 export function isGoogleChatEnabled() {
