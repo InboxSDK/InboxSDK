@@ -27,6 +27,10 @@ function getNavItem() {
   return document.querySelector(navItemSelector);
 }
 
+function getNavItemContent(selectors: SelectorRegistry) {
+  return selectors.querySelectorByKey(document, 'leftNav.nativeItemContent');
+}
+
 /**
  * @returns true if Gmail is in dark theme mode, false if not, or null if it can't be determined
  */
@@ -157,7 +161,7 @@ export default async function trackGmailStyles(driver: GmailDriver) {
   try {
     await waitFor(
       () =>
-        document.querySelector('.TO .TN') &&
+        getNavItemContent(driver.selectors) &&
         document.querySelector(navItemSelector),
     );
   } catch (err) {

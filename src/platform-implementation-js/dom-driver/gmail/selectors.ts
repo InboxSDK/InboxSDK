@@ -895,6 +895,12 @@ export const GMAIL_SELECTORS = {
   'leftNav.nativeItem': ['.aim'],
 
   /**
+   * The content box inside one of Gmail's own nav items.
+   * Root: `document`.
+   */
+  'leftNav.nativeItemContent': ['.TO .TN'],
+
+  /**
    * The section beside the left nav that holds the current route.
    * Root: `document`.
    */
