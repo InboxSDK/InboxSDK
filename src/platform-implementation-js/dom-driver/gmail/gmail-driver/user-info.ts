@@ -49,20 +49,18 @@ export default class UserInfo {
         };
       })
       .filter(isNotNil);
-    const extras: Contact[] = Array.from(
-      document.querySelectorAll<HTMLElement>(
-        '[role=banner] div[aria-label] div > a[target="_blank"] > img + div',
-      ),
-    ).map((el: HTMLElement) => {
-      const match = el.children[1].textContent!.match(/\S+/);
-      if (!match) {
-        throw new Error('Failed to match');
-      }
-      return {
-        name: el.children[0].textContent!,
-        emailAddress: match[0],
-      };
-    });
+    const extras: Contact[] = this.#selectors
+      .querySelectorAllByKey(document, 'header.accountSwitcherOtherAccounts')
+      .map((el: HTMLElement) => {
+        const match = el.children[1].textContent!.match(/\S+/);
+        if (!match) {
+          throw new Error('Failed to match');
+        }
+        return {
+          name: el.children[0].textContent!,
+          emailAddress: match[0],
+        };
+      });
     return uniqBy(main.concat(extras), (x) => x.emailAddress.toLowerCase());
   }
 }

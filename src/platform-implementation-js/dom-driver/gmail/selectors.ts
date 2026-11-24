@@ -998,6 +998,15 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The other signed-in accounts in the account switcher; each holds the
+   * account's name, then its email address.
+   * Root: `document`.
+   */
+  'header.accountSwitcherOtherAccounts': [
+    '[role=banner] div[aria-label] div > a[target="_blank"] > img + div',
+  ],
+
+  /**
    * The back button in a thread's toolbar.
    * Root: page toolbar.
    */
