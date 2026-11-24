@@ -22,6 +22,6 @@ export function isCollapsiblePanelHidden(
   return selectors.querySelectorByKey(document, 'appMenu.collapsedNav') != null;
 }
 
-export function isGoogleChatEnabled() {
-  return document.querySelector('div[role=navigation] > .ao4') != null;
+export function isGoogleChatEnabled(selectors: SelectorRegistry) {
+  return selectors.querySelectorByKey(document, 'appMenu.chatItem') != null;
 }

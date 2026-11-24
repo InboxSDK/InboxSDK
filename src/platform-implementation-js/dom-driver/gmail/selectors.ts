@@ -814,6 +814,12 @@ export const GMAIL_SELECTORS = {
   'appMenu.collapsedNav': ['div[role=navigation].aBA'],
 
   /**
+   * The Chat item in the app menu, which Gmail shows only when Chat is on.
+   * Root: `document`.
+   */
+  'appMenu.chatItem': ['div[role=navigation] > .ao4'],
+
+  /**
    * The Hangouts buttons at the bottom of the left nav.
    * Root: `document`.
    */
