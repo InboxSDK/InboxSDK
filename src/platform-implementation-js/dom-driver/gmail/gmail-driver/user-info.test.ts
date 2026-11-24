@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import { Driver } from '../../../driver-interfaces/driver';
+import SelectorRegistry from '../../../lib/dom/selectorRegistry';
 
 import UserInfo from './user-info';
 
@@ -8,6 +9,7 @@ const slot = document.getElementById('slot');
 if (!slot) throw new Error();
 const driver = {
   getUserEmailAddress: _.constant('cowan@streak.com'),
+  selectors: new SelectorRegistry(),
 } as Driver;
 
 describe('old', () => {

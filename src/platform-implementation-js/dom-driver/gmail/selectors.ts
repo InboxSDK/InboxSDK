@@ -592,6 +592,26 @@ export const GMAIL_SELECTORS = {
   'messageView.recipientSpans': ['.hb span[email]'],
 
   /**
+   * The contacts in the message details popup; each carries `email`, and
+   * `name` when Gmail knows it.
+   * Root: `document`.
+   */
+  'messageView.detailsContacts': ['.ajC [email]'],
+
+  /**
+   * The message details popup, kept in the DOM with `visibility: hidden` while
+   * closed.
+   * Root: message element.
+   */
+  'messageView.detailsPopup': ['.ajA.SK'],
+
+  /**
+   * The button that opens and closes the message details popup.
+   * Root: message element.
+   */
+  'messageView.detailsButton': ['.ajy[aria-haspopup=true]'],
+
+  /**
    * The thread's subject heading. Read for its text, or walked child by child
    * when it contains emoji images.
    * Root: thread element.
@@ -780,6 +800,26 @@ export const GMAIL_SELECTORS = {
   'appMenu.header': ['.oy8Mbf.qp'],
 
   /**
+   * The first item in the app menu, which Gmail shows only when Chat or Meet is
+   * on.
+   * Root: `document`.
+   */
+  'appMenu.firstItem': ['div[role=navigation] > :nth-child(1).Xa'],
+
+  /**
+   * The app menu nav while the main menu button has hidden its collapsible
+   * panel.
+   * Root: `document`.
+   */
+  'appMenu.collapsedNav': ['div[role=navigation].aBA'],
+
+  /**
+   * The Chat item in the app menu, which Gmail shows only when Chat is on.
+   * Root: `document`.
+   */
+  'appMenu.chatItem': ['div[role=navigation] > .ao4'],
+
+  /**
    * The Hangouts buttons at the bottom of the left nav.
    * Root: `document`.
    */
@@ -815,6 +855,12 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'companionSidebar.iconRail': ['.brC-aT5-aOt-Jw'],
+
+  /**
+   * The button at the bottom right that hides and shows the icon rail.
+   * Root: `document`.
+   */
+  'companionSidebar.collapseButton': ['.aT5-aOt-I[role=button]'],
 
   /**
    * The add-on sidebar. Only for Gmailv1 + Gmailv2-before-2018-07-30?
@@ -860,6 +906,26 @@ export const GMAIL_SELECTORS = {
    * Root: `document`.
    */
   'leftNav.nativeItemList': ['.aeN .n3'],
+
+  /**
+   * A row in the list of Gmail's own nav items; its height shows the display
+   * density.
+   * Root: `document`.
+   */
+  'leftNav.nativeItem': ['.aim'],
+
+  /**
+   * The label of one of Gmail's own nav items; its text colour shows whether
+   * the frame uses a dark theme.
+   * Root: `document`.
+   */
+  'leftNav.nativeItemLabel': ['.aio'],
+
+  /**
+   * The content box inside one of Gmail's own nav items.
+   * Root: `document`.
+   */
+  'leftNav.nativeItemContent': ['.TO .TN'],
 
   /**
    * The section beside the left nav that holds the current route.
@@ -934,6 +1000,30 @@ export const GMAIL_SELECTORS = {
    */
   'header.accountContainer': [
     'header[role="banner"] > div:nth-child(2) > div:nth-child(2)',
+  ],
+
+  /**
+   * The signed-in user's name in the Google bar.
+   * Root: `document`.
+   */
+  'header.accountName': ['div.gb_w div.gb_B .gb_D'],
+
+  /**
+   * The "Manage your Google Account" links in the account switcher; the first
+   * one's siblings hold the current account's name, then its email address.
+   * Root: `document`.
+   */
+  'header.accountSwitcherManageLinks': [
+    '[role=banner] div[aria-label] div div a[href^="https://myaccount.google."]',
+  ],
+
+  /**
+   * The other signed-in accounts in the account switcher; each holds the
+   * account's name, then its email address.
+   * Root: `document`.
+   */
+  'header.accountSwitcherOtherAccounts': [
+    '[role=banner] div[aria-label] div > a[target="_blank"] > img + div',
   ],
 
   /**

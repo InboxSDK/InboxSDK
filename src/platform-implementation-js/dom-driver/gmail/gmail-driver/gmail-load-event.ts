@@ -6,14 +6,17 @@ import isIntegratedViewGmail, {
 import { waitForMenuReady } from './add-nav-item';
 import { checkForDarkThemeSafe } from './track-gmail-styles';
 import waitFor, { WaitForError } from '../../../lib/wait-for';
+import type SelectorRegistry from '../../../lib/dom/selectorRegistry';
 
-async function isSidePanelCollapsed() {
+async function isSidePanelCollapsed(selectors: SelectorRegistry) {
   const sidePanelSelector = '.brC-aT5-aOt-Jw[role=complementary]';
 
   try {
     await waitFor(() => document.querySelector(sidePanelSelector), 10_000);
     // Wait for the collapse button to appear too. Otherwise, the side panel will initially appear without a display style set for collapsed.
-    await waitFor(() => document.querySelector('.aT5-aOt-I[role=button]'));
+    await waitFor(() =>
+      selectors.querySelectorByKey(document, 'companionSidebar.collapseButton'),
+    );
   } catch (e: unknown) {
     if (e instanceof WaitForError) {
       return null;
@@ -36,8 +39,8 @@ export default async function gmailLoadEvent(driver: GmailDriver) {
   const isConversationViewDisabled =
     await pageCommunicator.isConversationViewDisabled();
   await waitForMenuReady(driver);
-  const isUsingDarkTheme = await checkForDarkThemeSafe();
-  const sidePanelCollapsed = await isSidePanelCollapsed();
+  const isUsingDarkTheme = await checkForDarkThemeSafe(driver.selectors);
+  const sidePanelCollapsed = await isSidePanelCollapsed(driver.selectors);
 
   const timing = performance?.timing;
 
@@ -46,12 +49,12 @@ export default async function gmailLoadEvent(driver: GmailDriver) {
      * Whether or not Google Chat, Google Meet, or both enabled. If they are, the SDK's
      * AppMenu is available for the left nav.
      */
-    isGmailIntegratedView: isIntegratedViewGmail(),
+    isGmailIntegratedView: isIntegratedViewGmail(driver.selectors),
     /**
      * This is the panel on the left side of the screen. If the top left burger of Gmail is collapsed, then this is true.
      */
-    isCollapsiblePanelHidden: isCollapsiblePanelHidden(),
-    isGoogleChatEnabled: isGoogleChatEnabled(),
+    isCollapsiblePanelHidden: isCollapsiblePanelHidden(driver.selectors),
+    isGoogleChatEnabled: isGoogleChatEnabled(driver.selectors),
     /**
      * This is the sidePanel on the right side of the screen. The collapse button is at the bottom right corner of the screen.
      */

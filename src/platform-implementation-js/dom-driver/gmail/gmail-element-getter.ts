@@ -113,7 +113,7 @@ export default class GmailElementGetter {
   }
 
   getComposeButton(): HTMLElement | null {
-    if (isIntegratedViewGmail()) {
+    if (isIntegratedViewGmail(this.#driver.selectors)) {
       return this.#driver.selectors.querySelectorByKey(
         document,
         'leftNav.composeButtonIntegrated',
@@ -140,7 +140,7 @@ export default class GmailElementGetter {
       'page.contentSection',
     );
 
-    if (isIntegratedViewGmail()) {
+    if (isIntegratedViewGmail(this.#driver.selectors)) {
       return el;
     } else {
       const leftNavContainer = this.getLeftNavContainerElement();
@@ -205,7 +205,7 @@ export default class GmailElementGetter {
           )
         : null;
     }
-    if (isIntegratedViewGmail()) {
+    if (isIntegratedViewGmail(this.#driver.selectors)) {
       return this.#driver.selectors.querySelectorByKey(
         document,
         'leftNav.collapsiblePanelIntegrated',
@@ -246,7 +246,7 @@ export default class GmailElementGetter {
    * in their own sections at the bottom of the leftnav).
    */
   shouldAddNavItemsInline(): boolean {
-    if (isIntegratedViewGmail()) {
+    if (isIntegratedViewGmail(this.#driver.selectors)) {
       return true;
     }
 
@@ -336,7 +336,7 @@ export default class GmailElementGetter {
   }
 
   getSameSectionNavItemMenuInjectionContainer(): HTMLElement | null {
-    if (isIntegratedViewGmail()) {
+    if (isIntegratedViewGmail(this.#driver.selectors)) {
       return this.#driver.selectors.querySelectorByKey(
         document,
         'leftNav.nativeItemListIntegrated',

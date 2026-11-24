@@ -3,18 +3,22 @@ import uniqBy from 'lodash/uniqBy';
 import { Driver } from '../../../driver-interfaces/driver';
 import { Contact } from '../../../../inboxsdk';
 import isNotNil from '../../../../common/isNotNil';
+import type SelectorRegistry from '../../../lib/dom/selectorRegistry';
 
 export default class UserInfo {
   #userEmail: string;
+  #selectors: SelectorRegistry;
 
   constructor(driver: Driver) {
     this.#userEmail = driver.getUserEmailAddress();
+    this.#selectors = driver.selectors;
   }
 
   /** @deprecated */
   getUserName(): string {
-    const nameEl = document.querySelector<HTMLElement>(
-      'div.gb_w div.gb_B .gb_D',
+    const nameEl = this.#selectors.querySelectorByKey(
+      document,
+      'header.accountName',
     );
     if (nameEl) {
       return nameEl.textContent!;
@@ -31,11 +35,8 @@ export default class UserInfo {
 
   /** @deprecated */
   getAccountSwitcherContactList(): Contact[] {
-    const main: Contact[] = Array.from(
-      document.querySelectorAll<HTMLElement>(
-        '[role=banner] div[aria-label] div div a[href^="https://myaccount.google."]',
-      ),
-    )
+    const main: Contact[] = this.#selectors
+      .querySelectorAllByKey(document, 'header.accountSwitcherManageLinks')
       .slice(0, 1)
       .map((btn) => {
         const btnParent = btn.parentElement!;
@@ -48,20 +49,18 @@ export default class UserInfo {
         };
       })
       .filter(isNotNil);
-    const extras: Contact[] = Array.from(
-      document.querySelectorAll<HTMLElement>(
-        '[role=banner] div[aria-label] div > a[target="_blank"] > img + div',
-      ),
-    ).map((el: HTMLElement) => {
-      const match = el.children[1].textContent!.match(/\S+/);
-      if (!match) {
-        throw new Error('Failed to match');
-      }
-      return {
-        name: el.children[0].textContent!,
-        emailAddress: match[0],
-      };
-    });
+    const extras: Contact[] = this.#selectors
+      .querySelectorAllByKey(document, 'header.accountSwitcherOtherAccounts')
+      .map((el: HTMLElement) => {
+        const match = el.children[1].textContent!.match(/\S+/);
+        if (!match) {
+          throw new Error('Failed to match');
+        }
+        return {
+          name: el.children[0].textContent!,
+          emailAddress: match[0],
+        };
+      });
     return uniqBy(main.concat(extras), (x) => x.emailAddress.toLowerCase());
   }
 }

@@ -1027,7 +1027,7 @@ class GmailMessageView {
   }
 
   #getUpdatedContact(inContact: ContactNameOptional): ContactNameOptional {
-    return getUpdatedContact(inContact, this.#element);
+    return getUpdatedContact(inContact, this.#element, this.#driver.selectors);
   }
 
   // Is this used?

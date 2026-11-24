@@ -1,13 +1,17 @@
 import kefirBus from 'kefir-bus';
 import Logger from '../../../lib/logger';
 import waitFor, { WaitForError } from '../../../lib/wait-for';
+import type SelectorRegistry from '../../../lib/dom/selectorRegistry';
 import type GmailDriver from '../gmail-driver';
 
 /** should handle rgb and rgba */
 const RGB_REGEX = /^rgba?\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*(,\s*(0\.)?\d+)?\)/;
 
-function getDensity(): 'compact' | 'default' {
-  const navItemElement = document.querySelector('.aim');
+function getDensity(selectors: SelectorRegistry): 'compact' | 'default' {
+  const navItemElement = selectors.querySelectorByKey(
+    document,
+    'leftNav.nativeItem',
+  );
   if (!navItemElement) {
     Logger.error(new Error('Failed to find a nav item element'));
     return 'default';
@@ -17,18 +21,20 @@ function getDensity(): 'compact' | 'default' {
   return rect?.height === 24 ? 'compact' : 'default';
 }
 
-const navItemSelector = '.aio' as const;
+function getNavItem(selectors: SelectorRegistry) {
+  return selectors.querySelectorByKey(document, 'leftNav.nativeItemLabel');
+}
 
-function getNavItem() {
-  return document.querySelector(navItemSelector);
+function getNavItemContent(selectors: SelectorRegistry) {
+  return selectors.querySelectorByKey(document, 'leftNav.nativeItemContent');
 }
 
 /**
  * @returns true if Gmail is in dark theme mode, false if not, or null if it can't be determined
  */
-export async function checkForDarkThemeSafe() {
+export async function checkForDarkThemeSafe(selectors: SelectorRegistry) {
   try {
-    await waitFor(() => getNavItem());
+    await waitFor(() => getNavItem(selectors));
   } catch (e: unknown) {
     if (e instanceof WaitForError) {
       return null;
@@ -37,7 +43,7 @@ export async function checkForDarkThemeSafe() {
     throw e;
   }
 
-  return isFrameDarkTheme();
+  return isFrameDarkTheme(selectors);
 }
 
 function extractRgbColor(colorString: string) {
@@ -54,10 +60,10 @@ function extractRgbColor(colorString: string) {
   };
 }
 
-function isFrameDarkTheme(): boolean {
+function isFrameDarkTheme(selectors: SelectorRegistry): boolean {
   // get the color of the left-nav-menu entries to determine whether Gmail is
   // in dark theme mode.
-  const navItem = getNavItem();
+  const navItem = getNavItem(selectors);
   if (!navItem) {
     Logger.error(new Error('Failed to find nav item'));
     return false;
@@ -114,7 +120,7 @@ export default async function trackGmailStyles(driver: GmailDriver) {
   let currentDarkTheme: boolean | null = null;
 
   function checkStyles() {
-    const newDensity = getDensity();
+    const newDensity = getDensity(driver.selectors);
     if (currentDensity !== newDensity) {
       if (currentDensity) {
         document.body.classList.remove(
@@ -125,7 +131,7 @@ export default async function trackGmailStyles(driver: GmailDriver) {
       document.body.classList.add('inboxsdk__gmail_density_' + currentDensity);
     }
 
-    const newDarkTheme = isFrameDarkTheme();
+    const newDarkTheme = isFrameDarkTheme(driver.selectors);
     if (currentDarkTheme !== newDarkTheme) {
       currentDarkTheme = newDarkTheme;
 
@@ -152,9 +158,7 @@ export default async function trackGmailStyles(driver: GmailDriver) {
 
   try {
     await waitFor(
-      () =>
-        document.querySelector('.TO .TN') &&
-        document.querySelector(navItemSelector),
+      () => getNavItemContent(driver.selectors) && getNavItem(driver.selectors),
     );
   } catch (err) {
     Logger.error(err);

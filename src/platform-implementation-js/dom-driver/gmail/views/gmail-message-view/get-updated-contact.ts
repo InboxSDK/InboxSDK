@@ -1,6 +1,7 @@
 import Logger from '../../../../lib/logger';
 import { simulateClick } from '../../../../lib/dom/simulate-mouse-event';
 import extractContactFromEmailContactString from '../../../../lib/extract-contact-from-email-contact-string';
+import type SelectorRegistry from '../../../../lib/dom/selectorRegistry';
 import type { ContactNameOptional } from '../../../../../inboxsdk';
 const cache: Record<
   string,
@@ -14,6 +15,7 @@ const cache: Record<
 export default function getUpdatedContact(
   headerContact: ContactNameOptional,
   element: HTMLElement,
+  selectors: SelectorRegistry,
 ): ContactNameOptional {
   let cacheEntry = cache[headerContact.emailAddress];
 
@@ -25,11 +27,15 @@ export default function getUpdatedContact(
     }
   }
 
-  const menuElement = element.querySelector<HTMLElement>('.ajA.SK');
+  const menuElement = selectors.querySelectorByKey(
+    element,
+    'messageView.detailsPopup',
+  );
   const isMenuElementHidden =
     menuElement && menuElement.style.visibility === 'hidden';
-  const menuButtonElement = element.querySelector<HTMLElement>(
-    '.ajy[aria-haspopup=true]',
+  const menuButtonElement = selectors.querySelectorByKey(
+    element,
+    'messageView.detailsButton',
   );
 
   if (menuButtonElement && isMenuElementHidden) {
@@ -47,7 +53,7 @@ export default function getUpdatedContact(
     simulateClick(menuButtonElement);
 
     try {
-      updateContactCacheFromModal(headerContact);
+      updateContactCacheFromModal(headerContact, selectors);
     } catch (err) {
       Logger.error(err);
     } finally {
@@ -66,8 +72,14 @@ export default function getUpdatedContact(
   return headerContact;
 }
 
-function updateContactCacheFromModal(headerContact: ContactNameOptional) {
-  const spans = document.querySelectorAll('.ajC [email]');
+function updateContactCacheFromModal(
+  headerContact: ContactNameOptional,
+  selectors: SelectorRegistry,
+) {
+  const spans = selectors.querySelectorAllByKey(
+    document,
+    'messageView.detailsContacts',
+  );
 
   for (let ii = 0; ii < spans.length; ii++) {
     const span = spans[ii];
