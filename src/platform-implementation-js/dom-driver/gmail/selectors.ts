@@ -599,6 +599,13 @@ export const GMAIL_SELECTORS = {
   'messageView.detailsContacts': ['.ajC [email]'],
 
   /**
+   * The message details popup, kept in the DOM with `visibility: hidden` while
+   * closed.
+   * Root: message element.
+   */
+  'messageView.detailsPopup': ['.ajA.SK'],
+
+  /**
    * The thread's subject heading. Read for its text, or walked child by child
    * when it contains emoji images.
    * Root: thread element.

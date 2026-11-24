@@ -27,7 +27,10 @@ export default function getUpdatedContact(
     }
   }
 
-  const menuElement = element.querySelector<HTMLElement>('.ajA.SK');
+  const menuElement = selectors.querySelectorByKey(
+    element,
+    'messageView.detailsPopup',
+  );
   const isMenuElementHidden =
     menuElement && menuElement.style.visibility === 'hidden';
   const menuButtonElement = element.querySelector<HTMLElement>(
