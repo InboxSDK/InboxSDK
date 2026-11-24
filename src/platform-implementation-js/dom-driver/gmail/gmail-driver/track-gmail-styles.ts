@@ -1,13 +1,17 @@
 import kefirBus from 'kefir-bus';
 import Logger from '../../../lib/logger';
 import waitFor, { WaitForError } from '../../../lib/wait-for';
+import type SelectorRegistry from '../../../lib/dom/selectorRegistry';
 import type GmailDriver from '../gmail-driver';
 
 /** should handle rgb and rgba */
 const RGB_REGEX = /^rgba?\s*\(\s*(\d+),\s*(\d+),\s*(\d+)\s*(,\s*(0\.)?\d+)?\)/;
 
-function getDensity(): 'compact' | 'default' {
-  const navItemElement = document.querySelector('.aim');
+function getDensity(selectors: SelectorRegistry): 'compact' | 'default' {
+  const navItemElement = selectors.querySelectorByKey(
+    document,
+    'leftNav.nativeItem',
+  );
   if (!navItemElement) {
     Logger.error(new Error('Failed to find a nav item element'));
     return 'default';
@@ -114,7 +118,7 @@ export default async function trackGmailStyles(driver: GmailDriver) {
   let currentDarkTheme: boolean | null = null;
 
   function checkStyles() {
-    const newDensity = getDensity();
+    const newDensity = getDensity(driver.selectors);
     if (currentDensity !== newDensity) {
       if (currentDensity) {
         document.body.classList.remove(

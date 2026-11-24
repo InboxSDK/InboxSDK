@@ -888,6 +888,13 @@ export const GMAIL_SELECTORS = {
   'leftNav.nativeItemList': ['.aeN .n3'],
 
   /**
+   * A row in the list of Gmail's own nav items; its height shows the display
+   * density.
+   * Root: `document`.
+   */
+  'leftNav.nativeItem': ['.aim'],
+
+  /**
    * The section beside the left nav that holds the current route.
    * Root: `document`.
    */
