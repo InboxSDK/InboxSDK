@@ -33,8 +33,9 @@ export default function getUpdatedContact(
   );
   const isMenuElementHidden =
     menuElement && menuElement.style.visibility === 'hidden';
-  const menuButtonElement = element.querySelector<HTMLElement>(
-    '.ajy[aria-haspopup=true]',
+  const menuButtonElement = selectors.querySelectorByKey(
+    element,
+    'messageView.detailsButton',
   );
 
   if (menuButtonElement && isMenuElementHidden) {

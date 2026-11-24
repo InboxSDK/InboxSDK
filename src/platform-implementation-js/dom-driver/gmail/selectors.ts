@@ -606,6 +606,12 @@ export const GMAIL_SELECTORS = {
   'messageView.detailsPopup': ['.ajA.SK'],
 
   /**
+   * The button that opens and closes the message details popup.
+   * Root: message element.
+   */
+  'messageView.detailsButton': ['.ajy[aria-haspopup=true]'],
+
+  /**
    * The thread's subject heading. Read for its text, or walked child by child
    * when it contains emoji images.
    * Root: thread element.
