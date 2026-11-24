@@ -895,6 +895,13 @@ export const GMAIL_SELECTORS = {
   'leftNav.nativeItem': ['.aim'],
 
   /**
+   * The label of one of Gmail's own nav items; its text colour shows whether
+   * the frame uses a dark theme.
+   * Root: `document`.
+   */
+  'leftNav.nativeItemLabel': ['.aio'],
+
+  /**
    * The content box inside one of Gmail's own nav items.
    * Root: `document`.
    */

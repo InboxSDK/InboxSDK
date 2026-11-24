@@ -21,10 +21,8 @@ function getDensity(selectors: SelectorRegistry): 'compact' | 'default' {
   return rect?.height === 24 ? 'compact' : 'default';
 }
 
-const navItemSelector = '.aio' as const;
-
-function getNavItem() {
-  return document.querySelector(navItemSelector);
+function getNavItem(selectors: SelectorRegistry) {
+  return selectors.querySelectorByKey(document, 'leftNav.nativeItemLabel');
 }
 
 function getNavItemContent(selectors: SelectorRegistry) {
@@ -34,9 +32,9 @@ function getNavItemContent(selectors: SelectorRegistry) {
 /**
  * @returns true if Gmail is in dark theme mode, false if not, or null if it can't be determined
  */
-export async function checkForDarkThemeSafe() {
+export async function checkForDarkThemeSafe(selectors: SelectorRegistry) {
   try {
-    await waitFor(() => getNavItem());
+    await waitFor(() => getNavItem(selectors));
   } catch (e: unknown) {
     if (e instanceof WaitForError) {
       return null;
@@ -45,7 +43,7 @@ export async function checkForDarkThemeSafe() {
     throw e;
   }
 
-  return isFrameDarkTheme();
+  return isFrameDarkTheme(selectors);
 }
 
 function extractRgbColor(colorString: string) {
@@ -62,10 +60,10 @@ function extractRgbColor(colorString: string) {
   };
 }
 
-function isFrameDarkTheme(): boolean {
+function isFrameDarkTheme(selectors: SelectorRegistry): boolean {
   // get the color of the left-nav-menu entries to determine whether Gmail is
   // in dark theme mode.
-  const navItem = getNavItem();
+  const navItem = getNavItem(selectors);
   if (!navItem) {
     Logger.error(new Error('Failed to find nav item'));
     return false;
@@ -133,7 +131,7 @@ export default async function trackGmailStyles(driver: GmailDriver) {
       document.body.classList.add('inboxsdk__gmail_density_' + currentDensity);
     }
 
-    const newDarkTheme = isFrameDarkTheme();
+    const newDarkTheme = isFrameDarkTheme(driver.selectors);
     if (currentDarkTheme !== newDarkTheme) {
       currentDarkTheme = newDarkTheme;
 
@@ -160,9 +158,7 @@ export default async function trackGmailStyles(driver: GmailDriver) {
 
   try {
     await waitFor(
-      () =>
-        getNavItemContent(driver.selectors) &&
-        document.querySelector(navItemSelector),
+      () => getNavItemContent(driver.selectors) && getNavItem(driver.selectors),
     );
   } catch (err) {
     Logger.error(err);

@@ -39,7 +39,7 @@ export default async function gmailLoadEvent(driver: GmailDriver) {
   const isConversationViewDisabled =
     await pageCommunicator.isConversationViewDisabled();
   await waitForMenuReady(driver);
-  const isUsingDarkTheme = await checkForDarkThemeSafe();
+  const isUsingDarkTheme = await checkForDarkThemeSafe(driver.selectors);
   const sidePanelCollapsed = await isSidePanelCollapsed(driver.selectors);
 
   const timing = performance?.timing;
