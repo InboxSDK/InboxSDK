@@ -592,6 +592,13 @@ export const GMAIL_SELECTORS = {
   'messageView.recipientSpans': ['.hb span[email]'],
 
   /**
+   * The contacts in the message details popup; each carries `email`, and
+   * `name` when Gmail knows it.
+   * Root: `document`.
+   */
+  'messageView.detailsContacts': ['.ajC [email]'],
+
+  /**
    * The thread's subject heading. Read for its text, or walked child by child
    * when it contains emoji images.
    * Root: thread element.
