@@ -35,11 +35,8 @@ export default class UserInfo {
 
   /** @deprecated */
   getAccountSwitcherContactList(): Contact[] {
-    const main: Contact[] = Array.from(
-      document.querySelectorAll<HTMLElement>(
-        '[role=banner] div[aria-label] div div a[href^="https://myaccount.google."]',
-      ),
-    )
+    const main: Contact[] = this.#selectors
+      .querySelectorAllByKey(document, 'header.accountSwitcherManageLinks')
       .slice(0, 1)
       .map((btn) => {
         const btnParent = btn.parentElement!;

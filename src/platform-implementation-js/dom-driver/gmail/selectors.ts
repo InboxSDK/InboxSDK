@@ -989,6 +989,15 @@ export const GMAIL_SELECTORS = {
   'header.accountName': ['div.gb_w div.gb_B .gb_D'],
 
   /**
+   * The "Manage your Google Account" links in the account switcher; the first
+   * one's siblings hold the current account's name, then its email address.
+   * Root: `document`.
+   */
+  'header.accountSwitcherManageLinks': [
+    '[role=banner] div[aria-label] div div a[href^="https://myaccount.google."]',
+  ],
+
+  /**
    * The back button in a thread's toolbar.
    * Root: page toolbar.
    */
