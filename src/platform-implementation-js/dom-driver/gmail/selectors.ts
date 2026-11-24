@@ -837,6 +837,12 @@ export const GMAIL_SELECTORS = {
   'companionSidebar.iconRail': ['.brC-aT5-aOt-Jw'],
 
   /**
+   * The button at the bottom right that hides and shows the icon rail.
+   * Root: `document`.
+   */
+  'companionSidebar.collapseButton': ['.aT5-aOt-I[role=button]'],
+
+  /**
    * The add-on sidebar. Only for Gmailv1 + Gmailv2-before-2018-07-30?
    * Root: `document`.
    */
