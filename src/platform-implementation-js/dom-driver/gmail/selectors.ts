@@ -983,6 +983,12 @@ export const GMAIL_SELECTORS = {
   ],
 
   /**
+   * The signed-in user's name in the Google bar.
+   * Root: `document`.
+   */
+  'header.accountName': ['div.gb_w div.gb_B .gb_D'],
+
+  /**
    * The back button in a thread's toolbar.
    * Root: page toolbar.
    */

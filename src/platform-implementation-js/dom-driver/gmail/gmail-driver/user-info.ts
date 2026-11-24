@@ -3,18 +3,22 @@ import uniqBy from 'lodash/uniqBy';
 import { Driver } from '../../../driver-interfaces/driver';
 import { Contact } from '../../../../inboxsdk';
 import isNotNil from '../../../../common/isNotNil';
+import type SelectorRegistry from '../../../lib/dom/selectorRegistry';
 
 export default class UserInfo {
   #userEmail: string;
+  #selectors: SelectorRegistry;
 
   constructor(driver: Driver) {
     this.#userEmail = driver.getUserEmailAddress();
+    this.#selectors = driver.selectors;
   }
 
   /** @deprecated */
   getUserName(): string {
-    const nameEl = document.querySelector<HTMLElement>(
-      'div.gb_w div.gb_B .gb_D',
+    const nameEl = this.#selectors.querySelectorByKey(
+      document,
+      'header.accountName',
     );
     if (nameEl) {
       return nameEl.textContent!;
