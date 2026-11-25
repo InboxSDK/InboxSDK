@@ -1,10 +1,10 @@
 import ajax from './ajax';
 import rateLimit from './rate-limit';
 import getStackTrace from './get-stack-trace';
-import getExtensionId from './get-extension-id';
 import getSessionId from './get-session-id';
 import { BUILD_VERSION } from './version';
 import isObject from 'lodash/isObject';
+import { getExtensionId } from './extension-apis';
 
 export interface LogErrorContext {
   appId?: string;
